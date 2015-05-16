@@ -21,7 +21,7 @@ class BirthdayTypeTest extends BaseTypeTest
      */
     public function testSetInvalidYearsOption()
     {
-        $this->factory->create('birthday', null, array(
+        $this->factory->create('birthday', array(
             'years' => 'bad value',
         ));
     }

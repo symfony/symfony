@@ -10,6 +10,15 @@ CHANGELOG
  * removed `AbstractTypeExtension::setDefaultOptions()` method
  * added `FormTypeInterface::configureOptions()` method
  * added `FormTypeExtensionInterface::configureOptions()` method
+ * removed the `$data` parameter from:
+    - `Symfony\Component\Form\FormFactoryInterface::create()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamed()`
+    - `Symfony\Component\Form\FormFactoryInterface::createForProperty()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamedBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilderForProperty()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createForm()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createFormBuilder()`
 
 2.7.0
 -----

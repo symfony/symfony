@@ -20,7 +20,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     {
         $builder = $this->factory->createBuilder(
             'form',
-            null,
             array(
                 'validation_groups' => 'group',
             )
@@ -65,6 +64,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = array())
     {
-        return $this->factory->create('form', null, $options);
+        return $this->factory->create('form', $options);
     }
 }

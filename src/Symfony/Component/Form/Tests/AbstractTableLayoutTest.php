@@ -42,7 +42,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testLabelIsNotRenderedWhenSetToFalse()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'label' => false,
         ));
         $html = $this->renderRow($form->createView());
@@ -194,7 +194,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->createNamed('names', 'collection', array('a', 'b'), array(
+        $form = $this->factory->createNamed('names', 'collection', array(
+            'data' => array('a', 'b'),
             'type' => 'text',
         ));
 
@@ -212,7 +213,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testEmptyCollection()
     {
-        $form = $this->factory->createNamed('names', 'collection', array(), array(
+        $form = $this->factory->createNamed('names', 'collection', array(
+            'data' => array(),
             'type' => 'text',
         ));
 
@@ -317,7 +319,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamedBuilder('name', 'form')
             ->add($this->factory
-                ->createNamedBuilder('child', 'form', null, array('error_bubbling' => false))
+                ->createNamedBuilder('child', 'form', array('error_bubbling' => false))
                 ->add('grandChild', 'form')
             )
             ->getForm();
@@ -365,7 +367,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeated()
     {
-        $form = $this->factory->createNamed('name', 'repeated', 'foobar', array(
+        $form = $this->factory->createNamed('name', 'repeated', array(
+            'data' => 'foobar',
             'type' => 'text',
         ));
 
@@ -399,7 +402,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedWithCustomOptions()
     {
-        $form = $this->factory->createNamed('name', 'repeated', 'foobar', array(
+        $form = $this->factory->createNamed('name', 'repeated', array(
+            'data' => 'foobar',
             'type' => 'password',
             'first_options' => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2'),
@@ -440,7 +444,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testCollectionRowWithCustomBlock()
     {
         $collection = array('one', 'two', 'three');
-        $form = $this->factory->createNamedBuilder('names', 'collection', $collection)
+        $form = $this->factory->createNamedBuilder('names', 'collection', array('data' => $collection))
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -510,7 +514,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testWidgetContainerAttributes()
     {
-        $form = $this->factory->createNamed('form', 'form', null, array(
+        $form = $this->factory->createNamed('form', 'form', array(
             'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
         ));
 
@@ -524,7 +528,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testWidgetContainerAttributeNameRepeatedIfTrue()
     {
-        $form = $this->factory->createNamed('form', 'form', null, array(
+        $form = $this->factory->createNamed('form', 'form', array(
             'attr' => array('foo' => true),
         ));
 

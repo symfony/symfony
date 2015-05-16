@@ -22,14 +22,13 @@ interface FormFactoryInterface
      * @see createBuilder()
      *
      * @param string|FormTypeInterface $type    The type of the form
-     * @param mixed                    $data    The initial data
      * @param array                    $options The options
      *
      * @return FormInterface The form named after the type
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
      */
-    public function create($type = 'form', $data = null, array $options = array());
+    public function create($type = 'form', array $options = array());
 
     /**
      * Returns a form.
@@ -38,14 +37,13 @@ interface FormFactoryInterface
      *
      * @param string|int               $name    The name of the form
      * @param string|FormTypeInterface $type    The type of the form
-     * @param mixed                    $data    The initial data
      * @param array                    $options The options
      *
      * @return FormInterface The form
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
      */
-    public function createNamed($name, $type = 'form', $data = null, array $options = array());
+    public function createNamed($name, $type = 'form', array $options = array());
 
     /**
      * Returns a form for a property of a class.
@@ -54,41 +52,38 @@ interface FormFactoryInterface
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
-     * @param mixed  $data     The initial data
      * @param array  $options  The options for the builder
      *
      * @return FormInterface The form named after the property
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
      */
-    public function createForProperty($class, $property, $data = null, array $options = array());
+    public function createForProperty($class, $property, array $options = array());
 
     /**
      * Returns a form builder.
      *
      * @param string|FormTypeInterface $type    The type of the form
-     * @param mixed                    $data    The initial data
      * @param array                    $options The options
      *
      * @return FormBuilderInterface The form builder
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
      */
-    public function createBuilder($type = 'form', $data = null, array $options = array());
+    public function createBuilder($type = 'form', array $options = array());
 
     /**
      * Returns a form builder.
      *
      * @param string|int               $name    The name of the form
      * @param string|FormTypeInterface $type    The type of the form
-     * @param mixed                    $data    The initial data
      * @param array                    $options The options
      *
      * @return FormBuilderInterface The form builder
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
      */
-    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array());
+    public function createNamedBuilder($name, $type = 'form', array $options = array());
 
     /**
      * Returns a form builder for a property of a class.
@@ -98,12 +93,11 @@ interface FormFactoryInterface
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
-     * @param mixed  $data     The initial data
      * @param array  $options  The options for the builder
      *
      * @return FormBuilderInterface The form builder named after the property
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
      */
-    public function createBuilderForProperty($class, $property, $data = null, array $options = array());
+    public function createBuilderForProperty($class, $property, array $options = array());
 }

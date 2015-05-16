@@ -39,7 +39,7 @@ class MoneyTypeTest extends TestCase
     {
         \Locale::setDefault('en_US');
 
-        $form = $this->factory->create('money', null, array('currency' => 'JPY'));
+        $form = $this->factory->create('money', array('currency' => 'JPY'));
         $view = $form->createView();
         $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
     }
@@ -49,8 +49,8 @@ class MoneyTypeTest extends TestCase
     {
         \Locale::setDefault('de_DE');
 
-        $form1 = $this->factory->create('money', null, array('currency' => 'GBP'));
-        $form2 = $this->factory->create('money', null, array('currency' => 'EUR'));
+        $form1 = $this->factory->create('money', array('currency' => 'GBP'));
+        $form2 = $this->factory->create('money', array('currency' => 'EUR'));
         $view1 = $form1->createView();
         $view2 = $form2->createView();
 

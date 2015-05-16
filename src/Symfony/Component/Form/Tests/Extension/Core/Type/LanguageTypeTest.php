@@ -39,7 +39,7 @@ class LanguageTypeTest extends TestCase
 
     public function testMultipleLanguagesIsNotIncluded()
     {
-        $form = $this->factory->create('language', 'language');
+        $form = $this->factory->create('language', array('data' => 'language'));
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

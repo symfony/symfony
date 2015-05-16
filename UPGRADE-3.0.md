@@ -308,6 +308,36 @@ UPGRADE FROM 2.x to 3.0
    echo $form->getErrors(true, false);
    ```
 
+ * The `$data` parameter has been removed from:
+
+    - `Symfony\Component\Form\FormFactoryInterface::create()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamed()`
+    - `Symfony\Component\Form\FormFactoryInterface::createForProperty()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamedBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilderForProperty()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createForm()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createFormBuilder()`
+
+   You should use the `data` option instead.
+
+   Before:
+
+   ```php
+   $checkbox = $formFactory->createNamed('readOnly', 'checkbox', true, array(
+       // options ...
+   ));
+   ```
+
+   After:
+
+   ```php
+   $checkbox = $formFactory->createNamed('readOnly', 'checkbox', array(
+       'data' => true,
+       // options ...
+   ));
+   ```
+
 ### FrameworkBundle
 
  * The `getRequest` method of the base `Controller` class has been deprecated

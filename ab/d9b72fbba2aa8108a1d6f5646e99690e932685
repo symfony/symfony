@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-15T13:25:07Z
+
+Looks like the problem is also present in older branches, right? In which case, this should be merged in the right branch.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-15T14:12:53Z
+
+@fabpot : Actually, both `testSelectChoiceFromChoiceList` and `testAmbiguousChoiceFromChoicelist` methods were not present in 2.6. Those were the only two which could be problematic when testing them.
+
+Regarding the change [L206](https://github.com/symfony/symfony/pull/14638/files#diff-27e1f75fc676e61a547e8e8480fbc299L206), you're right, this could have been done in the 2.6 branch. It doesn't even have a link with this issue. It was just an unreachable assert (or at least useless if reached, because what matters is the `$this->fail()` part)
+
+Should I revert this line and submit another PR for this change only, or is there anything else I missed which should be targeted in the 2.6 branch ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T12:32:16Z
+
+@ogizanagi Yes, can you submit a PR on 2.6?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-16T13:11:47Z
+
+@fabpot : Sure. I just submitted https://github.com/symfony/symfony/pull/14661 and reverted incriminated line here.

@@ -77,22 +77,6 @@ class Esi implements SurrogateInterface
     }
 
     /**
-     * Checks that at least one surrogate has ESI/1.0 capability.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
-     */
-    public function hasSurrogateEsiCapability(Request $request)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasSurrogateCapability() method instead.', E_USER_DEPRECATED);
-
-        return $this->hasSurrogateCapability($request);
-    }
-
-    /**
      * Adds ESI/1.0 capability to the given Request.
      *
      * @param Request $request A Request instance
@@ -103,20 +87,6 @@ class Esi implements SurrogateInterface
         $new = 'symfony2="ESI/1.0"';
 
         $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
-    }
-
-    /**
-     * Adds ESI/1.0 capability to the given Request.
-     *
-     * @param Request $request A Request instance
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
-     */
-    public function addSurrogateEsiCapability(Request $request)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addSurrogateCapability() method instead.', E_USER_DEPRECATED);
-
-        $this->addSurrogateCapability($request);
     }
 
     /**
@@ -147,22 +117,6 @@ class Esi implements SurrogateInterface
         }
 
         return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
-    }
-
-    /**
-     * Checks that the Response needs to be parsed for ESI tags.
-     *
-     * @param Response $response A Response instance
-     *
-     * @return bool true if the Response needs to be parsed, false otherwise
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
-     */
-    public function needsEsiParsing(Response $response)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the needsParsing() method instead.', E_USER_DEPRECATED);
-
-        return $this->needsParsing($response);
     }
 
     /**

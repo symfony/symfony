@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-02T06:45:14Z
+
+can you also update the CHANGELOG.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-02T12:53:01Z
+
+@aitboudad sorry i don't understand, update the CHANGELOG.md for what?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-02T12:58:23Z
+
+@dosten just add note about the removed deprecations, you can see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/CHANGELOG.md for example
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-02T13:11:37Z
+
+@aitboudad Done!
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-22T01:50:11Z
+
+ping @stof @fabpot

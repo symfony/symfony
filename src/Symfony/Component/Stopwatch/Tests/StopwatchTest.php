@@ -20,8 +20,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StopwatchTest extends \PHPUnit_Framework_TestCase
 {
-    const DELTA = 20;
-
     public function testStart()
     {
         $stopwatch = new Stopwatch();
@@ -71,11 +69,12 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
-        usleep(200000);
+        usleep(100000);
         $event = $stopwatch->stop('foo');
-
+        $duration = $event->getDuration();
+        usleep(100000);
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+        $this->assertEquals($duration, $event->getDuration());
     }
 
     /**

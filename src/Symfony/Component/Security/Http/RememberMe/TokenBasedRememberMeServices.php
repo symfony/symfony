@@ -125,6 +125,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieValue($class, $username, $expires, $password)
     {
+        // $username is encoded because it might contain COOKIE_DELIMITER,
+        // we assume other values don't
         return $this->encodeCookie(array(
             $class,
             base64_encode($username),

@@ -219,6 +219,27 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Throws a NotFoundHttpException.
+     *
+     * This will result in a 404 response code. Usage example:
+     *
+     *     $object = ...;
+     *     $this->createNotFoundExceptionIfNotExist($object, 'Object does not exist');
+     *
+     * @param mixed           $object   The object
+     * @param string          $message  A message
+     * @param \Exception|null $previous The previous exception
+     *
+     * @throws NotFoundHttpException If the object does not exists
+     */
+    public function createNotFoundExceptionIfNotExist($object = null, $message = 'Not Found', \Exception $previous = null)
+    {
+        if (!$object) {
+            throw $this->createNotFoundException($message, $previous);
+        }
+    }
+
+    /**
      * Returns an AccessDeniedException.
      *
      * This will result in a 403 response code. Usage example:

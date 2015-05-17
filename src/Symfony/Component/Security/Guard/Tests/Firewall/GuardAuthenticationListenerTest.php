@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Guard\Tests\Firewall;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
-use Symfony\Component\Security\Guard\Token\NonAuthenticatedGuardToken;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -44,7 +44,7 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         // a clone of the token that should be created internally
         $uniqueGuardKey = 'my_firewall_0';
-        $nonAuthedToken = new NonAuthenticatedGuardToken($credentials, $uniqueGuardKey);
+        $nonAuthedToken = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
 
         $this->authenticationManager
             ->expects($this->once())

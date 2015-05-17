@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */
-class NonAuthenticatedGuardToken extends AbstractToken
+class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {
     private $credentials;
     private $guardProviderKey;
@@ -51,6 +51,6 @@ class NonAuthenticatedGuardToken extends AbstractToken
 
     public function setAuthenticated($authenticated)
     {
-        throw new \Exception('The NonAuthenticatedGuardToken is *always* not authenticated');
+        throw new \Exception('The PreAuthenticationGuardToken is *always* not authenticated');
     }
 }

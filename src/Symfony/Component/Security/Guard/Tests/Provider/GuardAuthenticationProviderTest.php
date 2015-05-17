@@ -20,7 +20,7 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
     private $userProvider;
     private $userChecker;
-    private $nonAuthedToken;
+    private $preAuthenticationToken;
 
     public function testAuthenticate()
     {
@@ -32,7 +32,7 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $authenticators = array($authenticatorA, $authenticatorB, $authenticatorC);
 
         // called 2 times - for authenticator A and B (stops on B because of match)
-        $this->nonAuthedToken->expects($this->exactly(2))
+        $this->preAuthenticationToken->expects($this->exactly(2))
             ->method('getGuardProviderKey')
             // it will return the "1" index, which will match authenticatorB
             ->will($this->returnValue('my_cool_firewall_1'));
@@ -41,7 +41,7 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             'username' => '_weaverryan_test_user',
             'password' => 'guard_auth_ftw',
         );
-        $this->nonAuthedToken->expects($this->once())
+        $this->preAuthenticationToken->expects($this->once())
             ->method('getCredentials')
             ->will($this->returnValue($enteredCredentials));
 
@@ -71,7 +71,7 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->with($mockedUser);
 
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, $providerKey, $this->userChecker);
-        $actualAuthedToken = $provider->authenticate($this->nonAuthedToken);
+        $actualAuthedToken = $provider->authenticate($this->preAuthenticationToken);
         $this->assertSame($authedToken, $actualAuthedToken);
     }
 
@@ -79,7 +79,7 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
-        $this->nonAuthedToken = $this->getMockBuilder('Symfony\Component\Security\Guard\Token\NonAuthenticatedGuardToken')
+        $this->preAuthenticationToken = $this->getMockBuilder('Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -88,6 +88,6 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->userProvider = null;
         $this->userChecker = null;
-        $this->nonAuthedToken = null;
+        $this->preAuthenticationToken = null;
     }
 }

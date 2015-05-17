@@ -7,17 +7,14 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * A generic token used by the AbstractGuardAuthenticator
+ * Used as an "authenticated" token, though it could be set to not-authenticated later.
  *
- * This is meant to be used as an "authenticated" token, though it
- * could be set to not-authenticated later.
- *
- * You're free to use this (it's simple) or use any other token for
- * your authenticated token
+ * If you're using Guard authentication, you *must* use a class that implements
+ * GuardTokenInterface as your authenticated token (like this class).
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */
-class GenericGuardToken extends AbstractToken
+class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {
     private $providerKey;
 

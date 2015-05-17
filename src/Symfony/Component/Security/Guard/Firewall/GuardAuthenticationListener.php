@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Guard\Token\NonAuthenticatedGuardToken;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Psr\Log\LoggerInterface;
@@ -86,7 +86,7 @@ class GuardAuthenticationListener implements ListenerInterface
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
-            $token = new NonAuthenticatedGuardToken($credentials, $uniqueGuardKey);
+            $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
 
             if (null !== $this->logger) {
                 $this->logger->info('Passing guard token information to the GuardAuthenticationProvider', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));

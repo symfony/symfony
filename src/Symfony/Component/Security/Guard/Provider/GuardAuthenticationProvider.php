@@ -3,15 +3,18 @@
 namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
-use Symfony\Component\Security\Guard\Token\NonAuthenticatedGuardToken;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
+use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Responsible for accepting the NonAuthenticatedGuardToken and calling
+ * Responsible for accepting the PreAuthenticationGuardToken and calling
  * the correct authenticator to retrieve the authenticated token
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
@@ -43,12 +46,12 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * Finds the correct authenticator for the token and calls it
      *
-     * @param NonAuthenticatedGuardToken $token
+     * @param GuardTokenInterface $token
      * @return TokenInterface
      */
     public function authenticate(TokenInterface $token)
     {
-        if (!$token instanceof NonAuthenticatedGuardToken) {
+        if (!$this->supports($token)) {
             throw new \InvalidArgumentException('GuardAuthenticationProvider only supports NonAuthenticatedGuardToken');
         }
 
@@ -69,7 +72,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         ));
     }
 
-    private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, NonAuthenticatedGuardToken $token)
+    private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->authenticate($token->getCredentials(), $this->userProvider);
@@ -101,6 +104,6 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        return $token instanceof NonAuthenticatedGuardToken;
+        return $token instanceof GuardTokenInterface;
     }
 }

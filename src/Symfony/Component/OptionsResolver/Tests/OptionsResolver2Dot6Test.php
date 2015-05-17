@@ -325,7 +325,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('bam', 'baz');
         $this->resolver->setDefault('foo', 'boo');
 
-        $this->assertSame(array('foo', 'bar'), $this->resolver->getRequiredOptions());
+        $this->assertSame(array('bar', 'foo'), $this->resolver->getRequiredOptions());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -451,7 +451,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('baz', 'bam');
         $this->resolver->setRequired('boo');
 
-        $this->assertSame(array('foo', 'bar', 'baz', 'boo'), $this->resolver->getDefinedOptions());
+        $this->assertSame(array('bar', 'baz', 'boo', 'foo'), $this->resolver->getDefinedOptions());
     }
 
     public function testRemovedOptionsAreNotDefined()

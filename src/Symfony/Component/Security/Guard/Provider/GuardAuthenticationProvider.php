@@ -65,6 +65,13 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
              * we will return an AnonymousToken to accomplish that.
              */
 
+            // this should never happen - but technically, the token is
+            // authenticated... so it could jsut be returned
+            if ($token->isAuthenticated()) {
+                return $token;
+            }
+
+            // cause the logout - the token is not authenticated
             return new AnonymousToken($this->providerKey, 'anon.');
         }
 

@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
@@ -67,7 +68,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * @see AbstractGuardAuthenticator
      * @param UserInterface $user
      * @param string $providerKey The provider (i.e. firewall) key
-     * @return TokenInterface
+     * @return GuardTokenInterface
      */
     public function createAuthenticatedToken(UserInterface $user, $providerKey);
 

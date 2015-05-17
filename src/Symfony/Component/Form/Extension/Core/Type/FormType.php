@@ -71,7 +71,6 @@ class FormType extends BaseType
         parent::buildView($view, $form, $options);
 
         $name = $form->getName();
-        $readOnly = $options['read_only'];
 
         if ($view->parent) {
             if ('' === $name) {
@@ -79,13 +78,13 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly) {
-                $readOnly = $view->parent->vars['read_only'];
+            if (!isset($view->vars['attr']['readonly']) && isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly']) {
+                $view->vars['attr']['readonly'] = true;
             }
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only' => $readOnly,
+            'read_only' => isset($view->vars['attr']['readonly']) && false !== $view->vars['attr']['readonly'], // deprecated
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
@@ -185,12 +184,31 @@ class FormType extends BaseType
             return $attributes;
         };
 
+        // BC for "read_only" option
+        $attrNormalizer = function (Options $options, array $attr) {
+            if (!isset($attr['readonly']) && $options['read_only']) {
+                $attr['readonly'] = true;
+            }
+
+            return $attr;
+        };
+
+        $readOnlyNormalizer = function (Options $options, $readOnly) {
+            if (null !== $readOnly) {
+                trigger_error('The form option "read_only" is deprecated since version 2.8 and will be removed in 3.0. Use "attr[\'readonly\']" instead.', E_USER_DEPRECATED);
+
+                return $readOnly;
+            }
+
+            return false;
+        };
+
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
             'required' => true,
-            'read_only' => false,
+            'read_only' => null, // deprecated
             'max_length' => null,
             'pattern' => null,
             'property_path' => null,
@@ -208,6 +226,9 @@ class FormType extends BaseType
             'attr' => $defaultAttr,
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
+
+        $resolver->setNormalizer('attr', $attrNormalizer);
+        $resolver->setNormalizer('read_only', $readOnlyNormalizer);
 
         $resolver->setAllowedTypes('label_attr', 'array');
     }

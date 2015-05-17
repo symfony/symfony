@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-01-08T15:45:36Z
+
+:+1: nice
+
+Maybe use [the new `dump()`](http://symfony.com/doc/current/components/var_dumper/introduction.html) to output the context?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-08T16:57:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T07:05:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2015-01-17T00:04:20Z
+
+looks good but needs a lot of space. i would like to see stats about rendering performance on large logs.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T13:48:14Z
+
+Can you rebase this one?
+
+---------------------------------------------------------------------------
+
+by hason at 2015-05-16T22:04:56Z
+
+@fabpot Rebased.

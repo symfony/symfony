@@ -146,10 +146,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function provideUsernamesForAutoLogin()
     {
         return array(
-            // simple case
-            array('foouser'),
-            // username might contain the delimiter
-            array('foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user'),
+            array('foouser', 'Simple username'),
+            array('foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user', 'Username might contain the delimiter'),
         );
     }
 

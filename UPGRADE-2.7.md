@@ -534,3 +534,33 @@ Validator
  * The PHP7-incompatible constraints (Null, True, False) and related validators
    (NullValidator, TrueValidator, FalseValidator) are marked as deprecated
    in favor of their `Is`-prefixed equivalent.
+
+TwigBundle
+----------
+
+ * The `Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy` is deprecated and no longer
+   used in favor of `Twig_FileExtensionEscapingStrategy`. This means that CSS files automatically
+   use the CSS escape strategy. This can cause different behaviour when outputting reserved
+   characters.
+
+   Before:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_color: '#123456' #}
+   body {
+       background: {{ brand_color }};
+   }
+   ```
+
+   After:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_Color: '#123456' #}
+   body {
+       background: {{ brand_color|raw }};
+   }
+   ```

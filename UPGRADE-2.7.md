@@ -559,7 +559,7 @@ TwigBundle
    ```css
    {# styles.css.twig #}
 
-   {# with brand_Color: '#123456' #}
+   {# with brand_color: '#123456' #}
    body {
        background: {{ brand_color|raw }};
    }

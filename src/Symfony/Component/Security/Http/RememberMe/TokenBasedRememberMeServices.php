@@ -36,6 +36,9 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         list($class, $username, $expires, $hash) = $cookieParts;
+        if (false === $username = base64_decode($username, true)) {
+            throw new AuthenticationException('$username contains a character from outside the base64 alphabet.');
+        }
         try {
             $user = $this->getUserProvider($class)->loadUserByUsername($username);
         } catch (\Exception $ex) {
@@ -122,9 +125,11 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieValue($class, $username, $expires, $password)
     {
+        // $username is encoded because it might contain COOKIE_DELIMITER,
+        // we assume other values don't
         return $this->encodeCookie(array(
             $class,
-            $username,
+            base64_encode($username),
             $expires,
             $this->generateCookieHash($class, $username, $expires, $password),
         ));

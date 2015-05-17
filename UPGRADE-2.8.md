@@ -22,3 +22,38 @@ Translator
         $messages = array_replace_recursive($catalogue->all(), $messages);
     }
    ```
+
+ * The visibility of the `locale` property has been changed from protected to private. Rely on `getLocale` and `setLocale`
+   instead.
+
+   Before:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->locale;
+
+           // update locale
+           $this->locale = $locale;
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->getLocale();
+
+           // update locale
+           $this->setLocale($locale);
+       }
+    }
+   ```

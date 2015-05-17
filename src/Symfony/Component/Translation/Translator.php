@@ -34,7 +34,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @var string
      */
-    protected $locale;
+    private $locale;
 
     /**
      * @var array

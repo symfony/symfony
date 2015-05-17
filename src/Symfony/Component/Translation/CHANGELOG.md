@@ -4,6 +4,7 @@ CHANGELOG
 2.8.0
 -----
 
+ * Changed the visibility of the locale property in `Translator` from protected to private.
  * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
 
 2.7.0

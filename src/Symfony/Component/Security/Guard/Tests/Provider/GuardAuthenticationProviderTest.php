@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Guard\Tests\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
@@ -73,6 +75,22 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, $providerKey, $this->userChecker);
         $actualAuthedToken = $provider->authenticate($this->preAuthenticationToken);
         $this->assertSame($authedToken, $actualAuthedToken);
+    }
+
+    public function testGuardWithNoLongerAuthenticatedTriggersLogout()
+    {
+        $providerKey = 'my_firewall_abc';
+
+        // create a token and mark it as NOT authenticated anymore
+        // this mimics what would happen if a user "changed" between request
+        $mockedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $token = new PostAuthenticationGuardToken($mockedUser, $providerKey, array('ROLE_USER'));
+        $token->setAuthenticated(false);
+
+        $provider = new GuardAuthenticationProvider(array(), $this->userProvider, $providerKey, $this->userChecker);
+        $actualToken = $provider->authenticate($token);
+        // this should return the anonymous user
+        $this->assertEquals(new AnonymousToken($providerKey, 'anon.'), $actualToken);
     }
 
     protected function setUp()

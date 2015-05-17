@@ -55,6 +55,19 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             throw new \InvalidArgumentException('GuardAuthenticationProvider only supports NonAuthenticatedGuardToken');
         }
 
+        if (!$token instanceof PreAuthenticationGuardToken) {
+            /*
+             * The listener *only* passes PreAuthenticationGuardToken instances.
+             * This means that an authenticated token (e.g. PostAuthenticationGuardToken)
+             * is being passed here, which happens if that token becomes
+             * "not authenticated" (e.g. happens if the user changes between
+             * requests). In this case, the user should be logged out, so
+             * we will return an AnonymousToken to accomplish that.
+             */
+
+            return new AnonymousToken($this->providerKey, 'anon.');
+        }
+
         // find the *one* GuardAuthenticator that this token originated from
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
             // get a key that's unique to *this* guard authenticator

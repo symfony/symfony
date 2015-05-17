@@ -119,8 +119,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param int    $expires  The Unix timestamp when the cookie expires
      * @param string $password The encoded password
      *
-     * @throws \RuntimeException if username contains invalid chars
-     *
      * @return string
      */
     protected function generateCookieValue($class, $username, $expires, $password)
@@ -140,8 +138,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param string $username The username
      * @param int    $expires  The Unix timestamp when the cookie expires
      * @param string $password The encoded password
-     *
-     * @throws \RuntimeException when the private key is empty
      *
      * @return string
      */

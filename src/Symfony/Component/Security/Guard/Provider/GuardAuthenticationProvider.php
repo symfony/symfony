@@ -4,7 +4,6 @@ namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
@@ -15,7 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Responsible for accepting the PreAuthenticationGuardToken and calling
- * the correct authenticator to retrieve the authenticated token
+ * the correct authenticator to retrieve the authenticated token.
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */
@@ -30,10 +29,10 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private $userChecker;
 
     /**
-     * @param GuardAuthenticatorInterface[] $guardAuthenticators    The authenticators, with keys that match what's passed to GuardAuthenticationListener
-     * @param UserProviderInterface         $userProvider           The user provider
-     * @param string                        $providerKey            The provider (i.e. firewall) key
-     * @param UserCheckerInterface $userChecker
+     * @param GuardAuthenticatorInterface[] $guardAuthenticators The authenticators, with keys that match what's passed to GuardAuthenticationListener
+     * @param UserProviderInterface         $userProvider        The user provider
+     * @param string                        $providerKey         The provider (i.e. firewall) key
+     * @param UserCheckerInterface          $userChecker
      */
     public function __construct(array $guardAuthenticators, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker)
     {
@@ -44,9 +43,10 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     }
 
     /**
-     * Finds the correct authenticator for the token and calls it
+     * Finds the correct authenticator for the token and calls it.
      *
      * @param GuardTokenInterface $token
+     *
      * @return TokenInterface
      */
     public function authenticate(TokenInterface $token)
@@ -66,7 +66,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
              */
 
             // this should never happen - but technically, the token is
-            // authenticated... so it could jsut be returned
+            // authenticated... so it could just be returned
             if ($token->isAuthenticated()) {
                 return $token;
             }
@@ -106,7 +106,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         // check the AdvancedUserInterface methods!
-        $this->userChecker->checkPreAuth($user);;
+        $this->userChecker->checkPreAuth($user);
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface

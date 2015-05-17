@@ -59,13 +59,13 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'provider' => 'some_provider',
-                'entry_point' => 'the_entry_point'
+                'entry_point' => 'the_entry_point',
             ),
             array(
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'provider' => 'some_provider',
-                'entry_point' => 'the_entry_point'
-            )
+                'entry_point' => 'the_entry_point',
+            ),
         );
 
         // testing xml config fix: authenticator -> authenticators
@@ -76,7 +76,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'entry_point' => null,
-            )
+            ),
         );
 
         return $tests;
@@ -88,7 +88,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
 
         // testing not empty
         $tests[] = array(
-            array('authenticators' => array())
+            array('authenticators' => array()),
         );
 
         return $tests;
@@ -108,7 +108,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'index_0' => array(new Reference('authenticator123')),
             'index_1' => new Reference('my_user_provider'),
-            'index_2' => 'my_firewall'
+            'index_2' => 'my_firewall',
         ), $providerDefinition->getArguments());
 
         $listenerDefinition = $container->getDefinition('security.authentication.listener.guard.my_firewall');
@@ -152,7 +152,6 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         );
         $this->executeCreate($config, null);
     }
-
 
     public function testCreateWithEntryPoint()
     {

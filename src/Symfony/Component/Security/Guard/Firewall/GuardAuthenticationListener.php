@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
- * Authentication listener for the "guard" system
+ * Authentication listener for the "guard" system.
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */
@@ -30,11 +30,11 @@ class GuardAuthenticationListener implements ListenerInterface
     private $rememberMeServices;
 
     /**
-     * @param GuardAuthenticatorHandler       $guardHandler          The Guard handler
-     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                          $providerKey           The provider (i.e. firewall) key
-     * @param GuardAuthenticatorInterface[]   $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
-     * @param LoggerInterface                 $logger                A LoggerInterface instance
+     * @param GuardAuthenticatorHandler      $guardHandler          The Guard handler
+     * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                         $providerKey           The provider (i.e. firewall) key
+     * @param GuardAuthenticatorInterface[]  $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
+     * @param LoggerInterface                $logger                A LoggerInterface instance
      */
     public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
     {
@@ -50,7 +50,7 @@ class GuardAuthenticationListener implements ListenerInterface
     }
 
     /**
-     * Iterates over each authenticator to see if each wants to authenticate the request
+     * Iterates over each authenticator to see if each wants to authenticate the request.
      *
      * @param GetResponseEvent $event
      */
@@ -147,12 +147,12 @@ class GuardAuthenticationListener implements ListenerInterface
 
     /**
      * Checks to see if remember me is supported in the authenticator and
-     * on the firewall. If it is, the RememberMeServicesInterface is notified
+     * on the firewall. If it is, the RememberMeServicesInterface is notified.
      *
      * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param Request $request
-     * @param TokenInterface $token
-     * @param Response $response
+     * @param Request                     $request
+     * @param TokenInterface              $token
+     * @param Response                    $response
      */
     private function triggerRememberMe(GuardAuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {

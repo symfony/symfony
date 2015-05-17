@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
- * A utility class that does much of the *work* during the guard authentication process
+ * A utility class that does much of the *work* during the guard authentication process.
  *
  * By having the logic here instead of the listener, more of the process
  * can be called directly (e.g. for manual authentication) or overridden.
@@ -33,10 +33,10 @@ class GuardAuthenticatorHandler
     }
 
     /**
-     * Authenticates the given token in the system
+     * Authenticates the given token in the system.
      *
      * @param TokenInterface $token
-     * @param Request $request
+     * @param Request        $request
      */
     public function authenticateWithToken(TokenInterface $token, Request $request)
     {
@@ -49,12 +49,13 @@ class GuardAuthenticatorHandler
     }
 
     /**
-     * Returns the "on success" response for the given GuardAuthenticator
+     * Returns the "on success" response for the given GuardAuthenticator.
      *
-     * @param TokenInterface $token
-     * @param Request $request
+     * @param TokenInterface              $token
+     * @param Request                     $request
      * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string $providerKey The provider (i.e. firewall) key
+     * @param string                      $providerKey        The provider (i.e. firewall) key
+     *
      * @return null|Response
      */
     public function handleAuthenticationSuccess(TokenInterface $token, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
@@ -75,12 +76,13 @@ class GuardAuthenticatorHandler
 
     /**
      * Convenience method for authenticating the user and returning the
-     * Response *if any* for success
+     * Response *if any* for success.
      *
-     * @param UserInterface $user
-     * @param Request $request
+     * @param UserInterface               $user
+     * @param Request                     $request
      * @param GuardAuthenticatorInterface $authenticator
-     * @param string $providerKey The provider (i.e. firewall) key
+     * @param string                      $providerKey   The provider (i.e. firewall) key
+     *
      * @return Response|null
      */
     public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, GuardAuthenticatorInterface $authenticator, $providerKey)
@@ -96,11 +98,12 @@ class GuardAuthenticatorHandler
 
     /**
      * Handles an authentication failure and returns the Response for the
-     * GuardAuthenticator
+     * GuardAuthenticator.
      *
-     * @param AuthenticationException $authenticationException
-     * @param Request $request
+     * @param AuthenticationException     $authenticationException
+     * @param Request                     $request
      * @param GuardAuthenticatorInterface $guardAuthenticator
+     *
      * @return null|Response
      */
     public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator)

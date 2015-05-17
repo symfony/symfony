@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 interface AuthenticationEntryPointInterface
 {
     /**
-     * Returns a response that directs the user to authenticate
+     * Returns a response that directs the user to authenticate.
      *
      * This is called when an anonymous request accesses a resource that
      * requires authentication. The job of this method is to return some

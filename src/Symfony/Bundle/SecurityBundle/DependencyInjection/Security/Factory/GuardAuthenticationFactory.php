@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Configures the "guard" authentication provider key under a firewall
+ * Configures the "guard" authentication provider key under a firewall.
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */

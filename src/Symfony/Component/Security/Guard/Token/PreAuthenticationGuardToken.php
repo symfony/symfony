@@ -5,7 +5,7 @@ namespace Symfony\Component\Security\Guard\Token;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 /**
- * The token used by the guard auth system before authentication
+ * The token used by the guard auth system before authentication.
  *
  * The GuardAuthenticationListener creates this, which is then consumed
  * immediately by the GuardAuthenticationProvider. If authentication is

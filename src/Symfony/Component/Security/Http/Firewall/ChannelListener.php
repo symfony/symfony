@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Psr\Log\LoggerInterface;
@@ -32,7 +33,7 @@ class ChannelListener implements ListenerInterface
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -47,9 +48,7 @@ class ChannelListener implements ListenerInterface
         list($attributes, $channel) = $this->map->getPatterns($request);
 
         if ('https' === $channel && !$request->isSecure()) {
-            if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTPS');
-            }
+            $this->logger->info('Redirecting to HTTPS');
 
             $response = $this->authenticationEntryPoint->start($request);
 
@@ -59,9 +58,7 @@ class ChannelListener implements ListenerInterface
         }
 
         if ('http' === $channel && $request->isSecure()) {
-            if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTP');
-            }
+            $this->logger->info('Redirecting to HTTP');
 
             $response = $this->authenticationEntryPoint->start($request);
 

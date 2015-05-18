@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -33,7 +34,7 @@ class ExceptionListener implements EventSubscriberInterface
     public function __construct($controller, LoggerInterface $logger = null)
     {
         $this->controller = $controller;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -97,14 +98,17 @@ class ExceptionListener implements EventSubscriberInterface
     {
         $isCritical = !$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500;
         $context = array('exception' => $exception);
-        if (null !== $this->logger) {
-            if ($isCritical) {
-                $this->logger->critical($message, $context);
-            } else {
-                $this->logger->error($message, $context);
-            }
-        } elseif (!$original || $isCritical) {
+
+        if ($this->logger instanceof NullLogger && (!$original || $isCritical)) {
             error_log($message);
+
+            return;
+        }
+
+        if ($isCritical) {
+            $this->logger->critical($message, $context);
+        } else {
+            $this->logger->error($message, $context);
         }
     }
 }

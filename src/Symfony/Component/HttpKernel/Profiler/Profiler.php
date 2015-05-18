@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
@@ -52,7 +53,7 @@ class Profiler
     public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null)
     {
         $this->storage = $storage;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -108,7 +109,7 @@ class Profiler
      */
     public function saveProfile(Profile $profile)
     {
-        if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
+        if (!($ret = $this->storage->write($profile))) {
             $this->logger->warning('Unable to store the profiler information.');
         }
 

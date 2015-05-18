@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
@@ -43,7 +44,7 @@ class BasicAuthenticationListener implements ListenerInterface
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->ignoreFailure = false;
     }
 
@@ -66,9 +67,7 @@ class BasicAuthenticationListener implements ListenerInterface
             }
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Basic Authentication Authorization header found for user "%s"', $username));
-        }
+        $this->logger->info(sprintf('Basic Authentication Authorization header found for user "%s"', $username));
 
         try {
             $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->headers->get('PHP_AUTH_PW'), $this->providerKey));
@@ -79,9 +78,7 @@ class BasicAuthenticationListener implements ListenerInterface
                 $this->securityContext->setToken(null);
             }
 
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
-            }
+            $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
 
             if ($this->ignoreFailure) {
                 return;

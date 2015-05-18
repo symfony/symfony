@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Psr\Log\LoggerInterface;
@@ -51,7 +52,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     {
         $this->dispatcher = $dispatcher;
         $this->stopwatch = $stopwatch;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->called = array();
         $this->wrappedListeners = array();
         $this->firstCalledEvent = array();
@@ -175,9 +176,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         try {
             $allListeners = $this->getListeners();
         } catch (\Exception $e) {
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf('An exception was thrown while getting the uncalled listeners (%s)', $e->getMessage()), array('exception' => $e));
-            }
+            $this->logger->info(sprintf('An exception was thrown while getting the uncalled listeners (%s)', $e->getMessage()), array('exception' => $e));
 
             // unable to retrieve the uncalled listeners
             return array();
@@ -218,7 +217,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     public function logSkippedListeners($eventName, $eventId, Event $event, $listener)
     {
-        if (null === $this->logger) {
+        if ($this->logger instanceof NullLogger) {
             return;
         }
 
@@ -261,9 +260,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         $info = $this->getListenerInfo($listener, $eventId, $eventName);
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, $info['pretty']));
-        }
+        $this->logger->debug(sprintf('Notified event "%s" to listener "%s".', $eventName, $info['pretty']));
 
         $this->called[$eventName.'.'.$info['pretty']] = $info;
 

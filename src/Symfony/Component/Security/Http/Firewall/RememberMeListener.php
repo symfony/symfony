@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -48,7 +49,7 @@ class RememberMeListener implements ListenerInterface
         $this->securityContext = $securityContext;
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->dispatcher = $dispatcher;
     }
 
@@ -77,17 +78,14 @@ class RememberMeListener implements ListenerInterface
                 $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
 
-            if (null !== $this->logger) {
-                $this->logger->debug('SecurityContext populated with remember-me token.');
-            }
+            $this->logger->debug('SecurityContext populated with remember-me token.');
+
         } catch (AuthenticationException $failed) {
-            if (null !== $this->logger) {
-                $this->logger->warning(
-                    'SecurityContext not populated with remember-me token as the'
-                   .' AuthenticationManager rejected the AuthenticationToken returned'
-                   .' by the RememberMeServices: '.$failed->getMessage()
-                );
-            }
+            $this->logger->warning(
+                'SecurityContext not populated with remember-me token as the'
+               .' AuthenticationManager rejected the AuthenticationToken returned'
+               .' by the RememberMeServices: '.$failed->getMessage()
+            );
 
             $this->rememberMeServices->loginFail($request);
         }

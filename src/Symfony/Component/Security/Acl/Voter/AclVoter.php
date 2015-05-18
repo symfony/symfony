@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Acl\Voter;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
@@ -42,7 +43,7 @@ class AclVoter implements VoterInterface
         $this->permissionMap = $permissionMap;
         $this->objectIdentityRetrievalStrategy = $oidRetrievalStrategy;
         $this->securityIdentityRetrievalStrategy = $sidRetrievalStrategy;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->allowIfObjectIdentityUnavailable = $allowIfObjectIdentityUnavailable;
     }
 
@@ -63,9 +64,7 @@ class AclVoter implements VoterInterface
             }
 
             if (null === $object) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
-                }
+                $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
             } elseif ($object instanceof FieldVote) {
@@ -78,9 +77,7 @@ class AclVoter implements VoterInterface
             if ($object instanceof ObjectIdentityInterface) {
                 $oid = $object;
             } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
-                }
+                $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
             }
@@ -95,34 +92,24 @@ class AclVoter implements VoterInterface
                 $acl = $this->aclProvider->findAcl($oid, $sids);
 
                 if (null === $field && $acl->isGranted($masks, $sids, false)) {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
-                    }
+                    $this->logger->debug('ACL found, permission granted. Voting to grant access');
 
                     return self::ACCESS_GRANTED;
                 } elseif (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
-                    }
+                    $this->logger->debug('ACL found, permission granted. Voting to grant access');
 
                     return self::ACCESS_GRANTED;
                 }
 
-                if (null !== $this->logger) {
-                    $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
-                }
+                $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             } catch (AclNotFoundException $noAcl) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('No ACL found for the object identity. Voting to deny access.');
-                }
+                $this->logger->debug('No ACL found for the object identity. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             } catch (NoAceFoundException $noAce) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('ACL found, no ACE applicable. Voting to deny access.');
-                }
+                $this->logger->debug('ACL found, no ACE applicable. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             }

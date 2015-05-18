@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -102,7 +103,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             'failure_forward' => false,
             'require_previous_session' => true,
         ), $options);
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->dispatcher = $dispatcher;
         $this->httpUtils = $httpUtils;
     }
@@ -191,9 +192,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     private function onFailure(GetResponseEvent $event, Request $request, AuthenticationException $failed)
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
-        }
+        $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
 
         $token = $this->securityContext->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
@@ -211,9 +210,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
-        }
+        $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
 
         $this->securityContext->setToken($token);
 

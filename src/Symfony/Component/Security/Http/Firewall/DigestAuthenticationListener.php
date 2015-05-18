@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
@@ -47,7 +48,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->provider = $provider;
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -73,9 +74,7 @@ class DigestAuthenticationListener implements ListenerInterface
             }
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Digest Authorization header received from user agent: %s', $header));
-        }
+        $this->logger->debug(sprintf('Digest Authorization header received from user agent: %s', $header));
 
         try {
             $digestAuth->validateAndDecode($this->authenticationEntryPoint->getKey(), $this->authenticationEntryPoint->getRealmName());
@@ -100,9 +99,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if ($serverDigestMd5 !== $digestAuth->getResponse()) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
-            }
+            $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
 
             $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
 
@@ -115,9 +112,7 @@ class DigestAuthenticationListener implements ListenerInterface
             return;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
-        }
+        $this->logger->info(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
 
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
@@ -129,9 +124,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->securityContext->setToken(null);
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info($authException);
-        }
+        $this->logger->info($authException);
 
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
     }

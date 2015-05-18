@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Logger;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Psr\Log\LoggerInterface;
 
@@ -47,7 +48,7 @@ class PropelLogger
      */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->queries = array();
         $this->stopwatch = $stopwatch;
         $this->isPrepared = false;
@@ -60,9 +61,7 @@ class PropelLogger
      */
     public function alert($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->alert($message);
-        }
+        $this->logger->alert($message);
     }
 
     /**
@@ -72,9 +71,7 @@ class PropelLogger
      */
     public function crit($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->critical($message);
-        }
+        $this->logger->critical($message);
     }
 
     /**
@@ -84,9 +81,7 @@ class PropelLogger
      */
     public function err($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->error($message);
-        }
+        $this->logger->error($message);
     }
 
     /**
@@ -96,9 +91,7 @@ class PropelLogger
      */
     public function warning($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->warning($message);
-        }
+        $this->logger->warning($message);
     }
 
     /**
@@ -108,9 +101,7 @@ class PropelLogger
      */
     public function notice($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->notice($message);
-        }
+        $this->logger->notice($message);
     }
 
     /**
@@ -120,9 +111,7 @@ class PropelLogger
      */
     public function info($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->info($message);
-        }
+        $this->logger->info($message);
     }
 
     /**
@@ -152,9 +141,7 @@ class PropelLogger
 
         if ($add) {
             $this->queries[] = $message;
-            if (null !== $this->logger) {
-                $this->logger->debug($message);
-            }
+            $this->logger->debug($message);
         }
     }
 

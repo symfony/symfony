@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -32,7 +33,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     {
         $this->context = $context;
         $this->key = $key;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -47,9 +48,6 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         $this->context->setToken(new AnonymousToken($this->key, 'anon.', array()));
-
-        if (null !== $this->logger) {
-            $this->logger->info('Populated SecurityContext with an anonymous Token');
-        }
+        $this->logger->info('Populated SecurityContext with an anonymous Token');
     }
 }

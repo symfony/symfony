@@ -47,7 +47,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
     public function getCredentials(Request $request);
 
     /**
-     * Return a UserInterface object based on the credentials
+     * Return a UserInterface object based on the credentials.
      *
      * The *credentials* are the return value from getCredentials()
      *
@@ -64,14 +64,14 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
     public function getUser($credentials, UserProviderInterface $userProvider);
 
     /**
-     * Throw an AuthenticationException if the credentials are invalid
+     * Throw an AuthenticationException if the credentials are invalid.
      *
      * The *credentials* are the return value from getCredentials()
      *
-     * @param mixed $credentials
+     * @param mixed         $credentials
      * @param UserInterface $user
+     *
      * @throws AuthenticationException
-     * @return void
      */
     public function checkCredentials($credentials, UserInterface $user);
 

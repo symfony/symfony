@@ -3,10 +3,11 @@
 namespace Symfony\Component\Security\Guard\Token;
 
 /**
- * An empty interface that both guard tokens implement.
+ * A marker interface that both guard tokens implement.
  *
- * This interface is used by the GuardAuthenticationProvider to know
- * that a token belongs to its system.
+ * Any tokens passed to GuardAuthenticationProvider (i.e. any tokens that
+ * are handled by the guard auth system) must implement this
+ * interface.
  *
  * @author Ryan Weaver <weaverryan@gmail.com>
  */

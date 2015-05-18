@@ -74,11 +74,11 @@ class GuardAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
         try {
             if (null !== $this->logger) {
-                $this->logger->info('Calling getCredentialsFromRequest on guard configurator', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
+                $this->logger->info('Calling getCredentials on guard configurator.', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
             }
 
             // allow the authenticator to fetch authentication info from the request
-            $credentials = $guardAuthenticator->getCredentialsFromRequest($request);
+            $credentials = $guardAuthenticator->getCredentials($request);
 
             // allow null to be returned to skip authentication
             if (null === $credentials) {

@@ -38,7 +38,7 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $credentials = array('username' => 'weaverryan', 'password' => 'all_your_base');
         $authenticator
             ->expects($this->once())
-            ->method('getCredentialsFromRequest')
+            ->method('getCredentials')
             ->with($this->equalTo($this->request))
             ->will($this->returnValue($credentials));
 
@@ -87,7 +87,7 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticator
             ->expects($this->once())
-            ->method('getCredentialsFromRequest')
+            ->method('getCredentials')
             ->with($this->equalTo($this->request))
             ->will($this->returnValue(array('username' => 'anything_not_empty')));
 
@@ -130,7 +130,7 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $authException = new AuthenticationException('Get outta here crazy user with a bad password!');
         $authenticator
             ->expects($this->once())
-            ->method('getCredentialsFromRequest')
+            ->method('getCredentials')
             ->will($this->throwException($authException));
 
         // this is not called
@@ -162,11 +162,11 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticatorA
             ->expects($this->once())
-            ->method('getCredentialsFromRequest')
+            ->method('getCredentials')
             ->will($this->returnValue(null));
         $authenticatorB
             ->expects($this->once())
-            ->method('getCredentialsFromRequest')
+            ->method('getCredentials')
             ->will($this->returnValue(null));
 
         // this is not called

@@ -70,7 +70,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param \DateTime $dateTime Normalized date.
+     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
      * @return string|array Localized date string/array.
      *
@@ -84,17 +84,18 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        // DateTimeInterface was introduced in PHP 5.5.0.
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
         // convert time to UTC before passing it to the formatter
         $dateTime = clone $dateTime;
         if ('UTC' !== $this->inputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone('UTC'));
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
-        $value = $this->getIntlDateFormatter()->format((int) $dateTime->format('U'));
+        $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());
 
         if (intl_get_error_code() != 0) {
             throw new TransformationFailedException(intl_get_error_message());

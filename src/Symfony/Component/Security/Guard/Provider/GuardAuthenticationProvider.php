@@ -52,7 +52,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            throw new \InvalidArgumentException('GuardAuthenticationProvider only supports NonAuthenticatedGuardToken');
+            throw new \InvalidArgumentException('GuardAuthenticationProvider only supports GuardTokenInterface.');
         }
 
         if (!$token instanceof PreAuthenticationGuardToken) {
@@ -87,7 +87,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         throw new \LogicException(sprintf(
-            'The correct GuardAuthenticator could not be found for unique key "%s". The listener and provider should be passed the same list of authenticators!?',
+            'The correct GuardAuthenticator could not be found for unique key "%s". The listener and provider should be passed the same list of authenticators.',
             $token->getGuardProviderKey()
         ));
     }
@@ -99,7 +99,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
         if (!$user instanceof UserInterface) {
             throw new \UnexpectedValueException(sprintf(
-                'The %s::authenticate method must return a UserInterface. You returned %s',
+                'The %s::authenticate method must return a UserInterface. You returned %s.',
                 get_class($guardAuthenticator),
                 is_object($user) ? get_class($user) : gettype($user)
             ));
@@ -113,7 +113,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
             throw new \UnexpectedValueException(sprintf(
-                'The %s::createAuthenticatedToken method must return a TokenInterface. You returned %s',
+                'The %s::createAuthenticatedToken method must return a TokenInterface. You returned %s.',
                 get_class($guardAuthenticator),
                 is_object($authenticatedToken) ? get_class($authenticatedToken) : gettype($authenticatedToken)
             ));

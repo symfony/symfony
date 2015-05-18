@@ -162,7 +162,7 @@ class GuardAuthenticationListener implements ListenerInterface
 
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
-                $this->logger->info('Remember me skipped: it is not configured for the firewall', array('authenticator' => get_class($guardAuthenticator)));
+                $this->logger->info('Remember me skipped: it is not configured for the firewall.', array('authenticator' => get_class($guardAuthenticator)));
             }
 
             return;

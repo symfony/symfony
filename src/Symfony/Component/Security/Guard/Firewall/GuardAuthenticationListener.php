@@ -36,7 +36,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param GuardAuthenticatorInterface[]  $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      * @param LoggerInterface                $logger                A LoggerInterface instance
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, array $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -57,7 +57,7 @@ class GuardAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Checking for guard authentication credentials', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
+            $this->logger->info('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
         }
 
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
@@ -121,13 +121,13 @@ class GuardAuthenticationListener implements ListenerInterface
         $response = $this->guardHandler->handleAuthenticationSuccess($token, $request, $guardAuthenticator, $this->providerKey);
         if ($response instanceof Response) {
             if (null !== $this->logger) {
-                $this->logger->info('Guard authenticator set success response', array('response' => $response, 'authenticator' => get_class($guardAuthenticator)));
+                $this->logger->info('Guard authenticator set success response.', array('response' => $response, 'authenticator' => get_class($guardAuthenticator)));
             }
 
             $event->setResponse($response);
         } else {
             if (null !== $this->logger) {
-                $this->logger->info('Guard authenticator set no success response: request continues', array('authenticator' => get_class($guardAuthenticator)));
+                $this->logger->info('Guard authenticator set no success response: request continues.', array('authenticator' => get_class($guardAuthenticator)));
             }
         }
 

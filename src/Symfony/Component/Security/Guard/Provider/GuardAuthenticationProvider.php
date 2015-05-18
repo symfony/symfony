@@ -4,6 +4,7 @@ namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
@@ -95,18 +96,28 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
-        $user = $guardAuthenticator->authenticate($token->getCredentials(), $this->userProvider);
+        $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
+
+        if (null === $user) {
+            throw new UsernameNotFoundException(sprintf(
+                'Null returned from %s::getUser()',
+                get_class($guardAuthenticator)
+            ));
+        }
 
         if (!$user instanceof UserInterface) {
             throw new \UnexpectedValueException(sprintf(
-                'The %s::authenticate method must return a UserInterface. You returned %s.',
+                'The %s::getUser method must return a UserInterface. You returned %s.',
                 get_class($guardAuthenticator),
                 is_object($user) ? get_class($user) : gettype($user)
             ));
         }
 
-        // check the AdvancedUserInterface methods!
+        // check the preAuth UserChecker
         $this->userChecker->checkPreAuth($user);
+        // check the credentials
+        $guardAuthenticator->checkCredentials($token->getCredentials(), $user);
+        // check the postAuth UserChecker
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface

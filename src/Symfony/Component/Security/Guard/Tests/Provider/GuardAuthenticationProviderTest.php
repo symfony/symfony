@@ -43,21 +43,25 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             'username' => '_weaverryan_test_user',
             'password' => 'guard_auth_ftw',
         );
-        $this->preAuthenticationToken->expects($this->once())
+        $this->preAuthenticationToken->expects($this->atLeastOnce())
             ->method('getCredentials')
             ->will($this->returnValue($enteredCredentials));
 
         // authenticators A and C are never called
         $authenticatorA->expects($this->never())
-            ->method('authenticate');
+            ->method('getUser');
         $authenticatorC->expects($this->never())
-            ->method('authenticate');
+            ->method('getUser');
 
         $mockedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $authenticatorB->expects($this->once())
-            ->method('authenticate')
+            ->method('getUser')
             ->with($enteredCredentials, $this->userProvider)
             ->will($this->returnValue($mockedUser));
+        // checkCredentials is called
+        $authenticatorB->expects($this->once())
+            ->method('checkCredentials')
+            ->with($enteredCredentials, $mockedUser);
         $authedToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $authenticatorB->expects($this->once())
             ->method('createAuthenticatedToken')

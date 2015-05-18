@@ -27,7 +27,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * as any type (e.g. an associate array). If you return null, authentication
      * will be skipped.
      *
-     * Whatever value you return here will be passed to authenticate()
+     * Whatever value you return here will be passed to getUser() and checkCredentials()
      *
      * For example, for a form login, you might:
      *
@@ -47,19 +47,33 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
     public function getCredentials(Request $request);
 
     /**
-     * Return a UserInterface object based on the credentials OR throw
-     * an AuthenticationException.
+     * Return a UserInterface object based on the credentials
      *
      * The *credentials* are the return value from getCredentials()
+     *
+     * You may throw an AuthenticationException if you wish. If you return
+     * null, then a UsernameNotFoundException is thrown for you.
      *
      * @param mixed                 $credentials
      * @param UserProviderInterface $userProvider
      *
      * @throws AuthenticationException
      *
-     * @return UserInterface
+     * @return UserInterface|null
      */
-    public function authenticate($credentials, UserProviderInterface $userProvider);
+    public function getUser($credentials, UserProviderInterface $userProvider);
+
+    /**
+     * Throw an AuthenticationException if the credentials are invalid
+     *
+     * The *credentials* are the return value from getCredentials()
+     *
+     * @param mixed $credentials
+     * @param UserInterface $user
+     * @throws AuthenticationException
+     * @return void
+     */
+    public function checkCredentials($credentials, UserInterface $user);
 
     /**
      * Create an authenticated token for the given user.

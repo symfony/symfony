@@ -309,7 +309,11 @@ class Request
         } elseif (in_array($request->headers->get('CONTENT_TYPE'), array('application/json', 'application/x-json')) &&
             in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('POST', 'PUT', 'DELETE', 'PATCH'))
         ) {
-            $request->request = new ParameterBag(json_decode($request->getContent(), true));
+            $data = json_decode($request->getContent(), true);
+
+            if (false !== $data && is_array($data)) {
+                $request->request = new ParameterBag(json_decode($request->getContent(), true));
+            }
         }
 
         return $request;

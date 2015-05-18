@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Psr\Log\LoggerInterface;
@@ -47,7 +48,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     {
         $this->httpKernel = $httpKernel;
         $this->httpUtils = $httpUtils;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
 
         $this->options = array_merge(array(
             'failure_path' => null,
@@ -71,9 +72,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         }
 
         if ($this->options['failure_forward']) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
-            }
+            $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
 
             $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
@@ -81,9 +80,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
             return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-        }
+        $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
 
         $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
 

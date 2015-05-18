@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $this->realmName = $realmName;
         $this->key = $key;
         $this->nonceValiditySeconds = $nonceValiditySeconds;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -53,9 +54,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
             $authenticateHeader .= ', stale="true"';
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('WWW-Authenticate header sent to user agent: "%s"', $authenticateHeader));
-        }
+        $this->logger->debug(sprintf('WWW-Authenticate header sent to user agent: "%s"', $authenticateHeader));
 
         $response = new Response();
         $response->headers->set('WWW-Authenticate', $authenticateHeader);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
@@ -41,7 +42,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
 
         parent::__construct($resolver);
     }

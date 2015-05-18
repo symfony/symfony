@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -55,7 +56,7 @@ class ContextListener implements ListenerInterface
         $this->context = $context;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->dispatcher = $dispatcher;
     }
 
@@ -81,17 +82,12 @@ class ContextListener implements ListenerInterface
         }
 
         $token = unserialize($token);
-
-        if (null !== $this->logger) {
-            $this->logger->debug('Read SecurityContext from the session');
-        }
+        $this->logger->debug('Read SecurityContext from the session');
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
         } elseif (null !== $token) {
-            if (null !== $this->logger) {
-                $this->logger->warning(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
-            }
+            $this->logger->warning(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
 
             $token = null;
         }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Util;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * A secure random number generator implementation.
@@ -40,15 +41,13 @@ final class SecureRandom implements SecureRandomInterface
     public function __construct($seedFile = null, LoggerInterface $logger = null)
     {
         $this->seedFile = $seedFile;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
 
         // determine whether to use OpenSSL
         if ('\\' === DIRECTORY_SEPARATOR && PHP_VERSION_ID < 50304) {
             $this->useOpenSsl = false;
         } elseif (!function_exists('openssl_random_pseudo_bytes')) {
-            if (null !== $this->logger) {
-                $this->logger->notice('It is recommended that you enable the "openssl" extension for random number generation.');
-            }
+            $this->logger->notice('It is recommended that you enable the "openssl" extension for random number generation.');
             $this->useOpenSsl = false;
         } else {
             $this->useOpenSsl = true;
@@ -68,9 +67,7 @@ final class SecureRandom implements SecureRandomInterface
                 return $bytes;
             }
 
-            if (null !== $this->logger) {
-                $this->logger->info('OpenSSL did not produce a secure random number.');
-            }
+            $this->logger->info('OpenSSL did not produce a secure random number.');
         }
 
         // initialize seed

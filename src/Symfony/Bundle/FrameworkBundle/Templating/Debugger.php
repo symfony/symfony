@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Templating\DebuggerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -30,7 +31,7 @@ class Debugger implements DebuggerInterface
      */
     public function __construct(LoggerInterface $logger = null)
     {
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -40,8 +41,6 @@ class Debugger implements DebuggerInterface
      */
     public function log($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->debug($message);
-        }
+        $this->logger->debug($message);
     }
 }

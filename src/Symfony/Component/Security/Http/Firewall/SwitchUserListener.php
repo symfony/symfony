@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -63,7 +64,7 @@ class SwitchUserListener implements ListenerInterface
         $this->accessDecisionManager = $accessDecisionManager;
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
         $this->dispatcher = $dispatcher;
     }
 
@@ -127,9 +128,7 @@ class SwitchUserListener implements ListenerInterface
 
         $username = $request->get($this->usernameParameter);
 
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
-        }
+        $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));
 
         $user = $this->provider->loadUserByUsername($username);
         $this->userChecker->checkPostAuth($user);

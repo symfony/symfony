@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -56,7 +57,7 @@ class ExceptionListener
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -94,9 +95,7 @@ class ExceptionListener
 
     private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
-        }
+        $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
 
         try {
             $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
@@ -111,9 +110,7 @@ class ExceptionListener
 
         $token = $this->context->getToken();
         if (!$this->authenticationTrustResolver->isFullFledged($token)) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
-            }
+            $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
 
             try {
                 $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
@@ -127,9 +124,7 @@ class ExceptionListener
             return;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
-        }
+        $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
 
         try {
             if (null !== $this->accessDeniedHandler) {
@@ -145,9 +140,7 @@ class ExceptionListener
                 $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
             }
         } catch (\Exception $e) {
-            if (null !== $this->logger) {
-                $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
-            }
+            $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
 
             $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
         }
@@ -155,9 +148,7 @@ class ExceptionListener
 
     private function handleLogoutException(LogoutException $exception)
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
-        }
+        $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
     }
 
     /**
@@ -174,9 +165,7 @@ class ExceptionListener
             throw $authException;
         }
 
-        if (null !== $this->logger) {
-            $this->logger->debug('Calling Authentication entry point');
-        }
+        $this->logger->debug('Calling Authentication entry point');
 
         $this->setTargetPath($request);
 

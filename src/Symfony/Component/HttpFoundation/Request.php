@@ -311,7 +311,7 @@ class Request
         ) {
             $data = json_decode($request->getContent(), true);
 
-            if (false !== $data && is_array($data)) {
+            if (null !== $data && is_array($data)) {
                 $request->request = new ParameterBag(json_decode($request->getContent(), true));
             }
         }

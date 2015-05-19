@@ -62,14 +62,14 @@ class IpUtils
     public static function checkIp4($requestIp, $ip)
     {
         if (false !== strpos($ip, '/')) {
-            list($address, $netmask) = explode('/', $ip, 2);
-
-            if ($netmask < 0 || $netmask > 32) {
-                return false;
+            if ('0.0.0.0/0' === $ip) {
+                return true;
             }
 
-            if ('0' === $netmask) {
-                return filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+            list($address, $netmask) = explode('/', $ip, 2);
+
+            if ($netmask < 1 || $netmask > 32) {
+                return false;
             }
         } else {
             $address = $ip;

@@ -382,7 +382,7 @@ EOF;
         if ($linkFormat = $this->fileLinkFormat) {
             $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
 
-            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', htmlspecialchars($link), $file, $line);
         }
 
         return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);

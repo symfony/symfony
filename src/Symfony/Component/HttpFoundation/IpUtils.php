@@ -69,7 +69,7 @@ class IpUtils
             }
 
             if ($netmask === '0') {
-                return true;
+                return filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
             }
         } else {
             $address = $ip;

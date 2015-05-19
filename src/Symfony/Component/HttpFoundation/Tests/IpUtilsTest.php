@@ -34,6 +34,7 @@ class IpUtilsTest extends \PHPUnit_Framework_TestCase
             array(true, '192.168.1.1', array('1.2.3.4/1', '192.168.1.0/24')),
             array(true, '192.168.1.1', array('192.168.1.0/24', '1.2.3.4/1')),
             array(false, '192.168.1.1', array('1.2.3.4/1', '4.3.2.1/1')),
+            array(true, '1.2.3.4', '0.0.0.0/0'),
         );
     }
 

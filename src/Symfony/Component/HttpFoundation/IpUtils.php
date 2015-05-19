@@ -64,8 +64,12 @@ class IpUtils
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);
 
-            if ($netmask < 1 || $netmask > 32) {
+            if ($netmask < 0 || $netmask > 32) {
                 return false;
+            }
+
+            if ($netmask === '0') {
+                return true;
             }
         } else {
             $address = $ip;

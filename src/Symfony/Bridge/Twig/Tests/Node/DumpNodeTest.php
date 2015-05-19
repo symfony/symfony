@@ -39,6 +39,30 @@ EOTXT;
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
 
+    public function testIndented()
+    {
+        $node = new DumpNode('bar', null, 7);
+
+        $env = new \Twig_Environment();
+        $compiler = new \Twig_Compiler($env);
+
+        $expected = <<<'EOTXT'
+    if ($this->env->isDebug()) {
+        $barvars = array();
+        foreach ($context as $barkey => $barval) {
+            if (!$barval instanceof \Twig_Template) {
+                $barvars[$barkey] = $barval;
+            }
+        }
+        // line 7
+        \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+    }
+
+EOTXT;
+
+        $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
+    }
+
     public function testOneVar()
     {
         $vars = new \Twig_Node(array(

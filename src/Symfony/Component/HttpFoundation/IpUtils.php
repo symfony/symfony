@@ -68,7 +68,7 @@ class IpUtils
                 return false;
             }
 
-            if ($netmask === '0') {
+            if ('0' === $netmask) {
                 return filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
             }
         } else {

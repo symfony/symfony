@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by garygreen at 2015-04-24T23:16:13Z
+
+Unfortunately doesn't fix #13617 for me . Did you try with the apache mod rewrite? That's where the issue occurs, it get's confused what the base path is
+
+---------------------------------------------------------------------------
+
+by danez at 2015-04-25T08:40:29Z
+
+No I have just tested with the unit tests. Do you have a testcase somewhere online?
+
+---------------------------------------------------------------------------
+
+by vimishor at 2015-04-25T09:34:43Z
+
+I tested this with Symfony 2.6.6 and it looks like the patch works.
+
+``` bash
+$ http -h GET http://sf2.internal.dev/xxx/index.php/demo/hello/World | grep 'HTTP/1.1'
+HTTP/1.1 200 OK
+
+$ wget https://patch-diff.githubusercontent.com/raw/symfony/symfony/pull/14335.patch
+$ patch -p1 < ./14335.patch
+patching file src/Symfony/Component/HttpFoundation/Tests/RequestTest.php
+Hunk #1 succeeded at 1346 (offset 25 lines).
+patching file src/Symfony/Component/HttpFoundation/Request.php
+Hunk #1 succeeded at 1824 (offset 112 lines).
+
+$ composer update --lock
+
+$ http -h GET http://sf2.internal.dev/xxx/index.php/demo/hello/World | grep 'HTTP/1.1'
+HTTP/1.1 404 Not Found
+```
+For this test,  the default .htaccess was replaced with the one specified in #13617 :
+```
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+```
+
+@garygreen If you are testing this on Symfony, make sure to run `composer update --lock` after you apply the patch, in order to update the bootstrap cache file.

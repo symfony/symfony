@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-05T08:59:45Z
+
+Great PR!
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-05T09:01:08Z
+
+Apart from my comment, I don't have any objections :) :+1:
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-05-05T13:37:38Z
+
+Keeping the legacy `ChoiceView` objects (and adding the `attr` attribute dynamically) to introduce as less overhead as possible sounds good, but changing it causes `testLegacySubmitSingleExpandedObjectChoices` tests to fail, since `ChoiceType::addSubForm()` expects `$coiceView` to be instance of the new `ChoiceView`. As `addSubForm` is a private method I think it is save to typehint with the deprecated `ChoiceView` and accessing the `attr` only if it is an instance of the new one, isn't it?
+Apart from the efficiency, I think it would be more clean and safe to provide `ChoiceListView`s with instances of the new `ChoiceView` only (as stated in `ChoiceListView` php doc) . But I don't know what matters more here.
+
+@webmozart If you are in favor of changing the typehint to enable the usage of the legacy `ChoiceView`s and save the mapping, I would to this change:
+
+``` diff
+@@ -408,12 +409,12 @@ class ChoiceType extends AbstractType
+      *
+      * @return mixed
+      */
+-    private function addSubForm(FormBuilderInterface $builder, $name, ChoiceView $choiceView, array $options)
++    private function addSubForm(FormBuilderInterface $builder, $name, LegacyChoiceView $choiceView, array $options)
+     {
+         $choiceOpts = array(
+             'value' => $choiceView->value,
+             'label' => $choiceView->label,
+-            'attr' => $choiceView->attr,
++            'attr' => $choiceView instanceof ChoiceView ? $choiceView->attr : array(),
+             'translation_domain' => $options['translation_domain'],
+             'block_name' => 'entry',
+         );
+```
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2015-05-18T09:48:57Z
+
+:+1:
+
+Will this PR fix #14382 without any code change on bundles / core project?
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-05-18T18:52:22Z
+
+@Soullivaneuh Yes, this fixes the code which keeps BC.

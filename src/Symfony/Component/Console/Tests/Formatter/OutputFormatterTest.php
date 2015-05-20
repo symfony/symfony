@@ -166,6 +166,14 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("\033[37;41msome error\033[0m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
+    public function testFormatToStringObject()
+    {
+        $formatter = new OutputFormatter(false);
+        $this->assertEquals(
+            'some info', $formatter->format(new TableCell())
+        );
+    }
+
     public function testNotDecoratedFormatter()
     {
         $formatter = new OutputFormatter(false);
@@ -253,5 +261,13 @@ more text
 </info>
 EOF
         ));
+    }
+}
+
+class TableCell
+{
+    public function __toString()
+    {
+        return '<info>some info</info>';
     }
 }

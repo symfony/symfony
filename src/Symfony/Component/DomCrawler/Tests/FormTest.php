@@ -787,6 +787,31 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cannot set value on a compound field "foo[bar]".
+     */
+    public function testFormRegistrySetValueOnCompoundField()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('foo[bar][baz]'));
+
+        $registry->set('foo[bar]', 'fbb');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Unreachable field "0"
+     */
+    public function testFormRegistrySetArrayOnNotCompoundField()
+    {
+
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('bar'));
+
+        $registry->set('bar', array('baz'));
+    }
+
     public function testDifferentFieldTypesWithSameName()
     {
         $dom = new \DOMDocument();

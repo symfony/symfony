@@ -211,6 +211,76 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider simpleAnswerProvider
+     */
+    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = array(
+            'My environment 1',
+            'My environment 2',
+            'My environment 3',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    public function simpleAnswerProvider()
+    {
+        return array(
+            array(0, 'My environment 1'),
+            array(1, 'My environment 2'),
+            array(2, 'My environment 3'),
+            array('My environment 1', 'My environment 1'),
+            array('My environment 2', 'My environment 2'),
+            array('My environment 3', 'My environment 3'),
+        );
+    }
+
+    /**
+     * @dataProvider mixedKeysChoiceListAnswerProvider
+     */
+    public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = array(
+            '0' => 'No environment',
+            '1' => 'My environment 1',
+            'env_2' => 'My environment 2',
+            3 => 'My environment 3',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    public function mixedKeysChoiceListAnswerProvider()
+    {
+        return array(
+            array('0', '0'),
+            array('No environment', '0'),
+            array('1', '1'),
+            array('env_2', 'env_2'),
+            array(3, '3'),
+            array('My environment 1', '1'),
+        );
+    }
+
+    /**
      * @dataProvider answerProvider
      */
     public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)

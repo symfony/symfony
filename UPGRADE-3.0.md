@@ -279,6 +279,11 @@ UPGRADE FROM 2.x to 3.0
 
 ### FrameworkBundle
 
+ * The `config:debug`, `container:debug`, `router:debug` and `translation:debug`
+   commands have been deprecated since Symfony 2.6 and will be removed in Symfony
+   3.0. Use the `debug:config`, `debug:container`, `debug:router` and
+   `debug:translation` commands instead.
+
  * The `getRequest` method of the base `Controller` class has been deprecated
    since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
    way to get the `Request` object is to inject it in the action method.
@@ -559,6 +564,11 @@ UPGRADE FROM 2.x to 3.0
        ...
    {{ form_end(form) }}
    ```
+
+### TwigBundle
+
+ * The `twig:debug` command has been deprecated since Symfony 2.6 and will be
+   removed in Symfony 3.0. Use the `debug:twig` command instead.
 
 ### Validator
 

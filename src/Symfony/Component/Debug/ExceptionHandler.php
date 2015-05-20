@@ -157,10 +157,11 @@ EOF
                         }
                         if (isset($trace['file']) && isset($trace['line'])) {
                             if ($linkFormat = ini_get('xdebug.file_link_format')) {
-                                $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
-                                $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
+                                $link = strtr($linkFormat, array('%f' => $trace['file'], '%l' => $trace['line']));
+                                $link = htmlspecialchars($link, $flags, $this->charset);
+                                $content .= sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, htmlspecialchars($trace['file'], $flags, $this->charset), $trace['line']);
                             } else {
-                                $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                                $content .= sprintf(' in %s line %d', htmlspecialchars($trace['file'], $flags, $this->charset), $trace['line']);
                             }
                         }
                         $content .= "</li>\n";

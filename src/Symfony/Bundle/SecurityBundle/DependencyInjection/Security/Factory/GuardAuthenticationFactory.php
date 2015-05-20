@@ -69,6 +69,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
             ->replaceArgument(0, $authenticatorReferences)
             ->replaceArgument(1, new Reference($userProvider))
             ->replaceArgument(2, $id)
+            ->replaceArgument(3, new Reference('security.user_checker.'.$id))
         ;
 
         // listener

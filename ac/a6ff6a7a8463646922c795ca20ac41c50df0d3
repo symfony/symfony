@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-17T13:03:31Z
+
+:+1:  :)
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-05-17T13:05:07Z
+
+Does it concern only CSS or may it involve also other mime types, like js ?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-05-17T13:08:27Z
+
+@Pierstoval the JS strategy is automatically applied for JS files in all Symfony versions (or at least, it was already applied before Symfony 2.7).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-17T13:08:34Z
+
+@Pierstoval : AFAIU, js was already handled correctly: https://github.com/symfony/symfony/pull/13141, but css handling was only introduced in symfony >=2.7 which dropped Twig <1.18 support.
+
+EDIT: too slow. :)

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-09T15:54:25Z
+
+Fabbot report had no relation with the purpose of this PR. But in case it would be appreciated, it's fixed, could be squashed, or reverted on demand.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-11T13:35:54Z
+
+use ~~`$output->text($outputMessage);`~~ `warning` in [TranslationDebugCommand.php#L145](https://github.com/ogizanagi/symfony/blob/trans_style/src/Symfony/Bundle/FrameworkBundle/Command/TranslationDebugCommand.php#L145)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-11T21:42:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-12T19:26:09Z
+
+@ogizanagi Can you please rebase to (hopefully) trigger a successful build?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-12T19:45:30Z
+
+@xabbuh : Sure. It's done. Let's see if Travis is happy :)

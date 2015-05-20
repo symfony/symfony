@@ -74,41 +74,6 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> caching does not work in '.($debug ? 'debug' : 'production'));
     }
 
-    public function testRefreshCacheWhenResourcesChange()
-    {
-        // prime the cache
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $loader
-            ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array(
-                'foo' => 'foo A',
-            ))))
-        ;
-
-        $translator = new Translator('fr', null, $this->tmpDir, true);
-        $translator->setLocale('fr');
-        $translator->addLoader('loader', $loader);
-        $translator->addResource('loader', 'foo', 'fr');
-
-        $this->assertEquals('foo A', $translator->trans('foo'));
-
-        // add a new resource to refresh the cache
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $loader
-            ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array(
-                'foo' => 'foo B',
-            ))))
-        ;
-
-        $translator = new Translator('fr', null, $this->tmpDir, true);
-        $translator->setLocale('fr');
-        $translator->addLoader('loader', $loader);
-        $translator->addResource('loader', 'bar', 'fr');
-
-        $this->assertEquals('foo B', $translator->trans('foo'));
-    }
-
     public function testCatalogueIsReloadedWhenResourcesAreNoLongerFresh()
     {
         /*
@@ -148,32 +113,6 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $translator->addLoader($format, $loader);
         $translator->addResource($format, null, $locale);
         $translator->trans($msgid);
-    }
-
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
-    public function testDifferentTranslatorsForSameLocaleDoNotInterfere($debug)
-    {
-        $locale = 'any_locale';
-        $format = 'some_format';
-        $msgid = 'test';
-
-        // Create a Translator and prime its cache
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
-        $translator->addLoader($format, new ArrayLoader());
-        $translator->addResource($format, array($msgid => 'FAIL'), $locale);
-        $translator->trans($msgid);
-
-        /*
-         * Create another Translator with the same locale but a different resource.
-         * It should not use the first translator's cache but return the value from its own resource.
-         */
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
-        $translator->addLoader($format, new ArrayLoader());
-        $translator->addResource($format, array($msgid => 'OK'), $locale);
-
-        $this->assertEquals('OK', $translator->trans($msgid), '-> different translators for the same domain interfere in '.($debug ? 'debug' : 'production'));
     }
 
     /**

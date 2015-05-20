@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by Arkadis at 2015-05-07T10:34:37Z
+
+I have test this with Doctrine/Mongo and i found next error:
+```
+Attempted to call an undefined method named "getSQL" of class "Doctrine\ODM\MongoDB\Query\Query".
+in vendor/symfony/symfony/src/Symfony/Bridge/Doctrine/Form/Type/DoctrineType.php at line 127   -
+```
+Removing $qbParts and its references it works
+```
+                $hash = CachingFactoryDecorator::generateHash(array(
+                    $options['em'],
+                    $options['class'],
+                    $options['loader'],
+                ));
+```
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-07T11:35:04Z
+
+@Arkadis I've added check if query builder is indeed one from ORM
+
+---------------------------------------------------------------------------
+
+by Arkadis at 2015-05-07T11:42:55Z
+
+Now it works perfectly! Thanks!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-07T11:46:05Z
+
+The allowed types for query builder should then be set on the subclass (entity)
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-07T12:00:11Z
+
+@Tobion in fact you're right, I will move code I have removed to Entity type
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-07T12:51:30Z
+
+@Tobion done, commits are squashed, travis is green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-13T14:25:27Z
+
+Would it possible to add a test to prevent any regression?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-13T14:39:18Z
+
+@nicolas-grekas what do you think about creating new Type for tests that won't override any options, pass some class as ``query_builder`` (both object and closure returning it) and expect that exception will not be thrown?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-14T11:27:44Z
+
+@stof I have changed the caching logic, can you take a look?
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-15T13:48:13Z
+
+@nicolas-grekas https://travis-ci.org/symfony/symfony/jobs/62702058#L1706 - I'm going to throw out last commit
+
+---------------------------------------------------------------------------
+
+by malarzm at 2015-05-15T13:53:09Z
+
+Ok, so last Travis fail is unrelated to my changes :)

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-19T11:51:19Z
+
+This looks wrong, `256.256.256/0` returns `true`
+
+---------------------------------------------------------------------------
+
+by zerkms at 2015-05-19T11:59:50Z
+
+@dosten that's a good catch, fixed
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-05-19T13:39:01Z
+
+Doesn't this should be merged in 2.3? Regardless the technical BC break, it's a bugfix.
+
+---------------------------------------------------------------------------
+
+by zerkms at 2015-05-19T20:03:10Z
+
+@phansys yep, I think it should be, but it's up to the core dev team to decide.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-20T06:43:09Z
+
+:+1: and it should indeed go in 2.3

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-05-09T12:58:56Z
+
+Good idea. We use a custom listener to avoid that. But if it can be in the core it's better :-)
+
+---------------------------------------------------------------------------
+
+by asiragusa at 2015-05-09T13:07:24Z
+
+It's exactly what I'm doing to solve the issue, waiting for this PR to be merged. Btw the custom listener is not that straightforward to implement, it took me some time to find the solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-15T11:55:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T13:56:09Z
+
+shouldn't it be merged in 2.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-19T19:39:00Z
+
+:+1: for merging into 2.3

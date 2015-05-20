@@ -380,12 +380,12 @@ EOF;
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
         if ($linkFormat = $this->fileLinkFormat) {
-            $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
+            $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, , '%l' => (int) $line));
 
-            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', htmlspecialchars($link), htmlspecialchars($file), $line);
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
         }
 
-        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', htmlspecialchars($path), htmlspecialchars($file), $line);
+        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
     }
 
     /**
@@ -422,7 +422,7 @@ EOF;
     }
 
     /**
-     * Returns an UTF-8 and HTML encoded string
+     * Returns an UTF-8 and HTML encoded string.
      */
     protected static function utf8Htmlize($str)
     {
@@ -441,7 +441,7 @@ EOF;
     }
 
     /**
-     * HTML-encodes a string
+     * HTML-encodes a string.
      */
     private function escapeHtml($str)
     {

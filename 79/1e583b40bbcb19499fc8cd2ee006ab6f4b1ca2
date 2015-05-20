@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-19T02:51:17Z
+
+@symfony/deciders ready
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-19T11:25:20Z
+
+Shouldn't we bump the dev dependency for the Form component in the FrameworkBundle to `~2.8`. We now have failing tests for using the deprecated `read_only` option because it uses an outdated version of the `AbstractLayoutTest`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-19T11:49:02Z
+
+yes
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-20T12:02:38Z
+
+Fixed
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-05T09:16:40Z
+
+Looks good! :+1:

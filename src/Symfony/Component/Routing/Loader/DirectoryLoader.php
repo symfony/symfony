@@ -28,7 +28,7 @@ class DirectoryLoader extends FileLoader
         $collection->addResource(new DirectoryResource($path));
 
         foreach (scandir($path) as $dir) {
-            if ($dir[0] !== '.') {
+            if ('.' !== $dir[0]) {
                 $this->setCurrentDir($path);
                 $subPath = $path.'/'.$dir;
                 $subType = null;

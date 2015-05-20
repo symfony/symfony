@@ -58,7 +58,7 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         for ($i = 1; $i <= 3; $i++) {
-            $this->assertSame('/route/'.$i, $routes["route".$i]->getPath());
+            $this->assertSame('/route/'.$i, $routes['route'.$i]->getPath());
         }
     }
 

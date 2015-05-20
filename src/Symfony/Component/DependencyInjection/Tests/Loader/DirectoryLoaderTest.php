@@ -58,9 +58,6 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\DirectoryLoader::__construct
-     * @covers Symfony\Component\DependencyInjection\Loader\DirectoryLoader::load
-     *
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The file "foo" does not exist (in:
      */
@@ -69,12 +66,9 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader->load('foo/');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\DirectoryLoader::supports
-     */
     public function testSupports()
     {
-        $loader  = new DirectoryLoader(new ContainerBuilder(), new FileLocator());
+        $loader = new DirectoryLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('directory/'), '->supports("directory/") returns true');
         $this->assertTrue($loader->supports('directory/', 'directory'), '->supports("directory/", "directory") returns true');

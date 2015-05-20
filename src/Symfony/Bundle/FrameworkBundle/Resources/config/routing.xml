@@ -12,7 +12,6 @@
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
         <parameter key="routing.loader.yml.class">Symfony\Component\Routing\Loader\YamlFileLoader</parameter>
         <parameter key="routing.loader.php.class">Symfony\Component\Routing\Loader\PhpFileLoader</parameter>
-        <parameter key="routing.loader.directory.class">Symfony\Component\Routing\Loader\DirectoryLoader</parameter>
         <parameter key="router.options.generator_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
         <parameter key="router.options.generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</parameter>
@@ -46,7 +45,7 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.directory" class="%routing.loader.directory.class%" public="false">
+        <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader" public="false">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>

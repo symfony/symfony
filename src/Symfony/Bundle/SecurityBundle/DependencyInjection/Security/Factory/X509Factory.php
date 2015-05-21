@@ -29,6 +29,7 @@ class X509Factory implements SecurityFactoryInterface
         $container
             ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
             ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(1, new Reference('security.chain_user_checker.'.$id))
             ->addArgument($id)
         ;
 

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-05-20T19:29:50Z
+
+I'll see if this fixes the issue tomorrow, thanks for the quick patch!
+
+Lines 110 and 113 feature `$v->setAccessible(true);`, this could be pushed down to just below the if-statement.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-20T19:35:26Z
+
+@iltar good catch, thanks
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-20T20:31:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-20T22:10:24Z
+
+:+1:

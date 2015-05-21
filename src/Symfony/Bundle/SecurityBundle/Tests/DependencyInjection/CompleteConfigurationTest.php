@@ -93,6 +93,13 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.anonymous.host',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.1',
+                'security.authentication.listener.basic.with_user_checkers',
+                'security.authentication.listener.anonymous.with_user_checkers',
+                'security.access_listener',
+            ),
         ), $listeners);
     }
 
@@ -231,6 +238,40 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $service = $container->getDefinition('security.authentication.listener.rememberme.main');
         $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
         $this->assertFalse($service->getArgument(5));
+    }
+
+    public function testUserCheckerConfig()
+    {
+        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.with_user_checkers');
+
+        $this->assertCount(1, $definition->getArguments());
+
+        $userCheckers = $definition->getArgument(0);
+        $this->assertCount(2, $userCheckers);
+        $this->assertEquals('app.user_checker1', $userCheckers[0]);
+        $this->assertEquals('app.user_checker2', $userCheckers[1]);
+    }
+
+    public function testUserCheckerConfigWithDefaultChecker()
+    {
+        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.host');
+
+        $this->assertCount(1, $definition->getArguments());
+
+        $userCheckers = $definition->getArgument(0);
+        $this->assertCount(1, $userCheckers);
+        $this->assertEquals('security.user_checker', $userCheckers[0]);
+    }
+
+    public function testUserCheckerConfigWithNoCheckers()
+    {
+        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.secure');
+
+        $this->assertCount(1, $definition->getArguments());
+
+        $userCheckers = $definition->getArgument(0);
+
+        $this->assertEmpty($userCheckers);
     }
 
     protected function getContainer($file)

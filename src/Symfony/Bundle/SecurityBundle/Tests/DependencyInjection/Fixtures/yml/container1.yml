@@ -56,12 +56,21 @@ security:
             logout: true
             remember_me:
                 key: TheKey
+            user_checkers:
+
         host:
             pattern: /test
             host: foo\.example\.org
             methods: [GET,POST]
             anonymous: true
             http_basic: true
+
+        with_user_checkers:
+            anonymous: ~
+            http_basic: ~
+            user_checkers:
+                - "app.user_checker1"
+                - "app.user_checker2"
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

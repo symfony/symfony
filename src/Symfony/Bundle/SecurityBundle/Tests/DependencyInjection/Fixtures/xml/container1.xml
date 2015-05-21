@@ -55,6 +55,7 @@
             <switch-user />
             <x509 />
             <remote-user />
+            <user-checkers></user-checkers>
             <logout />
             <remember-me key="TheyKey"/>
         </firewall>
@@ -62,6 +63,13 @@
         <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST">
             <anonymous />
             <http-basic />
+        </firewall>
+
+        <firewall name="with_user_checkers">
+            <anonymous />
+            <http-basic />
+            <user-checkers>app.user_checker1</user-checkers>
+            <user-checkers>app.user_checker2</user-checkers>
         </firewall>
 
         <role id="ROLE_ADMIN">ROLE_USER</role>

@@ -1,0 +1,35 @@
+{
+    "name": "symfony/psr-http-message-bridge",
+    "type": "symfony-bridge",
+    "description": "PSR HTTP message bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+    },
+    "suggest": {
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\PsrHttpMessage\\": "" }
+    },
+    "target-dir": "Symfony/Bridge/PsrHttpMessage",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8-dev"
+        }
+    }
+}

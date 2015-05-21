@@ -28,7 +28,7 @@
           <description>To output help as XML</description>
         </option>
         <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>To output help in other formats</description>
+          <description>The output format (txt, xml, json, or md)</description>
           <defaults>
             <default>txt</default>
           </defaults>
@@ -93,7 +93,7 @@
           <description>To output raw command list</description>
         </option>
         <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
-          <description>To output list in other formats</description>
+          <description>The output format (txt, xml, json, or md)</description>
           <defaults>
             <default>txt</default>
           </defaults>

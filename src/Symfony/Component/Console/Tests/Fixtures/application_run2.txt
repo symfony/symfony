@@ -7,7 +7,7 @@ Arguments:
 
 Options:
       --xml             To output help as XML
-      --format=FORMAT   To output help in other formats [default: "txt"]
+      --format=FORMAT   The output format (txt, xml, json, or md) [default: "txt"]
       --raw             To output raw command help
   -h, --help            Display this help message
   -q, --quiet           Do not output any message

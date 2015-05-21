@@ -254,13 +254,24 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testUserCheckerConfigWithDefaultChecker()
     {
-        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.secure');
+        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.host');
 
         $this->assertCount(1, $definition->getArguments());
 
         $userCheckers = $definition->getArgument(0);
         $this->assertCount(1, $userCheckers);
         $this->assertEquals('security.user_checker', $userCheckers[0]);
+    }
+
+    public function testUserCheckerConfigWithNoCheckers()
+    {
+        $definition = $this->getContainer('container1')->getDefinition('security.chain_user_checker.secure');
+
+        $this->assertCount(1, $definition->getArguments());
+
+        $userCheckers = $definition->getArgument(0);
+
+        $this->assertEmpty($userCheckers);
     }
 
     protected function getContainer($file)

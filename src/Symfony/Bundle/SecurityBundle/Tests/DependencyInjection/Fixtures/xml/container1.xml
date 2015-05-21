@@ -55,6 +55,7 @@
             <switch-user />
             <x509 />
             <remote-user />
+            <user-checkers></user-checkers>
             <logout />
             <remember-me key="TheyKey"/>
         </firewall>

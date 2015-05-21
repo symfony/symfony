@@ -193,6 +193,16 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->isBaz());
     }
 
+    public function testConstructorDenormalizeWithNullArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => null, 'baz' => true),
+            __NAMESPACE__.'\GetConstructorDummy', 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertNull($obj->getBar());
+        $this->assertTrue($obj->isBaz());
+    }
+
     public function testConstructorDenormalizeWithMissingOptionalArgument()
     {
         $obj = $this->normalizer->denormalize(

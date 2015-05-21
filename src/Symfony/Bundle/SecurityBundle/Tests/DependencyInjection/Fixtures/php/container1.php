@@ -80,6 +80,14 @@ $container->loadFromExtension('security', array(
             'anonymous' => true,
             'http_basic' => true,
         ),
+        'with_user_checkers' => array(
+            'user_checkers' => array(
+                'app.user_checker1',
+                'app.user_checker2',
+            ),
+            'anonymous' => true,
+            'http_basic' => true,
+        ),
     ),
 
     'access_control' => array(

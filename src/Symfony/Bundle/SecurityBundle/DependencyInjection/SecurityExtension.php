@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -100,16 +101,17 @@ class SecurityExtension extends Extension
 
         // add some required classes for compilation
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Security\\Http\\Firewall',
-            'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
-            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorage',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationChecker',
-            'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
-            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
-            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
-            'Symfony\\Component\\HttpFoundation\\RequestMatcher',
+            'Symfony\Component\Security\Http\Firewall',
+            'Symfony\Component\Security\Core\SecurityContext',
+            'Symfony\Component\Security\Core\User\UserProviderInterface',
+            'Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager',
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage',
+            'Symfony\Component\Security\Core\Authorization\AccessDecisionManager',
+            'Symfony\Component\Security\Core\Authorization\AuthorizationChecker',
+            'Symfony\Component\Security\Core\Authorization\Voter\VoterInterface',
+            'Symfony\Bundle\SecurityBundle\Security\FirewallMap',
+            'Symfony\Bundle\SecurityBundle\Security\FirewallContext',
+            'Symfony\Component\HttpFoundation\RequestMatcher',
         ));
     }
 

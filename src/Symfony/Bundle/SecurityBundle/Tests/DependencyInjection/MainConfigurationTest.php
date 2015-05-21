@@ -46,7 +46,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
+        $processor->processConfiguration($configuration, array($config));
     }
 
     /**
@@ -65,7 +65,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
-        $config = $processor->processConfiguration($configuration, array($config));
+        $processor->processConfiguration($configuration, array($config));
     }
 
     public function testCsrfAliases()
@@ -110,6 +110,36 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
+        $processor->processConfiguration($configuration, array($config));
+    }
+
+    public function testDefaultUserCheckers()
+    {
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $processedConfig = $processor->processConfiguration($configuration, array(static::$minimalConfig));
+
+        $this->assertEquals(array('security.user_checker'), $processedConfig['firewalls']['stub']['user_checkers']);
+    }
+
+    public function testUserCheckers()
+    {
+        $config = array(
+            'firewalls' => array(
+                'stub' => array(
+                    'user_checkers' => array(
+                        'security.dummy_checker',
+                        'app.henk_checker',
+                    ),
+                ),
+            ),
+        );
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
         $processedConfig = $processor->processConfiguration($configuration, array($config));
+
+        $this->assertEquals(array('security.dummy_checker', 'app.henk_checker'), $processedConfig['firewalls']['stub']['user_checkers']);
     }
 }

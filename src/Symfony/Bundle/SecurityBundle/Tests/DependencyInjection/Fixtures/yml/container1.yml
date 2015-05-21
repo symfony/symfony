@@ -63,6 +63,13 @@ security:
             anonymous: true
             http_basic: true
 
+        with_user_checkers:
+            anonymous: ~
+            http_basic: ~
+            user_checkers:
+                - "app.user_checker1"
+                - "app.user_checker2"
+
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]

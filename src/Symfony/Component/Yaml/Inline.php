@@ -21,6 +21,7 @@ use Symfony\Component\Yaml\Exception\DumpException;
  */
 class Inline
 {
+    const REGEX_TAG_PATTERN = '((?P<tag>![\w!.\/:-]+) +)?';
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
 
     private static $exceptionOnInvalidType = false;
@@ -481,6 +482,8 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!float '):
                         return (float) substr($scalar, 8);
+                    case 0 === strncmp($scalar, '!!binary ', 9):
+                        return base64_decode(self::parseScalar(substr($scalar, 9)));
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;

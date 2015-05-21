@@ -105,7 +105,12 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLogin()
+    /**
+     * @dataProvider provideUsernamesForAutoLogin
+     *
+     * @param string $username
+     */
+    public function testAutoLogin($username)
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
@@ -123,19 +128,27 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foouser'))
+            ->with($this->equalTo($username))
             ->will($this->returnValue($user))
         ;
 
         $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request();
-        $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() + 3600, 'foopass'));
+        $request->cookies->set('foo', $this->getCookie('fooclass', $username, time() + 3600, 'foopass'));
 
         $returnedToken = $service->autoLogin($request);
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $returnedToken);
         $this->assertSame($user, $returnedToken->getUser());
         $this->assertEquals('fookey', $returnedToken->getKey());
+    }
+
+    public function provideUsernamesForAutoLogin()
+    {
+        return array(
+            array('foouser', 'Simple username'),
+            array('foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user', 'Username might contain the delimiter'),
+        );
     }
 
     public function testLogout()

@@ -64,6 +64,13 @@
             <http-basic />
         </firewall>
 
+        <firewall name="with_user_checkers">
+            <anonymous />
+            <http-basic />
+            <user-checkers>app.user_checker1</user-checkers>
+            <user-checkers>app.user_checker2</user-checkers>
+        </firewall>
+
         <role id="ROLE_ADMIN">ROLE_USER</role>
         <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
         <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>

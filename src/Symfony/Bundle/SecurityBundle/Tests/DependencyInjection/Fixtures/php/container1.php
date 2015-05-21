@@ -72,6 +72,7 @@ $container->loadFromExtension('security', array(
             'remote_user' => true,
             'logout' => true,
             'remember_me' => array('secret' => 'TheSecret'),
+            'user_checkers' => array(),
         ),
         'host' => array(
             'pattern' => '/test',

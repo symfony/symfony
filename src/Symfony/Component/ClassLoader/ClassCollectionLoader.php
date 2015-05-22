@@ -117,8 +117,17 @@ class ClassCollectionLoader
 
         // cache the core classes
         if (!is_dir(dirname($cache))) {
-            mkdir(dirname($cache), 0777, true);
+            if (true !== @mkdir($cache, 0777, true)) {
+                $error = error_get_last();
+                if (!is_dir($cache)) {
+                    if ($error) {
+                        throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $cache, $error['message']));
+                    }
+                    throw new \RuntimeException(sprintf('Failed to create "%s".', $cache));
+                }
+            }
         }
+
         self::writeCacheFile($cache, '<?php '.$content);
 
         if ($autoReload) {

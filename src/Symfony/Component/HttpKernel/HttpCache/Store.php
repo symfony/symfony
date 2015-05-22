@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Store implements all the logic for storing cache metadata (Request and Response headers).
+ * Store implements all the logic for storing cache metadata (Request and Response headers) on filesystem.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -36,8 +36,14 @@ class Store implements StoreInterface
     public function __construct($root)
     {
         $this->root = $root;
-        if (!is_dir($this->root)) {
-            mkdir($this->root, 0777, true);
+        if (true !== @mkdir($this->root, 0777, true)) {
+            $error = error_get_last();
+            if (!is_dir($this->root)) {
+                if ($error) {
+                    throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $this->root, $error['message']));
+                }
+                throw new \RuntimeException(sprintf('Failed to create "%s".', $this->root));
+            }
         }
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();

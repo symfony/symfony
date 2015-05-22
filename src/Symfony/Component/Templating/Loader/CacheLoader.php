@@ -70,13 +70,22 @@ class CacheLoader extends Loader
         $content = $storage->getContent();
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            if (true !== @mkdir($dir, 0777, true) && null !== $this->debugger) {
+                $error = error_get_last();
+                if (!is_dir($dir)) {
+                    if ($error) {
+                        $this->debugger->log(sprintf('Failed to create "%s": %s.', $dir, $error['message']));
+                    } else {
+                        $this->debugger->log(sprintf('Failed to create "%s".', $dir));
+                    }
+                }
+            }
         }
 
-        file_put_contents($path, $content);
+        $writeResult = file_put_contents($path, $content);
 
         if (null !== $this->debugger) {
-            $this->debugger->log(sprintf('Storing template "%s" in cache', $template->get('name')));
+            $this->debugger->log(sprintf('Stored template "%s" in cache; %s', $template->get('name'), false === $writeResult ? 'failed' : 'success'));
         }
 
         return new FileStorage($path);

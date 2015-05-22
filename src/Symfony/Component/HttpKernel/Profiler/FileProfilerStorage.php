@@ -41,8 +41,14 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
         $this->folder = substr($dsn, 5);
 
-        if (!is_dir($this->folder)) {
-            mkdir($this->folder, 0777, true);
+        if (true !== @mkdir($this->folder, 0777, true)) {
+            $error = error_get_last();
+            if (!is_dir($this->folder)) {
+                if ($error) {
+                    throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $this->folder, $error['message']));
+                }
+                throw new \RuntimeException(sprintf('Failed to create "%s".', $this->folder));
+            }
         }
     }
 
@@ -135,7 +141,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
             // Create directory
             $dir = dirname($file);
             if (!is_dir($dir)) {
-                mkdir($dir, 0777, true);
+                if (true !== @mkdir($dir, 0777, true)) {
+                    $error = error_get_last();
+                    if (!is_dir($dir)) {
+                        if ($error) {
+                            throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $dir, $error['message']));
+                        }
+                        throw new \RuntimeException(sprintf('Failed to create "%s".', $dir));
+                    }
+                }
             }
         }
 

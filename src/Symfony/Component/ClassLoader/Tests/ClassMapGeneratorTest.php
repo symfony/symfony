@@ -23,7 +23,17 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     public function prepare_workspace()
     {
         $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
-        mkdir($this->workspace, 0777, true);
+
+        if (true !== @mkdir($this->workspace, 0777, true)) {
+            $error = error_get_last();
+            if (!is_dir($this->workspace)) {
+                if ($error) {
+                    throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $this->workspace, $error['message']));
+                }
+                throw new \RuntimeException(sprintf('Failed to create "%s".', $this->workspace));
+            }
+        }
+
         $this->workspace = realpath($this->workspace);
     }
 

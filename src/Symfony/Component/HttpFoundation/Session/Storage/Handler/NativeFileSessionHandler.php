@@ -37,8 +37,6 @@ class NativeFileSessionHandler extends NativeSessionHandler
             $savePath = ini_get('session.save_path');
         }
 
-        $baseDir = $savePath;
-
         if ($count = substr_count($savePath, ';')) {
             if ($count > 2) {
                 throw new \InvalidArgumentException(sprintf('Invalid argument $savePath \'%s\'', $savePath));
@@ -46,10 +44,20 @@ class NativeFileSessionHandler extends NativeSessionHandler
 
             // characters after last ';' are the path
             $baseDir = ltrim(strrchr($savePath, ';'), ';');
+        } else {
+            $baseDir = $savePath;
         }
 
         if ($baseDir && !is_dir($baseDir)) {
-            mkdir($baseDir, 0777, true);
+            if (true !== @mkdir($baseDir, 0777, true)) {
+                $error = error_get_last();
+                if (!is_dir($baseDir)) {
+                    if ($error) {
+                        throw new \RuntimeException(sprintf('Failed to create "%s": %s.', $baseDir, $error['message']));
+                    }
+                    throw new \RuntimeException(sprintf('Failed to create "%s".', $baseDir));
+                }
+            }
         }
 
         ini_set('session.save_path', $savePath);

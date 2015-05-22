@@ -38,6 +38,6 @@ class TokenStorage implements TokenStorageInterface
      */
     public function setToken(TokenInterface $token = null)
     {
-        $this->token = $token;
+        return $this->token = $token;
     }
 }

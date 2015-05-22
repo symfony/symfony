@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-22T14:23:41Z
+
+I confirm that this fixes the PHP7 issue.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-22T14:31:10Z
+
+:+1: But should it really be done in 2.5 ? It is not receiving bug fixes anymore since months. this is not a security fix.
+
+Btw, it might be good to fix the existing test failure to bring the  branch back to green.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-22T14:32:03Z
+
+ahah, 2.6 of course
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-22T14:36:21Z
+
+:+1:

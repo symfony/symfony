@@ -167,15 +167,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
     }
 
-    public function testGet()
-    {
-        $application = new Application();
-        $command = new \TestCommand();
-        $command->setApplication($application);
-        $formatterHelper = new FormatterHelper();
-        $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->__get() returns the correct helper');
-    }
-
     public function testMergeApplicationDefinition()
     {
         $application1 = new Application();

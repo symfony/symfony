@@ -142,6 +142,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function format($message)
     {
+        $message = (string) $message;
         $offset = 0;
         $output = '';
         $tagRegex = '[a-z][a-z0-9_=;-]*';

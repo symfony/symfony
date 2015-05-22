@@ -22,8 +22,8 @@ not suitable to run Symfony (https://bugs.php.net/bug.php?id=62715)
 Installation
 ------------
 
-The best way to install Symfony is to download the Symfony Standard Edition
-available at <https://symfony.com/download>.
+The best way to install Symfony is to use the [official Symfony Installer][7].
+It allows you to start a new project based on the version you want.
 
 Documentation
 -------------
@@ -53,3 +53,4 @@ Information on how to run the Symfony test suite can be found in the
 [4]: https://symfony.com/doc/current/contributing/code/patches.html#check-list
 [5]: https://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
 [6]: https://symfony.com/doc/master/contributing/code/tests.html
+[7]: https://symfony.com/doc/current/book/installation.html#installing-the-symfony-installer

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -66,22 +67,26 @@ class TwigExtension extends Extension
             } else {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+            $container->addResource(new DirectoryResource($path));
         }
 
         // register bundles as Twig namespaces
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+                $container->addResource(new DirectoryResource($dir));
             }
 
             $reflection = new \ReflectionClass($class);
             if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+                $container->addResource(new DirectoryResource($dir));
             }
         }
 
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+            $container->addResource(new DirectoryResource($dir));
         }
 
         if (!empty($config['globals'])) {

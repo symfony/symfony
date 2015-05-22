@@ -1346,6 +1346,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
+                '/fruit/strawberry/1234index.php/blah',
+                array(
+                    'SCRIPT_FILENAME' => 'E:/Sites/cc-new/public_html/fruit/index.php',
+                    'SCRIPT_NAME' => '/fruit/index.php',
+                    'PHP_SELF' => '/fruit/index.php',
+                ),
+                '/fruit',
+                '/strawberry/1234index.php/blah',
+            ),
+            array(
+                '/fruit/strawberry/1234index.php/blah',
+                array(
+                    'SCRIPT_FILENAME' => 'E:/Sites/cc-new/public_html/index.php',
+                    'SCRIPT_NAME' => '/index.php',
+                    'PHP_SELF' => '/index.php',
+                ),
+                '',
+                '/fruit/strawberry/1234index.php/blah',
+            ),
+            array(
                 '/foo%20bar/',
                 array(
                     'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',

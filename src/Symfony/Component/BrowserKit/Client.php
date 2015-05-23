@@ -556,7 +556,7 @@ abstract class Client
     protected function getAbsoluteUri($uri)
     {
         // already absolute?
-        if (0 === strpos($uri, 'http')) {
+        if (preg_match('/^https?:\/\//', $uri)) {
             return $uri;
         }
 

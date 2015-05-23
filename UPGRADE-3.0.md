@@ -1106,4 +1106,24 @@ UPGRADE FROM 2.x to 3.0
 
 ### HttpFoundation
 
-* `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+ * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+ * The schema of the `PdoSessionHandler` to store sessions in a database changed.
+   The following changes must be made to your `session` table:
+
+   - Create a new `sess_expiry` column. In MySQL this would be:
+
+      ```sql
+      ALTER TABLE `session` ADD `sess_expiry` INTEGER UNSIGNED NOT NULL;
+      ```
+
+   - Migrate the old data to the `sess_expiry` column. In MySQL this would be:
+
+      ```sql
+      UPDATE `session` SET `sess_expiry` = `sess_time` + `sess_lifetime`;
+      ```
+
+   - Remove the `sess_time` and `sess_lifetime` columns. In MySQL this would be:
+
+       ```sql
+       ALTER TABLE `session` DROP COLUMN `sess_time`, DROP COLUMN `sess_lifetime`;
+       ```

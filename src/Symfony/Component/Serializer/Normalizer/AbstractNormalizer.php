@@ -328,7 +328,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     $params[] = $data[$key];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$key]);
-                } elseif ($constructorParameter->isOptional()) {
+                } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
                     throw new RuntimeException(

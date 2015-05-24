@@ -39,11 +39,7 @@ class PathPackage extends Package
         if (!$basePath) {
             $this->basePath = '/';
         } else {
-            if ('/' != $basePath[0]) {
-                $basePath = '/'.$basePath;
-            }
-
-            $this->basePath = rtrim($basePath, '/').'/';
+            $this->basePath = '/'.trim($basePath, '/').'/';
         }
     }
 

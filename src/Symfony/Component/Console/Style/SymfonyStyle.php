@@ -76,7 +76,7 @@ class SymfonyStyle extends OutputStyle
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - Helper::strlen($prefix), PHP_EOL)));
+            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - Helper::strlen($prefix), PHP_EOL, true)));
 
             if (count($messages) > 1 && $key < count($messages) - 1) {
                 $lines[] = '';

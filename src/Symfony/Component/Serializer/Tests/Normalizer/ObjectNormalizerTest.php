@@ -137,6 +137,16 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->isBaz());
     }
 
+    public function testConstructorDenormalizeWithNullArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => null, 'baz' => true),
+            __NAMESPACE__.'\ObjectConstructorDummy', 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertNull($obj->bar);
+        $this->assertTrue($obj->isBaz());
+    }
+
     public function testConstructorDenormalizeWithMissingOptionalArgument()
     {
         $obj = $this->normalizer->denormalize(

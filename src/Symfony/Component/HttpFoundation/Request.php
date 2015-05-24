@@ -1459,7 +1459,7 @@ class Request
      */
     public function getContent($asResource = false)
     {
-        if (false === $this->content || (true === $asResource && null !== $this->content)) {
+        if (PHP_VERSION_ID < 50600 && (false === $this->content || (true === $asResource && null !== $this->content))) {
             throw new \LogicException('getContent() can only be called once when using the resource return type.');
         }
 

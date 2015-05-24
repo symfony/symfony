@@ -71,7 +71,7 @@ class SymfonyStyle extends OutputStyle
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode("\n", wordwrap($message, $this->lineLength - Helper::strlen($prefix))));
+            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - Helper::strlen($prefix), PHP_EOL)));
 
             if (count($messages) > 1 && $key < count($messages) - 1) {
                 $lines[] = '';
@@ -92,7 +92,8 @@ class SymfonyStyle extends OutputStyle
             }
         }
 
-        $this->writeln(implode("\n", $lines)."\n");
+        $this->writeln($lines);
+        $this->newLine();
     }
 
     /**
@@ -100,7 +101,12 @@ class SymfonyStyle extends OutputStyle
      */
     public function title($message)
     {
-        $this->writeln(sprintf("\n<comment>%s</>\n<comment>%s</>\n", $message, str_repeat('=', strlen($message))));
+        $this->newLine();
+        $this->writeln(array(
+            sprintf('<comment>%s</>', $message),
+            sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
+        ));
+        $this->newLine();
     }
 
     /**
@@ -108,7 +114,11 @@ class SymfonyStyle extends OutputStyle
      */
     public function section($message)
     {
-        $this->writeln(sprintf("<comment>%s</>\n<comment>%s</>\n", $message, str_repeat('-', strlen($message))));
+        $this->writeln(array(
+            sprintf('<comment>%s</>', $message),
+            sprintf('<comment>%s</>', str_repeat('-', strlen($message))),
+        ));
+        $this->newLine();
     }
 
     /**
@@ -122,7 +132,8 @@ class SymfonyStyle extends OutputStyle
             $elements
         );
 
-        $this->writeln(implode("\n", $elements)."\n");
+        $this->writeln($elements);
+        $this->newLine();
     }
 
     /**

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -219,6 +222,51 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $data = array('foo', array(5, 3));
         $result = $this->serializer->decode(json_encode($data), 'json');
         $this->assertEquals($data, $result);
+    }
+
+    public function testSupportsArrayDeserialization()
+    {
+        $serializer = new Serializer(
+            array(
+                new GetSetMethodNormalizer(),
+                new PropertyNormalizer(),
+                new ObjectNormalizer(),
+                new CustomNormalizer(),
+                new ArrayDenormalizer(),
+            ),
+            array(
+                'json' => new JsonEncoder(),
+            )
+        );
+
+        $this->assertTrue(
+            $serializer->supportsDenormalization(array(), __NAMESPACE__.'\Model[]', 'json')
+        );
+    }
+
+    public function testDeserializeArray()
+    {
+        $jsonData = '[{"title":"foo","numbers":[5,3]},{"title":"bar","numbers":[2,8]}]';
+
+        $expectedData = array(
+            Model::fromArray(array('title' => 'foo', 'numbers' => array(5, 3))),
+            Model::fromArray(array('title' => 'bar', 'numbers' => array(2, 8))),
+        );
+
+        $serializer = new Serializer(
+            array(
+                new GetSetMethodNormalizer(),
+                new ArrayDenormalizer(),
+            ),
+            array(
+                'json' => new JsonEncoder(),
+            )
+        );
+
+        $this->assertEquals(
+            $expectedData,
+            $serializer->deserialize($jsonData, __NAMESPACE__.'\Model[]', 'json')
+        );
     }
 }
 

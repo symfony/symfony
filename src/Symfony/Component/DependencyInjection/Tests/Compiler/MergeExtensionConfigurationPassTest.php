@@ -37,7 +37,7 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getMock('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface');
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
-        $container->prependExtensionConfig('foo', array('bar' => true ));
+        $container->prependExtensionConfig('foo', array('bar' => true));
         $container->addExpressionLanguageProvider($provider);
 
         $pass = new MergeExtensionConfigurationPass();
@@ -48,11 +48,11 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependingOrderAcrossBundles()
     {
-        $one   = array('foo' => 'one');
-        $two   = array('foo' => 'two');
+        $one = array('foo' => 'one');
+        $two = array('foo' => 'two');
         $three = array('foo' => 'three');
-        $four  = array('foo' => 'four');
-        $five  = array('foo' => 'five');
+        $four = array('foo' => 'four');
+        $five = array('foo' => 'five');
 
         $extensionA = $this->getMock('PrependExtension');
         $extensionA->expects($this->any())

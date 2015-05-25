@@ -23,6 +23,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUse
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\GuardAuthenticationFactory;
 
 /**
  * Bundle.
@@ -44,6 +45,7 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
         $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory());
         $extension->addSecurityListenerFactory(new SimpleFormFactory());
+        $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());

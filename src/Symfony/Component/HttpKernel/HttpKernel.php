@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -38,6 +40,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $dispatcher;
     protected $resolver;
     protected $requestStack;
+    protected $httpFoundationFactory;
 
     /**
      * Constructor.
@@ -48,11 +51,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, HttpFoundationFactory $httpFoundationFactory = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
+
+        if (null === $httpFoundationFactory && class_exists('Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory')) {
+            $this->httpFoundationFactory = new HttpFoundationFactory();
+        }
     }
 
     /**

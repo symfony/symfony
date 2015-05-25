@@ -140,7 +140,7 @@ EOF
 
             // Merge defined and extracted messages to get all message ids
             $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
-            $allMessages    = $mergeOperation->getResult()->all($domain);
+            $allMessages = $mergeOperation->getResult()->all($domain);
             if (null !== $domain) {
                 $allMessages = array($domain => $allMessages);
             }
@@ -176,7 +176,7 @@ EOF
             // Iterate all message ids and determine their state
             foreach ($allMessages as $domain => $messages) {
                 foreach (array_keys($messages) as $messageId) {
-                    $value  = $currentCatalogue->get($messageId, $domain);
+                    $value = $currentCatalogue->get($messageId, $domain);
                     $states = array();
 
                     if ($extractedCatalogue->defines($messageId, $domain)) {

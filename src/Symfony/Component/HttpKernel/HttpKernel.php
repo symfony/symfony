@@ -146,6 +146,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         // call controller
         $response = call_user_func_array($controller, $arguments);
 
+        // handle PSR-7 responses
+        if ($response instanceof ResponseInterface) {
+            if (null === $this->httpFoundationFactory) {
+                throw new \RuntimeException('The PSR-7 Bridge must be installed to handle instances of Psr\Http\Message\ResponseInterface.');
+            }
+
+            $response = $this->httpFoundationFactory->createResponse($response);
+        }
+
         // view
         if (!$response instanceof Response) {
             $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);

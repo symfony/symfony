@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
@@ -195,6 +196,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $controller = array(new self(), 'controllerMethod5');
         $this->assertEquals(array($request), $resolver->getArguments($request, $controller), '->getArguments() injects the request');
+
+        $request = Request::create('/');
+        $controller = array(new self(), 'controllerMethod6');
+        $args = $resolver->getArguments($request, $controller);
+        $this->assertInstanceOf('Psr\Http\Message\ServerRequestInterface', $args[0], '->getArguments() injects the PSR ServerRequest');
     }
 
     public function testCreateControllerCanReturnAnyCallable()
@@ -233,6 +239,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function controllerMethod5(Request $request)
+    {
+    }
+
+    protected function controllerMethod6(ServerRequestInterface $request)
     {
     }
 }

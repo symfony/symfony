@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-24T00:21:47Z
+
+:+1:  btw, i think this can be merged in 2.3
+
+---------------------------------------------------------------------------
+
+by taueres at 2015-05-24T08:35:37Z
+
+Tests now use @expectedException annotation
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-24T12:17:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-05-24T16:50:35Z
+
+This cannot be merged in 2.3 because it's a BC break.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-24T17:00:50Z
+
+@dunglas this is not a bc break at all.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-05-24T17:08:08Z
+
+Class not implementing the interface will stop working isn't it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-24T17:31:13Z
+
+Look at the phpdoc of the method it say `return ExtensionInterface` so anything else is not supported
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-05-24T18:28:14Z
+
+Ok missed that.

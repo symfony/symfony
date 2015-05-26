@@ -955,6 +955,66 @@ class FilesystemTest extends FilesystemTestCase
         );
     }
 
+    public function testTempNam()
+    {
+        $dirname = $this->workspace;
+
+        $filename = $this->filesystem->tempNam($dirname, 'foo');
+
+        $this->assertNotFalse($filename);
+        $this->assertFileExists($filename);
+    }
+
+    public function testTempNamWithFileScheme()
+    {
+        $scheme = 'file://';
+        $dirname = $scheme.$this->workspace;
+
+        $filename = $this->filesystem->tempNam($dirname, 'foo');
+
+        $this->assertNotFalse($filename);
+        $this->assertStringStartsWith($scheme, $filename);
+        $this->assertFileExists($filename);
+    }
+
+    public function testTempNamWithZlibScheme()
+    {
+        $scheme = 'compress.zlib://';
+        $dirname = $scheme.$this->workspace;
+
+        $filename = $this->filesystem->tempNam($dirname, 'bar');
+
+        $this->assertNotFalse($filename);
+        $this->assertStringStartsWith($scheme, $filename);
+        // Zlib stat uses file:// wrapper so remove scheme
+        $this->assertFileExists(str_replace($scheme, '', $filename));
+    }
+
+    public function testTempNamWithHTTPSchemeFails()
+    {
+        $scheme = 'http://';
+        $dirname = $scheme.$this->workspace;
+
+        $filename = $this->filesystem->tempNam($dirname, 'bar');
+
+        $this->assertFalse($filename);
+    }
+
+    public function testTempNamOnUnwritableFallsBackToSysTmp()
+    {
+        $scheme = 'file://';
+        $dirname = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'does_not_exist';
+
+        $filename = $this->filesystem->tempNam($dirname, 'bar');
+
+        $this->assertNotFalse($filename);
+        $this->assertStringStartsWith(rtrim($scheme.sys_get_temp_dir(), DIRECTORY_SEPARATOR), $filename);
+        $this->assertFileExists($filename);
+
+        // Tear down
+        unlink($filename);
+    }
+
     public function testDumpFile()
     {
         $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
@@ -1006,6 +1066,29 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'bar');
 
         $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function testDumpFileWithFileScheme()
+    {
+        $scheme = 'file://';
+        $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', null);
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function testDumpFileWithZlibScheme()
+    {
+        $scheme = 'compress.zlib://';
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', null);
+
+        // Zlib stat uses file:// wrapper so remove scheme
+        $this->assertFileExists(str_replace($scheme, '', $filename));
         $this->assertSame('bar', file_get_contents($filename));
     }
 

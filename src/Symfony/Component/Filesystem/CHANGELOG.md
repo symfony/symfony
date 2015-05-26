@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added tempNam() a stream aware version of tempnam()
+
 2.6.0
 -----
 

@@ -9,7 +9,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 2.3.29 (2015-05-26)
 
- * security #14759 [HttpKernel] Do not call the FragmentListener if _controller is already defined (jakzal)
+ * security #14759 CVE-2015-4050 [HttpKernel] Do not call the FragmentListener if _controller is already defined (jakzal)
  * bug #14715 [Form] Check instance of FormBuilderInterface instead of FormBuilder (dosten)
  * bug #14678 [Security] AbstractRememberMeServices::encodeCookie() validates cookie parts (MacDada)
  * bug #14635 [HttpKernel] Handle an array vary header in the http cache store (jakzal)

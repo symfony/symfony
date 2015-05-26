@@ -34,6 +34,22 @@ class FragmentListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->query->has('_path'));
     }
 
+
+    public function testOnlyTriggeredIfControllerWasNotDefinedYet()
+    {
+        $request = Request::create('http://example.com/_fragment?_path=foo%3Dbar%26_controller%3Dfoo');
+        $request->attributes->set('_controller', 'bar');
+
+        $listener = new FragmentListener(new UriSigner('foo'));
+        $event = $this->createGetResponseEvent($request, HttpKernelInterface::SUB_REQUEST);
+
+        $expected = $request->attributes->all();
+
+        $listener->onKernelRequest($event);
+
+        $this->assertEquals($expected, $request->attributes->all());
+    }
+
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -74,8 +90,8 @@ class FragmentListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->query->has('_path'));
     }
 
-    private function createGetResponseEvent(Request $request)
+    private function createGetResponseEvent(Request $request, $requestType = HttpKernelInterface::MASTER_REQUEST)
     {
-        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
+        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, $requestType);
     }
 }

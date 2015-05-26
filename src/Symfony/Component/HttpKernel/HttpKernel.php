@@ -37,10 +37,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
+    private $httpFoundationFactory;
     protected $dispatcher;
     protected $resolver;
     protected $requestStack;
-    protected $httpFoundationFactory;
 
     /**
      * Constructor.

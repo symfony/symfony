@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="profiler" class="Symfony\Component\HttpKernel\Profiler\Profiler">
+        <service id="profiler" class="Symfony\Component\Profiler\Profiler">
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="profiler.storage" />
             <argument type="service" id="logger" on-invalid="null" />
@@ -18,7 +18,7 @@
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 
-        <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
+        <service id="profiler_listener" class="Symfony\Component\Profiler\EventListener\ProfilerListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />

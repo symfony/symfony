@@ -48,6 +48,7 @@
         <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.finder" />
+            <argument type="collection" /> <!-- Twig paths -->
         </service>
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">

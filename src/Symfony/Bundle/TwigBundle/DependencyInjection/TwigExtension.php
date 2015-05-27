@@ -76,6 +76,8 @@ class TwigExtension extends Extension
             }
         }
 
+        $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
+
         // register bundles as Twig namespaces
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {

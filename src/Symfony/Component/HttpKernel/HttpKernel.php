@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -35,6 +37,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
+    private $httpFoundationFactory;
     protected $dispatcher;
     protected $resolver;
     protected $requestStack;
@@ -48,11 +51,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, HttpFoundationFactory $httpFoundationFactory = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
+
+        if (null === $httpFoundationFactory && class_exists('Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory')) {
+            $this->httpFoundationFactory = new HttpFoundationFactory();
+        }
     }
 
     /**
@@ -145,6 +152,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // call controller
         $response = call_user_func_array($controller, $arguments);
+
+        // handle PSR-7 responses
+        if ($response instanceof ResponseInterface) {
+            if (null === $this->httpFoundationFactory) {
+                throw new \RuntimeException('The PSR-7 Bridge must be installed to handle instances of Psr\Http\Message\ResponseInterface.');
+            }
+
+            $response = $this->httpFoundationFactory->createResponse($response);
+        }
 
         // view
         if (!$response instanceof Response) {

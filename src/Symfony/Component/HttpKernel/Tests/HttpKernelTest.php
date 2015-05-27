@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Response as PsrResponse;
+use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Stream as PsrStream;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -206,6 +208,14 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
 
+    public function testHandleWhenTheControllerReturnsAPsrResponse()
+    {
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(array(new Controller(), 'psrController')));
+
+        $response = $kernel->handle(new Request());
+        $this->assertResponseEquals(new Response('Les-Tilleuls.coop'), $response);
+    }
+
     /**
      * @expectedException \LogicException
      */
@@ -305,6 +315,11 @@ class Controller
     public function controller()
     {
         return new Response('foo');
+    }
+
+    public function psrController()
+    {
+        return new PsrResponse('1.0', array(), new PsrStream('Les-Tilleuls.coop'), 200);
     }
 
     public static function staticController()

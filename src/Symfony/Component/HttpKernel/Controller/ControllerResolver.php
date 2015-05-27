@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,21 +24,27 @@ use Symfony\Component\HttpFoundation\Request;
  * the controller method arguments.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @api
  */
 class ControllerResolver implements ControllerResolverInterface
 {
     private $logger;
+    private $httpMessageFactory;
 
     /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null, HttpMessageFactoryInterface $httpMessageFactory = null)
     {
         $this->logger = $logger;
+
+        if (null === $httpMessageFactory && class_exists('Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory')) {
+            $this->httpMessageFactory = new DiactorosFactory();
+        }
     }
 
     /**
@@ -112,21 +120,43 @@ class ControllerResolver implements ControllerResolverInterface
         foreach ($parameters as $param) {
             if (array_key_exists($param->name, $attributes)) {
                 $arguments[] = $attributes[$param->name];
-            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
-                $arguments[] = $request;
-            } elseif ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } else {
-                if (is_array($controller)) {
-                    $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
-                } elseif (is_object($controller)) {
-                    $repr = get_class($controller);
-                } else {
-                    $repr = $controller;
+
+                continue;
+            }
+
+            if ($class = $param->getClass()) {
+                if ($class->isInstance($request)) {
+                    $arguments[] = $request;
+
+                    continue;
                 }
 
-                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
+                if ($class->implementsInterface('Psr\Http\Message\ServerRequestInterface')) {
+                    if (null === $this->httpMessageFactory) {
+                        throw new \RuntimeException('The PSR-7 Bridge must be installed to inject instances of Psr\Http\Message\ServerRequestInterface in controllers.');
+                    }
+
+                    $arguments[] = $this->httpMessageFactory->createRequest($request);
+
+                    continue;
+                }
             }
+
+            if ($param->isDefaultValueAvailable()) {
+                $arguments[] = $param->getDefaultValue();
+
+                continue;
+            }
+
+            if (is_array($controller)) {
+                $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
+            } elseif (is_object($controller)) {
+                $repr = get_class($controller);
+            } else {
+                $repr = $controller;
+            }
+
+            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
         }
 
         return $arguments;
@@ -157,7 +187,7 @@ class ControllerResolver implements ControllerResolverInterface
     }
 
     /**
-     * Returns an instantiated controller
+     * Returns an instantiated controller.
      *
      * @param string $class A class name
      *

@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Mapping\Factory;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
 /**
@@ -43,8 +42,8 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
     /**
      * @param LoaderInterface $loader
-     * @param Cache|null $cache
-     * @param string $className
+     * @param Cache|null      $cache
+     * @param string          $className
      */
     public function __construct(LoaderInterface $loader, Cache $cache = null, $className = 'Symfony\Component\Serializer\Mapping\ClassMetadata')
     {

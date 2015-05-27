@@ -259,7 +259,7 @@
                 <target>Deze waarde moet groter dan of gelijk aan {{ compared_value }} zijn.</target>
             </trans-unit>
             <trans-unit id="68">
-                <source>This value should be identical  to {{ compared_value_type }} {{ compared_value }}.</source>
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Deze waarde moet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">

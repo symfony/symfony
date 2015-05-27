@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-05-26T20:52:57Z
+
+:+1: once fabbot is happy.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-05-26T20:55:47Z
+
+fabbot complains about lines I haven't touched. Not sure if I should fix them with my PR.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-05-26T21:25:03Z
+
+See #14758 for the fabbot complaints. Those CS issues are already present in 2.6.

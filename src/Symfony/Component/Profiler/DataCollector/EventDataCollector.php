@@ -23,7 +23,7 @@ use Symfony\Component\Profiler\ProfileData\EventData;
  */
 class EventDataCollector extends AbstractDataCollector implements DataCollectorInterface, LateDataCollectorInterface
 {
-    protected $dispatcher;
+    private $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher = null)
     {

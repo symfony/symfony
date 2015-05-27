@@ -28,9 +28,9 @@ use Symfony\Component\Profiler\ProfileData\RouterData;
  */
 class RouterDataCollector extends AbstractDataCollector implements EventSubscriberInterface, RuntimeDataCollectorInterface
 {
-    protected $requestStack;
-    protected $controllers;
-    protected $responses;
+    private $requestStack;
+    private $controllers;
+    private $responses;
 
     public function __construct(RequestStack $requestStack)
     {

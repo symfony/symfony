@@ -22,7 +22,7 @@ use Symfony\Component\Profiler\ProfileData\MemoryData;
  */
 class MemoryDataCollector extends AbstractDataCollector implements LateDataCollectorInterface, RuntimeDataCollectorInterface
 {
-    protected $memoryLimit;
+    private $memoryLimit;
 
     public function __construct()
     {

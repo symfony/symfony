@@ -8,8 +8,8 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class LoggerData implements ProfileDataInterface
 {
-    protected $data = array();
-    protected $logs;
+    private $data = array();
+    private $logs;
 
     public function __construct(DebugLoggerInterface $logger)
     {

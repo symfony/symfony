@@ -7,9 +7,8 @@ namespace Symfony\Component\Profiler\ProfileData;
 class MemoryData implements ProfileDataInterface
 {
 
-    protected $memory;
-
-    protected $memoryLimit;
+    private $memory;
+    private $memoryLimit;
 
     public function __construct($memory, $memoryLimit)
     {

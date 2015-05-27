@@ -6,9 +6,8 @@ namespace Symfony\Component\Profiler\ProfileData;
 
 class EventData implements ProfileDataInterface
 {
-    protected $calledListeners;
-
-    protected $notCalledListeners;
+    private $calledListeners;
+    private $notCalledListeners;
 
     public function __construct(array $calledListeners = array(), array $notCalledListeners = array())
     {

@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RouterData
 {
-    protected $redirect = false;
-    protected $url;
-    protected $route;
+    private $redirect = false;
+    private $url;
+    private $route;
 
     public function __construct(Response $response, $route = null)
     {

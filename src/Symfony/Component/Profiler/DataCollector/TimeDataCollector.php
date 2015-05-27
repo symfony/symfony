@@ -27,10 +27,10 @@ use Symfony\Component\Profiler\ProfileData\TimeData;
  */
 class TimeDataCollector extends AbstractDataCollector implements LateDataCollectorInterface
 {
-    protected $requestStack;
-    protected $kernel;
-    protected $stopwatch;
-    protected $startTime;
+    private $requestStack;
+    private $kernel;
+    private $stopwatch;
+    private $startTime;
 
     public function __construct(RequestStack $requestStack, KernelInterface $kernel = null, Stopwatch $stopwatch = null)
     {

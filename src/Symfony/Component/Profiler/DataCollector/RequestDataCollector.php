@@ -29,9 +29,9 @@ use Symfony\Component\Profiler\ProfileData\RequestData;
  */
 class RequestDataCollector extends AbstractDataCollector implements EventSubscriberInterface, RuntimeDataCollectorInterface
 {
-    protected $requestStack;
-    protected $responses;
-    protected $controllers;
+    private $requestStack;
+    private $responses;
+    private $controllers;
 
     public function __construct(RequestStack $requestStack)
     {

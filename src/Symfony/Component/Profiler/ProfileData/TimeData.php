@@ -6,9 +6,9 @@ namespace Symfony\Component\Profiler\ProfileData;
 
 class TimeData implements ProfileDataInterface
 {
-    protected $token;
-    protected $startTime;
-    protected $events;
+    private $token;
+    private $startTime;
+    private $events;
 
     public function __construct($startTime, array $events)
     {

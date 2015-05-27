@@ -30,6 +30,11 @@ class ViolationMapper implements ViolationMapperInterface
     private $allowNonSynchronized;
 
     /**
+     * @var bool
+     */
+    private $formSubmissionRequired = true;
+
+    /**
      * {@inheritdoc}
      */
     public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false)
@@ -292,9 +297,29 @@ class ViolationMapper implements ViolationMapperInterface
      */
     private function acceptsErrors(FormInterface $form)
     {
-        // Ignore non-submitted forms. This happens, for example, in PATCH
-        // requests.
-        // https://github.com/symfony/symfony/pull/10567
-        return $form->isSubmitted() && ($this->allowNonSynchronized || $form->isSynchronized());
+        if ($this->isFormSubmissionRequired()) {
+            // Ignore non-submitted forms. This happens, for example, in PATCH
+            // requests.
+            // https://github.com/symfony/symfony/pull/10567
+            return $form->isSubmitted() && ($this->allowNonSynchronized || $form->isSynchronized());
+        }
+
+        return $this->allowNonSynchronized || $form->isSynchronized();
+    }
+
+    /**
+     * @param bool $formSubmissionRequired
+     */
+    public function setFormSubmissionRequired($formSubmissionRequired)
+    {
+        $this->formSubmissionRequired = (bool) $formSubmissionRequired;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isFormSubmissionRequired()
+    {
+        return $this->formSubmissionRequired;
     }
 }

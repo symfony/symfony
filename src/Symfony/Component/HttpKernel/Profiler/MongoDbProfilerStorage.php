@@ -20,5 +20,4 @@ use Symfony\Component\Profiler\Storage\MongoDbProfilerStorage as BaseMongoDbProf
  */
 class MongoDbProfilerStorage extends BaseMongoDbProfilerStorage
 {
-
 }

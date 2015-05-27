@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\Profiler\DataCollector\EventDataCollector as BaseEventDataCollector;
 
 /**
  * EventDataCollector.
@@ -22,7 +23,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\EventDataCollector instead.
  */
-class EventDataCollector extends \Symfony\Component\Profiler\DataCollector\EventDataCollector
+class EventDataCollector extends BaseEventDataCollector
 {
 
 }

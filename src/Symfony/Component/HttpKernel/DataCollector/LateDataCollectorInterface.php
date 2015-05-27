@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface as BaseLateDataCollectorInterface;
+
 /**
  * LateDataCollectorInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface instead.
  */
-interface LateDataCollectorInterface extends \Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface
+interface LateDataCollectorInterface extends BaseLateDataCollectorInterface
 {
 
 }

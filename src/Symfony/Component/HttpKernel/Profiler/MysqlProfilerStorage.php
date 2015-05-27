@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Symfony\Component\Profiler\Storage\MysqlProfilerStorage as BaseMysqlProfilerStorage;
+
 /**
  * A ProfilerStorage for Mysql.
  *
  * @author Jan Schumann <js@schumann-it.com>
  * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\MysqlProfilerStorage instead.
  */
-class MysqlProfilerStorage extends \Symfony\Component\Profiler\Storage\MysqlProfilerStorage
+class MysqlProfilerStorage extends BaseMysqlProfilerStorage
 {
 }

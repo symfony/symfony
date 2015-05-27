@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Symfony\Component\Profiler\Storage\BaseMemcacheProfilerStorage as Base;
+
 /**
  * Base Memcache storage for profiling information in a Memcache.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\BaseMemcacheProfilerStorage instead.
  */
-abstract class BaseMemcacheProfilerStorage extends \Symfony\Component\Profiler\Storage\BaseMemcacheProfilerStorage
+abstract class BaseMemcacheProfilerStorage extends Base
 {
 }

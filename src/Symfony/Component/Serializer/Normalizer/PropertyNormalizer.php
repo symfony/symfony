@@ -38,7 +38,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     private $camelizedAttributes = array();
 
     /**
-     * Set normalization callbacks
+     * Set normalization callbacks.
      *
      * @param array $callbacks help normalize the result
      *
@@ -68,7 +68,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     }
 
     /**
-     * Set attributes to be camelized on denormalize
+     * Set attributes to be camelized on denormalize.
      *
      * @param array $camelizedAttributes
      */
@@ -91,7 +91,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
             }
 
             // Override visibility
-            if (! $property->isPublic()) {
+            if (!$property->isPublic()) {
                 $property->setAccessible(true);
             }
 
@@ -155,7 +155,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
                 $property = $reflectionClass->getProperty($propertyName);
 
                 // Override visibility
-                if (! $property->isPublic()) {
+                if (!$property->isPublic()) {
                     $property->setAccessible(true);
                 }
 
@@ -213,7 +213,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
 
         // We look for at least one non-static property
         foreach ($class->getProperties() as $property) {
-            if (! $property->isStatic()) {
+            if (!$property->isStatic()) {
                 return true;
             }
         }

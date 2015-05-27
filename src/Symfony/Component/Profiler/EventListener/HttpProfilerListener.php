@@ -95,6 +95,8 @@ class HttpProfilerListener implements EventSubscriberInterface
             return;
         }
 
+        $this->profiler->addResponse($request, $event->getResponse());
+
         if (!$profile = $this->profiler->collect($request, $event->getResponse(), $exception)) {
             return;
         }

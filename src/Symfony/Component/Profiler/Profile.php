@@ -355,6 +355,18 @@ class Profile
         }
     }
 
+    /**
+     * @param $name
+     * @return DataCollectorInterface|ProfileDataInterface
+     */
+    public function get($name)
+    {
+        if ( $this->hasCollector($name) ) {
+            return $this->getCollector($name);
+        }
+        return $this->getProfileData($name);
+    }
+
     public function __sleep()
     {
         return array('token', 'parent', 'children', 'data', 'collectors', 'ip', 'method', 'url', 'time');

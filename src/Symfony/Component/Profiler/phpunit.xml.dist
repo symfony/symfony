@@ -12,7 +12,7 @@
          bootstrap="vendor/autoload.php"
         >
     <testsuites>
-        <testsuite name="Symfony HttpProfiler Component Test Suite">
+        <testsuite name="Symfony Profiler Component Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>

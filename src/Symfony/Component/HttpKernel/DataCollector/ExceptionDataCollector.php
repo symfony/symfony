@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  * ExceptionDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\ExceptionDataCollector instead.
  */
 class ExceptionDataCollector extends DataCollector
 {

@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * ConfigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\ConfigDataCollector instead.
  */
 class ConfigDataCollector extends DataCollector
 {

@@ -148,7 +148,7 @@ class XliffFileLoader implements LoaderInterface
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
         if (!@$dom->schemaValidateSource($source)) {
-            throw new InvalidResourceException(sprintf('The "%s" is not a valid resource: ', $file, implode("\n", $this->getXmlErrors($internalErrors))));
+            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: %s', $file, implode("\n", $this->getXmlErrors($internalErrors))));
         }
 
         $dom->normalizeDocument();

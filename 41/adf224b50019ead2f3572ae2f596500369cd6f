@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-15T12:59:24Z
+
+View diff as https://github.com/symfony/symfony/pull/14643/files?w=1
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-17T09:45:04Z
+
+I guess it would be good to have a test that ensures the bug explained by stof in https://github.com/symfony/symfony/pull/14558#issuecomment-100850702 is not triggered.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-20T04:40:45Z
+
+@stof @Tobion Any idea which test I should add? I'm not sure to have to right ideas for now.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-20T08:08:38Z
+
+@nicolas-grekas here is what the test should do:
+
+- define a container-scoped service
+- dump the container to PHP and continue the work with the dumped container (the bug in the previous PR does not affect the ContainerBuilder as its instantiation logic is different)
+- get it from the container (so that it is instantiated)
+- get it again from the container with a non-lowercase id, and a different casing than the previous time
+- assert that both instances are the same
+
+You can run the test against the code of #14558 to ensure it catches the issue properly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-20T18:46:28Z
+
+@stof thanks, done. I verified that the test fails on #14558 but not here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-27T18:33:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-28T13:30:20Z
+
+:+1:

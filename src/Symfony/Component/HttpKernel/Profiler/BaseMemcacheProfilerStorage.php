@@ -17,7 +17,8 @@ use Symfony\Component\Profiler\Storage\AbstractMemcacheProfilerStorage;
  * Base Memcache storage for profiling information in a Memcache.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\BaseMemcacheProfilerStorage instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\Storage\AbstractMemcacheProfilerStorage instead.
  */
 abstract class BaseMemcacheProfilerStorage extends AbstractMemcacheProfilerStorage
 {

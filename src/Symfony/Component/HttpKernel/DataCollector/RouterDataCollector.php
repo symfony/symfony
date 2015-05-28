@@ -20,7 +20,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  * RouterDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\RouterDataCollector instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\RouterDataCollector instead.
  */
 class RouterDataCollector extends DataCollector
 {

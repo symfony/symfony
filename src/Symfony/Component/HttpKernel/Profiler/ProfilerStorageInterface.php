@@ -17,7 +17,8 @@ use Symfony\Component\Profiler\Storage\ProfilerStorageInterface as BaseProfilerS
  * ProfilerStorageInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\ProfilerStorageInterface instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\Storage\ProfilerStorageInterface instead.
  */
 interface ProfilerStorageInterface extends BaseProfilerStorageInterface
 {

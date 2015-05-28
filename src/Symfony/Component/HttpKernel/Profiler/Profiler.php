@@ -23,7 +23,8 @@ use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
  * Profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\HttpProfiler instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\HttpProfiler instead.
  */
 class Profiler extends HttpProfiler
 {

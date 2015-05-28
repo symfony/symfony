@@ -17,7 +17,8 @@ use Symfony\Component\Profiler\Storage\SqliteProfilerStorage as BaseSqliteProfil
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\SqliteProfilerStorage instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\Storage\SqliteProfilerStorage instead.
  */
 class SqliteProfilerStorage extends BaseSqliteProfilerStorage
 {

@@ -21,7 +21,8 @@ use Symfony\Component\Profiler\DataCollector\DataCollectorInterface as BaseDataC
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\DataCollectorInterface instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\DataCollectorInterface instead.
  */
 interface DataCollectorInterface extends BaseDataCollectorInterface
 {

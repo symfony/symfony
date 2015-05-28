@@ -17,7 +17,8 @@ use Symfony\Component\Profiler\EventListener\HttpProfilerListener;
  * ProfilerListener collects data for the current request by listening to the kernel events.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\EventListener\ProfileListener instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\EventListener\HttpProfileListener instead.
  */
 class ProfilerListener extends HttpProfilerListener
 {

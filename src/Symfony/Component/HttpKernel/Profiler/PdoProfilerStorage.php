@@ -18,9 +18,9 @@ use Symfony\Component\Profiler\Storage\AbstractPdoProfilerStorage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schumann <js@schumann-it.com>
- * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\PdoProfilerStorage instead.
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\Storage\PdoProfilerStorage instead.
  */
 abstract class PdoProfilerStorage extends AbstractPdoProfilerStorage
 {
-
 }

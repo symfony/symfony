@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Profiler\Storage;
+
 use Symfony\Component\Profiler\Profile;
 
 /**

@@ -14,8 +14,6 @@ namespace Symfony\Component\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
-use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 

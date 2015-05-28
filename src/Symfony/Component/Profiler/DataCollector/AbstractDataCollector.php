@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
-use Symfony\Component\Profiler\DataCollector\Util\ValueExporter;
-
 /**
  * DataCollector.
  *

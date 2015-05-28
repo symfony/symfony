@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\Profiler\Storage\PdoProfilerStorage as BasePdoProfilerStorage;
+use Symfony\Component\Profiler\Storage\AbstractPdoProfilerStorage;
 
 /**
  * Base PDO storage for profiling information in a PDO database.
@@ -20,7 +20,7 @@ use Symfony\Component\Profiler\Storage\PdoProfilerStorage as BasePdoProfilerStor
  * @author Jan Schumann <js@schumann-it.com>
  * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\Storage\PdoProfilerStorage instead.
  */
-abstract class PdoProfilerStorage extends BasePdoProfilerStorage
+abstract class PdoProfilerStorage extends AbstractPdoProfilerStorage
 {
 
 }

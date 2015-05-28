@@ -16,7 +16,7 @@ namespace Symfony\Component\Profiler\Storage;
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  */
-class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
+class MemcacheProfilerStorage extends AbstractMemcacheProfilerStorage
 {
     /**
      * @var \Memcache

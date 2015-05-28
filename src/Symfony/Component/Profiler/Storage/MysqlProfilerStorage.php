@@ -16,7 +16,7 @@ namespace Symfony\Component\Profiler\Storage;
  *
  * @author Jan Schumann <js@schumann-it.com>
  */
-class MysqlProfilerStorage extends PdoProfilerStorage
+class MysqlProfilerStorage extends AbstractPdoProfilerStorage
 {
     /**
      * {@inheritdoc}

@@ -17,7 +17,7 @@ namespace Symfony\Component\Profiler\Storage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SqliteProfilerStorage extends PdoProfilerStorage
+class SqliteProfilerStorage extends AbstractPdoProfilerStorage
 {
     /**
      * @throws \RuntimeException When neither of SQLite3 or PDO_SQLite extension is enabled

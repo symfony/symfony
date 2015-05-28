@@ -26,7 +26,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testKernelTerminate()
     {
-        $profile = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')
+        $profile = $this->getMockBuilder('Symfony\Component\Profiler\Profile')
             ->disableOriginalConstructor()
             ->getMock();
 

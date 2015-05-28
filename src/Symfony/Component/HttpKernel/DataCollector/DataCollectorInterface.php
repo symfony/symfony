@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Profiler\DataCollector\DataCollectorInterface as BaseDataCollectorInterface;
 
 /**
  * DataCollectorInterface.
@@ -20,8 +21,10 @@ use Symfony\Component\HttpFoundation\Response;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\DataCollectorInterface instead.
  */
-interface DataCollectorInterface
+interface DataCollectorInterface extends BaseDataCollectorInterface
 {
     /**
      * Collects data for the given Request and Response.
@@ -33,13 +36,4 @@ interface DataCollectorInterface
      * @api
      */
     public function collect(Request $request, Response $response, \Exception $exception = null);
-
-    /**
-     * Returns the name of the collector.
-     *
-     * @return string The collector name
-     *
-     * @api
-     */
-    public function getName();
 }

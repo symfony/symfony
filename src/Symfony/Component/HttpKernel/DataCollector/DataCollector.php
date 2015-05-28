@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+use Symfony\Component\Profiler\DataCollector\AbstractDataCollector;
 
 /**
  * DataCollector.
@@ -20,8 +21,10 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@symfony.com>
+ *
+ * @deprecated since x.x, to be removed in x.x. Use Symfony\Component\Profiler\DataCollector\AbstractDataCollector instead.
  */
-abstract class DataCollector implements DataCollectorInterface, \Serializable
+abstract class DataCollector extends AbstractDataCollector implements DataCollectorInterface, \Serializable
 {
     protected $data = array();
 

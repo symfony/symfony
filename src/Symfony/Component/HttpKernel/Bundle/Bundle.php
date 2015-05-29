@@ -76,6 +76,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             if (class_exists($class)) {
                 $extension = new $class();
 
+                if (!$extension instanceof ExtensionInterface) {
+                    throw new \LogicException(sprintf('Extension %s must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface.', $class));
+                }
+
                 // check naming convention
                 $basename = preg_replace('/Bundle$/', '', $this->getName());
                 $expectedAlias = Container::underscore($basename);

@@ -37,7 +37,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $templateId = $this->getRememberMeServicesTemplateId($config);
         $rememberMeServicesId = $this->getRememberMeServicesId($id, $config);
 
-        $this->addRememberMeServicesToLogoutListener($container, $id, $rememberMeServicesId);
+        $this->addRememberMeServicesToLogoutListener($container, $id, $config);
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
         $rememberMeServices->replaceArgument(1, $config['key']);
@@ -121,12 +121,12 @@ class RememberMeFactory implements SecurityFactoryInterface
         return $authProviderId;
     }
 
-    private function addRememberMeServicesToLogoutListener(ContainerBuilder $container, $id, $rememberMeServicesId)
+    private function addRememberMeServicesToLogoutListener(ContainerBuilder $container, $id, array $config)
     {
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container
                 ->getDefinition('security.logout_listener.'.$id)
-                ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)))
+                ->addMethodCall('addHandler', array(new Reference($this->getRememberMeServicesId($id, $config))))
             ;
         }
     }

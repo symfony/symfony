@@ -7,6 +7,10 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.30 (2015-05-30)
+
+ * bug #14262 [REVERTED] [TwigBundle] Refresh twig paths when resources change. (aitboudad)
+
 * 2.3.29 (2015-05-26)
 
  * security #14759 CVE-2015-4050 [HttpKernel] Do not call the FragmentListener if _controller is already defined (jakzal)

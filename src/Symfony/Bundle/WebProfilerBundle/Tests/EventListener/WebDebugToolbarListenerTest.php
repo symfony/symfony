@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -29,7 +30,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response($content);
 
-        $m->invoke($listener, $response);
+        $m->invoke($listener, $response, Request::create('/'));
         $this->assertEquals($expected, $response->getContent());
     }
 

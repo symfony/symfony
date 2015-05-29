@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -101,7 +102,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $this->injectToolbar($response);
+        $this->injectToolbar($response, $request);
     }
 
     /**
@@ -109,7 +110,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      *
      * @param Response $response A Response instance
      */
-    protected function injectToolbar(Response $response)
+    protected function injectToolbar(Response $response, Request $request)
     {
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
@@ -121,6 +122,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'position' => $this->position,
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
+                    'request' => $request,
                 )
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);

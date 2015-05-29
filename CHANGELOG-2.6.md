@@ -7,6 +7,11 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.9 (2015-05-30)
+
+ * bug #14777 Avoid using the app global variable in the profiler templates (stof)
+ * bug #14262 [REVERTED] [TwigBundle] Refresh twig paths when resources change. (aitboudad)
+
 * 2.6.8 (2015-05-27)
 
  * security #14759 CVE-2015-4050 [HttpKernel] Do not call the FragmentListener if _controller is already defined (jakzal)

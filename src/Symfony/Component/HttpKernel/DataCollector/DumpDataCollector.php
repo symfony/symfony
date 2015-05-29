@@ -23,6 +23,8 @@ use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\DumpDataCollector instead.
  */
 class DumpDataCollector extends DataCollector implements DataDumperInterface
 {

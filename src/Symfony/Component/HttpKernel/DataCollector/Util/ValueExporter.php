@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\DataCollector\Util;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\Util\ValueExporter instead.
  */
 class ValueExporter
 {

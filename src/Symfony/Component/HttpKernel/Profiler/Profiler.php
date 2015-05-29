@@ -12,38 +12,23 @@
 namespace Symfony\Component\HttpKernel\Profiler;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Profiler\HttpProfiler;
+use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 
 /**
  * Profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\HttpProfiler instead.
  */
-class Profiler
+class Profiler extends HttpProfiler
 {
-    /**
-     * @var ProfilerStorageInterface
-     */
-    private $storage;
-
-    /**
-     * @var DataCollectorInterface[]
-     */
-    private $collectors = array();
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var bool
-     */
-    private $enabled = true;
-
     /**
      * Constructor.
      *
@@ -52,24 +37,7 @@ class Profiler
      */
     public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null)
     {
-        $this->storage = $storage;
-        $this->logger = $logger;
-    }
-
-    /**
-     * Disables the profiler.
-     */
-    public function disable()
-    {
-        $this->enabled = false;
-    }
-
-    /**
-     * Enables the profiler.
-     */
-    public function enable()
-    {
-        $this->enabled = true;
+        parent::__construct(new RequestStack(), $storage, $logger);
     }
 
     /**
@@ -81,11 +49,7 @@ class Profiler
      */
     public function loadProfileFromResponse(Response $response)
     {
-        if (!$token = $response->headers->get('X-Debug-Token')) {
-            return false;
-        }
-
-        return $this->loadProfile($token);
+        return $this->loadFromResponse($response);
     }
 
     /**
@@ -97,7 +61,7 @@ class Profiler
      */
     public function loadProfile($token)
     {
-        return $this->storage->read($token);
+        return $this->load($token);
     }
 
     /**
@@ -109,77 +73,12 @@ class Profiler
      */
     public function saveProfile(Profile $profile)
     {
-        // late collect
-        foreach ($profile->getCollectors() as $collector) {
+        foreach ( $profile->getCollectors() as $collector ) {
             if ($collector instanceof LateDataCollectorInterface) {
                 $collector->lateCollect();
             }
         }
-
-        if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.', array('configured_storage' => get_class($this->storage)));
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Purges all data from the storage.
-     */
-    public function purge()
-    {
-        $this->storage->purge();
-    }
-
-    /**
-     * Exports the current profiler data.
-     *
-     * @param Profile $profile A Profile instance
-     *
-     * @return string The exported data
-     */
-    public function export(Profile $profile)
-    {
-        return base64_encode(serialize($profile));
-    }
-
-    /**
-     * Imports data into the profiler storage.
-     *
-     * @param string $data A data string as exported by the export() method
-     *
-     * @return Profile A Profile instance
-     */
-    public function import($data)
-    {
-        $profile = unserialize(base64_decode($data));
-
-        if ($this->storage->read($profile->getToken())) {
-            return false;
-        }
-
-        $this->saveProfile($profile);
-
-        return $profile;
-    }
-
-    /**
-     * Finds profiler tokens for the given criteria.
-     *
-     * @param string $ip     The IP
-     * @param string $url    The URL
-     * @param string $limit  The maximum number of tokens to return
-     * @param string $method The request method
-     * @param string $start  The start date to search from
-     * @param string $end    The end date to search to
-     *
-     * @return array An array of tokens
-     *
-     * @see http://php.net/manual/en/datetime.formats.php for the supported date/time formats
-     */
-    public function find($ip, $url, $limit, $method, $start, $end)
-    {
-        return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end));
+        return $this->save($profile);
     }
 
     /**
@@ -193,104 +92,31 @@ class Profiler
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        if (false === $this->enabled) {
-            return;
-        }
+        $this->requestStack->push($request);
 
-        $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
-        $profile->setTime(time());
-        $profile->setUrl($request->getUri());
-        $profile->setIp($request->getClientIp());
-        $profile->setMethod($request->getMethod());
-        $profile->setStatusCode($response->getStatusCode());
+        if ( $profile = parent::profile() ) {
+            /** @var DataCollectorInterface $collector */
+            foreach ($this->all() as $collector) {
+                $collector->setToken($profile->getToken());
+                if ($collector instanceof DataCollectorInterface) {
+                    $collector->collect($request, $response, $exception);
 
-        $response->headers->set('X-Debug-Token', $profile->getToken());
-
-        foreach ($this->collectors as $collector) {
-            $collector->collect($request, $response, $exception);
-
-            // we need to clone for sub-requests
-            $profile->addCollector(clone $collector);
+                    // we need to clone for sub-requests
+                    $profile->addCollector(clone $collector);
+                }
+            }
         }
 
         return $profile;
     }
 
-    /**
-     * Gets the Collectors associated with this profiler.
-     *
-     * @return array An array of collectors
-     */
-    public function all()
+    public function profile()
     {
-        return $this->collectors;
-    }
+        // Prevent the deprecation notice to be triggered all the time.
+        // The onKernelRequest() method fires some logic only when the
+        // RequestStack instance is not provided as a dependency.
+        trigger_error('The ' . __METHOD__ . ' method should not be used till version 3.0 as it does not support 2.x DataCollectors. Use the method collect instead.', E_USER_DEPRECATED);
 
-    /**
-     * Sets the Collectors associated with this profiler.
-     *
-     * @param DataCollectorInterface[] $collectors An array of collectors
-     */
-    public function set(array $collectors = array())
-    {
-        $this->collectors = array();
-        foreach ($collectors as $collector) {
-            $this->add($collector);
-        }
-    }
-
-    /**
-     * Adds a Collector.
-     *
-     * @param DataCollectorInterface $collector A DataCollectorInterface instance
-     */
-    public function add(DataCollectorInterface $collector)
-    {
-        $this->collectors[$collector->getName()] = $collector;
-    }
-
-    /**
-     * Returns true if a Collector for the given name exists.
-     *
-     * @param string $name A collector name
-     *
-     * @return bool
-     */
-    public function has($name)
-    {
-        return isset($this->collectors[$name]);
-    }
-
-    /**
-     * Gets a Collector by name.
-     *
-     * @param string $name A collector name
-     *
-     * @return DataCollectorInterface A DataCollectorInterface instance
-     *
-     * @throws \InvalidArgumentException if the collector does not exist
-     */
-    public function get($name)
-    {
-        if (!isset($this->collectors[$name])) {
-            throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
-        }
-
-        return $this->collectors[$name];
-    }
-
-    private function getTimestamp($value)
-    {
-        if (null === $value || '' == $value) {
-            return;
-        }
-
-        try {
-            $value = new \DateTime(is_numeric($value) ? '@'.$value : $value);
-        } catch (\Exception $e) {
-            return;
-        }
-
-        return $value->getTimestamp();
+        return parent::profile();
     }
 }

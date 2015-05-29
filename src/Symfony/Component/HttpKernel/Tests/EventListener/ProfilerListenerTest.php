@@ -38,6 +38,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
         $profiler = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();
+
         $profiler->expects($this->once())
             ->method('collect')
             ->will($this->returnValue($profile));

@@ -31,6 +31,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
         $profiler = new Profiler($this->storage);
         $profiler->add($collector);
+        $profiler->addResponse($request, $response);
         $profile = $profiler->collect($request, $response);
 
         $this->assertSame(204, $profile->getStatusCode());

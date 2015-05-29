@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
-use Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage;
-use Symfony\Component\HttpKernel\Profiler\Profile;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+
+use Symfony\Component\Profiler\DataCollector\RuntimeDataCollectorInterface;
+use Symfony\Component\Profiler\Profile;
+use Symfony\Component\Profiler\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Profiler\ProfileData\AbstractProfileData;
+use Symfony\Component\Profiler\Storage\MongoDbProfilerStorage;
 
 class DummyMongoDbProfilerStorage extends MongoDbProfilerStorage
 {
@@ -25,8 +28,10 @@ class DummyMongoDbProfilerStorage extends MongoDbProfilerStorage
     }
 }
 
-class MongoDbProfilerStorageTestDataCollector extends DataCollector
+class MongoDbProfilerStorageTestDataCollector extends AbstractDataCollector implements RuntimeDataCollectorInterface
 {
+    private $data;
+
     public function setData($data)
     {
         $this->data = $data;
@@ -37,10 +42,19 @@ class MongoDbProfilerStorageTestDataCollector extends DataCollector
         return $this->data;
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect()
     {
+        return new MongoDbProfilerStorageTestDataProfile($this->data);
     }
 
+    public function getName()
+    {
+        return 'test_data_collector';
+    }
+}
+
+class MongoDbProfilerStorageTestDataProfile extends AbstractProfileData
+{
     public function getName()
     {
         return 'test_data_collector';

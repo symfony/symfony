@@ -29,10 +29,5 @@
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" }
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.8-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

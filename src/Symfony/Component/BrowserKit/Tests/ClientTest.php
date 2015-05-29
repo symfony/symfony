@@ -207,6 +207,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $client->request('GET', 'bar');
         $this->assertEquals('http://www.example.com/foo/bar', $client->getRequest()->getUri(), '->request() uses the previous request for relative URLs');
+
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/foo/');
+        $client->request('GET', 'http');
+        $this->assertEquals('http://www.example.com/foo/http', $client->getRequest()->getUri(), '->request() uses the previous request for relative URLs');
+
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/foo');
+        $client->request('GET', 'http/bar');
+        $this->assertEquals('http://www.example.com/http/bar', $client->getRequest()->getUri(), '->request() uses the previous request for relative URLs');
+
+        $client = new TestClient();
+        $client->request('GET', 'http://www.example.com/');
+        $client->request('GET', 'http');
+        $this->assertEquals('http://www.example.com/http', $client->getRequest()->getUri(), '->request() uses the previous request for relative URLs');
     }
 
     public function testRequestURIConversionByServerHost()

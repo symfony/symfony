@@ -54,7 +54,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         $rememberMeServices->replaceArgument(0, $this->findUserProviders($container, $id, $rememberMeServicesId, $config));
 
-        $listenerId = $this->configureRememberMeAuthenticationListener($container, $id, $rememberMeServicesId);
+        $listenerId = $this->configureRememberMeAuthenticationListener($container, $id, $config);
 
         return array($authProviderId, $listenerId, $defaultEntryPoint);
     }
@@ -182,12 +182,12 @@ class RememberMeFactory implements SecurityFactoryInterface
         return $userProviders;
     }
 
-    private function configureRememberMeAuthenticationListener(ContainerBuilder $container, $id, $rememberMeServicesId)
+    private function configureRememberMeAuthenticationListener(ContainerBuilder $container, $id, array $config)
     {
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
 
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
-        $listener->replaceArgument(1, new Reference($rememberMeServicesId));
+        $listener->replaceArgument(1, new Reference($this->getRememberMeServicesId($id, $config)));
 
         return $listenerId;
     }

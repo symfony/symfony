@@ -31,13 +31,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
-        // authentication provider
-        $authProviderId = 'security.authentication.provider.rememberme.'.$id;
-        $container
-            ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument($config['key'])
-            ->addArgument($id)
-        ;
+        $authProviderId = $this->configureRememberMeAuthenticationProvider($container, $id, $config);
 
         // remember me services
         $templateId = $this->getRememberMeServicesTemplateId($config);
@@ -148,5 +142,18 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         return 'security.authentication.rememberme.services.simplehash';
+    }
+
+    private function configureRememberMeAuthenticationProvider(ContainerBuilder $container, $id, array $config)
+    {
+        $authProviderId = 'security.authentication.provider.rememberme.'.$id;
+
+        $container
+            ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
+            ->addArgument($config['key'])
+            ->addArgument($id)
+        ;
+
+        return $authProviderId;
     }
 }

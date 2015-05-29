@@ -107,7 +107,7 @@ PHP
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
             $that->assertEquals(__LINE__ + 40, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
-            $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+            $that->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
 
             $trace = $exception->getTrace();

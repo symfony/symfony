@@ -52,26 +52,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         // remember-me options
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
 
-        // attach to remember-me aware listeners
-        $userProviders = array();
-        
-        foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
-            foreach ($attributes as $attribute) {
-                if (!isset($attribute['id']) || $attribute['id'] !== $id) {
-                    continue;
-                }
-
-                if (!isset($attribute['provider'])) {
-                    throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
-                }
-
-                $userProviders[] = new Reference($attribute['provider']);
-                $container
-                    ->getDefinition($serviceId)
-                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
-                ;
-            }
-        }
+        $userProviders = $this->findAndAttachToRememberMeAwareListeners($container, $id, $rememberMeServicesId);
 
         if ($config['user_providers']) {
             $userProviders = $this->findUserProvidersInConfig($config);
@@ -158,6 +139,31 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)))
             ;
         }
+    }
+
+    private function findAndAttachToRememberMeAwareListeners(ContainerBuilder $container, $id, $rememberMeServicesId)
+    {
+        $userProviders = array();
+
+        foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
+            foreach ($attributes as $attribute) {
+                if (!isset($attribute['id']) || $attribute['id'] !== $id) {
+                    continue;
+                }
+
+                if (!isset($attribute['provider'])) {
+                    throw new \RuntimeException('Each "security.remember_me_aware" tag must have a provider attribute.');
+                }
+
+                $userProviders[] = new Reference($attribute['provider']);
+                $container
+                    ->getDefinition($serviceId)
+                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
+                ;
+            }
+        }
+
+        return $userProviders;
     }
 
     private function findUserProvidersInConfig(array $config)

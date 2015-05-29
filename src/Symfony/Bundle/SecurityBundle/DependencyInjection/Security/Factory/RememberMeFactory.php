@@ -52,7 +52,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         // remember-me options
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
 
-        $rememberMeServices->replaceArgument(0, $this->findUserProviders($container, $id, $rememberMeServicesId, $config));
+        $rememberMeServices->replaceArgument(0, $this->findUserProviders($container, $id, $config));
 
         $listenerId = $this->configureRememberMeAuthenticationListener($container, $id, $config);
 
@@ -131,9 +131,9 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
     }
 
-    private function findUserProviders(ContainerBuilder $container, $id, $rememberMeServicesId, array $config)
+    private function findUserProviders(ContainerBuilder $container, $id, array $config)
     {
-        $userProviders = $this->findAndAttachToRememberMeAwareListeners($container, $id, $rememberMeServicesId);
+        $userProviders = $this->findAndAttachToRememberMeAwareListeners($container, $id, $config);
 
         if ($config['user_providers']) {
             $userProviders = $this->findUserProvidersInConfig($config);
@@ -146,8 +146,9 @@ class RememberMeFactory implements SecurityFactoryInterface
         return $userProviders;
     }
 
-    private function findAndAttachToRememberMeAwareListeners(ContainerBuilder $container, $id, $rememberMeServicesId)
+    private function findAndAttachToRememberMeAwareListeners(ContainerBuilder $container, $id, array $config)
     {
+        $rememberMeServicesId = $this->getRememberMeServicesId($id, $config);
         $userProviders = array();
 
         foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {

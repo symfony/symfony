@@ -54,6 +54,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // attach to remember-me aware listeners
         $userProviders = array();
+        
         foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
             foreach ($attributes as $attribute) {
                 if (!isset($attribute['id']) || $attribute['id'] !== $id) {
@@ -71,15 +72,15 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ;
             }
         }
+
         if ($config['user_providers']) {
-            $userProviders = array();
-            foreach ($config['user_providers'] as $providerName) {
-                $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
-            }
+            $userProviders = $this->findUserProvidersInConfig($config);
         }
+
         if (count($userProviders) === 0) {
             throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
         }
+
         $rememberMeServices->replaceArgument(0, $userProviders);
 
         $listenerId = $this->configureRememberMeAuthenticationListener($container, $id, $rememberMeServicesId);
@@ -157,6 +158,17 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)))
             ;
         }
+    }
+
+    private function findUserProvidersInConfig(array $config)
+    {
+        $userProviders = array();
+
+        foreach ($config['user_providers'] as $providerName) {
+            $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
+        }
+
+        return $userProviders;
     }
 
     private function configureRememberMeAuthenticationListener(ContainerBuilder $container, $id, $rememberMeServicesId)

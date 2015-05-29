@@ -60,7 +60,7 @@ class CollectionValidator extends ConstraintValidator
                 if (count($fieldConstraint->constraints) > 0) {
                     if ($context instanceof ExecutionContextInterface) {
                         $context->getValidator()
-                            ->inContext($context)
+                            ->inContext(clone $context)
                             ->atPath('['.$field.']')
                             ->validate($value[$field], $fieldConstraint->constraints);
                     } else {

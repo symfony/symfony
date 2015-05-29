@@ -33,26 +33,9 @@ class RememberMeFactory implements SecurityFactoryInterface
     {
         $authProviderId = $this->configureRememberMeAuthenticationProvider($container, $id, $config);
 
-        // remember me services
-        $templateId = $this->getRememberMeServicesTemplateId($config);
-        $rememberMeServicesId = $this->getRememberMeServicesId($id, $config);
-
         $this->addRememberMeServicesToLogoutListener($container, $id, $config);
 
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
-        $rememberMeServices->replaceArgument(2, $id);
-
-        if (isset($config['token_provider'])) {
-            $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference($config['token_provider']),
-            ));
-        }
-
-        // remember-me options
-        $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
-
-        $rememberMeServices->replaceArgument(0, $this->findUserProviders($container, $id, $config));
+        $this->configureRememberMeServices($container, $id, $config);
 
         $listenerId = $this->configureRememberMeAuthenticationListener($container, $id, $config);
 
@@ -129,6 +112,27 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->addMethodCall('addHandler', array(new Reference($this->getRememberMeServicesId($id, $config))))
             ;
         }
+    }
+
+    private function configureRememberMeServices(ContainerBuilder $container, $id, array $config)
+    {
+        $templateId = $this->getRememberMeServicesTemplateId($config);
+        $rememberMeServicesId = $this->getRememberMeServicesId($id, $config);
+
+        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
+        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(2, $id);
+
+        if (isset($config['token_provider'])) {
+            $rememberMeServices->addMethodCall('setTokenProvider', array(
+                new Reference($config['token_provider']),
+            ));
+        }
+
+        // remember-me options
+        $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
+
+        $rememberMeServices->replaceArgument(0, $this->findUserProviders($container, $id, $config));
     }
 
     private function findUserProviders(ContainerBuilder $container, $id, array $config)

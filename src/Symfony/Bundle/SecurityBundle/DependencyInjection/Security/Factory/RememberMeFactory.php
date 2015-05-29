@@ -41,7 +41,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember me services
         $templateId = $this->getRememberMeServicesTemplateId($config);
-        $rememberMeServicesId = $templateId.'.'.$id;
+        $rememberMeServicesId = $this->getRememberMeServicesId($id, $config);
 
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container
@@ -134,6 +134,11 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $builder->scalarNode($name)->defaultValue($value);
             }
         }
+    }
+
+    private function getRememberMeServicesId($id, array $config)
+    {
+        return $this->getRememberMeServicesTemplateId($config).'.'.$id;
     }
 
     private function getRememberMeServicesTemplateId(array $config)

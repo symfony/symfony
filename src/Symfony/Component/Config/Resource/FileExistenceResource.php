@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -7,7 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\Config\Resource;
+
 /**
  * FileExistenceResource represents a resource stored on the filesystem.
  * Freshness is only evaluated against resource creation or deletion.
@@ -19,7 +22,9 @@ namespace Symfony\Component\Config\Resource;
 class FileExistenceResource implements ResourceInterface, \Serializable
 {
     private $resource;
+
     private $exists;
+
     /**
      * Constructor.
      *
@@ -30,6 +35,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
         $this->resource = $resource;
         $this->exists = file_exists($resource);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -37,6 +43,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
     {
         return (string) $this->resource;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -44,6 +51,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
     {
         return $this->resource;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -51,6 +59,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
     {
         return file_exists($this->resource) === $this->exists;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -58,6 +67,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
     {
         return serialize(array($this->resource, $this->exists));
     }
+
     /**
      * {@inheritdoc}
      */

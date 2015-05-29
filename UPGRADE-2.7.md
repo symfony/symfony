@@ -559,6 +559,31 @@ Validator
    (NullValidator, TrueValidator, FalseValidator) are marked as deprecated
    in favor of their `Is`-prefixed equivalent.
 
+Console
+-------
+
+ * The `Symfony\Component\Console\Input\InputDefinition::getSynopsis()` method
+   now has an optional argument (it previously had no arguments). If you override
+   this method, you'll need to add this argument so that your signature matches:
+
+   Before:
+
+   ```php
+   public function getSynopsis()
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   public function getSynopsis($short = false)
+   {
+       // ...
+   }
+   ```
+
 TwigBundle
 ----------
 

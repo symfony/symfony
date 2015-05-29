@@ -40,13 +40,8 @@ class RememberMeFactory implements SecurityFactoryInterface
         ;
 
         // remember me services
-        if (isset($config['token_provider'])) {
-            $templateId = 'security.authentication.rememberme.services.persistent';
-            $rememberMeServicesId = $templateId.'.'.$id;
-        } else {
-            $templateId = 'security.authentication.rememberme.services.simplehash';
-            $rememberMeServicesId = $templateId.'.'.$id;
-        }
+        $templateId = $this->getRememberMeServicesTemplateId($config);
+        $rememberMeServicesId = $templateId.'.'.$id;
 
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container
@@ -139,5 +134,14 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $builder->scalarNode($name)->defaultValue($value);
             }
         }
+    }
+
+    private function getRememberMeServicesTemplateId(array $config)
+    {
+        if (isset($config['token_provider'])) {
+            return 'security.authentication.rememberme.services.persistent';
+        }
+
+        return 'security.authentication.rememberme.services.simplehash';
     }
 }

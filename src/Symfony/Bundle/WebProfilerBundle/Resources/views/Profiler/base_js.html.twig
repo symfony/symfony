@@ -205,12 +205,12 @@
                     /* prevent logging AJAX calls to static and inline files, like templates */
                     var path = url;
                     if (url.substr(0, 1) === '/') {
-                        if (0 === url.indexOf('{{ app.request.basePath|e('js') }}')) {
-                            path = url.substr({{ app.request.basePath|length }});
+                        if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
+                            path = url.substr({{ request.basePath|length }});
                         }
                     }
-                    else if (0 === url.indexOf('{{ (app.request.schemeAndHttpHost ~ app.request.basePath)|e('js') }}')) {
-                        path = url.substr({{ (app.request.schemeAndHttpHost ~ app.request.basePath)|length }});
+                    else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
+                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
                     }
 
                     if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {

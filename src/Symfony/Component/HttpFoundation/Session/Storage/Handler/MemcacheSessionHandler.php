@@ -87,7 +87,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        return $this->memcache->set($this->prefix.$sessionId, $data, 0, time() + $this->ttl);
+        return $this->memcache->set($this->prefix.$sessionId, $data, 0, $this->ttl);
     }
 
     /**

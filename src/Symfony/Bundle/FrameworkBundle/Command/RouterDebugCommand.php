@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * A console command for retrieving information about routes.
@@ -84,11 +85,10 @@ EOF
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
 
+        $routes = $this->getContainer()->get('router')->getRouteCollection();
         if ($name) {
-            $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
-            if (!$route) {
-                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
-            }
+            $name = $this->findProperRouteName($input, $output, $routes, $name);
+            $route = $routes->get($name);
             $this->convertController($route);
             $helper->describe($output, $route, array(
                 'format' => $input->getOption('format'),
@@ -96,8 +96,6 @@ EOF
                 'name' => $name,
             ));
         } else {
-            $routes = $this->getContainer()->get('router')->getRouteCollection();
-
             foreach ($routes as $route) {
                 $this->convertController($route);
             }
@@ -107,6 +105,10 @@ EOF
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
             ));
+        }
+
+        if (!$name && $input->isInteractive()) {
+            $output->writeln('To search for a route, re-run this command with a search term. <comment>debug:router admin</comment>');
         }
     }
 
@@ -119,5 +121,21 @@ EOF
             } catch (\InvalidArgumentException $e) {
             }
         }
+    }
+
+    private function findProperRouteName(InputInterface $input, OutputInterface $output, $routes, $name)
+    {
+        $matchingServices = array_filter(array_keys($routes->all()), function ($routeName) use ($name) {
+            return false !== strpos($routeName, $name);
+        });
+
+        if (!$matchingServices) {
+            throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
+        }
+
+        $question = new ChoiceQuestion('Choose a number for more information on the route', array_values($matchingServices));
+        $question->setErrorMessage('Route %s is invalid.');
+
+        return $this->getHelper('question')->ask($input, $output, $question);
     }
 }

@@ -419,6 +419,10 @@ EOF
 
     private function getCatalogueCachePath($locale)
     {
+        if (!$this->debug) {
+            return $this->cacheDir.'/catalogue.'.$locale.'.php';
+        }
+
         $catalogueHash = sha1(serialize(array(
             'resources' => isset($this->resources[$locale]) ? $this->resources[$locale] : array(),
             'fallback_locales' => $this->fallbackLocales,

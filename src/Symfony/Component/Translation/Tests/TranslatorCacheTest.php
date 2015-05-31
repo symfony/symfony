@@ -150,11 +150,9 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $translator->trans($msgid);
     }
 
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
-    public function testDifferentTranslatorsForSameLocaleDoNotInterfere($debug)
+    public function testDifferentTranslatorsForSameLocaleDoNotInterfere()
     {
+        $debug = true;
         $locale = 'any_locale';
         $format = 'some_format';
         $msgid = 'test';
@@ -216,7 +214,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * catalogues, we must take the set of fallback locales into consideration when
          * loading a catalogue from the cache.
          */
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = new Translator('a', null, $this->tmpDir, true);
         $translator->setFallbackLocales(array('b'));
 
         $translator->addLoader('array', new ArrayLoader());
@@ -230,7 +228,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
 
         // Use a fresh translator with no fallback locales, result should be the same
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = new Translator('a', null, $this->tmpDir, true);
 
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (a)'), 'a');

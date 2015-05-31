@@ -209,8 +209,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function addChild(NodeInterface $node)
     {
-        $name = (string) $node->getName();
-        if ('' === $name) {
+        $name = $node->getName();
+        if (!strlen($name)) {
             throw new \InvalidArgumentException('Child nodes must be named.');
         }
         if (isset($this->children[$name])) {

@@ -45,7 +45,7 @@ class Inline
 
         $value = trim($value);
 
-        if (0 == strlen($value)) {
+        if ('' === $value) {
             return '';
         }
 
@@ -462,7 +462,7 @@ class Inline
                         return -log(0);
                     case '-.inf' === $scalarLower:
                         return log(0);
-                    case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
+                    case preg_match('/^(-|\+)?[0-9,]+(\.\d+)?$/', $scalar):
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         return strtotime($scalar);

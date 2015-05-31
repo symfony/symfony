@@ -309,7 +309,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getName()
     {
         if (null === $this->name) {
-            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+            $this->name = preg_replace('/\W+/', '', basename($this->rootDir));
         }
 
         return $this->name;

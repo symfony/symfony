@@ -511,8 +511,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      */
     private function insertFieldAce($property, $index, $field, $mask, SecurityIdentityInterface $sid, $granting, $strategy = null)
     {
-        if (0 === strlen($field)) {
-            throw new \InvalidArgumentException('$field cannot be empty.');
+        if ('' === $field || !is_string($field)) {
+            throw new \InvalidArgumentException('$field must be a non-empty string.');
         }
 
         if (!is_int($mask)) {
@@ -622,8 +622,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      */
     private function updateFieldAce($property, $index, $field, $mask, $strategy = null)
     {
-        if (0 === strlen($field)) {
-            throw new \InvalidArgumentException('$field cannot be empty.');
+        if ('' === $field || !is_string($field)) {
+            throw new \InvalidArgumentException('$field must be a non-empty string.');
         }
 
         $aces = &$this->$property;

@@ -116,7 +116,7 @@ class Link
             return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
         }
 
-        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
+        $baseUri = preg_replace('#^([^/]*//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
 
         // absolute path
         if ('/' === $uri[0]) {

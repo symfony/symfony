@@ -85,3 +85,4 @@ class RedisSessionHandler implements \SessionHandlerInterface
         return true;
     }
 }
+

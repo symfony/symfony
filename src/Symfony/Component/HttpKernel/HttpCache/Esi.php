@@ -162,7 +162,7 @@ class Esi
 
         // we don't use a proper XML parser here as we can have ESI tags in a plain text response
         $content = $response->getContent();
-        $content = preg_replace('#<esi\:remove>[^<]*</esi\:remove>#', '', $content);
+        $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#s', '', $content);
         $content = preg_replace('#<esi\:comment[^>]*(?:/|</esi\:comment)>#', '', $content);
 
         $chunks = preg_split('#<esi\:include\s+(.*?)\s*(?:/|</esi\:include)>#', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -183,7 +183,7 @@ class Esi
             $chunks[$i] = sprintf('<?php echo $this->esi->handle($this, %s, %s, %s) ?>'."\n",
                 var_export($options['src'], true),
                 var_export(isset($options['alt']) ? $options['alt'] : '', true),
-                isset($options['onerror']) && 'continue' == $options['onerror'] ? 'true' : 'false'
+                isset($options['onerror']) && 'continue' === $options['onerror'] ? 'true' : 'false'
             );
             ++$i;
             $chunks[$i] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[$i]);

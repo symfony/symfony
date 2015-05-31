@@ -47,7 +47,6 @@
     </service>
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="false" />
-    <service id="request" class="Request" synthetic="true" synchronized="true" lazy="true"/>
     <service id="decorator_service" decorates="decorated" />
     <service id="decorator_service_with_name" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="new_factory1" class="FooBarClass">

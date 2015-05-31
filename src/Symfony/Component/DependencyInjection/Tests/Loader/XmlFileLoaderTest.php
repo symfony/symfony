@@ -206,6 +206,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($services['factory_service']->getClass());
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
         $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
+        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
+        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
+        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
+        $this->assertNull($services['request']->getDecoratedService());
     }
 
     public function testLoadServices()
@@ -231,10 +235,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new Reference('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
 
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isSynchronized(false), '->load() parses the synchronized flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
-
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses <service> elements');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
@@ -243,7 +243,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
 
-        $this->assertNull($services['request']->getDecoratedService());
         $this->assertEquals(array('decorated', null), $services['decorator_service']->getDecoratedService());
         $this->assertEquals(array('decorated', 'decorated.pif-pouf'), $services['decorator_service_with_name']->getDecoratedService());
     }

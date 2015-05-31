@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -8,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
-
 
 /**
  * RedisSessionHandler
@@ -34,53 +33,52 @@ class RedisSessionHandler implements \SessionHandlerInterface
     /**
      * Class Constructor
      *
-     * @param \Redis $redis  A memcached instance
-     * @param int $ttl Session lifetime
+     * @param \Redis $redis A memcached instance
+     * @param int   $ttl    Session lifetime
      */
     public function __construct(\Redis $redis, $ttl)
     {
-
         $this->redis = $redis;
         $this->ttl = $ttl;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
         return true;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function read($sessionId)
     {
         return (string) $this->redis->get($sessionId);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function write($sessionId, $data)
     {
         return $this->redis->setex($sessionId, $this->ttl, $data);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function destroy($sessionId)
     {
         return 1 === $this->redis->delete($sessionId);
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function gc($lifetime)
     {
         return true;
     }
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function close()
     {

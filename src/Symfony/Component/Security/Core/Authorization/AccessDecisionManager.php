@@ -41,12 +41,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $voters, $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
-        if (!$voters) {
-            throw new \InvalidArgumentException('You must at least add one voter.');
-        }
-
         $strategyMethod = 'decide'.ucfirst($strategy);
         if (!is_callable(array($this, $strategyMethod))) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
@@ -56,6 +52,16 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+    }
+
+    /**
+     * Configures the voters.
+     *
+     * @param VoterInterface[] $voters An array of VoterInterface instances
+     */
+    public function setVoters(array $voters)
+    {
+        $this->voters = $voters;
     }
 
     /**

@@ -213,7 +213,7 @@ class ApacheMatcherDumper extends MatcherDumper
     {
         $regexPatternEnd = strrpos($regex, $regex[0]);
 
-        return preg_replace('/\?P<[^>]+>/', '', substr($regex, 1, $regexPatternEnd - 1));
+        return preg_replace('/\?P<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
     }
 
     /**

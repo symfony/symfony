@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-23T19:22:00Z
+
+:+1: I tested this - it allows for the `security.access.decision_manager` service to be injected into voters without a circular reference (e.g. so that a voter could check `isGranted('ROLE_ADMIN')`.
+
+For docs: symfony/symfony-docs#5306, I have an issue to doc this.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-05-24T20:10:09Z
+
+@weaverryan wouldn't that lead to potential recursion?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-25T21:58:46Z
+
+@iltar Recursion where? Do you mean a circular reference? If so, then no - the container is able to create the AccessDecisionManager, then create the voters, then finish the AccessDecisionManager by calling `setVoters()`. Or do you mean recursion in that AccessDecisionManager refers to voters, which refer back to the AccessDecisionManager? If so, then yes, which isn't really a problem except for garbage collection (see https://github.com/symfony/symfony/pull/14550#issuecomment-99112957), in which case you could call `setVoters()` with an empty array to clear things if you really needed to. More broadly, I don't think there's another possible way to fix this, rather than giving the voters access to the AccessDecisionManager.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-25T22:07:41Z
+
+@weaverryan : I think what @iltar means isn't about the circular object graph, but in the case of a voter `A` calling `isGranted` on an object and attribute supported by voter `B`, and voter `B` calling `isGranted` on the same object and attribute supported by voter `A` again. Or `A` calling itself.
+But if there is such a case, I think it's only due to a bad design.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-25T22:36:43Z
+
+@ogizanagi OOOH, yes, of course - I don't know how I missed that. Yes, it's possible - but I agree with you - that would be an error on the developer, and one that they would suffer during development and fix. And this is already true today if you use a voter to go back through the AccessDecisionManager ("possible" if you inject the container into a voter - it's hacky, hence this PR).
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-05-26T04:59:50Z
+
+@weaverryan that's exactly what I meant. Maybe we could somehow make the AccesDecisionManager track what it's voting for, so when it tries to vote again on the same role, it will throw an exception.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-26T17:50:43Z
+
+I don't think it's possible because it *may* make sense to call a voter recursively - the attributes or token may be different, or the voter may be holding some state (it shouldn't) that makes it act different the second time. I like the thought - but I'm not sure it's possible

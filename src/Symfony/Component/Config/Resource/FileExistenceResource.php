@@ -32,7 +32,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
      */
     public function __construct($resource)
     {
-        $this->resource = $resource;
+        $this->resource = (string) $resource;
         $this->exists = file_exists($resource);
     }
 
@@ -41,7 +41,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return $this->resource;
     }
 
     /**

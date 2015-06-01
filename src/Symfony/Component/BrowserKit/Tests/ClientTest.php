@@ -332,7 +332,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request was not redirected');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was not redirected');
+            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request was not redirected');
         }
 
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
@@ -362,7 +362,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
+            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         }
     }
 
@@ -392,7 +392,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
+            $this->assertInstanceOf('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         }
 
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
@@ -562,7 +562,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->request('GET', 'http://www.example.com/foo/foobar');
             $this->fail('->request() throws a \RuntimeException if the script has an error');
         } catch (\Exception $e) {
-            $this->assertInstanceof('RuntimeException', $e, '->request() throws a \RuntimeException if the script has an error');
+            $this->assertInstanceOf('RuntimeException', $e, '->request() throws a \RuntimeException if the script has an error');
         }
     }
 

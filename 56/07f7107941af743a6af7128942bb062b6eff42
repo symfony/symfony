@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-05-30T07:45:40Z
+
+Can you add a test on [Client::getAbsoluteUri](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/BrowserKit/Tests/ClientTest.php) ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-05-30T09:57:00Z
+
+duplicate of #14734
+
+---------------------------------------------------------------------------
+
+by amouhzi at 2015-05-30T20:09:51Z
+
+Tests added.

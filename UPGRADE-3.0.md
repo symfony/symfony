@@ -446,6 +446,15 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+ * The `templating.helper.router` service was moved to `templating_php.xml`. You
+   have to ensure that the PHP templating engine is enabled to be able to use it:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['php']
+   ```
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in

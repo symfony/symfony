@@ -215,6 +215,8 @@ class Process
      * @param callback|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
+     * @return Process The process itself
+     *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      */
@@ -253,12 +255,14 @@ class Process
         $this->processPipes->unblock();
 
         if ($this->tty) {
-            return;
+            return $this;
         }
 
         $this->processPipes->write(false, $this->stdin);
         $this->updateStatus(false);
         $this->checkTimeout();
+
+        return $this;
     }
 
     /**

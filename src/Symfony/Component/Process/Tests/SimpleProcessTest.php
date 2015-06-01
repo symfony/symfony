@@ -198,6 +198,12 @@ class SimpleProcessTest extends AbstractProcessTest
         parent::testStopWithTimeoutIsActuallyWorking();
     }
 
+    public function testStartMethodReturnsProcessInstance()
+    {
+        $process = $this->getProcess('echo foo');
+        $process = $process->start();
+        $this->assertInstanceOf('Symfony\Component\Process\Process', $process);
+    }
     /**
      * {@inheritdoc}
      */

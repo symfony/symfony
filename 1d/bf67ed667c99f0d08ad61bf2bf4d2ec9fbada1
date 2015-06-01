@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-30T20:43:26Z
+
+We did the same for the `templating.helper.assets` service in #13871 and imho we should discuss if we need to do the same for the other helper service in `templating_php.xml`.

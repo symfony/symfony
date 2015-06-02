@@ -103,6 +103,17 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(' Keep this And this', $response->getContent());
     }
 
+    public function testCommentTagsAreRemoved()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('<esi:comment text="some comment &gt;" /> Keep this');
+        $esi->process($request, $response);
+
+        $this->assertEquals(' Keep this', $response->getContent());
+    }
+
     public function testProcess()
     {
         $esi = new Esi();

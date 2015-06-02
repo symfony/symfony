@@ -75,7 +75,6 @@ class TwigExtension extends Extension
             } else {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
-            $container->addResource(new FileExistenceResource($path));
         }
 
         // register bundles as Twig namespaces

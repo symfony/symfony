@@ -100,7 +100,6 @@ class SecurityExtension extends Extension
         // add some required classes for compilation
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Security\\Http\\Firewall',
-            'Symfony\\Component\\Security\\Core\\SecurityContext',
             'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
             'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
             'Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorage',

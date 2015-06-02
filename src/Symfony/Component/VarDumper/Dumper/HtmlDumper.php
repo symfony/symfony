@@ -119,6 +119,9 @@ var refStyle = doc.createElement('style'),
     addEventListener = function (e, n, cb) {
         e.addEventListener(n, cb, false);
     };
+    
+var isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+var expandAllKeybinding = isMac ? '[Cmd+click]' : '[Ctrl+click]';
 
 doc.documentElement.firstChild.appendChild(refStyle);
 
@@ -255,7 +258,7 @@ return function (root) {
             } else {
                 a.innerHTML += ' ';
             }
-            a.title = (a.title ? a.title+'\n' : '')+'[Ctrl+click] Expand all children';
+            a.title = (a.title ? a.title+'\n' : '')+expandAllKeybinding+' Expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
             if ('sf-dump' != elt.parentNode.className) {

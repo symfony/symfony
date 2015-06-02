@@ -405,9 +405,12 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('foo3', 'Bar\FooClass')->setConfigurator(array(new Reference('baz'), 'configure'));
         $this->assertTrue($builder->get('foo3')->configured, '->createService() calls the configurator');
 
-        $builder->register('foo4', 'Bar\FooClass')->setConfigurator('foo');
+        $builder->register('foo4', 'Bar\FooClass')->setConfigurator(array($builder->getDefinition('baz'), 'configure'));
+        $this->assertTrue($builder->get('foo4')->configured, '->createService() calls the configurator');
+
+        $builder->register('foo5', 'Bar\FooClass')->setConfigurator('foo');
         try {
-            $builder->get('foo4');
+            $builder->get('foo5');
             $this->fail('->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The configure callable for class "Bar\FooClass" is not a callable.', $e->getMessage(), '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');

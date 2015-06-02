@@ -246,7 +246,7 @@ EOF;
 EOF;
 
         if ($methods) {
-            $gotoname = 'not_'.preg_replace('/\W/', '', $name);
+            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
             if (1 === count($methods)) {
                 $code .= <<<EOF

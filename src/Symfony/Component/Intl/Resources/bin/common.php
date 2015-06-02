@@ -22,7 +22,7 @@ function bailout($message)
 
 function strip_minor_versions($version)
 {
-    preg_match('/^(?P<version>\d\.\d|\d{2,})/', $version, $matches);
+    preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $version, $matches);
 
     return $matches['version'];
 }

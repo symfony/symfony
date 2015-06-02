@@ -939,6 +939,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     *
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCanBeCalledTwiceWithResources($first, $second)
@@ -948,8 +949,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         }
 
         $req = new Request();
-        $req->getContent($first);
-        $req->getContent($second);
+        $a = $req->getContent($first);
+        $b = $req->getContent($second);
+
+        if ($first) {
+            $a = stream_get_contents($a);
+        }
+
+        if ($second) {
+            $b = stream_get_contents($b);
+        }
+
+        $this->assertEquals($a, $b);
     }
 
     public function getContentCantBeCalledTwiceWithResourcesProvider()

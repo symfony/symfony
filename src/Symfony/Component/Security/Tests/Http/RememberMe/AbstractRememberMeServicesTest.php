@@ -82,16 +82,36 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('fookey', $returnedToken->getProviderKey());
     }
 
-    public function testLogout()
+    /**
+     * @dataProvider provideOptionsForLogout
+     */
+    public function testLogout(array $options)
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, $options);
         $request = new Request();
         $response = new Response();
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $service->logout($request, $response, $token);
 
-        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
+        $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
+        $this->assertTrue($cookie->isCleared());
+        $this->assertSame($options['name'], $cookie->getName());
+        $this->assertSame($options['path'], $cookie->getPath());
+        $this->assertSame($options['domain'], $cookie->getDomain());
+        $this->assertSame($options['secure'], $cookie->isSecure());
+        $this->assertSame($options['httponly'], $cookie->isHttpOnly());
+    }
+
+    public function provideOptionsForLogout()
+    {
+        return array(
+            array(array('name' => 'foo', 'path' => '/', 'domain' => null, 'secure' => false, 'httponly' => true)),
+            // "secure" and "httpOnly" options are currently ignored, uncommented shows a failing test
+            //array(array('name' => 'foo', 'path' => '/bar', 'domain' => 'baz.com', 'secure' => true, 'httponly' => false)),
+        );
     }
 
     public function testLoginFail()

@@ -214,7 +214,7 @@ abstract class AbstractCloner implements ClonerInterface
             $classInfo = array(
                 $class,
                 new \ReflectionClass($class),
-                array_reverse(array('*' => '*', $class => $class) + class_parents($class) + class_implements($class)),
+                array_reverse(array($class => $class) + class_parents($class) + class_implements($class) + array('*' => '*')),
             );
 
             $this->classInfo[$class] = $classInfo;

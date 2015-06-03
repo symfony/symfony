@@ -123,6 +123,10 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
                     $paramClass = $param->getClass();
                     if ($paramClass !== null) {
+                        if (!$this->serializer instanceof DenormalizerInterface) {
+                            throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
+                        }
+
                         $value = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
                     }
 

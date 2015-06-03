@@ -313,6 +313,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return $context['object_to_populate'];
         }
 
+        $format = null;
+        if (isset($context['format'])) {
+            $format = $context['format'];
+        }
+
         $constructor = $reflectionClass->getConstructor();
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
@@ -325,6 +330,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
                 $ignored = in_array($paramName, $this->ignoredAttributes);
                 if ($allowed && !$ignored && array_key_exists($key, $data)) {
+                    /* denormalizing based on type hinting */
+                    $paramClass = $constructorParameter->getClass()->getName();
+                    if ($paramClass !==  null) {
+                        $value = $data[$paramName];
+                        $data[$paramName] = $this->serializer->denormalize( $value, $paramClass, $format, $context);
+                    }
+
                     $params[] = $data[$key];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$key]);

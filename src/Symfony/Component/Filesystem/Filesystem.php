@@ -476,21 +476,17 @@ class Filesystem
             // Create a unique filename
             $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
 
-            // If the file already exists restart the loop
             // Use fopen instead of file_exists as some streams do not support stat
-            $handle = @fopen($tmpFile, 'r');
-            if (false !== $handle) {
+            // Use mode 'x' to atomically check existence and create to avoid a TOCTOU vulnerability
+            $handle = @fopen($tmpFile, 'x');
+
+            // If unsuccessful restart the loop
+            if (false === $handle) {
                 continue;
             }
 
             // Close the file if it was successfully opened
             @fclose($handle);
-
-            // Create the file, if unsuccessful then stream is not writable so set to false
-            // Use file_put_contents instead of touch as it supports stream wrappers
-            if (false === @file_put_contents($tmpFile, '')) {
-                return false;
-            }
 
             return $tmpFile;
 

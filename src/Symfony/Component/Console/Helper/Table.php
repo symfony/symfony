@@ -550,12 +550,13 @@ class Table
     {
         if (isset($row[$column])) {
             $cell = $row[$column];
+            $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
                 // we assume that cell value will be across more than one column.
-                $cell = substr($cell, 0, strlen($cell)/$cell->getColspan());
+                $cellWidth = $cellWidth/$cell->getColspan();
             }
 
-            return Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+            return $cellWidth;
         }
 
         return 0;

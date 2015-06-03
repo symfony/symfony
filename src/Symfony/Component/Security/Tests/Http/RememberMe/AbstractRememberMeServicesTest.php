@@ -109,8 +109,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array('name' => 'foo', 'path' => '/', 'domain' => null, 'secure' => false, 'httponly' => true)),
-            // "secure" and "httpOnly" options are currently ignored, uncommented shows a failing test
-            //array(array('name' => 'foo', 'path' => '/bar', 'domain' => 'baz.com', 'secure' => true, 'httponly' => false)),
+            array(array('name' => 'foo', 'path' => '/bar', 'domain' => 'baz.com', 'secure' => true, 'httponly' => false)),
         );
     }
 

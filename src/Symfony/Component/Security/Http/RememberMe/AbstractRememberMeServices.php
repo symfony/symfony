@@ -299,9 +299,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             1,
             $this->options['path'],
             $this->options['domain'],
-            // passing cookie defaults for now, options are currently ignored
-            false,
-            true
+            isset($this->options['secure']) ? $this->options['secure'] : false,
+            isset($this->options['httponly']) ? $this->options['httponly'] : true
         ));
     }
 

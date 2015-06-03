@@ -37,6 +37,8 @@ class YamlDumper extends Dumper
      *
      * @return string A YAML string representing of the service container
      *
+     * @throws RuntimeException
+     *
      * @api
      */
     public function dump(array $options = array())

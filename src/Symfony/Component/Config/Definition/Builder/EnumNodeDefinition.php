@@ -26,6 +26,8 @@ class EnumNodeDefinition extends ScalarNodeDefinition
      * @param array $values
      *
      * @return EnumNodeDefinition|$this
+     *
+     * @throws \InvalidArgumentException
      */
     public function values(array $values)
     {

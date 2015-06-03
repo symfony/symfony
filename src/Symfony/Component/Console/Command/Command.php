@@ -516,6 +516,8 @@ class Command
      *
      * @return Command The current instance
      *
+     * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function setAliases($aliases)

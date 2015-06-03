@@ -301,6 +301,8 @@ class ProgressHelper extends Helper
 
     /**
      * Finishes the progress output.
+     *
+     * @throws \LogicException
      */
     public function finish()
     {

@@ -146,6 +146,8 @@ class Esi
      * @param Response $response A Response instance
      *
      * @return Response
+     *
+     * @throws \RuntimeException
      */
     public function process(Request $request, Response $response)
     {

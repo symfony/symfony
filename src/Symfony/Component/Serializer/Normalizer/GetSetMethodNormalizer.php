@@ -121,9 +121,9 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                     $params = $setter->getParameters();
                     $param = $params[0];
 
-                    if ($param->getClass() !== null) {
-                        $paramClass = $param->getClass()->getName();
-                        $value = $this->serializer->denormalize($value, $paramClass, $format, $context);
+                    $paramClass = $param->getClass();
+                    if ($paramClass !== null) {
+                        $value = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
                     }
 
                     $setter->invoke($object, $value);

@@ -331,10 +331,10 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 $ignored = in_array($paramName, $this->ignoredAttributes);
                 if ($allowed && !$ignored && array_key_exists($key, $data)) {
                     /* denormalizing based on type hinting */
-                    $paramClass = $constructorParameter->getClass()->getName();
+                    $paramClass = $constructorParameter->getClass();
                     if ($paramClass !==  null) {
                         $value = $data[$paramName];
-                        $data[$paramName] = $this->serializer->denormalize( $value, $paramClass, $format, $context);
+                        $data[$paramName] = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
                     }
 
                     $params[] = $data[$key];

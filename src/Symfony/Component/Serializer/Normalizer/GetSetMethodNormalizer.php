@@ -119,7 +119,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                     $setter = $reflectionClass->getMethod($setter);
 
                     $params = $setter->getParameters();
-                    $param  = $params[0];
+                    $param = $params[0];
 
                     if ($param->getClass() !== null) {
                         $paramClass = $param->getClass()->getName();

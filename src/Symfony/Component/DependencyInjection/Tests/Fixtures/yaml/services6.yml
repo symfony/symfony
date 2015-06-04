@@ -23,11 +23,6 @@ services:
     another_alias_for_foo:
         alias: foo
         public: false
-    request:
-        class: Request
-        synthetic: true
-        synchronized: true
-        lazy: true
     decorator_service:
         decorates: decorated
     decorator_service_with_name:

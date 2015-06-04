@@ -271,7 +271,7 @@ class GraphvizDumper extends Dumper
      */
     private function dotize($id)
     {
-        return strtolower(preg_replace('/[^\w]/i', '_', $id));
+        return strtolower(preg_replace('/\W/i', '_', $id));
     }
 
     /**

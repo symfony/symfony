@@ -23,6 +23,8 @@ class PreAuthenticatedToken extends AbstractToken
 
     /**
      * Constructor.
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())
     {

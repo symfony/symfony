@@ -49,6 +49,8 @@ class SwitchUserListener implements ListenerInterface
 
     /**
      * Constructor.
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
     {

@@ -82,6 +82,8 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
+     *
+     * @throws InvalidArgumentException
      */
     private function parseImports($content, $file)
     {
@@ -267,6 +269,7 @@ class YamlFileLoader extends FileLoader
      * @return array The file content
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
+     * @throws RuntimeException
      */
     protected function loadFile($file)
     {

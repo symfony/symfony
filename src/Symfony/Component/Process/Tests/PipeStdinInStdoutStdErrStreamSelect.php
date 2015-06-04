@@ -32,7 +32,7 @@ while ($read || $write) {
         }
         $out = (binary) substr($out, $written);
     }
-    if (null === $read && strlen($out) < 1) {
+    if (null === $read && '' === $out) {
         $write = array_diff($write, array(STDOUT));
     }
 
@@ -43,7 +43,7 @@ while ($read || $write) {
         }
         $err = (binary) substr($err, $written);
     }
-    if (null === $read && strlen($err) < 1) {
+    if (null === $read && '' === $err) {
         $write = array_diff($write, array(STDERR));
     }
 

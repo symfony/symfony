@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
+ * added options 'as_tree', 'inline' to YamlFileDumper
 
 2.7.0
 -----

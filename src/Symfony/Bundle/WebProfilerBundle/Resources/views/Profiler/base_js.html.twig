@@ -213,7 +213,17 @@
                     var self = this;
 
                     /* prevent logging AJAX calls to static and inline files, like templates */
-                    if (url.substr(0, 1) === '/' && !url.match(new RegExp("{{ excluded_ajax_paths }}"))) {
+                    var path = url;
+                    if (url.substr(0, 1) === '/') {
+                        if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
+                            path = url.substr({{ request.basePath|length }});
+                        }
+                    }
+                    else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
+                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
+                    }
+
+                    if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var stackElement = {
                             loading: true,
                             error: false,

@@ -142,9 +142,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
 
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
-
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
@@ -153,7 +150,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
 
-        $this->assertNull($services['request']->getDecoratedService());
         $this->assertEquals(array('decorated', null), $services['decorator_service']->getDecoratedService());
         $this->assertEquals(array('decorated', 'decorated.pif-pouf'), $services['decorator_service_with_name']->getDecoratedService());
     }

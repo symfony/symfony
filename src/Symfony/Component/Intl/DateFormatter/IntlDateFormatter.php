@@ -119,7 +119,7 @@ class IntlDateFormatter
     /**
      * @var bool
      */
-    private $unitializedTimeZoneId = false;
+    private $uninitializedTimeZoneId = false;
 
     /**
      * @var string
@@ -365,7 +365,7 @@ class IntlDateFormatter
      */
     public function getTimeZoneId()
     {
-        if (!$this->unitializedTimeZoneId) {
+        if (!$this->uninitializedTimeZoneId) {
             return $this->timeZoneId;
         }
 
@@ -533,7 +533,7 @@ class IntlDateFormatter
         if (null === $timeZoneId) {
             $timeZoneId = date_default_timezone_get();
 
-            $this->unitializedTimeZoneId = true;
+            $this->uninitializedTimeZoneId = true;
         }
 
         // Backup original passed time zone

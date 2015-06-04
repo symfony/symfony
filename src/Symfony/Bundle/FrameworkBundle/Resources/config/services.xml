@@ -13,6 +13,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
+            <argument>false</argument>
         </service>
 
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />

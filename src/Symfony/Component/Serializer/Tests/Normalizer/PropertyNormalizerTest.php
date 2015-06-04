@@ -74,6 +74,17 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
+    public function testConstructorDenormalizeWithNullArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => null, 'bar' => 'bar'),
+            __NAMESPACE__.'\PropertyConstructorDummy', '
+            any'
+        );
+        $this->assertNull($obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+    }
+
     /**
      * @dataProvider provideCallbacks
      */

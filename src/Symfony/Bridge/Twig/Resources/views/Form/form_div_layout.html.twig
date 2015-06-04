@@ -310,7 +310,6 @@
 
 {%- block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"
-    {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
     {%- for attrname, attrvalue in attr -%}

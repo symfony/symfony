@@ -11,6 +11,11 @@ CHANGELOG
  * added `FormTypeInterface::configureOptions()` method
  * added `FormTypeExtensionInterface::configureOptions()` method
 
+2.8.0
+-----
+
+ * deprecated option "read_only" in favor of "attr['readonly']"
+
 2.7.0
 -----
 

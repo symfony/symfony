@@ -805,7 +805,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
-        $dateTime->setTimeZone(new \DateTimeZone($timeZone));
+        $dateTime->setTimezone(new \DateTimeZone($timeZone));
 
         return $dateTime;
     }

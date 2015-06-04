@@ -141,7 +141,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime('2010-02-03 16:05:06 Asia/Hong_Kong');
         $input = $output->format('Y-m-d H:i:s');
-        $output->setTimeZone(new \DateTimeZone('America/New_York'));
+        $output->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }

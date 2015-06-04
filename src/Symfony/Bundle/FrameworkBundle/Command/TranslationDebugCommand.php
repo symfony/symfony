@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -89,6 +90,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
+
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
         /** @var TranslationLoader $loader */
@@ -108,9 +111,7 @@ EOF
                 $rootPaths = array($input->getArgument('bundle'));
 
                 if (!is_dir($rootPaths[0])) {
-                    throw new \InvalidArgumentException(
-                        sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $rootPaths[0])
-                    );
+                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.</error>', $rootPaths[0]));
                 }
             }
         } elseif ($input->getOption('all')) {
@@ -153,20 +154,15 @@ EOF
 
             // Load the fallback catalogues
             $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $translationsPath, $loader);
-            if (class_exists('Symfony\Component\Console\Helper\Table')) {
-                $table = new Table($output);
-            } else {
-                $table = $this->getHelperSet()->get('table');
-            }
 
             // Display header line
             $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
             foreach ($fallbackCatalogues as $fallbackCatalogue) {
                 $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
             }
-            $table->setHeaders($headers);
 
             // Iterate all message ids and determine their state
+            $rows = array();
             foreach ($allMessages as $domain => $messages) {
                 foreach (array_keys($messages) as $messageId) {
                     $value  = $currentCatalogue->get($messageId, $domain);
@@ -198,16 +194,11 @@ EOF
                         $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                     }
 
-                    $table->addRow($row);
+                    $rows[] = $row;
                 }
             }
 
-            if (class_exists('Symfony\Component\Console\Helper\Table')) {
-                $table->render();
-            } else {
-                $table->render($output);
-            }
-            $output->writeln('');
+            $output->table($headers, $rows);
         }
     }
 

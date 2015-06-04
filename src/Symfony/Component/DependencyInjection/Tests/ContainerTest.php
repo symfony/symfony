@@ -313,7 +313,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $container->enterScope('foo');
         $scoped2 = $container->get('scoped');
-        $scoped3 = $container->get('scoped');
+        $scoped3 = $container->get('SCOPED');
         $scopedFoo2 = $container->get('scoped_foo');
 
         $container->leaveScope('foo');

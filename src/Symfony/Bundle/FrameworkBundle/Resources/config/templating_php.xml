@@ -27,12 +27,16 @@
             <argument type="service" id="request_stack" />
         </service>
 
+<<<<<<< HEAD
         <service id="templating.helper.router" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper">
             <tag name="templating.helper" alias="router" />
             <argument type="service" id="router" />
         </service>
 
         <service id="templating.helper.actions" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper">
+=======
+        <service id="templating.helper.actions" class="%templating.helper.actions.class%">
+>>>>>>> 2.8
             <tag name="templating.helper" alias="actions" />
             <argument type="service" id="fragment.handler" />
         </service>

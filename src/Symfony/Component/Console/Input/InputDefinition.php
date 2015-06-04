@@ -387,7 +387,7 @@ class InputDefinition
     /**
      * Gets the synopsis.
      *
-     * @param bool $short Whether to return the short version (with options foloded) or not
+     * @param bool $short Whether to return the short version (with options folded) or not
      *
      * @return string The synopsis
      */

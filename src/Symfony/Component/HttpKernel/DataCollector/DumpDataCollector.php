@@ -95,9 +95,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $name = $info->getTemplateName();
                         $src = $info->getEnvironment()->getLoader()->getSource($name);
                         $info = $info->getDebugInfo();
-                        if (isset($info[$trace[$i-1]['line']])) {
+                        if (isset($info[$trace[$i - 1]['line']])) {
                             $file = false;
-                            $line = $info[$trace[$i-1]['line']];
+                            $line = $info[$trace[$i - 1]['line']];
                             $src = explode("\n", $src);
                             $fileExcerpt = array();
 
@@ -255,7 +255,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $name = strip_tags($this->style('', $name));
                         $file = strip_tags($this->style('', $file));
                         if ($fileLinkFormat) {
-                            $link = strtr($fileLinkFormat, array('%f' => $file, '%l' => (int) $line));
+                            $link = strtr(strip_tags($this->style('', $fileLinkFormat)), array('%f' => $file, '%l' => (int) $line));
                             $name = sprintf('<a href="%s" title="%s">'.$s.'</a>', $link, $file, $name);
                         } else {
                             $name = sprintf('<abbr title="%s">'.$s.'</abbr>', $file, $name);

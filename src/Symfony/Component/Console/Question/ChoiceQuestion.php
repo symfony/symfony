@@ -149,19 +149,19 @@ class ChoiceQuestion extends Question
                 $result = array_search($value, $choices);
 
                 if (!$isAssoc) {
-                    if (!empty($result)) {
+                    if (false !== $result) {
                         $result = $choices[$result];
                     } elseif (isset($choices[$value])) {
                         $result = $choices[$value];
                     }
-                } elseif (empty($result) && array_key_exists($value, $choices)) {
+                } elseif (false === $result && isset($choices[$value])) {
                     $result = $value;
                 }
 
-                if (empty($result)) {
+                if (false === $result) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
-                array_push($multiselectChoices, $result);
+                array_push($multiselectChoices, (string) $result);
             }
 
             if ($multiselect) {

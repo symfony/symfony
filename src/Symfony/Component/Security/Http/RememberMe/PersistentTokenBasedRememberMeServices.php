@@ -98,7 +98,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $series = $persistentToken->getSeries();
         $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,

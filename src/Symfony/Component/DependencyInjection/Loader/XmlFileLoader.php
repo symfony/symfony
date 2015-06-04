@@ -126,10 +126,11 @@ class XmlFileLoader extends FileLoader
      * Parses an individual Definition.
      *
      * @param \DOMElement $service
+     * @param string      $file
      *
      * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service)
+    private function parseDefinition(\DOMElement $service, $file)
     {
         if ($alias = $service->getAttribute('alias')) {
             $public = true;
@@ -149,6 +150,9 @@ class XmlFileLoader extends FileLoader
 
         foreach (array('class', 'scope', 'public', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
+                if (in_array($key, array('factory-class', 'factory-method', 'factory-service'))) {
+                    trigger_error(sprintf('The "%s" attribute in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, $file), E_USER_DEPRECATED);
+                }
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
             }
@@ -169,7 +173,7 @@ class XmlFileLoader extends FileLoader
                 $factoryService = $this->getChildren($factory, 'service');
 
                 if (isset($factoryService[0])) {
-                    $class = $this->parseDefinition($factoryService[0]);
+                    $class = $this->parseDefinition($factoryService[0], $file);
                 } elseif ($childService = $factory->getAttribute('service')) {
                     $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
                 } else {
@@ -188,7 +192,7 @@ class XmlFileLoader extends FileLoader
                 $configuratorService = $this->getChildren($configurator, 'service');
 
                 if (isset($configuratorService[0])) {
-                    $class = $this->parseDefinition($configuratorService[0]);
+                    $class = $this->parseDefinition($configuratorService[0], $file);
                 } elseif ($childService = $configurator->getAttribute('service')) {
                     $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
                 } else {
@@ -229,7 +233,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML file to a \DOMDocument
+     * Parses a XML file to a \DOMDocument.
      *
      * @param string $file Path to a file
      *
@@ -388,7 +392,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Get child elements by name
+     * Get child elements by name.
      *
      * @param \DOMNode $node
      * @param mixed    $name

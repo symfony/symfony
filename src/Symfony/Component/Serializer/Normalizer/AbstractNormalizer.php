@@ -57,8 +57,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
-     * @param ClassMetadataFactoryInterface|null   $classMetadataFactory
-     * @param NameConverterInterface|null $nameConverter
+     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
+     * @param NameConverterInterface|null        $nameConverter
      */
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
     {
@@ -275,11 +275,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                 $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
                 $ignored = in_array($paramName, $this->ignoredAttributes);
-                if ($allowed && !$ignored && isset($data[$key])) {
+                if ($allowed && !$ignored && array_key_exists($key, $data)) {
                     $params[] = $data[$key];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$key]);
-                } elseif ($constructorParameter->isOptional()) {
+                } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
                     throw new RuntimeException(

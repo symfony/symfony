@@ -64,6 +64,26 @@ namespace Symfony\Component\Security\Acl\Tests\Domain
             $this->assertEquals('Symfony\Component\Security\Acl\Tests\Domain\TestDomainObject', $id->getType());
         }
 
+        public function testFromDomainObjectWithoutInterfaceEnforcesStringIdentifier()
+        {
+            $domainObject = new TestDomainObject();
+            $domainObject->id = 1;
+            $id = ObjectIdentity::fromDomainObject($domainObject);
+
+            $this->assertSame('1', $id->getIdentifier());
+            $this->assertEquals('Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
+        }
+
+        public function testFromDomainObjectWithoutInterfaceAllowsZeroAsIdentifier()
+        {
+            $domainObject = new TestDomainObject();
+            $domainObject->id = '0';
+            $id = ObjectIdentity::fromDomainObject($domainObject);
+
+            $this->assertSame('0', $id->getIdentifier());
+            $this->assertEquals('Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
+        }
+
         /**
          * @dataProvider getCompareData
          */
@@ -89,6 +109,8 @@ namespace Symfony\Component\Security\Acl\Tests\Domain
 
     class TestDomainObject
     {
+        public $id = 'getId()';
+
         public function getObjectIdentifier()
         {
             return 'getObjectIdentifier()';
@@ -96,7 +118,7 @@ namespace Symfony\Component\Security\Acl\Tests\Domain
 
         public function getId()
         {
-            return 'getId()';
+            return $this->id;
         }
     }
 }

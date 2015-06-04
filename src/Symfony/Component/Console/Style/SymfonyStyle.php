@@ -60,7 +60,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
     {
-        $messages = array_values((array) $messages);
+        $messages = is_array($messages) ? array_values($messages) : array($messages);
         $lines = array();
 
         // add type

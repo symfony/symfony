@@ -154,24 +154,25 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line, $text = null)
     {
+        if (PHP_VERSION_ID >= 50400) {
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+        } else {
+            $flags = ENT_QUOTES;
+        }
+
         if (null === $text) {
             $file = trim($file);
             $fileStr = $file;
             if (0 === strpos($fileStr, $this->rootDir)) {
                 $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
-                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+                $fileStr = htmlspecialchars($fileStr, $flags, $this->charset);
+                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', htmlspecialchars($this->rootDir, $flags, $this->charset), $fileStr);
             }
 
-            $text = "$fileStr at line $line";
+            $text = sprintf('%s at line %d', $fileStr, $line);
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            if (PHP_VERSION_ID >= 50400) {
-                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-            } else {
-                $flags = ENT_QUOTES;
-            }
-
             return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
         }
 

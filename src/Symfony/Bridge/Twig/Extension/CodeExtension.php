@@ -49,7 +49,7 @@ class CodeExtension extends \Twig_Extension
             new \Twig_SimpleFilter('file_excerpt', array($this, 'fileExcerpt'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file', array($this, 'formatFile'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFilter('file_link', array($this, 'getFileLink'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('file_link', array($this, 'getFileLink')),
         );
     }
 

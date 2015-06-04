@@ -36,7 +36,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
      */
     public function __construct($identifier, $type)
     {
-        if (empty($identifier)) {
+        if ('' === $identifier) {
             throw new \InvalidArgumentException('$identifier cannot be empty.');
         }
         if (empty($type)) {
@@ -66,7 +66,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
             if ($domainObject instanceof DomainObjectInterface) {
                 return new self($domainObject->getObjectIdentifier(), ClassUtils::getRealClass($domainObject));
             } elseif (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), ClassUtils::getRealClass($domainObject));
+                return new self((string) $domainObject->getId(), ClassUtils::getRealClass($domainObject));
             }
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);

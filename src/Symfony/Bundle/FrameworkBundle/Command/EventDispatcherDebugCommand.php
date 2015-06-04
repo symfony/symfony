@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A console command for retrieving information about event dispatcher
+ * A console command for retrieving information about event dispatcher.
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
  */
@@ -34,7 +34,7 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
             ->setName('debug:event-dispatcher')
             ->setDefinition(array(
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays configured listeners for an application')
@@ -87,7 +87,7 @@ EOF
     }
 
     /**
-     * Loads the Event Dispatcher from the container
+     * Loads the Event Dispatcher from the container.
      *
      * @return EventDispatcherInterface
      */

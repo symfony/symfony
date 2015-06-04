@@ -215,7 +215,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             }
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
         } catch (TransformationFailedException $e) {
             throw $e;

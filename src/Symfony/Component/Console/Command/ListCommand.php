@@ -69,6 +69,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('xml')) {
+            trigger_error('The --xml option was deprecated in version 2.7 and will be removed in version 3.0. Use the --format option instead.', E_USER_DEPRECATED);
+
             $input->setOption('format', 'xml');
         }
 
@@ -89,7 +91,7 @@ EOF
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
             new InputOption('xml', null, InputOption::VALUE_NONE, 'To output list as XML'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output list in other formats', 'txt'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
         ));
     }
 }

@@ -1,6 +1,30 @@
 UPGRADE FROM 2.6 to 2.7
 =======================
 
+Global
+------
+
+ * `E_USER_DEPRECATED` warnings -
+   `trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
+   are now triggered when using all deprecated functionality.
+   To avoid filling up error logs, you may need to add
+   `~E_USER_DEPRECATED` to your `error_reporting` setting in
+   `php.ini` to *not* add these errors to your log.
+
+   In the Symfony Framework, `~E_USER_DEPRECATED` is added to
+   `bootstrap.php.cache` automatically, but you need at least
+   version `2.3.14` or `3.0.21` of the
+   [SensioDistributionBundle](https://github.com/sensiolabs/SensioDistributionBundle).
+   So, you may need to upgrade:
+
+   ```bash
+   composer update sensio/distribution-bundle
+   ```
+
+   The [phpunit-bridge](https://github.com/symfony/phpunit-bridge)
+   was introduced to silence deprecation warnings while running your
+   tests and give you a report of deprecated function calls.
+
 Router
 ------
 
@@ -534,3 +558,58 @@ Validator
  * The PHP7-incompatible constraints (Null, True, False) and related validators
    (NullValidator, TrueValidator, FalseValidator) are marked as deprecated
    in favor of their `Is`-prefixed equivalent.
+
+Console
+-------
+
+ * The `Symfony\Component\Console\Input\InputDefinition::getSynopsis()` method
+   now has an optional argument (it previously had no arguments). If you override
+   this method, you'll need to add this argument so that your signature matches:
+
+   Before:
+
+   ```php
+   public function getSynopsis()
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   public function getSynopsis($short = false)
+   {
+       // ...
+   }
+   ```
+
+TwigBundle
+----------
+
+ * The `Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy` is deprecated and no longer
+   used in favor of `Twig_FileExtensionEscapingStrategy`. This means that CSS files automatically
+   use the CSS escape strategy. This can cause different behaviour when outputting reserved
+   characters.
+
+   Before:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_color: '#123456' #}
+   body {
+       background: {{ brand_color }};
+   }
+   ```
+
+   After:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_color: '#123456' #}
+   body {
+       background: {{ brand_color|raw }};
+   }
+   ```

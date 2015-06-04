@@ -69,11 +69,20 @@ class Cookie
             $this->rawValue = urlencode($value);
         }
         $this->name = $name;
-        $this->expires = null === $expires ? null : (int) $expires;
         $this->path = empty($path) ? '/' : $path;
         $this->domain = $domain;
         $this->secure = (bool) $secure;
         $this->httponly = (bool) $httponly;
+
+        if (null !== $expires) {
+            $timestampAsDateTime = \DateTime::createFromFormat('U', $expires);
+            if (false === $timestampAsDateTime) {
+                throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.'), $expires);
+            }
+
+            $this->expires = $timestampAsDateTime->getTimestamp();
+        }
+
     }
 
     /**
@@ -91,12 +100,6 @@ class Cookie
 
         if (null !== $this->expires) {
             $dateTime = \DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
-
-            if ($dateTime === false) {
-                // this throw will provoke PHP fatal
-                throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.'), $this->expires);
-            }
-
             $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::$dateFormats[0]));
         }
 

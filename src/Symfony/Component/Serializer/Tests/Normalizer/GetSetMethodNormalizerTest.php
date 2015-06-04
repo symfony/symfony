@@ -193,6 +193,16 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->isBaz());
     }
 
+    public function testConstructorDenormalizeWithNullArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => null, 'baz' => true),
+            __NAMESPACE__.'\GetConstructorDummy', 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertNull($obj->getBar());
+        $this->assertTrue($obj->isBaz());
+    }
+
     public function testConstructorDenormalizeWithMissingOptionalArgument()
     {
         $obj = $this->normalizer->denormalize(
@@ -201,6 +211,15 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $obj->getFoo());
         $this->assertEquals(array(), $obj->getBar());
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
+    }
+
+    public function testConstructorDenormalizeWithOptionalDefaultArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('bar' => 'test'),
+            __NAMESPACE__.'\GetConstructorArgsWithDefaultValueDummy', 'any');
+        $this->assertEquals(array(), $obj->getFoo());
+        $this->assertEquals('test', $obj->getBar());
     }
 
     public function testConstructorWithObjectDenormalize()
@@ -642,6 +661,33 @@ class GetConstructorOptionalArgsDummy
     public function getBaz()
     {
         return $this->baz;
+    }
+
+    public function otherMethod()
+    {
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class GetConstructorArgsWithDefaultValueDummy
+{
+    protected $foo;
+    protected $bar;
+
+    public function __construct($foo = array(), $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
     }
 
     public function otherMethod()

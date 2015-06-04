@@ -306,6 +306,11 @@ UPGRADE FROM 2.x to 3.0
 
 ### FrameworkBundle
 
+ * The `config:debug`, `container:debug`, `router:debug`, `translation:debug`
+   and `yaml:lint` commands have been deprecated since Symfony 2.7 and will
+   be removed in Symfony 3.0. Use the `debug:config`, `debug:container`,
+   `debug:router`, `debug:translation` and `lint:yaml` commands instead.
+
  * The `getRequest` method of the base `Controller` class has been deprecated
    since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
    way to get the `Request` object is to inject it in the action method.
@@ -440,6 +445,15 @@ UPGRADE FROM 2.x to 3.0
    ```
 
  * The `RouterApacheDumperCommand` was removed.
+
+ * The `templating.helper.router` service was moved to `templating_php.xml`. You
+   have to ensure that the PHP templating engine is enabled to be able to use it:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['php']
+   ```
 
 ### HttpKernel
 
@@ -580,6 +594,9 @@ UPGRADE FROM 2.x to 3.0
 
 ### Twig Bridge
 
+ * The `twig:lint` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `lint:twig` command instead.
+
  * The `render` tag is deprecated in favor of the `render` function.
 
  * The `form_enctype` helper was removed. You should use the new `form_start`
@@ -631,6 +648,11 @@ UPGRADE FROM 2.x to 3.0
        ...
    {{ form_end(form) }}
    ```
+
+### TwigBundle
+
+ * The `twig:debug` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `debug:twig` command instead.
 
 ### Validator
 

@@ -60,7 +60,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level
-            $dom->loadXml('<root>'.$html.'</root>');
+            $dom->loadXML('<root>'.$html.'</root>');
         } catch (\Exception $e) {
             $this->fail(sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",

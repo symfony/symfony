@@ -180,6 +180,10 @@ class DateType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+            if ($options['widget'] === 'single_text') {
+                return $placeholder;
+            }
+
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 

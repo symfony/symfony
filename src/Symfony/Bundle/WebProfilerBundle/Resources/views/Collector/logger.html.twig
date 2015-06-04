@@ -110,6 +110,8 @@
 
 
 {% macro display_message(log_index, log, is_deprecation) %}
+    {{ is_deprecation ? 'DEPRECATED' : log.priorityName }} - {{ log.message }}
+
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
         {% set id = 'sf-call-stack-' ~ log_index %}
@@ -144,7 +146,6 @@
             {% endif %}
         {% endfor %}
     {% else %}
-        {{ log.priorityName }} - {{ log.message }}
         {% if log.context is defined and log.context is not empty %}
             <br />
             <small>

@@ -75,6 +75,14 @@ class GetAttrNode extends Node
 
                 $property = $this->nodes['attribute']->attributes['value'];
 
+                if (!property_exists($obj, $property) && !method_exists($obj, '__get')) {
+                    throw new \RuntimeException(sprintf(
+                        'Object of class %s does not support property %s.',
+                        get_class($obj),
+                        $property
+                    ));
+                }
+
                 return $obj->$property;
 
             case self::METHOD_CALL:
@@ -83,7 +91,17 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
+                $method = $this->nodes['attribute']->attributes['value'];
+
+                if (!method_exists($obj, $method) && !method_exists($obj, '__call')) {
+                    throw new \RuntimeException(sprintf(
+                        'Object of class %s does not support call of method %s.',
+                        get_class($obj),
+                        $method
+                    ));
+                }
+
+                return call_user_func_array(array($obj, $method), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);
@@ -91,7 +109,16 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get an item on a non-array.');
                 }
 
-                return $array[$this->nodes['attribute']->evaluate($functions, $values)];
+                $index = $this->nodes['attribute']->evaluate($functions, $values);
+                if (!array_key_exists($index, $array)) {
+                    throw new \RuntimeException(sprintf(
+                        'Unable to access requested index %s in array %s.',
+                        $index,
+                        $this->nodes['node']->attributes['name']
+                    ));
+                }
+
+                return $array[$index];
         }
     }
 }

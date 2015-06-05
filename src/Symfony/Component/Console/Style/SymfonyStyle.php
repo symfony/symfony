@@ -205,7 +205,7 @@ class SymfonyStyle extends OutputStyle
         $question = new Question($question, $default);
         $question->setValidator($validator);
 
-        return $this->askQuestion($question, $validator);
+        return $this->askQuestion($question);
     }
 
     /**
@@ -214,9 +214,11 @@ class SymfonyStyle extends OutputStyle
     public function askHidden($question, $validator = null)
     {
         $question = new Question($question);
-        $question->setHidden(true);
 
-        return $this->askQuestion($question, $validator);
+        $question->setHidden(true);
+        $question->setValidator($validator);
+
+        return $this->askQuestion($question);
     }
 
     /**

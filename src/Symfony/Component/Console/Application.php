@@ -488,7 +488,7 @@ class Application
         if (empty($namespaces)) {
             $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
-            if ($alternatives = $this->findAlternatives($namespace, $allNamespaces, array())) {
+            if ($alternatives = $this->findAlternatives($namespace, $allNamespaces)) {
                 if (1 == count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
@@ -537,7 +537,7 @@ class Application
 
             $message = sprintf('Command "%s" is not defined.', $name);
 
-            if ($alternatives = $this->findAlternatives($name, $allCommands, array())) {
+            if ($alternatives = $this->findAlternatives($name, $allCommands)) {
                 if (1 == count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
                 } else {
@@ -1086,7 +1086,7 @@ class Application
             }
         }
 
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2*$threshold; });
+        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
         asort($alternatives);
 
         return array_keys($alternatives);

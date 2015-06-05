@@ -655,11 +655,11 @@ class Route implements \Serializable
 
         // this is to keep BC and will be removed in a future version
         if ('_scheme' === $key) {
-            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setSchemes() method instead or the "schemes" option in the route definition.', E_USER_DEPRECATED);
+            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setSchemes() method instead.', E_USER_DEPRECATED);
 
             $this->setSchemes(explode('|', $regex));
         } elseif ('_method' === $key) {
-            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setMethods() method instead or the "methods" option in the route definition.', E_USER_DEPRECATED);
+            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setMethods() method instead.', E_USER_DEPRECATED);
 
             $this->setMethods(explode('|', $regex));
         }

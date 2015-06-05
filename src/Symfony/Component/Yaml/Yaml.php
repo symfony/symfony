@@ -49,8 +49,6 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
-     * @deprecated The ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
-     *
      * @api
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)

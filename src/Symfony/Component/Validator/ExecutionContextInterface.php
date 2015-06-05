@@ -91,6 +91,8 @@ interface ExecutionContextInterface
     /**
      * Adds a violation at the current node of the validation graph.
      *
+     * Note: the parameters $invalidValue, $plural and $code are deprecated since version 2.5 and will be removed in 3.0.
+     *
      * @param string   $message      The error message
      * @param array    $params       The parameters substituted in the error message
      * @param mixed    $invalidValue The invalid, validated value

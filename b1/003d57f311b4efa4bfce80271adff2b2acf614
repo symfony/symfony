@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-26T13:35:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-26T18:46:50Z
+
+This is tricky: this will make apps behave differently based on the PHP version. Could e.g. work on dev, not on prod env. Also, is it really a bug fix? It looks like a new feature to me.
+I don't know if it's possible, but if yes, I'd prefer finding a workaround that makes this a new feature working on any PHP version (thus on 2.8).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-05-27T11:32:42Z
+
+It was a (painful) limitation in PHP and I think this check was added to help users understanding what is happening (instead of just returning an empty string - the old default behavior of PHP). That PHP limitation is gone, so IMO we can tell it's a bug fix.
+
+The only way I see is changing the method signature to `getContent($asResource = false, $allowReuseResource = false)` but it looks ugly.
+
+Applications behaving differently depending of the PHP version will be a edge case:
+- having different PHP versions in prod and in dev (already a bad idea)
+- a server running on PHP < 5.6 (5.6 is now the PHP version distributed in Debian stable)
+- getting twice the php://input (and keep in mind that with or without Symfony, it will not work on PHP <= 5.6)
+
+In many case this can provide a performance boost. Look the PSR-7 bridge for instance: https://github.com/symfony/psr-http-message-bridge/pull/1/files#diff-7e5b3956b6ae2a5924719b9d4eecb8cdR47
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-27T17:17:37Z
+
+Ok, I did some research on this and I'm :+1: ...

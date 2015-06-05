@@ -34,7 +34,7 @@
         "symfony/expression-language": "~2.4|~3.0.0",
         "symfony/finder": "~2.0,>=2.0.5|~3.0.0",
         "symfony/process": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/routing": "~2.2|~3.0.0",
+        "symfony/routing": "~2.8|~3.0.0",
         "symfony/stopwatch": "~2.3|~3.0.0",
         "symfony/templating": "~2.2|~3.0.0",
         "symfony/translation": "~2.0,>=2.0.5|~3.0.0",

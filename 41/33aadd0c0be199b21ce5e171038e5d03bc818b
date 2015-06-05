@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2015-05-29T15:12:41Z
+
+Not sure, but does `src/Symfony/Bundle/TwigBundle/composer.json` need an update for `symfony/config`?
+
+---------------------------------------------------------------------------
+
+by chbruyand at 2015-05-29T15:15:25Z
+
+I think so, but don't know which version to put there
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-05-29T15:33:29Z
+
+I'd go for ~2.8, which is the first version that will contain the new resource.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-31T18:08:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by chbruyand at 2015-06-02T08:01:04Z
+
+Any other suggestion / improvement ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-02T09:36:53Z
+
+:+1:

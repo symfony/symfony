@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-01T16:34:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-01T16:36:56Z
+
+:-1: as this is going to make that these two methods show up in IDEs as deprecated. Methods themselves are not deprecated, only some of their parameters are.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-01T16:37:43Z
+
+Sorry, I was reading the patch in reverse :(
+
+Obviously :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-04T07:35:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-04T15:19:33Z
+
+This should probably be merged ealier than 2.7.

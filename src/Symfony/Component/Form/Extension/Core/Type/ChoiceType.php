@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -71,7 +70,7 @@ class ChoiceType extends AbstractType
             // Check if the choices already contain the empty value
             // Only add the placeholder option if this is not the case
             if (null !== $options['placeholder'] && 0 === count($options['choice_list']->getChoicesForValues(array('')))) {
-                $placeholderView = new ChoiceView($options['placeholder'], '', null);
+                $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved name
                 $this->addSubForm($builder, 'placeholder', $placeholderView, $options);
@@ -436,7 +435,7 @@ class ChoiceType extends AbstractType
         // information from the "choices" option for creating groups
         if (!$options['group_by'] && $options['choices']) {
             $options['group_by'] = !$options['choices_as_values']
-                ? ChoiceType::flipRecursive($options['choices'])
+                ? self::flipRecursive($options['choices'])
                 : $options['choices'];
         }
 

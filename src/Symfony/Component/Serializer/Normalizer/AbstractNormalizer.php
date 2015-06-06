@@ -332,7 +332,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 if ($allowed && !$ignored && array_key_exists($key, $data)) {
                     /* denormalizing based on type hinting */
                     $paramClass = $constructorParameter->getClass();
-                    if ($paramClass !==  null) {
+                    if ($paramClass !==  null and (!empty($value) or !$constructorParameter->allowsNull())) {
+                        if (!$this->serializer instanceof DenormalizerInterface) {
+                            throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
+                        }
+
                         $value = $data[$paramName];
                         $data[$paramName] = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
                     }

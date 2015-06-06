@@ -100,7 +100,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $subcontext = $context + array('format' => $format);
+        $subcontext = array_merge($context, array('format' => $format));
         $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
 
         foreach ($normalizedData as $attribute => $value) {
@@ -122,7 +122,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                     $param = $params[0];
 
                     $paramClass = $param->getClass();
-                    if ($paramClass !== null) {
+                    if ($paramClass !== null and (!empty($value) or !$param->allowsNull())) {
                         if (!$this->serializer instanceof DenormalizerInterface) {
                             throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
                         }

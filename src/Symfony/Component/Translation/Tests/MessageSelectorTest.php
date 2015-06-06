@@ -93,7 +93,7 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There are no apples', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
             array('There are no apples', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0.0),
             array('There are no apples', '{0.0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
-            
+    
             // Test texts with new-lines
             array('This is text with a
             new-line in it. Selector = 0.', '{0}This is a text with a

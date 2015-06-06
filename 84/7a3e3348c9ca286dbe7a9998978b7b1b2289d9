@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-06-06T08:46:41Z
+
+i use silexphp with symfony 2.7 components, and at the moment, i get deprecation messages, cause the validator implement both interfaces, which means the deprecated logic get called even with a new validator instance
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-06-06T08:52:19Z
+
+@webmozart did i understand this wrong, or does this not cause any problems within fullstack?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-06T09:14:53Z
+
+The change looks correct to me.
+
+@dominikzogg Can you also add a test for this to avoid future regressions?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-06T14:09:54Z
+
+:+1:
+
+A test would indeed be great.
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-06-06T15:05:08Z
+
+@xabbuh @fabpot can't test it, cause $this->never() get ignored
+
+```{.php}
+// #14891: loadTypeGuesser should not call getMetadataFactory
+$validator->expects($this->never())->method('getMetadataFactory');
+```
+
+which means, that this does not fail even with old method code

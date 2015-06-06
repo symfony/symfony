@@ -12,7 +12,9 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
+use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +29,13 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new ConcreteExtension();
         $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('foo'));
+    }
+
+    public function testCustomOptionsResolver()
+    {
+        $extension = new FooTypeBarExtension();
+        $resolver = new CustomOptionsResolver();
+        $extension->setDefaultOptions($resolver);
     }
 }
 

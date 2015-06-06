@@ -45,7 +45,11 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $this->configureOptions($resolver);
+        if ($resolver instanceof OptionsResolver) {
+            $this->configureOptions($resolver);
+        } else {
+            $this->configureOptions(new LegacyOptionsResolverAdapter($resolver));
+        }
     }
 
     /**

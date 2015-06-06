@@ -1,8 +1,8 @@
 
 
-                                 
-  [InvalidArgumentException]     
-  Command "foo" is not defined.  
-                                 
+                                                                    
+  [Symfony\Component\Console\Exception\CommandNotDefinedException]  
+  Command "foo" is not defined.                                     
+                                                                    
 
 

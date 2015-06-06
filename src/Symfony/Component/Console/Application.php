@@ -38,6 +38,7 @@ use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Exception\CommandNotDefinedException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -411,14 +412,14 @@ class Application
      *
      * @return Command A Command object
      *
-     * @throws \InvalidArgumentException When command name given does not exist
+     * @throws CommandNotDefinedException When command name given does not exist
      *
      * @api
      */
     public function get($name)
     {
         if (!isset($this->commands[$name])) {
-            throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
+            throw new CommandNotDefinedException(sprintf('The command "%s" does not exist.', $name));
         }
 
         $command = $this->commands[$name];
@@ -477,7 +478,7 @@ class Application
      *
      * @return string A registered namespace
      *
-     * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
+     * @throws CommandNotDefinedException When namespace is incorrect or ambiguous
      */
     public function findNamespace($namespace)
     {
@@ -498,12 +499,12 @@ class Application
                 $message .= implode("\n    ", $alternatives);
             }
 
-            throw new \InvalidArgumentException($message);
+            throw new CommandNotDefinedException($message, $alternatives);
         }
 
         $exact = in_array($namespace, $namespaces, true);
         if (count($namespaces) > 1 && !$exact) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))));
+            throw new CommandNotDefinedException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -519,7 +520,7 @@ class Application
      *
      * @return Command A Command instance
      *
-     * @throws \InvalidArgumentException When command name is incorrect or ambiguous
+     * @throws CommandNotDefinedException When command name is incorrect or ambiguous
      *
      * @api
      */
@@ -546,7 +547,7 @@ class Application
                 $message .= implode("\n    ", $alternatives);
             }
 
-            throw new \InvalidArgumentException($message);
+            throw new CommandNotDefinedException($message, $alternatives);
         }
 
         // filter out aliases for commands which are already on the list
@@ -563,7 +564,7 @@ class Application
         if (count($commands) > 1 && !$exact) {
             $suggestions = $this->getAbbreviationSuggestions(array_values($commands));
 
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions));
+            throw new CommandNotDefinedException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions), array_values($commands));
         }
 
         return $this->get($exact ? $name : reset($commands));

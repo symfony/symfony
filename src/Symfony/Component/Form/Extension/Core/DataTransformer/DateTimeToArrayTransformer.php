@@ -51,7 +51,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param \DateTime $dateTime Normalized date.
+     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
      * @return array Localized date.
      *
@@ -72,14 +72,15 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ), array_flip($this->fields));
         }
 
-        if (!$dateTime instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        // DateTimeInterface was introduced in PHP 5.5.0.
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
         $dateTime = clone $dateTime;
         if ($this->inputTimezone !== $this->outputTimezone) {
             try {
-                $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+                $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
             } catch (\Exception $e) {
                 throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
             }

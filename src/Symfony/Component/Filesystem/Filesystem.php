@@ -361,7 +361,7 @@ class Filesystem
         $originDir = rtrim($originDir, '/\\');
 
         // Iterate in destination folder to remove obsolete entries
-        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+        if (isset($options['delete']) && $options['delete'] && $this->exists($targetDir)) {
             $deleteIterator = $iterator;
             if (null === $deleteIterator) {
                 $flags = \FilesystemIterator::SKIP_DOTS;

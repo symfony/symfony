@@ -509,9 +509,9 @@ class Parser
 
         // deal with trailing newlines as indicated
         if ('' === $indicator) {
-            $text = preg_replace('/\n+$/s', "\n", $text);
+            $text = preg_replace('/\n+$/', "\n", $text);
         } elseif ('-' === $indicator) {
-            $text = preg_replace('/\n+$/s', '', $text);
+            $text = preg_replace('/\n+$/', '', $text);
         }
 
         return $text;
@@ -610,7 +610,7 @@ class Parser
             $value = $trimmedValue;
 
             // remove end of the document marker (...)
-            $value = preg_replace('#\.\.\.\s*$#s', '', $value);
+            $value = preg_replace('#\.\.\.\s*$#', '', $value);
         }
 
         return $value;

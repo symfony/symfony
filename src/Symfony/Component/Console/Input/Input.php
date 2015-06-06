@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
+
 /**
  * Input is the base class for all concrete Input classes.
  *
@@ -69,12 +72,12 @@ abstract class Input implements InputInterface
     /**
      * Validates the input.
      *
-     * @throws \RuntimeException When not enough arguments are given
+     * @throws RuntimeException When not enough arguments are given
      */
     public function validate()
     {
         if (count($this->arguments) < $this->definition->getArgumentRequiredCount()) {
-            throw new \RuntimeException('Not enough arguments.');
+            throw new RuntimeException('Not enough arguments.');
         }
     }
 
@@ -115,12 +118,12 @@ abstract class Input implements InputInterface
      *
      * @return mixed The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function getArgument($name)
     {
         if (!$this->definition->hasArgument($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
         return isset($this->arguments[$name]) ? $this->arguments[$name] : $this->definition->getArgument($name)->getDefault();
@@ -132,12 +135,12 @@ abstract class Input implements InputInterface
      * @param string $name  The argument name
      * @param string $value The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function setArgument($name, $value)
     {
         if (!$this->definition->hasArgument($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
         $this->arguments[$name] = $value;
@@ -172,12 +175,12 @@ abstract class Input implements InputInterface
      *
      * @return mixed The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function getOption($name)
     {
         if (!$this->definition->hasOption($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 
         return isset($this->options[$name]) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
@@ -189,12 +192,12 @@ abstract class Input implements InputInterface
      * @param string      $name  The option name
      * @param string|bool $value The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function setOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 
         $this->options[$name] = $value;

@@ -14,6 +14,8 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver;
+use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
@@ -1055,6 +1057,13 @@ class SimpleFormTest extends AbstractFormTest
         $child->setParent($parent);
 
         $child->initialize();
+    }
+
+    public function testCustomResolver()
+    {
+        $fooType = new FooType();
+        $resolver = new CustomOptionsResolver();
+        $fooType->setDefaultOptions($resolver);
     }
 
     protected function createForm()

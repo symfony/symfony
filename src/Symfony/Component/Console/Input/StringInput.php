@@ -40,7 +40,7 @@ class StringInput extends ArgvInput
     public function __construct($input, InputDefinition $definition = null)
     {
         if ($definition) {
-            trigger_error('The $definition argument of the '.__METHOD__.' method is deprecated and will be removed in 3.0. Set this parameter with the bind() method instead.', E_USER_DEPRECATED);
+            @trigger_error('The $definition argument of the '.__METHOD__.' method is deprecated and will be removed in 3.0. Set this parameter with the bind() method instead.', E_USER_DEPRECATED);
         }
 
         parent::__construct(array(), null);

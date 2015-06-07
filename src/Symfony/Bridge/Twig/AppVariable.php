@@ -68,7 +68,7 @@ class AppVariable
      */
     public function getSecurity()
     {
-        trigger_error('The "app.security" variable is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The "app.security" variable is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (null === $this->container) {
             throw new \RuntimeException('The "app.security" variable is not available.');

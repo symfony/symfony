@@ -5,7 +5,7 @@ Global
 ------
 
  * `E_USER_DEPRECATED` warnings -
-   `trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
+   `@trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
    are now triggered when using all deprecated functionality.
    To avoid filling up error logs, you may need to add
    `~E_USER_DEPRECATED` to your `error_reporting` setting in

@@ -69,7 +69,7 @@
     {% set debug_status_class %}sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}{% endset %}
     {% set icon %}
         <svg width="21" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 21 28" enable-background="new 0 0 21 28" xml:space="preserve"><g><path fill="#3F3F3F" d="M5 17H1c-0.5 0-1-0.4-1-1V9c0-0.5 0.4-1 1-1h4c0.5 0 1 0.4 1 1v7C6 16.6 5.6 17 5 17z"/><path fill="#3F3F3F" d="M19 17h-4c-0.5 0-1-0.4-1-1V9c0-0.5 0.4-1 1-1h4c0.5 0 1 0.4 1 1v7C20 16.6 19.6 17 19 17z"/><path fill="#3F3F3F" d="M12.1 20h-4c-0.5 0-1-0.4-1-1v-7c0-0.5 0.4-1 1-1h4c0.5 0 1 0.4 1 1v7C13.1 19.5 12.6 20 12.1 20z"/><rect x="9.1" y="5.8" fill="#3F3F3F" width="2" height="4.5"/><rect x="16" y="17.7" fill="#3F3F3F" width="2" height="4.5"/><rect x="2.1" y="17.7" fill="#3F3F3F" width="2" height="4.5"/><rect x="9.1" y="20.7" fill="#3F3F3F" width="2" height="1.5"/><rect x="2.1" y="5.7" fill="#3F3F3F" width="2" height="1.5"/><rect x="16.1" y="5.7" fill="#3F3F3F" width="2" height="1.5"/></g></svg>
-        <span class="{{ debug_status_class }}">{{ token }}</span>
+        <span class="sf-toolbar-info-piece-additional {{ debug_status_class }}">{{ token }}</span>
         {% if 'n/a' != collector.appname or 'n/a' != collector.env %}
             <span class="sf-toolbar-info-piece-additional-detail">
                 <span class="sf-toolbar-info-with-delimiter">{{ collector.appname }}</span>

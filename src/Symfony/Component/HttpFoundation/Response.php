@@ -202,9 +202,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
-        }
     }
 
     /**
@@ -331,6 +328,10 @@ class Response
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
+        }
+
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
         }
 
         // status
@@ -644,7 +645,11 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**

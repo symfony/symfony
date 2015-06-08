@@ -26,6 +26,7 @@ class Inline
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
     private static $objectForMap = false;
+    private static $timestampAsDateTime = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -35,16 +36,18 @@ class Inline
      * @param bool   $objectSupport          true if object support is enabled, false otherwise
      * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
      * @param array  $references             Mapping of variable names to values
+     * @param bool   $timestampAsDateTime    true if timestamps must be parsed as DateTime objects rather than Unix timestamps (integers)
      *
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array())
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array(), $timestampAsDateTime = false)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
         self::$objectForMap = $objectForMap;
+        self::$timestampAsDateTime = $timestampAsDateTime;
 
         $value = trim($value);
 
@@ -89,13 +92,16 @@ class Inline
      * @param mixed $value                  The PHP variable to convert
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $timestampAsDateTime    true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string The YAML string representing the PHP array
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false, $timestampAsDateTime = false)
     {
+        self::$timestampAsDateTime = $timestampAsDateTime;
+        
         switch (true) {
             case is_resource($value):
                 if ($exceptionOnInvalidType) {
@@ -104,6 +110,18 @@ class Inline
 
                 return 'null';
             case is_object($value):
+                if (self::$timestampAsDateTime && ($value instanceof \DateTime || $value instanceof \DateTimeImmutable)) {
+                    if ($value->getTimezone()->getName() === date_default_timezone_get()) {
+                        if ('000000' === $value->format('His')) {
+                            return $value->format('Y-m-d');
+                        }
+
+                        return $value->format('Y-m-d H:i:s');
+                    }
+
+                    return $value->format(\DateTime::W3C);
+                }
+
                 if ($objectSupport) {
                     return '!!php/object:'.serialize($value);
                 }
@@ -502,6 +520,10 @@ class Inline
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
+                        if (self::$timestampAsDateTime) {
+                            return new \DateTime($scalar);
+                        }
+
                         return strtotime($scalar);
                 }
             default:

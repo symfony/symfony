@@ -34,6 +34,16 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getTestsForParseWithTimestampAsDateTime
+     */
+    public function testParseTimestampAsDateTime($yamlTimestamp)
+    {
+        $expected = serialize(new \DateTime($yamlTimestamp));
+        $actual = serialize(Inline::parse($yamlTimestamp, false, false, false, null, true));
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * @dataProvider getTestsForDump
      */
     public function testDump($yaml, $value)
@@ -41,6 +51,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
         $this->assertSame($value, Inline::parse(Inline::dump($value)), 'check consistency');
+    }
+
+    /**
+     * @dataProvider getTestsForDumpWithDateTimeSupport
+     */
+    public function testDumpWithDateTimeSupport($yaml, $value)
+    {
+        $this->assertSame($yaml, Inline::dump($value, false, false, true));
     }
 
     public function testDumpNumericValueWithLocale()
@@ -290,7 +308,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('{foo: \'bar\', bar: \'foo: bar\'}', (object) array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\': \'bar\', "bar": \'foo: bar\'}', (object) array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', (object) array('foo\'' => 'bar', "bar\"" => 'foo: bar')),
-            array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', (object) array('foo: ' => 'bar', "bar: " => 'foo: bar')),
+            array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', (object) array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
 
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),
@@ -320,6 +338,17 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('[foo, [[], {}]]', array('foo', array(array(), new \stdClass()))),
             array('[foo, [[{}, {}], {}]]', array('foo', array(array(new \stdClass(), new \stdClass()), new \stdClass()))),
             array('[foo, {bar: {}}]', array('foo', '1' => (object) array('bar' => new \stdClass()))),
+        );
+    }
+
+    public function getTestsForParseWithTimestampAsDateTime()
+    {
+        return array(
+            array('2007-10-30'),
+            array('2007-10-30T02:59:43Z'),
+            array('2007-10-30 02:59:43 Z'),
+            array('1960-10-30 02:59:43 Z'),
+            array('1730-10-30T02:59:43Z'),
         );
     }
 
@@ -375,6 +404,16 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('[foo, { bar: foo, foo: [foo, { bar: foo }] }, [foo, { bar: foo }]]', array('foo', array('bar' => 'foo', 'foo' => array('foo', array('bar' => 'foo'))), array('foo', array('bar' => 'foo')))),
 
             array('[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', array('foo', '@foo.baz', array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, '@service_container')),
+        );
+    }
+
+    public function getTestsForDumpWithDateTimeSupport () {
+        return array(
+            array('2015-04-21T05:30:30-08:00', new \DateTime('2015-04-21 05:30:30 -8')),
+            array('2015-04-21T00:00:00-02:00', new \DateTime('2015-04-21 -2')),
+            array('2015-04-21T00:00:00+00:00', new \DateTime('2015-04-21 -0')),
+            array('2015-04-21 05:30:30', new \DateTime('2015-04-21 05:30:30')),
+            array('2015-04-21', new \DateTime('2015-04-21')),
         );
     }
 }

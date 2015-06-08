@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-08T16:50:09Z
+
+A note should be kept explaining that these arguments are deprecated though. It cannot be removed entirely
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-08T17:04:45Z
+
+@stof The note is already there: https://github.com/symfony/symfony/blob/2.6/src/Symfony/Component/Validator/ExecutionContextInterface.php#L94
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-08T17:51:42Z
+
+:+1:

@@ -218,7 +218,7 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('security')->defaultTrue()->end()
             ->arrayNode('user_checkers')
                 ->defaultValue(array('security.user_checker'))
-                ->info('A list of user checkers reserved for this firewall.')
+                ->info('A list of user checker service ids to use when authenticating users in this firewall.')
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode('request_matcher')->end()

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-07T14:58:55Z
+
+:+1:
+This is good for saving toolbar space.
+BTW, you should squash your commits.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-06-07T16:12:27Z
+
+@phansys The commits will be squashed latest once the PR is being merged, this is part of the `gh` toolchain Fabien showed once.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-07T16:45:36Z
+
+I've thought in the whole change as a single one, but you're right if you are trying to  track each change individually. Thank you for the clarification, I didn't know about the toolchain.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-06-07T17:10:15Z
+
+@phansys Once it is being merged it will be squashed into one commit if you have not squashed it before in order to maintain a clean history
+
+---------------------------------------------------------------------------
+
+by MJBGO at 2015-06-08T17:43:25Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-08T17:56:08Z
+
+@fabpot please fix fabbot.io to avoid having such error messages
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-08T17:57:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-08T18:01:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-08T18:15:35Z
+
+:+1:

@@ -74,6 +74,6 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($loader->supports('directory/', 'directory'), '->supports("directory/", "directory") returns true');
         $this->assertFalse($loader->supports('directory'), '->supports("directory") returns false');
         $this->assertTrue($loader->supports('directory', 'directory'), '->supports("directory", "directory") returns true');
-        $this->assertFalse($loader->supports('directory', 'foo'), '->supports("directory, "foo") returns false');
+        $this->assertFalse($loader->supports('directory', 'foo'), '->supports("directory", "foo") returns false');
     }
 }

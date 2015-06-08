@@ -1,0 +1,171 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-12T23:46:58Z
+
+Although the implementation might not be the most elegant solution, I'd like to have some opinions about such a "feature" (in fact, I consider this an improvement just as much as a bug fix) ?
+Should this behavior be configurable at `SymfonyStyle` instantiation ?
+
+Fabbot issue will be fixed as soon as this PR is merged: https://github.com/symfony/symfony/pull/14620
+
+Here is the code used in order to generate this output (+questions):
+
+```php
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output = new SymfonyStyle($input, $output);
+
+        $output->caution(array('Lorem ipsum dolor sit amet', 'consectetur adipisicing elit'));
+        $output->note('Lorem ipsum dolor sit amet, ');
+        $output->title('First title');
+        $output->warning('Lorem ipsum dolor sit amet');
+
+        $output->title('Second title');
+        $output->section('Section One');
+        $output->listing(array(
+            'Lorem ipsum dolor sit amet, consectetur adipisicing elit',
+            'Excepteur sint occaecat cupidatat non proident.'
+        ));
+        $output->write(array('<comment>Lorem ipsum dolor', 'ipsum', 'dolor</>'));
+        $output->write(' amet <info>consectetur</>', true);
+
+        $output->section('Section 2');
+        $output->writeln(array('Lorem ', 'ipsum'));
+        $output->write(array('Amet ', 'consectetur'));
+        $output->title('Third title');
+
+        $output->section('Section 1');
+        $output->write(array('Lorem ', 'ipsum ', 'dolor '));
+        $output->text(array(
+            'Duis aute irure dolor in reprehenderit in voluptate velit esse',
+            'cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat'
+        ));
+
+        $output->success('Success');
+        $output->error('Success');
+
+        $output->table(array('Name', 'Method', 'Scheme', 'Host', 'Path'), array(
+            array('admin_post_new', 'ANY', 'ANY', 'ANY', '/admin/post/new'),
+            array('admin_post_show', 'GET', 'ANY', 'ANY', '/admin/post/{id}'),
+        ));
+
+        $output->progressStart(100);
+        for ($i = 0; $i < 100; $i++) {
+            usleep(10000);
+            $output->progressAdvance();
+        }
+        $output->progressFinish();
+
+        $output->text('Duis aute irure dolor in reprehenderit in voluptate velit esse');
+        $output->note($output->askHidden('Hidden question'));
+        $output->note($output->choice('Choice question with default', array('choice1', 'choice2'), 'choice1'));
+        $output->text('Duis aute irure dolor in reprehenderit in voluptate velit esse');;
+        $output->section('Section 1');
+        $output->note($output->ask('Question with default', 'default'));
+        $output->write('<comment>Lorem ipsum dolor</>');
+        $output->writeln(' amet <info>consectetur</>');
+        $output->note($output->confirm('Confirmation with yes default', true) ? 'yes' : 'no');
+        $output->note('Duis aute irure dolor in reprehenderit in voluptate velit');
+    }
+```
+
+Tests are also provided in order to ensure the output is what we expect it to be.
+
+Lastly, this PR also contains a bug fix about questions rendering with SymfonyStyle when using a non-interactive input. Before, extra blank lines were rendered.
+As the questions themselves aren't rendered, they shouldn't output extra lines neither.
+This could have been done in another PR, but as this one will cover it with tests and need it anyway, IMO it makes more sense to fix this in the very same PR.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-05-16T13:37:33Z
+
+How will this affect current commands that are adding the newlines already? Just asking, as we use this for Gush at the moment :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-16T14:21:37Z
+
+@sstok : If everything works as fine as I expect it to be (I need to test it on windows, soon), the only side-effect for your commands when upgrading to symfony 2.7 is that all the newlines you added manually in the aim of having proper gaps between text and block elements should be removed.
+
+However, note that some of the newlines you might have added will have no effect if kept:
+
+```php
+protected function execute(InputInterface $input, OutputInterface $output)
+{
+    $output = new SymfonyStyle($input, $output);
+    $output->newLine(); //In order to have a first blank line at command start. Same effect if removed.
+    $output->section('Section 1');
+    $output->write('Lorem ipsum dolor');
+    $output->newLine(); //Should be removed
+    $output->text(array(
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse',
+        'cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat'
+    ));
+    $output->newLine(); //In order to have a blank line before the success block. Same effect if removed.
+    $output->success('Success');
+}
+```
+**Before:** This piece of code without this PR.
+**After:** This very same piece of code with this PR:
+![screenshot 2015-05-16 a 15 48 08](https://cloud.githubusercontent.com/assets/2211145/7666381/900a133c-fbe3-11e4-97f9-aac24dd232bd.PNG)
+
+The best would be to remove any manual newlines between text and blocks elements.
+~~Also, as mentioned above: avoid ending any string with a trailing EOL when using `write` (i.e, no `$output->write('Lorem ipsum'.PHP_EOL)`).~~
+
+If your are relying on the full command output in some of your tests, there is good chances those tests fail, as some extra lines are removed (like between an admonition and a title).
+
+I would be very pleased to receive your feedbacks if you try this code with Gush :smiley:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-23T16:26:17Z
+
+As far as I can tell, everything seems to work properly on windows concerning this PR:
+![screenshot 2015-05-23 a 18 00 18](https://cloud.githubusercontent.com/assets/2211145/7784849/5bc99410-0176-11e5-9686-ea746ba935e8.PNG)
+
+I didn't investigate further, but as you can see, it seems there is a not related issue regarding strange extra lines within and after blocks.
+Note that the output redirected to a file seems to be properly formatted and doesn't have any extra line.
+`SymfonyStyle` is also mixing `PHP_EOL` and simple `\n` which leads to the use of both `CRLF` and simple `LF` under windows and will certainly make the subject of another PR, but is not sufficient in order to solve the problem.
+(ANSICON isn't related either)
+
+**Edit:** There is 1 extra `space` char per line of a block, which explains the output
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-25T20:04:30Z
+
+This PR has been rebased onto #14741, as it indirectly improves and allows to simplify the way we keep track of an "history buffer".
+Also, there is no more issue when trying to output a string with an trailing EOL using `write`:
+```php
+$output->write('Lorem ipsum dolor'.PHP_EOL);
+$output->note('NOTE');
+$output->write('sit amet');
+````
+Will render as expected with this PR:
+> Lorem ispum dolor
+>
+> ! [NOTE] NOTE
+>
+> sit amet
+
+And everything works like a charm on Windows (if we forget about #14740).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-06-01T07:51:26Z
+
+@fabpot : Do you think this PR is still applicable to the 2.7 branch ?
+I would have liked this being part of the first release, as 2.7 introduced the `SymfonyStyle` class. People will now start relying on it, and this PR might obviously changes their outputs.
+So, would it be considered as a BC break ? (I don't know how much people relies on the output for their tests for instance, nor if it is a good practice)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-04T20:14:24Z
+
+:+1:
+Could go in 2.7 to me
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-08T18:59:34Z
+
+:+1:

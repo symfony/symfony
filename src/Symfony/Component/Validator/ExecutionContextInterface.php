@@ -100,10 +100,6 @@ interface ExecutionContextInterface
      * @param int|null $code         The violation code
      *
      * @api
-     *
-     * @deprecated The parameters $invalidValue, $pluralization and $code are
-     *             deprecated since version 2.5 and will be removed in
-     *             Symfony 3.0.
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null);
 

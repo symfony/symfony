@@ -17,7 +17,7 @@ namespace Symfony\Component\Security\Core\User;
  * This user checker is a collection of other user checkers
  * and triggers each user checker in the sequence provided.
  *
- * @author Iltar van der Berg <ivanderberg@hostnet.nl>
+ * @author Iltar van der Berg <kjarli@gmail.com>
  */
 final class ChainUserChecker implements UserCheckerInterface
 {

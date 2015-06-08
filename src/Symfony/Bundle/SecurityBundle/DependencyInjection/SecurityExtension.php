@@ -371,6 +371,16 @@ class SecurityExtension extends Extension
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
+        $userCheckers = array();
+        foreach ($firewall['user_checkers'] as $userChecker) {
+            $userCheckers[] = new Reference($userChecker);
+        }
+
+        $chainUserChecker = new Definition('Symfony\Component\Security\Core\User\ChainUserChecker', array($userCheckers));
+        $chainUserChecker->setPublic(false);
+
+        $container->setDefinition('security.chain_user_checker.'.$id, $chainUserChecker);
+
         return array($matcher, $listeners, $exceptionListener);
     }
 

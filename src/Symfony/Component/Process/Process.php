@@ -468,7 +468,7 @@ class Process
      */
     public function getExitCode()
     {
-        if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+        if ($this->isSigchildEnabled() && !$this->enhanceSigchildCompatibility) {
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
         }
 

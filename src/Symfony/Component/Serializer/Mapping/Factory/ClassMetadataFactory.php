@@ -32,18 +32,24 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private $cache;
     /**
+     * @var string
+     */
+    private $className;
+    /**
      * @var array
      */
     private $loadedClasses;
 
     /**
      * @param LoaderInterface $loader
-     * @param Cache|null $cache
+     * @param Cache|null      $cache
+     * @param string          $className
      */
-    public function __construct(LoaderInterface $loader, Cache $cache = null)
+    public function __construct(LoaderInterface $loader, Cache $cache = null, $className = 'Symfony\Component\Serializer\Mapping\ClassMetadata')
     {
         $this->loader = $loader;
         $this->cache = $cache;
+        $this->className = $className;
     }
 
     /**
@@ -68,7 +74,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
-        $classMetadata = new ClassMetadata($class);
+        $classMetadata = new $this->className($class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $reflectionClass = $classMetadata->getReflectionClass();

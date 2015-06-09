@@ -126,12 +126,7 @@ abstract class DoctrineType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $registry = $this->registry;
-        $choiceListFactory = $this->choiceListFactory;
-        $idReaders = &$this->idReaders;
-        $choiceLoaders = &$this->choiceLoaders;
-
-        $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
+        $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
 
@@ -141,7 +136,7 @@ abstract class DoctrineType extends AbstractType
                 // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
-                if (!$options['query_builder'] || false !== ($qbParts = $type->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
+                if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
 
                     $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
@@ -150,8 +145,8 @@ abstract class DoctrineType extends AbstractType
                         $options['loader'],
                     ));
 
-                    if (isset($choiceLoaders[$hash])) {
-                        return $choiceLoaders[$hash];
+                    if (isset($this->choiceLoaders[$hash])) {
+                        return $this->choiceLoaders[$hash];
                     }
                 }
 
@@ -165,7 +160,7 @@ abstract class DoctrineType extends AbstractType
                 }
 
                 $doctrineChoiceLoader = new DoctrineChoiceLoader(
-                    $choiceListFactory,
+                    $this->choiceListFactory,
                     $options['em'],
                     $options['class'],
                     $options['id_reader'],
@@ -173,7 +168,7 @@ abstract class DoctrineType extends AbstractType
                 );
 
                 if ($hash !== null) {
-                    $choiceLoaders[$hash] = $doctrineChoiceLoader;
+                    $this->choiceLoaders[$hash] = $doctrineChoiceLoader;
                 }
 
                 return $doctrineChoiceLoader;
@@ -220,17 +215,17 @@ abstract class DoctrineType extends AbstractType
             // Otherwise, an incrementing integer is used as value automatically
         };
 
-        $emNormalizer = function (Options $options, $em) use ($registry) {
+        $emNormalizer = function (Options $options, $em) {
             /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 if ($em instanceof ObjectManager) {
                     return $em;
                 }
 
-                return $registry->getManager($em);
+                return $this->registry->getManager($em);
             }
 
-            $em = $registry->getManagerForClass($options['class']);
+            $em = $this->registry->getManagerForClass($options['class']);
 
             if (null === $em) {
                 throw new RuntimeException(sprintf(
@@ -273,7 +268,7 @@ abstract class DoctrineType extends AbstractType
 
         // Set the "id_reader" option via the normalizer. This option is not
         // supposed to be set by the user.
-        $idReaderNormalizer = function (Options $options) use (&$idReaders) {
+        $idReaderNormalizer = function (Options $options) {
             $hash = CachingFactoryDecorator::generateHash(array(
                 $options['em'],
                 $options['class'],
@@ -285,12 +280,12 @@ abstract class DoctrineType extends AbstractType
             // of the field, so we store that information in the reader.
             // The reader is cached so that two choice lists for the same class
             // (and hence with the same reader) can successfully be cached.
-            if (!isset($idReaders[$hash])) {
+            if (!isset($this->idReaders[$hash])) {
                 $classMetadata = $options['em']->getClassMetadata($options['class']);
-                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
+                $this->idReaders[$hash] = new IdReader($options['em'], $classMetadata);
             }
 
-            return $idReaders[$hash];
+            return $this->idReaders[$hash];
         };
 
         $resolver->setDefaults(array(

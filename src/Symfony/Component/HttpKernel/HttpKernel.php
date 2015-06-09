@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributesArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverManager;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -42,17 +45,28 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Constructor.
      *
-     * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
-     * @param RequestStack                $requestStack A stack for master/sub requests
+     * @param EventDispatcherInterface    $dispatcher              An EventDispatcherInterface instance
+     * @param ControllerResolverInterface $resolver                A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack            A stack for master/sub requests
+     * @param ArgumentResolverManager     $argumentResolverManager A manager to resolve the controller arguments
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverManager $argumentResolverManager = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
+
+        if (null === $argumentResolverManager) {
+            $argumentResolverManager = new ArgumentResolverManager();
+            $argumentResolverManager->add(new RequestArgumentResolver());
+            $argumentResolverManager->add(new RequestAttributesArgumentResolver());
+        }
+
+        if (method_exists($resolver, 'setArgumentResolverManager')) {
+            $resolver->setArgumentResolverManager($argumentResolverManager);
+        }
     }
 
     /**
@@ -141,6 +155,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $controller = $event->getController();
 
         // controller arguments
+        $reflector = new \ReflectionMethod($this->resolver, 'getArguments');
+        if ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\HttpKernel\Controller\ControllerResolver') {
+            trigger_error('['.$reflector->getDeclaringClass()->getName().'] The ControllerResolverInterface::getArguments() method is deprecated since version 2.8 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
+        }
+
         $arguments = $this->resolver->getArguments($request, $controller);
 
         // call controller

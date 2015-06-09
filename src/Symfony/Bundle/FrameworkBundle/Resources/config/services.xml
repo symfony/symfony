@@ -25,6 +25,7 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
+            <argument type="service" id="argument_resolver.manager" />
             <argument>false</argument>
         </service>
 

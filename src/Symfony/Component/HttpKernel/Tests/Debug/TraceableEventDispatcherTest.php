@@ -20,6 +20,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * Tagged as legacy because of the usage of the deprecated ControllerResolver#getArguments().
+     *
+     * @group legacy
+     */
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());
@@ -39,6 +44,11 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         ), array_keys($events));
     }
 
+    /**
+     * Tagged as legacy because of the usage of the deprecated ControllerResolver#getArguments().
+     *
+     * @group legacy
+     */
     public function testStopwatchCheckControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
@@ -55,6 +65,11 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request);
     }
 
+    /**
+     * Tagged as legacy because of the usage of the deprecated ControllerResolver#getArguments().
+     *
+     * @group legacy
+     */
     public function testStopwatchStopControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')

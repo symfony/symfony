@@ -17,8 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Tests\TestArgumentResolverManager;
+use Symfony\Component\HttpKernel\Tests\TestControllerResolver;
 
-class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInterface
+class TestMultipleHttpKernel extends HttpKernel
 {
     protected $bodies = array();
     protected $statuses = array();
@@ -34,7 +36,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
             $this->headers[] = $response['headers'];
         }
 
-        parent::__construct(new EventDispatcher(), $this);
+        parent::__construct(new EventDispatcher(), new TestControllerResolver($this), null, new TestArgumentResolverManager());
     }
 
     public function getBackendRequest()
@@ -47,16 +49,6 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         $this->backendRequest = $request;
 
         return parent::handle($request, $type, $catch);
-    }
-
-    public function getController(Request $request)
-    {
-        return array($this, 'callController');
-    }
-
-    public function getArguments(Request $request, $controller)
-    {
-        return array($request);
     }
 
     public function callController(Request $request)

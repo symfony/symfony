@@ -17,8 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Tests\TestArgumentResolverManager;
+use Symfony\Component\HttpKernel\Tests\TestControllerResolver;
 
-class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
+class TestHttpKernel extends HttpKernel
 {
     protected $body;
     protected $status;
@@ -35,7 +37,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->headers = $headers;
         $this->customizer = $customizer;
 
-        parent::__construct(new EventDispatcher(), $this);
+        parent::__construct(new EventDispatcher(), new TestControllerResolver($this), null, new TestArgumentResolverManager());
     }
 
     public function getBackendRequest()
@@ -54,16 +56,6 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     public function isCatchingExceptions()
     {
         return $this->catch;
-    }
-
-    public function getController(Request $request)
-    {
-        return array($this, 'callController');
-    }
-
-    public function getArguments(Request $request, $controller)
-    {
-        return array($request);
     }
 
     public function callController(Request $request)

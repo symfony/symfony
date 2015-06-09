@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributesArgumentResolver;
 
 /**
  * ControllerResolver.
@@ -30,6 +32,12 @@ class ControllerResolver implements ControllerResolverInterface
     private $logger;
 
     /**
+     * @var ArgumentResolverManager
+     * @internal
+     */
+    private $argumentResolverManager;
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
@@ -37,6 +45,14 @@ class ControllerResolver implements ControllerResolverInterface
     public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @internal
+     */
+    public function setArgumentResolverManager(ArgumentResolverManager $argumentResolverManager)
+    {
+        $this->argumentResolverManager = $argumentResolverManager;
     }
 
     /**
@@ -102,34 +118,20 @@ class ControllerResolver implements ControllerResolverInterface
             $r = new \ReflectionFunction($controller);
         }
 
+        $reflector = new \ReflectionMethod($this, 'doGetArguments');
+        if ($reflector->getDeclaringClass()->getName() !== __CLASS__) {
+            trigger_error('The ControllerResolverInterface::doGetArguments() method is deprecated since version 2.7 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
+        }
+
         return $this->doGetArguments($request, $controller, $r->getParameters());
     }
 
+    /**
+     * @deprecated As of Symfony 2.8, to be removed in Symfony 3.0. Create a custom ArgumentResolverInterface implementation instead.
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
-        $attributes = $request->attributes->all();
-        $arguments = array();
-        foreach ($parameters as $param) {
-            if (array_key_exists($param->name, $attributes)) {
-                $arguments[] = $attributes[$param->name];
-            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
-                $arguments[] = $request;
-            } elseif ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } else {
-                if (is_array($controller)) {
-                    $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
-                } elseif (is_object($controller)) {
-                    $repr = get_class($controller);
-                } else {
-                    $repr = $controller;
-                }
-
-                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
-            }
-        }
-
-        return $arguments;
+        return $this->getArgumentResolverManager()->getArguments($request, $controller);
     }
 
     /**
@@ -166,5 +168,16 @@ class ControllerResolver implements ControllerResolverInterface
     protected function instantiateController($class)
     {
         return new $class();
+    }
+
+    private function getArgumentResolverManager()
+    {
+        if (null === $this->argumentResolverManager) {
+            $this->argumentResolverManager = new ArgumentResolverManager();
+            $this->argumentResolverManager->add(new RequestArgumentResolver());
+            $this->argumentResolverManager->add(new RequestAttributesArgumentResolver());
+        }
+
+        return $this->argumentResolverManager;
     }
 }

@@ -140,6 +140,11 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         return $kernel;
     }
 
+    /**
+     * Tagged as legacy because of the usage of the deprecated ControllerResolver#getArguments().
+     *
+     * @group legacy
+     */
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');

@@ -220,19 +220,19 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    protected function controllerMethod2($foo, $bar = null)
+    public function controllerMethod2($foo, $bar = null)
     {
     }
 
-    protected function controllerMethod3($foo, $bar = null, $foobar)
+    public function controllerMethod3($foo, $bar = null, $foobar)
     {
     }
 
-    protected static function controllerMethod4()
+    public static function controllerMethod4()
     {
     }
 
-    protected function controllerMethod5(Request $request)
+    public function controllerMethod5(Request $request)
     {
     }
 }

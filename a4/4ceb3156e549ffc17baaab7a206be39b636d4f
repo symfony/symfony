@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-08T18:50:09Z
+
+There is also a slight BC break if someone access the Date header from the bag directly...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-08T18:50:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-09T07:32:01Z
+
+ooops... HttpKernel tests are failing
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-09T07:43:47Z
+
+I've added lazy date header initialisation in `getDate`. It should fix the tests.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-09T12:20:31Z
+
+There is a BC break for people who accessed `$request->headers->getDate` after request construction. The header will now not be set anymore. But I guess this is an edge case. People relying on it didn't respect the HeaderBag anyway which assumes headers are optional.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-09T15:08:20Z
+
+@Tobion That's the BC break I mentioned above, but I think we can ignore this use case. But of course, that's also why it should only be merged in 2.8 and not on earlier branches.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-09T16:33:07Z
+
+:+1: apart from the changes I mentioned above

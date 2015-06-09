@@ -1,7 +1,7 @@
 <!-- START of Symfony Web Debug Toolbar -->
 {% if 'normal' != position %}
     <div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar" data-no-turbolink>
-        <a href="javascript:void(0);" title="Show Symfony toolbar" onclick="
+        <a href="javascript:void(0);" title="Show Symfony toolbar" tabindex="-1" onclick="
             var elem = this.parentNode;
             if (elem.style.display == 'none') {
                 document.getElementById('sfToolbarMainContent-{{ token }}').style.display = 'none';
@@ -36,7 +36,7 @@
     {% endfor %}
 
     {% if 'normal' != position %}
-        <a class="hide-button" title="Close Toolbar" onclick="
+        <a class="hide-button" title="Close Toolbar" tabindex="-1" onclick="
             var p = this.parentNode;
             p.style.display = 'none';
             (p.previousElementSibling || p.previousSibling).style.display = 'none';

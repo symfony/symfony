@@ -95,7 +95,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     {
         // BC
         if ($this->innerType instanceof AbstractType) {
-            return $this->innerType->getExtensions();
+            if (method_exists($this->innerType, 'getExtensions')) {
+                return $this->innerType->getExtensions();
+            }
         }
 
         return $this->typeExtensions;

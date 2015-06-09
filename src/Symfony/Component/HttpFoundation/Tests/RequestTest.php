@@ -930,9 +930,38 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)
     {
+        if (PHP_VERSION_ID >= 50600) {
+            $this->markTestSkipped('PHP >= 5.6 allows to open php://input several times.');
+        }
+
         $req = new Request();
         $req->getContent($first);
         $req->getContent($second);
+    }
+
+    /**
+     *
+     * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
+     */
+    public function testGetContentCanBeCalledTwiceWithResources($first, $second)
+    {
+        if (PHP_VERSION_ID < 50600) {
+            $this->markTestSkipped('PHP < 5.6 does not allow to open php://input several times.');
+        }
+
+        $req = new Request();
+        $a = $req->getContent($first);
+        $b = $req->getContent($second);
+
+        if ($first) {
+            $a = stream_get_contents($a);
+        }
+
+        if ($second) {
+            $b = stream_get_contents($b);
+        }
+
+        $this->assertEquals($a, $b);
     }
 
     public function getContentCantBeCalledTwiceWithResourcesProvider()

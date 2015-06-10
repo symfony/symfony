@@ -4,26 +4,16 @@ UPGRADE FROM 2.6 to 2.7
 Global
 ------
 
- * `E_USER_DEPRECATED` warnings -
-   `trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
-   are now triggered when using all deprecated functionality.
-   To avoid filling up error logs, you may need to add
-   `~E_USER_DEPRECATED` to your `error_reporting` setting in
-   `php.ini` to *not* add these errors to your log.
+ * Deprecation notices -
+   `@trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
+   are now triggered when using any deprecated functionality.
 
-   In the Symfony Framework, `~E_USER_DEPRECATED` is added to
-   `bootstrap.php.cache` automatically, but you need at least
-   version `2.3.14` or `3.0.21` of the
-   [SensioDistributionBundle](https://github.com/sensiolabs/SensioDistributionBundle).
-   So, you may need to upgrade:
+   By default these notices are silenced, so they won't appear in the PHP logs of
+   your production server. However, these notices are still visible in the web
+   debug toolbar, so you can know where your code needs an upgrade.
 
-   ```bash
-   composer update sensio/distribution-bundle
-   ```
-
-   The [phpunit-bridge](https://github.com/symfony/phpunit-bridge)
-   was introduced to silence deprecation warnings while running your
-   tests and give you a report of deprecated function calls.
+   In addition, it's strongly recommended to enable the [phpunit-bridge](https://github.com/symfony/phpunit-bridge)
+   so that you can deal with deprecation notices in your test suite.
 
 Router
 ------

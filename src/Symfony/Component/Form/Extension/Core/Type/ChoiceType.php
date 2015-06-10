@@ -258,7 +258,7 @@ class ChoiceType extends AbstractType
 
         $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
             if ($choiceList) {
-                trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
 
                 return $choiceList;
             }

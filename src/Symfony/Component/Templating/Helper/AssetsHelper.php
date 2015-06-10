@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Templating\Helper;
 
-trigger_error('The Symfony\Component\Templating\Helper\AssetsHelper is deprecated since version 2.7 and will be removed in 3.0. Use the Asset component instead.', E_USER_DEPRECATED);
+@trigger_error('The Symfony\Component\Templating\Helper\AssetsHelper is deprecated since version 2.7 and will be removed in 3.0. Use the Asset component instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Templating\Asset\PathPackage;
 use Symfony\Component\Templating\Asset\UrlPackage;

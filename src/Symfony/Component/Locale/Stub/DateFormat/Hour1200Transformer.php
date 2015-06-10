@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-trigger_error('The '.__NAMESPACE__.'\Hour1200Transformer class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\Hour1200Transformer class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\Hour1200Transformer class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\Hour1200Transformer class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Intl\DateFormatter\DateFormat\Hour1200Transformer as BaseHour1200Transformer;
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-trigger_error('The '.__NAMESPACE__.'\StubCollator class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\Collator\Collator class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\StubCollator class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\Collator\Collator class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Intl\Collator\Collator;
 

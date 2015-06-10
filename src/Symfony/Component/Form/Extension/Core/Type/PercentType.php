@@ -34,7 +34,7 @@ class PercentType extends AbstractType
     {
         $scale = function (Options $options) {
             if (null !== $options['precision']) {
-                trigger_error('The form option "precision" is deprecated since version 2.7 and will be removed in 3.0. Use "scale" instead.', E_USER_DEPRECATED);
+                @trigger_error('The form option "precision" is deprecated since version 2.7 and will be removed in 3.0. Use "scale" instead.', E_USER_DEPRECATED);
 
                 return $options['precision'];
             }

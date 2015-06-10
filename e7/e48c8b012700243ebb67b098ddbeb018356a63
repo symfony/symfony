@@ -1,0 +1,262 @@
+---------------------------------------------------------------------------
+
+by perk11 at 2015-06-07T06:51:12Z
+
+👍 had numerous deprecated warnings after upgrading to 2.7 and this PR solved all of them.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-07T08:12:50Z
+
+The deprecation warnings are triggered intentionally to let you know what you need to change in your code to be forward compatible with Symfony 3.0.
+
+You *could* silence them by changing your project's `error_reporting` level, but I'd rather update your code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-07T08:16:41Z
+
+This PR may be a good idea in fact don't you think?
+
+---------------------------------------------------------------------------
+
+by elnur at 2015-06-07T08:22:53Z
+
+The most profound PR I've ever seen. A must merge. :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-07T08:29:10Z
+
+@nicolas-grekas Not sure if I understand. Which issue would this change actually solve?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-07T08:31:25Z
+
+It switches deprecation notices from opt-out to opt-in
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-07T08:34:04Z
+
+Yeah, but is that really a good idea? I bet that many people then will never know about this and that they will be surprised when their apps break on Symfony 3.0. Not sure if that's a good experience either.
+
+---------------------------------------------------------------------------
+
+by reecefowell at 2015-06-07T10:53:46Z
+
+I think it is a good idea. @deprecated tags are sufficient, but calling trigger_error() is very shouty.
+
+Googling most of the deprecated errors that come out result in most cases with the people discussing end suggesting and / or agreeing that muting E_DEPRECATED in php.ini is the best solution.
+
+If the intent is to get people to prepare for 3.0 then, well people aren't. Instead they are just muting the warnings. Further more, for upgraders, seeing the messages for the first time, diagnosing / solving them the correct way is very difficult as google has little to offer in the way of answers.
+
+Perhaps some of the deprecated calls don't actually have future ready implementations in place yet. I believe this was the case with the Form components OptionResolverInterface, which my IDE informs me was deprecated in (I think it was) 2.5 or so, but no alternative was provided until something like 2.6 (with OptionResolver).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-07T10:53:56Z
+
+Still thinking about it, I really like the idea.
+Upgrading to 3.0 is also an opt in, the upgrade path is clear.
+
+I'm :+1:
+Reopening to see what other @symfony/deciders think
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-07T11:00:40Z
+
+@reecefowell can you please enhance the commit message?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-07T12:25:57Z
+
+@nicolas-grekas are these deprecation warnings still reported in the logs after being muted or no ?
+
+And does the silencing add some overhead or no ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-07T13:24:28Z
+
+Yes, the debug handler ignores silencing for deprecations. The overhead is
+not significant at all.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-07T18:05:19Z
+
+ping @symfony/deciders
+
+If we agree on this one, I'd like to merge ASAP for at least two reasons:
+
+* I want to release 2.7.1 ASAP
+* Maintaining such a large patch is going to be difficult over time.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-07T20:05:39Z
+
+So this only changes that the deprecation warnings are ignored in production, or?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-08T03:41:03Z
+
+Yes, by default
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-06-08T08:21:10Z
+
+So how would I turn on deprecation notices now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-08T08:51:42Z
+
+By adding a user land error handler, like the one provided by e.g. the debug component
+
+---------------------------------------------------------------------------
+
+by reecefowell at 2015-06-08T09:51:00Z
+
+Comments addressed in code, also tests are now passing. Somehow though I seem to have broken fabbot.io.
+
+The patch just gave me this
+```
+curl http://fabbot.io/patch/symfony/symfony/14900/eb261d45b038f9af47a92b4e6b602bcf8a853816/cs.diff | patch -p0
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  8717  100  8717    0     0  20591      0 --:--:-- --:--:-- --:--:-- 20607
+patch: **** Only garbage was found in the patch input.
+```
+
+So I applied the changes manually, but I guess maybe because I pushed another fix while fabbot.io was still running it broke it this time around.
+
+Fabbot.io was talking about code I never touched though. So I guess those problems were already there.
+
+Apparently the patch only contains garbage.... :confused:
+
+Other than that. Good to go.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-08T19:16:46Z
+
+To summarize a few questions people had (that I also had):
+
+A) Do you still get deprecated warnings in the web debug toolbar? YES
+
+B) Do deprecation warnings still show up in the logs? NO
+
+Does this have any other side effects?
+
+If there are no other side effects, I'm +1. We can add something to the "how to get rid of deprecation warnings" section of the docs to show people how to hook up an error handler to log the deprecation warnings.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-09T14:46:51Z
+
+Ready to be merged?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-09T15:02:25Z
+
+To me, yes
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-09T15:45:17Z
+
+Maybe I missunderstood the question or the answer, but I haven't clear enough what happen with deprecation warnings in logs.
+
+@stof's question:
+>are these deprecation warnings still reported in the logs after being muted or no ?
+
+@nicolas-grekas' response:
+>Yes, the debug handler ignores silencing for deprecations.
+
+@weaverryan's assumption:
+>Do deprecation warnings still show up in the logs? NO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-09T16:13:06Z
+
+Ryan was talking about php logs, stof about logs in the sf toolbar
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-09T16:15:55Z
+
+Nice! Thanks for the clarification @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-09T17:16:37Z
+
+Would it not be better to change the production error handler instead to not log by default if that is what we want? Triggering deprecations and at the same time silence them seems like a hack.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-10T06:27:06Z
+
+@tobion this PR solves a real issue/pain users experiment with 2.7.: they must opt-out from deprecation notices. If we think this is required then we should not merge this PR.
+If we think the deprecations should be opt-in, as would be migrating 3.0, then this PR is the right one.
+Nobody but me voted here. Please do @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-10T06:28:42Z
+
+@reecefowell please rebase
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-06-10T07:13:44Z
+
+I agree that this should have been opt-in rather than opt-out. I do not know if there is a more elegant approach as I agree with @Tobion it seems hacky to use ``@trigger_error()``.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-10T07:53:52Z
+
+I understand how you can see this as a hack. There is an other consideration that makes me think this is really the best: performance. We could wrap the implementation of triggering "opt-in deprecation notices" behind some more semantic interface. But that would add overhead to something that needs to be as fast as possible. This is not a micro-optim when this can be called thousands of times.
+Thus this raw-bare-metal-php implementation that may look hacky, but is just the right implementation for our needs. At least that's my humble opinion :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-10T14:00:53Z
+
+I'm going to merge this today if nobody vote otherwise.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-10T14:43:55Z
+
+:+1: as I see people struggling with deprecation messages, especially in cli. However, we should provide clear instructions on how to enable them.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-10T14:47:06Z
+
+:+1:
+
+It also means we are much less intrusive for other libraries relying on Symfony 2.x
+
+---------------------------------------------------------------------------
+
+by matthias-chlechowitz at 2015-06-10T14:48:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-10T14:48:48Z
+
+:+1:

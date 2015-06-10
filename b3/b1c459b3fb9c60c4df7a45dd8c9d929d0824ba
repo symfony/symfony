@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-02T07:07:42Z
+
+Is that intended? To me, if that is the solution, the `choices_as_value` option doesn't have the right name (it promises something else than it does).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-02T13:09:19Z
+
+@xabbuh Good point - there is a confusion between "value" as in "this is the value that will be returned by the form" and "value" as in "this is the value attribute of the option". These are not the same thing, so it can be confusing. But yes, I believe this is all intended.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-06-02T18:56:28Z
+
+@xabbuh if I understood the initial implementation correctly `choices_as_values` simply means, that the choice values (as in your model data) is in the values of the `'choices' => [...]` array instead of the keys (like it was before).
+
+The reason behind this change was to easily allow values of types other than int or string as choice values. This was apparently implemented by ignoring the model value when creating the html `value=""`, which is required for some cases, but is not for other cases.
+
+This should be documented, but it is no BC issue as the option previously just didn't exist.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-02T19:46:21Z
+
+@apfelbox If I understand you correctly, it is nothing more than a trigger for the `array_flip()` call. Is that what you mean?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-06-02T20:04:36Z
+
+@xabbuh something in this direction. It is a way to provide both a) a comfortable and minimally verbose way of configuring the choices option (no object, nothing to implement just a plain array) and b) supporting model values in this compact form that don't work as PHP array keys (floats, objects, etc..).
+
+I guess historically the array was defined this way, because the assumption was that the model values will be unique per options. Now the realization came, that the label probably is unique per option, too (otherwise the user can't differentiate different values). And by using this direction one can use any arbitrary type as model data – as the label is required to be a string it is optimal for usage in the array keys.
+
+But as arbitrary model data can't be embedded into the `value=""` field, the simplification is made, that the values are just numbered (although the model data could be of a type, that *can* be embedded into HTML – but this is not guaranteed).
+
+So therefore... it is more of a convenience method of expanding the usage of the compact choice array definition.
+
+(... but as I keep thinking about that, I just realized that there is another possible issue with this implementation (maybe someone could verify that): as the choices are just numbered now, the order of the choices in the array suddenly becomes important. Although it would be weird for these options to have an arbitrary order, this currently would produce wrong results in the current implementation ("wrong" as in you select option "a", but after page refresh you selected option "b"). Probably not frequent enough, but I just wanted to mention it.)
+
+---------------------------------------------------------------------------
+
+by davedevelopment at 2015-06-03T20:09:44Z
+
+>  Now the realization came, that the label probably is unique per option, too (otherwise the user can't differentiate different values
+
+I have a situation where I have duplicate labels, but they are in different groups. I'm not 100% sure if this use case is supported, as I'm still trying to make sense of the changes.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-03T20:27:08Z
+
+@davedevelopment I've thought about this - I believe the answer is that you should make your array keys unique, but then use `choice_label` (either with a callback or a property path) as described in #14050.
+
+I'm with you - I understand why the change was made, but I'm still making sense of it too :).
+
+---------------------------------------------------------------------------
+
+by davedevelopment at 2015-06-03T20:43:23Z
+
+@weaverryan you legend, just fixed something in 3 minutes that I've been working on for about 3 hours :)
+
+---------------------------------------------------------------------------
+
+by davedevelopment at 2015-06-03T20:59:01Z
+
+And the fix is in production, thanks again @weaverryan, I owe you big time
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-03T21:22:15Z
+
+@davedevelopment too nice :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-08T18:22:17Z
+
+@webmozart I'm pretty sure this is an easy merge into the UPGRADE log - we just need you to confirm - thx :)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-06-09T01:55:54Z
+
+@weaverryan Why is the change even required? It feels kind of weird.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-10T14:39:33Z
+
+:+1:

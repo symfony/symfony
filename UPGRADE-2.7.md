@@ -134,6 +134,11 @@ Form
            'Ignored' => Status::IGNORED,
        ),
        'choices_as_values' => true,
+       // important if you rely on your option value attribute (e.g. for JavaScript)
+       // this will keep the same functionality as before
+       'choice_value' => function ($choice) {
+           return $choice;
+       },
    ));
    ```
 

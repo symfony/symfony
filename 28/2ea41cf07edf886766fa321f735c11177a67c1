@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-09T23:08:28Z
+
+See https://travis-ci.org/symfony/symfony/jobs/66126841 for an example of the failing tests.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-09T23:16:57Z
+
+The DoctrineBridge tests are now running ok.

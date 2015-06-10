@@ -62,10 +62,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $pk));
 
             $this->connection->commit();
-        } catch (\Exception $failed) {
+        } catch (\Exception $e) {
             $this->connection->rollBack();
 
-            throw $failed;
+            throw $e;
         }
 
         // re-read the ACL from the database to ensure proper caching, etc.
@@ -90,10 +90,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $this->deleteObjectIdentity($oidPK);
 
             $this->connection->commit();
-        } catch (\Exception $failed) {
+        } catch (\Exception $e) {
             $this->connection->rollBack();
 
-            throw $failed;
+            throw $e;
         }
 
         // evict the ACL from the in-memory identity map
@@ -324,10 +324,10 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
 
             $this->connection->commit();
-        } catch (\Exception $failed) {
+        } catch (\Exception $e) {
             $this->connection->rollBack();
 
-            throw $failed;
+            throw $e;
         }
 
         $this->propertyChanges->offsetSet($acl, array());

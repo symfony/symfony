@@ -47,7 +47,7 @@ class ChainUserProvider implements UserProviderInterface
         foreach ($this->providers as $provider) {
             try {
                 return $provider->loadUserByUsername($username);
-            } catch (UsernameNotFoundException $notFound) {
+            } catch (UsernameNotFoundException $e) {
                 // try next one
             }
         }
@@ -67,18 +67,18 @@ class ChainUserProvider implements UserProviderInterface
         foreach ($this->providers as $provider) {
             try {
                 return $provider->refreshUser($user);
-            } catch (UnsupportedUserException $unsupported) {
+            } catch (UnsupportedUserException $e) {
                 // try next one
-            } catch (UsernameNotFoundException $notFound) {
+            } catch (UsernameNotFoundException $e) {
                 $supportedUserFound = true;
                 // try next one
             }
         }
 
         if ($supportedUserFound) {
-            $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
-            $ex->setUsername($user->getUsername());
-            throw $ex;
+            $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+            $e->setUsername($user->getUsername());
+            throw $e;
         } else {
             throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -463,6 +464,34 @@ class SimpleFormTest extends AbstractFormTest
 
         $this->assertSame('1', $form->getData());
         $this->assertSame('1', $form->getNormData());
+        $this->assertSame('1', $form->getViewData());
+    }
+
+    /*
+     * When there is no data transformer and the data is a boolean, it should not be converted to a string
+     */
+    public function testSetDataIsIgnoredIfDataIsBooleanFalse()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(false);
+
+        $this->assertFalse($form->getData());
+        $this->assertFalse($form->getNormData());
+        $this->assertSame('', $form->getViewData());
+    }
+
+    /*
+     * When there is no data transformer and the data is a boolean, it should not be converted to a string
+     */
+    public function testSetDataIsIgnoredIfDataIsBooleanTrue()
+    {
+        $form = $this->getBuilder()->getForm();
+
+        $form->setData(true);
+
+        $this->assertTrue($form->getData());
+        $this->assertTrue($form->getNormData());
         $this->assertSame('1', $form->getViewData());
     }
 

@@ -98,7 +98,8 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
-        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryClass), E_USER_DEPRECATED);
+        $caller = (PHP_VERSION_ID >= 50400) ? current(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1)) : current(debug_backtrace());
+        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead. Called from %s', __METHOD__, $factoryClass, $caller['file'] . "::" . $caller['function']), E_USER_DEPRECATED);
 
         $this->factoryClass = $factoryClass;
 
@@ -134,7 +135,8 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
-        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryMethod), E_USER_DEPRECATED);
+        $caller = (PHP_VERSION_ID >= 50400) ? current(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1)) : current(debug_backtrace());
+        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead. Called from %s', __METHOD__, $factoryMethod, $caller['file'] . "::" . $caller['function']), E_USER_DEPRECATED);
 
         $this->factoryMethod = $factoryMethod;
 
@@ -205,7 +207,8 @@ class Definition
      */
     public function setFactoryService($factoryService)
     {
-        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryService), E_USER_DEPRECATED);
+        $caller = (PHP_VERSION_ID >= 50400) ? current(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1)) : current(debug_backtrace());
+        trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead. Called from %s', __METHOD__, $factoryService, $caller['file'] . "::" . $caller['function']), E_USER_DEPRECATED);
 
         $this->factoryService = $factoryService;
 

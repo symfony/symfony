@@ -23,7 +23,7 @@
         "symfony/phpunit-bridge": "~2.7",
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
-        "symfony/form": "~2.7",
+        "symfony/form": "~2.7,>=2.7.1",
         "symfony/http-kernel": "~2.2",
         "symfony/property-access": "~2.3",
         "symfony/security": "~2.2",

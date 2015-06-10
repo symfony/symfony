@@ -171,24 +171,8 @@ Form
  * `Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\View\ChoiceView` instead.
-
-   Note that the order of the arguments passed to the constructor was inverted.
-
-   Before:
-
-   ```php
-   use Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView;
-
-   $view = new ChoiceView($data, 'value', 'Label');
-   ```
-
-   After:
-
-   ```php
-   use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-
-   $view = new ChoiceView('Label', 'value', $data);
-   ```
+   The constructor arguments of the new class are in the same order than in the
+   deprecated one (this was not true in 2.7.0 but has been fixed in 2.7.1).
 
  * `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use

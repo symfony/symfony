@@ -78,12 +78,12 @@ class ChoiceView extends LegacyChoiceView
     /**
      * Creates a new choice view.
      *
-     * @param string $label The label displayed to humans
-     * @param string $value The view representation of the choice
      * @param mixed  $data  The original choice
+     * @param string $value The view representation of the choice
+     * @param string $label The label displayed to humans
      * @param array  $attr  Additional attributes for the HTML tag
      */
-    public function __construct($label, $value, $data, array $attr = array())
+    public function __construct($data, $value, $label, array $attr = array())
     {
         parent::__construct($data, $value, $label);
 

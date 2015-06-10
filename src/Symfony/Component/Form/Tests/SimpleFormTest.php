@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;

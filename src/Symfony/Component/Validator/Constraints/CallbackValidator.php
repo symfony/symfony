@@ -60,7 +60,7 @@ class CallbackValidator extends ConstraintValidator
                 call_user_func($method, $object, $this->context);
             } elseif (null !== $object) {
                 if (!method_exists($object, $method)) {
-                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
+                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class %s', $method, get_class($object)));
                 }
 
                 $reflMethod = new \ReflectionMethod($object, $method);

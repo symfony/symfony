@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-05T23:12:57Z
+
+Since 2.7.0 is really a stabilization release (like all .0 releases) and 2.7.1 is about to be tagged, having this in 2.7.1 is the only window we have to get this fixed.
+Ping @webmozart
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-06T18:27:55Z
+
+:+1:
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-09T20:20:13Z
+
+I am not sure if that is a good idea. Yes, it's not consistent, but do we really want people have to change their apps again if they already adapted the new `ChoiceView` class?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-10T14:43:52Z
+
+This should be documented as a BC break between 2.7.0 and 2.7.1 though
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-10T14:57:32Z
+
+UPGRADE-2.7 updated. If someone has a better wording idea, I'm open to suggestions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-10T16:38:53Z
+
+:+1:

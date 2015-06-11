@@ -7,6 +7,31 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.1 (2015-06-11)
+
+ * bug #14835 [DependencyInjection] Fixed resolving of service configurators containing Definition objects (webmozart)
+ * bug #14816 [TwigBridge] Make AppVariable check if security.context exists (ogizanagi)
+ * bug #14897  Allow new lines in Messages translated with transchoice() (replacement for #14867)  (azine)
+ * bug #14887 [Form] Swap new ChoiceView constructor arguments to ease migrating from the deprecated one (nicolas-grekas)
+ * bug #14900 Silence deprecation warnings by default (reecefowell)
+ * bug #14739 [Console] SymfonyStyle : fix blocks wordwrapping (ogizanagi)
+ * bug #14740 [Console] SymfonyStyle : fix blocks output is broken on windows cmd (ogizanagi)
+ * bug #14623 [Console] SymfonyStyle : fix & automate block gaps. (ogizanagi)
+ * bug #14895 [Form] Support DateTimeImmutable in transform() (c960657)
+ * bug #14891 without this change allways the legacy code get called (dominikzogg)
+ * bug #14888 [Console] Fix ask and askHidden methods (dosten)
+ * bug #14705 [Translator] avoid serialize unserializable resources. (aitboudad)
+ * bug #14846 [console][TableCell] get cell width without decoration. (aitboudad)
+ * bug #14852 [VarDumper] Fix generic casters calling order (nicolas-grekas)
+ * bug #14855 [VarDumper] Changed tooltip to expand-all keybinding in OS X (taylankasap)
+ * bug #14854 [Bridge\PhpUnit] Fix composer installed phpunit detection (nicolas-grekas)
+ * bug #14859 Improve the config validation in TwigBundle (stof)
+ * bug #14837 [SecurityBundle] Remove SecurityContext from Compile (Zander Baldwin)
+ * bug #14793 [FrameworkBundle] make `templating.helper.router` service available again for BC reasons (xabbuh)
+ * bug #14785 [BrowserKit] Fix bug when uri starts with http. (amouhzi)
+ * bug #14807 [Security][Acl] enforce string identifiers (xabbuh)
+ * bug #14808 [WebProfilerBundle][logger] added missing deprecation message. (aitboudad)
+
 * 2.7.0 (2015-05-30)
 
  * bug #14777 Avoid using the app global variable in the profiler templates (stof)

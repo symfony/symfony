@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-11T11:30:37Z
+
+I updated the PR to match @stof's comments. I don't like this solution however, because the duplicated code in `createService()` and `resolvedServices()` bears potential for new bugs.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T17:05:10Z
+
+:+1:

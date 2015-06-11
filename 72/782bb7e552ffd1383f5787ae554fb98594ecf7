@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-11T07:53:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-11T08:05:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T13:56:00Z
+
+That's really just a hack to make things work. So, we should probably trigger some error notices when methods from the old class are called. And anyway, calling any of these methods will lead to some fatal errors as the original constructor is not called, so the properties are not initialized.
+
+:-1:
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-06-11T14:10:06Z
+
+There are several ways how this could adjusted further:
+
+1. Overwrite the other methods of the old service and trigger deprecation messages
+2. Try to return the old service
+3. Accept the minor BC break (It looks like it does not affect many at all) and just add that to the upgrade description
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T15:12:21Z
+
+3 looks like the better idea.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-06-11T15:30:41Z
+
+@fabpot Just updated. I am wondering if I updated that correctly, will the `templating.helper.assets` really be removed in 3.0. It is still in the template_php.xml but the actual helper class is not any more there in the master branch.
+
+I assumed this for now and would update accordingly, the way as it was phrased before recommended anyway the use of the `asset.packages` service.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T17:07:53Z
+
+:+1:

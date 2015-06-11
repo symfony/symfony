@@ -734,7 +734,6 @@ EOF;
 $code    }
 
 EOF;
->>>>>>> 2.8
     }
 
     private function addNewInstance($id, Definition $definition, $return, $instantiation)

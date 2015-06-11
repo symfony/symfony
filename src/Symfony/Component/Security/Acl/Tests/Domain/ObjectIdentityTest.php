@@ -71,7 +71,7 @@ namespace Symfony\Component\Security\Acl\Tests\Domain
             $id = ObjectIdentity::fromDomainObject($domainObject);
 
             $this->assertSame('1', $id->getIdentifier());
-            $this->assertEquals('Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
+            $this->assertEquals('Symfony\Component\Security\Acl\Tests\Domain\TestDomainObject', $id->getType());
         }
 
         public function testFromDomainObjectWithoutInterfaceAllowsZeroAsIdentifier()
@@ -81,7 +81,7 @@ namespace Symfony\Component\Security\Acl\Tests\Domain
             $id = ObjectIdentity::fromDomainObject($domainObject);
 
             $this->assertSame('0', $id->getIdentifier());
-            $this->assertEquals('Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject', $id->getType());
+            $this->assertEquals('Symfony\Component\Security\Acl\Tests\Domain\TestDomainObject', $id->getType());
         }
 
         /**

@@ -173,12 +173,12 @@ class DebugClassLoader
 
                 if (!$parent || strncmp($ns, $parent->name, $len)) {
                     if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
-                        trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
                     }
 
                     foreach ($refl->getInterfaceNames() as $interface) {
                         if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
-                            trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }
                 }

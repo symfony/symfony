@@ -22,9 +22,9 @@ class TimezoneTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $choices = $view->vars['choices'];
 
         $this->assertArrayHasKey('Africa', $choices);
-        $this->assertContains(new ChoiceView('Kinshasa', 'Africa/Kinshasa', 'Africa/Kinshasa'), $choices['Africa'], '', false, false);
+        $this->assertContains(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Kinshasa'), $choices['Africa'], '', false, false);
 
         $this->assertArrayHasKey('America', $choices);
-        $this->assertContains(new ChoiceView('New York', 'America/New_York', 'America/New_York'), $choices['America'], '', false, false);
+        $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'New York'), $choices['America'], '', false, false);
     }
 }

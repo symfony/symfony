@@ -125,7 +125,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     public function testIsChoiceSelected($expected, $choice, $value)
     {
-        $choice = new ChoiceView($choice.' label', $choice, $choice);
+        $choice = new ChoiceView($choice, $choice, $choice.' label');
 
         $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
     }

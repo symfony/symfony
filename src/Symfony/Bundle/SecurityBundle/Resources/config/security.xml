@@ -50,6 +50,11 @@
     </parameters>
 
     <services>
+
+        <service id="security.argument_resolver.user" class="Symfony\Bundle\SecurityBundle\ArgumentResolver\UserArgumentResolver">
+            <tag name="kernel.argument_resolver" />
+        </service>
+
         <service id="security.context" class="%security.context.class%">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authorization_checker" />

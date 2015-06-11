@@ -36,7 +36,7 @@
         "symfony/validator": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
-        "doctrine/doctrine-bundle": "~1.2",
+        "doctrine/doctrine-bundle": "~1.4",
         "twig/twig": "~1.12"
     },
     "autoload": {

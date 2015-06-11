@@ -70,7 +70,7 @@
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",
-        "doctrine/doctrine-bundle": "~1.2",
+        "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2"

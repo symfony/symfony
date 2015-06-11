@@ -133,6 +133,24 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
+        if (isset($requirements['_method'])) {
+            if (0 === count($methods)) {
+                $methods = explode('|', $requirements['_method']);
+            }
+
+            unset($requirements['_method']);
+            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" attribute instead.', $id, $path), E_USER_DEPRECATED);
+        }
+
+        if (isset($requirements['_scheme'])) {
+            if (0 === count($schemes)) {
+                $schemes = explode('|', $requirements['_scheme']);
+            }
+
+            unset($requirements['_scheme']);
+            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" attribute instead.', $id, $path), E_USER_DEPRECATED);
+        }
+
         $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
         $collection->add($id, $route);
     }

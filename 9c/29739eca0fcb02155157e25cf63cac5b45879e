@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T15:09:50Z
+
+Would it make sense to also bump the version in SecurityBundle for the doctrine bundle dep?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-11T15:14:46Z
+
+Sorry, i don't understand. This PR already bump the version of DoctrineBundle dep in the SecurityBundle
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T15:19:08Z
+
+Sorry I meant the main composer.json.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-11T15:24:01Z
+
+No problem, you're right. Fixed.

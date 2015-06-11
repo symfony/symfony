@@ -13,14 +13,14 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * AssetsHelper helps manage asset URLs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AssetsHelper extends CoreAssetsHelper
+class AssetsHelper extends Helper
 {
     private $packages;
 

@@ -592,3 +592,54 @@ TwigBundle
        background: {{ brand_color|raw }};
    }
    ```
+
+FrameworkBundle
+---------------
+
+ * The `templating.helper.assets` was refactored and returns now an object of the type
+   `Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper` instead of
+   `Symfony\Component\Templating\Helper\CoreAssetsHelper`. You can update your class definition
+   or use the `assets.package` service instead. Using the `assets.package` service is the recommended 
+   way. The `templating.helper.assets` service will be removed in Symfony 3.0.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+
+   class DemoService
+   {
+       private $assetsHelper;
+
+       public function __construct(CoreAssetsHelper $assetsHelper)
+       {
+           $this->assetsHelper = $assetsHelper;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetsHelper->getUrl('thumbnail.png', null, $this->assetsHelper->getVersion());
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Asset\Packages;
+
+   class DemoService
+   {
+       private $assetPackages;
+
+       public function __construct(Packages $assetPackages)
+       {
+           $this->assetPackages = $assetPackages;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetPackages->getUrl('thumbnail.png').$this->assetPackages->getVersion();
+       }
+   }
+   ```

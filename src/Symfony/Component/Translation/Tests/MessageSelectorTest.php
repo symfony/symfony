@@ -96,10 +96,10 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
 
             // Test texts with new-lines
             // with double-quotes and \n in id & double-quotes and actual newlines in text
-            array("This is a text with a\n            new-line in it. Selector = 0.", "{0}This is a text with a
+            array("This is a text with a\n            new-line in it. Selector = 0.", '{0}This is a text with a
             new-line in it. Selector = 0.|{1}This is a text with a
             new-line in it. Selector = 1.|[1,Inf]This is a text with a
-            new-line in it. Selector > 1.", 0),
+            new-line in it. Selector > 1.', 0),
             // with double-quotes and \n in id and single-quotes and actual newlines in text
             array("This is a text with a\n            new-line in it. Selector = 1.", '{0}This is a text with a
             new-line in it. Selector = 0.|{1}This is a text with a
@@ -110,8 +110,8 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             new-line in it. Selector = 1.|[1,Inf]This is a text with a
             new-line in it. Selector > 1.', 5),
             // with double-quotes and id split accros lines
-            array("This is a text with a
-            new-line in it. Selector = 1.", '{0}This is a text with a
+            array('This is a text with a
+            new-line in it. Selector = 1.', '{0}This is a text with a
             new-line in it. Selector = 0.|{1}This is a text with a
             new-line in it. Selector = 1.|[1,Inf]This is a text with a
             new-line in it. Selector > 1.', 1),

@@ -72,8 +72,8 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \Twig_Error
-     * @expectedExceptionMessage Unclosed "block" in "extractor/syntax_error.twig" at line 1
+     * @expectedException              \Twig_Error
+     * @expectedExceptionMessageRegExp /Unclosed "block" in "extractor(\/|\\)syntax_error\.twig" at line 1/
      */
     public function testExtractSyntaxError()
     {

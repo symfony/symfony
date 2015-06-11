@@ -86,6 +86,12 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
         if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
             $parameterType = Connection::PARAM_INT_ARRAY;
+
+            // Filter out non-integer values (e.g. ""). If we don't, some
+            // databases such as PostgreSQL fail.
+            $values = array_values(array_filter($values, function ($v) {
+                return (string) $v === (string) (int) $v;
+            }));
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;
         }

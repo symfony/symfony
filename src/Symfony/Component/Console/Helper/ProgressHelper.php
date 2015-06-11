@@ -121,7 +121,7 @@ class ProgressHelper extends Helper
     public function __construct($triggerDeprecationError = true)
     {
         if ($triggerDeprecationError) {
-            trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Console\Helper\ProgressBar class instead.', E_USER_DEPRECATED);
+            @trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Console\Helper\ProgressBar class instead.', E_USER_DEPRECATED);
         }
     }
 

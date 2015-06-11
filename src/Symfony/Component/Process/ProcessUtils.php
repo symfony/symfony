@@ -97,7 +97,7 @@ class ProcessUtils
             }
             // deprecated as of Symfony 2.5, to be removed in 3.0
             if (is_object($input) && method_exists($input, '__toString')) {
-                trigger_error('Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+                @trigger_error('Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
                 return (string) $input;
             }

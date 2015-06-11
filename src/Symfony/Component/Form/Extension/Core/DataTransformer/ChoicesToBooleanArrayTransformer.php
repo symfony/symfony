@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
-trigger_error('The class '.__NAMESPACE__.'\ChoicesToBooleanArrayTransformer is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper instead.', E_USER_DEPRECATED);
+@trigger_error('The class '.__NAMESPACE__.'\ChoicesToBooleanArrayTransformer is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;

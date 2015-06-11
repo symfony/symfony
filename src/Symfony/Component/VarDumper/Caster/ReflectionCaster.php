@@ -36,7 +36,7 @@ class ReflectionCaster
      */
     public static function castReflector(\Reflector $c, array $a, Stub $stub, $isNested)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
         $a[Caster::PREFIX_VIRTUAL.'reflection'] = $c->__toString();
 
         return $a;

@@ -45,7 +45,7 @@ class DebugClassLoader
         $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
 
         if ($this->wasFinder) {
-            trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
             $this->classLoader = array($classLoader, 'loadClass');
             $this->isFinder = true;
         } else {
@@ -127,7 +127,7 @@ class DebugClassLoader
      */
     public function findFile($class)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if ($this->wasFinder) {
             return $this->classLoader[0]->findFile($class);
@@ -200,12 +200,12 @@ class DebugClassLoader
 
                 if (!$parent || strncmp($ns, $parent->name, $len)) {
                     if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
-                        trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
                     }
 
                     foreach ($refl->getInterfaceNames() as $interface) {
                         if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
-                            trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }
                 }

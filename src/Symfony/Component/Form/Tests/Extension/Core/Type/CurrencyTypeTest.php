@@ -30,8 +30,8 @@ class CurrencyTypeTest extends TestCase
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Euro', 'EUR', 'EUR'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('US Dollar', 'USD', 'USD'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('Slovenian Tolar', 'SIT', 'SIT'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('EUR', 'EUR', 'Euro'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('USD', 'USD', 'US Dollar'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
 }

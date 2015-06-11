@@ -31,7 +31,7 @@ class DialogHelper extends InputAwareHelper
     public function __construct($triggerDeprecationError = true)
     {
         if ($triggerDeprecationError) {
-            trigger_error('"Symfony\Component\Console\Helper\DialogHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\QuestionHelper" instead.', E_USER_DEPRECATED);
+            @trigger_error('"Symfony\Component\Console\Helper\DialogHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\QuestionHelper" instead.', E_USER_DEPRECATED);
         }
     }
 

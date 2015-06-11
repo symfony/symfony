@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-trigger_error('The '.__NAMESPACE__.'\Debugger class is deprecated since version 2.4 and will be removed in 3.0. Use the Psr\Log\LoggerInterface interface instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\Debugger class is deprecated since version 2.4 and will be removed in 3.0. Use the Psr\Log\LoggerInterface interface instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Templating\DebuggerInterface;
 use Psr\Log\LoggerInterface;

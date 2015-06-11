@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
             ->beforeNormalization()
                 ->ifTrue(function ($v) { return isset($v['csrf_protection']['field_name']); })
                 ->then(function ($v) {
-                    trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
+                    @trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
 
                     return $v;
                 })
@@ -82,7 +82,7 @@ class Configuration implements ConfigurationInterface
                         || count($v['templating']['assets_base_urls']['ssl'])
                         || count($v['templating']['packages'])
                     ) {
-                        trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
+                        @trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
 
                         // convert the old configuration to the new one
                         if (isset($v['assets'])) {
@@ -115,7 +115,7 @@ class Configuration implements ConfigurationInterface
             ->beforeNormalization()
                 ->ifTrue(function ($v) { return isset($v['validation']['api']); })
                 ->then(function ($v) {
-                    trigger_error('The validation.api configuration key is deprecated since version 2.7 and will be removed in 3.0', E_USER_DEPRECATED);
+                    @trigger_error('The validation.api configuration key is deprecated since version 2.7 and will be removed in 3.0', E_USER_DEPRECATED);
 
                     return $v;
                 })

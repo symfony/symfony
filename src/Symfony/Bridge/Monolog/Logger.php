@@ -27,7 +27,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function emerg($message, array $context = array())
     {
-        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the emergency() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the emergency() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
 
         return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
     }
@@ -37,7 +37,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function crit($message, array $context = array())
     {
-        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the method critical() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the method critical() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
 
         return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
     }
@@ -47,7 +47,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function err($message, array $context = array())
     {
-        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the error() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the error() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
 
         return parent::addRecord(BaseLogger::ERROR, $message, $context);
     }
@@ -57,7 +57,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function warn($message, array $context = array())
     {
-        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the warning() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the warning() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
 
         return parent::addRecord(BaseLogger::WARNING, $message, $context);
     }

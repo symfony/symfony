@@ -144,7 +144,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if ($list instanceof LegacyChoiceListInterface && empty($preferredChoices)
             && null === $label && null === $index && null === $groupBy && null === $attr) {
             $mapToNonLegacyChoiceView = function (LegacyChoiceView $choiceView) {
-                return new ChoiceView($choiceView->label, $choiceView->value, $choiceView->data);
+                return new ChoiceView($choiceView->data, $choiceView->value, $choiceView->label);
             };
 
             return new ChoiceListView(
@@ -245,10 +245,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $nextIndex = is_int($index) ? $index++ : call_user_func($index, $choice, $key, $value);
 
         $view = new ChoiceView(
+            $choice,
+            $value,
             // If the labels are null, use the choice key by default
             null === $label ? (string) $key : (string) call_user_func($label, $choice, $key, $value),
-            $value,
-            $choice,
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
             is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())

@@ -50,7 +50,7 @@ abstract class Loader implements LoaderInterface
      */
     public function setDebugger(DebuggerInterface $debugger)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. Use the setLogger() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. Use the setLogger() method instead.', E_USER_DEPRECATED);
 
         $this->debugger = $debugger;
     }

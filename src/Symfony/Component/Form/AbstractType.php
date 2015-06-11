@@ -46,8 +46,9 @@ abstract class AbstractType implements FormTypeInterface
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         if (!$resolver instanceof OptionsResolver) {
-            throw new \InvalidArgumentException(sprintf('Custom resolver %s must extend Symfony\Component\OptionsResolver\OptionsResolver', get_class($resolver)));
+            throw new \InvalidArgumentException(sprintf('Custom resolver "%s" must extend "Symfony\Component\OptionsResolver\OptionsResolver".', get_class($resolver)));
         }
+
         $this->configureOptions($resolver);
     }
 

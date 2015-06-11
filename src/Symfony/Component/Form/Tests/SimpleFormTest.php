@@ -1059,7 +1059,7 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Custom resolver Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver must extend Symfony\Component\OptionsResolver\OptionsResolver
+     * @expectedExceptionMessage Custom resolver "Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver" must extend "Symfony\Component\OptionsResolver\OptionsResolver".
      */
     public function testCustomOptionsResolver()
     {

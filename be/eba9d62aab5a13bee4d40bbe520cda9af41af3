@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-06T10:25:33Z
+
+Now you get two deprecation warnings for one error. Doesn't look better to me. Also this would require to change the deprecation warning in Route which currently also mentions the config.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-06T10:27:42Z
+
+And if you do this, the annotation loader would need to be changed as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-06T10:41:47Z
+
+> Now you get two deprecation warnings for one error. Doesn't look better to me.
+
+Imo that's a fair trade-off. We did the same in the DependencyInjection component because people had a hard time to find the actual file that was causing the deprecation message.
+
+We could also just extra the `_scheme` and `_method` requirements in the loaders to not trigger the second warning? What do you think about that?
+
+> Also this would require to change the deprecation warning in Route which currently also mentions the config.
+
+done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-08T16:14:36Z
+
+@Tobion I updated the loaders so that deprecation warnings are only triggered once. I also update the `Route` annotation class (we already had a trigger for the `pattern` option there). I am not sure if we should additionally trigger warnings in the annotation loaders. What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-10T14:49:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dawehner at 2015-06-11T00:10:28Z
+
+I like the idea to mention the yaml format which most people probably use! Similar things could also be done for the factory class thing in the container ...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-11T06:59:22Z
+
+@dawehner see #14687

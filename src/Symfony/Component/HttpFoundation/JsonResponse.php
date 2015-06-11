@@ -26,7 +26,10 @@ class JsonResponse extends Response
 {
     protected $data;
     protected $callback;
-    protected $encodingOptions;
+
+    // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+    // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+    protected $encodingOptions = 15;
 
     /**
      * Constructor.
@@ -42,9 +45,6 @@ class JsonResponse extends Response
         if (null === $data) {
             $data = new \ArrayObject();
         }
-
-        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
 
         $this->setData($data);
     }

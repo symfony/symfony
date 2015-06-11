@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-06T09:10:42Z
+
+Imo we should rather fix the BC break and add a BC layer for custom `OptionsResolverInterface` implementations (I proposed a fix in #14892).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-08T16:20:19Z
+
+:+1:
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-08T17:09:23Z
+
+I tried to follow the [native PHP wording](https://github.com/php/php-src/blob/7f39ee7159e500c7971da99a9cfdbdab0648e8f9/Zend/zend_execute.c#L617) (check **before** and **after** examples). But if you want, I can update the PR according your comments.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-08T17:18:26Z
+
+I'm :-1: on such things. There is no point in ensuring things with exceptions that are already handled by PHP itself at the language level. And one can expect developers to read the stack trace. It's just one level higher where is call is from...
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-08T17:23:44Z
+
+@Tobion, I added this check just because the ```OptionsResolverInterface``` hint for ```setDefaultOptions()``` can't be updated by BC reasons, while if you now pass a custom implementation of this interface, you receive an error from hint in the next call in the stack (```configureOptions()```), while actually the constraint is intended to be in ```setDefaultOptions()```.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-08T17:25:22Z
+
+The only advantage of a custom exception is to provide a concrete exception message. But then it should really be concrete and include workaround. In this case, it would be that they have to change their custom options resolver to extend from the standard one. Or they have to overwrite `setDefaultOptions` in their forms to be based on the interface as it was < 2.7
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-08T17:26:58Z
+
+I know just read the first entry in the call stack and you know this as well.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-08T17:29:25Z
+
+I agree that the exception message could add some more helpful hint. I can update it, but first I need to know what, because this is really a BC break that breaks with the BC promise. Can you suggest any good message to express this situation?
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-08T18:05:07Z
+
+What about ```Custom resolver %s must extend Symfony\Component\OptionsResolver\OptionsResolver```?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-10T17:02:01Z
+
+> What about Custom resolver %s must extend Symfony\Component\OptionsResolver\OptionsResolver?
+
+Sure. But that is exactly what the fatal error also tells you. So to me there is no benefit. So I'm +-0
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-10T17:33:13Z
+
+From my POV, currently the fatal error fails because the use of a deprecated method which has changed its behavior, but if some user doesn't know about this change, it's weird (or at least confusing) to see an error coming from a method they never called (remember, in this use case, the called method is ```setDefaultOptions()``` relying in the interface hint / BC promise).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T16:58:25Z
+
+@phansys Can you update the error message as the current one is very unfriendly (at least to me), and not very Symfony-like.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-11T16:58:34Z
+
+Any other vote on this one?
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-11T18:22:03Z
+
+@fabpot, done!

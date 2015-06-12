@@ -353,9 +353,9 @@ UPGRADE FROM 2.x to 3.0
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
 
- * The `templating.helper.assets` was moved to `templating_php.xml`. You can
+ * The `templating.helper.assets` was removed in Symfony 3.0. You should
    use the `assets.package` service instead.
-
+   
    Before:
 
    ```php

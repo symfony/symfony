@@ -40,27 +40,14 @@ class ExceptionCaster
         E_STRICT => 'E_STRICT',
     );
 
+    public static function castError(\Error $e, array $a, Stub $stub, $isNested)
+    {
+        return $e instanceof \Exception ? $a : self::filterExceptionArray($a, "\0Error\0");
+    }
+
     public static function castException(\Exception $e, array $a, Stub $stub, $isNested)
     {
-        $xPrefix = PHP_VERSION_ID >= 70000 ? "\0BaseException\0" : "\0Exception\0";
-        if (isset($a[$xPrefix.'trace'])) {
-            $trace = $a[$xPrefix.'trace'];
-            unset($a[$xPrefix.'trace']); // Ensures the trace is always last
-        } else {
-            $trace = array();
-        }
-
-        static::filterTrace($trace, static::$traceArgs);
-
-        if (null !== $trace) {
-            $a[$xPrefix.'trace'] = $trace;
-        }
-        if (empty($a[$xPrefix.'previous'])) {
-            unset($a[$xPrefix.'previous']);
-        }
-        unset($a[$xPrefix.'string'], $a["\0+\0xdebug_message"], $a["\0+\0__destructorException"]);
-
-        return $a;
+        return self::filterExceptionArray($a, "\0Exception\0");
     }
 
     public static function castErrorException(\ErrorException $e, array $a, Stub $stub, $isNested)
@@ -75,7 +62,7 @@ class ExceptionCaster
     public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, $isNested)
     {
         $prefix = "\0*\0";
-        $xPrefix = PHP_VERSION_ID >= 70000 ? "\0BaseException\0" : "\0Exception\0";
+        $xPrefix = "\0Exception\0";
 
         if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'][0])) {
             $b = (array) $a[$xPrefix.'previous'];
@@ -122,5 +109,27 @@ class ExceptionCaster
                 unset($t['args']);
             }
         }
+    }
+
+    private static function filterExceptionArray(array $a, $xPrefix)
+    {
+        if (isset($a[$xPrefix.'trace'])) {
+            $trace = $a[$xPrefix.'trace'];
+            unset($a[$xPrefix.'trace']); // Ensures the trace is always last
+        } else {
+            $trace = array();
+        }
+
+        static::filterTrace($trace, static::$traceArgs);
+
+        if (null !== $trace) {
+            $a[$xPrefix.'trace'] = $trace;
+        }
+        if (empty($a[$xPrefix.'previous'])) {
+            unset($a[$xPrefix.'previous']);
+        }
+        unset($a[$xPrefix.'string'], $a["\0+\0xdebug_message"], $a["\0+\0__destructorException"]);
+
+        return $a;
     }
 }

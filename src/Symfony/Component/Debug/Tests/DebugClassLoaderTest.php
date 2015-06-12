@@ -64,6 +64,9 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         if (PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped('PHP7 throws exceptions, unsilencing is not required anymore.');
         }
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM is not handled in this test case.');
+        }
 
         ob_start();
 
@@ -85,6 +88,9 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         // for https://bugs.php.net/65322.
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
+        }
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM is not handled in this test case.');
         }
 
         ErrorHandler::register();

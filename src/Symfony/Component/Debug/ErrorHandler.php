@@ -160,6 +160,10 @@ class ErrorHandler
      */
     public function setDefaultLogger(LoggerInterface $logger, $levels = null, $replace = false)
     {
+        if (defined('FATAL_ERROR')) {
+            $this->loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
+        }
+
         $loggers = array();
 
         if (is_array($levels)) {
@@ -525,7 +529,13 @@ class ErrorHandler
             // Handled below
         }
 
-        if ($error && ($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR))) {
+        $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
+
+        if (defined('FATAL_ERROR')) {
+            $levels |= FATAL_ERROR;
+        }
+
+        if ($error && ($error['type'] & $levels)) {
             // Let's not throw anymore but keep logging
             $handler->throwAt(0, true);
 
@@ -558,7 +568,13 @@ class ErrorHandler
      */
     public static function stackErrors()
     {
-        self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+        $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
+
+        if (defined('FATAL_ERROR')) {
+            $levels |= FATAL_ERROR;
+        }
+
+        self::$stackedErrorLevels[] = error_reporting(error_reporting() | $levels);
     }
 
     /**
@@ -570,7 +586,13 @@ class ErrorHandler
 
         if (null !== $level) {
             $e = error_reporting($level);
-            if ($e !== ($level | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
+            $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
+
+            if (defined('FATAL_ERROR')) {
+                $levels |= FATAL_ERROR;
+            }
+
+            if ($e !== ($level | $levels)) {
                 // If the user changed the error level, do not overwrite it
                 error_reporting($e);
             }
@@ -662,8 +684,13 @@ class ErrorHandler
             $handler->setDefaultLogger($logger, E_ALL | E_STRICT, false);
             $handler->screamAt(E_ALL | E_STRICT);
         } elseif ('emergency' === $channel) {
-            $handler->setDefaultLogger($logger, E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR, true);
-            $handler->screamAt(E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+            $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
+
+            if (defined('FATAL_ERROR')) {
+                $levels = $levels | FATAL_ERROR;
+            }
+            $handler->setDefaultLogger($logger, $levels, true);
+            $handler->screamAt($levels);
         }
     }
 

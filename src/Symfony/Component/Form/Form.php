@@ -608,6 +608,7 @@ class Form implements \IteratorAggregate, FormInterface
                 // default data using the data mapper.
                 // If the form is not compound, the submitted data is also the data in view format.
                 $viewData = $this->config->getCompound() ? $this->viewData : $submittedData;
+                $emptyIsNotValue = true;
 
                 if (FormUtil::isEmpty($viewData)) {
                     $emptyData = $this->config->getEmptyData();
@@ -618,6 +619,7 @@ class Form implements \IteratorAggregate, FormInterface
                     }
 
                     $viewData = $emptyData;
+                    $emptyIsNotValue = $this->config->getOption('empty_data') !== '';
                 }
 
                 // Merge form data from children into existing view data
@@ -634,7 +636,7 @@ class Form implements \IteratorAggregate, FormInterface
                 }
 
                 // Normalize data to unified representation
-                $normData = $this->viewToNorm($viewData);
+                $normData = $this->viewToNorm($viewData, $emptyIsNotValue);
 
                 // Hook to change content of the data in the normalized
                 // representation
@@ -1179,12 +1181,12 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return mixed
      */
-    private function viewToNorm($value)
+    private function viewToNorm($value, $emptyIsNotValue)
     {
         $transformers = $this->config->getViewTransformers();
 
         if (!$transformers) {
-            return '' === $value ? null : $value;
+            return '' === $value && $emptyIsNotValue ? null : $value;
         }
 
         try {

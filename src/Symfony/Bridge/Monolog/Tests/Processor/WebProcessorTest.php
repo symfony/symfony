@@ -26,10 +26,24 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
+        $this->assertCount(5, $record['extra']);
         $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
         $this->assertEquals($server['REMOTE_ADDR'], $record['extra']['ip']);
         $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
         $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
+        $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
+    }
+
+    public function testCanBeConstructedWithExtraFields()
+    {
+        list($event, $server) = $this->createRequestEvent();
+
+        $processor = new WebProcessor(array('url', 'referrer'));
+        $processor->onKernelRequest($event);
+        $record = $processor($this->getRecord());
+
+        $this->assertCount(2, $record['extra']);
+        $this->assertEquals($server['REQUEST_URI'], $record['extra']['url']);
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 

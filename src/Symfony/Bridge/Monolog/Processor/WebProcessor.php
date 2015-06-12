@@ -22,10 +22,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class WebProcessor extends BaseWebProcessor
 {
-    public function __construct()
+    /**
+     * @param array|null $extraFields
+     */
+    public function __construct(array $extraFields = null)
     {
         // Pass an empty array as the default null value would access $_SERVER
-        parent::__construct(array());
+        parent::__construct(array(), $extraFields);
     }
 
     public function onKernelRequest(GetResponseEvent $event)

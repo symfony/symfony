@@ -22,14 +22,15 @@ class SplCaster
 {
     public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, $isNested)
     {
+        $prefix = "\0~\0";
         $class = $stub->class;
         $flags = $c->getFlags();
 
         $b = array(
-            "\0~\0flag::STD_PROP_LIST" => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
-            "\0~\0flag::ARRAY_AS_PROPS" => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
-            "\0~\0iteratorClass" => $c->getIteratorClass(),
-            "\0~\0storage" => $c->getArrayCopy(),
+            $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
+            $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
+            $prefix.'iteratorClass' => $c->getIteratorClass(),
+            $prefix.'storage' => $c->getArrayCopy(),
         );
 
         if ($class === 'ArrayObject') {
@@ -68,12 +69,13 @@ class SplCaster
 
     public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, $isNested)
     {
+        $prefix = "\0~\0";
         $mode = $c->getIteratorMode();
         $c->setIteratorMode(\SplDoublyLinkedList::IT_MODE_KEEP | $mode & ~\SplDoublyLinkedList::IT_MODE_DELETE);
 
         $a += array(
-            "\0~\0mode" => new ConstStub((($mode & \SplDoublyLinkedList::IT_MODE_LIFO) ? 'IT_MODE_LIFO' : 'IT_MODE_FIFO').' | '.(($mode & \SplDoublyLinkedList::IT_MODE_KEEP) ? 'IT_MODE_KEEP' : 'IT_MODE_DELETE'), $mode),
-            "\0~\0dllist" => iterator_to_array($c),
+            $prefix.'mode' => new ConstStub((($mode & \SplDoublyLinkedList::IT_MODE_LIFO) ? 'IT_MODE_LIFO' : 'IT_MODE_FIFO').' | '.(($mode & \SplDoublyLinkedList::IT_MODE_KEEP) ? 'IT_MODE_KEEP' : 'IT_MODE_DELETE'), $mode),
+            $prefix.'dllist' => iterator_to_array($c),
         );
         $c->setIteratorMode($mode);
 

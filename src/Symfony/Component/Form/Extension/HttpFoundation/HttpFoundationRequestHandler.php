@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
+use Symfony\Component\Form\ChainableRequestHandlerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class HttpFoundationRequestHandler implements RequestHandlerInterface
+class HttpFoundationRequestHandler implements ChainableRequestHandlerInterface
 {
     /**
      * @var ServerParams
@@ -37,6 +37,14 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     public function __construct(ServerParams $serverParams = null)
     {
         $this->serverParams = $serverParams ?: new ServerParams();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($request = null)
+    {
+        return $request instanceof Request;
     }
 
     /**

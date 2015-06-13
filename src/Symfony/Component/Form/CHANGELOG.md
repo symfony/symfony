@@ -4,6 +4,7 @@ CHANGELOG
 2.8.0
 -----
 
+ * added ability to chain request handlers
  * deprecated option "read_only" in favor of "attr['readonly']"
 
 2.7.0

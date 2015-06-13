@@ -51,7 +51,7 @@
 
     <services>
 
-        <service id="security.argument_resolver.user" class="Symfony\Bundle\SecurityBundle\ArgumentResolver\UserArgumentResolver">
+        <service id="security.argument_resolver.user"Controller class="Symfony\Bundle\SecurityBundle\ArgumentResolver\UserArgumentResolver">
             <tag name="kernel.argument_resolver" />
         </service>
 

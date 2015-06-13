@@ -33,7 +33,6 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * @var ArgumentResolverManager
-     * @internal
      */
     private $argumentResolverManager;
 
@@ -120,7 +119,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         $reflector = new \ReflectionMethod($this, 'doGetArguments');
         if ($reflector->getDeclaringClass()->getName() !== __CLASS__) {
-            trigger_error('The ControllerResolverInterface::doGetArguments() method is deprecated since version 2.7 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
+            @trigger_error('The ControllerResolverInterface::doGetArguments() method is deprecated since version 2.8 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
         }
 
         return $this->doGetArguments($request, $controller, $r->getParameters());
@@ -173,9 +172,10 @@ class ControllerResolver implements ControllerResolverInterface
     private function getArgumentResolverManager()
     {
         if (null === $this->argumentResolverManager) {
-            $this->argumentResolverManager = new ArgumentResolverManager();
-            $this->argumentResolverManager->add(new RequestArgumentResolver());
-            $this->argumentResolverManager->add(new RequestAttributesArgumentResolver());
+            $this->argumentResolverManager = new ArgumentResolverManager(array(
+                new RequestArgumentResolver(),
+                new RequestAttributesArgumentResolver(),
+            ));
         }
 
         return $this->argumentResolverManager;

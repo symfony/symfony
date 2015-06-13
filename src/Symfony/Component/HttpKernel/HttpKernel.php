@@ -59,9 +59,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->requestStack = $requestStack ?: new RequestStack();
 
         if (null === $argumentResolverManager) {
-            $argumentResolverManager = new ArgumentResolverManager();
-            $argumentResolverManager->add(new RequestArgumentResolver());
-            $argumentResolverManager->add(new RequestAttributesArgumentResolver());
+            $argumentResolverManager = new ArgumentResolverManager(array(
+                new RequestArgumentResolver(),
+                new RequestAttributesArgumentResolver(),
+            ));
         }
 
         if (method_exists($resolver, 'setArgumentResolverManager')) {
@@ -157,7 +158,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         // controller arguments
         $reflector = new \ReflectionMethod($this->resolver, 'getArguments');
         if ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\HttpKernel\Controller\ControllerResolver') {
-            trigger_error('['.$reflector->getDeclaringClass()->getName().'] The ControllerResolverInterface::getArguments() method is deprecated since version 2.8 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
+            @trigger_error('The ControllerResolverInterface::getArguments() method is deprecated since version 2.8 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
         }
 
         $arguments = $this->resolver->getArguments($request, $controller);

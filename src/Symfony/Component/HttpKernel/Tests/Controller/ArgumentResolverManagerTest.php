@@ -25,9 +25,7 @@ class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
         $this->resolver1 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInterface');
         $this->resolver2 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInterface');
 
-        $this->manager = new ArgumentResolverManager();
-        $this->manager->add($this->resolver1);
-        $this->manager->add($this->resolver2);
+        $this->manager = new ArgumentResolverManager(array($this->resolver1, $this->resolver2));
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
     }

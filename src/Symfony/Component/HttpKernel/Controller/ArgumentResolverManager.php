@@ -25,7 +25,15 @@ class ArgumentResolverManager
     /**
      * @var ArgumentResolverInterface[]
      */
-    private $resolvers = array();
+    private $resolvers;
+
+    /**
+     * @param ArgumentResolverInterface[] $resolvers
+     */
+    public function __construct(array $resolvers = array())
+    {
+        $this->resolvers = $resolvers;
+    }
 
     /**
      * Adds an argument resolver.

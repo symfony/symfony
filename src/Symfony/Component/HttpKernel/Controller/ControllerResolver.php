@@ -172,10 +172,9 @@ class ControllerResolver implements ControllerResolverInterface
     private function getArgumentResolverManager()
     {
         if (null === $this->argumentResolverManager) {
-            $this->argumentResolverManager = new ArgumentResolverManager(array(
-                new RequestArgumentResolver(),
-                new RequestAttributesArgumentResolver(),
-            ));
+            $this->argumentResolverManager = new ArgumentResolverManager();
+            $this->argumentResolverManager->add(new RequestArgumentResolver());
+            $this->argumentResolverManager->add(new RequestAttributesArgumentResolver());
         }
 
         return $this->argumentResolverManager;

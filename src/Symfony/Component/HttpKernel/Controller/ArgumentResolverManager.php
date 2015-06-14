@@ -23,26 +23,30 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInt
 class ArgumentResolverManager
 {
     /**
-     * @var ArgumentResolverInterface[]
+     * @var array
      */
-    private $resolvers;
+    private $resolvers = array();
 
     /**
-     * @param ArgumentResolverInterface[] $resolvers
+     * @var null|ArgumentResolverInterface[]
      */
-    public function __construct(array $resolvers = array())
-    {
-        $this->resolvers = $resolvers;
-    }
+    private $sortedResolvers;
 
     /**
      * Adds an argument resolver.
      *
      * @param ArgumentResolverInterface $resolver
      */
-    public function add(ArgumentResolverInterface $resolver)
+    public function add(ArgumentResolverInterface $resolver, $priority = 0)
     {
-        $this->resolvers[] = $resolver;
+        if (!isset($this->resolvers[$priority])) {
+            $this->resolvers[$priority] = array();
+        }
+
+        $this->resolvers[$priority][] = $resolver;
+
+        // force a new sort of the resolvers
+        $this->sortedResolvers = null;
     }
 
     public function getArguments(Request $request, $controller)
@@ -64,7 +68,7 @@ class ArgumentResolverManager
         $arguments = array();
 
         foreach ($parameters as $parameter) {
-            foreach ($this->resolvers as $argumentResolver) {
+            foreach ($this->getSortedResolvers() as $argumentResolver) {
                 if ($argumentResolver->supports($request, $parameter)) {
                     $arguments[] = $argumentResolver->resolve($request, $parameter);
                     continue 2;
@@ -87,5 +91,16 @@ class ArgumentResolverManager
         }
 
         return $arguments;
+    }
+
+    private function getSortedResolvers()
+    {
+        if (null === $this->sortedResolvers) {
+            $this->sortedResolvers = $this->resolvers;
+            ksort($this->sortedResolvers);
+            $this->sortedResolvers = call_user_func_array('array_merge', $this->sortedResolvers);
+        }
+
+        return $this->sortedResolvers;
     }
 }

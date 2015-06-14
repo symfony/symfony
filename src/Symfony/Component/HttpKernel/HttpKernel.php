@@ -59,10 +59,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->requestStack = $requestStack ?: new RequestStack();
 
         if (null === $argumentResolverManager) {
-            $argumentResolverManager = new ArgumentResolverManager(array(
-                new RequestArgumentResolver(),
-                new RequestAttributesArgumentResolver(),
-            ));
+            $argumentResolverManager = new ArgumentResolverManager();
+            $argumentResolverManager->add(new RequestArgumentResolver());
+            $argumentResolverManager->add(new RequestAttributesArgumentResolver());
         }
 
         if (method_exists($resolver, 'setArgumentResolverManager')) {

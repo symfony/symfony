@@ -37,6 +37,13 @@ class Table
     private $rows = array();
 
     /**
+     * Original table rows.
+     *
+     * @var array
+     */
+    private $originalRows = array();
+
+    /**
      * Column widths cache.
      *
      * @var array
@@ -205,6 +212,8 @@ class Table
     public function render()
     {
         $this->calculateNumberOfColumns();
+
+        $this->originalRows = $this->rows;
         $this->rows = $this->buildTableRows($this->rows);
         $this->headers = $this->buildTableRows($this->headers);
 
@@ -567,6 +576,7 @@ class Table
      */
     private function cleanup()
     {
+        $this->rows = $this->originalRows;
         $this->columnWidths = array();
         $this->numberOfColumns = null;
     }

@@ -552,6 +552,33 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testColspans()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table->setRows(array(
+            array(new TableCell('foo', array('colspan' => 2)))
+        ));
+        $table->render();
+        $table->render();
+        $table->render();
+
+        $expected =
+<<<TABLE
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

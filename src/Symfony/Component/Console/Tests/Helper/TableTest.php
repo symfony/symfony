@@ -556,7 +556,7 @@ TABLE;
     {
         $table = new Table($output = $this->getOutputStream());
         $table->setRows(array(
-            array(new TableCell('foo', array('colspan' => 2)))
+            array(new TableCell('foo', array('colspan' => 2))),
         ));
         $table->render();
         $table->render();

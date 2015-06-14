@@ -50,7 +50,7 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    protected function createRequestEvent()
+    private function createRequestEvent()
     {
         $server = array(
             'REQUEST_URI' => 'A',
@@ -82,7 +82,7 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
      *
      * @return array Record
      */
-    protected function getRecord($level = Logger::WARNING, $message = 'test')
+    private function getRecord($level = Logger::WARNING, $message = 'test')
     {
         return array(
             'message' => $message,

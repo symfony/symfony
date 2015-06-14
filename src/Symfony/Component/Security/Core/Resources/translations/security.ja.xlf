@@ -4,67 +4,67 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>En fejl indtraf ved godkendelse.</target>
+                <target>認証エラーが発生しました。</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Loginoplysninger kan findes.</target>
+                <target>認証資格がありません。</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Godkendelsesanmodning kan ikke behandles på grund af et systemfejl.</target>
+                <target>システムの問題により認証要求を処理できませんでした。</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Ugyldige loginoplysninger.</target>
+                <target>資格が無効です。</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Cookie er allerede brugt af en anden.</target>
+                <target>Cookie が別のユーザーで使用されています。</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Ingen tilladselese at anvende kilden.</target>
+                <target>リソースをリクエストする権限がありません。</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
-                <target>Ugyldigt CSRF token.</target>
+                <target>CSRF トークンが無効です。</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>Digest nonce has expired.</source>
-                <target>Digest nonce er udløbet.</target>
+                <target>Digest の nonce 値が期限切れです。</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>No authentication provider found to support the authentication token.</source>
-                <target>Ingen godkendelsesudbyder er fundet til understøttelsen af godkendelsestoken.</target>
+                <target>認証トークンをサポートする認証プロバイダーが見つかりません。</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Ingen session tilgængelig, sessionen er enten udløbet eller cookies er ikke aktiveret.</target>
+                <target>利用可能なセッションがありません。タイムアウトしたか、Cookie が無効になっています。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
-                <target>Ingen token kan findes.</target>
+                <target>トークンが見つかりません。</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Brugernavn kan ikke findes.</target>
+                <target>ユーザー名が見つかりません。</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Brugerkonto er udløbet.</target>
+                <target>アカウントが有効期限切れです。</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Loginoplysninger er udløbet.</target>
+                <target>資格が有効期限切れです。</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>Brugerkonto er deaktiveret.</target>
+                <target>アカウントが無効です。</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>Brugerkonto er låst.</target>
+                <target>アカウントはロックされています。</target>
             </trans-unit>
         </body>
     </file>

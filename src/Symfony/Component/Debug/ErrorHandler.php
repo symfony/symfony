@@ -689,6 +689,7 @@ class ErrorHandler
             if (defined('FATAL_ERROR')) {
                 $levels = $levels | FATAL_ERROR;
             }
+
             $handler->setDefaultLogger($logger, $levels, true);
             $handler->screamAt($levels);
         }

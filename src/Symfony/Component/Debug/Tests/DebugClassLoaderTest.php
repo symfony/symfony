@@ -133,7 +133,8 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFileCaseMismatch()
     {
-        if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
+        //Cannot be tested if the file loads (there is is casemismatch.php in the filesystem)
+        if (file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
             $this->markTestSkipped('Can only be run on case insensitive filesystems');
         }
 

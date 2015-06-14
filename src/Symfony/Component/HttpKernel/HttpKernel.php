@@ -157,7 +157,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // controller arguments
         $reflector = new \ReflectionMethod($this->resolver, 'getArguments');
-        if ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\HttpKernel\Controller\ControllerResolver') {
+        if (0 !== strpos($reflector->getDeclaringClass()->getName(), 'Symfony\Component\HttpKernel\Controller\\')) {
             @trigger_error('The ControllerResolverInterface::getArguments() method is deprecated since version 2.8 and will be removed in 3.0. Use the ArgumentResolverManager and custom ArgumentResolverInterface implementations instead.', E_USER_DEPRECATED);
         }
 

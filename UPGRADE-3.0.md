@@ -354,7 +354,7 @@ UPGRADE FROM 2.x to 3.0
    service instead.
 
  * The `templating.helper.assets` was moved to `templating_php.xml`. You can
-   use the `assets.package` service instead.
+   use the `assets.packages` service instead.
 
    Before:
 

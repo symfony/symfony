@@ -19,6 +19,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * Translations in the `src/Symfony/Component/Security/Resources/translations/` directory are deprecated, ones in `src/Symfony/Component/Security/Core/Resources/translations/` must be used instead.
  * The switch user listener now preserves the query string when switching a user
  * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
  * added simpler customization options

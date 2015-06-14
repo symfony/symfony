@@ -109,6 +109,21 @@ class ErrorHandler
     private $displayErrors = 0x1FFF;
 
     /**
+     * wether we should also listen to FATAL_ERROR levels (hhvm only).
+     *
+     * @var bool
+     */
+    private static $fatalErrors = false;
+
+    public function __construct()
+    {
+        if (defined('FATAL_ERROR')) {
+            $this->loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
+            self::$fatalErrors = true;
+        }
+    }
+
+    /**
      * Registers the error handler.
      *
      * @param self|null|int $handler The handler to register, or @deprecated (since version 2.6, to be removed in 3.0) bit field of thrown levels
@@ -160,10 +175,6 @@ class ErrorHandler
      */
     public function setDefaultLogger(LoggerInterface $logger, $levels = null, $replace = false)
     {
-        if (defined('FATAL_ERROR')) {
-            $this->loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
-        }
-
         $loggers = array();
 
         if (is_array($levels)) {
@@ -531,7 +542,7 @@ class ErrorHandler
 
         $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
 
-        if (defined('FATAL_ERROR')) {
+        if (self::$fatalErrors) {
             $levels |= FATAL_ERROR;
         }
 
@@ -570,7 +581,7 @@ class ErrorHandler
     {
         $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
 
-        if (defined('FATAL_ERROR')) {
+        if (self::$fatalErrors) {
             $levels |= FATAL_ERROR;
         }
 
@@ -588,7 +599,7 @@ class ErrorHandler
             $e = error_reporting($level);
             $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
 
-            if (defined('FATAL_ERROR')) {
+            if (self::$fatalErrors) {
                 $levels |= FATAL_ERROR;
             }
 

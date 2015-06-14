@@ -205,24 +205,26 @@ class Table
     public function render()
     {
         $this->calculateNumberOfColumns();
-        $this->rows = $this->buildTableRows($this->rows);
-        $this->headers = $this->buildTableRows($this->headers);
+        $rows = $this->buildTableRows($this->rows);
+        $headers = $this->buildTableRows($this->headers);
+
+        $this->calculateColumnsWidth(array_merge($headers, $rows));
 
         $this->renderRowSeparator();
-        if (!empty($this->headers)) {
-            foreach ($this->headers as $header) {
+        if (!empty($headers)) {
+            foreach ($headers as $header) {
                 $this->renderRow($header, $this->style->getCellHeaderFormat());
                 $this->renderRowSeparator();
             }
         }
-        foreach ($this->rows as $row) {
+        foreach ($rows as $row) {
             if ($row instanceof TableSeparator) {
                 $this->renderRowSeparator();
             } else {
                 $this->renderRow($row, $this->style->getCellRowFormat());
             }
         }
-        if (!empty($this->rows)) {
+        if (!empty($rows)) {
             $this->renderRowSeparator();
         }
 
@@ -246,7 +248,7 @@ class Table
 
         $markup = $this->style->getCrossingChar();
         for ($column = 0; $column < $count; $column++) {
-            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->getColumnWidth($column)).$this->style->getCrossingChar();
+            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->columnWidths[$column]).$this->style->getCrossingChar();
         }
 
         $this->output->writeln(sprintf($this->style->getBorderFormat(), $markup));
@@ -292,11 +294,11 @@ class Table
     private function renderCell(array $row, $column, $cellFormat)
     {
         $cell = isset($row[$column]) ? $row[$column] : '';
-        $width = $this->getColumnWidth($column);
+        $width = $this->columnWidths[$column];
         if ($cell instanceof TableCell && $cell->getColspan() > 1) {
             // add the width of the following columns(numbers of colspan).
             foreach (range($column + 1, $column + $cell->getColspan() - 1) as $nextColumn) {
-                $width += $this->getColumnSeparatorWidth() + $this->getColumnWidth($nextColumn);
+                $width += $this->getColumnSeparatorWidth() + $this->columnWidths[$nextColumn];
             }
         }
 
@@ -509,21 +511,20 @@ class Table
      *
      * @return int
      */
-    private function getColumnWidth($column)
+    private function calculateColumnsWidth($rows)
     {
-        if (isset($this->columnWidths[$column])) {
-            return $this->columnWidths[$column];
-        }
+        for ($column = 0; $column < $this->numberOfColumns; $column++) {
+            $lengths = array();
+            foreach ($rows as $row) {
+                if ($row instanceof TableSeparator) {
+                    continue;
+                }
 
-        foreach (array_merge($this->headers, $this->rows) as $row) {
-            if ($row instanceof TableSeparator) {
-                continue;
+                $lengths[] = $this->getCellWidth($row, $column);
             }
 
-            $lengths[] = $this->getCellWidth($row, $column);
+            $this->columnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
         }
-
-        return $this->columnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
     }
 
     /**

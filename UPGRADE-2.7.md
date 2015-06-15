@@ -643,3 +643,25 @@ FrameworkBundle
        }
    }
    ```
+
+Security
+---------------
+
+ * Injection of the `security.context` service has been reduced to a bare minimum. This means
+   that arguments that once hinted `SecurityContext` or `SecurityContextInterface` will have
+   to be updated accordingly to either the `TokenStorageInterface` or `AuthorizationCheckerInterface`.
+   The following classes now require the `security.token_storage` service instead of the `security.context`,
+   please update your extending implementations accordingly.
+
+    * `AbstractAuthenticationListener`
+    * `AnonymousAuthenticationListener`
+    * `ContextListener`
+    * `SimplePreAuthenticationListener`
+    * `X509AuthenticationListener`
+    * `RemoteUserAuthenticationListener`
+    * `BasicAuthenticationListener`
+    * `DigestAuthenticationListener`
+    * `ExceptionListener`
+    * `SwitchUserListener`
+    * `AccessListener`
+    * `RememberMeListener`

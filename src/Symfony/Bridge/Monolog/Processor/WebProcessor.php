@@ -22,9 +22,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class WebProcessor extends BaseWebProcessor
 {
-    /**
-     * @param array|null $extraFields
-     */
     public function __construct(array $extraFields = null)
     {
         // Pass an empty array as the default null value would access $_SERVER

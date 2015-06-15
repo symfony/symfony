@@ -101,7 +101,7 @@ class ContextListener implements ListenerInterface
     }
 
     /**
-     * Writes the SecurityContext to the session.
+     * Writes the security token into the session.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
@@ -120,10 +120,6 @@ class ContextListener implements ListenerInterface
 
         $request = $event->getRequest();
         $session = $request->getSession();
-
-        if (null === $session) {
-            return;
-        }
 
         if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
             if ($request->hasPreviousSession()) {

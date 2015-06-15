@@ -36,8 +36,8 @@ interface RememberMeServicesInterface
     const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
 
     /**
-     * This method will be called whenever the SecurityContext does not contain
-     * an TokenInterface object and the framework wishes to provide an implementation
+     * This method will be called whenever the TokenStorage does not contain
+     * a TokenInterface object and the framework wishes to provide an implementation
      * with an opportunity to authenticate the request using remember-me capabilities.
      *
      * No attempt whatsoever is made to determine whether the browser has requested

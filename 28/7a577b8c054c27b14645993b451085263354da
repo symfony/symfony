@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-10T21:44:27Z
+
+:+1: I think that it's safe to change the name of the `$error` exception variable.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-11T12:14:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-11T12:23:00Z
+
+it is safe to change the variable name if you change it everywhere in the method
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-06-11T13:09:18Z
+
+OK. I've updated the last variable name, so now 100% of non-nested exception variables are called `$e`.

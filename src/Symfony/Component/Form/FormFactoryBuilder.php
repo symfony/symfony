@@ -100,7 +100,13 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
      */
     public function addTypeExtension(FormTypeExtensionInterface $typeExtension)
     {
-        $this->typeExtensions[$typeExtension->getExtendedType()][] = $typeExtension;
+        $extendedTypes = $typeExtension instanceof FormTypeExtensionMultiInterface
+            ? $typeExtension->getExtendedTypes()
+            : array($typeExtension->getExtendedType());
+
+        foreach ($extendedTypes as $extendedType) {
+            $this->typeExtensions[$extendedType][] = $typeExtension;
+        }
 
         return $this;
     }
@@ -111,7 +117,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     public function addTypeExtensions(array $typeExtensions)
     {
         foreach ($typeExtensions as $typeExtension) {
-            $this->typeExtensions[$typeExtension->getExtendedType()][] = $typeExtension;
+            $this->addTypeExtension($typeExtension);
         }
 
         return $this;

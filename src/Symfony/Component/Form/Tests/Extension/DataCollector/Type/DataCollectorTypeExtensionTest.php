@@ -35,6 +35,15 @@ class DataCollectorTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('form', $this->extension->getExtendedType());
     }
 
+    public function testGetExtendedTypes()
+    {
+        $types = $this->extension->getExtendedTypes();
+
+        $this->assertInternalType('array', $types);
+        $this->assertArrayHasKey(0, $types);
+        $this->assertEquals($this->extension->getExtendedType(), $types[0]);
+    }
+
     public function testBuildForm()
     {
         $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');

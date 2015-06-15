@@ -156,7 +156,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 E_CORE_ERROR => array(null, LogLevel::CRITICAL),
             );
 
-            if (defined('FATAL_ERROR')) {
+            if (defined('HHVM_VERSION')) {
                 $loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
             }
             $this->assertSame($loggers, $handler->setLoggers(array()));
@@ -365,7 +365,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleFatalErrorOnHHVM()
     {
-        if (!defined('FATAL_ERROR')) {
+        if (!defined('HHVM_VERSION')) {
             $this->markTestSkipped('Should be executed in HHVM context.');
         }
 

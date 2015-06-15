@@ -108,18 +108,13 @@ class ErrorHandler
      */
     private $displayErrors = 0x1FFF;
 
-    /**
-     * wether we should also listen to FATAL_ERROR levels (hhvm only).
-     *
-     * @var bool
-     */
-    private static $fatalErrors = false;
+    private static $fatalErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE;
 
     public function __construct()
     {
-        if (defined('FATAL_ERROR')) {
+        if (defined('HHVM_VERSION')) {
             $this->loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
-            self::$fatalErrors = true;
+            self::$fatalErrors |= FATAL_ERROR;
         }
     }
 
@@ -540,13 +535,7 @@ class ErrorHandler
             // Handled below
         }
 
-        $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
-
-        if (self::$fatalErrors) {
-            $levels |= FATAL_ERROR;
-        }
-
-        if ($error && ($error['type'] & $levels)) {
+        if ($error && ($error['type'] & self::$fatalErrors)) {
             // Let's not throw anymore but keep logging
             $handler->throwAt(0, true);
 
@@ -579,13 +568,7 @@ class ErrorHandler
      */
     public static function stackErrors()
     {
-        $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
-
-        if (self::$fatalErrors) {
-            $levels |= FATAL_ERROR;
-        }
-
-        self::$stackedErrorLevels[] = error_reporting(error_reporting() | $levels);
+        self::$stackedErrorLevels[] = error_reporting(error_reporting() | self::$fatalErrors);
     }
 
     /**
@@ -597,13 +580,8 @@ class ErrorHandler
 
         if (null !== $level) {
             $e = error_reporting($level);
-            $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
 
-            if (self::$fatalErrors) {
-                $levels |= FATAL_ERROR;
-            }
-
-            if ($e !== ($level | $levels)) {
+            if ($e !== ($level | self::$fatalErrors)) {
                 // If the user changed the error level, do not overwrite it
                 error_reporting($e);
             }
@@ -695,14 +673,8 @@ class ErrorHandler
             $handler->setDefaultLogger($logger, E_ALL | E_STRICT, false);
             $handler->screamAt(E_ALL | E_STRICT);
         } elseif ('emergency' === $channel) {
-            $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
-
-            if (defined('FATAL_ERROR')) {
-                $levels = $levels | FATAL_ERROR;
-            }
-
-            $handler->setDefaultLogger($logger, $levels, true);
-            $handler->screamAt($levels);
+            $handler->setDefaultLogger($logger, self::$fatalErrors, true);
+            $handler->screamAt(self::$fatalErrors);
         }
     }
 

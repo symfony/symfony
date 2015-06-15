@@ -151,7 +151,7 @@ class FrameworkExtension extends Extension
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         } else {
             $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
-            if (defined('FATAL_ERROR')) {
+            if (defined('HHVM_VERSION')) {
                 $levels |= FATAL_ERROR;
             }
             $definition->replaceArgument(2, $levels);

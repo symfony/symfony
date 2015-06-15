@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-15T08:35:23Z
+
+I voted too quickly, removing it for now. When this code path is taken, it means one is using a deprecated service factories configuration. Why should we hide the notice? To me, there is something to upgrade, thus to warn about. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-15T09:43:32Z
+
+@nicolas-grekas but you already got the notice in the place using it. This will trigger a second notice in a place out of the control of the user
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-15T09:44:14Z
+
+btw, the call to ``setFactoryClass`` will also trigger a deprecation warning here, so you would even get 2 new warnings
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-15T09:48:08Z
+
+@stof true, thanks for the review! :+1: then

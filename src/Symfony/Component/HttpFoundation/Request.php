@@ -1746,7 +1746,7 @@ class Request
     {
         $requestUri = '';
 
-        if ($this->headers->has('X_ORIGINAL_URL')) {
+        if ($this->headers->has('X_ORIGINAL_URL') && !empty($this->headers->get('X_ORIGINAL_URL'))) {
             // IIS with Microsoft Rewrite Module
             $requestUri = $this->headers->get('X_ORIGINAL_URL');
             $this->headers->remove('X_ORIGINAL_URL');

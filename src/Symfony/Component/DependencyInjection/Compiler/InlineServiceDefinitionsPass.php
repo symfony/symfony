@@ -92,7 +92,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 if ($this->isInlineableDefinition($container, $id, $definition = $container->getDefinition($id))) {
                     $this->compiler->addLogMessage($this->formatter->formatInlineService($this, $id, $this->currentId));
 
-                    if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
+                    if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope(false)) {
                         $arguments[$k] = $definition;
                     } else {
                         $arguments[$k] = clone $definition;
@@ -119,7 +119,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      */
     private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
-        if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
+        if (!$definition->isShared() || ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
             return true;
         }
 
@@ -152,6 +152,6 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        return $container->getDefinition(reset($ids))->getScope() === $definition->getScope();
+        return $container->getDefinition(reset($ids))->getScope(false) === $definition->getScope(false);
     }
 }

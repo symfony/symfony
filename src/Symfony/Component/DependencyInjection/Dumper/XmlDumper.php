@@ -126,7 +126,10 @@ class XmlDumper extends Dumper
         if ($definition->getFactoryService(false)) {
             $service->setAttribute('factory-service', $definition->getFactoryService(false));
         }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
+        if (!$definition->isShared()) {
+            $service->setAttribute('shared', 'false');
+        }
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
             $service->setAttribute('scope', $scope);
         }
         if (!$definition->isPublic()) {
@@ -283,7 +286,7 @@ class XmlDumper extends Dumper
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-                if (!$value->isStrict()) {
+                if (!$value->isStrict(false)) {
                     $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {

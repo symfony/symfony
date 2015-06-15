@@ -79,6 +79,9 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isAbstract());
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessDoesNotCopyScope()
     {
         $container = new ContainerBuilder();

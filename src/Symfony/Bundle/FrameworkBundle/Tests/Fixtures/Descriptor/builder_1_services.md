@@ -12,6 +12,7 @@ definition_1
 - Public: yes
 - Synthetic: no
 - Lazy: yes
+- Shared: yes
 - Synchronized: no
 - Abstract: yes
 - Factory Class: `Full\Qualified\FactoryClass`
@@ -25,6 +26,7 @@ definition_2
 - Public: no
 - Synthetic: yes
 - Lazy: no
+- Shared: yes
 - Synchronized: no
 - Abstract: no
 - File: `/path/to/file`

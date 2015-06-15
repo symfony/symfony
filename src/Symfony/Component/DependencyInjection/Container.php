@@ -180,6 +180,8 @@ class Container implements IntrospectableContainerInterface
      * Setting a service to null resets the service: has() returns false and get()
      * behaves in the same way as if the service was never created.
      *
+     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
@@ -191,6 +193,10 @@ class Container implements IntrospectableContainerInterface
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
+        if (!in_array($scope, array('container', 'request')) || ('request' === $scope && 'request' !== $id)) {
+            @trigger_error('The concept of container scopes is deprecated since version 2.8 and will be removed in 3.0. Omit the third parameter.', E_USER_DEPRECATED);
+        }
+
         if (self::SCOPE_PROTOTYPE === $scope) {
             throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
         }
@@ -397,9 +403,15 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException When the scope does not exist
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function enterScope($name)
     {
+        if ('request' !== $name) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         if (!isset($this->scopes[$name])) {
             throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
         }
@@ -445,9 +457,15 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException if the scope is not active
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function leaveScope($name)
     {
+        if ('request' !== $name) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         if (!isset($this->scopedServices[$name])) {
             throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
         }
@@ -492,12 +510,17 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function addScope(ScopeInterface $scope)
     {
         $name = $scope->getName();
         $parentScope = $scope->getParentName();
 
+        if ('request' !== $name) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
             throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }
@@ -526,9 +549,15 @@ class Container implements IntrospectableContainerInterface
      * @return bool
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function hasScope($name)
     {
+        if ('request' !== $name) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return isset($this->scopes[$name]);
     }
 
@@ -542,9 +571,13 @@ class Container implements IntrospectableContainerInterface
      * @return bool
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function isScopeActive($name)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return isset($this->scopedServices[$name]);
     }
 

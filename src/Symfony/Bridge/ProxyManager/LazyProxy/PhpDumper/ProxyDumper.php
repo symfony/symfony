@@ -68,9 +68,9 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if ($definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
             $instantiation .= " \$this->services['$id'] =";
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
             $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 

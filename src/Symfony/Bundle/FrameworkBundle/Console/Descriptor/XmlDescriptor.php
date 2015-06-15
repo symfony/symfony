@@ -362,10 +362,13 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $serviceXML->setAttribute('scope', $definition->getScope());
+        $serviceXML->setAttribute('scope', $definition->getScope(false));
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
+        if (method_exists($definition, 'isShared')) {
+            $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
+        }
         if (method_exists($definition, 'isSynchronized')) {
             $serviceXML->setAttribute('synchronized', $definition->isSynchronized(false) ? 'true' : 'false');
         }

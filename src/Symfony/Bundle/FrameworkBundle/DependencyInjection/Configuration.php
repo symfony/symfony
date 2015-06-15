@@ -660,6 +660,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->scalarNode('cache')->end()
+                        ->scalarNode('name_converter')->end()
                     ->end()
                 ->end()
             ->end()

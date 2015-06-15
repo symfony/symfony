@@ -970,6 +970,10 @@ class FrameworkExtension extends Extension
                 1, new Reference($config['cache'])
             );
         }
+
+        if ($config['name_converter']) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
+        }
     }
 
     /**

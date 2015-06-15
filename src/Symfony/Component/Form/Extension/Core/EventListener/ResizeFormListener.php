@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -29,7 +30,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $type;
 
     /**
-     * @var array
+     * @var array|\Closure
      */
     protected $options;
 
@@ -52,7 +53,7 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct($type, $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -93,7 +94,7 @@ class ResizeFormListener implements EventSubscriberInterface
         foreach ($data as $name => $value) {
             $form->add($name, $this->type, array_replace(array(
                 'property_path' => '['.$name.']',
-            ), $this->options));
+            ), CollectionType::normalizeOptions($this->options, $value)));
         }
     }
 
@@ -125,7 +126,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 if (!$form->has($name)) {
                     $form->add($name, $this->type, array_replace(array(
                         'property_path' => '['.$name.']',
-                    ), $this->options));
+                    ), CollectionType::normalizeOptions($this->options, $value)));
                 }
             }
         }

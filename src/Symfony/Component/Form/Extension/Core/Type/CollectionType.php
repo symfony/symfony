@@ -29,7 +29,7 @@ class CollectionType extends AbstractType
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
                 'label' => $options['prototype_name'].'label__',
-            ), $options['options']));
+            ), self::normalizeOptions($options['options'], null)));
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -75,7 +75,18 @@ class CollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $optionsNormalizer = function (Options $options, $value) {
-            $value['block_name'] = 'entry';
+            // If this is a closure, a wrapped closure needs to be returned in order
+            // to call the closure when needed, and still force the block_name
+            if ($value instanceof \Closure) {
+                return function ($data) use ($value) {
+                    $options = $value($data);
+                    $options['block_name'] = 'entry';
+
+                    return $options;
+                };
+            } else {
+                $value['block_name'] = 'entry';
+            }
 
             return $value;
         };
@@ -99,5 +110,22 @@ class CollectionType extends AbstractType
     public function getName()
     {
         return 'collection';
+    }
+
+    /**
+     * This is a utility method used specifically by this class and its ResizeFormListener for getting dynamic options
+     * for each child in this collection based off of the data provided.
+     *
+     * @param array|\Closure $options
+     * @param $data
+     * @return mixed
+     */
+    public static function normalizeOptions($options, $data)
+    {
+        if ($options instanceof \Closure) {
+            return $options($data);
+        }
+
+        return $options;
     }
 }

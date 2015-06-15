@@ -177,13 +177,13 @@ class AclProvider implements AclProviderInterface
             if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $c)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
-                } catch (AclNotFoundException $aclNotFoundexception) {
+                } catch (AclNotFoundException $e) {
                     if ($result->count()) {
                         $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');
                         $partialResultException->setPartialResult($result);
                         throw $partialResultException;
                     } else {
-                        throw $aclNotFoundexception;
+                        throw $e;
                     }
                 }
                 foreach ($loadedBatch as $loadedOid) {

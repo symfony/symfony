@@ -6,7 +6,6 @@ Arguments:
   command_name          The command name [default: "help"]
 
 Options:
-      --xml             To output help as XML
       --format=FORMAT   The output format (txt, xml, json, or md) [default: "txt"]
       --raw             To output raw command help
   -h, --help            Display this help message

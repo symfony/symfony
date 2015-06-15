@@ -38,7 +38,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
                 $definition->setFile($parameterBag->resolveValue($definition->getFile()));
                 $definition->setArguments($parameterBag->resolveValue($definition->getArguments()));
                 if ($definition->getFactoryClass(false)) {
-                    $definition->setFactoryClass($parameterBag->resolveValue($definition->getFactoryClass()));
+                    $definition->setFactoryClass($parameterBag->resolveValue($definition->getFactoryClass(false)));
                 }
 
                 $factory = $definition->getFactory();

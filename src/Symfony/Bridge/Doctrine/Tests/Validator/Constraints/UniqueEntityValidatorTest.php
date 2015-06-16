@@ -16,6 +16,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
@@ -134,6 +136,8 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Person'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Employee'),
         ));
     }
 
@@ -454,5 +458,36 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $entity = new SingleIntIdEntity(1, null);
 
         $this->validator->validate($entity, $constraint);
+    }
+
+    public function testValidateInheritanceUniqueness()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'repository' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\Person',
+        ));
+
+        $entity1 = new Person(1, 'Foo');
+        $entity2 = new Employee(2, 'Foo');
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity1);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($entity2, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->assertRaised();
     }
 }

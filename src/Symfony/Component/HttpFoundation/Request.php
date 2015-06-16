@@ -304,7 +304,19 @@ class Request
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
         ) {
-            parse_str($request->getContent(), $data);
+            $content = $request->getContent();
+            parse_str($content, $data);
+
+            // if the whole content is a key after parse_str()
+            // it is an indicator, that the content is no valid request
+            if (isset($data[$content])) {
+                $jsonContent = json_decode($content, true);
+                
+                if (JSON_ERROR_NONE === json_last_error()) {
+                    $data = $jsonContent;
+                }
+            }
+
             $request->request = new ParameterBag($data);
         }
 

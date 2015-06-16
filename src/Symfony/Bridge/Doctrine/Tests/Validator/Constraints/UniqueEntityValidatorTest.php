@@ -16,6 +16,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Employee;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\Person;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
@@ -134,6 +136,8 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Person'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\Employee'),
         ));
     }
 
@@ -515,6 +519,56 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $entity = new SingleIntIdEntity(1, null);
 
+        $this->validator->validate($entity, $constraint);
+    }
+
+    public function testValidateInheritanceUniqueness()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'entityClass' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\Person',
+        ));
+
+        $entity1 = new Person(1, 'Foo');
+        $entity2 = new Employee(2, 'Foo');
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity1);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($entity2, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->setCode('23bd9dbf-6b9b-41cd-a99e-4844bcf3077f')
+            ->setParameters(array('{{ value }}' => 'Foo'))
+            ->assertRaised();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedExceptionMessage The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".
+     */
+    public function testInvalidateRepositoryForInheritance()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'entityClass' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity',
+        ));
+
+        $entity = new Person(1, 'Foo');
         $this->validator->validate($entity, $constraint);
     }
 }

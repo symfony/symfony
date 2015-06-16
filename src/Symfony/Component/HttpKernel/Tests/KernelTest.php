@@ -768,16 +768,27 @@ EOF;
                 array($bA, $cBA),
                 array($aNon, $bA, $cBA),
             ),
+            array(
+                array($cBA),
+                array($cBA),
+                'prod_test'
+            ),
+            array(
+                array($cBA),
+                array($aNon, $cBA),
+                'test',
+                true
+            ),
         );
     }
 
     /**
      * @dataProvider getRegisteredDependenciesData
      */
-    public function testRegisteredDependencies(array $dependencies, array $expected)
+    public function testRegisteredDependencies(array $dependencies, array $expected, $environment = 'test', $debug = false)
     {
         // use test kernel so we can test registeredDependencies() directly
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(array('registerBundles'), $environment, $debug);
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
@@ -949,14 +960,16 @@ EOF;
     /**
      * Returns a mock for the abstract kernel.
      *
-     * @param array $methods Additional methods to mock (besides the abstract ones)
+     * @param array $methods      Additional methods to mock (besides the abstract ones)
+     * @param string $environment The current environment
+     * @param bool   $debug       Whether to debugging is enabled or not
      *
      * @return KernelForTest|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getKernelForTest(array $methods = array())
+    protected function getKernelForTest(array $methods = array(), $environment = 'test', $debug = false)
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(array('test', false))
+            ->setConstructorArgs(array($environment, $debug))
             ->setMethods($methods)
             ->getMock();
         $p = new \ReflectionProperty($kernel, 'rootDir');

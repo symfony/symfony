@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleDependenciesInterface;
 
 class BundleDDependenciesE implements BundleDependenciesInterface
 {
-    public function getBundleDependencies()
+    public function getBundleDependencies($environment, $debug)
     {
         return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleEDependenciesD');
     }

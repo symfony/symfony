@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleDependenciesInterface;
 
 class BundleADependenciesNon implements BundleDependenciesInterface
 {
-    public function getBundleDependencies()
+    public function getBundleDependencies($environment, $debug)
     {
         return array();
     }

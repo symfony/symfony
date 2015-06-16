@@ -567,6 +567,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function appendDependenciesRecursively(array $children, array &$bundles, array $rootBundles, array $stack)
     {
+        ;
         while (!empty($children)) {
             $dependencyFQN = array_shift($children);
             if (isset($bundles[$dependencyFQN])) {
@@ -589,7 +590,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             if ($dependency instanceof BundleDependenciesInterface) {
                 $stack[$dependencyFQN] = true;
                 $this->appendDependenciesRecursively(
-                    $dependency->getBundleDependencies(),
+                    $dependency->getBundleDependencies($this->environment, $this->debug),
                     $bundles,
                     $rootBundles,
                     $stack

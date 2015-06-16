@@ -42,14 +42,18 @@ interface BundleDependenciesInterface
      * ```php
      * class AcmeBundle extends Bundle implements BundleDependenciesInterface
      * {
-     *     public function getBundleDependencies()
+     *     public function getBundleDependencies($environment, $debug)
      *     {
      *         // If you need to specify some bundle dependencies as optional you can achieve this using class_exits:
-     *         // $dependencies = array();
-     *         // if (class_exists('FOS\UserBundle\FOSUserBundle'))
-     *         //     $dependencies[] = 'FOS\UserBundle\FOSUserBundle';
+     *         $dependencies = array();
+     *         if (class_exists('FOS\UserBundle\FOSUserBundle'))
+     *              $dependencies[] = 'FOS\UserBundle\FOSUserBundle';
      *
-     *         return array(
+     *        // If you need to load some bundles only in dev using $environment (or in $debug)
+     *         if ($environment === 'dev')
+     *              $dependencies[] = 'Egulias\SecurityDebugCommandBundle\EguliasSecurityDebugCommandBundle';
+     *
+     *         return $dependencies + array(
      *             // All values must be FQN strings to avoid bundles being loaded several times
      *             'FOS\HttpCacheBundle\FOSHttpCacheBundle',
      *
@@ -60,10 +64,12 @@ interface BundleDependenciesInterface
      * }
      * ```
      *
+     * @param string $environment The current environment
+     * @param bool   $debug       Whether to debugging is enabled or not
      *
      * @return string[] An array of bundle class (FQN) names as strings.
      *
      * @api
      */
-    public function getBundleDependencies();
+    public function getBundleDependencies($environment, $debug);
 }

@@ -15,8 +15,13 @@ use Symfony\Component\HttpKernel\Bundle\BundleDependenciesInterface;
 
 class BundleCDependenciesBA implements BundleDependenciesInterface
 {
-    public function getBundleDependencies()
+    public function getBundleDependencies($environment, $debug)
     {
+        if ($environment === 'prod_test')
+            return array();
+        else if ($debug)
+            return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleADependenciesNon');
+
         return array(
             'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleBDependenciesA',
             'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleADependenciesNon',

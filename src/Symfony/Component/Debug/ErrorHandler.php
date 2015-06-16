@@ -412,7 +412,7 @@ class ErrorHandler
         if ($this->isRecursive) {
             $log = 0;
         } elseif (self::$stackedErrorLevels) {
-            self::$stackedErrors[] = array($this->loggers[$type], $message, $e);
+            self::$stackedErrors[] = array($this->loggers[$type][0], ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG, $message, $e);
         } else {
             try {
                 $this->isRecursive = true;
@@ -581,7 +581,7 @@ class ErrorHandler
             self::$stackedErrors = array();
 
             foreach ($errors as $e) {
-                $e[0][0]->log($e[0][1], $e[1], $e[2]);
+                $e[0]->log($e[1], $e[2], $e[3]);
             }
         }
     }

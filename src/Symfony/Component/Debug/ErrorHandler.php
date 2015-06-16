@@ -133,6 +133,7 @@ class ErrorHandler
                 unset($context['GLOBALS']);
             }
 
+            $level &= E_ALL | E_STRICT;
             $exception = new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
 
             // Exceptions thrown from error handlers are sometimes not caught by the exception
@@ -173,7 +174,7 @@ class ErrorHandler
         }
 
         $this->reservedMemory = '';
-        $type = $error['type'];
+        $type = $error['type'] & (E_ALL | E_STRICT);
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;
         }

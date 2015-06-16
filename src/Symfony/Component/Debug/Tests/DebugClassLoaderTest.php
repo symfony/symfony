@@ -130,6 +130,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage Case mismatch between class and source file names
      */
     public function testFileCaseMismatch()
     {
@@ -177,6 +178,8 @@ class ClassLoader
 
     public function findFile($class)
     {
+        $fixtureDir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR;
+
         if (__NAMESPACE__.'\TestingUnsilencing' === $class) {
             eval('-- parse error --');
         } elseif (__NAMESPACE__.'\TestingStacking' === $class) {
@@ -184,13 +187,13 @@ class ClassLoader
         } elseif (__NAMESPACE__.'\TestingCaseMismatch' === $class) {
             eval('namespace '.__NAMESPACE__.'; class TestingCaseMisMatch {}');
         } elseif (__NAMESPACE__.'\Fixtures\CaseMismatch' === $class) {
-            return __DIR__.'/Fixtures/CaseMismatch.php';
+            return $fixtureDir.'CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\Psr4CaseMismatch' === $class) {
-            return __DIR__.'/Fixtures/psr4/Psr4CaseMismatch.php';
+            return $fixtureDir.'psr4'.DIRECTORY_SEPARATOR.'Psr4CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0' === $class) {
-            return __DIR__.'/Fixtures/reallyNotPsr0.php';
+            return $fixtureDir.'reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
-            return __DIR__.'/Fixtures/notPsr0Bis.php';
+            return $fixtureDir.'notPsr0Bis.php';
         }
     }
 }

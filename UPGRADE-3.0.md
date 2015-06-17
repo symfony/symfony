@@ -110,6 +110,9 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * Type hints for `ChoiceList::initialize()` method's `$labels` and `$preferredChoices` 
+   parameters were removed.
+
  * The option "precision" was renamed to "scale".
 
    Before:

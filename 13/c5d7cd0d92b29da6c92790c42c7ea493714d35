@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-13T03:05:47Z
+
+IMO you should remove all references about `BaseException` because no longer exists if the RFC is accepted.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-13T03:27:57Z
+
+@dosten, I think ```BaseException``` should be kept since this change is only intended to add compatibility with PHP 7 and not to drop compatibility with PHP 5.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-13T03:34:24Z
+
+@phansys The `BaseException` has been implemented in 7.0 see https://wiki.php.net/rfc/engine_exceptions_for_php7 and as you can see in php/php-src#1284: "There is no common exception class anymore, only the Throwable interface. BaseException or any similar class has been eliminated."
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-13T03:40:44Z
+
+Oh, you're right @dosten, I agree with you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-15T13:10:25Z
+
+What do @symfony/deciders think? Should we keep BaseException compatibility?
+That doesn't cost very much, and php7-alpha1 is tagged with them.
+Strictly following our BC promise, we should keep supporting them, thus the current state of this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-15T13:33:55Z
+
+@nicolas-grekas we don't advocate PHP 7 compat yet, and this would only be about compat with an early alpha release. So IMO, it is fine to drop the code handling the early PHP 7 implementation.
+
+but anyway, we should wait until the PHP 7 codebase is updated before merging this PR
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-15T13:59:44Z
+
+I agree that we should not be keeping compat with an alpha version of PHP7.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-15T14:35:44Z
+
+Agree with stof and fabpot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-17T17:00:25Z
+
+The Throwable Interface RFC has been accepted, this PR is ready for vote @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-17T21:02:52Z
+
+:+1:

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by jaytaph at 2014-09-27T17:53:37Z
+
+One thing I didn't want to change, is the fact that the [validatorGuesser](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Validator/ValidatorTypeGuesser.php#L153) guesses  "Range" constraints to be a `number` FormType.
+
+It might make sense to change this into this new `range` FormType, but this will break BC.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-02T11:46:09Z
+
+Please add tests for your new form type. and this will make you notice that you forgot to implement the support of the range type in the PHP form theme
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2014-10-02T13:06:44Z
+
+@stof: ok.. are there currently formtype tests available, as I cannot find them. Maybe i'm looking in the wrong place?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-03T11:46:40Z
+
+@jaytaph You can have a look at the tests in ``src/Symfony/Component/Form/Tests/Extension/Core/Type``.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2014-10-03T20:30:16Z
+
+@xabbuh I did, but types like EmailType etc are not in there as well, so I was a bit confused on where tests where. I've found the tests that @stof mentioned inside the Twig Bridge, which turns out failed on the missing php templates. I've added these, and the tests seem fine again.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2014-11-21T21:31:29Z
+
+Any news on this PR?

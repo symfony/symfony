@@ -664,6 +664,10 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('', 301, array('Location' => '/good-uri'));
         $this->assertFalse($response->isRedirect('/bad-uri'));
         $this->assertTrue($response->isRedirect('/good-uri'));
+
+        $response = new Response('', 301, array('Location' => 'http://localhost/good-uri'));
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
     }
 
     public function testIsNotFound()

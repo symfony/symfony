@@ -1671,4 +1671,21 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // Trigger data initialization
         $form->getViewData();
     }
+
+    public function testChoicesOptionSupportsTraversable()
+    {
+        $this->factory->create('choice', null, array(
+            'choices' => new \ArrayObject($this->choices),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidPreferredChoicesOption()
+    {
+        $this->factory->create('choice', null, array(
+            'preferred_choices' => 'bad value',
+        ));
+    }
 }

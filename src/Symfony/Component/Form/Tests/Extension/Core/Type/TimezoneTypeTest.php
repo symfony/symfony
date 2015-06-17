@@ -27,4 +27,14 @@ class TimezoneTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertArrayHasKey('America', $choices);
         $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'New York'), $choices['America'], '', false, false);
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidChoices()
+    {
+        $this->factory->create('timezone', null, array(
+            'choices' => 'bad value',
+        ));
+    }
 }

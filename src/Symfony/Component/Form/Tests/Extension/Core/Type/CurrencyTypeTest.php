@@ -34,4 +34,14 @@ class CurrencyTypeTest extends TestCase
         $this->assertContains(new ChoiceView('USD', 'USD', 'US Dollar'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidChoices()
+    {
+        $this->factory->create('currency', null, array(
+            'choices' => 'bad value',
+        ));
+    }
 }

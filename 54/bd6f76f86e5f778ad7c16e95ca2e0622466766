@@ -1,0 +1,175 @@
+---------------------------------------------------------------------------
+
+by kgilden at 2014-10-24T19:14:21Z
+
+The failing test seems to be unrelated.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-26T16:12:41Z
+
+Maybe I'm mistaken, but isn't this already possible and done when creating the form?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T01:54:17Z
+
+@iltar this is about being able to initialize the prototype with a non-empty object, to have default values in fields.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-04T19:37:24Z
+
+:+1: Looks good.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-01-18T11:30:34Z
+
+I hope this one can make 2.7!
+
+---------------------------------------------------------------------------
+
+by kgilden at 2015-01-18T12:15:16Z
+
+@webmozart is there anything preventing this from making to 2.7?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-18T14:00:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T14:05:44Z
+
+I don't think this is the right place to set the data in the prototype actually. It should be set when building the prototype instead
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T14:17:08Z
+
+IMO, the implementation done in https://github.com/symfony/symfony/pull/6910 looked better
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-18T14:47:53Z
+
+I think either implementation is fine. @webmozart closed #6910 in favor of #9177. However it looks like #9177 is yet in a very early state. It will IMHO make sense to move ahead with this way if #9177 makes it into 3.0 it can stell be adjusted.
+
+I would agree that having the logic in buildForm() makes more sense than in buildView().
+
+An option for 3.0 would be instantiate an entity as the prototype date as it works with an non embedded form by default. If you do not want this you can set the data as you want with the prototype_data option. I think this is normally the expected behavior but would break BC, therefore we can add this only in 3.0.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2015-01-31T06:37:42Z
+
+shouldnt this cause problems, when you provide data in the child options?
+`array('options' => array('data' => 'something'), 'prototype_data' => 'anotherthing')`
+since auto_initialize is true by default, as soon as the prototypes getForm method is called in the buildForm method, the prototypes data gets locked to something, and trying to setData afterwards should cause an exception to be thrown?
+
+edit: #6910 does not have this problem, but another one: you cant provide prototype_data and item data at the same time, since the item data, will always overwrite the prototype_data
+
+---------------------------------------------------------------------------
+
+by kgilden at 2015-01-31T21:57:31Z
+
+@peterrehm yep, instantiating an entity sounds the sanest way for me too. Presumably `empty_data` comes into action as well.
+
+@backbone87 yes, You raise a very valid point. Do you mean [this](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Form.php#L320) exception? I'll try whipping up a test to verify this.
+
+Turns out my initial solution also suffered from item data always overwriting prototype data so I went for something closer to #6910. Now the `data` option under `options` will never be used for the prototype data, which is counter-intuitive anyway IMO.
+
+Also, this PR should probably be merged to `2.7`, which didn't exist back in October.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2015-02-01T02:29:43Z
+
+No i mean this exception: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Form.php#L314`
+but you changed your PR now, so this issue should be solved.
+
+Regarding inherit data check:
+I cant come up with any sane use case to ever set inherit data = true in childs of a collection.
+
+In my project i use the following check for prototype_data to be "injected" into the prototype:
+```php
+$prototypeOptions = array_replace(array(
+	'label' => $options['prototype_name'].'label__',
+), $options['options']);
+
+if($options['prototype_data'] !== null) {
+	$prototypeOptions['data'] = $options['prototype_data'];
+}
+
+$prototype = $builder->create($options['prototype_name'], $options['type'], $prototypeOptions);
+$builder->setAttribute('prototype', $prototype->getForm());
+```
+
+So if you use "prototype_data" = null (the default), it means "dont use any special prototype data" and the previous behavior is fully restored.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2015-02-01T02:41:07Z
+
+Regarding empty_data:
+Sadly we cant reuse this, since we can not provide the same env for the closure call (we have no FormInterface that is in the correct state and viewData to pass as parameters to empty data closures)
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2015-04-15T10:58:20Z
+
+Thanks @backbone87 that's a good tip, your solution works like a charm.
+
+For anyone wanting "a ready to go" code, here's a form type extension I use:
+
+```php
+use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+class CollectionTypeExtension extends AbstractTypeExtension
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ($options['allow_add'] && $options['prototype']) {
+            $prototypeOptions = array_replace(array(
+                'label' => $options['prototype_name'].'label__',
+            ), $options['options']);
+
+            if ($options['prototype_data'] !== null) {
+                $prototypeOptions['data'] = $options['prototype_data'];
+            }
+
+            $prototype = $builder->create($options['prototype_name'], $options['type'], $prototypeOptions);
+            $builder->setAttribute('prototype', $prototype->getForm());
+        }
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array('prototype_data' => null));
+    }
+
+    public function getExtendedType()
+    {
+        return 'collection';
+    }
+}
+```
+
+Just register it in your services:
+
+```yaml
+services:
+    acme_demo_bundle.collection_type_extension:
+        class: Acme\DemoBundle\Form\Extension\CollectionTypeExtension
+        tags:
+            - { name: form.type_extension, alias: collection }
+```
+
+and you can use `collection` form type type with new `prototype_data` option.
+
+cheers :beers:

@@ -49,6 +49,15 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
+    public function __construct($output = null, $charset = null)
+    {
+        parent::__construct($output, $charset);
+        $this->dumpId = 'sf-dump-'.mt_rand();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setOutput($output)
     {
         if ($output !== $prev = parent::setOutput($output)) {
@@ -94,8 +103,8 @@ class HtmlDumper extends CliDumper
      */
     public function dump(Data $data, $output = null)
     {
-        $this->dumpId = 'sf-dump-'.mt_rand();
         parent::dump($data, $output);
+        $this->dumpId = 'sf-dump-'.mt_rand();
     }
 
     /**
@@ -342,7 +351,7 @@ EOHTML;
             $style .= sprintf(' title="%s%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style) {
             if (false !== $c = strrpos($v, '\\')) {
-                return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c+1));
+                return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c + 1));
             } elseif (':' === $v[0]) {
                 return sprintf('<abbr title="`%s` resource" class=sf-dump-%s>%s</abbr>', substr($v, 1), $style, $v);
             }

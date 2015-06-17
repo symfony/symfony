@@ -6,6 +6,8 @@ CHANGELOG
 
  * deprecated option "read_only" in favor of "attr['readonly']"
  * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
 
 2.7.0
 -----

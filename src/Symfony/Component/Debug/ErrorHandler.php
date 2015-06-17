@@ -108,6 +108,16 @@ class ErrorHandler
      */
     private $displayErrors = 0x1FFF;
 
+    private static $fatalErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE;
+
+    public function __construct()
+    {
+        if (defined('HHVM_VERSION')) {
+            $this->loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
+            self::$fatalErrors |= FATAL_ERROR;
+        }
+    }
+
     /**
      * Registers the error handler.
      *
@@ -525,7 +535,7 @@ class ErrorHandler
             // Handled below
         }
 
-        if ($error && ($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR))) {
+        if ($error && ($error['type'] & self::$fatalErrors)) {
             // Let's not throw anymore but keep logging
             $handler->throwAt(0, true);
 
@@ -558,7 +568,7 @@ class ErrorHandler
      */
     public static function stackErrors()
     {
-        self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+        self::$stackedErrorLevels[] = error_reporting(error_reporting() | self::$fatalErrors);
     }
 
     /**
@@ -570,7 +580,8 @@ class ErrorHandler
 
         if (null !== $level) {
             $e = error_reporting($level);
-            if ($e !== ($level | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
+
+            if ($e !== ($level | self::$fatalErrors)) {
                 // If the user changed the error level, do not overwrite it
                 error_reporting($e);
             }
@@ -662,8 +673,8 @@ class ErrorHandler
             $handler->setDefaultLogger($logger, E_ALL | E_STRICT, false);
             $handler->screamAt(E_ALL | E_STRICT);
         } elseif ('emergency' === $channel) {
-            $handler->setDefaultLogger($logger, E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR, true);
-            $handler->screamAt(E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+            $handler->setDefaultLogger($logger, self::$fatalErrors, true);
+            $handler->screamAt(self::$fatalErrors);
         }
     }
 

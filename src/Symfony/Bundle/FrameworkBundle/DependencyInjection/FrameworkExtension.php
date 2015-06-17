@@ -150,7 +150,11 @@ class FrameworkExtension extends Extension
             $container->setDefinition('debug.event_dispatcher.parent', $definition);
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         } else {
-            $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
+            $levels = E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
+            if (defined('HHVM_VERSION')) {
+                $levels |= FATAL_ERROR;
+            }
+            $definition->replaceArgument(2, $levels);
         }
 
         $this->addClassesToCompile(array(

@@ -155,6 +155,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 E_ERROR => array(null, LogLevel::CRITICAL),
                 E_CORE_ERROR => array(null, LogLevel::CRITICAL),
             );
+
+            if (defined('HHVM_VERSION')) {
+                $loggers[FATAL_ERROR] = array(null, LogLevel::CRITICAL);
+            }
             $this->assertSame($loggers, $handler->setLoggers(array()));
 
             restore_error_handler();
@@ -346,6 +350,51 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             ;
 
             $handler->setDefaultLogger($logger, E_PARSE);
+
+            $handler->handleFatalError($error);
+
+            restore_error_handler();
+            restore_exception_handler();
+        } catch (\Exception $e) {
+            restore_error_handler();
+            restore_exception_handler();
+
+            throw $e;
+        }
+    }
+
+    public function testHandleFatalErrorOnHHVM()
+    {
+        if (!defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Should be executed in HHVM context.');
+        }
+
+        try {
+            $handler = ErrorHandler::register();
+
+            $error = array(
+                'type' => FATAL_ERROR,
+                'message' => 'foo',
+                'file' => 'bar',
+                'line' => 123,
+            );
+
+            $logger = $this->getMock('Psr\Log\LoggerInterface');
+
+            $that = $this;
+            $logArgCheck = function ($level, $message, $context) use ($that) {
+                $that->assertEquals('Fatal : foo', $message);
+                $that->assertArrayHasKey('type', $context);
+                $that->assertEquals($context['type'], FATAL_ERROR);
+            };
+
+            $logger
+                ->expects($this->once())
+                ->method('log')
+                ->will($this->returnCallback($logArgCheck))
+            ;
+
+            $handler->setDefaultLogger($logger, FATAL_ERROR);
 
             $handler->handleFatalError($error);
 

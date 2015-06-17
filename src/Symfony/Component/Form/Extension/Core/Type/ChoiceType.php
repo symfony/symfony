@@ -32,6 +32,7 @@ class ChoiceType extends AbstractType
 {
     /**
      * Caches created choice lists.
+     *
      * @var array
      */
     private $choiceListCache = array();
@@ -163,7 +164,7 @@ class ChoiceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceListCache = & $this->choiceListCache;
+        $choiceListCache = &$this->choiceListCache;
 
         $choiceList = function (Options $options) use (&$choiceListCache) {
             // Harden against NULL values (like in EntityType and ModelType)

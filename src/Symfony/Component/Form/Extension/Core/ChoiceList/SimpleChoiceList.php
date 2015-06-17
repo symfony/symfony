@@ -39,7 +39,7 @@ class SimpleChoiceList extends ChoiceList
      *                                             as hierarchy of unlimited depth by creating nested
      *                                             arrays. The title of the sub-hierarchy is stored
      *                                             in the array key pointing to the nested array.
-     * @param array $preferredChoices A flat array of choices that should be
+     * @param array              $preferredChoices A flat array of choices that should be
      *                                             presented to the user with priority.
      */
     public function __construct($choices, array $preferredChoices = array())

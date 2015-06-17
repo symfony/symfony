@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-16T16:38:00Z
+
+Can you explain what the fix is changing ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-16T18:54:40Z
+
+`self::$stackedErrors` holds errors that should be delayed. When it's time, they should be logged with exactly the same parameters that would have been used at the time they where triggered.
+This was not the case for silenced errors and this PR fixes that.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-16T18:58:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-16T21:05:04Z
+
+any way to add a test?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-17T19:17:33Z
+
+Test added

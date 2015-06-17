@@ -19,7 +19,8 @@
         "php": ">=5.3.9",
         "doctrine/common": "~2.3",
         "twig/twig": "~1.18",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "symfony/templating": "~2.8"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -57,7 +58,6 @@
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/swiftmailer-bridge": "self.version",
-        "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",

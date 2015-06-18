@@ -393,6 +393,52 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHandleFatalErrorOnHHVM()
+    {
+        try {
+            $handler = ErrorHandler::register();
+
+            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger
+                ->expects($this->once())
+                ->method('log')
+                ->with(
+                    $this->equalTo(LogLevel::CRITICAL),
+                    $this->equalTo('Fatal Error: foo'),
+                    $this->equalTo(array(
+                        'type' => 1,
+                        'file' => 'bar',
+                        'line' => 123,
+                        'level' => -1,
+                        'stack' => array(456),
+                    ))
+                )
+            ;
+
+            $handler->setDefaultLogger($logger, E_ERROR);
+
+            $error = array(
+                'type' => E_ERROR + 0x1000000, // This error level is used by HHVM for fatal errors
+                'message' => 'foo',
+                'file' => 'bar',
+                'line' => 123,
+                'context' => array(123),
+                'backtrace' => array(456),
+            );
+
+            call_user_func_array(array($handler, 'handleError'), $error);
+            $handler->handleFatalError($error);
+
+            restore_error_handler();
+            restore_exception_handler();
+        } catch (\Exception $e) {
+            restore_error_handler();
+            restore_exception_handler();
+
+            throw $e;
+        }
+    }
+
     /**
      * @group legacy
      */

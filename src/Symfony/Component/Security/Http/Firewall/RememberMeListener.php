@@ -83,12 +83,12 @@ class RememberMeListener implements ListenerInterface
             if (null !== $this->logger) {
                 $this->logger->debug('Populated the token storage with a remember-me token.');
             }
-        } catch (AuthenticationException $failed) {
+        } catch (AuthenticationException $e) {
             if (null !== $this->logger) {
                 $this->logger->warning(
                     'The token storage was not populated with remember-me token as the'
                    .' AuthenticationManager rejected the AuthenticationToken returned'
-                   .' by the RememberMeServices.', array('exception' => $failed)
+                   .' by the RememberMeServices.', array('exception' => $e)
                 );
             }
 

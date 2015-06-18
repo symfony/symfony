@@ -126,7 +126,7 @@ class MaskBuilder
             if ('1' === $bitmask[$i]) {
                 try {
                     $pattern[$i] = self::getCode(1 << ($length - $i - 1));
-                } catch (\Exception $notPredefined) {
+                } catch (\Exception $e) {
                     $pattern[$i] = self::ON;
                 }
             }

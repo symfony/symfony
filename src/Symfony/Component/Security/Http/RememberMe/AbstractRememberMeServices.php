@@ -123,21 +123,21 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
 
             return new RememberMeToken($user, $this->providerKey, $this->key);
-        } catch (CookieTheftException $theft) {
+        } catch (CookieTheftException $e) {
             $this->cancelCookie($request);
 
-            throw $theft;
-        } catch (UsernameNotFoundException $notFound) {
+            throw $e;
+        } catch (UsernameNotFoundException $e) {
             if (null !== $this->logger) {
                 $this->logger->info('User for remember-me cookie not found.');
             }
-        } catch (UnsupportedUserException $unSupported) {
+        } catch (UnsupportedUserException $e) {
             if (null !== $this->logger) {
                 $this->logger->warning('User class for remember-me cookie not supported.');
             }
-        } catch (AuthenticationException $invalid) {
+        } catch (AuthenticationException $e) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-Me authentication failed: '.$invalid->getMessage());
+                $this->logger->debug('Remember-Me authentication failed: '.$e->getMessage());
             }
         }
 

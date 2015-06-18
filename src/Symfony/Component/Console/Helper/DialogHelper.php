@@ -466,18 +466,18 @@ class DialogHelper extends InputAwareHelper
      */
     private function validateAttempts($interviewer, OutputInterface $output, $validator, $attempts)
     {
-        $error = null;
+        $e = null;
         while (false === $attempts || $attempts--) {
-            if (null !== $error) {
-                $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+            if (null !== $e) {
+                $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($e->getMessage(), 'error'));
             }
 
             try {
                 return call_user_func($validator, $interviewer());
-            } catch (\Exception $error) {
+            } catch (\Exception $e) {
             }
         }
 
-        throw $error;
+        throw $e;
     }
 }

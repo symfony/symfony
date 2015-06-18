@@ -74,7 +74,9 @@ class AppVariable
             throw new \RuntimeException('The "app.security" variable is not available.');
         }
 
-        return $this->container->get('security.context');
+        if ($this->container->has('security.context')) {
+            return $this->container->get('security.context');
+        }
     }
 
     /**
@@ -89,6 +91,8 @@ class AppVariable
         if (null === $this->tokenStorage) {
             if (null === $this->container) {
                 throw new \RuntimeException('The "app.user" variable is not available.');
+            } elseif (!$this->container->has('security.context')) {
+                return;
             }
 
             $this->tokenStorage = $this->container->get('security.context');

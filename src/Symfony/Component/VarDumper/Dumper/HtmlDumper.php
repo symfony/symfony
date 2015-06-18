@@ -49,6 +49,15 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
+    public function __construct($output = null, $charset = null)
+    {
+        parent::__construct($output, $charset);
+        $this->dumpId = 'sf-dump-'.mt_rand();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setOutput($output)
     {
         if ($output !== $prev = parent::setOutput($output)) {
@@ -94,8 +103,8 @@ class HtmlDumper extends CliDumper
      */
     public function dump(Data $data, $output = null)
     {
-        $this->dumpId = 'sf-dump-'.mt_rand();
         parent::dump($data, $output);
+        $this->dumpId = 'sf-dump-'.mt_rand();
     }
 
     /**

@@ -246,7 +246,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
             try {
                 $value[$name] = $child->finalize($value[$name]);
-            } catch (UnsetKeyException $unset) {
+            } catch (UnsetKeyException $e) {
                 unset($value[$name]);
             }
         }

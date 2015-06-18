@@ -288,7 +288,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
-     * Instantiates an object using contructor parameters when needed.
+     * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
      * it is present in the context with the object_to_populate key.

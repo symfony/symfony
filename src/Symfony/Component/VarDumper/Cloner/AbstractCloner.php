@@ -65,6 +65,7 @@ abstract class AbstractCloner implements ClonerInterface
 
         'ErrorException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castErrorException',
         'Exception' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castException',
+        'Error' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castError',
         'Symfony\Component\DependencyInjection\ContainerInterface' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
 

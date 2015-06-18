@@ -127,6 +127,24 @@ class YamlFileLoader extends FileLoader
         $methods = isset($config['methods']) ? $config['methods'] : array();
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
+        if (isset($requirements['_method'])) {
+            if (0 === count($methods)) {
+                $methods = explode('|', $requirements['_method']);
+            }
+
+            unset($requirements['_method']);
+            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
+        }
+
+        if (isset($requirements['_scheme'])) {
+            if (0 === count($schemes)) {
+                $schemes = explode('|', $requirements['_scheme']);
+            }
+
+            unset($requirements['_scheme']);
+            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
+        }
+
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
         $collection->add($name, $route);

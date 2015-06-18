@@ -45,11 +45,11 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $this->getProvider()->findAcls($oids);
 
             $this->fail('Provider did not throw an expected exception.');
-        } catch (\Exception $ex) {
-            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\AclNotFoundException', $ex);
-            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException', $ex);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\AclNotFoundException', $e);
+            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException', $e);
 
-            $partialResult = $ex->getPartialResult();
+            $partialResult = $e->getPartialResult();
             $this->assertTrue($partialResult->contains($oids[0]));
             $this->assertFalse($partialResult->contains($oids[1]));
         }

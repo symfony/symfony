@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-05T15:45:41Z
+
+Would seem more natural to me if `onSubmit` would also ignore invalid data.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-05T15:46:25Z
+
+And it should be merged in 2.3
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-11T11:09:43Z
+
+> Would seem more natural to me if `onSubmit` would also ignore invalid data.
+
+`FormEvent::getData()` returns the normalised data in the `SUBMIT` event. Malformed data cannot be triggered by the request data, right? I don't think it makes sense to simply ignore it here.

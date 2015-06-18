@@ -53,6 +53,7 @@ class FileLocator implements FileLocatorInterface
             array_unshift($paths, $currentPath);
         }
 
+        $paths = array_unique($paths);
         $filepaths = array();
 
         foreach ($paths as $path) {
@@ -68,7 +69,7 @@ class FileLocator implements FileLocatorInterface
             throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $name, implode(', ', $paths)));
         }
 
-        return array_values(array_unique($filepaths));
+        return $filepaths;
     }
 
     /**

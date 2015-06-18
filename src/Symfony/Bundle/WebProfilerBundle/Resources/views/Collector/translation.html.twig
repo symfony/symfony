@@ -57,6 +57,14 @@
 {% endblock %}
 
 {% block panelContent %}
+    {% set filter = request.query.get('state', '-1') %}
+    {% set filterOptions = {
+        '-1': '',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_DEFINED')): 'Defined messages',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_MISSING')): 'Missing messages',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK')): 'Fallback messages',
+    } %}
+
     <h2>Translation Stats</h2>
     <table>
         <tbody>
@@ -72,6 +80,22 @@
                 <th>Missing messages</th>
                 <td><pre>{{ collector.countMissings }}</pre></td>
             </tr>
+            <tr>
+                <th>Filter</th>
+                <td>
+                    <form id="filter-form" action="" method="get" style="display: inline">
+                        <input type="hidden" name="panel" value="translation">
+                        <select id="filter" name="state" onchange="document.getElementById('filter-form').submit(); ">
+                            {% for key,option in filterOptions %}
+                                <option value="{{ key }}"{{ filter == key ? ' selected' : '' }}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                        <noscript>
+                            <input type="submit" value="refresh">
+                        </noscript>
+                    </form>
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -83,7 +107,7 @@
             <th>Id</th>
             <th>Message Preview</th>
         </tr>
-        {% for message in collector.messages %}
+        {% for message in collector.messages if message.state == filter or filter == '-1' %}
             <tr>
                 <td><code>{{ translator.state(message) }}</code></td>
                 <td><code>{{ message.locale }}</code></td>

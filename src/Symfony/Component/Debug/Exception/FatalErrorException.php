@@ -18,11 +18,19 @@ namespace Symfony\Component\Debug\Exception;
  */
 class FatalErrorException extends \ErrorException
 {
-    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true)
+    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true, array $trace = null)
     {
         parent::__construct($message, $code, $severity, $filename, $lineno);
 
-        if (null !== $traceOffset) {
+        if (null !== $trace) {
+            if (!$traceArgs) {
+                foreach ($trace as &$frame) {
+                    unset($frame['args'], $frame['this'], $frame);
+                }
+            }
+
+            $this->setTrace($trace);
+        } elseif (null !== $traceOffset) {
             if (function_exists('xdebug_get_function_stack')) {
                 $trace = xdebug_get_function_stack();
                 if (0 < $traceOffset) {
@@ -31,7 +39,7 @@ class FatalErrorException extends \ErrorException
 
                 foreach ($trace as &$frame) {
                     if (!isset($frame['type'])) {
-                        //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
+                        // XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
                         if (isset($frame['class'])) {
                             $frame['type'] = '::';
                         }

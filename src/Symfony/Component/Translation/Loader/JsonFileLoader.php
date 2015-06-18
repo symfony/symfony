@@ -25,14 +25,6 @@ class JsonFileLoader extends FileLoader
      */
     protected function loadResource($resource)
     {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
-
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
-
         $messages = array();
         if ($data = file_get_contents($resource)) {
             $messages = json_decode($data, true);

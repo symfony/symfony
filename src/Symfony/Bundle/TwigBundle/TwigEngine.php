@@ -53,7 +53,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
                 try {
                     // try to get the real file name of the template where the error occurred
                     $e->setTemplateFile(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateFile()))));
-                } catch (\Exception $ex) {
+                } catch (\Exception $e2) {
                 }
             }
 

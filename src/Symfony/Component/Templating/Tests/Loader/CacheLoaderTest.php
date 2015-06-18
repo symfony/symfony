@@ -34,7 +34,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
         $this->assertFalse($loader->load(new TemplateReference('foo', 'php')), '->load() returns false if the embed loader is not able to load the template');
         $loader->load(new TemplateReference('index'));
-        $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
+        $this->assertTrue($debugger->hasMessage('Stored template'), '->load() logs a "Storing template" message if the template is found');
         $loader->load(new TemplateReference('index'));
         $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
     }

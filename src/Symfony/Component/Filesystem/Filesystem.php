@@ -84,7 +84,7 @@ class Filesystem
                     if ($error) {
                         throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']));
                     }
-                    throw new IOException(sprintf('Failed to create "%s"', $dir));
+                    throw new IOException(sprintf('Failed to create "%s".', $dir));
                 }
             }
         }

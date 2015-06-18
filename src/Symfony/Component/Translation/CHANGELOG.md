@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Changed the visibility of the locale property in `Translator` from protected to private.
+
 2.8.0
 -----
 

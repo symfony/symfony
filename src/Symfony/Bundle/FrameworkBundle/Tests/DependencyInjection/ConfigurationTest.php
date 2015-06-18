@@ -93,8 +93,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyInvalidValueAssets()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(

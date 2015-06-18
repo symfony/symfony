@@ -342,8 +342,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyCreateServiceFactory()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $builder = new ContainerBuilder();
         $builder->register('bar', 'Bar\FooClass');
         $builder
@@ -363,8 +361,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyCreateServiceFactoryService()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $builder = new ContainerBuilder();
         $builder->register('foo_service', 'Bar\FooClass');
         $builder
@@ -735,8 +731,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetOnSynchronizedService()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = new ContainerBuilder();
         $container->register('baz', 'BazClass')
             ->setSynchronized(true)
@@ -757,8 +751,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySynchronizedServiceWithScopes()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = new ContainerBuilder();
         $container->addScope(new Scope('foo'));
         $container->register('baz', 'BazClass')

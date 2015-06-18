@@ -86,8 +86,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyRouteDefinitionLoading()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('legacy_validpattern.yml');
         $route = $routeCollection->get('blog_show_legacy');

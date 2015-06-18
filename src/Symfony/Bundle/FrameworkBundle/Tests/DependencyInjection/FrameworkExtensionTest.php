@@ -208,8 +208,6 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testLegacyTemplatingAssets()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
     }
 
@@ -296,8 +294,6 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testLegacyFullyConfiguredValidationService()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         if (!extension_loaded('apc')) {
             $this->markTestSkipped('The apc extension is not available.');
         }
@@ -399,8 +395,6 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testLegacyFormCsrfFieldNameCanBeSetUnderCsrfSettings()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainerFromFile('form_csrf_sets_field_name');
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
@@ -412,8 +406,6 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testLegacyFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainerFromFile('form_csrf_under_form_sets_field_name');
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));

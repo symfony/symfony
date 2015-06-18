@@ -461,8 +461,6 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGenerateNetworkPath()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $routes = $this->getRoutes('test', new Route('/{name}', array(), array('_scheme' => 'http'), array(), '{locale}.example.com'));
 
         $this->assertSame('//fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test',

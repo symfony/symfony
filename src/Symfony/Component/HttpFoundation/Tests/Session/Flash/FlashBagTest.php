@@ -138,8 +138,6 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetIterator()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $flashes = array('hello' => 'world', 'beep' => 'boop', 'notice' => 'nope');
         foreach ($flashes as $key => $val) {
             $this->bag->set($key, $val);

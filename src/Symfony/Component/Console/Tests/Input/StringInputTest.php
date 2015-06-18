@@ -46,8 +46,6 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyInputOptionDefinitionInConstructor()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $definition = new InputDefinition(
             array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
         );

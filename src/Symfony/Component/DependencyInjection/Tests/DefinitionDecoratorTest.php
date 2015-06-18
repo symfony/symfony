@@ -55,8 +55,6 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetProperty($property, $changeKey)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $def = new DefinitionDecorator('foo');
 
         $getter = 'get'.ucfirst($property);

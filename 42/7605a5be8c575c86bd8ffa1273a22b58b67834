@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-16T12:22:32Z
+
+Fatal errors on HHVM use the 16777217 magic number.
+But since `16777217 == E_ERROR + 0x1000000;` the only required tweak is to remove this leading `1`.
+
+---------------------------------------------------------------------------
+
+by staabm at 2015-06-17T19:03:38Z
+
+Feels like this should be reported as a php incompatibility to hhvm
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-18T09:39:56Z
+
+I took some time to test the Debug component on HHVM.
+
+The main differences are:
+- the 6th $backtrace argument
+- the hhvm.error_handling.call_user_handler_on_fatals=1 behavior
+- the `16777217 == E_ERROR + 0x1000000` special error level
+
+This PR handles all of them and gives full HHVM support to the component.
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by digitalkaoz at 2015-06-18T09:45:16Z
+
+yeah :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-18T09:51:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-18T12:16:00Z
+
+:+1:

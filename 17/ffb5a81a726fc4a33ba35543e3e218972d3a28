@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-16T12:42:14Z
+
+could we add a test for HHVM checking that we can handle fatal errors ?
+Not sure whether it is possible to write such test though.
+
+---------------------------------------------------------------------------
+
+by digitalkaoz at 2015-06-16T13:20:31Z
+
+@stof i wrote this test in #14967

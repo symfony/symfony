@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2015-05-19T11:31:10Z
+
+Thats something users will have to find in the `3.0` upgrade file, so no deprecation warning in earlier `2.x` versions. Is that expected? (No idea how one could warn users, though...)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-19T12:48:24Z
+
+@mpdude Not sure if there is a way to deprecate protected property the only thing came to my mind is to add a note in `UPGRADE-2.8.md`.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-05-20T07:02:35Z
+
+There's a way but you won't like it. Implement `__get()` which returns only the property required but also throws a deprecation notice.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-20T07:06:44Z
+
+@iltar no it won't work as expected, the `locale` will be considered as public property.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-05-20T07:59:39Z
+
+The question is what the "Symfony standard way" of doing this looks like.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-05-21T03:16:56Z
+
+Does this BC break really add a value to the codebase? I mean, is it really worth it to take the risk of breaking applications / libraries relying on this `$locale` property?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-21T10:59:14Z
+
+@hhamon making `locale` private can reduce the risk to use an invalid locale see [setLocale](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L153) and  also I would prefer the public methods instead (setLocale, getLocale).
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-18T10:53:53Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-18T12:10:30Z
+
+and given that we added validations of invalid locales to avoid a security issue, forcing to go through the setter to update it seems logical to me.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-18T12:13:43Z
+
+I'm :+1: given that it usually doesn't make sense to make properties protected when there are public getters/setters also defined. There is no point it creating 2 extension points, esp. when it's security related.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-18T14:20:40Z
+
+:+1:

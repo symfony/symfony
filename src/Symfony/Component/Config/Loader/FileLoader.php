@@ -83,16 +83,7 @@ abstract class FileLoader extends Loader
             $loader = $this->resolve($resource, $type);
 
             if ($loader instanceof self && null !== $this->currentDir) {
-                // we fallback to the current locator to keep BC
-                // as some some loaders do not call the parent __construct()
-                // @deprecated should be removed in 3.0
-                $locator = $loader->getLocator();
-                if (null === $locator) {
-                    @trigger_error('Not calling the parent constructor in '.get_class($loader).' which extends '.__CLASS__.' is deprecated since version 2.7 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-                    $locator = $this->locator;
-                }
-
-                $resource = $locator->locate($resource, $this->currentDir, false);
+                $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
             }
 
             $resources = is_array($resource) ? $resource : array($resource);

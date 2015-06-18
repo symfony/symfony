@@ -25,11 +25,15 @@ class ResizeFormListener implements EventSubscriberInterface
 {
     /**
      * @var string
+     *
+     * @deprecated since version 2.7, will be replaced by a $entryType private property in 3.0.
      */
     protected $type;
 
     /**
      * @var array
+     *
+     * @deprecated since version 2.7, will be replaced by a $entryOptions private property in 3.0.
      */
     protected $options;
 
@@ -52,12 +56,12 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct($entryType, array $entryOptions = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
-        $this->type = $type;
+        $this->type = $entryType;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
-        $this->options = $options;
+        $this->options = $entryOptions;
         $this->deleteEmpty = $deleteEmpty;
     }
 

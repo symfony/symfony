@@ -285,7 +285,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testCollection()
     {
         $form = $this->factory->createNamed('names', 'collection', array('a', 'b'), array(
-            'type' => 'text',
+            'entry_type' => 'text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -307,7 +307,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             array('title' => 'b'),
         );
         $form = $this->factory->createNamed('names', 'collection', $data, array(
-            'type' => new AlternatingRowType(),
+            'entry_type' => new AlternatingRowType(),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -325,7 +325,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testEmptyCollection()
     {
         $form = $this->factory->createNamed('names', 'collection', array(), array(
-            'type' => 'text',
+            'entry_type' => 'text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -342,7 +342,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             'collection',
             'collection',
             array('a', 'b'),
-            array('type' => 'text')
+            array('entry_type' => 'text')
         );
 
         $form = $this->factory->createNamedBuilder('form', 'form')

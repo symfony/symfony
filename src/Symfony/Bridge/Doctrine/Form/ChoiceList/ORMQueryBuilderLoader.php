@@ -108,6 +108,9 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;
         }
+        if (!$values) {
+            return array();
+        }
 
         return $qb->andWhere($where)
                   ->getQuery()

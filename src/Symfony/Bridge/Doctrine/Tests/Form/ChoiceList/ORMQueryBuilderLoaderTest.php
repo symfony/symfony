@@ -56,7 +56,7 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(), $expectedType)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(1, 2), $expectedType)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -72,7 +72,7 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
             ->from($classname, 'e');
 
         $loader = new ORMQueryBuilderLoader($qb);
-        $loader->getEntitiesByIds('id', array());
+        $loader->getEntitiesByIds('id', array(1, 2));
     }
 
     public function testFilterNonIntegerValues()

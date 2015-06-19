@@ -23,8 +23,6 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // Locale extends \Locale, so intl must be present
         IntlTestHelper::requireIntl($this);
     }

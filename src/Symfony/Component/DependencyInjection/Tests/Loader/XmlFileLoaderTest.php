@@ -195,8 +195,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyLoadServices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('legacy-services6.xml');

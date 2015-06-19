@@ -170,8 +170,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetIsSynchronized()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $def = new Definition('stdClass');
         $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');
         $this->assertSame($def, $def->setSynchronized(true), '->setSynchronized() implements a fluent interface');

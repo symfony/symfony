@@ -65,7 +65,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetDispatcher()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->event->setDispatcher($this->dispatcher);
         $this->assertSame($this->dispatcher, $this->event->getDispatcher());
     }
@@ -75,7 +74,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetDispatcher()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->assertNull($this->event->getDispatcher());
     }
 
@@ -84,7 +82,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetName()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->assertNull($this->event->getName());
     }
 
@@ -93,7 +90,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetName()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->event->setName('foo');
         $this->assertEquals('foo', $this->event->getName());
     }

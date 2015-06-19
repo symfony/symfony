@@ -68,8 +68,6 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyDenormalizeOnCamelCaseFormat()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->normalizer->setCamelizedAttributes(array('camel_case'));
         $obj = $this->normalizer->denormalize(
             array('camel_case' => 'value'),
@@ -83,8 +81,6 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyCamelizedAttributesNormalize()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $obj = new PropertyCamelizedDummy('dunglas.fr');
         $obj->fooBar = 'les-tilleuls.coop';
         $obj->bar_foo = 'lostinthesupermarket.fr';
@@ -109,8 +105,6 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyCamelizedAttributesDenormalize()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $obj = new PropertyCamelizedDummy('dunglas.fr');
         $obj->fooBar = 'les-tilleuls.coop';
         $obj->bar_foo = 'lostinthesupermarket.fr';

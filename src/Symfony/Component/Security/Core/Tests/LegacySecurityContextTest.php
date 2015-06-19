@@ -26,8 +26,6 @@ class LegacySecurityContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $this->authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
         $this->securityContext = new SecurityContext($this->tokenStorage, $this->authorizationChecker);

@@ -835,6 +835,23 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function clearErrors($deep = false)
+    {
+        $this->errors = array();
+
+        // Copy the errors of nested forms to the $errors array
+        if ($deep) {
+            foreach ($this as $child) {
+                $child->clearErrors(true);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns a string representation of all form errors (including children errors).
      *
      * This method should only be used to help debug a form.

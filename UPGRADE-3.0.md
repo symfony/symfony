@@ -110,6 +110,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The method `clearErrors()` was added to `FormInterface`.
+
  * The option "precision" was renamed to "scale".
 
    Before:

@@ -339,6 +339,14 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertCount(0, $this->form->getErrors());
     }
 
+    public function testClearErrors()
+    {
+        $this->form->addError(new FormError('Error!'));
+        $this->form->clearErrors();
+
+        $this->assertCount(0, $this->form->getErrors());
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
      */

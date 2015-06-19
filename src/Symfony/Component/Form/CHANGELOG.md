@@ -10,6 +10,7 @@ CHANGELOG
  * removed `AbstractTypeExtension::setDefaultOptions()` method
  * added `FormTypeInterface::configureOptions()` method
  * added `FormTypeExtensionInterface::configureOptions()` method
+ * added `FormInterface::clearErrors()` method
 
 2.8.0
 -----

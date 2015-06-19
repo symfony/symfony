@@ -19,7 +19,7 @@ use Symfony\Component\Form\Util\ServerParams;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NativeRequestHandler implements RequestHandlerInterface
+class NativeRequestHandler implements ChainableRequestHandlerInterface
 {
     /**
      * @var ServerParams
@@ -32,6 +32,14 @@ class NativeRequestHandler implements RequestHandlerInterface
     public function __construct(ServerParams $params = null)
     {
         $this->serverParams = $params ?: new ServerParams();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($request = null)
+    {
+        return null === $request;
     }
 
     /**

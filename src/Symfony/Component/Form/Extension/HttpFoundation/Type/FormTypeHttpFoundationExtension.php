@@ -47,7 +47,12 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->listener);
-        $builder->setRequestHandler($this->requestHandler);
+
+        if (!method_exists($builder, 'addRequestHandler')) {
+            $builder->setRequestHandler($this->requestHandler);
+        } else {
+            $builder->addRequestHandler($this->requestHandler);
+        }
     }
 
     /**

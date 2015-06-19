@@ -266,6 +266,17 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setRequestHandler(RequestHandlerInterface $requestHandler);
 
     /**
+     * Adds a request handler to a chain of request handlers.
+     *
+     * @param ChainableRequestHandlerInterface $requestHandler
+     *
+     * @return self The configuration object
+     *
+     * @todo Add to the interface in Symfony 3.
+     *
+    public function addRequestHandler(ChainableRequestHandlerInterface $requestHandler);*/
+
+    /**
      * Sets whether the form should be initialized automatically.
      *
      * Should be set to true only for root forms.

@@ -850,6 +850,28 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
+     * Adds a request handler to a chain of request handlers.
+     *
+     * @param ChainableRequestHandlerInterface $requestHandler
+     *
+     * @return self The configuration object
+     */
+    public function addRequestHandler(ChainableRequestHandlerInterface $requestHandler)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        if (!$this->requestHandler instanceof ChainRequestHandler) {
+            $this->requestHandler = new ChainRequestHandler(array($this->getRequestHandler()));
+        }
+
+        $this->requestHandler->add($requestHandler);
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setAutoInitialize($initialize)

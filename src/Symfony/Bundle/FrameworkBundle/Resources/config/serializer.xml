@@ -14,9 +14,13 @@
             <argument type="collection" />
         </service>
 
+        <service id="serializer.property_accessor" alias="property_accessor" public="false" />
+
         <!-- Normalizer -->
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
+            <argument>null</argument>
+            <argument type="service" id="serializer.property_accessor" />
 
             <!-- Run after all custom serializers -->
             <tag name="serializer.normalizer" priority="-1000" />

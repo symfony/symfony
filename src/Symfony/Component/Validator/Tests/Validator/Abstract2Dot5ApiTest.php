@@ -570,8 +570,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
      */
     public function testLegacyPropertyMetadataMustImplementPropertyMetadataInterface()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $entity = new Entity();
 
         // Legacy interface

@@ -376,7 +376,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             array(new InputDefinition(array(new InputOption('foo'), new InputArgument('foo', InputArgument::REQUIRED))), '[--foo] [--] <foo>', 'puts [--] between options and arguments'),
         );
     }
-    
+
     public function testGetShortSynopsis()
     {
         $definition = new InputDefinition(array(new InputOption('foo'), new InputOption('bar'), new InputArgument('cat')));

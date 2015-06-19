@@ -24,8 +24,6 @@ class LegacySecurityContextInterfaceTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstantSync()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertSame(Security::ACCESS_DENIED_ERROR, SecurityContextInterface::ACCESS_DENIED_ERROR);
         $this->assertSame(Security::AUTHENTICATION_ERROR, SecurityContextInterface::AUTHENTICATION_ERROR);
         $this->assertSame(Security::LAST_USERNAME, SecurityContextInterface::LAST_USERNAME);

@@ -169,8 +169,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleError()
     {
-        $this->iniSet('error_reporting', -1);
-
         try {
             $handler = ErrorHandler::register();
             $handler->throwAt(0, true);

@@ -23,8 +23,6 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetUrl()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $package = new Package(new StaticVersionStrategy('22', '%s?version=%s'));
         $packages = new Packages($package);
         $helper = new AssetsHelper($packages);
@@ -37,8 +35,6 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetVersion()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $package = new Package(new StaticVersionStrategy('22'));
         $imagePackage = new Package(new StaticVersionStrategy('42'));
         $packages = new Packages($package, array('images' => $imagePackage));

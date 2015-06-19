@@ -22,8 +22,6 @@ class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
             $this->markTestSkipped('This test requires SQLite support in your environment');
         }

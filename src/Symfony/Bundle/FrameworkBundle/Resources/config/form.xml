@@ -55,8 +55,10 @@
         </service>
 
         <!-- CoreExtension -->
+        <service id="form.property_accessor" alias="property_accessor" public="false" />
+
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
-            <argument type="service" id="property_accessor"/>
+            <argument type="service" id="form.property_accessor" />
             <tag name="form.type" alias="form" />
         </service>
         <service id="form.type.birthday" class="Symfony\Component\Form\Extension\Core\Type\BirthdayType">

@@ -169,8 +169,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleError()
     {
-        $this->iniSet('error_reporting', -1);
-
         try {
             $handler = ErrorHandler::register();
             $handler->throwAt(0, true);
@@ -444,8 +442,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyInterface()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         try {
             $handler = ErrorHandler::register(0);
             $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, array()));

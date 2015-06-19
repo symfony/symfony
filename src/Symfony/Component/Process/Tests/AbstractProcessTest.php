@@ -238,8 +238,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyValidInput($expected, $value)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $process = $this->getProcess('php -v');
         $process->setInput($value);
         $this->assertSame($expected, $process->getInput());

@@ -45,8 +45,6 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyAddService()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = include self::$fixturesPath.'/containers/legacy-container9.php';
         $dumper = new YamlDumper($container);
 

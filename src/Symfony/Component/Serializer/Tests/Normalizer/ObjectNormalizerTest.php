@@ -102,8 +102,6 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyDenormalizeOnCamelCaseFormat()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->normalizer->setCamelizedAttributes(array('camel_case'));
         $obj = $this->normalizer->denormalize(
             array('camel_case' => 'camelCase'),

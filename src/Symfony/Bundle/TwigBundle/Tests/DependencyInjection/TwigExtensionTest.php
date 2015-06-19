@@ -29,8 +29,6 @@ class TwigExtensionTest extends TestCase
      */
     public function testLegacyFormResourcesConfigurationKey($format)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'legacy-form-resources-only', $format);
@@ -49,8 +47,6 @@ class TwigExtensionTest extends TestCase
      */
     public function testLegacyMergeFormResourcesConfigurationKeyWithFormThemesConfigurationKey($format)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'legacy-merge-form-resources-with-form-themes', $format);

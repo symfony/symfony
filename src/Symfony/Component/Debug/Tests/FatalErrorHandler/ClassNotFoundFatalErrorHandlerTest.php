@@ -73,8 +73,6 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyHandleClassNotFound()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $prefixes = array('Symfony\Component\Debug\Exception\\' => realpath(__DIR__.'/../../Exception'));
         $symfonyUniversalClassLoader = new SymfonyUniversalClassLoader();
         $symfonyUniversalClassLoader->registerPrefixes($prefixes);

@@ -81,7 +81,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new LoggingTranslatorPass());
-        $container->addCompilerPass(new AddCacheWarmerPass());
+        $container->addCompilerPass(new AddCacheWarmerPass(), PassConfig::TYPE_OPTIMIZE);
         $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new TranslationExtractorPass());

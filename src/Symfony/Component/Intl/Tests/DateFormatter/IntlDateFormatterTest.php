@@ -30,6 +30,21 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         new IntlDateFormatter('pt_BR', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
     }
 
+    public function testEqualWithNative()
+    {
+        $native = \IntlDateFormatter::create('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
+
+        if ($native instanceof IntlDateFormatter) {
+            $this->markTestSkipped('No intl extension installed');
+        }
+
+        $replacement = IntlDateFormatter::create('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
+
+        $time = time();
+
+        $this->assertSame($native->format($time), $replacement->format($time));
+    }
+
     public function testStaticCreate()
     {
         $formatter = IntlDateFormatter::create('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);

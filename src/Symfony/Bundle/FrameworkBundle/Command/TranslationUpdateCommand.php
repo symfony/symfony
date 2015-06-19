@@ -61,6 +61,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $kernel = $this->getContainer()->get('kernel');
+
         // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
@@ -79,8 +81,12 @@ EOF
         }
 
         // get bundle directory
-        $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-        $bundleTransPath = $foundBundle->getPath().'/Resources/translations';
+        $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
+        $bundleTransPaths = array(
+            $foundBundle->getPath().'/Resources/',
+            sprintf('%s/Resources/%s/', $kernel->getRootDir(), $foundBundle->getName()),
+        );
+
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
 
         // load any messages from templates
@@ -88,13 +94,23 @@ EOF
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
-        $extractor->extract($foundBundle->getPath().'/Resources/views/', $extractedCatalogue);
+        foreach ($bundleTransPaths as $path) {
+            $path = $path.'views';
+            if (is_dir($path)) {
+                $extractor->extract($path, $extractedCatalogue);
+            }
+        }
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
-        $loader->loadMessages($bundleTransPath, $currentCatalogue);
+        foreach ($bundleTransPaths as $path) {
+            $path = $path.'translations';
+            if (is_dir($path)) {
+                $loader->loadMessages($path, $currentCatalogue);
+            }
+        }
 
         // process catalogues
         $operation = $input->getOption('clean')
@@ -133,7 +149,17 @@ EOF
         // save the files
         if ($input->getOption('force') === true) {
             $output->writeln('Writing files');
-            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath));
+            $bundleTransPath = false;
+            foreach ($bundleTransPaths as $path) {
+                $path = $path.'translations';
+                if (is_dir($path)) {
+                    $bundleTransPath = $path;
+                }
+            }
+
+            if ($bundleTransPath) {
+                $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath));
+            }
         }
     }
 }

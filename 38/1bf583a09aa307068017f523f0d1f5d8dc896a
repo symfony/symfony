@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-19T07:39:42Z
+
+This may be an issue for deprecations triggered in other libraries than Symfony though, if they don't use the new silencing pattern
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-19T07:47:44Z
+
+Yes and no: if the deprecations where in place before the bridge was released, then these libs already have a way to make their users handle them. If the deprecations where added by taking inspiration from Symfony, then this is a recent move and I'd advocate we need to push them one step forward.
+It took us several months to create the current deprecation policy and I now really like it. This bridge should help spread the word :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-19T08:10:51Z
+
+Well, pushing to the new way is indeed a good idea. :+1:
+
+You should also update http://symfony.com/doc/current/contributing/code/conventions.html#deprecations with the new convention btw
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-19T08:31:05Z
+
+Doc PR is symfony/symfony-docs#5413

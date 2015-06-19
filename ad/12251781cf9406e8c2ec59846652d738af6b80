@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-15T09:21:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-06-15T09:37:42Z
+
+Travis errors are unrelated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-15T14:40:21Z
+
+As the `property_accessor` service is used by the form framework as well, what about creating two aliases, one for the serializer and one for the form that points to the true property_accessor service? This way, it's easy to have a specific one for the serializer by overriding the alias.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-06-18T20:44:30Z
+
+done

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * PdoSessionHandler: removed the `lifetime` and `timestamp` columns in favor of `expiry` column
+
 2.6.0
 -----
 

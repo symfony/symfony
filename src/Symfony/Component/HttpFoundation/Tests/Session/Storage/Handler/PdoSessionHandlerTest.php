@@ -144,7 +144,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->will($this->returnValue(array(array($stream, 42, time()))));
+            ->will($this->returnValue(array(array($stream, 42 + time()))));
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -205,7 +205,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace)
+     * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace).
      */
     public function testWriteDifferentSessionIdThanRead()
     {

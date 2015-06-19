@@ -55,10 +55,10 @@ array:25 [
   4 => INF
   5 => -INF
   6 => {$intMax}
-  "str" => "déjà"
-  7 => b"é@"
+  "str" => "déjà\\n"
+  7 => b"é\\x00"
   "[]" => []
-  "res" => :stream {@{$res1}
+  "res" => stream resource {@{$res1}
     wrapper_type: "plainfile"
     stream_type: "STDIO"
     mode: "r"
@@ -69,21 +69,21 @@ array:25 [
     eof: false
     options: []
   }
-  8 => :Unknown {@{$res2}}
+  8 => Unknown resource @{$res2}
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
     +foo: "foo"
     +"bar": "bar"
   }
   "closure" => Closure {#%d
     reflection: """
-      Closure [ <user%S> %s Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
-        @@ {$var['file']} {$var['line']} - {$var['line']}
-
-        - Parameters [2] {
-          Parameter #0 [ <required> \$a ]
-          Parameter #1 [ <optional> PDO or NULL &\$b = NULL ]
-        }
-      }
+      Closure [ <user%S> %s Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {\\n
+        @@ {$var['file']} {$var['line']} - {$var['line']}\\n
+      \\n
+        - Parameters [2] {\\n
+          Parameter #0 [ <required> \$a ]\\n
+          Parameter #1 [ <optional> PDO or NULL &\$b = NULL ]\\n
+        }\\n
+      }\\n
       """
   }
   "line" => {$var['line']}
@@ -130,7 +130,7 @@ EOTXT
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-:stream {@{$ref}
+stream resource {@{$ref}
   wrapper_type: "PHP"
   stream_type: "MEMORY"
   mode: "w+b"
@@ -161,7 +161,7 @@ EOTXT
     public function testRefsInProperties()
     {
         $var = (object) array('foo' => 'foo');
-        $var->bar =& $var->foo;
+        $var->bar = &$var->foo;
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -325,7 +325,7 @@ EOTXT
 
         $var = function &() {
             $var = array();
-            $var[] =& $var;
+            $var[] = &$var;
 
             return $var;
         };

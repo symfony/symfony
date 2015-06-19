@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-06-19T20:13:28Z
+
+OptionsResolverInterface removed, but there is still some code that implement it. This PR remove this.

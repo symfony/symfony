@@ -30,6 +30,20 @@ class BooleanToStringTransformer implements DataTransformerInterface
     private $trueValue;
 
     /**
+     * Other values recognised as TRUE.
+     *
+     * @var array
+     */
+    private $defaultTrueValues = array('true', '1');
+
+    /**
+     * Values recognised as FALSE.
+     *
+     * @var array
+     */
+    private $defaultFalseValues = array('false', '0', '');
+
+    /**
      * Sets the value emitted upon transform if the input is true.
      *
      * @param string $trueValue
@@ -80,6 +94,19 @@ class BooleanToStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a string.');
         }
 
-        return true;
+        if (in_array($value, array_merge($this->defaultTrueValues, array($this->trueValue)), true)) {
+            return true;
+        }
+
+        if (in_array($value, $this->defaultFalseValues, true)) {
+            return false;
+        }
+
+        throw new TransformationFailedException(
+            sprintf(
+                'Unexpected value "%s"!',
+                $value
+            )
+        );
     }
 }

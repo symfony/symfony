@@ -4,13 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="profiler.class">Symfony\Component\HttpKernel\Profiler\Profiler</parameter>
-        <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\EventListener\ProfilerListener</parameter>
-    </parameters>
-
     <services>
-        <service id="profiler" class="%profiler.class%">
+        <service id="profiler" class="Symfony\Component\HttpKernel\Profiler\Profiler">
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="profiler.storage" />
             <argument type="service" id="logger" on-invalid="null" />
@@ -23,7 +18,7 @@
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 
-        <service id="profiler_listener" class="%profiler_listener.class%">
+        <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />

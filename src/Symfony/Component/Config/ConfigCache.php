@@ -42,19 +42,6 @@ class ConfigCache implements ConfigCacheInterface
      * Gets the cache file path.
      *
      * @return string The cache file path
-     * @deprecated since 2.7, to be removed in 3.0. Use getPath() instead.
-     */
-    public function __toString()
-    {
-        @trigger_error('ConfigCache::__toString() is deprecated since version 2.7 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
-
-        return $this->file;
-    }
-
-    /**
-     * Gets the cache file path.
-     *
-     * @return string The cache file path
      */
     public function getPath()
     {
@@ -108,7 +95,7 @@ class ConfigCache implements ConfigCacheInterface
         $mode = 0666;
         $umask = umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, null);
+        $filesystem->dumpFile($this->file, $content);
         try {
             $filesystem->chmod($this->file, $mode, $umask);
         } catch (IOException $e) {
@@ -116,7 +103,7 @@ class ConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {

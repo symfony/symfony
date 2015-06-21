@@ -190,26 +190,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyLoadServices()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('legacy-services6.xml');
-        $services = $container->getDefinitions();
-        $this->assertEquals('FooClass', $services['constructor']->getClass());
-        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod());
-        $this->assertNull($services['factory_service']->getClass());
-        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
-        $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
-        $this->assertNull($services['request']->getDecoratedService());
-    }
-
     public function testLoadServices()
     {
         $container = new ContainerBuilder();

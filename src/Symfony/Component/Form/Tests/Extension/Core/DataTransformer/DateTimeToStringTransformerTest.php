@@ -30,6 +30,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('H:i:00', '16:05:00', '1970-01-01 16:05:00 UTC'),
             array('H:i', '16:05', '1970-01-01 16:05:00 UTC'),
             array('H', '16', '1970-01-01 16:00:00 UTC'),
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
 
             // different day representations
             array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),

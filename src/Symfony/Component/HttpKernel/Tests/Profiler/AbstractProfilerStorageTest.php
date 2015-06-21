@@ -27,6 +27,22 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(10, $this->getStorage()->find('127.0.0.1', 'http://foo.bar', 20, 'GET'), '->write() stores data in the storage');
     }
 
+    public function testStoreWithStatusCode()
+    {
+        foreach(array(200, 400) as $statusCode) {
+            for ($i = 0; $i < 5; ++$i) {
+                $profile = new Profile('token_' . $i);
+                $profile->setIp('127.0.0.1');
+                $profile->setUrl('http://foo.bar');
+                $profile->setMethod('GET');
+                $profile->setStatusCode($statusCode);
+                $this->getStorage()->write($profile);
+            }
+        }
+
+        $this->assertCount(5, $this->getStorage()->find('127.0.0.1', 'http://foo.bar', 200, 'GET'), '->write() stores data in the storage with status code');
+    }
+
     public function testChildren()
     {
         $parentProfile = new Profile('token_parent');
@@ -205,6 +221,21 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->getStorage()->purge();
     }
 
+    public function testRetrieveByStatusCode()
+    {
+        foreach (array(200, 400) as $statusCode) {
+            for ($i = 0; $i < 5; ++$i) {
+                $profile = new Profile('token_'.$i.$statusCode);
+                $profile->setStatusCode($statusCode);
+                $this->getStorage()->write($profile);
+            }
+        }
+
+        $this->assertCount(5, $this->getStorage()->find('', '', '', '', 200));
+
+        $this->getStorage()->purge();
+    }
+
     public function testPurge()
     {
         $profile = new Profile('token1');
@@ -261,6 +292,11 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $tokens);
         $this->assertContains($tokens[0]['status_code'], array(200, 404));
         $this->assertContains($tokens[1]['status_code'], array(200, 404));
+
+        foreach(array(200, 404) as $statusCode) {
+            $tokens = $this->getStorage()->find('', '', 10, '', $statusCode);
+            $this->assertCount(1, $tokens);
+        }
     }
 
     /**

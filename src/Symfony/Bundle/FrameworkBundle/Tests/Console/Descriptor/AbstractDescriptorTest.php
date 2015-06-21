@@ -66,20 +66,6 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
     }
 
-    /**
-     * @dataProvider provideLegacySynchronizedServiceDefinitionTestData
-     * @group legacy
-     */
-    public function testLegacyDescribeSynchronizedServiceDefinition(Definition $definition, $expectedDescription)
-    {
-        $this->assertDescription($expectedDescription, $definition);
-    }
-
-    public function provideLegacySynchronizedServiceDefinitionTestData()
-    {
-        return $this->getDescriptionTestData(ObjectsProvider::getLegacyContainerDefinitions());
-    }
-
     /** @dataProvider getDescribeContainerDefinitionTestData */
     public function testDescribeContainerDefinition(Definition $definition, $expectedDescription)
     {
@@ -151,7 +137,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         if ('json' === $this->getFormat()) {
             $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals($expectedDescription, $output->fetch());
         }
     }
 

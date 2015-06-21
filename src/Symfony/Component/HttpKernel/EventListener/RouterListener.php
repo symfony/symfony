@@ -67,32 +67,10 @@ class RouterListener implements EventSubscriberInterface
             throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
         }
 
-        if (!$requestStack instanceof RequestStack) {
-            @trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
-        }
-
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
         $this->requestStack = $requestStack;
         $this->logger = $logger;
-    }
-
-    /**
-     * Sets the current Request.
-     *
-     * This method was used to synchronize the Request, but as the HttpKernel
-     * is doing that automatically now, you should never call it directly.
-     * It is kept public for BC with the 2.3 version.
-     *
-     * @param Request|null $request A Request instance
-     *
-     * @deprecated since version 2.4, to be removed in 3.0.
-     */
-    public function setRequest(Request $request = null)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be made private in 3.0.', E_USER_DEPRECATED);
-
-        $this->setCurrentRequest($request);
     }
 
     private function setCurrentRequest(Request $request = null)

@@ -36,6 +36,8 @@ framework:
         form:
             resources:    [theme1, theme2]
         hinclude_default_template: global_hinclude_template
+    assets:
+        version: v1
     translator:
         enabled:  true
         fallback: fr

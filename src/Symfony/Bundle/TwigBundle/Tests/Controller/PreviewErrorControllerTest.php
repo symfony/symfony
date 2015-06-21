@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\PreviewErrorController;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -21,8 +22,6 @@ class PreviewErrorControllerTest extends TestCase
 {
     public function testForwardRequestToConfiguredController()
     {
-        $self = $this;
-
         $request = Request::create('whatever');
         $response = new Response("");
         $code = 123;
@@ -33,15 +32,14 @@ class PreviewErrorControllerTest extends TestCase
             ->expects($this->once())
             ->method('handle')
             ->with(
-                $this->callback(function (Request $request) use ($self, $logicalControllerName, $code) {
+                $this->callback(function (Request $request) use ($logicalControllerName, $code) {
 
-                    $self->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
+                    $this->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
 
                     $exception = $request->attributes->get('exception');
-                    $self->assertInstanceOf('Symfony\Component\Debug\Exception\FlattenException', $exception);
-                    $self->assertEquals($code, $exception->getStatusCode());
-
-                    $self->assertFalse($request->attributes->get('showException'));
+                    $this->assertInstanceOf(FlattenException::class, $exception);
+                    $this->assertEquals($code, $exception->getStatusCode());
+                    $this->assertFalse($request->attributes->get('showException'));
 
                     return true;
                 }),

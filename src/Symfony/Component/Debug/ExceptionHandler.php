@@ -122,13 +122,30 @@ class ExceptionHandler
 
         $caughtLength = $this->caughtLength = 0;
 
-        ob_start(array($this, 'catchOutput'));
+        ob_start(function($buffer) {
+            $this->caughtBuffer = $buffer;
+
+            return '';
+        });
+
+
         $this->failSafeHandle($exception);
         while (null === $this->caughtBuffer && ob_end_flush()) {
             // Empty loop, everything is in the condition
         }
         if (isset($this->caughtBuffer[0])) {
-            ob_start(array($this, 'cleanOutput'));
+            ob_start(function($buffer) {
+                if ($this->caughtLength) {
+                    // use substr_replace() instead of substr() for mbstring overloading resistance
+                    $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
+                    if (isset($cleanBuffer[0])) {
+                        $buffer = $cleanBuffer;
+                    }
+                }
+
+                return $buffer;
+            });
+
             echo $this->caughtBuffer;
             $caughtLength = ob_get_length();
         }
@@ -422,48 +439,10 @@ EOF;
     }
 
     /**
-     * Returns an UTF-8 and HTML encoded string.
-     *
-     * @deprecated since version 2.7, to be removed in 3.0.
-     */
-    protected static function utf8Htmlize($str)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
-    }
-
-    /**
      * HTML-encodes a string.
      */
     private function escapeHtml($str)
     {
-        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), $this->charset);
-    }
-
-    /**
-     * @internal
-     */
-    public function catchOutput($buffer)
-    {
-        $this->caughtBuffer = $buffer;
-
-        return '';
-    }
-
-    /**
-     * @internal
-     */
-    public function cleanOutput($buffer)
-    {
-        if ($this->caughtLength) {
-            // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
-            if (isset($cleanBuffer[0])) {
-                $buffer = $cleanBuffer;
-            }
-        }
-
-        return $buffer;
+        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset);
     }
 }

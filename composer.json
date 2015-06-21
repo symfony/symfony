@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": ">=5.5.9",
         "doctrine/common": "~2.3",
         "twig/twig": "~1.18",
         "psr/log": "~1.0"
@@ -25,56 +25,53 @@
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
-        "symfony/config": "self.version",
-        "symfony/console": "self.version",
+        "symfony/config": "2.99.99",
+        "symfony/console": "2.99.99",
         "symfony/css-selector": "self.version",
-        "symfony/dependency-injection": "self.version",
+        "symfony/dependency-injection": "2.99.99",
         "symfony/debug": "self.version",
         "symfony/debug-bundle": "self.version",
-        "symfony/doctrine-bridge": "self.version",
+        "symfony/doctrine-bridge": "2.99.99",
         "symfony/dom-crawler": "self.version",
-        "symfony/event-dispatcher": "self.version",
-        "symfony/expression-language": "self.version",
-        "symfony/filesystem": "self.version",
+        "symfony/event-dispatcher": "2.99.99",
+        "symfony/expression-language": "2.99.99",
+        "symfony/filesystem": "2.99.99",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
-        "symfony/framework-bundle": "self.version",
+        "symfony/framework-bundle": "2.99.99",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
-        "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
-        "symfony/process": "self.version",
+        "symfony/process": "2.99.99",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
-        "symfony/security": "self.version",
+        "symfony/security": "2.99.99",
         "symfony/security-acl": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
         "symfony/security-http": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
-        "symfony/stopwatch": "self.version",
-        "symfony/swiftmailer-bridge": "self.version",
+        "symfony/stopwatch": "2.99.99",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
-        "symfony/validator": "self.version",
+        "symfony/validator": "2.99.99",
         "symfony/var-dumper": "self.version",
         "symfony/web-profiler-bundle": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/yaml": "2.99.99"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "self.version",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",
-        "doctrine/doctrine-bundle": "~1.2",
+        "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
-        "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2"
     },
@@ -97,7 +94,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

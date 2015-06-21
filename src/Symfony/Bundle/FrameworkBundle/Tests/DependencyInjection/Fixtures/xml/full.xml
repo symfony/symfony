@@ -34,6 +34,7 @@
                  <framework:resource>theme2</framework:resource>
             </framework:form>
         </framework:templating>
+        <framework:assets version="v1" />
         <framework:translator enabled="true" fallback="fr" logging="true">
             <framework:path>%kernel.root_dir%/Fixtures/translations</framework:path>
         </framework:translator>

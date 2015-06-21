@@ -960,35 +960,6 @@ class FilesystemTest extends FilesystemTestCase
         $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 
         $this->filesystem->dumpFile($filename, 'bar');
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDumpFileAndSetPermissions()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, 'bar', 0753);
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-
-        // skip mode check on Windows
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(753, $filename);
-        }
-    }
-
-    public function testDumpFileWithNullMode()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, 'bar', null);
-
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
 

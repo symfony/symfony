@@ -43,15 +43,6 @@ class CliDumperTest extends VarDumperTestCase
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
         $res2 = (int) $var[8];
-        $closure54 = '';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
-EOTXT;
-        }
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -84,7 +75,9 @@ array:25 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {#%d{$closure54}
+  "closure" => Closure {#%d
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
     parameters: array:2 [
       "\$a" => []
       "&\$b" => array:2 [

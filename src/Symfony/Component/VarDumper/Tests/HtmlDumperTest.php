@@ -46,15 +46,6 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         $dumpId = $dumpId[0];
         $res1 = (int) $var['res'];
         $res2 = (int) $var[8];
-        $closure54 = '';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="48 characters">Symfony\Component\VarDumper\Tests\HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &#8230;}
-EOTXT;
-        }
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -87,7 +78,9 @@ EOTXT;
     +<span class=sf-dump-public title="Public property">foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
-  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-ref>#%d</a><samp>{$closure54}
+  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-ref>#%d</a><samp>
+    <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="48 characters">Symfony\Component\VarDumper\Tests\HtmlDumperTest</span>"
+    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &#8230;}
     <span class=sf-dump-meta>parameters</span>: <span class=sf-dump-note>array:2</span> [<samp>
       "<span class=sf-dump-key>\$a</span>" => []
       "<span class=sf-dump-key>&amp;\$b</span>" => <span class=sf-dump-note>array:2</span> [<samp>

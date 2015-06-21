@@ -5,7 +5,6 @@
 <comment>Public</comment>           yes
 <comment>Synthetic</comment>        no
 <comment>Lazy</comment>             yes
-<comment>Synchronized</comment>     no
 <comment>Abstract</comment>         yes
 <comment>Factory Class</comment>    Full\Qualified\FactoryClass
 <comment>Factory Method</comment>   get

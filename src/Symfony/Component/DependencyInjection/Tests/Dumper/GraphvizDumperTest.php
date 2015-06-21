@@ -23,16 +23,6 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = __DIR__.'/../Fixtures/';
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyDump()
-    {
-        $container = include self::$fixturesPath.'/containers/legacy-container9.php';
-        $dumper = new GraphvizDumper($container);
-        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/legacy-services9.dot')), $dumper->dump(), '->dump() dumps services');
-    }
-
     public function testDump()
     {
         $dumper = new GraphvizDumper($container = new ContainerBuilder());

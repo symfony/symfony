@@ -119,26 +119,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4_bad_import.yml');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyLoadServices()
-    {
-        $container = new ContainerBuilder();
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('legacy-services6.yml');
-        $services = $container->getDefinitions();
-        $this->assertEquals('FooClass', $services['constructor']->getClass());
-        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod());
-        $this->assertEquals('BazClass', $services['factory_service']->getClass());
-        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
-        $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
-        $this->assertNull($services['request']->getDecoratedService());
-    }
-
     public function testLoadServices()
     {
         $container = new ContainerBuilder();

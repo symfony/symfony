@@ -164,19 +164,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setSynchronized
-     * @covers Symfony\Component\DependencyInjection\Definition::isSynchronized
-     * @group legacy
-     */
-    public function testLegacySetIsSynchronized()
-    {
-        $def = new Definition('stdClass');
-        $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');
-        $this->assertSame($def, $def->setSynchronized(true), '->setSynchronized() implements a fluent interface');
-        $this->assertTrue($def->isSynchronized(), '->isSynchronized() returns true if the service is synchronized.');
-    }
-
-    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setLazy
      * @covers Symfony\Component\DependencyInjection\Definition::isLazy
      */

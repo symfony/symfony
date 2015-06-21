@@ -25,6 +25,11 @@ CHANGELOG
  * removed `Symfony\Component\HttpKernel\Log\LoggerInterface`
  * removed `Symfony\Component\HttpKernel\Log\NullLogger`
 
+2.7.1
+-----
+
+ * added the search by HTTP status code
+
 2.7.0
 -----
 

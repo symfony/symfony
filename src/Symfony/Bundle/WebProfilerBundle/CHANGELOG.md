@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.1
+-----
+
+ * added the search by HTTP status code
+
 2.7.0
 -----
 

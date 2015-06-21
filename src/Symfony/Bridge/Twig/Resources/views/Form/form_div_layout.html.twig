@@ -35,7 +35,11 @@
 {%- endblock textarea_widget -%}
 
 {%- block choice_widget -%}
-    {% if expanded %}
+    {% if 'hidden' == widget %}
+        {{- block('hidden_widget') -}}
+    {% elseif 'text' == widget %}
+        {{- block('form_widget_simple') -}}
+    {% elseif expanded %}
         {{- block('choice_widget_expanded') -}}
     {% else %}
         {{- block('choice_widget_collapsed') -}}

@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ValuesToStringTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -60,7 +61,7 @@ class ChoiceType extends AbstractType
         $choiceList = $this->createChoiceList($options);
         $builder->setAttribute('choice_list', $choiceList);
 
-        if ($options['expanded']) {
+        if ($options['expanded'] && !in_array($options['widget'], array('text', 'hidden'))) {
             $builder->setDataMapper($options['multiple']
                 ? new CheckboxListMapper($choiceList)
                 : new RadioListMapper($choiceList));
@@ -146,10 +147,15 @@ class ChoiceType extends AbstractType
                 });
             }
         } elseif ($options['multiple']) {
-            // <select> tag with "multiple" option
+            // "select", "text" or "hidden" widget with "multiple" option
             $builder->addViewTransformer(new ChoicesToValuesTransformer($choiceList));
+
+            // for "text" / "hidden" widget, view data uses a delimiter
+            if (in_array($options['widget'], array('text', 'hidden'))) {
+                $builder->addViewTransformer(new ValuesToStringTransformer($options['delimiter'], $options['trim']));
+            }
         } else {
-            // <select> tag without "multiple" option
+            // "select", "text" or "hidden" tag without "multiple" option
             $builder->addViewTransformer(new ChoiceToValueTransformer($choiceList));
         }
 
@@ -179,14 +185,19 @@ class ChoiceType extends AbstractType
             : $this->createChoiceListView($choiceList, $options);
 
         $view->vars = array_replace($view->vars, array(
+            'widget' => $options['widget'],
             'multiple' => $options['multiple'],
-            'expanded' => $options['expanded'],
+            'expanded' => $options['expanded'], // BC
             'preferred_choices' => $choiceListView->preferredChoices,
             'choices' => $choiceListView->choices,
             'separator' => '-------------------',
             'placeholder' => null,
             'choice_translation_domain' => $choiceTranslationDomain,
         ));
+
+        if (in_array($options['widget'], array('text', 'hidden'))) {
+            return;
+        }
 
         // The decision, whether a choice is selected, is potentially done
         // thousand of times during the rendering of a template. Provide a
@@ -226,6 +237,10 @@ class ChoiceType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
+        if (in_array($options['widget'], array('text', 'hidden'))) {
+            return;
+        }
+
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
             $childName = $view->vars['full_name'];
@@ -302,9 +317,30 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
+        $multipleNormalizer = function (Options $options, $multiple) {
+            if (in_array($options['widget'], array('radio', 'checkbox'))) {
+                return 'checkbox' == $options['widget'];
+            }
+
+            return $multiple;
+        };
+
+        $expandedNomalizer = function (Options $options, $expanded) {
+            if (null !== $expanded) {
+                @trigger_error('The "expanded" option is deprecated since version 3.1 and will be removed in 4.0. You should use "widget" instead.', E_USER_DEPRECATED);
+            } else {
+                $expanded = false;
+            }
+
+            return in_array($options['widget'], array('radio', 'checkbox')) ?: $expanded;
+        };
+
         $resolver->setDefaults(array(
+            'widget' => null,
             'multiple' => false,
-            'expanded' => false,
+            'delimiter' => ',',
+            'expanded' => null, // deprecated
+            'choice_list' => null, // deprecated
             'choices' => array(),
             'choices_as_values' => null, // deprecated since 3.1
             'choice_loader' => null,
@@ -325,6 +361,8 @@ class ChoiceType extends AbstractType
             'choice_translation_domain' => true,
         ));
 
+        $resolver->setNormalizer('expanded', $expandedNomalizer);
+        $resolver->setNormalizer('multiple', $multipleNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
         $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);

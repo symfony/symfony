@@ -28,7 +28,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.rand(111111, 999999);
+        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.mt_rand(111111, 999999);
         mkdir($dir, 0777, true);
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), $dir);
         $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());

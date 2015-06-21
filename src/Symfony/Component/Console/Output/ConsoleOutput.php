@@ -43,14 +43,12 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        $outputStream = 'php://stdout';
-        if (!$this->hasStdoutSupport()) {
-            $outputStream = 'php://output';
-        }
+        $outputStream = $this->hasStdoutSupport() ? 'php://stdout' : 'php://output';
+        $errorStream = $this->hasStderrSupport() ? 'php://stderr' : 'php://output';
 
         parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
 
-        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $this->getFormatter());
+        $this->stderr = new StreamOutput(fopen($errorStream, 'w'), $verbosity, $decorated, $this->getFormatter());
     }
 
     /**
@@ -100,14 +98,32 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * Returns true if current environment supports writing console output to
      * STDOUT.
      *
-     * IBM iSeries (OS400) exhibits character-encoding issues when writing to
-     * STDOUT and doesn't properly convert ASCII to EBCDIC, resulting in garbage
-     * output.
-     *
      * @return bool
      */
     protected function hasStdoutSupport()
     {
-        return ('OS400' != php_uname('s'));
+        return false === $this->isRunningOS400();
+    }
+
+    /**
+     * Returns true if current environment supports writing console output to
+     * STDERR.
+     *
+     * @return bool
+     */
+    protected function hasStderrSupport()
+    {
+        return false === $this->isRunningOS400();
+    }
+
+    /**
+     * Checks if current executing environment is IBM iSeries (OS400), which
+     * doesn't properly convert character-encodings between ASCII to EBCDIC.
+     *
+     * @return bool
+     */
+    private function isRunningOS400()
+    {
+        return 'OS400' === php_uname('s');
     }
 }

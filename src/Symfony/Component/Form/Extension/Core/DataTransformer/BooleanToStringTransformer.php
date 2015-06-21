@@ -30,6 +30,20 @@ class BooleanToStringTransformer implements DataTransformerInterface
     private $trueValue;
 
     /**
+     * Other values recognised as TRUE.
+     *
+     * @var array
+     */
+    private $defaultTrueValues = array('true', '1');
+
+    /**
+     * Values recognised as FALSE.
+     *
+     * @var array
+     */
+    private $defaultFalseValues = array('false', '0', '');
+
+    /**
      * Sets the value emitted upon transform if the input is true.
      *
      * @param string $trueValue
@@ -72,14 +86,31 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (null === $value) {
-            return false;
+        if (null === $value || is_bool($value)) {
+            return (bool) $value;
         }
 
         if (!is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 
-        return true;
+        if ($this->trueValue === $value || in_array($value, $this->defaultTrueValues, true)) {
+            return true;
+        }
+
+        if (in_array($value, $this->defaultFalseValues, true)) {
+            return false;
+        }
+
+        throw new TransformationFailedException(
+            sprintf(
+                'Unexpected value "%s"! Only the following values will be considered as valid: "%s"',
+                $value,
+                implode(
+                    '", "',
+                    array_merge(array($this->trueValue), $this->defaultTrueValues, $this->defaultFalseValues)
+                )
+            )
+        );
     }
 }

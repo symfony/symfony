@@ -60,6 +60,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         }
 
         $profileList = array_reverse(explode("\n", $indexContent));
+        $statusCode = (string) $statusCode;
         $result = array();
 
         foreach ($profileList as $item) {
@@ -96,7 +97,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 'url' => $itemUrl,
                 'time' => $itemTime,
                 'parent' => $itemParent,
-                'status_code' => $statusCode,
+                'status_code' => $itemStatusCode,
             );
             --$limit;
         }

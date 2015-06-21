@@ -65,7 +65,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
         }
 
         if ($statusCode) {
-            $criteria[]           = 'status_code = :status_code';
+            $criteria[] = 'status_code = :status_code';
             $args[':status_code'] = $statusCode;
         }
 

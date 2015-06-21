@@ -119,7 +119,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
 
         if ($statusCode) {
             $criteria[] = 'status_code = :status_code';
-            $args[':status_code'] = $statusCode;
+            $args[':status_code'] = (string) $statusCode;
         }
 
         if (!empty($start)) {

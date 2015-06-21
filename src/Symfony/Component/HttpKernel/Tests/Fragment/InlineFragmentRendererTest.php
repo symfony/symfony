@@ -67,6 +67,44 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $response->getContent());
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRenderWithObjectsAsAttributesWhenIsFallBack()
+    {
+        $object = new \stdClass();
+
+        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller');
+        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en'));
+        $subRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+        $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+
+        $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($subRequest));
+
+        $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'), array('is_fallback' => true));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRenderWithObjectsAsAttributesPassedAsObjectsInTheControllerWhenIsFallBack()
+    {
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver', array('getController'));
+        $resolver
+            ->expects($this->never())
+            ->method('getController')
+            ->will($this->returnValue(function (\stdClass $object, Bar $object1) {
+                return new Response($object1->getBar());
+            }))
+        ;
+
+        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $renderer = new InlineFragmentRenderer($kernel);
+
+        $response = $renderer->render(new ControllerReference('main_controller', array('object' => new \stdClass(), 'object1' => new Bar()), array()), Request::create('/'), array('is_fallback' => true));
+        $this->assertEquals('bar', $response->getContent());
+    }
+
     public function testRenderWithTrustedHeaderDisabled()
     {
         $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);

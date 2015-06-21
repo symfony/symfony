@@ -64,6 +64,8 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     public function render($uri, Request $request, array $options = array())
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
+            $options['is_fallback'] = true;
+
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 

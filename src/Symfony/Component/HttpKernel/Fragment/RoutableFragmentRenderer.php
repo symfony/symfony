@@ -77,7 +77,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
         return $request->getBaseUrl().$path;
     }
 
-    private function checkNonScalar($values)
+    protected function checkNonScalar($values)
     {
         foreach ($values as $key => $value) {
             if (is_array($value)) {

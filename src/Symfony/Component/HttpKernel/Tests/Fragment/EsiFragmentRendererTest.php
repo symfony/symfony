@@ -21,13 +21,13 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
     public function testRenderFallbackToInlineStrategyIfNoRequest()
     {
-        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true, array('is_fallback' => true)));
         $strategy->render('/', Request::create('/'));
     }
 
     public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
     {
-        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true, array('is_fallback' => true)));
         $strategy->render('/', Request::create('/'));
     }
 
@@ -90,12 +90,19 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy->render('/', $request, array('alt' => new ControllerReference('alt_controller')));
     }
 
-    private function getInlineStrategy($called = false)
+    private function getInlineStrategy($called = false, $options = false)
     {
         $inline = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer')->disableOriginalConstructor()->getMock();
 
         if ($called) {
-            $inline->expects($this->once())->method('render');
+            if ($options)
+            {
+                $inline->expects($this->once())->method('render')->with($this->anything(), $this->anything(), $options);
+            }
+            else
+            {
+                $inline->expects($this->once())->method('render');
+            }
         }
 
         return $inline;

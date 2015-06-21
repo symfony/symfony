@@ -36,6 +36,10 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCanBeConstructedWithExtraFields()
     {
+        if (!$this->isExtraFieldsSupported()) {
+            $this->markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');
+        }
+
         list($event, $server) = $this->createRequestEvent();
 
         $processor = new WebProcessor(array('url', 'referrer'));
@@ -93,5 +97,18 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
             'datetime' => new \DateTime(),
             'extra' => array(),
         );
+    }
+
+    private function isExtraFieldsSupported()
+    {
+        $monologWebProcessorClass = new \ReflectionClass('Monolog\Processor\WebProcessor');
+
+        foreach ($monologWebProcessorClass->getConstructor()->getParameters() as $parameter) {
+            if ('extraFields' === $parameter->getName()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

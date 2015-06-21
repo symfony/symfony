@@ -63,8 +63,12 @@ class ResponseHeaderBag extends HeaderBag
     public function __toString()
     {
         $cookies = '';
-        foreach ($this->getCookies() as $cookie) {
-            $cookies .= 'Set-Cookie: '.$cookie."\r\n";
+        try {
+            foreach ($this->getCookies() as $cookie) {
+                $cookies .= 'Set-Cookie: '.$cookie."\r\n";
+            }
+        } catch (\InvalidArgumentException $wrongFormat) {
+            trigger_error($wrongFormat->getMessage(), E_USER_ERROR);
         }
 
         ksort($this->headerNames);

@@ -476,22 +476,15 @@ class Request
      */
     public function __toString()
     {
-        $protocol = '';
-        try {
-            $protocol = $this->server->get('SERVER_PROTOCOL');
-        } catch (\InvalidArgumentException $mallformedPath) {
-            trigger_error($mallformedPath->getMessage(), E_USER_ERROR);
-        }
-
         $content = '';
         try {
             $content = $this->getContent();
-        } catch (\LogicException $usageRestrictions) {
-            trigger_error($usageRestrictions->getMessage(), E_USER_ERROR);
+        } catch (\LogicException $e) {
+            trigger_error($e->getMessage(), E_USER_ERROR);
         }
 
         return
-            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $protocol)."\r\n".
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
             $this->headers."\r\n".
             $content;
     }

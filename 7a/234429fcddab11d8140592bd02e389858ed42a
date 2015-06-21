@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-13T16:35:23Z
+
+I don't think this is a bug.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2015-06-13T18:37:16Z
+
+> I don't think this is a bug.
+
+@dosten I believe a bridge should connect two independent libraries – but in this case it doesn't do this properly (ignoring the parameter).
+
+But anyway, call it whatever way you like, bug/feature. I need this ;-)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-15T06:25:45Z
+
+Seems that the test for the lowest allowed dependencies are failing now (the optional fields where added in 1.11, but the bridge allows everything from 1.3 up).
+
+---------------------------------------------------------------------------
+
+by MacDada at 2015-06-15T07:20:49Z
+
+@xabbuh [I'm guilty](https://github.com/Seldaek/monolog/commit/6a4b73468e88c9a491700e8805e70f15bfb939e4) ;-)
+
+What's the solution? PHP will just ignore the extra arg on older Monolog, so the code will not crash. The arg starts to make a change on a newer Monolog.
+
+1. Just ignore the failing test on older Monolog versions?
+2. Remove the test.
+3. Some conditional testing? Using reflection on `WebProcessor` class maybe?
+4. PR to newer branch and setting the minimal version for Monolog?
+5. ?
+
+---------------------------------------------------------------------------
+
+by MacDada at 2015-06-21T15:55:59Z
+
+@xabbuh Tests fixed by skipping the test when `Monolog`s `WebProcessor` doesn't have `$extraFields` parameter [solution 3].

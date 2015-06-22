@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -157,7 +157,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('en'))
         ;
 
-        $translator = new Translator($container, new MessageSelector());
+        $translator = new Translator($container, new DefaultMessageFormatter());
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -290,7 +290,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         return new $translatorClass(
             $this->getContainer($loader),
-            new MessageSelector(),
+            new DefaultMessageFormatter(),
             array($loaderFomat => array($loaderFomat)),
             $options
         );

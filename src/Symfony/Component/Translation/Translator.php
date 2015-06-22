@@ -16,11 +16,14 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 
 /**
  * Translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  *
  * @api
  */
@@ -52,6 +55,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $resources = array();
 
     /**
+     * @var MessageFormatterInterface
+     */
+    private $formatter;
+
+    /**
      * @var MessageSelector
      */
     private $selector;
@@ -74,19 +82,31 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Constructor.
      *
-     * @param string               $locale   The locale
-     * @param MessageSelector|null $selector The message selector for pluralization
-     * @param string|null          $cacheDir The directory to use for the cache
-     * @param bool                 $debug    Use cache in debug mode ?
+     * @param string                                    $locale    The locale
+     * @param MessageFormatterInterface|MessageSelector $formatter The message formatter
+     * @param string|null                               $cacheDir  The directory to use for the cache
+     * @param bool                                      $debug     Use cache in debug mode ?
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
+    public function __construct($locale, $formatter = null, $cacheDir = null, $debug = false)
     {
         $this->setLocale($locale);
-        $this->selector = $selector ?: new MessageSelector();
+        if ($formatter instanceof MessageSelector) {
+            @trigger_error('Passing a MessageSelector instance into the '.__METHOD__.' as a second argument is deprecated since version 2.8 and will be removed in 3.0. Inject a MessageFormatterInterface instance instead.', E_USER_DEPRECATED);
+            $this->selector = $formatter;
+            $formatter = new DefaultMessageFormatter();
+        } else {
+            $this->selector = new MessageSelector();
+        }
+
+        $this->formatter = $formatter ?: new DefaultMessageFormatter();
+        if (!$this->formatter instanceof MessageFormatterInterface) {
+            throw new \InvalidArgumentException(sprintf('The message formatter "%s" must implement MessageFormatterInterface.', get_class($this->formatter)));
+        }
+
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -226,7 +246,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
-        return strtr($this->getCatalogue($locale)->get((string) $id, $domain), $parameters);
+        return $this->formatter->format($locale, $this->getCatalogue($locale)->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -252,7 +272,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+        return $this->formatter->format($locale, $this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     /**

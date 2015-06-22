@@ -38,7 +38,7 @@
     <services>
         <service id="translator.default" class="%translator.class%">
             <argument type="service" id="service_container" />
-            <argument type="service" id="translator.selector" />
+            <argument type="service" id="translator.formatter" />
             <argument type="collection" /> <!-- translation loaders -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
@@ -54,6 +54,13 @@
         </service>
 
         <service id="translator" class="%translator.identity.class%">
+            <argument type="service" id="translator.formatter" />
+        </service>
+
+        <service id="translator.formatter" alias="translator.formatter.default" />
+        <service id="translator.formatter.intl" class="Symfony\Component\Translation\Formatter\IntlMessageFormatter" public="false" />
+
+        <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\DefaultMessageFormatter" public="false">
             <argument type="service" id="translator.selector" />
         </service>
 

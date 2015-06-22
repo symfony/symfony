@@ -663,6 +663,7 @@ class FrameworkExtension extends Extension
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
+        $container->setAlias('translator.formatter', $config['formatter']);
         $translator = $container->findDefinition('translator.default');
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
 

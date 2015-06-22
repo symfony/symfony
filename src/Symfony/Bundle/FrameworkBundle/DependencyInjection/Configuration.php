@@ -584,6 +584,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()
                         ->end()

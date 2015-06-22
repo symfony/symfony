@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-20T22:40:29Z
+
+The feature looks strange to me: a StringUtil in the Form component to deal with non-form-related situations. If I'm the only one, then an entry in the CHANGELOG is missing :)
+
+---------------------------------------------------------------------------
+
+by issei-m at 2015-05-21T03:19:42Z
+
+@nicolas-grekas
+Although I said this feature is used without creating a form, this substantially concerns the form ([as document explains](http://symfony.com/doc/current/components/form/introduction.html), it focuses on processing data) I think.
+It's just like the `StringUtils` in `Security/Core`.
+
+btw, I have just updated CHANGELOG :)
+
+---------------------------------------------------------------------------
+
+by issei-m at 2015-05-21T12:30:10Z
+
+Oh..., I marked deprecation "yes" mistakenly. There is no deprecation in this PR.
+
+---------------------------------------------------------------------------
+
+by issei-m at 2015-06-02T16:18:05Z
+
+ping @webmozart
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-19T10:39:13Z
+
+Thanks @issei-m! Could you rebase this onto 2.8 and fix the issues I mentioned? After that, I'm :+1:.
+
+---------------------------------------------------------------------------
+
+by issei-m at 2015-06-20T08:48:43Z
+
+@webmozart Thanks for your good. I've fixed code you mentioned and rebased onto 2.8.

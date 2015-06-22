@@ -77,6 +77,13 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         return $this->obj1 === $object || $this->obj2 === $object ? 'Group 1' : 'Group 2';
     }
 
+    public function getGroupAsObject($object)
+    {
+        return $this->obj1 === $object || $this->obj2 === $object
+            ? new DefaultChoiceListFactoryTest_Castable('Group 1')
+            : new DefaultChoiceListFactoryTest_Castable('Group 2');
+    }
+
     protected function setUp()
     {
         $this->obj1 = (object) array('label' => 'A', 'index' => 'w', 'value' => 'a', 'preferred' => false, 'group' => 'Group 1', 'attr' => array());
@@ -581,6 +588,19 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertGroupedView($view);
     }
 
+    public function testCreateViewFlatGroupByObjectThatCanBeCastToString()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            array($this, 'getGroupAsObject')
+        );
+
+        $this->assertGroupedView($view);
+    }
+
     public function testCreateViewFlatGroupByAsClosure()
     {
         $obj1 = $this->obj1;
@@ -895,5 +915,20 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     ),
                 )
         ), $view);
+    }
+}
+
+class DefaultChoiceListFactoryTest_Castable
+{
+    private $property;
+
+    public function __construct($property)
+    {
+        $this->property = $property;
+    }
+
+    public function __toString()
+    {
+        return $this->property;
     }
 }

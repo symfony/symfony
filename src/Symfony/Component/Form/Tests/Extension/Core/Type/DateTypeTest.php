@@ -614,6 +614,20 @@ class DateTypeTest extends TestCase
         $this->assertFalse(isset($view->vars['date_pattern']));
     }
 
+    public function testDatePatternFormatWithQuotedStrings()
+    {
+        \Locale::setDefault('es_ES');
+
+        $form = $this->factory->create('date', null, array(
+            // EEEE, d 'de' MMMM 'de' y
+            'format' => \IntlDateFormatter::FULL,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
+    }
+
     public function testPassWidgetToView()
     {
         $form = $this->factory->create('date', null, array(

@@ -480,7 +480,7 @@ class Request
         try {
             $content = $this->getContent();
         } catch (\LogicException $e) {
-            trigger_error($e->getMessage(), E_USER_ERROR);
+            return trigger_error($e, E_USER_ERROR);
         }
 
         return

@@ -76,7 +76,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 continue;
             }
 
-            $output[$value] = $key;
+            $output[(string) $value] = $key;
         }
     }
 

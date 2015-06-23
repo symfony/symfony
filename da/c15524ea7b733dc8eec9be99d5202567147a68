@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-03T21:28:35Z
+
+:+1:
+Btw, I'm wondering if we ever considered using the W3's definition of an email [as specified in HTML5](http://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single)?
+This is much simpler than the full RFC, and still is already enforced by browsers for those using the "email" input type:
+```
+/^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-03T21:41:10Z
+
+You sure this is according to the standard? From what I read, the domain may be bracketed.
+RFC 2822, section 3.4.1
+> domain          =       dot-atom / domain-literal / obs-domain
+domain-literal  =       [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-03T21:47:09Z
+
+See http://www.w3.org/TR/html-markup/input.email.html#input.email.attrs.value.single
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-04T19:42:11Z
+
+>  Btw, I'm wondering if we ever considered using the W3's definition of an email as specified in HTML5?
+
+Why not? But that should imo be considered a new feature and therefore be introduced in Symfony 2.8.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-04T20:28:38Z
+
+Actually, @iltar is right about localhost being a valid domain-part. The HTML5 pattern would accept that. Does everybody agree with switching to that regular expression then?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-04T20:31:55Z
+
+We had a very lengthy discussion about this a few months ago, changing anything in the current regex would be a BC break.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-04T21:04:28Z
+
+@fabpot Do you mean even the change forbidding whitespaces in the domain part would be a BC break?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-04T21:07:29Z
+
+Not necessarily. I just wanted to say that it would be very easy to break BC if we change the current regex we agree upon a while ago.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-04T21:17:32Z
+
+I'd be -1 on making the current rx even more weak. i.e. removing the "contains dot" constraint. It has been fine for months.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-04T21:30:48Z
+
+I didn't mean to remove the check for the period in the domain part. I meant that the HTML5 pattern that you suggested also addresses the issue @iltar raised.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-09T20:34:13Z
+
+So, what do we do here now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-20T15:15:53Z
+
+I think this one is conservative enough to be merges asis
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T15:49:27Z
+
+:+1:

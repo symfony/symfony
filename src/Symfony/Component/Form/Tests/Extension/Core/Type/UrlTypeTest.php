@@ -15,9 +15,16 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
 class UrlTypeTest extends TestCase
 {
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('url');
+
+        $this->assertSame('url', $form->getConfig()->getType()->getName());
+    }
+
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
-        $form = $this->factory->create('url', 'name');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', 'name');
 
         $form->submit('www.domain.com');
 
@@ -27,7 +34,7 @@ class UrlTypeTest extends TestCase
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, array(
             'default_protocol' => 'http',
         ));
 
@@ -39,7 +46,7 @@ class UrlTypeTest extends TestCase
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, array(
             'default_protocol' => 'http',
         ));
 
@@ -51,7 +58,7 @@ class UrlTypeTest extends TestCase
 
     public function testSubmitAddsNoDefaultProtocolIfNull()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, array(
             'default_protocol' => 'http',
         ));
 
@@ -63,7 +70,7 @@ class UrlTypeTest extends TestCase
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $form = $this->factory->create('url', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, array(
             'default_protocol' => null,
         ));
 
@@ -78,7 +85,7 @@ class UrlTypeTest extends TestCase
      */
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
-        $this->factory->create('url', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', null, array(
             'default_protocol' => array(),
         ));
     }

@@ -362,6 +362,14 @@ class ChoiceType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return 'choice';
     }
 
@@ -424,12 +432,12 @@ class ChoiceType extends AbstractType
         );
 
         if ($options['multiple']) {
-            $choiceType = 'checkbox';
+            $choiceType = __NAMESPACE__.'\CheckboxType';
             // The user can check 0 or more checkboxes. If required
             // is true, he is required to check all of them.
             $choiceOpts['required'] = false;
         } else {
-            $choiceType = 'radio';
+            $choiceType = __NAMESPACE__.'\RadioType';
         }
 
         $builder->add($name, $choiceType, $choiceOpts);

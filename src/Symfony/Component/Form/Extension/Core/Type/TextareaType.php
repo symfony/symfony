@@ -30,13 +30,21 @@ class TextareaType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return __NAMESPACE__.'\TextType';
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'textarea';
     }

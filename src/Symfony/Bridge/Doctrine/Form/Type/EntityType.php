@@ -56,7 +56,18 @@ class EntityType extends DoctrineType
         return new ORMQueryBuilderLoader($queryBuilder, $manager, $class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'entity';
     }
@@ -64,11 +75,11 @@ class EntityType extends DoctrineType
     /**
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
-     * 
+     *
      * @param QueryBuilder $queryBuilder
-     * 
+     *
      * @return array
-     * 
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */

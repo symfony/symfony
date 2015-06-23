@@ -31,13 +31,21 @@ class BirthdayType extends AbstractType
      */
     public function getParent()
     {
-        return 'date';
+        return __NAMESPACE__.'\DateType';
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'birthday';
     }

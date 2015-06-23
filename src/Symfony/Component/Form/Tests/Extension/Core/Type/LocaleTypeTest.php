@@ -24,9 +24,16 @@ class LocaleTypeTest extends TestCase
         parent::setUp();
     }
 
-    public function testLocalesAreSelectable()
+    public function testLegacyName()
     {
         $form = $this->factory->create('locale');
+
+        $this->assertSame('locale', $form->getConfig()->getType()->getName());
+    }
+
+    public function testLocalesAreSelectable()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LocaleType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

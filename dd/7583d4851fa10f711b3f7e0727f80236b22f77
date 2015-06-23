@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-21T18:39:35Z
+
+is this lazyloaded? :-1: This imo should just be documented http://www.craftitonline.com/2015/04/telling-symfony-to-use-cached-validation-from-doctrine-cache-bundle-provider/
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-22T06:15:29Z
+
+@cordoval documenting is not enough imho. We need to provide an upgrade path.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-06-15T12:50:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-16T06:51:32Z
+
+:+1: We should just add this to the docs after merging.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-16T15:43:59Z
+
+Can we have the doc PR before merging?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-16T19:16:01Z
+
+yes, we can (see symfony/symfony-docs#5409)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-17T06:59:34Z
+
+> I'm not convinced if APC is a good default anymore and hope for some discussion.
+
+Any feedback on this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-17T14:29:30Z
+
+:+1: Does not hurt to have this extra service anyway. Having some other alternatives would be good as well but out of the scope of this PR.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-22T17:38:21Z
+
+Ok then. Let's merge :)

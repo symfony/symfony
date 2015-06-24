@@ -29,4 +29,5 @@ services:
         factory_service: foo.baz
     foo_bar:
         class: %foo_class%
+        shared: false
         scope: prototype

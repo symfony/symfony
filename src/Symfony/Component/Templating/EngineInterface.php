@@ -14,7 +14,7 @@ namespace Symfony\Component\Templating;
 /**
  * EngineInterface is the interface each engine must implement.
  *
- * All methods relies on a template name. A template name is a
+ * All methods rely on a template name. A template name is a
  * "logical" name for the template, and as such it does not refer to
  * a path on the filesystem (in fact, the template can be stored
  * anywhere, like in a database).

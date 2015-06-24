@@ -203,7 +203,7 @@ class StringUtil
         }
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && 'feedback' !== $plural) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !preg_match('{feedback|Feedback|career|Career}', $plural)) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

@@ -276,6 +276,34 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals('Bernhard', $author->firstName);
     }
 
+    public function testPropertiesSingularization()
+    {
+        $author = new Author();
+
+        $builder = $this->factory->createBuilder('form', null, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+            'empty_data' => $author,
+        ));
+        $builder->add('career', 'collection', array(
+            'by_reference' => false,
+            'allow_add' => true,
+        ));
+        $builder->add('feedbackReport', 'collection', array(
+            'by_reference' => false,
+            'allow_add' => true,
+        ));
+        $form = $builder->getForm();
+
+        $form->submit(array(
+            'career' => array('some career'),
+            'feedbackReport' => array('something'),
+        ));
+
+        $this->assertSame($author, $form->getData());
+        $this->assertContains('some career', $author->getCareer());
+        $this->assertContains('something', $author->getFeedbackReport());
+    }
+
     public function provideZeros()
     {
         return array(

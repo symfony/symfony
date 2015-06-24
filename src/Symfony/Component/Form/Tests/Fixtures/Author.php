@@ -21,6 +21,10 @@ class Author
 
     private $privateProperty;
 
+    private $career = array();
+
+    private $feedbackReport = array();
+
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
@@ -67,5 +71,39 @@ class Author
 
     private function setPrivateSetter($data)
     {
+    }
+
+    public function addCareer($career)
+    {
+        $this->career[] = $career;
+    }
+
+    public function removeCareer($career)
+    {
+        if ($key = array_search($career, $this->career, true)) {
+            unset($this->career[$key]);
+        }
+    }
+
+    public function getCareer()
+    {
+        return $this->career;
+    }
+
+    public function addFeedbackReport($feedbackReport)
+    {
+        $this->feedbackReport[] = $feedbackReport;
+    }
+
+    public function removeFeedbackReport($feedbackReport)
+    {
+        if ($key = array_search($feedbackReport, $this->feedbackReport, true)) {
+            unset($this->career[$key]);
+        }
+    }
+
+    public function getFeedbackReport()
+    {
+        return $this->feedbackReport;
     }
 }

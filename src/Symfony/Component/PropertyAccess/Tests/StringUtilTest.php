@@ -45,6 +45,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('buses', array('bus', 'buse', 'busis')),
             array('bushes', array('bush', 'bushe')),
             array('calves', array('calf', 'calve', 'calff')),
+            array('careers', 'career'),
             array('cars', 'car'),
             array('cassettes', array('cassett', 'cassette')),
             array('caves', array('caf', 'cave', 'caff')),

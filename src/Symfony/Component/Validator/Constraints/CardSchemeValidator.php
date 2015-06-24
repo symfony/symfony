@@ -63,7 +63,7 @@ class CardSchemeValidator extends ConstraintValidator
             '/^(6304|670[69]|6771)[0-9]{12,15}$/',
         ),
         // Maestro international cards begin with 675900..675999 and have between 12 and 19 digits.
-        // Maestro UK cards begin with either 500000..509999 or 560000..699999 and have between between 12 and 19 digits.
+        // Maestro UK cards begin with either 500000..509999 or 560000..699999 and have between 12 and 19 digits.
         'MAESTRO' => array(
             '/^(6759[0-9]{2})[0-9]{6,13}$/',
             '/^(50[0-9]{4})[0-9]{6,13}$/',

@@ -19,6 +19,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  *
  * @see http://en.wikipedia.org/wiki/Bank_card_number
  * @see http://www.regular-expressions.info/creditcard.html
+ * @see http://www.barclaycard.co.uk/business/files/Ranges_and_Rules_September_2014.pdf
  *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  */
@@ -61,10 +62,12 @@ class CardSchemeValidator extends ConstraintValidator
         'LASER' => array(
             '/^(6304|670[69]|6771)[0-9]{12,15}$/',
         ),
-        // Maestro cards begin with either 5018, 5020, 5038, 5893, 6304, 6759, 6761, 6762, 6763 or 0604
-        // They have between 12 and 19 digits.
+        // Maestro international cards begin with 675900..675999 and have between 12 and 19 digits.
+        // Maestro UK cards begin with either 500000..509999 or 560000..699999 and have between 12 and 19 digits.
         'MAESTRO' => array(
-            '/^(5018|5020|5038|6304|6759|6761|676[23]|0604)[0-9]{8,15}$/',
+            '/^(6759[0-9]{2})[0-9]{6,13}$/',
+            '/^(50[0-9]{4})[0-9]{6,13}$/',
+            '/^([56-69][0-9]{4})[0-9]{6,13}$/',
         ),
         // All MasterCard numbers start with the numbers 51 through 55. All have 16 digits.
         'MASTERCARD' => array(

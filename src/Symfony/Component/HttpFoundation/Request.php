@@ -1656,7 +1656,9 @@ class Request
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(dirname($baseUrl), '/'.DIRECTORY_SEPARATOR).'/')) {
+        // Make sure the directory of the base url starts and ends with a slash for this check
+        $baseUrlDirectory = rtrim(dirname('/'.ltrim($baseUrl, '/'.DIRECTORY_SEPARATOR)), '/'.DIRECTORY_SEPARATOR).'/';
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrlDirectory)) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/'.DIRECTORY_SEPARATOR);
         }

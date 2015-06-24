@@ -33,6 +33,6 @@
       <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
-    <service id="foo_bar" class="%foo_class%" scope="prototype"/>
+    <service id="foo_bar" class="%foo_class%" shared="false" scope="prototype"/>
   </services>
 </container>

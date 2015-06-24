@@ -27,7 +27,7 @@ services:
         configurator: ['@foo.baz', configure]
     foo_bar:
         class: %foo_class%
-        scope: prototype
+        shared: false
     method_call1:
         class: Bar\FooClass
         file: %path%foo.php

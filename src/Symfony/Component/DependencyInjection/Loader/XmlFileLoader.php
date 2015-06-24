@@ -148,7 +148,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'shared', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 if (in_array($key, array('factory-class', 'factory-method', 'factory-service'))) {
                     @trigger_error(sprintf('The "%s" attribute in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, $file), E_USER_DEPRECATED);
@@ -156,6 +156,16 @@ class XmlFileLoader extends FileLoader
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
             }
+        }
+
+        if ($value = $service->getAttribute('scope')) {
+            $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
+
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('The "scope" attribute in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $file), E_USER_DEPRECATED);
+            }
+
+            $definition->setScope(XmlUtils::phpize($value), false);
         }
 
         if ($value = $service->getAttribute('synchronized')) {

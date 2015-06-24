@@ -153,7 +153,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope());
+        $def->setScope($definition->getScope(false), false);
         $def->setTags($definition->getTags());
 
         // set new definition on container

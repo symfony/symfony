@@ -65,3 +65,74 @@ Translator
         $messages = array_replace_recursive($catalogue->all(), $messages);
     }
    ```
+
+DependencyInjection
+-------------------
+
+ * The concept of scopes were deprecated, the deprecated methods are:
+
+    - `Symfony\Component\DependencyInjection\ContainerBuilder::getScopes()`
+    - `Symfony\Component\DependencyInjection\ContainerBuilder::getScopeChildren()`
+    - `Symfony\Component\DependencyInjection\ContainerInterface::enterScope()`
+    - `Symfony\Component\DependencyInjection\ContainerInterface::leaveScope()`
+    - `Symfony\Component\DependencyInjection\ContainerInterface::addScope()`
+    - `Symfony\Component\DependencyInjection\ContainerInterface::hasScope()`
+    - `Symfony\Component\DependencyInjection\ContainerInterface::isScopeActive()`
+    - `Symfony\Component\DependencyInjection\Definition::setScope()`
+    - `Symfony\Component\DependencyInjection\Definition::getScope()`
+    - `Symfony\Component\DependencyInjection\Reference::isStrict()`
+
+  Also, the `$scope` and `$strict` parameters of `Symfony\Component\DependencyInjection\ContainerInterface::set()` and `Symfony\Component\DependencyInjection\Reference` respectively were deprecated.
+
+ * A new `shared` flag has been added to the service definition
+   in replacement of the `prototype` scope.
+
+   Before:
+
+   ```php
+   use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+   $container = new ContainerBuilder();
+   $container
+       ->register('foo', 'stdClass')
+       ->setScope(ContainerBuilder::SCOPE_PROTOTYPE)
+   ;
+   ```
+
+   ```yml
+   services:
+       foo:
+           class: stdClass
+           scope: prototype
+   ```
+
+   ```xml
+   <services>
+       <service id="foo" class="stdClass" scope="prototype" />
+   </services>
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+   $container = new ContainerBuilder();
+   $container
+       ->register('foo', 'stdClass')
+       ->setShared(false)
+   ;
+   ```
+
+   ```yml
+   services:
+       foo:
+           class: stdClass
+           shared: false
+   ```
+
+   ```xml
+   <services>
+       <service id="foo" class="stdClass" shared="false" />
+   </services>
+   ```

@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-15T08:55:22Z
+
+You need to make sure that core code does not trigger such deprecation though (for the ``request`` service for instance).
+
+and the loaders should trigger their own deprecations when using ``scope`` to have a better message (same than done in a few other places)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-15T14:11:09Z
+
+@stof The only cases in the core code are the `request` scope and the `test.client` service with the `prototype` scope. What's the best approach?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-21T20:30:50Z
+
+@dosten As you can see on Travis, there are still many tests that need to be moved as legacy ones. For the `test.client`, I think that we need to keep the `prototype` scope as it was done before the introduction of scopes. Back then, we had a flag for prototype. As we decided to call it `factory` in Pimple (as this is where prototypes make more sense), I think we can add a `factory` flag which would replace the `prototype` scope.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-21T22:01:21Z
+
+@fabpot Thank you for your feedback, I didn't have enough time to continue with this PR. I'll work on this soon.
+I've searched for the flag that you refer, and I have found this commit 1d5b6ed908046d2765b585c05b7ab4697a8c2b3d. Are you refering to the `shared` flag?
+IMO if we add a `factory` flag this would be confusing, we already have the concept of factories in the DI. `shared` is a good name IMO.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-22T02:48:33Z
+
+I've added a initial implementation of a `shared` flag in the service definition, so any service that sets this flag as `false` will return a new instance every time, like the `prototype` scope. There is many failing tests because the deprecation messages, but i want to discuss this before fix the tests.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-22T14:00:56Z
+
+I can't trigger an error on the methods of the `ContainerInterface` because the BC promise, any idea?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-22T15:24:15Z
+
+@dosten I was indeed refering to the old `shared` flag (and you are right that using factory like in Pimple is probably confusing). ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-22T17:39:14Z
+
+`shared` makes sense to me.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-24T03:40:16Z
+
+@fabpot This PR is ready to be reviewed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-24T09:37:11Z
+
+:+1:  good job
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-24T15:29:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-24T15:34:01Z
+
+@fabpot Comments addressed

@@ -1,0 +1,2 @@
+_templatecachetest_bundle:
+    resource: @TestBundle/Resources/config/routing.yml

@@ -1,0 +1,10 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    templating:
+        engines: ['php']
+
+services:
+    cache_warmer_test.cache_warmer:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\CacheWarmer\CacheWarmer

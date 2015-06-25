@@ -30,7 +30,7 @@ class ChoiceTypePerformanceTest extends FormPerformanceTestCase
         $choices = range(1, 300);
 
         for ($i = 0; $i < 100; ++$i) {
-            $this->factory->create('choice', rand(1, 400), array(
+            $this->factory->create('choice', mt_rand(1, 400), array(
                 'choices' => $choices,
             ));
         }

@@ -58,6 +58,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation');
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
+        $this->fs->mkdir($this->translationDir.'/Resources/views');
     }
 
     protected function tearDown()

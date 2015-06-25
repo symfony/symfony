@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T12:08:51Z
+
+In any case, `trigger_error(..., E_USER_ERROR);` is the last line of the method, because E_USER_ERROR either kills the process or throws (which kills the process with a fatal error). But when an error handler like the one in #15076 is in place, it is possible to recover, and it's the only way to do that.
+
+About the argument type, $e is automatically casted to a string (__toString() is in the Throwable interface) and this is the most accurate error message: the generated string contains the type of the exception, its message + stack trace excerpt. They are all required to debug correctly. $e->getMessage() is not enought.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T12:16:07Z
+
+It's not possible to gracefully handle an E_USER_ERROR and continue the programm?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T12:28:40Z
+
+Technically it's possible with a custom error handler, but that would be wrong as it's not the semantic of E_USER_ERROR.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T12:44:06Z
+
+The semantic of trigger_error is that it allows to continue the program flow of the method (which is the main difference to an exception). So `return trigger_error` breaks this contract and makes no sense to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T12:46:54Z
+
+This is not the semantic for E_USER_ERROR: http://3v4l.org/6rDU4
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T12:48:58Z
+
+Which is also why E_USER_ERROR (and E_RECOVERABLE ERROR) can't be made to continue, but are forced to throw:
+https://github.com/symfony/symfony/blob/27e6f485c1fa0923ea8ff8be9bb64d9bce65c49e/src/Symfony/Component/Debug/ErrorHandler.php#L254
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T14:01:32Z
+
+> This is not the semantic for E_USER_ERROR: http://3v4l.org/6rDU4
+
+But this is only the default error handler. A custom one can do things differently. And for those the behavior changes. This is probably an edge case, but for me this code stand-alone makes no sense.
+I'm not against it, but it's pretty much a hack which is bound to #15076. Without the debug error handler this change just creates an invalid toString() return value. That also means static code analysis will easily mark this as invalid.
+
+So we can just as well provide a convenience method in the debug component for `return trigger_error` which is then used (which makes it a dependency).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T14:34:40Z
+
+When looking for the perfect convention that would allow working around the restriction, I had in mind to not mandate a dependency on the debug component. I still think this is very important.
+The convention I propose in #15076, which is applied here, is IMO the best: it allows for an enhanced experience when a non-compliant error handler is in use (native one or any other custom one), and opens for an even more enhanced experience when a compliant error handler is in use.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T14:47:08Z
+
+It's ugly but a sensible workaround. :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T14:49:17Z
+
+That's why I like this Debug component :)

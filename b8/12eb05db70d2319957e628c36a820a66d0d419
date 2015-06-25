@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-21T07:39:51Z
+
+What issue/bug does this actually fix? Can you add that to the PR?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-22T09:53:44Z
+
+Could you rebase as [tests are failing](https://travis-ci.org/symfony/symfony/jobs/51581926) and they're fixed in 2.6.
+
+Also, please explain more what's being fixed here.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-03-07T23:10:53Z
+
+@itar and @jakzal The explanation is in the tests. Nevertheless I present a real problem:
+
+I want to decorate all haml filters defined by DI tag `mthaml.filter` (a decorator is a front yaml parser). So I define the abstract filter:
+
+```yaml```
+front_yaml.haml_filter:
+    class: Vendor\Haml\FrontYamlFilter
+    arguments:
+      - @front_yaml.parser
+    abstract: true
+```
+In a compiler pass I create a new filter from parent service `front_yaml.haml_filter` (see http://symfony.com/doc/current/components/dependency_injection/parentservices.html) and define the decorated service - the original haml filter (see http://symfony.com/doc/current/components/dependency_injection/advanced.html#decorating-services):
+
+```php
+foreach ($container->findTaggedServiceIds('mthaml.filter') as $id => $tags) {
+    $name = $id.'_front_yaml';
+    $filter = new DefinitionDecorator('front_yaml.haml_filter');
+    $filter->addArgument(new Reference($name.'.inner'));
+    $filter->setDecoratedService($id);
+    $filter->setTags(['mthaml.filter' => $tags]);
+    $container->setDefinition($name, $filter);
+}
+````
+
+---------------------------------------------------------------------------
+
+by hason at 2015-04-04T09:13:02Z
+
+ping @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by hason at 2015-05-06T10:22:59Z
+
+ping @fabpot @stof
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-06T10:37:14Z
+
+The decoratedService overwrite should be handled in the same way than other changeable settings IMO (through ``$definitionDecorator->getChanges()``, not in the special way.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-05-18T09:58:51Z
+
+@stof Updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-24T07:43:54Z
+
+:+1: ~~for a merge on 2.3~~ (setDecoratedService() does not exist in 2.3...)

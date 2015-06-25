@@ -96,35 +96,41 @@ EOF
         $kernel = $this->getContainer()->get('kernel');
 
         // Define Root Path to App folder
-        $rootPath = $kernel->getRootDir();
+        $transPaths = array($kernel->getRootDir().'/Resources/');
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
             try {
-                $rootPath = $kernel->getBundle($input->getArgument('bundle'))->getPath();
+                $bundle = $kernel->getBundle($input->getArgument('bundle'));
+                $transPaths = array(
+                    $bundle->getPath().'/Resources/',
+                    sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName()),
+                );
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $rootPath = $input->getArgument('bundle');
-
-                if (!is_dir($rootPath)) {
-                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $rootPath));
+                $transPaths = array($input->getArgument('bundle').'/Resources/');
+                if (!is_dir($transPaths[0])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         }
 
-        // get bundle directory
-        $translationsPath = $rootPath.'/Resources/translations';
-
         // Extract used messages
         $extractedCatalogue = new MessageCatalogue($locale);
-        if (is_dir($rootPath.'/Resources/views')) {
-            $this->getContainer()->get('translation.extractor')->extract($rootPath.'/Resources/views', $extractedCatalogue);
+        foreach ($transPaths as $path) {
+            $path = $path.'views';
+            if (is_dir($path)) {
+                $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
+            }
         }
 
         // Load defined messages
         $currentCatalogue = new MessageCatalogue($locale);
-        if (is_dir($translationsPath)) {
-            $loader->loadMessages($translationsPath, $currentCatalogue);
+        foreach ($transPaths as $path) {
+            $path = $path.'translations';
+            if (is_dir($path)) {
+                $loader->loadMessages($path, $currentCatalogue);
+            }
         }
 
         // Merge defined and extracted messages to get all message ids
@@ -157,7 +163,12 @@ EOF
                 }
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-                $loader->loadMessages($translationsPath, $fallbackCatalogue);
+                foreach ($transPaths as $path) {
+                    $path = $path.'translations';
+                    if (is_dir($path)) {
+                        $loader->loadMessages($path, $fallbackCatalogue);
+                    }
+                }
                 $fallbackCatalogues[] = $fallbackCatalogue;
             }
         }

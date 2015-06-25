@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T12:45:35Z
+
+When one does `return trigger_error($exception, E_USER_ERROR);` from a __toString() method,
+it is possible to convert the call to make it do the same as `throw $exception;`, which is otherwise forbidden from happening in __toString in PHP.
+This convention plays nice with any error handler (even the native one). And when a compliant error handler is used (like ours if this PR gets merged) it can be used to throw from __toString().
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T13:14:33Z
+
+The full workaround is the following:
+- `return trigger_error($e, E_USER_ERROR);` triggers the error handler
+- $e is casted to string automatically and given to the error handler as $message
+- the error handler looks up for the original exception in its $context variable, searching for a matching index whose value is an exception whose string representation is exactly $message
+- the matched $e exception is temporarily stored in a private $toStringException static property
+- the return value of trigger_error is always a boolean, so we exit __toString() by returning this boolean
+- which triggers an E_RECOVERABLE_ERROR, because this is the behavior of __toString() when a not-string value is returned
+- which calls the error handler again
+- that checks the $toStringException property and throws it (yes, it is allowed at this point).
+
+On HHVM, things are much simpler, because throwing from __toString is allowed.
+The behavior ends up being the same (and that's the reason why the provided test case passes on HHVM also).
+
+When no error handler is plugged, PHP dies with a fatal error (as usual in this situation), and with a message full of details: the exception string contains its type+message+stack trace excerpt.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T13:47:43Z
+
+> the return value of trigger_error is always null
+
+It actually is a boolean
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T13:49:40Z
+
+> It actually is a boolean
+
+thanks, updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T14:09:54Z
+
+How did you find out about this hack? Never seen it before. We also had to add stupid workarounds in PSR-7 StreamInterface and UriInterface since throwing an exception in toString is not allowed in PHP.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T14:23:56Z
+
+I don't remember exactly if I discovered this hack by myself or not, but I used it a few years ago in my own (now history) framework (https://github.com/nicolas-grekas/Patchwork/commit/0f1f1fdbe40df2204af20776bd1dd0dfd44aa957)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T14:59:19Z
+
+What if I just want to create an exception without catching it first. Something like the following which I guess cannot work. This is why I thought a helper method might be useful, which throws the exception, catches it again and then calls trigger error.
+
+```
+class Uri {
+    public function __toString() {
+        return trigger_error(new \LogicException('Given URI components cannot be represented as URI reference'), E_USER_ERROR);
+    }
+}
+```
+
+Or do you get a stack trace with a trigger_error anyway?
+
+```
+    public function __toString() {
+        return trigger_error('Given URI components cannot be represented as URI reference', E_USER_ERROR);
+    }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-23T15:09:02Z
+
+If you do not follow the convention (which is the case in both your examples), then you will end up in the `if` after the `foreach`:
+https://github.com/symfony/symfony/pull/15076/files#diff-e7d086f2c2086fdb8f108e74f11dac5bR429
+
+which will handle it as uncaught exception, then kill the process (by returning false).
+We have no better choice here since throwing would also kill the process with a fatal error.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-25T08:49:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T09:01:00Z
+
+:+1:

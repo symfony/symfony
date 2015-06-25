@@ -100,6 +100,7 @@ class ErrorHandler
     private static $reservedMemory;
     private static $stackedErrors = array();
     private static $stackedErrorLevels = array();
+    private static $toStringException = null;
 
     /**
      * Same init value as thrownErrors.
@@ -377,7 +378,10 @@ class ErrorHandler
         }
 
         if ($throw) {
-            if (($this->scopedErrors & $type) && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
+            if (null !== self::$toStringException) {
+                $throw = self::$toStringException;
+                self::$toStringException = null;
+            } elseif (($this->scopedErrors & $type) && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                 // Checking for class existence is a work around for https://bugs.php.net/42098
                 $throw = new ContextErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line, $context);
             } else {
@@ -390,6 +394,47 @@ class ErrorHandler
                 // We temporarily re-enable display_errors to prevent any blank page related to this bug.
 
                 $throw->errorHandlerCanary = new ErrorHandlerCanary();
+            }
+
+            if (E_USER_ERROR & $type) {
+                $backtrace = $backtrace ?: $throw->getTrace();
+
+                for ($i = 1; isset($backtrace[$i]); ++$i) {
+                    if (isset($backtrace[$i]['function'], $backtrace[$i]['type'], $backtrace[$i - 1]['function'])
+                        && '__toString' === $backtrace[$i]['function']
+                        && '->' === $backtrace[$i]['type']
+                        && !isset($backtrace[$i - 1]['class'])
+                        && ('trigger_error' === $backtrace[$i - 1]['function'] || 'user_error' === $backtrace[$i - 1]['function'])
+                    ) {
+                        // Here, we know trigger_error() has been called from __toString().
+                        // HHVM is fine with throwing from __toString() but PHP triggers a fatal error instead.
+                        // A small convention allows working around the limitation:
+                        // given a caught $e exception in __toString(), quitting the method with
+                        // `return trigger_error($e, E_USER_ERROR);` allows this error handler
+                        // to make $e get through the __toString() barrier.
+
+                        foreach ($context as $e) {
+                            if (($e instanceof \Exception || $e instanceof \Throwable) && $e->__toString() === $message) {
+                                if (1 === $i) {
+                                    // On HHVM
+                                    $throw = $e;
+                                    break;
+                                }
+                                self::$toStringException = $e;
+
+                                return true;
+                            }
+                        }
+
+                        if (1 < $i) {
+                            // On PHP (not on HHVM), display the original error message instead of the default one.
+                            $this->handleException($throw);
+
+                            // Stop the process by giving back the error to the native handler.
+                            return false;
+                        }
+                    }
+                }
             }
 
             throw $throw;

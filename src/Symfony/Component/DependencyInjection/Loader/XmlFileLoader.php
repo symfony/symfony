@@ -162,7 +162,7 @@ class XmlFileLoader extends FileLoader
             $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
 
             if ($triggerDeprecation) {
-                @trigger_error(sprintf('The "scope" attribute in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $file), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "scope" attribute of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
 
             $definition->setScope(XmlUtils::phpize($value), false);

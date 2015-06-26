@@ -118,6 +118,7 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
                 'tokens' => $tokens,
                 'ip' => '127.0.0.1',
                 'method' => 'GET',
+                'status_code' => null,
                 'url' => 'http://example.com/',
                 'start' => null,
                 'end' => null,

@@ -97,7 +97,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method, $statusCode)
     {
         $criteria = array();
         $args = array();
@@ -115,6 +115,11 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         if ($method) {
             $criteria[] = 'method = :method';
             $args[':method'] = $method;
+        }
+
+        if ($statusCode) {
+            $criteria[] = 'status_code = :status_code';
+            $args[':status_code'] = (string) $statusCode;
         }
 
         if (!empty($start)) {

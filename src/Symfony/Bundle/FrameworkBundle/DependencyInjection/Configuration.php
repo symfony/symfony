@@ -99,7 +99,7 @@ class Configuration implements ConfigurationInterface
 
                         foreach ($v['templating']['packages'] as $name => $config) {
                             $v['assets']['packages'][$name] = array(
-                                'version' => (string) $config['version'],
+                                'version' => $config['version'],
                                 'version_format' => $config['version_format'],
                                 'base_path' => '',
                                 'base_urls' => array_values(array_unique(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),

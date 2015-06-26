@@ -875,7 +875,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue(is_dir($targetPath));
         $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
-        $this->assertEquals($sourcePath.'nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
+        $this->assertEquals('nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
     /**

@@ -11,7 +11,7 @@
     {% if label is empty %}
         {% set label = name|humanize %}
     {% endif %}
-    <label>Custom label: {{ label|trans({}, translation_domain) }}</label>
+    <label>Custom label: {{ label|trans(translation_params, translation_domain) }}</label>
 {% endspaceless %}
 {% endblock _names_entry_label %}
 
@@ -20,6 +20,6 @@
     {% if label is empty %}
         {% set label = name|humanize %}
     {% endif %}
-    <label>Custom name label: {{ label|trans({}, translation_domain) }}</label>
+    <label>Custom name label: {{ label|trans(translation_params, translation_domain) }}</label>
 {% endspaceless %}
 {% endblock _name_c_entry_label %}

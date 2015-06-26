@@ -169,7 +169,7 @@
         {% endif %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {{- widget|raw -}}
-            {{- label is not sameas(false) ? label|trans({}, translation_domain) -}}
+            {{- label is not sameas(false) ? label|trans(translation_params, translation_domain) -}}
         </label>
     {% endif %}
 {% endblock checkbox_radio_label %}

@@ -584,12 +584,8 @@ class FrameworkExtension extends Extension
 
         $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
-            if (null === $package['version']) {
-                $version = $defaultVersion;
-            } else {
-                $format = $package['version_format'] ?: $config['version_format'];
-                $version = $this->createVersion($container, $package['version'], $format, $name);
-            }
+            $format = $package['version_format'] ?: $config['version_format'];
+            $version = $this->createVersion($container, $package['version'], $format, $name);
 
             $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
             $namedPackages[$name] = new Reference('assets._package_'.$name);

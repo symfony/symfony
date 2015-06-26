@@ -69,7 +69,7 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
 
     private static function testConstraints($constraints)
     {
-        return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && current($constraints) instanceof Constraint);
+        return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && (empty($constraints) || current($constraints) instanceof Constraint));
     }
 
     private static function testGroups($groups)

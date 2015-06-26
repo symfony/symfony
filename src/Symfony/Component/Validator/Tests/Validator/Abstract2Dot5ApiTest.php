@@ -74,6 +74,12 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertCount(1, $violations);
     }
 
+    public function testValidateWithEmptyArrayAsConstraint()
+    {
+        $violations = $this->validator->validate(null, array());
+        $this->assertCount(0, $violations);
+    }
+
     public function testGroupSequenceAbortsAfterFailedGroup()
     {
         $entity = new Entity();

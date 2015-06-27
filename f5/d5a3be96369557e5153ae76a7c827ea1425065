@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-06-26T21:05:55Z
+
+But options shortcuts [are only one-letter](http://symfony.com/doc/current/components/console/introduction.html#using-command-options), aren't they ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-26T21:09:14Z
+
+> But options shortcuts are only one-letter, aren't they ?
+
+Usually, they should, but:
+
+1. we do not enforce that anywhere
+1. you can have more than one shortcut and all these shortcuts will be separated by the pipe character
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-26T21:21:57Z
+
+Though the added test case was probably not the best. I updated it to use multiple shortcuts instead of one shortcut with multiple characters.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-26T22:47:39Z
+
+shouldn't this go in 2.6 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-27T05:05:24Z
+
+@stof In Symfony 2.6, this is handled in https://github.com/symfony/symfony/blob/2.6/src/Symfony/Component/Console/Descriptor/TextDescriptor.php#L78-84. I think this case was forgotten when we updated to the docopt compatible output in Symfony 2.7.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-27T07:14:09Z
+
+:+1:

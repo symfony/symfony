@@ -42,6 +42,7 @@ class ObjectsProvider
             'input_option_3' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, 'option description'),
             'input_option_4' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'option description', array()),
             'input_option_5' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, "multiline\noption description"),
+            'input_option_6' => new InputOption('option_name', array('o', 'O'), InputOption::VALUE_REQUIRED, 'option with multiple shortcuts'),
         );
     }
 

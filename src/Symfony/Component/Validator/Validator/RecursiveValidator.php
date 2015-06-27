@@ -25,6 +25,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * Recursive implementation of {@link ValidatorInterface}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
@@ -182,6 +183,6 @@ class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
 
     private static function testGroups($groups)
     {
-        return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (is_string(current($groups)) || current($groups) instanceof GroupSequence));
+        return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (0 === count($groups) || is_string(current($groups)) || current($groups) instanceof GroupSequence));
     }
 }

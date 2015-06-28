@@ -69,7 +69,8 @@ class CardSchemeValidator extends ConstraintValidator
         'MAESTRO' => array(
             '/^(6759[0-9]{2})[0-9]{6,13}$/',
             '/^(50[0-9]{4})[0-9]{6,13}$/',
-            '/^([56-69][0-9]{4})[0-9]{6,13}$/',
+            '/^5[6-9][0-9]{10,17}$/',
+            '/^6[0-9]{11,18}$/',
         ),
         // All MasterCard numbers start with the numbers 51 through 55. All have 16 digits.
         'MASTERCARD' => array(

@@ -401,8 +401,8 @@ class ProgressBar
             $this->max = $step;
         }
 
-        $prevPeriod = intval($this->step / $this->redrawFreq);
-        $currPeriod = intval($step / $this->redrawFreq);
+        $prevPeriod = (int) ($this->step / $this->redrawFreq);
+        $currPeriod = (int) ($step / $this->redrawFreq);
         $this->step = $step;
         $this->percent = $this->max ? (float) $this->step / $this->max : 0;
         if ($prevPeriod !== $currPeriod || $this->max === $step) {

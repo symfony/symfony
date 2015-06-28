@@ -32,7 +32,7 @@
     <service id="method_call1" class="FooClass">
       <call method="setBar" />
       <call method="setBar">
-        <argument type="expression">service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")</argument>
+        <argument type="expression">service('foo').foo() ~ (container.hasParameter('foo') ? parameter('foo') : 'default')</argument>
       </call>
     </service>
     <service id="method_call2" class="FooClass">

@@ -6,6 +6,8 @@ CHANGELOG
 
  * deprecated `getKey()` of the `AnonymousToken`, `RememberMeToken` and `AbstractRememberMeServices` classes
    in favor of `getSecret()`.
+ * deprecated `Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface`, use
+   `Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface` instead
 
 2.7.0
 -----

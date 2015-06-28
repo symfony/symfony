@@ -21,7 +21,6 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
 
     public function __construct(array $array = null)
     {
-        new \ArrayObject();
         $this->array = $array ?: array();
     }
 

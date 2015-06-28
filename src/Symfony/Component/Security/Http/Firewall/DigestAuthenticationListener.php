@@ -101,7 +101,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
         if ($serverDigestMd5 !== $digestAuth->getResponse()) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
+                $this->logger->debug(sprintf('Expected response: "%s" but received: "%s"; is AuthenticationDao returning clear text passwords?', $serverDigestMd5, $digestAuth->getResponse()));
             }
 
             $this->fail($event, $request, new BadCredentialsException('Incorrect response'));

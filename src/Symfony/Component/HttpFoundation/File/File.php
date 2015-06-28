@@ -37,7 +37,7 @@ class File extends \SplFileInfo
      */
     public function __construct($path, $checkPath = true)
     {
-        if ($checkPath && !is_file($path)) {
+        if ($checkPath && !is_file($path) && !(($fp = @fopen($path, 'r')) && fclose($fp))) {
             throw new FileNotFoundException($path);
         }
 

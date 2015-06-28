@@ -200,6 +200,18 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals(realpath($response->getFile()->getPathname()), realpath($filePath));
     }
 
+    public function testSplTempFileObject()
+    {
+        $filePath = __DIR__.'/File/Fixtures/test';
+        $file = new \SplTempFileObject(0);
+        $file->fwrite(file_get_contents($filePath));
+        $file->fflush();
+
+        $response = new BinaryFileResponse($file);
+
+        $this->assertEquals($response->getFile()->getFileInfo()->getPathname(), $file->getFileInfo()->getPathname());
+    }
+
     public function testAcceptRangeOnUnsafeMethods()
     {
         $request = Request::create('/', 'POST');

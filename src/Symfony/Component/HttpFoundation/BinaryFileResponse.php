@@ -91,7 +91,7 @@ class BinaryFileResponse extends Response
             }
         }
 
-        if (!$file->isReadable()) {
+        if (!$file->isReadable() && !(($fp = @fopen($file->getPath(), 'r')) && fclose($fp))) {
             throw new FileException('File must be readable.');
         }
 
@@ -127,7 +127,12 @@ class BinaryFileResponse extends Response
      */
     public function setAutoLastModified()
     {
-        $this->setLastModified(\DateTime::createFromFormat('U', $this->file->getMTime()));
+        if ($this->file->isReadable()) {
+            $mtime = $this->file->getMTime();
+        } else {
+            $mtime = date('U');
+        }
+        $this->setLastModified(\DateTime::createFromFormat('U', $mtime));
 
         return $this;
     }

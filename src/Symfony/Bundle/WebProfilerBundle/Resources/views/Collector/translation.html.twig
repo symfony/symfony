@@ -81,6 +81,7 @@
             <th>Locale</th>
             <th>Domain</th>
             <th>Id</th>
+            <th>Parameters</th>
             <th>Message Preview</th>
         </tr>
         {% for message in collector.messages %}
@@ -91,6 +92,11 @@
                 <td>
                     <code>{{ message.id }}</code>
                     {% if message.count > 1 %}<br><small style="color: gray;">(used {{ message.count }} times)</small>{% endif %}
+                </td>
+                <td>
+                    {% for key, value in message.parameters %}
+                        <code>{{ key }} = {{ value }}</code>{% if not loop.last %}<br />{% endif %}
+                    {% endfor %}
                 </td>
                 <td><code>{{ message.translation }}</code></td>
             </tr>

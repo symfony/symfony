@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated `getKey()` of the `AnonymousToken`, `RememberMeToken` and `AbstractRememberMeServices` classes
+   in favor of `getSecret()`.
+
 2.7.0
 -----
 

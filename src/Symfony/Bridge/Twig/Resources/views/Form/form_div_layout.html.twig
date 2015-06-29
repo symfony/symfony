@@ -46,7 +46,7 @@
     <div {{ block('widget_container_attributes') }}>
     {%- for child in form %}
         {{- form_widget(child) -}}
-        {{- form_label(child) -}}
+        {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
     {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded -%}
@@ -220,7 +220,7 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
-        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ translation_domain is sameas(false) ? label : label|trans({}, translation_domain) }}</label>
     {%- endif -%}
 {%- endblock form_label -%}
 

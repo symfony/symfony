@@ -119,8 +119,9 @@ class Controller extends ContainerAware
      * @param mixed $attributes The attributes
      * @param mixed $object     The object
      *
-     * @throws \LogicException
      * @return bool
+     *
+     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null)
     {
@@ -230,7 +231,7 @@ class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
-    public function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -344,7 +345,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Checks the validity of a CSRF token
+     * Checks the validity of a CSRF token.
      *
      * @param string $id    The id used when generating the token
      * @param string $token The actual token sent with the request that should be validated

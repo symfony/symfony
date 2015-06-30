@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\ProcessPipes;
@@ -21,10 +22,18 @@ use Symfony\Component\Process\ProcessPipes;
  */
 abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 {
+    protected static $phpBin;
+
+    public static function setUpBeforeClass()
+    {
+        $phpBin = new PhpExecutableFinder();
+        self::$phpBin = $phpBin->find();
+    }
+
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
         @trigger_error('Test Error', E_USER_NOTICE);
-        $process = $this->getProcess("php -r 'sleep(3)'");
+        $process = $this->getProcess(self::$phpBin." -r 'sleep(3)'");
         $process->run();
         $actualError = error_get_last();
         $this->assertEquals('Test Error', $actualError['message']);
@@ -158,7 +167,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testSetStdinWhileRunningThrowsAnException()
     {
-        $process = $this->getProcess('php -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
         $process->start();
         try {
             $process->setStdin('foobar');
@@ -177,7 +186,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidStdin($value)
     {
-        $process = $this->getProcess('php -v');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->setStdin($value);
     }
 
@@ -195,7 +204,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidStdin($expected, $value)
     {
-        $process = $this->getProcess('php -v');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->setStdin($value);
         $this->assertSame($expected, $process->getStdin());
     }
@@ -452,7 +461,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartIsNonBlocking()
     {
-        $process = $this->getProcess('php -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
@@ -462,14 +471,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateStatus()
     {
-        $process = $this->getProcess('php -h');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertTrue(strlen($process->getOutput()) > 0);
     }
 
     public function testGetExitCodeIsNullOnStart()
     {
-        $process = $this->getProcess('php -r "usleep(200000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(200000);"');
         $this->assertNull($process->getExitCode());
         $process->start();
         $this->assertNull($process->getExitCode());
@@ -479,7 +488,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExitCodeIsNullOnWhenStartingAgain()
     {
-        $process = $this->getProcess('php -r "usleep(200000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(200000);"');
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
         $process->start();
@@ -490,14 +499,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExitCode()
     {
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertSame(0, $process->getExitCode());
     }
 
     public function testStatus()
     {
-        $process = $this->getProcess('php -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
         $this->assertFalse($process->isRunning());
         $this->assertFalse($process->isStarted());
         $this->assertFalse($process->isTerminated());
@@ -516,7 +525,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStop()
     {
-        $process = $this->getProcess('php -r "sleep(4);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();
@@ -525,14 +534,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSuccessful()
     {
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertTrue($process->isSuccessful());
     }
 
     public function testIsSuccessfulOnlyAfterTerminated()
     {
-        $process = $this->getProcess('php -r "sleep(1);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
         $process->start();
         while ($process->isRunning()) {
             $this->assertFalse($process->isSuccessful());
@@ -544,7 +553,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotSuccessful()
     {
-        $process = $this->getProcess('php -r "usleep(500000);throw new \Exception(\'BOUM\');"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);throw new \Exception(\'BOUM\');"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->wait();
@@ -557,7 +566,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertFalse($process->hasBeenSignaled());
     }
@@ -568,7 +577,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertFalse($process->hasBeenSignaled());
     }
@@ -579,7 +588,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertEquals(0, $process->getTermSignal());
     }
@@ -590,7 +599,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
-        $process = $this->getProcess('php -r "sleep(4);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
         $process->start();
         $process->stop();
         $this->assertTrue($process->hasBeenSignaled());
@@ -605,7 +614,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         // SIGTERM is only defined if pcntl extension is present
         $termSignal = defined('SIGTERM') ? SIGTERM : 15;
 
-        $process = $this->getProcess('php -r "sleep(4);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
         $process->start();
         $process->stop();
 
@@ -634,7 +643,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testRestart()
     {
-        $process1 = $this->getProcess('php -r "echo getmypid();"');
+        $process1 = $this->getProcess(self::$phpBin.' -r "echo getmypid();"');
         $process1->run();
         $process2 = $process1->restart();
 
@@ -656,7 +665,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
-        $process = $this->getProcess('php -r "while (true) {}"');
+        $process = $this->getProcess(self::$phpBin.' -r "while (true) {}"');
         $process->start();
 
         // PHP will deadlock when it tries to cleanup $process
@@ -665,7 +674,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testRunProcessWithTimeout()
     {
         $timeout = 0.5;
-        $process = $this->getProcess('php -r "usleep(600000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(600000);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
         try {
@@ -687,13 +696,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckTimeoutOnNonStartedProcess()
     {
-        $process = $this->getProcess('php -r "sleep(3);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
         $process->checkTimeout();
     }
 
     public function testCheckTimeoutOnTerminatedProcess()
     {
-        $process = $this->getProcess('php -v');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $process->checkTimeout();
     }
@@ -702,7 +711,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $timeout = 0.5;
         $precision = 100000;
-        $process = $this->getProcess('php -r "sleep(3);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
 
@@ -738,7 +747,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPid()
     {
-        $process = $this->getProcess('php -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
         $process->start();
         $this->assertGreaterThan(0, $process->getPid());
         $process->wait();
@@ -746,13 +755,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPidIsNullBeforeStart()
     {
-        $process = $this->getProcess('php -r "sleep(1);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
         $this->assertNull($process->getPid());
     }
 
     public function testGetPidIsNullAfterRun()
     {
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->run();
         $this->assertNull($process->getPid());
     }
@@ -797,7 +806,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testSignalProcessNotRunning()
     {
         $this->verifyPosixIsEnabled();
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $process->signal(SIGHUP);
     }
 
@@ -806,7 +815,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethodsThatNeedARunningProcess($method)
     {
-        $process = $this->getProcess('php -m');
+        $process = $this->getProcess(self::$phpBin.' -v');
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
         $process->{$method}();
     }
@@ -827,7 +836,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethodsThatNeedATerminatedProcess($method)
     {
-        $process = $this->getProcess('php -r "sleep(1);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
         $process->start();
         try {
             $process->{$method}();
@@ -869,7 +878,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
-        $process = $this->getProcess('php -r "sleep(3);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
         $process->start();
         $process->signal(-4);
     }
@@ -883,7 +892,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
-        $process = $this->getProcess('php -r "sleep(3);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
         $process->start();
         $process->signal('Céphalopodes');
     }

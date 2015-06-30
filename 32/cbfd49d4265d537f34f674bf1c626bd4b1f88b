@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T09:04:54Z
+
+what about anonymous services used in the factory or the configurator ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T09:08:26Z
+
+Please add some tests using anonymous definition decorators in all supported places, not only in the properties
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-25T10:44:27Z
+
+Tests added.
+What do you mean by anonymous services used in the factory or the configurator?
+Resolving `->setFactory(array(new DefinitionDecorator(), ...`?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T10:45:17Z
+
+yes
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T10:45:26Z
+
+it is supported since 2.7 for definitions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-25T10:58:54Z
+
+Updated for factories and configurators
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-25T11:08:13Z
+
+Factory/configurator resolution was missing for nested definitions, both in ResolveDefinitionTemplatesPass and InlineServiceDefinitionsPass
+This is now fixed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-28T07:12:59Z
+
+ping @symfony/deciders

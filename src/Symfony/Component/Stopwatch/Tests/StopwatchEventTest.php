@@ -119,12 +119,12 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     public function testStartTime()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertLessThan(0.5, $event->getStartTime());
+        $this->assertLessThanOrEqual(0.5, $event->getStartTime());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         $event->stop();
-        $this->assertLessThan(1, $event->getStartTime());
+        $this->assertLessThanOrEqual(1, $event->getStartTime());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();

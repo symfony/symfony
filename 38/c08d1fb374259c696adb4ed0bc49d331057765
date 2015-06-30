@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-23T10:44:15Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-23T16:06:57Z
+
+Seems harmless, unless someone was relying on the indexed keys inside the data mapper (I that really doesn't seem like something that someone would do??).
+
+@webmozart was there an issue/motivation for this? Something we can add/update in the docs after this is merged?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-23T20:31:17Z
+
+The question is if someone could have relied on the old indexed way. Is there a valid use case for doing that?
+
+@weaverryan looks like this is related to https://gist.github.com/webmozart/36b1cd8a68a5f7844268
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T12:57:20Z
+
+@xabbuh Yes exactly. If you want to write a custom data mapper for a specific class, you currently *cannot* access array entries by their field names.
+
+@weaverryan Accessing entries by numeric indices doesn't work, since in other cases (`setData()` and `submit()`) the data mapper *already* receives the data indexed by field names. So this was the only exception to the rule which I fixed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-29T07:00:27Z
+
+:+1:

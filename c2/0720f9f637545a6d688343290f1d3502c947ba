@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-29T18:04:14Z
+
+Looks like a good solution. A test would be good though.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2015-06-29T19:36:55Z
+
+Added some tests.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-29T22:49:46Z
+
+:+1:
+
+2.7 is the correct branch since that is where choice_translation_domain was introduced.

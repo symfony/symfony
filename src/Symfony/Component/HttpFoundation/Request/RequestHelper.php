@@ -478,8 +478,8 @@ class RequestHelper
         $method = strtoupper($request->server->get('REQUEST_METHOD', 'GET'));
 
         if ('POST' === $method) {
-            if ($method = $request->headers->get('X-HTTP-METHOD-OVERRIDE')) {
-                $method = strtoupper($method);
+            if ($tmpMethod = $request->headers->get('X-HTTP-METHOD-OVERRIDE')) {
+                $method = strtoupper($tmpMethod);
             } elseif ($this->httpMethodParameterOverride) {
                 $method = strtoupper($request->request->get('_method', $request->query->get('_method', 'POST')));
             }

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Header\AcceptItem;
  * Represents an Accept-* header item.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
- * @deprecated use Symfony\Component\HttpFoundation\
+ * @deprecated use Symfony\Component\HttpFoundation\Header\AcceptItem instead
  */
 class AcceptHeaderItem extends AcceptItem
 {

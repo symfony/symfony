@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Header\Accept;
  * sorted by descending quality.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ * @deprecated use Symfony\Component\HttpFoundation\Header\Accept instead
  */
 class AcceptHeader extends Accept
 {

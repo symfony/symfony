@@ -1242,15 +1242,9 @@ class Response
     {
         $status = ob_get_status(true);
         $level = count($status);
+        $flags = PHP_VERSION_ID >= 50400 ? PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
 
-        while ($level-- > $targetLevel
-            && (!empty($status[$level]['del'])
-                || (isset($status[$level]['flags'])
-                    && ($status[$level]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)
-                    && ($status[$level]['flags'] & ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE))
-                )
-            )
-        ) {
+        while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || $flags === ($s['flags'] & $flags) : $s['del'])) {
             if ($flush) {
                 ob_end_flush();
             } else {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\AssetsHelper;
+use Symfony\Component\Templating\Tests\Fixtures\StringObject;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -69,5 +70,14 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
     {
         $helper = new AssetsHelper(null, 'http://foo.com');
         $this->assertEquals('//bar.com/asset', $helper->getUrl('//bar.com/asset'));
+    }
+
+    public function testWorksWithObjectsAndToString()
+    {
+        $helper = new AssetsHelper(null, new StringObject('http://foo.com'), new StringObject('version'));
+        $this->assertSame('http://foo.com/asset?version', $helper->getUrl(new StringObject('asset')));
+
+        $helper = new AssetsHelper(new StringObject('/base/path/'), array(), new StringObject('version'));
+        $this->assertSame('/base/path/asset?version', $helper->getUrl(new StringObject('asset')));
     }
 }

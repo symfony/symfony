@@ -56,8 +56,8 @@ class Package implements PackageInterface
     /**
      * Applies version to the supplied path.
      *
-     * @param string              $path    A path
-     * @param string|bool|null    $version A specific version
+     * @param string           $path    A path
+     * @param string|bool|null $version A specific version
      *
      * @return string The versionized path
      */
@@ -70,7 +70,7 @@ class Package implements PackageInterface
 
         $versionized = sprintf($this->format, ltrim($path, '/'), $version);
 
-        if ($path && '/' == $path[0]) {
+        if ($path && '/' == substr($path, 0, 1)) {
             $versionized = '/'.$versionized;
         }
 

@@ -52,7 +52,7 @@ class UrlPackage extends Package
 
         $url = $this->applyVersion($path, $version);
 
-        if ($url && '/' != $url[0]) {
+        if ($url && '/' != substr($url, 0, 1)) {
             $url = '/'.$url;
         }
 

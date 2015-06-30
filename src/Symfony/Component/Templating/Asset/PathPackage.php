@@ -34,7 +34,7 @@ class PathPackage extends Package
         if (!$basePath) {
             $this->basePath = '/';
         } else {
-            if ('/' != $basePath[0]) {
+            if ('/' != substr($basePath, 0, 1)) {
                 $basePath = '/'.$basePath;
             }
 

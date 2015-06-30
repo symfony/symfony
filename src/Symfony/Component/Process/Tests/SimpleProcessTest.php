@@ -150,7 +150,7 @@ class SimpleProcessTest extends AbstractProcessTest
     public function testStopTerminatesProcessCleanly()
     {
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 $process->stop();
             });
@@ -164,7 +164,7 @@ class SimpleProcessTest extends AbstractProcessTest
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
                     $process->signal(defined('SIGKILL') ? SIGKILL : 9);
@@ -180,7 +180,7 @@ class SimpleProcessTest extends AbstractProcessTest
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
                     $process->signal(defined('SIGTERM') ? SIGTERM : 15);

@@ -39,6 +39,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCompileTimeError()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM behaves differently in this test case.');
+        }
+
         // the ContextErrorException must not be loaded to test the workaround
         // for https://bugs.php.net/bug.php?id=65322.
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
@@ -62,10 +66,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $that->assertEquals(2, $exception->getLine());
             if (PHP_VERSION_ID < 70000) {
                 $that->assertEquals(E_STRICT, $exception->getSeverity());
-                $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+                $that->assertStringStartsWith('Runtime Notice: Declaration', $exception->getMessage());
             } else {
                 $that->assertEquals(E_WARNING, $exception->getSeverity());
-                $that->assertStringStartsWith('Warning: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+                $that->assertStringStartsWith('Warning: Declaration', $exception->getMessage());
             }
             $that->assertArrayHasKey('bar', $exception->getContext());
         };

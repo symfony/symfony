@@ -91,7 +91,6 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 
         $storage = $this->getStorage();
 
-        $this->assertFalse(isset($_SESSION));
         $this->assertFalse($storage->getSaveHandler()->isActive());
         $this->assertFalse($storage->isStarted());
 

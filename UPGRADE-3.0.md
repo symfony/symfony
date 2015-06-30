@@ -680,6 +680,43 @@ UPGRADE FROM 2.x to 3.0
    ));
   ```
 
+ * The `AbstractVoter::getSupportedAttributes()` and `AbstractVoter::getSupportedClasses()`
+   methods have been removed in favor of `AbstractVoter::supports()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function getSupportedAttributes()
+       {
+           return array('CREATE', 'EDIT');
+       }
+
+       protected function getSupportedClasses()
+       {
+           return array('AppBundle\Entity\Post');
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $class)
+       {
+           return $this->isClassInstanceOf($class, 'AppBundle\Entity\Post')
+               && in_array($attribute, array('CREATE', 'EDIT'));
+       }
+
+       // ...
+   }
+   ```
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of

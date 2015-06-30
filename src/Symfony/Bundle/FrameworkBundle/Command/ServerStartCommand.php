@@ -37,6 +37,7 @@ class ServerStartCommand extends ServerCommand
                 new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force web server startup'),
             ))
             ->setName('server:start')
             ->setDescription('Starts PHP built-in web server in the background')
@@ -110,8 +111,9 @@ EOF
             $address = $address.':'.$input->getOption('port');
         }
 
-        if ($this->isOtherServerProcessRunning($address)) {
+        if (!$input->getOption('force') && $this->isOtherServerProcessRunning($address)) {
             $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+            $output->writeln(sprintf('<error>Use the --force option if the server process terminated unexpectedly to start a new web server process.</error>'));
 
             return 1;
         }

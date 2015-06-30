@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * [DEPRECATION] The protected properties `normalizationClosures` and `finalValidationClosures` in
+   `BaseNode` were renamed to `normalizationCallbacks` and `finalValidationCallbacks`.
+ * [DEPRECATION] The methods `setNormalizationClosures()` and `setFinalValidationClosures()` in
+   `BaseNode` were deprecated, `setNormalizationCallbacks()` and `setFinalValidationCallbacks()`
+   should be used instead.
+
 2.7.0
 -----
 

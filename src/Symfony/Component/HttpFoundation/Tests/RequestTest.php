@@ -847,7 +847,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->query->set('_method', 'purge');
         $request->getMethod();
         Request::enableHttpMethodParameterOverride();
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returned a cached value, instead of expected');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returned a previously cached value after enabling parameter override');
         $this->disableHttpMethodParameterOverride();
 
         $request = new Request();

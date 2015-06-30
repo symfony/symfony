@@ -81,7 +81,7 @@ class Request
 
     protected static $httpMethodParameterOverride = false;
 
-    protected static $httpMethodCachedIsValid = true;
+    protected static $httpMethodCacheIsValid = true;
 
     /**
      * Custom parameters.
@@ -713,7 +713,7 @@ class Request
     public static function enableHttpMethodParameterOverride()
     {
         self::$httpMethodParameterOverride = true;
-        self::$httpMethodCachedIsValid = false;
+        self::$httpMethodCacheIsValid = false;
     }
 
     /**
@@ -1341,7 +1341,7 @@ class Request
      */
     public function getMethod()
     {
-        if (null === $this->method || !self::$httpMethodCachedIsValid) {
+        if (null === $this->method || !self::$httpMethodCacheIsValid) {
             $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
 
             if ('POST' === $this->method) {
@@ -1351,7 +1351,7 @@ class Request
                     $this->method = strtoupper($this->request->get('_method', $this->query->get('_method', 'POST')));
                 }
             }
-            self::$httpMethodCachedIsValid = true;
+            self::$httpMethodCacheIsValid = true;
         }
 
         return $this->method;

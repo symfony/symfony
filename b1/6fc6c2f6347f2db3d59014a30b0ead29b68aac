@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T12:58:38Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2015-06-25T13:01:04Z
+
+Well, seems to makes a lot of BC break...
+
+Maybe just add a note about the issue and how to solve it would be "less" painful.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T13:03:54Z
+
+@Soullivaneuh Please consider that the BC breaks are only for *new* functionality introduced in 2.7. So people who implemented the new interfaces are affected. Any code that worked < 2.7 is not affected.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-28T07:23:54Z
+
+Not sure if we can break BC in 2.7.2 as 2.7 was released almost a month ago now.
+
+What others @symfony/deciders think?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-30T12:40:04Z
+
+Can this be merged? To emphasize: This change fixes a bug in a new 2.7 feature that is a regression compared to the old implementation. I think that more people will be affected by this bug than by the BC break, as I don't think that many (if any) people implemented the new 2.7 interfaces so far.
+
+ping @symfony/deciders

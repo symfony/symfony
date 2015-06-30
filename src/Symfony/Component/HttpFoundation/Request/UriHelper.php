@@ -71,16 +71,23 @@ class UriHelper
         if ($request->headers->has('X_ORIGINAL_URL')) {
             // IIS with Microsoft Rewrite Module
             $requestUri = $request->headers->get('X_ORIGINAL_URL');
+            $request->headers->remove('X_ORIGINAL_URL');
+            $request->server->remove('HTTP_X_ORIGINAL_URL');
+            $request->server->remove('UNENCODED_URL');
+            $request->server->remove('IIS_WasUrlRewritten');
         } elseif ($request->headers->has('X_REWRITE_URL')) {
             // IIS with ISAPI_Rewrite
             $requestUri = $request->headers->get('X_REWRITE_URL');
+            $request->headers->remove('X_REWRITE_URL');
         } elseif ($request->server->get('IIS_WasUrlRewritten') == '1' && $request->server->get('UNENCODED_URL') != '') {
             // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
             $requestUri = $request->server->get('UNENCODED_URL');
+            $request->server->remove('UNENCODED_URL');
+            $request->server->remove('IIS_WasUrlRewritten');
         } elseif ($request->server->has('REQUEST_URI')) {
             $requestUri = $request->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path, only use URL path
-            $schemeAndHttpHost = $this->getSchemeAndHttpHost($request);
+            $schemeAndHttpHost = $request->getSchemeAndHttpHost();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
                 $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
             }
@@ -90,7 +97,11 @@ class UriHelper
             if ('' != $request->server->get('QUERY_STRING')) {
                 $requestUri .= '?'.$request->server->get('QUERY_STRING');
             }
+            $request->server->remove('ORIG_PATH_INFO');
         }
+
+        // normalize the request URI to ease creating sub-requests from this request
+        $request->server->set('REQUEST_URI', $requestUri);
 
         return $requestUri;
     }

@@ -1522,10 +1522,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     private function disableHttpMethodParameterOverride()
     {
-        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
+        $requestHelper = Request::getRequestHelper();
+        $class = new \ReflectionClass($requestHelper);
         $property = $class->getProperty('httpMethodParameterOverride');
         $property->setAccessible(true);
-        $property->setValue(false);
+        $property->setValue($requestHelper, false);
     }
 
     private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)

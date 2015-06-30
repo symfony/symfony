@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -97,6 +99,56 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setResponse')->with($this->isInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse'));
 
         $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener->handle($this->event);
+    }
+
+    public function testExitUserDispatchesEventWithRefreshedUser()
+    {
+        $originalUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $refreshedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $this
+            ->userProvider
+            ->expects($this->any())
+            ->method('refreshUser')
+            ->with($originalUser)
+            ->willReturn($refreshedUser);
+        $originalToken = $this->getToken();
+        $originalToken
+            ->expects($this->any())
+            ->method('getUser')
+            ->willReturn($originalUser);
+        $role = $this
+            ->getMockBuilder('Symfony\Component\Security\Core\Role\SwitchUserRole')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $role->expects($this->any())->method('getSource')->willReturn($originalToken);
+        $this
+            ->securityContext
+            ->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->getToken(array($role)));
+        $this
+            ->request
+            ->expects($this->any())
+            ->method('get')
+            ->with('_switch_user')
+            ->willReturn('_exit');
+        $this
+            ->request
+            ->expects($this->any())
+            ->method('getUri')
+            ->willReturn('/');
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with(SecurityEvents::SWITCH_USER, $this->callback(function (SwitchUserEvent $event) use ($refreshedUser) {
+                return $event->getTargetUser() === $refreshedUser;
+            }))
+        ;
+
+        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener->handle($this->event);
     }
 

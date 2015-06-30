@@ -78,7 +78,6 @@
     <table>
         <tr>
             <th>State</th>
-            <th>Type</th>
             <th>Locale</th>
             <th>Domain</th>
             <th>Id</th>
@@ -88,7 +87,6 @@
         {% for message in collector.messages %}
             <tr>
                 <td><code>{{ translator.state(message) }}</code></td>
-                <td>{{ message.transChoiceNumber in not null ? 'transChoice' : 'trans' }}</td>
                 <td><code>{{ message.locale }}</code></td>
                 <td><code>{{ message.domain }}</code></td>
                 <td>
@@ -99,7 +97,7 @@
                     {% for key, value in message.parameters %}
                         <code>{{ key }} = {{ value }}</code><br />
                     {% endfor %}
-                    {% if message.transChoiceNumber in not null %}
+                    {% if message.transChoiceNumber is not null %}
                         <em><code>transChoice count = {{ message.transChoiceNumber }}</code></em>
                     {% endif %}
                 </td>

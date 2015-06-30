@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-30T07:52:06Z
+
+Regarding the phar error in the DI tests, I suggest to check whether the phar is a compressed one. HHVM does not support compressed phars: https://github.com/facebook/hhvm/issues/4263
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-30T07:54:04Z
+
+And the HttpKernel tests are passing, but they are polluting the output
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-30T08:34:40Z
+
+Phar fixed, DI component is OK now
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-30T08:38:39Z
+
+@nicolas-grekas I suggest adding a checklist in the PR description with all components which are failing in the 2.3 branch currently, and then checking them when fixed. This would make it easier to follow the PR progress
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-30T14:32:00Z
+
+![capture du 2015-06-30 16 27 17](https://cloud.githubusercontent.com/assets/243674/8433286/1654a784-1f45-11e5-8df3-7c4134c5ed50.png)

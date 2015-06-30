@@ -12,6 +12,9 @@ CHANGELOG
    `Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface` instead
  * deprecated `Symfony\Component\Security\Core\Util\ClassUtils`, use
    `Symfony\Component\Security\Acl\Util\ClassUtils` instead
+ * deprecated `supportsAttribute()` and `supportsClass()` attributes of
+   `Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface` and
+   `Symfony\Component\Security\Core\Authorization\Voter\VoterInterface`.
 
 2.7.0
 -----

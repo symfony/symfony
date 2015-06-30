@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -7,6 +16,8 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInt
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
+ * Resolves a typehint for UserInterface in a controller to the current user.
+ *
  * @author Wouter J <wouter@wouterj.nl>
  */
 class UserArgumentResolver implements ArgumentResolverInterface
@@ -28,8 +39,9 @@ class UserArgumentResolver implements ArgumentResolverInterface
     {
         $class = $parameter->getClass();
         $userInterface = 'Symfony\Component\Security\Core\User\UserInterface';
+        $userImplementation = 'Symfony\Component\Security\Core\User\User';
 
-        return null !== $class && ($userInterface === $class || $class->implementsInterface($userInterface));
+        return null !== $class && ($userInterface === $class->getName() || $userImplementation === $class->getName());
     }
 
     /**

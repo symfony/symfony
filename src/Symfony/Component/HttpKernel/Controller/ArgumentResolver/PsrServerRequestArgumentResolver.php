@@ -39,7 +39,7 @@ class PsrServerRequestArgumentResolver implements ArgumentResolverInterface
     {
         $class = $parameter->getClass();
 
-        return null !== $class && isset(self::$supportedTypes[$class->name]);
+        return null !== $class && isset(self::$supportedTypes[$class->getName()]);
     }
 
     /**

@@ -15,19 +15,20 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolverManager;
 
 class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $manager;
-    protected $resolver1;
-    protected $resolver2;
-    protected $request;
+    private $manager;
+    private $resolver1;
+    private $resolver2;
+    private $request;
 
     public function setUp()
     {
         $this->resolver1 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInterface');
         $this->resolver2 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInterface');
 
-        $this->manager = new ArgumentResolverManager();
-        $this->manager->add($this->resolver1);
-        $this->manager->add($this->resolver2);
+        $this->manager = new ArgumentResolverManager(array(
+            $this->resolver1,
+            $this->resolver2,
+        ));
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
     }
@@ -107,20 +108,6 @@ class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
         $this->promiseResolverToNotMatch($this->resolver2);
 
         $this->assertArguments(array(null), function ($a = null) { });
-    }
-
-    public function testPriority()
-    {
-        $this->promiseResolverToNotMatch($this->resolver1);
-        $this->resolver1->expects($this->never())->method('resolve');
-
-        $this->promiseResolverToMatch($this->resolver2, 'resolved by 2');
-
-        $this->manager = new ArgumentResolverManager();
-        $this->manager->add($this->resolver1);
-        $this->manager->add($this->resolver2, 100);
-
-        $this->assertArguments(array('resolved by 2'), function ($a) { });
     }
 
     private function assertArguments(array $expected, $controller)

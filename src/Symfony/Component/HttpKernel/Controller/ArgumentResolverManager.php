@@ -23,32 +23,39 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ArgumentResolverInt
 class ArgumentResolverManager
 {
     /**
-     * @var array
+     * @var ArgumentResolverInterface[]
      */
-    private $resolvers = array();
+    private $resolvers;
 
     /**
-     * @var null|ArgumentResolverInterface[]
+     * @param ArgumentResolverInterface[] $resolvers
      */
-    private $sortedResolvers;
+    public function __construct(array $resolvers = array())
+    {
+        $this->resolvers = $resolvers;
+    }
 
     /**
-     * Adds an argument resolver.
+     * Adds an argument resolver to the chain.
+     *
+     * The order in which the resolvers will be chained is equal
+     * to the order in which this method is called.
      *
      * @param ArgumentResolverInterface $resolver
      */
-    public function add(ArgumentResolverInterface $resolver, $priority = 0)
+    public function add(ArgumentResolverInterface $resolver)
     {
-        if (!isset($this->resolvers[$priority])) {
-            $this->resolvers[$priority] = array();
-        }
-
-        $this->resolvers[$priority][] = $resolver;
-
-        // force a new sort of the resolvers
-        $this->sortedResolvers = null;
+        $this->resolvers[] = $resolver;
     }
 
+    /**
+     * Resolves the constructor arguments of the passed controller.
+     *
+     * @param Request  $request
+     * @param callable $controller
+     *
+     * @return array
+     */
     public function getArguments(Request $request, $controller)
     {
         if (!is_callable($controller)) {
@@ -68,7 +75,7 @@ class ArgumentResolverManager
         $arguments = array();
 
         foreach ($parameters as $parameter) {
-            foreach ($this->getSortedResolvers() as $argumentResolver) {
+            foreach ($this->resolvers as $argumentResolver) {
                 if ($argumentResolver->supports($request, $parameter)) {
                     $arguments[] = $argumentResolver->resolve($request, $parameter);
                     continue 2;
@@ -91,16 +98,5 @@ class ArgumentResolverManager
         }
 
         return $arguments;
-    }
-
-    private function getSortedResolvers()
-    {
-        if (null === $this->sortedResolvers) {
-            $this->sortedResolvers = $this->resolvers;
-            ksort($this->sortedResolvers);
-            $this->sortedResolvers = call_user_func_array('array_merge', $this->sortedResolvers);
-        }
-
-        return $this->sortedResolvers;
     }
 }

@@ -30,9 +30,16 @@ class RegisterArgumentResolversPass implements CompilerPassInterface
         }
 
         $definition = $container->findDefinition($this->managerService);
+        $resolvers = array();
 
-        foreach ($container->findTaggedServiceIds($this->resolverTag) as $id => $resolver) {
-            $definition->addMethodCall('add', array(new Reference($id)));
+        foreach ($container->findTaggedServiceIds($this->resolverTag) as $id => $tags) {
+            $priority = isset($tags[0]['priority']) ? $tags[0]['priority'] : 0;
+            $resolvers[$priority][] = new Reference($id);
         }
+
+        ksort($resolvers);
+        $resolvers = call_user_func_array('array_merge', $resolvers);
+
+        $definition->replaceArgument(1, $resolvers);
     }
 }

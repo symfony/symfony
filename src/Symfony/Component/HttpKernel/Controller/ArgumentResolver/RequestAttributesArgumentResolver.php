@@ -25,7 +25,7 @@ class RequestAttributesArgumentResolver implements ArgumentResolverInterface
      */
     public function supports(Request $request, \ReflectionParameter $parameter)
     {
-        return $request->attributes->has($parameter->name);
+        return $request->attributes->has($parameter->getName());
     }
 
     /**
@@ -33,6 +33,6 @@ class RequestAttributesArgumentResolver implements ArgumentResolverInterface
      */
     public function resolve(Request $request, \ReflectionParameter $parameter)
     {
-        return $request->attributes->get($parameter->name);
+        return $request->attributes->get($parameter->getName());
     }
 }

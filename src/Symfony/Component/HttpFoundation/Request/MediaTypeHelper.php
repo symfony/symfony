@@ -116,11 +116,7 @@ class MediaTypeHelper
      */
     public function getCharsets(Request $request)
     {
-        if (null !== $this->charsets) {
-            return $this->charsets;
-        }
-
-        return $this->charsets = array_keys(AcceptHeader::fromString($request->headers->get('Accept-Charset'))->all());
+        return array_keys(AcceptHeader::fromString($request->headers->get('Accept-Charset'))->all());
     }
 
     /**
@@ -131,11 +127,7 @@ class MediaTypeHelper
      */
     public function getEncodings(Request $request)
     {
-        if (null !== $this->encodings) {
-            return $this->encodings;
-        }
-
-        return $this->encodings = array_keys(AcceptHeader::fromString($request->headers->get('Accept-Encoding'))->all());
+        return array_keys(AcceptHeader::fromString($request->headers->get('Accept-Encoding'))->all());
     }
 
     /**

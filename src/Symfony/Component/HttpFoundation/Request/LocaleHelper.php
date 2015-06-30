@@ -143,13 +143,9 @@ class LocaleHelper
      */
     public function getLanguages(Request $request)
     {
-        if (null !== $this->languages) {
-            return $this->languages;
-        }
-
-        $languages = AcceptHeader::fromString($request->headers->get('Accept-Language'))->all();
-        $this->languages = array();
-        foreach ($languages as $lang => $acceptHeaderItem) {
+        $rawLanguages = AcceptHeader::fromString($request->headers->get('Accept-Language'))->all();
+        $languages = array();
+        foreach ($rawLanguages as $lang => $acceptHeaderItem) {
             if (false !== strpos($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ('i' === $codes[0]) {
@@ -170,10 +166,10 @@ class LocaleHelper
                 }
             }
 
-            $this->languages[] = $lang;
+            $languages[] = $lang;
         }
 
-        return $this->languages;
+        return $languages;
     }
 
     /**
@@ -186,11 +182,7 @@ class LocaleHelper
      */
     public function getAcceptableContentTypes(Request $request)
     {
-        if (null !== $this->acceptableContentTypes) {
-            return $this->acceptableContentTypes;
-        }
-
-        return $this->acceptableContentTypes = array_keys(AcceptHeader::fromString($request->headers->get('Accept'))->all());
+        return array_keys(AcceptHeader::fromString($request->headers->get('Accept'))->all());
     }
 
     /**

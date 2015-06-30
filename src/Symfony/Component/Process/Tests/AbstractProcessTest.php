@@ -102,7 +102,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $expectedOutputSize = ProcessPipes::CHUNK_SIZE * 2 + 2;
 
         $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
 
         $p->start();
         // Let's wait enough time for process to finish...
@@ -141,7 +141,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessResponses($expected, $getter, $code)
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
         $p->run();
 
         $this->assertSame($expected, $p->$getter());
@@ -157,7 +157,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $expected = str_repeat(str_repeat('*', 1024), $size).'!';
         $expectedLength = (1024 * $size) + 1;
 
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
         $p->setStdin($expected);
         $p->run();
 
@@ -246,7 +246,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testCallbackIsExecutedForOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('echo \'foo\';')));
 
         $called = false;
         $p->run(function ($type, $buffer) use (&$called) {
@@ -258,7 +258,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetErrorOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
@@ -271,7 +271,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
         file_put_contents($lock, 'W');
 
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
         while ($p->isRunning()) {
@@ -292,7 +292,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
         file_put_contents($lock, 'W');
 
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
 
@@ -318,7 +318,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
@@ -331,7 +331,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
         file_put_contents($lock, 'W');
 
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
         while ($p->isRunning()) {
@@ -352,7 +352,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
         file_put_contents($lock, 'W');
 
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
 
@@ -733,7 +733,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartAfterATimeout()
     {
-        $process = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 1000; while ($n--) {echo \'\'; usleep(1000); }')));
+        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 1000; while ($n--) {echo \'\'; usleep(1000); }')));
         $process->setTimeout(0.1);
         try {
             $process->run();

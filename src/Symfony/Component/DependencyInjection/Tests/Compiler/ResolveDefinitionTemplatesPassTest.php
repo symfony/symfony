@@ -176,6 +176,42 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->getDefinition('child1')->isLazy());
     }
 
+    public function testDeepDefinitionsResolving()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'parentClass');
+        $container->register('sibling', 'siblingClass')
+            ->setConfigurator(new DefinitionDecorator('parent'), 'foo')
+            ->setFactory(array(new DefinitionDecorator('parent'), 'foo'))
+            ->addArgument(new DefinitionDecorator('parent'))
+            ->setProperty('prop', new DefinitionDecorator('parent'))
+            ->addMethodCall('meth', array(new DefinitionDecorator('parent')))
+        ;
+
+        $this->process($container);
+
+        $configurator = $container->getDefinition('sibling')->getConfigurator();
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($configurator));
+        $this->assertSame('parentClass', $configurator->getClass());
+
+        $factory = $container->getDefinition('sibling')->getFactory();
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($factory[0]));
+        $this->assertSame('parentClass', $factory[0]->getClass());
+
+        $argument = $container->getDefinition('sibling')->getArgument(0);
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($argument));
+        $this->assertSame('parentClass', $argument->getClass());
+
+        $properties = $container->getDefinition('sibling')->getProperties();
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($properties['prop']));
+        $this->assertSame('parentClass', $properties['prop']->getClass());
+
+        $methodCalls = $container->getDefinition('sibling')->getMethodCalls();
+        $this->assertSame('Symfony\Component\DependencyInjection\Definition', get_class($methodCalls[0][1][0]));
+        $this->assertSame('parentClass', $methodCalls[0][1][0]->getClass());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

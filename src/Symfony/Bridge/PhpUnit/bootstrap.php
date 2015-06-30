@@ -14,6 +14,9 @@ if (PHP_VERSION_ID >= 50400 && gc_enabled()) {
     gc_disable();
 }
 
+// Enforce a consistent locale
+setlocale(LC_ALL, 'C');
+
 if (class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
     AnnotationRegistry::registerLoader('class_exists');
 }

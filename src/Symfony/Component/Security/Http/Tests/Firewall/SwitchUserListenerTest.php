@@ -138,6 +138,12 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getUri')
             ->willReturn('/');
+        $this
+            ->request
+            ->query
+            ->expects($this->any())
+            ->method('all')
+            ->will($this->returnValue(array()));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $dispatcher

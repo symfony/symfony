@@ -98,6 +98,7 @@
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    translation_domain: choice_translation_domain,
                 }) -}}
             {% endfor -%}
         </div>
@@ -106,6 +107,7 @@
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    translation_domain: choice_translation_domain,
                 }) -}}
             {% endfor -%}
         </div>
@@ -169,7 +171,7 @@
         {% endif %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {{- widget|raw -}}
-            {{- label is not sameas(false) ? label|trans({}, translation_domain) -}}
+            {{- label is not sameas(false) ? (translation_domain is sameas(false) ? label : label|trans({}, translation_domain)) -}}
         </label>
     {% endif %}
 {% endblock checkbox_radio_label %}

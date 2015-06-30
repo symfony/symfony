@@ -9,7 +9,7 @@
 namespace Symfony\Component\HttpFoundation\Header;
 
 
-class CacheControl implements SelfParsingHeaderInterface
+class CacheControl
 {
     protected $cacheControl;
 
@@ -37,7 +37,7 @@ class CacheControl implements SelfParsingHeaderInterface
         return implode(', ', $parts);
     }
 
-    public static function parseHeader($header)
+    public static function fromString($header)
     {
         $cacheControl = array();
         preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, PREG_SET_ORDER);

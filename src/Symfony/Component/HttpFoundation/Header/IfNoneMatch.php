@@ -9,7 +9,7 @@
 namespace Symfony\Component\HttpFoundation\Header;
 
 
-class IfNoneMatch implements SelfParsingHeaderInterface
+class IfNoneMatch
 {
     protected $eTags;
 
@@ -25,9 +25,9 @@ class IfNoneMatch implements SelfParsingHeaderInterface
 
     /**
      * @param $header
-     * @return ParsedHeaderInterface
+     * @return IfNoneMatch
      */
-    public static function parseHeader($header)
+    public static function fromString($header)
     {
         return new static(preg_split('/\s*,\s*/', $header, null, PREG_SPLIT_NO_EMPTY));
     }

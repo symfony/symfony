@@ -1499,10 +1499,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
+        $helper = new Request\UriHelper(new Request\RequestHelper());
+        $me = new \ReflectionMethod($helper, 'getUrlencodedPrefix');
         $me->setAccessible(true);
 
-        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+        $this->assertSame($expect, $me->invoke($helper, $string, $prefix));
     }
 
     public function urlencodedStringPrefixData()

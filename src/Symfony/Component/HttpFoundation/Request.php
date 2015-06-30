@@ -468,15 +468,6 @@ class Request
             $dup->server = new ServerBag($server);
             $dup->headers = new HeaderBag($dup->server->getHeaders());
         }
-        $dup->languages = null;
-        $dup->charsets = null;
-        $dup->encodings = null;
-        $dup->acceptableContentTypes = null;
-        $dup->pathInfo = null;
-        $dup->requestUri = null;
-        $dup->baseUrl = null;
-        $dup->basePath = null;
-        $dup->method = null;
         $dup->format = null;
 
         if (!$dup->get('_format') && $this->get('_format')) {
@@ -636,7 +627,7 @@ class Request
      */
     public static function getTrustedHeaderName($key)
     {
-        self::getRequestHelper()->getTrustedHeaderName($key);
+        return self::getRequestHelper()->getTrustedHeaderName($key);
     }
 
     /**
@@ -651,7 +642,7 @@ class Request
      */
     public static function normalizeQueryString($qs)
     {
-        self::getUriHelper()->normalizeQueryString($qs);
+        return self::getUriHelper()->normalizeQueryString($qs);
     }
 
     /**
@@ -1355,7 +1346,7 @@ class Request
      */
     public function getPreferredLanguage(array $locales = null)
     {
-        self::getLocaleHelper()->getPreferredLanguage($this, $locales);
+        return self::getLocaleHelper()->getPreferredLanguage($this, $locales);
     }
 
     /**
@@ -1367,7 +1358,7 @@ class Request
      */
     public function getLanguages()
     {
-        self::getLocaleHelper()->getLanguages($this);
+        return self::getLocaleHelper()->getLanguages($this);
     }
 
     /**

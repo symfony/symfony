@@ -483,7 +483,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             if ('sqlite' === $this->driver) {
                 $this->pdo->exec('ROLLBACK');
             } else {
-                $this->pdo->rollback();
+                $this->pdo->rollBack();
             }
             $this->inTransaction = false;
         }

@@ -344,7 +344,7 @@ class Table
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
                 $rows[$rowKey] = $this->fillCells($rows[$rowKey], $column);
-                if (!strstr($cell, "\n")) {
+                if (false === strpos($cell, "\n")) {
                     continue;
                 }
                 $lines = explode("\n", $cell);
@@ -387,7 +387,7 @@ class Table
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
-                if (strstr($cell, "\n")) {
+                if (false !== strpos($cell, "\n")) {
                     $lines = explode("\n", $cell);
                     $nbLines = count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 
@@ -553,7 +553,7 @@ class Table
             $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
                 // we assume that cell value will be across more than one column.
-                $cellWidth = $cellWidth / $cell->getColspan();
+                $cellWidth /= $cell->getColspan();
             }
 
             return $cellWidth;

@@ -56,7 +56,7 @@
         <argument type="service" id="foobaz" on-invalid="ignore"/>
       </call>
       <call method="setBar">
-        <argument type="expression">service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")</argument>
+        <argument type="expression">service('foo').foo() ~ (container.hasParameter('foo') ? parameter('foo') : 'default')</argument>
       </call>
     </service>
     <service id="foo_with_inline" class="Foo">

@@ -5,14 +5,10 @@
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
         {% set icon %}
-            <svg width="16" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 28" enable-background="new 0 0 16 28" xml:space="preserve"><g><path fill="#3F3F3F" d="M15 6h-1V5c0-0.5-0.5-1-1-1H2C1.4 4 1 4.4 1 5v2v13c0 1.6 1.3 3 3 3h11c0.5 0 1-0.5 1-1V7 C16 6.5 15.5 6 15 6z M6 15h3v3H6V15z M6 13V7h3v6H6z M15 21c0 0.6-0.4 1-1 1H5c-0.9 0-1.7-0.4-2.2-1H13c0.6 0 1-0.4 1-1V7 c0.5 0 1 0.5 1 1V21z"/></g></svg>
-            {% if collector.counterrors %}
-                {% set status_color = "red" %}
-            {% elseif collector.countdeprecations %}
-                {% set status_color = "yellow" %}
-            {% endif %}
+            <svg width="16" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 28" enable-background="new 0 0 16 28" xml:space="preserve"><g><path fill="#AAA" d="M15 6h-1V5c0-0.5-0.5-1-1-1H2C1.4 4 1 4.4 1 5v2v13c0 1.6 1.3 3 3 3h11c0.5 0 1-0.5 1-1V7 C16 6.5 15.5 6 15 6z M6 15h3v3H6V15z M6 13V7h3v6H6z M15 21c0 0.6-0.4 1-1 1H5c-0.9 0-1.7-0.4-2.2-1H13c0.6 0 1-0.4 1-1V7 c0.5 0 1 0.5 1 1V21z"/></g></svg>
+            {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
             {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
-            <span class="sf-toolbar-status{% if status_color is defined %} sf-toolbar-status-{{ status_color }}{% endif %}">{{ error_count }}</span>
+            <span class="sf-toolbar-value">{{ error_count }}</span>
         {% endset %}
         {% set text %}
             {% if collector.counterrors %}
@@ -34,7 +30,7 @@
                 </div>
             {% endif %}
         {% endset %}
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url, 'block_status': status_color } %}
     {% endif %}
 {% endblock %}
 
@@ -87,30 +83,20 @@
     </table>
 
     {% if collector.logs %}
-        <table>
-            <tr>
-                <th>#</th>
-                <th>Priority</th>
-                <th>Channel</th>
-                <th>Message and context</th>
-            </tr>
-
+        <ul class="alt">
             {% set log_loop_index = 0 %}
             {% for log in collector.logs %}
                 {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
                 {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
                     {% set log_loop_index = log_loop_index + 1 %}
-                    <tr class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
-                        <td>{{ log_loop_index }}</td>
-                        <td>{{ is_deprecation ? 'DEPRECATION' : log.priorityName }}</td>
-                        <td>{{ log.channel is defined ? log.channel }}</td>
-                        <td>{{ logger.display_message(loop.index, log, is_deprecation) }}</td>
-                    </tr>
+                    <li class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
+                        {{ logger.display_message(loop.index, log, is_deprecation) }}
+                    </li>
                 {% endif %}
             {% else %}
-                <tr><td colspan="4"><em>No logs available for {{ priority }} priority.</em></td></tr>
+                <li><em>No logs available for this priority.</em></li>
             {% endfor %}
-        </table>
+        </ul>
     {% else %}
         <p>
             <em>No logs available.</em>
@@ -120,13 +106,11 @@
 
 
 {% macro display_message(log_index, log, is_deprecation) %}
-    {{ is_deprecation ? 'DEPRECATED' : log.priorityName }} - {{ log.message }}
-
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
         {% set id = 'sf-call-stack-' ~ log_index %}
 
-        {{ log.message }}
+        DEPRECATED - {{ log.message }}
 
         {% if stack %}
             <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
@@ -156,6 +140,7 @@
             {% endif %}
         {% endfor %}
     {% else %}
+        {{ log.priorityName }} - {{ log.message }}
         {% if log.context is defined and log.context is not empty %}
             <br />
             <small>

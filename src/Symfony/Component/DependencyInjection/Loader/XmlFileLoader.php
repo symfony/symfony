@@ -151,7 +151,7 @@ class XmlFileLoader extends FileLoader
         foreach (array('class', 'shared', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 if (in_array($key, array('factory-class', 'factory-method', 'factory-service'))) {
-                    @trigger_error(sprintf('The "%s" attribute in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, $file), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "%s" attribute of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
                 }
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
@@ -172,7 +172,7 @@ class XmlFileLoader extends FileLoader
             $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
 
             if ($triggerDeprecation) {
-                @trigger_error(sprintf('The "synchronized" attribute in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', $file), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "synchronized" attribute of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
 
             $definition->setSynchronized(XmlUtils::phpize($value), $triggerDeprecation);

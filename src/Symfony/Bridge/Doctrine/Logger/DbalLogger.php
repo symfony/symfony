@@ -50,30 +50,7 @@ class DbalLogger implements SQLLogger
         }
 
         if (is_array($params)) {
-            foreach ($params as $index => $param) {
-                if (!is_string($params[$index])) {
-                    continue;
-                }
-
-                // non utf-8 strings break json encoding
-                if (!preg_match('//u', $params[$index])) {
-                    $params[$index] = self::BINARY_DATA_VALUE;
-                    continue;
-                }
-
-                // detect if the too long string must be shorten
-                if (function_exists('mb_strlen')) {
-                    if (self::MAX_STRING_LENGTH < mb_strlen($params[$index], 'UTF-8')) {
-                        $params[$index] = mb_substr($params[$index], 0, self::MAX_STRING_LENGTH - 6, 'UTF-8').' [...]';
-                        continue;
-                    }
-                } else {
-                    if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
-                        $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
-                        continue;
-                    }
-                }
-            }
+            $params = $this->normalizeParams($params);
         }
 
         if (null !== $this->logger) {
@@ -100,5 +77,41 @@ class DbalLogger implements SQLLogger
     protected function log($message, array $params)
     {
         $this->logger->debug($message, $params);
+    }
+
+    private function normalizeParams(array $params)
+    {
+        foreach ($params as $index => $param) {
+            // normalize recursively
+            if (is_array($param)) {
+                $params[$index] = $this->normalizeParams($param);
+                continue;
+            }
+
+            if (!is_string($params[$index])) {
+                continue;
+            }
+
+            // non utf-8 strings break json encoding
+            if (!preg_match('//u', $params[$index])) {
+                $params[$index] = self::BINARY_DATA_VALUE;
+                continue;
+            }
+
+            // detect if the too long string must be shorten
+            if (function_exists('mb_strlen')) {
+                if (self::MAX_STRING_LENGTH < mb_strlen($params[$index], 'UTF-8')) {
+                    $params[$index] = mb_substr($params[$index], 0, self::MAX_STRING_LENGTH - 6, 'UTF-8').' [...]';
+                    continue;
+                }
+            } else {
+                if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                    $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
+                    continue;
+                }
+            }
+        }
+
+        return $params;
     }
 }

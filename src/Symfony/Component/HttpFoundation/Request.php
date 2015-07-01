@@ -517,10 +517,17 @@ class Request
      */
     public function __toString()
     {
+        $content = '';
+        try {
+            $content = $this->getContent();
+        } catch (\LogicException $e) {
+            return trigger_error($e, E_USER_ERROR);
+        }
+
         return
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
             $this->headers."\r\n".
-            $this->getContent();
+            $content;
     }
 
     /**

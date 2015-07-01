@@ -66,6 +66,30 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     }
 
     /**
+     * Flattens an array into the given output variable.
+     *
+     * @param array $array  The array to flatten
+     * @param array $output The flattened output
+     *
+     * @internal Should not be used by user-land code
+     */
+    private static function flatten(array $array, &$output)
+    {
+        if (null === $output) {
+            $output = array();
+        }
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                self::flatten($value, $output);
+                continue;
+            }
+
+            $output[$key] = $value;
+        }
+    }
+
+    /**
      * Decorates the given factory.
      *
      * @param ChoiceListFactoryInterface $decoratedFactory The decorated factory
@@ -100,7 +124,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // We ignore the choice groups for caching. If two choice lists are
         // requested with the same choices, but a different grouping, the same
         // choice list is returned.
-        DefaultChoiceListFactory::flatten($choices, $flatChoices);
+        self::flatten($choices, $flatChoices);
 
         $hash = self::generateHash(array($flatChoices, $value), 'fromChoices');
 
@@ -129,7 +153,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // We ignore the choice groups for caching. If two choice lists are
         // requested with the same choices, but a different grouping, the same
         // choice list is returned.
-        DefaultChoiceListFactory::flattenFlipped($choices, $flatChoices);
+        self::flatten($choices, $flatChoices);
 
         $hash = self::generateHash(array($flatChoices, $value), 'fromFlippedChoices');
 
@@ -161,7 +185,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
-
         $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr));
 
         if (!isset($this->views[$hash])) {

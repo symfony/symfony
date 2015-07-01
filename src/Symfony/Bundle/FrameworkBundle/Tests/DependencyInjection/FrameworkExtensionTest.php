@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -530,14 +530,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
     }
 
-    private function assertPathPackage(ContainerBuilder $container, Definition $package, $basePath, $version, $format)
+    private function assertPathPackage(ContainerBuilder $container, DefinitionDecorator $package, $basePath, $version, $format)
     {
         $this->assertEquals('assets.path_package', $package->getParent());
         $this->assertEquals($basePath, $package->getArgument(0));
         $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
     }
 
-    private function assertUrlPackage(ContainerBuilder $container, Definition $package, $baseUrls, $version, $format)
+    private function assertUrlPackage(ContainerBuilder $container, DefinitionDecorator $package, $baseUrls, $version, $format)
     {
         $this->assertEquals('assets.url_package', $package->getParent());
         $this->assertEquals($baseUrls, $package->getArgument(0));

@@ -179,16 +179,16 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
         try {
             $dateTime = new \DateTime(sprintf(
-                '%s-%s-%s %s:%s:%s %s',
+                '%s-%s-%s %s:%s:%s',
                 empty($value['year']) ? '1970' : $value['year'],
                 empty($value['month']) ? '1' : $value['month'],
                 empty($value['day']) ? '1' : $value['day'],
                 empty($value['hour']) ? '0' : $value['hour'],
                 empty($value['minute']) ? '0' : $value['minute'],
                 empty($value['second']) ? '0' : $value['second']
-+               ),
-+new \DateTimeZone($this->outputTimezone)
-+            );
+                ),
+                new \DateTimeZone($this->outputTimezone)
+            );
 
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));

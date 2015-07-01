@@ -81,7 +81,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 1
                         )
@@ -96,7 +96,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 2
                         )
@@ -107,7 +107,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 3
                         )

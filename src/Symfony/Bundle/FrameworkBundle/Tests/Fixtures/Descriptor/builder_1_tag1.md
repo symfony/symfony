@@ -12,6 +12,7 @@ definition_2
 - Public: no
 - Synthetic: yes
 - Lazy: no
+- Shared: yes
 - Abstract: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`

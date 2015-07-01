@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * allowed specifying a directory to recursively load all configuration files it contains
+ * deprecated the concept of scopes
+ * added `Definition::setShared()` and `Definition::isShared()`
 
 2.7.0
 -----

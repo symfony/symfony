@@ -4,6 +4,7 @@
     "public": false,
     "synthetic": true,
     "lazy": false,
+    "shared": true,
     "abstract": false,
     "file": "\/path\/to\/file",
     "factory_service": "factory.service",

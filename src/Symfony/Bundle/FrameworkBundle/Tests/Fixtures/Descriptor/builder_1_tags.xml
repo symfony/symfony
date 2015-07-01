@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <container>
   <tag name="tag1">
-    <definition id="definition_2" class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" abstract="false" file="/path/to/file">
+    <definition id="definition_2" class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" shared="true" abstract="false" file="/path/to/file">
       <factory service="factory.service" method="get"/>
     </definition>
   </tag>
   <tag name="tag2">
-    <definition id="definition_2" class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" abstract="false" file="/path/to/file">
+    <definition id="definition_2" class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" shared="true" abstract="false" file="/path/to/file">
       <factory service="factory.service" method="get"/>
     </definition>
   </tag>

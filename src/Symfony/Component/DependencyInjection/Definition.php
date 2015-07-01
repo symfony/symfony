@@ -26,6 +26,7 @@ class Definition
     private $class;
     private $file;
     private $factory;
+    private $shared = true;
     private $scope = ContainerInterface::SCOPE_CONTAINER;
     private $properties = array();
     private $calls = array();
@@ -485,6 +486,34 @@ class Definition
     }
 
     /**
+     * Sets if the service must be shared or not.
+     *
+     * @param bool $shared Whether the service must be shared or not
+     *
+     * @return Definition The current instance
+     *
+     * @api
+     */
+    public function setShared($shared)
+    {
+        $this->shared = (bool) $shared;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is shared.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isShared()
+    {
+        return $this->shared;
+    }
+
+    /**
      * Sets the scope of the service.
      *
      * @param string $scope Whether the service must be shared or not
@@ -492,9 +521,19 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function setScope($scope)
+    public function setScope($scope, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
+        if (ContainerInterface::SCOPE_PROTOTYPE === $scope) {
+            $this->setShared(false);
+        }
+
         $this->scope = $scope;
 
         return $this;
@@ -506,9 +545,15 @@ class Definition
      * @return string
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function getScope()
+    public function getScope($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->scope;
     }
 

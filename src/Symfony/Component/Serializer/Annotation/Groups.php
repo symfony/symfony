@@ -35,16 +35,16 @@ class Groups
     public function __construct(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {
-            throw new InvalidArgumentException(sprintf("Parameter of annotation '%s' cannot be empty.", get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', get_class($this)));
         }
 
         if (!is_array($data['value'])) {
-            throw new InvalidArgumentException(sprintf("Parameter of annotation '%s' must be an array of strings.", get_class($this)));
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an array of strings.', get_class($this)));
         }
 
         foreach ($data['value'] as $group) {
             if (!is_string($group)) {
-                throw new InvalidArgumentException(sprintf("Parameter of annotation '%s' must be an array of strings.", get_class($this)));
+                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an array of strings.', get_class($this)));
             }
         }
 

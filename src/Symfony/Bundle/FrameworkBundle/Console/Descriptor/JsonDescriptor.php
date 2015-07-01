@@ -210,11 +210,15 @@ class JsonDescriptor extends Descriptor
     {
         $data = array(
             'class' => (string) $definition->getClass(),
-            'scope' => $definition->getScope(),
+            'scope' => $definition->getScope(false),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
         );
+
+        if (method_exists($definition, 'isShared')) {
+            $data['shared'] = $definition->isShared();
+        }
 
         $data['abstract'] = $definition->isAbstract();
         $data['file'] = $definition->getFile();

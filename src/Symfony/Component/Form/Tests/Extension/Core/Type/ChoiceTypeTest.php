@@ -186,6 +186,32 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         }
     }
 
+    public function testExpandedChoicesOptionsAreFlattenedObjectChoices()
+    {
+        $obj1 = (object) array('id' => 1, 'name' => 'Bernhard');
+        $obj2 = (object) array('id' => 2, 'name' => 'Fabien');
+        $obj3 = (object) array('id' => 3, 'name' => 'Kris');
+        $obj4 = (object) array('id' => 4, 'name' => 'Jon');
+        $obj5 = (object) array('id' => 5, 'name' => 'Roman');
+
+        $form = $this->factory->create('choice', null, array(
+            'expanded' => true,
+            'choices' => array(
+                'Symfony' => array($obj1, $obj2, $obj3),
+                'Doctrine' => array($obj4, $obj5),
+            ),
+            'choices_as_values' => true,
+            'choice_name' => 'id',
+        ));
+
+        $this->assertSame(5, $form->count(), 'Each nested choice should become a new field, not the groups');
+        $this->assertTrue($form->has(1));
+        $this->assertTrue($form->has(2));
+        $this->assertTrue($form->has(3));
+        $this->assertTrue($form->has(4));
+        $this->assertTrue($form->has(5));
+    }
+
     public function testExpandedCheckboxesAreNeverRequired()
     {
         $form = $this->factory->create('choice', null, array(

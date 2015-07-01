@@ -119,9 +119,9 @@ abstract class Controller extends ContainerAware
      * @param mixed $attributes The attributes
      * @param mixed $object     The object
      *
-     * @throws \LogicException
-     *
      * @return bool
+     *
+     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null)
     {
@@ -231,7 +231,7 @@ abstract class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
-    protected function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }

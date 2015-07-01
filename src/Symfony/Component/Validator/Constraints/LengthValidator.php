@@ -70,12 +70,14 @@ class LengthValidator extends ConstraintValidator
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ charset }}', $constraint->charset)
                     ->setInvalidValue($value)
+                    ->setCode(Length::INVALID_CHARACTERS_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->charsetMessage)
                     ->setParameter('{{ value }}', $this->formatValue($stringValue))
                     ->setParameter('{{ charset }}', $constraint->charset)
                     ->setInvalidValue($value)
+                    ->setCode(Length::INVALID_CHARACTERS_ERROR)
                     ->addViolation();
             }
 

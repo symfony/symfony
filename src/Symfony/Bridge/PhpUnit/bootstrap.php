@@ -12,6 +12,9 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Comman
 // https://bugs.php.net/bug.php?id=53976
 gc_disable();
 
+// Enforce a consistent locale
+setlocale(LC_ALL, 'C');
+
 if (class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
     AnnotationRegistry::registerLoader('class_exists');
 }

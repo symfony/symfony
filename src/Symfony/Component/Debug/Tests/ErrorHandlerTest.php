@@ -266,6 +266,33 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHandleUserError()
+    {
+        try {
+            $handler = ErrorHandler::register();
+            $handler->throwAt(0, true);
+
+            $e = null;
+            $x = new \Exception('Foo');
+
+            try {
+                $f = new Fixtures\ToStringThrower($x);
+                $f .= ''; // Trigger $f->__toString()
+            } catch (\Exception $e) {
+            }
+
+            $this->assertSame($x, $e);
+
+            restore_error_handler();
+            restore_exception_handler();
+        } catch (\Exception $e) {
+            restore_error_handler();
+            restore_exception_handler();
+
+            throw $e;
+        }
+    }
+
     public function testHandleException()
     {
         try {

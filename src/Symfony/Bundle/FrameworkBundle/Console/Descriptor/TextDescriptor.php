@@ -170,7 +170,7 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $maxTags = array();
 
-        foreach ($serviceIds as $key =>  $serviceId) {
+        foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
                 // filter out private services unless shown explicitly
@@ -256,10 +256,13 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Tags</comment>             -';
         }
 
-        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope());
+        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope(false));
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
+        if (method_exists($definition, 'isShared')) {
+            $description[] = sprintf('<comment>Shared</comment>           %s', $definition->isShared() ? 'yes' : 'no');
+        }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {

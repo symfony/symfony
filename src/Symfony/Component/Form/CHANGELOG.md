@@ -18,6 +18,7 @@ CHANGELOG
  * added the html5 "range" FormType
  * deprecated the "cascade_validation" option in favor of setting "constraints"
    with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
 
 2.7.0
 -----

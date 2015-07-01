@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInterface;
-use Symfony\Component\Form\FormConfigBuilder;
-
 /**
  * Contains choices that can be selected in a form field.
  *
@@ -30,10 +27,24 @@ use Symfony\Component\Form\FormConfigBuilder;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated since version 2.7, to be removed in 3.0.
- *             Use {@link BaseChoiceListInterface} instead.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ChoiceListInterface} instead.
  */
-interface ChoiceListInterface extends BaseChoiceListInterface
+interface ChoiceListInterface
 {
+    /**
+     * Returns the list of choices.
+     *
+     * @return array The choices with their indices as keys
+     */
+    public function getChoices();
+
+    /**
+     * Returns the values for the choices.
+     *
+     * @return array The values with the corresponding choice indices as keys
+     */
+    public function getValues();
+
     /**
      * Returns the choice views of the preferred choices as nested array with
      * the choice groups as top-level keys.
@@ -83,6 +94,37 @@ interface ChoiceListInterface extends BaseChoiceListInterface
      * @see getPreferredValues()
      */
     public function getRemainingViews();
+
+    /**
+     * Returns the choices corresponding to the given values.
+     *
+     * The choices can have any data type.
+     *
+     * The choices must be returned with the same keys and in the same order
+     * as the corresponding values in the given array.
+     *
+     * @param array $values An array of choice values. Not existing values in
+     *                      this array are ignored
+     *
+     * @return array An array of choices with ascending, 0-based numeric keys
+     */
+    public function getChoicesForValues(array $values);
+
+    /**
+     * Returns the values corresponding to the given choices.
+     *
+     * The values must be strings.
+     *
+     * The values must be returned with the same keys and in the same order
+     * as the corresponding choices in the given array.
+     *
+     * @param array $choices An array of choices. Not existing choices in this
+     *                       array are ignored
+     *
+     * @return array An array of choice values with ascending, 0-based numeric
+     *               keys
+     */
+    public function getValuesForChoices(array $choices);
 
     /**
      * Returns the indices corresponding to the given choices.

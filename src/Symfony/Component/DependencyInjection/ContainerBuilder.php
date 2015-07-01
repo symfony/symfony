@@ -358,9 +358,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scopes
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function getScopes()
+    public function getScopes($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->scopes;
     }
 
@@ -370,14 +376,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scope children.
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function getScopeChildren()
+    public function getScopeChildren($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->scopeChildren;
     }
 
     /**
      * Sets a service.
+     *
+     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
@@ -1126,7 +1140,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function shareService(Definition $definition, $service, $id)
     {
-        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        if ($definition->isShared() && self::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
             if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
                 throw new InactiveScopeException($id, $scope);
             }

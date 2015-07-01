@@ -40,7 +40,7 @@ class TextDescriptor extends Descriptor
         $totalWidth = isset($options['total_width']) ? $options['total_width'] : strlen($argument->getName());
         $spacingWidth = $totalWidth - strlen($argument->getName()) + 2;
 
-        $this->writeText(sprintf("  <info>%s</info>%s%s%s",
+        $this->writeText(sprintf('  <info>%s</info>%s%s%s',
             $argument->getName(),
             str_repeat(' ', $spacingWidth),
             // + 17 = 2 spaces + <info> + </info> + 2 spaces
@@ -77,7 +77,7 @@ class TextDescriptor extends Descriptor
 
         $spacingWidth = $totalWidth - strlen($synopsis) + 2;
 
-        $this->writeText(sprintf("  <info>%s</info>%s%s%s%s",
+        $this->writeText(sprintf('  <info>%s</info>%s%s%s%s',
             $synopsis,
             str_repeat(' ', $spacingWidth),
             // + 17 = 2 spaces + <info> + </info> + 2 spaces
@@ -207,7 +207,7 @@ class TextDescriptor extends Descriptor
                 foreach ($namespace['commands'] as $name) {
                     $this->writeText("\n");
                     $spacingWidth = $width - strlen($name);
-                    $this->writeText(sprintf("  <info>%s</info>%s%s", $name, str_repeat(' ', $spacingWidth), $description->getCommand($name)->getDescription()), $options);
+                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $description->getCommand($name)->getDescription()), $options);
                 }
             }
 
@@ -262,7 +262,8 @@ class TextDescriptor extends Descriptor
     {
         $totalWidth = 0;
         foreach ($options as $option) {
-            $nameLength = 4 + strlen($option->getName()) + 2; // - + shortcut + , + whitespace + name + --
+            // "-" + shortcut + ", --" + name
+            $nameLength = 1 + max(strlen($option->getShortcut()), 1) + 4 + strlen($option->getName());
 
             if ($option->acceptValue()) {
                 $valueLength = 1 + strlen($option->getName()); // = + value

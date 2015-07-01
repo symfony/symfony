@@ -95,10 +95,10 @@
                 </td>
                 <td>
                     {% for key, value in message.parameters %}
-                        <code>{{ key }} = {{ value }}</code><br />
+                        <code>{{ key }} = {{ value }}</code>{% if message.transChoiceNumber is not null or not loop.last %}<br />{% endif %}
                     {% endfor %}
                     {% if message.transChoiceNumber is not null %}
-                        <em><code>transChoice count = {{ message.transChoiceNumber }}</code></em>
+                        <em><code>pluralization = {{ message.transChoiceNumber }}</code></em>
                     {% endif %}
                 </td>
                 <td><code>{{ message.translation }}</code></td>

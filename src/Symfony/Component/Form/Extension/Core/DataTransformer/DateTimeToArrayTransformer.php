@@ -185,9 +185,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 empty($value['day']) ? '1' : $value['day'],
                 empty($value['hour']) ? '0' : $value['hour'],
                 empty($value['minute']) ? '0' : $value['minute'],
-                empty($value['second']) ? '0' : $value['second'],
-                $this->outputTimezone
-            ));
+                empty($value['second']) ? '0' : $value['second']
++               ),
++               new \DateTimeZone($this->outputTimezone)
++            );
 
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));

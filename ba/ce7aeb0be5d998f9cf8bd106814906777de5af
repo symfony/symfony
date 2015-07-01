@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-01T14:31:25Z
+
+You also need to change the sprintf format `'%s-%s-%s %s:%s:%s %s'` which is not correct anymore.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-01T14:39:20Z
+
+The PHP bug seems true: http://3v4l.org/Q1lpe
+
+I guess it's because this timezone is not meant to be used anymore: http://php.net/manual/en/timezones.others.php
+> Warning
+Please do not use any of the timezones listed here (besides UTC), they only exist for backward compatible reasons.
+
+But I think the change here makes sense anyway. When there is a timezone parameter we should use it instead of letting it being parsed from the string.
+
+---------------------------------------------------------------------------
+
+by zhil at 2015-07-01T15:03:02Z
+
+@Tobion fixed sprintf format as well
+
+---------------------------------------------------------------------------
+
+by zhil at 2015-07-01T15:04:32Z
+
+@Tobion not sure exactly, but probably outputTimezone could be empty sometimes - should I add check if its valid timezone?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-01T16:00:05Z
+
+It cannot be empty because it uses the default timezone if none is provided: https://github.com/zhil/symfony/blob/2.8/src/Symfony/Component/Form/Extension/Core/DataTransformer/BaseDateTimeTransformer.php#L51
+So you don't need to check it (an invalid one would fail before as well).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-01T16:03:14Z
+
+:+1: should be merged in 2.3

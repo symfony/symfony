@@ -13,6 +13,8 @@ namespace Symfony\Component\Stopwatch\Tests;
 
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
+require_once __DIR__.'/ClockMock.php';
+
 /**
  * StopwatchEventTest.
  *

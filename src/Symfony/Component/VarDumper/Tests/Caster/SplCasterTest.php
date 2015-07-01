@@ -23,7 +23,7 @@ class SplCasterTest extends VarDumperTestCase
         return array(
             array(__FILE__, <<<'EOTXT'
 SplFileInfo {
-  path: "%s/Tests/Caster"
+%Apath: "%s/Tests/Caster"
   filename: "SplCasterTest.php"
   basename: "SplCasterTest.php"
   pathname: "%s/Tests/Caster/SplCasterTest.php"
@@ -49,7 +49,7 @@ EOTXT
             ),
             array('https://google.com/about', <<<'EOTXT'
 SplFileInfo {
-  path: "https://google.com"
+%Apath: "https://google.com"
   filename: "about"
   basename: "about"
   pathname: "https://google.com/about"
@@ -79,7 +79,7 @@ EOTXT
         $var->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
         $dump = <<<'EOTXT'
 SplFileObject {
-  path: "%s/Tests/Caster"
+%Apath: "%s/Tests/Caster"
   filename: "SplCasterTest.php"
   basename: "SplCasterTest.php"
   pathname: "%s/Tests/Caster/SplCasterTest.php"

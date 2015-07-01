@@ -123,7 +123,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $role->expects($this->any())->method('getSource')->willReturn($originalToken);
         $this
-            ->securityContext
+            ->tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->willReturn($this->getToken(array($role)));
@@ -154,7 +154,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $listener->handle($this->event);
     }
 

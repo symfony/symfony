@@ -46,16 +46,16 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         $dumpId = $dumpId[0];
         $res = (int) $var['res'];
         $closure54 = '';
+        $r = defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
 
         if (PHP_VERSION_ID >= 50400) {
             $closure54 = <<<EOTXT
 
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="48 characters">Symfony\Component\VarDumper\Tests\HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {<a class=sf-dump-ref>#%d</a> &#8230;}
+    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {{$r} &#8230;}
 EOTXT;
         }
 
-        $r = defined('HHVM_VERSION') ? '' : '<a class=sf-dump-ref>#%d</a>';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 <foo></foo><bar><span class=sf-dump-note>array:24</span> [<samp>

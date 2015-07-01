@@ -43,16 +43,16 @@ class CliDumperTest extends VarDumperTestCase
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
         $closure54 = '';
+        $r = defined('HHVM_VERSION') ? '' : '#%d';
 
         if (PHP_VERSION_ID >= 50400) {
             $closure54 = <<<EOTXT
 
     class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
 EOTXT;
         }
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -123,11 +123,11 @@ EOTXT
 
         $var = xml_parser_create();
 
-        $this->assertDumpEquals(
+        $this->assertDumpMatchesFormat(
             <<<EOTXT
 xml resource {
-  current_byte_index: 0
-  current_column_number: 1
+  current_byte_index: %i
+  current_column_number: %i
   current_line_number: 1
   error_code: XML_ERROR_NONE
 }

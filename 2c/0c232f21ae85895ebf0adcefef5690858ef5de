@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-06-30T22:02:28Z
+
+Hi @shehi!
+
+Thanks for the pull request! I speak absolutely no Azerbaijani at all, so I will need your help :).
+
+According to these rules: http://localization-guide.readthedocs.org/en/latest/l10n/pluralforms.html, `az` follows the same ruleset as, for example, `en`. That implies that the original code *is* correct - that there is no bug here. Also - your example (0 books, 1 book, 2+ books), is the same as English as well.
+
+So, I think this patch is invalid. What's causing you to think it's wrong?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-06-30T23:52:00Z
+
+Firstly, I am Azeri :) Born and raised. And I live in Turkey, I speak that language fluently as well.
+
+Secondly, to be precise with examples (btw plural form suffix in AZ is ```-lar```
+or ```-lər``` and ```apple``` means ```alma``` in AZ)...
+
+```Give me an apple!``` - ```Mənə 1 alma ver!```
+```I got two apples``` - ```Mənim 3 almam var.```
+```Do you have 3 apples?``` - ```Sənin 3 alman varmı?```
+```Where did you put those apples?``` - ```O almaları hara qoydun?```
+(notice this example isn't a count case, just plural, so the word has plural
+form suffix).
+
+Are we good now?
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-06-30T23:57:28Z
+
+More on the subject: so our language is EXACTLY like Turkish (TR) as we are close dialects of the same language family. Also, both these languages are: ```nplurals=2; plural=0;```, not ```nplurals=1; plural=0;```, meaning when COUNTED we don't use plural form suffixes, but when talking in general about objects in multitude, we do. And the code I fixed above is about that case. Now check that very table for TR, you will see it has the same rules as AZ (oh, btw, for AZ, it says ```nplurals=2; plural=(n != 1);``` which is *completely* wrong, coz in case ```n = 0``` there can't be any suffixes in our language, so it is as in TR: ```nplurals=2; plural=(n > 1);``` when you are *not* counting). Then check your code for TR, you will see it's ```$n = 0``` regardless (the correct case). Same goes for AZ.
+
+Also there are many cases where plural form suffix can be used with irregular counters, such as:
+
+```many apples``` = ```coxlu almalar``` (we have suffix here) | ```coxlu alma``` (and without suffix, both versions are correct).
+
+So as programmers, we don't need to re-invent the Azeri grammar here, we need *minimum set of correct rules* to apply to our l10n coding. That's why, as weird as it looks, for AZ and TR the rule of: ```nplurals = 2; plural = 0``` is correct in 100% of cases when you are *counting*, whereas the otherwise is not.
+
+Overall, for the sake of sanity, let's call it a day with rule ```nplurals=1;plural=0``` for AZ language, in case of counting (our context) and move on, shall we? :D
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-07-01T00:26:54Z
+
+Last, but not least, check Mozilla rules here:
+
+https://developer.mozilla.org/en-US/docs/Mozilla/Localization/Localization_and_Plurals
+
+As you can see Turkic Altaic languages have one plural form (I am sure it's for the case where you count, not other generic cases) for all counts: 0, 1, 2 ... And Mozilla tools are much widely used, than let's say Ubuntu/Linux localized tools where the rules are wrong for the case of counting:
+
+https://translations.launchpad.net/+languages/az
+
+I am Azeri and trust me, I never use Ubuntu in azeri localized version (full of bugs, crashes every half an hour).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-01T01:28:42Z
+
+@shehi Thanks for all the info :) - these pluralizations make my head spin.
+
+And so I can't add anything else intelligent to your argument, but I did find a prominent example that agrees with you. It's RoR: https://github.com/svenfuchs/rails-i18n/tree/804b142d46f171f130c38a48ceab7019e8a7465d/rails/pluralization. If you click any language, our "0" is their "Other", and our "1" is their "OneOther".
+
+Anyways, in that list, `az` is "Other" as well as everything else in our "0" list. And everything in our "1" list is "OneOther".
+
+So :+1:  and ping @aitboudad (who is a merger for the Translation component). This is a bug fix, but since it has potentially large BC implications for any existing applications, I would lean towards merging into 2.8.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-07-01T08:00:04Z
+
+Thanks @weaverryan : I am Laravel developer and since they use Symfony as their backbone, I need this be done with as soon as possible. I understand BC implications and really hope 2.8 gets released as early as possible. Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:08:42Z
+
+@shehi 2.8 will be released at the end of November. Our release schedule is very well defined. New versions are always released at the end of May and November.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-01T08:11:00Z
+
+It looks like a bug fix to me, no?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:11:53Z
+
+@fabpot see the comment of @weaverryan just above
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-07-01T08:13:13Z
+
+@stof : Oh boy! Please do your best to get this one in, as early as possible. It is a bugfix and I am damn sure every Azeri dev out there fixed this on their own to circumvent the problem. I understand you might not be convinced and remain wary re BC implications - but we are not a very big nation and using this plural form in its current form would be outright wrong and laughable, from Azeri point of view.
+
+Anyway, that's it :) THANKS A LOT for such a wonderful tool guys and thanks for maintaining it!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-01T08:15:36Z
+
+I don't understand the BC implications here. If the plural is wrong, it needs to be fixed, as there is no way people could get something working correctly with the current code as far as I understand. Any bug fix is a BC break somehow.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-01T11:22:32Z
+
+I would consider it a bug fix and could you also open PR for [zf1](https://github.com/zendframework/zf1/blob/master/library/Zend/Translate/Plural.php) :)
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-07-01T13:19:05Z
+
+@aitboudad : Done, though been ages last time I used ZF1 :) Like 10 years lol.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-01T13:29:04Z
+
+Time to merge?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-01T13:38:04Z
+
+:+1: (I don't know anything about this language, but @shehi's explanations sound convincing)
+
+---------------------------------------------------------------------------
+
+by shehi at 2015-07-01T13:50:04Z
+
+How else do you maintain i18n related projects anyway? :) One can't know all those languages, can they now? Hehehe.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-01T14:15:37Z
+
+:+1: and also agree with merging into 2.3 (I thought more about this last night - agree that anyone using `az` was working around this anyways)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T14:19:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-01T14:20:02Z
+
+:+1:

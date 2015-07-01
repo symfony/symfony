@@ -285,8 +285,22 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('anonymous')
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return isset($v['key']); })
+                    ->then(function ($v) {
+                        if (isset($v['secret'])) {
+                            throw new \LogicException('Cannot set both key and secret options for security.firewall.anonymous, use only secret instead.');
+                        }
+
+                        @trigger_error('security.firewall.anonymous.key is deprecated since version 2.8 and will be removed in 3.0. Use security.firewall.anonymous.secret instead.', E_USER_DEPRECATED);
+
+                        $v['secret'] = $v['key'];
+
+                        unset($v['key']);
+                    })
+                ->end()
                 ->children()
-                    ->scalarNode('key')->defaultValue(uniqid())->end()
+                    ->scalarNode('secret')->defaultValue(uniqid())->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')

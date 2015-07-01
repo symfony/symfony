@@ -410,7 +410,7 @@ class SecurityExtension extends Extension
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['key'])
+                ->replaceArgument(1, $firewall['anonymous']['secret'])
             ;
 
             $listeners[] = new Reference($listenerId);
@@ -418,7 +418,7 @@ class SecurityExtension extends Extension
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['key'])
+                ->replaceArgument(0, $firewall['anonymous']['secret'])
             ;
 
             $authenticationProviders[] = $providerId;

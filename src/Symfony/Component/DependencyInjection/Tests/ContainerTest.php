@@ -320,6 +320,49 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
+    public function testReset()
+    {
+        $c = new Container();
+        $c->set('bar', new \stdClass());
+
+        $c->reset();
+
+        $this->assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage Resetting the container is not allowed when a scope is active.
+     * @group legacy
+     */
+    public function testCannotResetInActiveScope()
+    {
+        $c = new Container();
+        $c->addScope(new Scope('foo'));
+        $c->set('bar', new \stdClass());
+
+        $c->enterScope('foo');
+
+        $c->reset();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testResetAfterLeavingScope()
+    {
+        $c = new Container();
+        $c->addScope(new Scope('foo'));
+        $c->set('bar', new \stdClass());
+
+        $c->enterScope('foo');
+        $c->leaveScope('foo');
+
+        $c->reset();
+
+        $this->assertNull($c->get('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
     /**
      * @group legacy
      */

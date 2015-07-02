@@ -82,21 +82,31 @@
         </tr>
     </table>
 
-    {% if collector.logs %}
-        <ul class="alt">
+{% if collector.logs %}
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Priority</th>
+                <th>Channel</th>
+                <th>Message and context</th>
+            </tr>
+
             {% set log_loop_index = 0 %}
             {% for log in collector.logs %}
                 {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
                 {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
                     {% set log_loop_index = log_loop_index + 1 %}
-                    <li class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
-                        {{ logger.display_message(loop.index, log, is_deprecation) }}
-                    </li>
+                    <tr class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
+                        <td>{{ log_loop_index }}</td>
+                        <td>{{ is_deprecation ? 'DEPRECATION' : log.priorityName }}</td>
+                        <td>{{ log.channel is defined ? log.channel }}</td>
+                        <td>{{ logger.display_message(loop.index, log, is_deprecation) }}</td>
+                    </tr>
                 {% endif %}
             {% else %}
-                <li><em>No logs available for this priority.</em></li>
+                <tr><td colspan="4"><em>No logs available for {{ priority }} priority.</em></td></tr>
             {% endfor %}
-        </ul>
+        </table>
     {% else %}
         <p>
             <em>No logs available.</em>
@@ -106,11 +116,13 @@
 
 
 {% macro display_message(log_index, log, is_deprecation) %}
+    {{ is_deprecation ? 'DEPRECATED' : log.priorityName }} - {{ log.message }}
+
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
         {% set id = 'sf-call-stack-' ~ log_index %}
 
-        DEPRECATED - {{ log.message }}
+        {{ log.message }}
 
         {% if stack %}
             <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
@@ -140,7 +152,6 @@
             {% endif %}
         {% endfor %}
     {% else %}
-        {{ log.priorityName }} - {{ log.message }}
         {% if log.context is defined and log.context is not empty %}
             <br />
             <small>

@@ -1,12 +1,6 @@
-
-    <div class="sf-toolbar-block sf-toolbar-block-{{ block_name|default(name) }} sf-toolbar-status-{{ block_status|default('') }}">
-{% if link %}
-    <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">
-{% endif %}
+<div class="sf-toolbar-block sf-toolbar-block-{{ block_name|default(name) }} sf-toolbar-status-{{ block_status|default('normal') }}">
+    {% if link %}<a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}"{% endif %}
         <div class="sf-toolbar-icon">{{ icon|default('') }}</div>
         <div class="sf-toolbar-info">{{ text|default('') }}</div>
-{% if link %}
-    </a>
-{% endif %}
-    </div>
-
+    {% if link %}</a>{% endif %}
+</div>

@@ -15,22 +15,21 @@
     {% elseif 'dev' == collector.symfonyState %}
         {% set block_status = 'yellow' %}
         {% set symfony_version_status = 'This Symfony version is still in the development phase.' %}
-    <span class="sf-toolbar-status sf-toolbar-status-yellow" title="">
     {% else %}
         {% set block_status = '' %}
         {% set symfony_version_status = '' %}
     {% endif %}
 
     {% set icon %}
-        <a href="https://symfony.com/" title="{{ symfony_version_status }}">
             {% if collector.applicationname %}
                 <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
                 <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
             {% elseif collector.symfonyState is defined %}
-                <span class="sf-toolbar-label">symfony</span>
-                <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
+                <a href="https://symfony.com/" title="{{ symfony_version_status }}">
+                    <span class="sf-toolbar-label">symfony</span>
+                    <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
+                </a>
             {% endif %}
-        </a>
     {% endset %}
     {% set text %}
         {% if collector.applicationname %}

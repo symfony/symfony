@@ -69,4 +69,12 @@ class FrozenParameterBag extends ParameterBag
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($name)
+    {
+        throw new LogicException('Impossible to call remove() on a frozen ParameterBag.');
+    }
 }

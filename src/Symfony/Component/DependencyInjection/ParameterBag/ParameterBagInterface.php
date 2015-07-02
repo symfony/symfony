@@ -89,17 +89,6 @@ interface ParameterBagInterface
     public function has($name);
 
     /**
-     * Removes a parameter.
-     *
-     * @param string $name The parameter name
-     *
-     * @throws LogicException if the parameter can not be removed
-     *
-     * @api
-     */
-    public function remove($name);
-
-    /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
     public function resolve();

@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "symfony/security": "~2.8|~3.0.0",
-        "symfony/http-kernel": "~2.2|~3.0.0"
+        "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
@@ -28,8 +28,8 @@
         "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0",
         "symfony/dependency-injection": "~2.6,>=2.6.6|~3.0.0",
         "symfony/dom-crawler": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/form": "~2.7|~3.0.0",
-        "symfony/framework-bundle": "~2.7|~3.0.0",
+        "symfony/form": "~2.7",
+        "symfony/framework-bundle": "~2.7",
         "symfony/http-foundation": "~2.4|~3.0.0",
         "symfony/twig-bundle": "~2.7|~3.0.0",
         "symfony/twig-bridge": "~2.7|~3.0.0",

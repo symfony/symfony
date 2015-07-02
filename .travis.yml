@@ -9,6 +9,7 @@ addons:
 
 matrix:
     include:
+        - php: hhvm
         - php: 5.3
         - php: 5.4
         - php: 5.5
@@ -18,7 +19,6 @@ matrix:
         - php: 5.6
           env: deps=high
         - php: nightly
-        - php: hhvm
     allow_failures:
         - php: nightly
     fast_finish: true

@@ -40,7 +40,6 @@ class File extends Constraint
         self::INVALID_MIME_TYPE_ERROR => 'INVALID_MIME_TYPE_ERROR',
     );
 
-    public $maxSize;
     public $binaryFormat;
     public $mimeTypes = array();
     public $notFoundMessage = 'The file could not be found.';
@@ -58,29 +57,56 @@ class File extends Constraint
     public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
     public $uploadErrorMessage = 'The file could not be uploaded.';
 
+    protected $maxSize;
+
     public function __construct($options = null)
     {
         parent::__construct($options);
 
-        if ($this->maxSize) {
-            if (ctype_digit((string) $this->maxSize)) {
-                $this->maxSize = (int) $this->maxSize;
-                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-            } elseif (preg_match('/^\d++k$/i', $this->maxSize)) {
-                $this->maxSize = $this->maxSize * 1000;
-                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-            } elseif (preg_match('/^\d++M$/i', $this->maxSize)) {
-                $this->maxSize = $this->maxSize * 1000000;
-                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-            } elseif (preg_match('/^\d++Ki$/i', $this->maxSize)) {
-                $this->maxSize = $this->maxSize << 10;
-                $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
-            } elseif (preg_match('/^\d++Mi$/i', $this->maxSize)) {
-                $this->maxSize = $this->maxSize << 20;
-                $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
-            } else {
-                throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
-            }
+        if (null !== $this->maxSize) {
+            $this->normalizeBinaryFormat($this->maxSize);
+        }
+    }
+
+    public function __set($option, $value)
+    {
+        if ('maxSize' === $option) {
+            $this->normalizeBinaryFormat($value);
+
+            return;
+        }
+
+        parent::__set($option, $value);
+    }
+
+    public function __get($option)
+    {
+        if ('maxSize' === $option) {
+            return $this->maxSize;
+        }
+
+        return parent::__get($option);
+    }
+
+    private function normalizeBinaryFormat($maxSize)
+    {
+        if (ctype_digit((string) $maxSize)) {
+            $this->maxSize = (int) $maxSize;
+            $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
+        } elseif (preg_match('/^\d++k$/i', $maxSize)) {
+            $this->maxSize = $maxSize * 1000;
+            $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
+        } elseif (preg_match('/^\d++M$/i', $maxSize)) {
+            $this->maxSize = $maxSize * 1000000;
+            $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
+        } elseif (preg_match('/^\d++Ki$/i', $maxSize)) {
+            $this->maxSize = $maxSize << 10;
+            $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
+        } elseif (preg_match('/^\d++Mi$/i', $maxSize)) {
+            $this->maxSize = $maxSize << 20;
+            $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
+        } else {
+            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
         }
     }
 }

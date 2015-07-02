@@ -55,7 +55,7 @@ security:
             remote_user: true
             logout: true
             remember_me:
-                key: TheKey
+                secret: TheSecret
         host:
             pattern: /test
             host: foo\.example\.org

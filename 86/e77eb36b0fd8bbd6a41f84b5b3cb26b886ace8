@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T10:21:51Z
+
+should we also cut internals for Mockery mocks ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-02T10:25:32Z
+
+> should we also cut internals for Mockery mocks ?
+
+I don't use Mockery... So no ? ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T10:33:19Z
+
+@lyrixx ``Mockery\MockInterface`` is the mockery mock interface.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-02T13:34:47Z
+
+I added support for Mockery
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T13:39:08Z
+
+@lyrixx In the case of Prophecy, ``$this->prophesize('Datetime')`` does not give you a test double. It is the ``Prophecy\Prophecy\ObjectProphecy`` instance used to configure your test double. You will only get the test double after calling ``->reveal()`` on it. this is why I said that the interface for which cutting internals makes sense is ``Prophecy\Prophecy\ProphecySubjectInterface``
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-02T14:21:00Z
+
+@stof Ah, Got it ;)Thanks. Fixed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-02T14:27:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T14:44:23Z
+
+:+1:

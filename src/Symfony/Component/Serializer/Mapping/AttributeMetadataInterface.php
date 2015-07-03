@@ -42,6 +42,20 @@ interface AttributeMetadataInterface
     public function getGroups();
 
     /**
+     * Sets the normalization alias of this attribute.
+     *
+     * @param string|null $alias
+     */
+    public function setAlias($alias);
+
+    /**
+     * Gets the normalization alias of this attribute.
+     *
+     * @return string|null
+     */
+    public function getAlias();
+
+    /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      *
      * @param AttributeMetadataInterface $attributeMetadata

@@ -44,11 +44,14 @@
     <xsd:complexType name="attribute">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
-        Contains serialization groups for a attributes. The name of the attribute should be given in the "name" option.
+        Contains serialization metadata for a attributes. The name of the attribute should be given in the "name" attribute.
       ]]></xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
-            <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
+            <xsd:choice>
+                <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
+            </xsd:choice>
+            <xsd:element name="alias" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>

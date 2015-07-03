@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface GroupDummyInterface
+interface MappedDummyInterface
 {
     /**
      * @Groups({"a", "name_converter"})

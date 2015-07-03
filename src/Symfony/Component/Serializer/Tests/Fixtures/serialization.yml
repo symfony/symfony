@@ -1,6 +1,7 @@
-Symfony\Component\Serializer\Tests\Fixtures\GroupDummy:
+Symfony\Component\Serializer\Tests\Fixtures\MappedDummy:
   attributes:
     foo:
       groups: ['group1', 'group2']
     bar:
       groups: ['group2']
+      alias:  'myBar'

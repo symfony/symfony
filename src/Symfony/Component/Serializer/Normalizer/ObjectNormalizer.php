@@ -112,7 +112,7 @@ class ObjectNormalizer extends AbstractNormalizer
             }
 
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->normalize($attribute);
+                $attribute = $this->nameConverter->normalize($object, $attribute);
             }
 
             $data[$attribute] = $attributeValue;
@@ -142,7 +142,7 @@ class ObjectNormalizer extends AbstractNormalizer
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
+                $attribute = $this->nameConverter->denormalize($object, $attribute);
             }
 
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);

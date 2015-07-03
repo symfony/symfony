@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\NameConverter;
 
 /**
- * CamelCase to Underscore name converter.
+ * Converts names of properties from CamelCase to Underscore.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -40,7 +40,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName)
+    public function normalize($object, $propertyName)
     {
         if (null === $this->attributes || in_array($propertyName, $this->attributes)) {
             $snakeCasedName = '';
@@ -63,7 +63,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName)
+    public function denormalize($object, $propertyName)
     {
         $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
             return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);

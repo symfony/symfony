@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\MappedDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 
@@ -204,7 +204,7 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new PropertyNormalizer($classMetadataFactory);
         $this->normalizer->setSerializer($this->serializer);
 
-        $obj = new GroupDummy();
+        $obj = new MappedDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
         $obj->setFooBar('fooBar');
@@ -231,7 +231,7 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new PropertyNormalizer($classMetadataFactory);
         $this->normalizer->setSerializer($this->serializer);
 
-        $obj = new GroupDummy();
+        $obj = new MappedDummy();
         $obj->setFoo('foo');
 
         $toNormalize = array('foo' => 'foo', 'bar' => 'bar');
@@ -261,7 +261,7 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
-        $obj = new GroupDummy();
+        $obj = new MappedDummy();
         $obj->setFooBar('@dunglas');
         $obj->setSymfony('@coopTilleuls');
         $obj->setCoopTilleuls('les-tilleuls.coop');
@@ -282,7 +282,7 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new PropertyNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $this->normalizer->setSerializer($this->serializer);
 
-        $obj = new GroupDummy();
+        $obj = new MappedDummy();
         $obj->setFooBar('@dunglas');
         $obj->setSymfony('@coopTilleuls');
 

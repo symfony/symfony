@@ -230,11 +230,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @return string
      */
-    protected function formatAttribute($attributeName)
+    protected function formatAttribute($object, $attributeName)
     {
         @trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
 
-        return $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
+        return $this->nameConverter ? $this->nameConverter->normalize($object, $attributeName) : $attributeName;
     }
 
     /**
@@ -320,7 +320,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+                $key = $this->nameConverter ? $this->nameConverter->denormalize($class, $paramName) : $paramName;
 
                 $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
                 $ignored = in_array($paramName, $this->ignoredAttributes);

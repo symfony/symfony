@@ -79,7 +79,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                 }
 
                 if ($this->nameConverter) {
-                    $attributeName = $this->nameConverter->normalize($attributeName);
+                    $attributeName = $this->nameConverter->normalize($object, $attributeName);
                 }
 
                 $attributes[$attributeName] = $attributeValue;
@@ -104,7 +104,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
+                $attribute = $this->nameConverter->denormalize($object, $attribute);
             }
 
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);

@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures;
 
+use Symfony\Component\Serializer\Annotation\Alias;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GroupDummy extends GroupDummyParent implements GroupDummyInterface
+class MappedDummy extends MappedDummyParent implements MappedDummyInterface
 {
     /**
      * @Groups({"a"})
+     * @Alias("myAlias")
      */
     private $foo;
     /**

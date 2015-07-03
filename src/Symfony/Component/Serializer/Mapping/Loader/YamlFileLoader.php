@@ -78,6 +78,10 @@ class YamlFileLoader extends FileLoader
                             $attributeMetadata->addGroup($group);
                         }
                     }
+
+                    if (isset($data['alias'])) {
+                        $attributeMetadata->setAlias($data['alias']);
+                    }
                 }
             }
 

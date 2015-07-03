@@ -32,7 +32,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
-        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MappedDummy');
     }
 
     public function testInterface()

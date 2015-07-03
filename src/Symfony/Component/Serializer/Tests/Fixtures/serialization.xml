@@ -4,7 +4,7 @@
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     xsi:schemaLocation="http://symfony.com/schema/dic/serializer-mapping http://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd">
 
-    <class name="Symfony\Component\Serializer\Tests\Fixtures\GroupDummy">
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\MappedDummy">
         <attribute name="foo">
             <group>group1</group>
             <group>group2</group>
@@ -12,6 +12,7 @@
 
         <attribute name="bar">
             <group>group2</group>
+            <alias>myBar</alias>
         </attribute>
     </class>
 

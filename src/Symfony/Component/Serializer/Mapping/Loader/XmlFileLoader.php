@@ -62,6 +62,10 @@ class XmlFileLoader extends FileLoader
                 foreach ($attribute->group as $group) {
                     $attributeMetadata->addGroup((string) $group);
                 }
+
+                if ($alias = (string) $attribute->alias) {
+                    $attributeMetadata->setAlias($alias);
+                }
             }
 
             return true;

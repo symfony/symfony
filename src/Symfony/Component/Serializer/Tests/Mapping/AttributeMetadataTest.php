@@ -49,9 +49,24 @@ class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
         $attributeMetadata2 = new AttributeMetadata('a2');
         $attributeMetadata2->addGroup('a');
         $attributeMetadata2->addGroup('c');
+        $attributeMetadata2->setAlias('alias');
 
         $attributeMetadata1->merge($attributeMetadata2);
 
         $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
+        $this->assertEquals('alias', $attributeMetadata1->getAlias());
+    }
+
+    public function testMergeWithExistingAlias()
+    {
+        $attributeMetadata1 = new AttributeMetadata('a1');
+        $attributeMetadata1->setAlias('a1');
+
+        $attributeMetadata2 = new AttributeMetadata('a2');
+        $attributeMetadata2->setAlias('a2');
+
+        $attributeMetadata1->merge($attributeMetadata2);
+
+        $this->assertEquals('a1', $attributeMetadata1->getAlias());
     }
 }

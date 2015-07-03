@@ -55,27 +55,27 @@ class Request
     /**
      * @var RequestHelper
      */
-    protected static $requestHelper;
+    private static $requestHelper;
 
     /**
      * @var UriHelper
      */
-    protected static $uriHelper;
+    private static $uriHelper;
 
     /**
      * @var MediaTypeHelper
      */
-    protected static $mediaTypeHelper;
+    private static $mediaTypeHelper;
 
     /**
      * @var CacheHelper
      */
-    protected static $cacheHelper;
+    private static $cacheHelper;
 
     /**
      * @var LocaleHelper
      */
-    protected static $localeHelper;
+    private static $localeHelper;
 
     protected $format;
 

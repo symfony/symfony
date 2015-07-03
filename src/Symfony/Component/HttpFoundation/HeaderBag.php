@@ -253,7 +253,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $this->cacheControl->addDirective($key, $value);
 
-        $this->set('Cache-Control', (string)$this->cacheControl);
+        $this->set('Cache-Control', (string) $this->cacheControl);
     }
 
     /**
@@ -289,7 +289,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $this->cacheControl->removeDirective($key);
 
-        $this->set('Cache-Control', (string)$this->cacheControl);
+        $this->set('Cache-Control', (string) $this->cacheControl);
     }
 
     /**

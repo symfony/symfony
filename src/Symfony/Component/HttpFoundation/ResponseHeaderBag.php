@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Header\CacheControl;
+use Symfony\Component\HttpFoundation\Header\ContentDisposition;
 
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
@@ -258,36 +259,8 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
-        if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
-            throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
-        }
-
-        if ('' == $filenameFallback) {
-            $filenameFallback = $filename;
-        }
-
-        // filenameFallback is not ASCII.
-        if (!preg_match('/^[\x20-\x7e]*$/', $filenameFallback)) {
-            throw new \InvalidArgumentException('The filename fallback must only contain ASCII characters.');
-        }
-
-        // percent characters aren't safe in fallback.
-        if (false !== strpos($filenameFallback, '%')) {
-            throw new \InvalidArgumentException('The filename fallback cannot contain the "%" character.');
-        }
-
-        // path separators aren't allowed in either.
-        if (false !== strpos($filename, '/') || false !== strpos($filename, '\\') || false !== strpos($filenameFallback, '/') || false !== strpos($filenameFallback, '\\')) {
-            throw new \InvalidArgumentException('The filename and the fallback cannot contain the "/" and "\\" characters.');
-        }
-
-        $output = sprintf('%s; filename="%s"', $disposition, str_replace('"', '\\"', $filenameFallback));
-
-        if ($filename !== $filenameFallback) {
-            $output .= sprintf("; filename*=utf-8''%s", rawurlencode($filename));
-        }
-
-        return $output;
+        $header = new ContentDisposition($disposition, $filename, $filenameFallback);
+        return (string) $header;
     }
 
     /**
@@ -309,7 +282,7 @@ class ResponseHeaderBag extends HeaderBag
             return 'private, must-revalidate';
         }
 
-        $header = (string)$this->cacheControl;
+        $header = (string) $this->cacheControl;
         if ($this->cacheControl->hasDirective('public') || $this->cacheControl->hasDirective('private')) {
             return $header;
         }

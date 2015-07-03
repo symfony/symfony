@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +13,12 @@ namespace Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Request helper with methods helpful for general request data
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
+ */
 class RequestHelper
 {
     const HEADER_FORWARDED = 'forwarded';

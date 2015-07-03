@@ -1,16 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yosefderay
- * Date: 7/3/15
- * Time: 2:12 PM
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\HttpFoundation\Request\Uri;
 
-
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Request uri resolver that modifies the request passed it ot make creating
+ * sub requests easier
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
+ */
 class UriResolver implements UriResolverInterface
 {
     private $resolver;

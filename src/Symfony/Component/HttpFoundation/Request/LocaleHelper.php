@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the Symfony package.
  *
@@ -15,6 +14,12 @@ namespace Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Request helper with methods helpful for working with local data
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
+ */
 class LocaleHelper
 {
 

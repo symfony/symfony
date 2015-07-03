@@ -1,16 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yosefderay
- * Date: 7/1/15
- * Time: 12:40 AM
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\HttpFoundation\Request\Uri;
 
-
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Request uri resolver that takes into account how IIS7 with
+ * Microsoft Rewrite Module works
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
+ */
 class IISWithMicrosoftRewriteModuleUriResolver implements UriResolverInterface
 {
     public function resolveUri(Request $request)

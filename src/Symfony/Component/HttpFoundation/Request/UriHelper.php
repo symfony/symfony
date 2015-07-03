@@ -1,4 +1,13 @@
 <?php
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\ApacheRequest;
@@ -6,6 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolver;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolverInterface;
 
+/**
+ * Request helper with methods helpful for working with the request uri
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
+ */
 class UriHelper
 {
     protected $requestHelper;

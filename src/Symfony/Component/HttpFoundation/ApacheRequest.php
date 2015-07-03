@@ -16,7 +16,8 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- *
+ * @deprecated since 2.8, to be removed in 3.0. The apache request is primarily useful
+ * with the apache route dumper which is already deprecated
  */
 class ApacheRequest extends Request
 {

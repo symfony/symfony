@@ -21,14 +21,6 @@ class ApacheRequest extends Request
     /**
      * {@inheritdoc}
      */
-    protected function prepareRequestUri()
-    {
-        return $this->server->get('REQUEST_URI');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareBaseUrl()
     {
         $baseUrl = $this->server->get('SCRIPT_NAME');

@@ -3,10 +3,13 @@ namespace Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Request\RequestHelper;
+use Symfony\Component\HttpFoundation\Request\Uri\UriResolver;
+use Symfony\Component\HttpFoundation\Request\Uri\UriResolverInterface;
 
 class UriHelper
 {
     protected $requestHelper;
+    protected $uriResolver;
 
     /**
      * Normalizes a query string.
@@ -51,9 +54,12 @@ class UriHelper
         return implode('&', $parts);
     }
 
-    public function __construct(RequestHelper $requestHelper)
-    {
+    public function __construct(
+        RequestHelper $requestHelper,
+        UriResolverInterface $uriResolver = null
+    ) {
         $this->requestHelper = $requestHelper;
+        $this->uriResolver = $uriResolver ?: UriResolver::create();
     }
 
     /**
@@ -66,25 +72,7 @@ class UriHelper
      */
     public function getRequestUri(Request $request)
     {
-        $requestUri = false;
-
-        /** @var Request\Uri\UriResolverInterface[] $uriResolvers */
-        $uriResolvers = array(
-            new Request\Uri\ApacheRequestUriResolver(),
-            new Request\Uri\IISWithMicrosoftRewriteModuleUriResolver(),
-            new Request\Uri\IISWithASAPIRewriteUriResolver(),
-            new Request\Uri\IIS7WithUrlRewriteUriResolver(),
-            new Request\Uri\RequestUriUriResolver(),
-            new Request\Uri\OrigPathInfoUriResolver()
-        );
-
-        foreach ($uriResolvers as $uriResolver) {
-            $requestUri = $uriResolver->resolveUri($request);
-
-            if ($requestUri !== false) {
-                break;
-            }
-        }
+        $requestUri = $this->uriResolver->resolveUri($request);
 
         // normalize the request URI to ease creating sub-requests from this request
         $request->server->set('REQUEST_URI', (string) $requestUri);

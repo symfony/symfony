@@ -3,7 +3,6 @@ namespace Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\ApacheRequest;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Request\RequestHelper;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolver;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolverInterface;
 

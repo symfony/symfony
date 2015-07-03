@@ -11,18 +11,18 @@ namespace Symfony\Component\HttpFoundation\Header;
 
 class CacheControl
 {
-    protected $cacheControl;
+    protected $directives;
 
     public function __construct(array $cacheControl = array())
     {
-        $this->cacheControl = $cacheControl;
+        $this->directives = $cacheControl;
     }
 
     public function __toString()
     {
         $parts = array();
-        ksort($this->cacheControl);
-        foreach ($this->cacheControl as $key => $value) {
+        ksort($this->directives);
+        foreach ($this->directives as $key => $value) {
             if (true === $value) {
                 $parts[] = $key;
             } else {
@@ -58,7 +58,7 @@ class CacheControl
      */
     public function addDirective($key, $value = true)
     {
-        $this->cacheControl[$key] = $value;
+        $this->directives[$key] = $value;
         return $this;
     }
 
@@ -70,7 +70,7 @@ class CacheControl
      */
     public function hasDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl);
+        return array_key_exists($key, $this->directives);
     }
 
     /**
@@ -81,7 +81,7 @@ class CacheControl
      */
     public function getDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
+        return array_key_exists($key, $this->directives) ? $this->directives[$key] : null;
     }
 
     /**
@@ -92,7 +92,12 @@ class CacheControl
      */
     public function removeDirective($key)
     {
-        unset($this->cacheControl[$key]);
+        unset($this->directives[$key]);
         return $this;
+    }
+
+    public function allDirectives()
+    {
+        return $this->directives;
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Header\CacheControl;
+
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
  *
@@ -27,9 +29,9 @@ class ResponseHeaderBag extends HeaderBag
     const DISPOSITION_INLINE = 'inline';
 
     /**
-     * @var array
+     * @var CacheControl
      */
-    protected $computedCacheControl = array();
+    protected $computedCacheControl;
 
     /**
      * @var array
@@ -115,7 +117,7 @@ class ResponseHeaderBag extends HeaderBag
             $computed = $this->computeCacheControlValue();
             $this->headers['cache-control'] = array($computed);
             $this->headerNames['cache-control'] = 'Cache-Control';
-            $this->computedCacheControl = $this->parseCacheControl($computed);
+            $this->computedCacheControl = CacheControl::fromString($computed);
         }
     }
 
@@ -132,7 +134,7 @@ class ResponseHeaderBag extends HeaderBag
         unset($this->headerNames[$uniqueKey]);
 
         if ('cache-control' === $uniqueKey) {
-            $this->computedCacheControl = array();
+            $this->computedCacheControl = new CacheControl();
         }
     }
 
@@ -141,7 +143,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function hasCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl);
+        return $this->computedCacheControl->hasDirective($key);
     }
 
     /**
@@ -149,7 +151,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+        return $this->computedCacheControl->getDirective($key);
     }
 
     /**
@@ -298,22 +300,22 @@ class ResponseHeaderBag extends HeaderBag
      */
     protected function computeCacheControlValue()
     {
-        if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
+        if (!$this->cacheControl->allDirectives() && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
             return 'no-cache';
         }
 
-        if (!$this->cacheControl) {
+        if (!$this->cacheControl->allDirectives()) {
             // conservative by default
             return 'private, must-revalidate';
         }
 
-        $header = $this->getCacheControlHeader();
-        if (isset($this->cacheControl['public']) || isset($this->cacheControl['private'])) {
+        $header = (string)$this->cacheControl;
+        if ($this->cacheControl->hasDirective('public') || $this->cacheControl->hasDirective('private')) {
             return $header;
         }
 
         // public if s-maxage is defined, private otherwise
-        if (!isset($this->cacheControl['s-maxage'])) {
+        if (!$this->cacheControl->hasDirective('s-maxage')) {
             return $header.', private';
         }
 

@@ -24,7 +24,6 @@ class OrigPathInfoUriResolver implements UriResolverInterface
         if ('' != $request->server->get('QUERY_STRING')) {
             $requestUri .= '?'.$request->server->get('QUERY_STRING');
         }
-        $request->server->remove('ORIG_PATH_INFO');
         return $requestUri;
     }
 }

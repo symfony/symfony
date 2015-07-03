@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\HttpFoundation\Tests\Header;
 
-use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+use Symfony\Component\HttpFoundation\Header\AcceptItem;
 
-class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
+class AcceptItemTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provideFromStringData
      */
     public function testFromString($string, $value, array $attributes)
     {
-        $item = AcceptHeaderItem::fromString($string);
+        $item = AcceptItem::fromString($string);
         $this->assertEquals($value, $item->getValue());
         $this->assertEquals($attributes, $item->getAttributes());
     }
@@ -52,7 +52,7 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
      */
     public function testToString($value, array $attributes, $string)
     {
-        $item = new AcceptHeaderItem($value, $attributes);
+        $item = new AcceptItem($value, $attributes);
         $this->assertEquals($string, (string) $item);
     }
 
@@ -72,7 +72,7 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
 
     public function testValue()
     {
-        $item = new AcceptHeaderItem('value', array());
+        $item = new AcceptItem('value', array());
         $this->assertEquals('value', $item->getValue());
 
         $item->setValue('new value');
@@ -84,7 +84,7 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
 
     public function testQuality()
     {
-        $item = new AcceptHeaderItem('value', array());
+        $item = new AcceptItem('value', array());
         $this->assertEquals(1.0, $item->getQuality());
 
         $item->setQuality(0.5);
@@ -97,7 +97,7 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
 
     public function testAttribute()
     {
-        $item = new AcceptHeaderItem('value', array());
+        $item = new AcceptItem('value', array());
         $this->assertEquals(array(), $item->getAttributes());
         $this->assertFalse($item->hasAttribute('test'));
         $this->assertNull($item->getAttribute('test'));

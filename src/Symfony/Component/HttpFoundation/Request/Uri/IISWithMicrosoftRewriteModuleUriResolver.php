@@ -20,11 +20,6 @@ class IISWithMicrosoftRewriteModuleUriResolver implements UriResolverInterface
         }
 
         // IIS with Microsoft Rewrite Module
-        $requestUri = $request->headers->get('X_ORIGINAL_URL');
-        $request->headers->remove('X_ORIGINAL_URL');
-        $request->server->remove('HTTP_X_ORIGINAL_URL');
-        $request->server->remove('UNENCODED_URL');
-        $request->server->remove('IIS_WasUrlRewritten');
-        return $requestUri;
+        return $request->headers->get('X_ORIGINAL_URL');
     }
 }

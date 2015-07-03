@@ -20,9 +20,6 @@ class IIS7WithUrlRewriteUriResolver implements UriResolverInterface
         }
 
         // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
-        $requestUri = $request->server->get('UNENCODED_URL');
-        $request->server->remove('UNENCODED_URL');
-        $request->server->remove('IIS_WasUrlRewritten');
-        return $requestUri;
+        return $request->server->get('UNENCODED_URL');
     }
 }

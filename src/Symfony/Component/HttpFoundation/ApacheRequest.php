@@ -15,21 +15,9 @@ namespace Symfony\Component\HttpFoundation;
  * Request represents an HTTP request from an Apache server.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ *
  */
 class ApacheRequest extends Request
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function prepareBaseUrl()
-    {
-        $baseUrl = $this->server->get('SCRIPT_NAME');
-
-        if (false === strpos($this->server->get('REQUEST_URI'), $baseUrl)) {
-            // assume mod_rewrite
-            return rtrim(dirname($baseUrl), '/\\');
-        }
-
-        return $baseUrl;
-    }
 }

@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\HttpFoundation\Tests\Header;
 
-use Symfony\Component\HttpFoundation\AcceptHeader;
-use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+use Symfony\Component\HttpFoundation\Header\Accept;
+use Symfony\Component\HttpFoundation\Header\AcceptItem;
 
-class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
+class AcceptTest extends \PHPUnit_Framework_TestCase
 {
     public function testFirst()
     {
-        $header = AcceptHeader::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
+        $header = Accept::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
         $this->assertSame('text/html', $header->first()->getValue());
     }
 
@@ -27,7 +27,7 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFromString($string, array $items)
     {
-        $header = AcceptHeader::fromString($string);
+        $header = Accept::fromString($string);
         $parsed = array_values($header->all());
         // reset index since the fixtures don't have them set
         foreach ($parsed as $item) {
@@ -40,10 +40,10 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('', array()),
-            array('gzip', array(new AcceptHeaderItem('gzip'))),
-            array('gzip,deflate,sdch', array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
-            array("gzip, deflate\t,sdch", array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
-            array('"this;should,not=matter"', array(new AcceptHeaderItem('this;should,not=matter'))),
+            array('gzip', array(new AcceptItem('gzip'))),
+            array('gzip,deflate,sdch', array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch'))),
+            array("gzip, deflate\t,sdch", array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch'))),
+            array('"this;should,not=matter"', array(new AcceptItem('this;should,not=matter'))),
         );
     }
 
@@ -52,7 +52,7 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testToString(array $items, $string)
     {
-        $header = new AcceptHeader($items);
+        $header = new Accept($items);
         $this->assertEquals($string, (string) $header);
     }
 
@@ -60,9 +60,9 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array(), ''),
-            array(array(new AcceptHeaderItem('gzip')), 'gzip'),
-            array(array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch')), 'gzip,deflate,sdch'),
-            array(array(new AcceptHeaderItem('this;should,not=matter')), 'this;should,not=matter'),
+            array(array(new AcceptItem('gzip')), 'gzip'),
+            array(array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch')), 'gzip,deflate,sdch'),
+            array(array(new AcceptItem('this;should,not=matter')), 'this;should,not=matter'),
         );
     }
 
@@ -71,7 +71,7 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilter($string, $filter, array $values)
     {
-        $header = AcceptHeader::fromString($string)->filter($filter);
+        $header = Accept::fromString($string)->filter($filter);
         $this->assertEquals($values, array_keys($header->all()));
     }
 
@@ -87,7 +87,7 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSorting($string, array $values)
     {
-        $header = AcceptHeader::fromString($string);
+        $header = Accept::fromString($string);
         $this->assertEquals($values, array_keys($header->all()));
     }
 

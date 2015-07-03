@@ -13,14 +13,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UriResolver implements UriResolverInterface
 {
-    /**
-     * @var UriResolverInterface[]
-     */
-    private $resolvers = array();
+    private $resolver;
+
+    public function __construct(UriResolverInterface $resolver)
+    {
+        $this->resolver = $resolver;
+    }
 
     public static function create()
     {
-        $resolver = new static();
+        $resolver = new ChainResolver();
         $resolver
             ->add(new ApacheRequestUriResolver())
             ->add(new IISWithMicrosoftRewriteModuleUriResolver())
@@ -29,31 +31,20 @@ class UriResolver implements UriResolverInterface
             ->add(new RequestUriUriResolver())
             ->add(new OrigPathInfoUriResolver())
         ;
-        return $resolver;
+        return new static($resolver);
     }
 
     public function resolveUri(Request $request)
     {
-        $requestUri = false;
-
-        foreach ($this->resolvers as $uriResolver) {
-            $requestUri = $uriResolver->resolveUri($request);
-
-            if ($requestUri !== false) {
-                break;
-            }
-        }
-
+        $requestUri = (string) $this->resolver->resolveUri($request);
+        $request->server->remove('UNENCODED_URL');
+        $request->server->remove('IIS_WasUrlRewritten');
+        $request->headers->remove('X_REWRITE_URL');
+        $request->headers->remove('X_ORIGINAL_URL');
+        $request->server->remove('HTTP_X_ORIGINAL_URL');
+        $request->server->remove('ORIG_PATH_INFO');
+        // normalize the request URI to ease creating sub-requests from this request
+        $request->server->set('REQUEST_URI', $requestUri);
         return $requestUri;
-    }
-
-    /**
-     * @param UriResolverInterface $resolver
-     * @return $this
-     */
-    public function add(UriResolverInterface $resolver)
-    {
-        array_unshift($this->resolvers, $resolver);
-        return $this;
     }
 }

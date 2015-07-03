@@ -1,6 +1,7 @@
 <?php
 namespace Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Component\HttpFoundation\ApacheRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Request\RequestHelper;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolver;
@@ -72,11 +73,7 @@ class UriHelper
      */
     public function getRequestUri(Request $request)
     {
-        $requestUri = $this->uriResolver->resolveUri($request);
-
-        // normalize the request URI to ease creating sub-requests from this request
-        $request->server->set('REQUEST_URI', (string) $requestUri);
-        return $requestUri;
+        return $this->uriResolver->resolveUri($request);
     }
 
     /**
@@ -100,7 +97,7 @@ class UriHelper
     {
         $baseUrl = $this->getBaseUrl($request);
 
-        if (null === ($requestUri = $this->getRequestUri($request))) {
+        if (null === ($requestUri = $this->uriResolver->resolveUri($request))) {
             return '/';
         }
 
@@ -173,6 +170,17 @@ class UriHelper
      */
     public function getBaseUrl(Request $request)
     {
+        if ($request instanceof ApacheRequest) {
+            $baseUrl = $request->server->get('SCRIPT_NAME');
+
+            if (false === strpos($request->server->get('REQUEST_URI'), $baseUrl)) {
+                // assume mod_rewrite
+                return rtrim(dirname($baseUrl), '/\\');
+            }
+
+            return $baseUrl;
+        }
+
         $filename = basename($request->server->get('SCRIPT_FILENAME'));
 
         if (basename($request->server->get('SCRIPT_NAME')) === $filename) {

@@ -81,7 +81,6 @@
             <th>Locale</th>
             <th>Domain</th>
             <th>Id</th>
-            <th>Parameters</th>
             <th>Message Preview</th>
         </tr>
         {% for message in collector.messages %}
@@ -91,20 +90,44 @@
                 <td><code>{{ message.domain }}</code></td>
                 <td>
                     <code>{{ message.id }}</code>
+
                     {% if message.count > 1 %}<br><small style="color: gray;">(used {{ message.count }} times)</small>{% endif %}
-                </td>
-                <td>
-                    {% for key, value in message.parameters %}
-                        <code>{{ key }} = {{ value }}</code>{% if message.transChoiceNumber is not null or not loop.last %}<br />{% endif %}
-                    {% endfor %}
-                    {% if message.transChoiceNumber is not null %}
-                        <em><code>pluralization = {{ message.transChoiceNumber }}</code></em>
-                    {% endif %}
+                    {% if message.transChoiceNumber is not null %}<br><small style="color: gray;">(use pluralization)</small>{% endif %}
+
+                    <div>
+                        [<a href="#" onclick="return openParameters(this);" style="text-decoration: none;"
+                            title="Toggle parameters display" data-target-id="parameters-{{ loop.index }}" >
+                            <img alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: inline; width: 12px; height: 12px;" />
+                            <img alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: none; width: 12px; height: 12px;" />
+                            <span style="vertical-align:top">Parameters</span>
+                        </a>]
+
+                        <div id="parameters-{{ loop.index }}" style="display: none;">
+                            {% for parameters in message.parameters %}
+                                {% if parameters|length > 0 %}
+                                    {{ dump(parameters) }}
+                                {% else %}
+                                    {{ dump(null) }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 </td>
                 <td><code>{{ message.translation }}</code></td>
             </tr>
         {% endfor %}
     </table>
+
+    <script type="text/javascript">
+        function openParameters(link) {
+            "use strict";
+
+            var imgs = link.children,
+                target = link.getAttribute('data-target-id');
+
+            Sfjs.toggle(target, imgs[0], imgs[1]);
+        }
+    </script>
 {% endblock %}
 
 {% macro state(translation) %}

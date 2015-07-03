@@ -34,10 +34,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function __construct(array $headers = array())
     {
+        $this->cacheControl = new CacheControl();
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
         }
-        $this->cacheControl = new CacheControl();
     }
 
     /**
@@ -167,7 +167,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ('cache-control' === $key) {
-            $this->cacheControl = $this->parseCacheControl($values[0]);
+            $this->cacheControl = CacheControl::fromString($values[0]);
         }
     }
 

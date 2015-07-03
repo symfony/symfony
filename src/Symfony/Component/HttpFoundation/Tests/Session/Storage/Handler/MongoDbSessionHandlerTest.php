@@ -33,8 +33,12 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
 
-        $this->mongo = $this->getMockBuilder($mongoClass)
-            ->getMock();
+        try {
+            $this->mongo = $this->getMockBuilder($mongoClass)
+                ->getMock();
+        } catch (\MongoConnectionException $e) {
+            $this->markTestSkipped('MongoDbSessionHandlerTest requires a connection on localhost:27017.');
+        }
 
         $this->options = array(
             'id_field' => '_id',

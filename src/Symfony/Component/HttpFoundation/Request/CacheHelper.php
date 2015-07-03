@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Request;
 
 
+use Symfony\Component\HttpFoundation\Header\IfNoneMatch;
 use Symfony\Component\HttpFoundation\Request;
 
 class CacheHelper
@@ -24,7 +25,7 @@ class CacheHelper
      */
     public function getETags(Request $request)
     {
-        return preg_split('/\s*,\s*/', $request->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
+        return IfNoneMatch::fromString($request->headers->get('if_none_match'))->getETags();
     }
 
     /**

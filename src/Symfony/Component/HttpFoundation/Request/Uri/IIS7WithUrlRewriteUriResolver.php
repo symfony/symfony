@@ -11,7 +11,7 @@ namespace Symfony\Component\HttpFoundation\Request\Uri;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class IIS7WithUrlRewrite implements UriResolverInterface
+class IIS7WithUrlRewriteUriResolver implements UriResolverInterface
 {
     public function resolveUri(Request $request)
     {

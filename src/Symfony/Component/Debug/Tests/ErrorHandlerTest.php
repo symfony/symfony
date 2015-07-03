@@ -40,7 +40,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testCompileTimeError()
     {
         if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM behaves differently in this test case.');
+            $this->markTestSkipped('HHVM does not trigger strict notices.');
         }
 
         // the ContextErrorException must not be loaded to test the workaround

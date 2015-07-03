@@ -154,19 +154,21 @@ class Accept
      */
     private function sort()
     {
-        if (!$this->sorted) {
-            uasort($this->items, function (AcceptItem $a, AcceptItem $b) {
-                $qA = $a->getQuality();
-                $qB = $b->getQuality();
-
-                if ($qA === $qB) {
-                    return $a->getIndex() > $b->getIndex() ? 1 : -1;
-                }
-
-                return $qA > $qB ? -1 : 1;
-            });
-
-            $this->sorted = true;
+        if ($this->sorted) {
+            return;
         }
+
+        uasort($this->items, function (AcceptItem $a, AcceptItem $b) {
+            $qA = $a->getQuality();
+            $qB = $b->getQuality();
+
+            if ($qA === $qB) {
+                return $a->getIndex() > $b->getIndex() ? 1 : -1;
+            }
+
+            return $qA > $qB ? -1 : 1;
+        });
+
+        $this->sorted = true;
     }
 }

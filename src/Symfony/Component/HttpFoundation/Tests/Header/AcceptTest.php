@@ -99,4 +99,18 @@ class AcceptTest extends \PHPUnit_Framework_TestCase
             'order matters when q is equal2' => array('*;q=0.3,utf-8;q=0.7,ISO-8859-1;q=0.7',  array('utf-8', 'ISO-8859-1', '*')),
         );
     }
+
+    public function testGetHas()
+    {
+        $item1 = new AcceptItem('gzip');
+        $item2 = new AcceptItem('deflate');
+        $header = new Accept(array($item1));
+        $header->add($item2);
+        $this->assertTrue($header->has('gzip'));
+        $this->assertSame($item1, $header->get('gzip'));
+        $this->assertTrue($header->has('deflate'));
+        $this->assertSame($item2, $header->get('deflate'));
+        $this->assertFalse($header->has('sdch'));
+        $this->assertNull($header->get('sdch'));
+    }
 }

@@ -36,7 +36,7 @@ class Accept
      *
      * @param AcceptItem[] $items
      */
-    public function __construct(array $items)
+    public function __construct(array $items = array())
     {
         foreach ($items as $item) {
             $this->add($item);

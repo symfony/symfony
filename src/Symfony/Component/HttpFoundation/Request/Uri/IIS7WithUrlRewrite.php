@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: yosefderay
- * Date: 7/1/15
- * Time: 12:40 AM
+ * Date: 7/3/15
+ * Time: 1:15 PM
  */
 
 namespace Symfony\Component\HttpFoundation\Request\Uri;
@@ -11,18 +11,16 @@ namespace Symfony\Component\HttpFoundation\Request\Uri;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class IISWithMicrosoftRewriteModuleUriResolver implements UriResolverInterface
+class IIS7WithUrlRewrite implements UriResolverInterface
 {
     public function resolveUri(Request $request)
     {
-        if (!$request->headers->has('X_ORIGINAL_URL')) {
+        if ($request->server->get('IIS_WasUrlRewritten') != '1' || $request->server->get('UNENCODED_URL') == '') {
             return false;
         }
 
-        // IIS with Microsoft Rewrite Module
-        $requestUri = $request->headers->get('X_ORIGINAL_URL');
-        $request->headers->remove('X_ORIGINAL_URL');
-        $request->server->remove('HTTP_X_ORIGINAL_URL');
+        // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
+        $requestUri = $request->server->get('UNENCODED_URL');
         $request->server->remove('UNENCODED_URL');
         $request->server->remove('IIS_WasUrlRewritten');
         return $requestUri;

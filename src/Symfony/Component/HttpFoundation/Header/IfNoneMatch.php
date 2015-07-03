@@ -24,7 +24,7 @@ class IfNoneMatch
     }
 
     /**
-     * @param $header
+     * @param string $header
      * @return IfNoneMatch
      */
     public static function fromString($header)
@@ -33,7 +33,7 @@ class IfNoneMatch
     }
 
     /**
-     * @return mixed
+     * @return string[]
      */
     public function getETags()
     {

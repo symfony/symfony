@@ -15,6 +15,13 @@ class IISWithASAPIRewriteUriResolver implements UriResolverInterface
 {
     public function resolveUri(Request $request)
     {
-        // TODO: Implement resolveUri() method.
+        if (!$request->headers->has('X_REWRITE_URL')) {
+            return false;
+        }
+
+        // IIS with ISAPI_Rewrite
+        $requestUri = $request->headers->get('X_REWRITE_URL');
+        $request->headers->remove('X_REWRITE_URL');
+        return $requestUri;
     }
 }

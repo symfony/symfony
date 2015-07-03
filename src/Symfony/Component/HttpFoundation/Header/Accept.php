@@ -18,7 +18,6 @@ namespace Symfony\Component\HttpFoundation\Header;
  * sorted by descending quality.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
- * @deprecated use
  */
 class Accept
 {

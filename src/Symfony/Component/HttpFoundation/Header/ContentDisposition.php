@@ -13,9 +13,10 @@ class ContentDisposition
 {
     const DISPOSITION_ATTACHMENT = 'attachment';
     const DISPOSITION_INLINE = 'inline';
-    protected $disposition;
-    protected $filename;
-    protected $filenameFallback;
+
+    private $disposition;
+    private $filename;
+    private $filenameFallback;
 
     public function __construct($disposition, $filename, $filenameFallback = '')
     {

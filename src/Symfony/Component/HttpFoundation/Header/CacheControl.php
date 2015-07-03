@@ -11,7 +11,7 @@ namespace Symfony\Component\HttpFoundation\Header;
 
 class CacheControl
 {
-    protected $directives;
+    private $directives;
 
     public function __construct(array $cacheControl = array())
     {

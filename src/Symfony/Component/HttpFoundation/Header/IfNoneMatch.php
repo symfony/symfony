@@ -11,7 +11,7 @@ namespace Symfony\Component\HttpFoundation\Header;
 
 class IfNoneMatch
 {
-    protected $eTags;
+    private $eTags;
 
     public function __construct(array $eTags = array())
     {

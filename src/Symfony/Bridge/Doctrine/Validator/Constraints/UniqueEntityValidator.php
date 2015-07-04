@@ -141,7 +141,7 @@ class UniqueEntityValidator extends ConstraintValidator
             $accessor = PropertyAccess::createPropertyAccessor();
 
             foreach ($vars[1] as $var) {
-                $constraint->message = str_replace(sprintf("{{ %s }}", $var), $accessor->getValue($entity, $var), $constraint->message);
+                $constraint->message = str_replace(sprintf('{{ %s }}', $var), $accessor->getValue($entity, $var), $constraint->message);
             }
         }
 

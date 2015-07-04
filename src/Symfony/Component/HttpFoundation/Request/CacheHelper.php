@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Header\IfNoneMatch;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Request helper with methods helpful for getting info concerning caching
+ * Request helper with methods helpful for getting info concerning caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>

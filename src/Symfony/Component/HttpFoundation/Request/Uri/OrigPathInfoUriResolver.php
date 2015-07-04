@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -13,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Request\Uri;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Request uri resolver that resolves the uri if ORIG_PATH_INFO is defined
+ * Request uri resolver that resolves the uri if ORIG_PATH_INFO is defined.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -31,6 +32,7 @@ class OrigPathInfoUriResolver implements UriResolverInterface
         if ('' != $request->server->get('QUERY_STRING')) {
             $requestUri .= '?'.$request->server->get('QUERY_STRING');
         }
+
         return $requestUri;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Request helper with methods helpful for working with the media type data
- * like formats, mime types, character encoding and charsets
+ * like formats, mime types, character encoding and charsets.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -75,7 +76,8 @@ class MediaTypeHelper
                 return $format;
             }
         }
-        return null;
+
+        return;
     }
 
     /**
@@ -97,6 +99,7 @@ class MediaTypeHelper
      * Gets the format associated with the request.
      *
      * @param Request $request
+     *
      * @return null|string The format (null if no content type is present)
      */
     public function getContentType(Request $request)
@@ -108,6 +111,7 @@ class MediaTypeHelper
      * Gets a list of charsets acceptable by the client browser.
      *
      * @param Request $request
+     *
      * @return array List of charsets in preferable order
      */
     public function getCharsets(Request $request)
@@ -119,6 +123,7 @@ class MediaTypeHelper
      * Gets a list of encodings acceptable by the client browser.
      *
      * @param Request $request
+     *
      * @return array List of encodings in preferable order
      */
     public function getEncodings(Request $request)

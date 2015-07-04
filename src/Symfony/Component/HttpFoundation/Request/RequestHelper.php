@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Request helper with methods helpful for general request data
+ * Request helper with methods helpful for general request data.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -75,6 +76,7 @@ class RequestHelper
     public function enableHttpMethodParameterOverride()
     {
         $this->httpMethodParameterOverride = true;
+
         return $this;
     }
 
@@ -100,6 +102,7 @@ class RequestHelper
     public function setTrustedProxies(array $proxies)
     {
         $this->trustedProxies = $proxies;
+
         return $this;
     }
 
@@ -119,6 +122,7 @@ class RequestHelper
      * You should only list the hosts you manage using regexs.
      *
      * @param array $hostPatterns A list of trusted host patterns
+     *
      * @return $this
      */
     public function setTrustedHosts(array $hostPatterns)
@@ -128,6 +132,7 @@ class RequestHelper
         }, $hostPatterns);
         // we need to reset trusted hosts on trusted host patterns change
         $this->trustedHosts = array();
+
         return $this;
     }
 
@@ -153,10 +158,11 @@ class RequestHelper
      *
      * Setting an empty value allows to disable the trusted header for the given key.
      *
-     * @param string $key The header key
+     * @param string $key   The header key
      * @param string $value The header name
      *
      * @return $this
+     *
      * @throws \InvalidArgumentException
      */
     public function setTrustedHeaderName($key, $value)
@@ -166,6 +172,7 @@ class RequestHelper
         }
 
         $this->trustedHeaders[$key] = $value;
+
         return $this;
     }
 
@@ -197,6 +204,7 @@ class RequestHelper
      * Use this method carefully; you should use getClientIp() instead.
      *
      * @param Request $request
+     *
      * @return array The client IP addresses
      *
      * @see getClientIp()
@@ -250,6 +258,7 @@ class RequestHelper
      * the "client-ip" key.
      *
      * @param Request $request
+     *
      * @return string The client IP address
      *
      * @see getClientIps()
@@ -313,6 +322,7 @@ class RequestHelper
      * configure it via "setTrustedHeaderName()" with the "client-host" key.
      *
      * @param Request $request
+     *
      * @return string
      */
     public function getHost(Request $request)
@@ -371,6 +381,7 @@ class RequestHelper
      * configure it via "setTrustedHeaderName()" with the "client-port" key.
      *
      * @param Request $request
+     *
      * @return string
      */
     public function getPort(Request $request)
@@ -406,6 +417,7 @@ class RequestHelper
      * Returns the user.
      *
      * @param Request $request
+     *
      * @return null|string
      */
     public function getUser(Request $request)
@@ -417,6 +429,7 @@ class RequestHelper
      * Returns the password.
      *
      * @param Request $request
+     *
      * @return null|string
      */
     public function getPassword(Request $request)
@@ -428,6 +441,7 @@ class RequestHelper
      * Gets the user info.
      *
      * @param Request $request
+     *
      * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
      */
     public function getUserInfo(Request $request)
@@ -446,7 +460,7 @@ class RequestHelper
      * Sets the request method.
      *
      * @param Request $request
-     * @param string $method
+     * @param string  $method
      */
     public function setMethod(Request $request, $method)
     {
@@ -465,6 +479,7 @@ class RequestHelper
      * The method is always an uppercased string.
      *
      * @param Request $request
+     *
      * @return string The request method
      *
      * @see getRealMethod()
@@ -488,7 +503,8 @@ class RequestHelper
      * Checks if the request method is of specified type.
      *
      * @param Request $request
-     * @param string $method Uppercase request method (GET, POST etc).
+     * @param string  $method  Uppercase request method (GET, POST etc).
+     *
      * @return bool
      */
     public function isMethod(Request $request, $method)
@@ -500,6 +516,7 @@ class RequestHelper
      * Checks whether the method is safe or not.
      *
      * @param Request $request
+     *
      * @return bool
      */
     public function isMethodSafe(Request $request)
@@ -511,6 +528,7 @@ class RequestHelper
      * Gets the "real" request method.
      *
      * @param Request $request
+     *
      * @return string The request method
      *
      * @see getMethod()

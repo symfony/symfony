@@ -260,6 +260,7 @@ class ResponseHeaderBag extends HeaderBag
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
         $header = new ContentDisposition($disposition, $filename, $filenameFallback);
+
         return (string) $header;
     }
 

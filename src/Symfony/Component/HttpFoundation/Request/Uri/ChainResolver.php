@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Request uri resolver that takes a chain of other resolvers and
- * loops through them until one returns a value that !== false
+ * loops through them until one returns a value that !== false.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -43,11 +44,13 @@ class ChainResolver implements UriResolverInterface
 
     /**
      * @param UriResolverInterface $resolver
+     *
      * @return $this
      */
     public function add(UriResolverInterface $resolver)
     {
         array_unshift($this->resolvers, $resolver);
+
         return $this;
     }
 }

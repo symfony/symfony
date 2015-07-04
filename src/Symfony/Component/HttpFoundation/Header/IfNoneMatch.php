@@ -33,6 +33,7 @@ class IfNoneMatch
 
     /**
      * @param string $header
+     *
      * @return IfNoneMatch
      */
     public static function fromString($header)

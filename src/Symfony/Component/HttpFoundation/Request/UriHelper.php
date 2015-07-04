@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request\Uri\UriResolver;
 use Symfony\Component\HttpFoundation\Request\Uri\UriResolverInterface;
 
 /**
- * Request helper with methods helpful for working with the request uri
+ * Request helper with methods helpful for working with the request uri.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -141,6 +142,7 @@ class UriHelper
      *  * http://localhost/we%20b/index.php  returns '/we%20b'
      *
      * @param Request $request
+     *
      * @return string The raw path (i.e. not urldecoded)
      */
     public function getBasePath(Request $request)
@@ -174,6 +176,7 @@ class UriHelper
      * script filename (e.g. index.php) if one exists.
      *
      * @param Request $request
+     *
      * @return string The raw URL (i.e. not urldecoded)
      */
     public function getBaseUrl(Request $request)
@@ -252,6 +255,7 @@ class UriHelper
      * Gets the request's scheme.
      *
      * @param Request $request
+     *
      * @return string
      */
     public function getScheme(Request $request)
@@ -265,6 +269,7 @@ class UriHelper
      * The port name will be appended to the host if it's non-standard.
      *
      * @param Request $request
+     *
      * @return string
      */
     public function getHttpHost(Request $request)
@@ -283,6 +288,7 @@ class UriHelper
      * Generates a normalized URI (URL) for the Request.
      *
      * @param Request $request
+     *
      * @return string A normalized URI (URL) for the Request
      *
      * @see getQueryString()
@@ -303,6 +309,7 @@ class UriHelper
      * and the password are not added to the generated string.
      *
      * @param Request $request
+     *
      * @return string The scheme and HTTP host
      */
     public function getSchemeAndHttpHost(Request $request)
@@ -314,7 +321,8 @@ class UriHelper
      * Generates a normalized URI for the given path.
      *
      * @param Request $request
-     * @param string $path A path to use instead of the current one
+     * @param string  $path    A path to use instead of the current one
+     *
      * @return string The normalized URI for the path
      */
     public function getUriForPath(Request $request, $path)
@@ -338,7 +346,8 @@ class UriHelper
      * - "/a/x/y"       -> "../../x/y"
      *
      * @param Request $request
-     * @param string $path The target path
+     * @param string  $path    The target path
+     *
      * @return string The relative target path
      */
     public function getRelativeUriForPath(Request $request, $path)
@@ -384,6 +393,7 @@ class UriHelper
      * and have consistent escaping.
      *
      * @param Request $request
+     *
      * @return null|string A normalized query string for the Request
      */
     public function getQueryString(Request $request)

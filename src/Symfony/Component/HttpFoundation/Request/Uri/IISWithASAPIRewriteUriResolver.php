@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -13,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Request\Uri;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Request uri resolver that takes into account how IIS with ASAPI Rewrite works
+ * Request uri resolver that takes into account how IIS with ASAPI Rewrite works.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>

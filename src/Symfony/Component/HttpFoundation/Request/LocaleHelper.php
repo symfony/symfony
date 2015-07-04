@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Request;
 
-
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -137,6 +136,7 @@ class LocaleHelper
      * Gets a list of languages acceptable by the client browser.
      *
      * @param Request $request
+     *
      * @return array Languages ordered in the user browser preferences
      */
     public function getLanguages(Request $request)
@@ -174,6 +174,7 @@ class LocaleHelper
      * Gets a list of content types acceptable by the client browser.
      *
      * @param Request $request
+     *
      * @return array List of content types in preferable order
      */
     public function getAcceptableContentTypes(Request $request)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This interface is for classes that are set up to resolve the request
- * uri based off a request instance
+ * uri based off a request instance.
  *
  * @author Yosef Deray <yderay@gmail.com>
  */

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Request uri resolver that takes into account how IIS7 with
- * Microsoft Rewrite Module works
+ * Microsoft Rewrite Module works.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>

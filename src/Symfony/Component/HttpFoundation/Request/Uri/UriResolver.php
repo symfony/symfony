@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Request uri resolver that modifies the request passed it ot make creating
- * sub requests easier
+ * sub requests easier.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
@@ -39,6 +40,7 @@ class UriResolver implements UriResolverInterface
             ->add(new RequestUriUriResolver())
             ->add(new OrigPathInfoUriResolver())
         ;
+
         return new static($resolver);
     }
 
@@ -53,6 +55,7 @@ class UriResolver implements UriResolverInterface
         $request->server->remove('ORIG_PATH_INFO');
         // normalize the request URI to ease creating sub-requests from this request
         $request->server->set('REQUEST_URI', $requestUri);
+
         return $requestUri;
     }
 }

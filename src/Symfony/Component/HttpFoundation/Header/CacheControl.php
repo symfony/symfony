@@ -59,8 +59,8 @@ class CacheControl
     /**
      * Adds a custom Cache-Control directive.
      *
-     * @param string $key  The Cache-Control directive name
-     * @param mixed $value The Cache-Control directive value
+     * @param string $key   The Cache-Control directive name
+     * @param mixed  $value The Cache-Control directive value
      *
      * @return $this
      */

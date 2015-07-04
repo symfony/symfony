@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Request uri resolver that checks to see if the request is an instance of
- * an apache request which has been mostly rewritten by mod rewrite already
+ * an apache request which has been mostly rewritten by mod rewrite already.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>

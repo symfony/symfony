@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
@@ -675,65 +674,6 @@ EOF;
         }
 
         return $publicServices.$privateServices;
-    }
-
-    /**
-     * Adds synchronizer methods.
-     *
-     * @param string     $id         A service identifier
-     * @param Definition $definition A Definition instance
-     *
-     * @return string|null
-     *
-     * @deprecated since version 2.7, will be removed in 3.0.
-     */
-    private function addServiceSynchronizer($id, Definition $definition)
-    {
-        if (!$definition->isSynchronized(false)) {
-            return;
-        }
-
-        if ('request' !== $id) {
-            @trigger_error('Synchronized services were deprecated in version 2.7 and won\'t work anymore in 3.0.', E_USER_DEPRECATED);
-        }
-
-        $code = '';
-        foreach ($this->container->getDefinitions() as $definitionId => $definition) {
-            foreach ($definition->getMethodCalls() as $call) {
-                foreach ($call[1] as $argument) {
-                    if ($argument instanceof Reference && $id == (string) $argument) {
-                        $arguments = array();
-                        foreach ($call[1] as $value) {
-                            $arguments[] = $this->dumpValue($value);
-                        }
-
-                        $call = $this->wrapServiceConditionals($call[1], sprintf("\$this->get('%s')->%s(%s);", $definitionId, $call[0], implode(', ', $arguments)));
-
-                        $code .= <<<EOF
-        if (\$this->initialized('$definitionId')) {
-            $call
-        }
-
-EOF;
-                    }
-                }
-            }
-        }
-
-        if (!$code) {
-            return;
-        }
-
-        return <<<EOF
-
-    /**
-     * Updates the '$id' service.
-     */
-    protected function synchronize{$this->camelize($id)}Service()
-    {
-$code    }
-
-EOF;
     }
 
     private function addNewInstance($id, Definition $definition, $return, $instantiation)

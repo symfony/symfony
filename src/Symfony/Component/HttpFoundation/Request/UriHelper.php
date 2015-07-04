@@ -81,9 +81,8 @@ class UriHelper
      * Returns the requested URI (path and query string).
      *
      * @param Request $request
-     * @return string The raw URI (i.e. not URI decoded)
      *
-     * @api
+     * @return string The raw URI (i.e. not URI decoded)
      */
     public function getRequestUri(Request $request)
     {
@@ -103,9 +102,8 @@ class UriHelper
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
      * @param Request $request
-     * @return string The raw path (i.e. not urldecoded)
      *
-     * @api
+     * @return string The raw path (i.e. not urldecoded)
      */
     public function getPathInfo(Request $request)
     {
@@ -144,8 +142,6 @@ class UriHelper
      *
      * @param Request $request
      * @return string The raw path (i.e. not urldecoded)
-     *
-     * @api
      */
     public function getBasePath(Request $request)
     {
@@ -179,8 +175,6 @@ class UriHelper
      *
      * @param Request $request
      * @return string The raw URL (i.e. not urldecoded)
-     *
-     * @api
      */
     public function getBaseUrl(Request $request)
     {
@@ -259,7 +253,6 @@ class UriHelper
      *
      * @param Request $request
      * @return string
-     * @api
      */
     public function getScheme(Request $request)
     {
@@ -273,7 +266,6 @@ class UriHelper
      *
      * @param Request $request
      * @return string
-     * @api
      */
     public function getHttpHost(Request $request)
     {
@@ -294,8 +286,6 @@ class UriHelper
      * @return string A normalized URI (URL) for the Request
      *
      * @see getQueryString()
-     *
-     * @api
      */
     public function getUri(Request $request)
     {
@@ -326,8 +316,6 @@ class UriHelper
      * @param Request $request
      * @param string $path A path to use instead of the current one
      * @return string The normalized URI for the path
-     *
-     * @api
      */
     public function getUriForPath(Request $request, $path)
     {
@@ -397,8 +385,6 @@ class UriHelper
      *
      * @param Request $request
      * @return null|string A normalized query string for the Request
-     *
-     * @api
      */
     public function getQueryString(Request $request)
     {

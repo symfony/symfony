@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -9,7 +10,6 @@
  */
 
 namespace Symfony\Component\HttpFoundation\Header;
-
 
 /**
  * Represents a Cache-Control header.
@@ -56,17 +56,18 @@ class CacheControl
         return new static($cacheControl);
     }
 
-
     /**
      * Adds a custom Cache-Control directive.
      *
-     * @param string $key The Cache-Control directive name
+     * @param string $key  The Cache-Control directive name
      * @param mixed $value The Cache-Control directive value
+     *
      * @return $this
      */
     public function addDirective($key, $value = true)
     {
         $this->directives[$key] = $value;
+
         return $this;
     }
 
@@ -74,6 +75,7 @@ class CacheControl
      * Returns true if the Cache-Control directive is defined.
      *
      * @param string $key The Cache-Control directive
+     *
      * @return bool true if the directive exists, false otherwise
      */
     public function hasDirective($key)
@@ -85,6 +87,7 @@ class CacheControl
      * Returns a Cache-Control directive value by name.
      *
      * @param string $key The directive name
+     *
      * @return mixed|null The directive value if defined, null otherwise
      */
     public function getDirective($key)
@@ -96,14 +99,19 @@ class CacheControl
      * Removes a Cache-Control directive.
      *
      * @param string $key The Cache-Control directive
+     *
      * @return $this
      */
     public function removeDirective($key)
     {
         unset($this->directives[$key]);
+
         return $this;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function allDirectives()
     {
         return $this->directives;

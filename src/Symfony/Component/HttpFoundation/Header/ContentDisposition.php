@@ -10,7 +10,6 @@
 
 namespace Symfony\Component\HttpFoundation\Header;
 
-
 /**
  * Represents a Content-Disposition header.
  *
@@ -77,8 +76,9 @@ class ContentDisposition
         $matches = array_merge(array(
             'disposition' => self::DISPOSITION_ATTACHMENT,
             'filename' => '',
-            'filenameFallback' => ''
+            'filenameFallback' => '',
         ), $matches);
+
         return new static($matches['disposition'], $matches['filename'], $matches['filenameFallback']);
     }
 

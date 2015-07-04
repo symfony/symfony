@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -25,6 +26,7 @@ class CacheHelper
      * Gets the Etags.
      *
      * @param Request $request
+     *
      * @return array The entity tags
      */
     public function getETags(Request $request)
@@ -34,6 +36,7 @@ class CacheHelper
 
     /**
      * @param Request $request
+     *
      * @return bool
      */
     public function isNoCache(Request $request)

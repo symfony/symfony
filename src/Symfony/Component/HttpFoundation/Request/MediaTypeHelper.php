@@ -43,8 +43,6 @@ class MediaTypeHelper
      * @param string $format The format
      *
      * @return string The associated mime type (null if not found)
-     *
-     * @api
      */
     public function getMimeType($format)
     {
@@ -61,8 +59,6 @@ class MediaTypeHelper
      * @param string $mimeType The associated mime type
      *
      * @return string|null The format (null if not found)
-     *
-     * @api
      */
     public function getFormat($mimeType)
     {
@@ -87,8 +83,6 @@ class MediaTypeHelper
      *
      * @param string       $format    The format
      * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
-     *
-     * @api
      */
     public function setFormat($format, $mimeTypes)
     {
@@ -104,8 +98,6 @@ class MediaTypeHelper
      *
      * @param Request $request
      * @return null|string The format (null if no content type is present)
-     *
-     * @api
      */
     public function getContentType(Request $request)
     {
@@ -117,8 +109,6 @@ class MediaTypeHelper
      *
      * @param Request $request
      * @return array List of charsets in preferable order
-     *
-     * @api
      */
     public function getCharsets(Request $request)
     {

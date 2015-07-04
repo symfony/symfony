@@ -95,7 +95,6 @@ class RequestHelper
      *
      * @param array $proxies A list of trusted proxies
      *
-     * @api
      * @return $this
      */
     public function setTrustedProxies(array $proxies)
@@ -255,8 +254,6 @@ class RequestHelper
      *
      * @see getClientIps()
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
-     *
-     * @api
      */
     public function getClientIp(Request $request)
     {
@@ -269,8 +266,8 @@ class RequestHelper
      * Returns current script name.
      *
      * @param Request $request
+     *
      * @return string
-     * @api
      */
     public function getScriptName(Request $request)
     {
@@ -290,8 +287,8 @@ class RequestHelper
      * the "client-proto" key.
      *
      * @param Request $request
+     *
      * @return bool
-     * @api
      */
     public function isSecure(Request $request)
     {
@@ -317,7 +314,6 @@ class RequestHelper
      *
      * @param Request $request
      * @return string
-     * @api
      */
     public function getHost(Request $request)
     {
@@ -376,7 +372,6 @@ class RequestHelper
      *
      * @param Request $request
      * @return string
-     * @api
      */
     public function getPort(Request $request)
     {
@@ -452,8 +447,6 @@ class RequestHelper
      *
      * @param Request $request
      * @param string $method
-     *
-     * @api
      */
     public function setMethod(Request $request, $method)
     {
@@ -473,8 +466,6 @@ class RequestHelper
      *
      * @param Request $request
      * @return string The request method
-     *
-     * @api
      *
      * @see getRealMethod()
      */
@@ -510,7 +501,6 @@ class RequestHelper
      *
      * @param Request $request
      * @return bool
-     * @api
      */
     public function isMethodSafe(Request $request)
     {
@@ -539,9 +529,8 @@ class RequestHelper
      * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
      * @param Request $request
-     * @return bool true if the request is an XMLHttpRequest, false otherwise
      *
-     * @api
+     * @return bool true if the request is an XMLHttpRequest, false otherwise
      */
     public function isXmlHttpRequest(Request $request)
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -15,14 +16,13 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Request helper with methods helpful for working with local data
+ * Request helper with methods helpful for working with local data.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yosef Deray <yderay@gmail.com>
  */
 class LocaleHelper
 {
-
     /**
      * @var string
      */
@@ -57,8 +57,6 @@ class LocaleHelper
      * Sets the default locale.
      *
      * @param string $locale
-     *
-     * @api
      */
     public function setDefaultLocale($locale)
     {
@@ -83,8 +81,6 @@ class LocaleHelper
      * Sets the locale.
      *
      * @param string $locale
-     *
-     * @api
      */
     public function setLocale($locale)
     {
@@ -105,10 +101,9 @@ class LocaleHelper
      * Returns the preferred language.
      *
      * @param Request $request
-     * @param array $locales An array of ordered available locales
-     * @return null|string The preferred locale
+     * @param array   $locales An array of ordered available locales
      *
-     * @api
+     * @return null|string The preferred locale
      */
     public function getPreferredLanguage(Request $request, array $locales = null)
     {
@@ -143,8 +138,6 @@ class LocaleHelper
      *
      * @param Request $request
      * @return array Languages ordered in the user browser preferences
-     *
-     * @api
      */
     public function getLanguages(Request $request)
     {
@@ -182,8 +175,6 @@ class LocaleHelper
      *
      * @param Request $request
      * @return array List of content types in preferable order
-     *
-     * @api
      */
     public function getAcceptableContentTypes(Request $request)
     {

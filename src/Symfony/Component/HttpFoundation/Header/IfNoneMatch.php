@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -9,7 +10,6 @@
  */
 
 namespace Symfony\Component\HttpFoundation\Header;
-
 
 /**
  * Represents an If-None-Match header.

@@ -174,7 +174,7 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $maxTags = array();
 
-        foreach ($serviceIds as $key =>  $serviceId) {
+        foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
                 // filter out private services unless shown explicitly

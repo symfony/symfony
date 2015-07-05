@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by piotrpasich at 2015-06-27T08:21:28Z
+
+:-1:
+The problem is well described - good job! But the solution is a shortcut, I think. In this case, you can reset the mime type in every single part of the code. It's not good.
+
+This part should be fully refactored. What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:36:42Z
+
+I think we should actually stop using a singleton in Symfony 3
+
+---------------------------------------------------------------------------
+
+by dawehner at 2015-07-01T09:58:51Z
+
+Yeah totally agree. It could be added automatically via some subscriber or via the constructor.
+
+What is the way to move forward on this issue though?

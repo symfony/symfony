@@ -78,7 +78,7 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test dedicated to check if the backwards compatibility is still working
+     * Test dedicated to check if the backwards compatibility is still working.
      */
     public function testOldConstructorSignature()
     {

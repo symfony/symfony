@@ -570,7 +570,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Provides each defined format
+     * Provides each defined format.
      *
      * @return array
      */

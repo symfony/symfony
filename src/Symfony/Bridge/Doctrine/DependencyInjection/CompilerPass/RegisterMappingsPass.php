@@ -75,14 +75,14 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
 
     /**
      * Naming pattern for the configuration service id, for example
-     * 'doctrine.orm.%s_configuration'
+     * 'doctrine.orm.%s_configuration'.
      * @var string
      */
     private $configurationPattern;
 
     /**
      * Method name to call on the configuration service. This depends on the
-     * Doctrine implementation. For example addEntityNamespace
+     * Doctrine implementation. For example addEntityNamespace.
      * @var string
      */
     private $registerAliasMethodName;

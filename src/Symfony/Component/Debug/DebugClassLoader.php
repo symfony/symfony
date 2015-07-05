@@ -69,7 +69,7 @@ class DebugClassLoader
     }
 
     /**
-     * Wraps all autoloaders
+     * Wraps all autoloaders.
      */
     public static function enable()
     {
@@ -117,7 +117,7 @@ class DebugClassLoader
     }
 
     /**
-     * Finds a file by class name
+     * Finds a file by class name.
      *
      * @param string $class A class name to resolve to file
      *

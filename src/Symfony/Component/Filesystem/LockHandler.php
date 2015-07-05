@@ -53,7 +53,7 @@ class LockHandler
     }
 
     /**
-     * Lock the resource
+     * Lock the resource.
      *
      * @param  bool        $blocking wait until the lock is released
      * @return bool        Returns true if the lock was acquired, false otherwise
@@ -98,7 +98,7 @@ class LockHandler
     }
 
     /**
-     * Release the resource
+     * Release the resource.
      */
     public function release()
     {

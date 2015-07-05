@@ -212,7 +212,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Dumps callable to YAML format
+     * Dumps callable to YAML format.
      *
      * @param callable $callable
      *

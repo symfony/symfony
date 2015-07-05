@@ -219,7 +219,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML file to a \DOMDocument
+     * Parses a XML file to a \DOMDocument.
      *
      * @param string $file Path to a file
      *
@@ -376,7 +376,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Get child elements by name
+     * Get child elements by name.
      *
      * @param \DOMNode $node
      * @param mixed    $name

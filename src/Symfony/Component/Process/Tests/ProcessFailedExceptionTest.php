@@ -91,7 +91,7 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that ProcessFailedException does not extract information from
-     * process output if it was previously disabled
+     * process output if it was previously disabled.
      */
     public function testDisabledOutputInFailedExceptionDoesNotPopulateOutput()
     {

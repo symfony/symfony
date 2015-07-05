@@ -25,7 +25,7 @@ class DebugFormatterHelper extends Helper
     private $count = -1;
 
     /**
-     * Starts a debug formatting session
+     * Starts a debug formatting session.
      *
      * @param string $id      The id of the formatting session
      * @param string $message The message to display
@@ -41,7 +41,7 @@ class DebugFormatterHelper extends Helper
     }
 
     /**
-     * Adds progress to a formatting session
+     * Adds progress to a formatting session.
      *
      * @param string $id          The id of the formatting session
      * @param string $buffer      The message to display
@@ -83,7 +83,7 @@ class DebugFormatterHelper extends Helper
     }
 
     /**
-     * Stops a formatting session
+     * Stops a formatting session.
      *
      * @param string $id         The id of the formatting session
      * @param string $message    The message to display

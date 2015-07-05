@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Security;
 class LegacySecurityContextInterfaceTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Test if the BC Layer is working as intended
+     * Test if the BC Layer is working as intended.
      */
     public function testConstantSync()
     {

@@ -679,7 +679,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Issue #9285
+     * Issue #9285.
      *
      * If the "verbose" option is just before an argument in ArgvInput,
      * an argument value should not be treated as verbosity value.

@@ -21,7 +21,7 @@ class UriSafeTokenGeneratorTest extends \PHPUnit_Framework_TestCase
     const ENTROPY = 1000;
 
     /**
-     * A non alpha-numeric byte string
+     * A non alpha-numeric byte string.
      * @var string
      */
     private static $bytes;

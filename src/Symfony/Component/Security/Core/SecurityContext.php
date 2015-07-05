@@ -41,7 +41,7 @@ class SecurityContext implements SecurityContextInterface
     private $authorizationChecker;
 
     /**
-     * For backwards compatibility, the signature of sf <2.6 still works
+     * For backwards compatibility, the signature of sf <2.6 still works.
      *
      * @param TokenStorageInterface|AuthenticationManagerInterface         $tokenStorage
      * @param AuthorizationCheckerInterface|AccessDecisionManagerInterface $authorizationChecker

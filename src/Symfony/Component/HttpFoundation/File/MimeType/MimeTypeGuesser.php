@@ -70,7 +70,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * Resets the singleton instance.
      */
-    public static function reset() {
+    public static function reset()
+    {
         self::$instance = null;
     }
 

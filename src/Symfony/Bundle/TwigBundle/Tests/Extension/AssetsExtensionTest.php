@@ -13,7 +13,6 @@ namespace Symfony\Bundle\TwigBundle\Tests\Extension;
 
 use Symfony\Bundle\TwigBundle\Extension\AssetsExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Component\Routing\RequestContext;
 
 class AssetsExtensionTest extends TestCase
 {

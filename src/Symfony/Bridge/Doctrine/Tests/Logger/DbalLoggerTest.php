@@ -91,7 +91,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
                     'utf8' => 'foo',
                     array(
                         'nonutf8' => DbalLogger::BINARY_DATA_VALUE,
-                    )
+                    ),
                 )
             )
         ;
@@ -100,7 +100,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
             'utf8' => 'foo',
             array(
                 'nonutf8' => "\x7F\xFF",
-            )
+            ),
         ));
     }
 

@@ -51,7 +51,7 @@ class MessageSelector
      */
     public function choose($message, $number, $locale)
     {
-        $parts = explode('|', $message);
+        $parts = preg_split('/(?<!\\\\)\|/', $message)
         $explicitRules = array();
         $standardRules = array();
         foreach ($parts as $part) {

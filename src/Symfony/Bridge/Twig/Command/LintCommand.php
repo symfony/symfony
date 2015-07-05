@@ -193,7 +193,7 @@ EOF
 
     private function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
     {
-        $line =  $exception->getTemplateLine();
+        $line = $exception->getTemplateLine();
 
         if ($file) {
             $output->writeln(sprintf('<error>KO</error> in %s (line %s)', $file, $line));

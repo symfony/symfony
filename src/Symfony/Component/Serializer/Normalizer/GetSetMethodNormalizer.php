@@ -146,7 +146,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                 throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
             }
 
-            $context['circular_reference_limit'][$objectHash]++;
+            ++$context['circular_reference_limit'][$objectHash];
         } else {
             $context['circular_reference_limit'][$objectHash] = 1;
         }

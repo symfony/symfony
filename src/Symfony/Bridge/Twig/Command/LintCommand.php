@@ -162,7 +162,7 @@ EOF
             if ($info['valid'] && $output->isVerbose()) {
                 $output->writeln('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
             } elseif (!$info['valid']) {
-                $errors++;
+                ++$errors;
                 $this->renderException($output, $info['template'], $info['exception'], $info['file']);
             }
         }
@@ -182,7 +182,7 @@ EOF
             if (!$v['valid']) {
                 $v['message'] = $v['exception']->getMessage();
                 unset($v['exception']);
-                $errors++;
+                ++$errors;
             }
         });
 
@@ -224,7 +224,7 @@ EOF
         $result = array();
         while ($position < $max) {
             $result[$position + 1] = $lines[$position];
-            $position++;
+            ++$position;
         }
 
         return $result;

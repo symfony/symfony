@@ -37,13 +37,19 @@ class PropertyAccessor implements PropertyAccessorInterface
     private $ignoreInvalidIndices;
 
     /**
+     * @var StringSingularifyInterface
+     */
+    private $propertySingularify = null;
+
+    /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, $propertySingularify = null)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
+        $this->propertySingularify = $propertySingularify ?: new StringSingularifyEnglish();
     }
 
     /**
@@ -389,7 +395,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $reflClass = new \ReflectionClass($object);
         $camelized = $this->camelize($property);
-        $singulars = (array) StringUtil::singularify($camelized);
+        $singulars = (array) $this->propertySingularify->singularify($camelized);
 
         if (is_array($value) || $value instanceof \Traversable) {
             $methods = $this->findAdderAndRemover($reflClass, $singulars);
@@ -517,7 +523,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             return true;
         }
 
-        $singulars = (array) StringUtil::singularify($camelized);
+        $singulars = (array) $this->propertySingularify->singularify($camelized);
 
         // Any of the two methods is required, but not yet known
         if (null !== $this->findAdderAndRemover($reflClass, $singulars)) {

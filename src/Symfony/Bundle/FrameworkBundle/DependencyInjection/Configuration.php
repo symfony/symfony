@@ -499,6 +499,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
+                        ->scalarNode('property_singularify')->defaultNull()->end()
                     ->end()
                 ->end()
             ->end()

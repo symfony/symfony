@@ -805,7 +805,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormRegistrySetArrayOnNotCompoundField()
     {
-
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('bar'));
 

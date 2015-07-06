@@ -843,9 +843,7 @@ class Request
 
     /**
      * @see IpRetriever\IpRetriever\IpRetrieverInterface::getClientIps()
-     *
      * @see getClientIp()
-     *
      * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function getClientIps()
@@ -859,10 +857,10 @@ class Request
             return array($this->server->get('REMOTE_ADDR'));
         }
 
-
         $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
         $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
         $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
+
         return $this->ipRetriever->getClientIps($this);
     }
 
@@ -870,6 +868,7 @@ class Request
      * @see IpRetriever\IpRetriever\IpRetrieverInterface::getClientIp()
      *
      * @api
+     *
      * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function getClientIp()
@@ -881,6 +880,7 @@ class Request
         $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
         $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
         $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
+
         return $this->ipRetriever->getClientIp($this);
     }
 
@@ -1966,7 +1966,7 @@ class Request
         if (self::$requestFactory) {
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
-            if (!$request instanceof Request) {
+            if (!$request instanceof self) {
                 throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
             }
 
@@ -1983,6 +1983,7 @@ class Request
 
     /**
      * @param IpRetrieverInterface $ipRetriever
+     *
      * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function setIpRetriever(IpRetrieverInterface $ipRetriever)
@@ -1993,6 +1994,7 @@ class Request
 
     /**
      * @return IpRetrieverInterface
+     *
      * @deprecated since version 2.7, to be removed in 3.0.
      */
     private function getDefaultIpRetriever()
@@ -2001,6 +2003,7 @@ class Request
         if (null === $this->ipRetriever) {
             $this->ipRetriever = new IpRetriever();
         }
+
         return $this->ipRetriever;
     }
 }

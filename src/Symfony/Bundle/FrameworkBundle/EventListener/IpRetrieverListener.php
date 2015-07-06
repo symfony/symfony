@@ -20,7 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Sets the ip retriever in the request.
  *
  * This listener is only here to provide backward compatibility until 3.0
+ *
  * @deprecated since version 2.7, to be removed in 3.0.
+ *
  * @author Xavier Leune <xavier.leune@gmail.com>
  */
 class IpRetrieverListener implements EventSubscriberInterface
@@ -44,7 +46,7 @@ class IpRetrieverListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => 'onKernelRequest'
+            KernelEvents::REQUEST => 'onKernelRequest',
         );
     }
 }

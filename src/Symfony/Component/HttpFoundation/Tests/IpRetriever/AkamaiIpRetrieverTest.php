@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\IpRetriever;
 
-
 use Symfony\Component\HttpFoundation\IpRetriever\AkamaiIpRetriever;
 use Symfony\Component\HttpFoundation\Request;
 

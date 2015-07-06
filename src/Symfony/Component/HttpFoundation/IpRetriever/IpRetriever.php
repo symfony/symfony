@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\HttpFoundation\IpRetriever;
 
-
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * IpRetriever
+ * IpRetriever.
  *
  * Can retrieve real user ip from various contexts (proxified query or not).
  * If you use a reverse proxy, set his ip with setTrustedProxies

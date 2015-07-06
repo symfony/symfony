@@ -893,7 +893,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Kept to check backward compatibility
+     * Kept to check backward compatibility.
+     *
      * @group legacy
      */
     public function testGetClientIpsForwardedProvider()
@@ -910,7 +911,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Kept to check backward compatibility
+     * Kept to check backward compatibility.
+     *
      * @group legacy
      */
     public function testGetClientIpsProvider()
@@ -996,7 +998,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCanBeCalledTwiceWithResources($first, $second)

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\IpRetriever;
 
-
 use Symfony\Component\HttpFoundation\Request;
 
 interface IpRetrieverInterface
@@ -71,6 +70,7 @@ interface IpRetrieverInterface
      * Use this method carefully; you should use getClientIp() instead.
      *
      * @param Request $request
+     *
      * @return array The client IP addresses
      *
      * @see getClientIp()
@@ -91,6 +91,7 @@ interface IpRetrieverInterface
      * the "client-ip" key.
      *
      * @param Request $request
+     *
      * @return string The client IP address
      *
      * @see getClientIps()

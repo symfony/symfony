@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\IpRetriever;
 
-
-use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * AkamaiIpRetriever
+ * AkamaiIpRetriever.
  *
  * Warning : this class is less strict than IpRetriever.
  * It has been created to handle akamai CDN.
@@ -26,9 +24,9 @@ use Symfony\Component\HttpFoundation\Request;
  * If you don't use akamai, use IpRetriever.
  *
  * @see IpRetriever
+ *
  * @author Xavier Leune <xavier.leune@gmail.com>
  */
-
 class AkamaiIpRetriever extends IpRetriever
 {
     const HEADER_TRUE_CLIENT_IP = 'true_client_ip';
@@ -70,7 +68,7 @@ class AkamaiIpRetriever extends IpRetriever
                 $clientIps = array_slice(
                     $clientIps,
                     0,
-                    count($clientIps) - (int)$forwardAkamai - 1
+                    count($clientIps) - (int) $forwardAkamai - 1
                 );
             }
         } elseif (

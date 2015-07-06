@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
+use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand;
@@ -29,5 +30,15 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $bundle2 = new ExtensionAbsentBundle();
 
         $this->assertNull($bundle2->registerCommands($app));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface
+     */
+    public function testGetContainerExtensionWithInvalidClass()
+    {
+        $bundle = new ExtensionNotValidBundle();
+        $bundle->getContainerExtension();
     }
 }

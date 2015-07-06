@@ -171,6 +171,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @group legacy
      */
     public function testSetDoesNotAllowPrototypeScope()
     {
@@ -180,6 +181,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @group legacy
      */
     public function testSetDoesNotAllowInactiveScope()
     {
@@ -188,6 +190,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->set('foo', new \stdClass(), 'foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetAlsoSetsScopedService()
     {
         $c = new Container();
@@ -200,6 +205,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $scoped['foo']['foo'], '->set() sets a scoped service');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetAlsoCallsSynchronizeService()
     {
         $c = new ProjectServiceContainer();
@@ -273,6 +281,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\Container::get
+     * @group legacy
      */
     public function testGetReturnsNullOnInactiveScope()
     {
@@ -311,6 +320,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnterLeaveCurrentScope()
     {
         $container = new ProjectServiceContainer();
@@ -322,7 +334,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $container->enterScope('foo');
         $scoped2 = $container->get('scoped');
-        $scoped3 = $container->get('scoped');
+        $scoped3 = $container->get('SCOPED');
         $scopedFoo2 = $container->get('scoped_foo');
 
         $container->leaveScope('foo');
@@ -336,6 +348,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($scopedFoo1, $scopedFoo3);
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnterLeaveScopeWithChildScopes()
     {
         $container = new Container();
@@ -366,6 +381,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->has('a'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnterScopeRecursivelyWithInactiveChildScopes()
     {
         $container = new Container();
@@ -407,6 +425,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->has('a'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnterChildScopeRecursively()
     {
         $container = new Container();
@@ -444,6 +465,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @group legacy
      */
     public function testEnterScopeNotAdded()
     {
@@ -453,6 +475,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @group legacy
      */
     public function testEnterScopeDoesNotAllowInactiveParentScope()
     {
@@ -462,6 +485,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container->enterScope('bar');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLeaveScopeNotActive()
     {
         $container = new Container();
@@ -486,7 +512,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @dataProvider getBuiltInScopes
+     * @dataProvider getLegacyBuiltInScopes
+     * @group legacy
      */
     public function testAddScopeDoesNotAllowBuiltInScopes($scope)
     {
@@ -496,6 +523,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @group legacy
      */
     public function testAddScopeDoesNotAllowExistingScope()
     {
@@ -506,7 +534,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @dataProvider getInvalidParentScopes
+     * @dataProvider getLegacyInvalidParentScopes
+     * @group legacy
      */
     public function testAddScopeDoesNotAllowInvalidParentScope($scope)
     {
@@ -514,6 +543,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c->addScope(new Scope('foo', $scope));
     }
 
+    /**
+     * @group legacy
+     */
     public function testAddScope()
     {
         $c = new Container();
@@ -529,6 +561,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('foo' => array('bar', 'baz'), 'bar' => array('baz'), 'baz' => array()), $this->getField($c, 'scopeChildren'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testHasScope()
     {
         $c = new Container();
@@ -577,6 +612,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testIsScopeActive()
     {
         $c = new Container();
@@ -593,7 +631,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->isScopeActive('foo'));
     }
 
-    public function getInvalidParentScopes()
+    public function getLegacyInvalidParentScopes()
     {
         return array(
             array(ContainerInterface::SCOPE_PROTOTYPE),
@@ -601,7 +639,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function getBuiltInScopes()
+    public function getLegacyBuiltInScopes()
     {
         return array(
             array(ContainerInterface::SCOPE_CONTAINER),

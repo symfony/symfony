@@ -50,7 +50,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays current services for an application')
@@ -145,7 +145,7 @@ EOF
         $optionsCount = 0;
         foreach ($options as $option) {
             if ($input->getOption($option)) {
-                $optionsCount++;
+                ++$optionsCount;
             }
         }
 
@@ -166,6 +166,10 @@ EOF
      */
     protected function getContainerBuilder()
     {
+        if ($this->containerBuilder) {
+            return $this->containerBuilder;
+        }
+
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
@@ -179,7 +183,7 @@ EOF
         $loader = new XmlFileLoader($container, new FileLocator());
         $loader->load($cachedFile);
 
-        return $container;
+        return $this->containerBuilder = $container;
     }
 
     private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)

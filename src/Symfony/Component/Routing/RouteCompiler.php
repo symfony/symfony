@@ -145,7 +145,7 @@ class RouteCompiler implements RouteCompilerInterface
         // find the first optional token
         $firstOptional = PHP_INT_MAX;
         if (!$isHost) {
-            for ($i = count($tokens) - 1; $i >= 0; $i--) {
+            for ($i = count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
                 if ('variable' === $token[0] && $route->hasDefault($token[3])) {
                     $firstOptional = $i;
@@ -157,7 +157,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // compute the matching regexp
         $regexp = '';
-        for ($i = 0, $nbToken = count($tokens); $i < $nbToken; $i++) {
+        for ($i = 0, $nbToken = count($tokens); $i < $nbToken; ++$i) {
             $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
         }
 
@@ -218,7 +218,7 @@ class RouteCompiler implements RouteCompilerInterface
                     $nbTokens = count($tokens);
                     if ($nbTokens - 1 == $index) {
                         // Close the optional subpatterns
-                        $regexp .= str_repeat(")?", $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
+                        $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
                     }
                 }
 

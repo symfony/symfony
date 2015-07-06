@@ -27,6 +27,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -66,7 +70,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function renderEnctype(FormView $view)
     {
         if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf("Deprecated method %s->enctype() is not implemented.", get_class($form)));
+            $this->markTestSkipped(sprintf('Deprecated method %s->enctype() is not implemented.', get_class($form)));
         }
 
         return (string) $form->enctype($view);

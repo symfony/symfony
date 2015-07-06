@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -29,10 +30,12 @@ use Symfony\Component\Validator\Validation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class FrameworkExtension extends Extension
 {
     private $formConfigEnabled = false;
+    private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
 
     /**
@@ -116,19 +119,18 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
         if (isset($config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
 
-        if (isset($config['serializer']) && $config['serializer']['enabled']) {
-            $loader->load('serializer.xml');
+        if (isset($config['serializer'])) {
+            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
         $loader->load('debug_prod.xml');
@@ -289,8 +291,13 @@ class FrameworkExtension extends Extension
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
-        if (true === $this->formConfigEnabled) {
+        if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');
+        }
+
+        if ($this->translationConfigEnabled) {
+            $loader->load('translation_debug.xml');
+            $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -439,7 +446,7 @@ class FrameworkExtension extends Extension
     /**
      * Loads the request configuration.
      *
-     * @param array            $config    A session configuration array
+     * @param array            $config    A request configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
@@ -553,6 +560,12 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
         }
+
+        if ($container->hasDefinition('assets.packages')) {
+            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
+        } else {
+            $container->removeDefinition('templating.helper.assets');
+        }
     }
 
     /**
@@ -645,6 +658,7 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
+        $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
@@ -680,6 +694,13 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
             }
         }
+        foreach ($config['paths'] as $dir) {
+            if (is_dir($dir)) {
+                $dirs[] = $dir;
+            } else {
+                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
+            }
+        }
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
             $dirs[] = $dir;
         }
@@ -699,6 +720,7 @@ class FrameworkExtension extends Extension
                 ->in($dirs)
             ;
 
+            $locales = array();
             foreach ($finder as $file) {
                 list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
                 if (!isset($files[$locale])) {
@@ -708,7 +730,12 @@ class FrameworkExtension extends Extension
                 $files[$locale][] = (string) $file;
             }
 
-            $translator->replaceArgument(4, $files);
+            $options = array_merge(
+                $translator->getArgument(3),
+                array('resource_files' => $files)
+            );
+
+            $translator->replaceArgument(3, $options);
         }
     }
 
@@ -762,20 +789,11 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
 
-        if ('2.5' === $config['api']) {
-            $api = Validation::API_VERSION_2_5;
-        } else {
-            // 2.4 is now the same as 2.5 BC
-            $api = Validation::API_VERSION_2_5_BC;
-            // the validation class needs to be changed for BC
-            $container->setParameter('validator.class', 'Symfony\Component\Validator\ValidatorInterface');
-        }
-
-        $validatorBuilder->addMethodCall('setApiVersion', array($api));
-
         // You can use this parameter to check the API version in your own
         // bundle extension classes
-        $container->setParameter('validator.api', $api);
+        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
+        // @deprecated since version 2.7, to be removed in 3.0
+        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)
@@ -874,6 +892,86 @@ class FrameworkExtension extends Extension
 
         // Enable services for CSRF protection (even without forms)
         $loader->load('security_csrf.xml');
+    }
+
+    /**
+     * Loads the serializer configuration.
+     *
+     * @param array            $config    A serializer configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $loader->load('serializer.xml');
+        $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
+
+        $serializerLoaders = array();
+        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            $annotationLoader = new Definition(
+                'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
+                 array(new Reference('annotation_reader'))
+            );
+            $annotationLoader->setPublic(false);
+
+            $serializerLoaders[] = $annotationLoader;
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            $dirname = dirname($reflection->getFilename());
+
+            if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_file($file = $dirname.'/Resources/config/serialization.yml')) {
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_dir($dir = $dirname.'/Resources/config/serialization')) {
+                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+
+                $container->addResource(new DirectoryResource($dir));
+            }
+        }
+
+        $chainLoader->replaceArgument(0, $serializerLoaders);
+
+        if (isset($config['cache']) && $config['cache']) {
+            $container->setParameter(
+                'serializer.mapping.cache.prefix',
+                'serializer_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+            );
+
+            $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
+                1, new Reference($config['cache'])
+            );
+        }
     }
 
     /**

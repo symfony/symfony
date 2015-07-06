@@ -85,6 +85,30 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
     }
 
+    public function testGetCatalogueReturnsConsolidatedCatalogue()
+    {
+        /*
+         * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).
+         * In that case, getCatalogue() will probably have to load all missing domains in order to return
+         * one complete catalogue.
+         */
+
+        $locale = 'whatever';
+        $translator = new Translator($locale);
+        $translator->addLoader('loader-a', new ArrayLoader());
+        $translator->addLoader('loader-b', new ArrayLoader());
+        $translator->addResource('loader-a', array('foo' => 'foofoo'), $locale, 'domain-a');
+        $translator->addResource('loader-b', array('bar' => 'foobar'), $locale, 'domain-b');
+
+        /*
+         * Test that we get a single catalogue comprising messages
+         * from different loaders and different domains
+         */
+        $catalogue = $translator->getCatalogue($locale);
+        $this->assertTrue($catalogue->defines('foo', 'domain-a'));
+        $this->assertTrue($catalogue->defines('bar', 'domain-b'));
+    }
+
     public function testSetFallbackLocales()
     {
         $translator = new Translator('en');
@@ -136,11 +160,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR');
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
-        $translator->addResource('array', array('bar' => 'foobar'), 'en');
-
         $translator->setFallbackLocales(array('en'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
 
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
@@ -280,12 +303,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransValidLocale($locale)
     {
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator($locale, new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+        $translator->addResource('array', array('test' => 'OK'), $locale);
 
-        $translator->trans('foo', array(), '', $locale);
-        // no assertion. this method just asserts that no exception is thrown
+        $this->assertEquals('OK', $translator->trans('test'));
+        $this->assertEquals('OK', $translator->trans('test', array(), null, $locale));
     }
 
     /**
@@ -358,7 +381,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('Symfony est super !', 'Symfony is great!', 'Symfony est super !', array(), 'fr', ''),
             array('Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', array('%what%' => 'awesome'), 'fr', ''),
-            array('Symfony est super !', new String('Symfony is great!'), 'Symfony est super !', array(), 'fr', ''),
+            array('Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', array(), 'fr', ''),
         );
     }
 
@@ -404,7 +427,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Il y a 1 pomme', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 1, array('%count%' => 1), 'fr', ''),
             array('Il y a 10 pommes', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
 
-            array('Il y a 0 pomme', new String('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
+            array('Il y a 0 pomme', new StringClass('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
         );
     }
 
@@ -474,9 +497,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider dataProviderGetMessages
      */
-    public function testGetMessages($resources, $locale, $expected)
+    public function testLegacyGetMessages($resources, $locale, $expected)
     {
         $locales = array_keys($resources);
         $_locale = !is_null($locale) ? $locale : reset($locales);
@@ -588,7 +612,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class String
+class StringClass
 {
     protected $str;
 

@@ -53,7 +53,7 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals('16', $transformer->transform(15.9));
     }
 
-    public function testTransformWithPrecision()
+    public function testTransformWithScale()
     {
         $transformer = new PercentToLocalizedStringTransformer(2);
 
@@ -87,7 +87,7 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(200, $transformer->reverseTransform('200'));
     }
 
-    public function testReverseTransformWithPrecision()
+    public function testReverseTransformWithScale()
     {
         $transformer = new PercentToLocalizedStringTransformer(2);
 

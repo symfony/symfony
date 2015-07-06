@@ -26,7 +26,7 @@ use Symfony\Component\Translation\PluralizationRules;
  *
  * @author Clemens Tolboom clemens@build2be.nl
  */
-class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
+class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * We test failed langcode here.
@@ -112,7 +112,7 @@ class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
     {
         $matrix = array();
         foreach ($langCodes as $langCode) {
-            for ($count = 0; $count < 200; $count++) {
+            for ($count = 0; $count < 200; ++$count) {
                 $plural = PluralizationRules::get($count, $langCode);
                 $matrix[$langCode][$count] = $plural;
             }

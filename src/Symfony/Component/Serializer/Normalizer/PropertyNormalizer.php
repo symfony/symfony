@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -58,7 +59,7 @@ class PropertyNormalizer extends AbstractNormalizer
             }
 
             // Override visibility
-            if (! $property->isPublic()) {
+            if (!$property->isPublic()) {
                 $property->setAccessible(true);
             }
 
@@ -68,6 +69,10 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                if (!$this->serializer instanceof NormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $property->name));
+                }
+
                 $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
@@ -106,7 +111,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $property = $reflectionClass->getProperty($propertyName);
 
                 // Override visibility
-                if (! $property->isPublic()) {
+                if (!$property->isPublic()) {
                     $property->setAccessible(true);
                 }
 
@@ -122,7 +127,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
     }
 
     /**
@@ -130,7 +135,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->supports($type);
+        return class_exists($type) && $this->supports($type);
     }
 
     /**
@@ -146,7 +151,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
         // We look for at least one non-static property
         foreach ($class->getProperties() as $property) {
-            if (! $property->isStatic()) {
+            if (!$property->isStatic()) {
                 return true;
             }
         }

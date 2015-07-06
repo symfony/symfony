@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -74,7 +75,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
+        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true);
     }
 
     /**
@@ -162,8 +163,15 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
+        }
+
         if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+            if ('request' !== $id) {
+                @trigger_error(sprintf('The "scope" key of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
+            }
+            $definition->setScope($service['scope'], false);
         }
 
         if (isset($service['synthetic'])) {
@@ -171,6 +179,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['synchronized'])) {
+            @trigger_error(sprintf('The "synchronized" key of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
             $definition->setSynchronized($service['synchronized'], 'request' !== $id);
         }
 
@@ -200,14 +209,17 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['factory_class'])) {
+            @trigger_error(sprintf('The "factory_class" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
             $definition->setFactoryClass($service['factory_class']);
         }
 
         if (isset($service['factory_method'])) {
+            @trigger_error(sprintf('The "factory_method" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
             $definition->setFactoryMethod($service['factory_method']);
         }
 
         if (isset($service['factory_service'])) {
+            @trigger_error(sprintf('The "factory_service" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
             $definition->setFactoryService($service['factory_service']);
         }
 
@@ -237,8 +249,15 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service['calls'] as $call) {
-                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
-                $definition->addMethodCall($call[0], $args);
+                if (isset($call['method'])) {
+                    $method = $call['method'];
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                } else {
+                    $method = $call[0];
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                }
+
+                $definition->addMethodCall($method, $args);
             }
         }
 
@@ -288,6 +307,10 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
+        }
+
         if (!stream_is_local($file)) {
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
         }
@@ -323,7 +346,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        foreach (array_keys($content) as $namespace) {
+        foreach ($content as $namespace => $data) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }

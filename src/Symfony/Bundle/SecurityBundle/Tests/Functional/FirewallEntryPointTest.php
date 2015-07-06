@@ -13,9 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 
-/**
- * @group functional
- */
 class FirewallEntryPointTest extends WebTestCase
 {
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
@@ -25,7 +22,7 @@ class FirewallEntryPointTest extends WebTestCase
 
         $client->request('GET', '/secure/resource', array(), array(), array(
             'PHP_AUTH_USER' => 'unknown',
-            'PHP_AUTH_PW'   => 'credentials',
+            'PHP_AUTH_PW' => 'credentials',
         ));
 
         $this->assertEquals(

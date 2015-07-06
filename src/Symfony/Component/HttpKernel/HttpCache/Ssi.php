@@ -23,6 +23,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class Ssi implements SurrogateInterface
 {
     private $contentTypes;
+    private $phpEscapeMap = array(
+        array('<?', '<%', '<s', '<S'),
+        array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'),
+    );
 
     /**
      * Constructor.
@@ -122,8 +126,30 @@ class Ssi implements SurrogateInterface
 
         // we don't use a proper XML parser here as we can have SSI tags in a plain text response
         $content = $response->getContent();
-        $content = str_replace(array('<?', '<%'), array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>'), $content);
-        $content = preg_replace_callback('#<!--\#include\s+(.*?)\s*-->#', array($this, 'handleIncludeTag'), $content);
+
+        $chunks = preg_split('#<!--\#include\s+(.*?)\s*-->#', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $chunks[0] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[0]);
+
+        $i = 1;
+        while (isset($chunks[$i])) {
+            $options = array();
+            preg_match_all('/(virtual)="([^"]*?)"/', $chunks[$i], $matches, PREG_SET_ORDER);
+            foreach ($matches as $set) {
+                $options[$set[1]] = $set[2];
+            }
+
+            if (!isset($options['virtual'])) {
+                throw new \RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
+            }
+
+            $chunks[$i] = sprintf('<?php echo $this->surrogate->handle($this, %s, \'\', false) ?>'."\n",
+                var_export($options['virtual'], true)
+            );
+            ++$i;
+            $chunks[$i] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[$i]);
+            ++$i;
+        }
+        $content = implode('', $chunks);
 
         $response->setContent($content);
         $response->headers->set('X-Body-Eval', 'SSI');
@@ -165,31 +191,5 @@ class Ssi implements SurrogateInterface
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Handles an SSI include tag (called internally).
-     *
-     * @param array $attributes An array containing the attributes.
-     *
-     * @return string The response content for the include.
-     *
-     * @throws \RuntimeException
-     */
-    private function handleIncludeTag($attributes)
-    {
-        $options = array();
-        preg_match_all('/(virtual)="([^"]*?)"/', $attributes[1], $matches, PREG_SET_ORDER);
-        foreach ($matches as $set) {
-            $options[$set[1]] = $set[2];
-        }
-
-        if (!isset($options['virtual'])) {
-            throw new \RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
-        }
-
-        return sprintf('<?php echo $this->surrogate->handle($this, %s, \'\', false) ?>'."\n",
-            var_export($options['virtual'], true)
-        );
     }
 }

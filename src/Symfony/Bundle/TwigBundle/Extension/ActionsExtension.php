@@ -36,7 +36,7 @@ class ActionsExtension extends \Twig_Extension
         if ($handler instanceof FragmentHandler) {
             $this->handler = $handler;
         } elseif ($handler instanceof ContainerInterface) {
-            trigger_error('The ability to pass a ContainerInterface instance as a first argument to '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Pass a FragmentHandler instance instead.', E_USER_DEPRECATED);
+            @trigger_error('The ability to pass a ContainerInterface instance as a first argument to '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Pass a FragmentHandler instance instead.', E_USER_DEPRECATED);
 
             $this->handler = $handler->get('fragment.handler');
         } else {
@@ -56,7 +56,7 @@ class ActionsExtension extends \Twig_Extension
      */
     public function renderUri($uri, array $options = array())
     {
-        trigger_error('The Twig render tag was deprecated in version 2.2 and will be removed in version 3.0. Use the Twig render function instead.', E_USER_DEPRECATED);
+        @trigger_error('The Twig render tag was deprecated in version 2.2 and will be removed in version 3.0. Use the Twig render function instead.', E_USER_DEPRECATED);
 
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -77,6 +77,9 @@ class ActionsExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'actions';

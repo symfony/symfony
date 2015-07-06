@@ -36,7 +36,7 @@ class UnexpectedTypeException extends RuntimeException
                 $path->getElement($pathIndex)
             );
         } else {
-            trigger_error('The '.__CLASS__.' constructor now expects 3 arguments: the invalid property value, the '.__NAMESPACE__.'\PropertyPathInterface object and the current index of the property path.', E_USER_DEPRECATED);
+            @trigger_error('The '.__CLASS__.' constructor now expects 3 arguments: the invalid property value, the '.__NAMESPACE__.'\PropertyPathInterface object and the current index of the property path.', E_USER_DEPRECATED);
 
             $message = sprintf(
                 'Expected argument of type "%s", "%s" given',

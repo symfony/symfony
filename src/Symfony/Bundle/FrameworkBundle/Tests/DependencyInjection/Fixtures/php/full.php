@@ -50,6 +50,7 @@ $container->loadFromExtension('framework', array(
     'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
+        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
     ),
     'validation' => array(
         'enabled' => true,
@@ -60,6 +61,7 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
+    'serializer' => array('enabled' => true),
     'ide' => 'file%%link%%format',
     'request' => array(
         'formats' => array(

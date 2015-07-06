@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Lists twig functions, filters, globals and tests present in the current project
+ * Lists twig functions, filters, globals and tests present in the current project.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -35,7 +35,7 @@ class DebugCommand extends Command
     }
 
     /**
-     * Sets the twig environment
+     * Sets the twig environment.
      *
      * @param \Twig_Environment $twig
      */
@@ -57,7 +57,7 @@ class DebugCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: text or json', 'text'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
             ))
             ->setDescription('Shows a list of twig functions, filters, globals and tests')
             ->setHelp(<<<EOF

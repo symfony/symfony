@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated `DefaultTranslator` in favor of `Symfony\Component\Translation\IdentityTranslator`
+ * deprecated PHP7-incompatible constraints (Null, True, False) and related validators (NullValidator, TrueValidator, FalseValidator) in favor of their `Is`-prefixed equivalent
 
 2.6.0
 -----
@@ -86,6 +87,11 @@ CHANGELOG
 
  * added a constraint the uses the expression language
  * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+
+2.3.29
+------
+
+ * fixed compatibility with PHP7 and up by introducing new constraints (IsNull, IsTrue, IsFalse) and related validators (IsNullValidator, IsTrueValidator, IsFalseValidator)
 
 2.3.0
 -----

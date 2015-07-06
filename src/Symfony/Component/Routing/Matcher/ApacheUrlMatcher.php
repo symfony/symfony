@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-trigger_error('The '.__NAMESPACE__.'\ApacheUrlMatcher class is deprecated since version 2.5 and will be removed in 3.0. It\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\ApacheUrlMatcher class is deprecated since version 2.5 and will be removed in 3.0. It\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
@@ -66,8 +66,8 @@ class ApacheUrlMatcher extends UrlMatcher
                 continue;
             }
             if (false !== $pos = strpos($name, '_', 9)) {
-                $type = substr($name, 9, $pos-9);
-                $name = substr($name, $pos+1);
+                $type = substr($name, 9, $pos - 9);
+                $name = substr($name, $pos + 1);
             } else {
                 $type = substr($name, 9);
             }

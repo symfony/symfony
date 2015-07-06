@@ -27,7 +27,7 @@ If you'd like to contribute, please read the following documents:
 
 * [Backwards Compatibility][4]: Backward compatibility rules.
 
-[1]: http://symfony.com/doc/current/contributing/code/index.html
-[2]: http://symfony.com/doc/current/contributing/code/patches.html#check-list
-[3]: http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
-[4]: http://symfony.com/doc/current/contributing/code/bc.html#working-on-symfony-code
+[1]: https://symfony.com/doc/current/contributing/code/index.html
+[2]: https://symfony.com/doc/current/contributing/code/patches.html#check-list
+[3]: https://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+[4]: https://symfony.com/doc/current/contributing/code/bc.html#working-on-symfony-code

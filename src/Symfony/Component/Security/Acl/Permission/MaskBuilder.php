@@ -42,7 +42,7 @@ namespace Symfony\Component\Security\Acl\Permission;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class MaskBuilder
+class MaskBuilder extends AbstractMaskBuilder
 {
     const MASK_VIEW = 1;           // 1 << 0
     const MASK_CREATE = 2;         // 1 << 1
@@ -67,50 +67,6 @@ class MaskBuilder
     const OFF = '.';
     const ON = '*';
 
-    private $mask;
-
-    /**
-     * Constructor.
-     *
-     * @param int $mask optional; defaults to 0
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($mask = 0)
-    {
-        if (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask = $mask;
-    }
-
-    /**
-     * Adds a mask to the permission.
-     *
-     * @param mixed $mask
-     *
-     * @return MaskBuilder
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function add($mask)
-    {
-        $this->mask |= $this->getMask($mask);
-
-        return $this;
-    }
-
-    /**
-     * Returns the mask of this permission.
-     *
-     * @return int
-     */
-    public function get()
-    {
-        return $this->mask;
-    }
-
     /**
      * Returns a human-readable representation of the permission.
      *
@@ -122,45 +78,17 @@ class MaskBuilder
         $length = strlen($pattern);
         $bitmask = str_pad(decbin($this->mask), $length, '0', STR_PAD_LEFT);
 
-        for ($i = $length-1; $i >= 0; $i--) {
+        for ($i = $length - 1; $i >= 0; --$i) {
             if ('1' === $bitmask[$i]) {
                 try {
                     $pattern[$i] = self::getCode(1 << ($length - $i - 1));
-                } catch (\Exception $notPredefined) {
+                } catch (\Exception $e) {
                     $pattern[$i] = self::ON;
                 }
             }
         }
 
         return $pattern;
-    }
-
-    /**
-     * Removes a mask from the permission.
-     *
-     * @param mixed $mask
-     *
-     * @return MaskBuilder
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function remove($mask)
-    {
-        $this->mask &= ~$this->getMask($mask);
-
-        return $this;
-    }
-
-    /**
-     * Resets the PermissionBuilder.
-     *
-     * @return MaskBuilder
-     */
-    public function reset()
-    {
-        $this->mask = 0;
-
-        return $this;
     }
 
     /**
@@ -204,7 +132,7 @@ class MaskBuilder
      *
      * @throws \InvalidArgumentException
      */
-    private function getMask($code)
+    public function resolveMask($code)
     {
         if (is_string($code)) {
             if (!defined($name = sprintf('static::MASK_%s', strtoupper($code)))) {

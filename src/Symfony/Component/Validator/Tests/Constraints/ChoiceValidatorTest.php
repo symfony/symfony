@@ -150,6 +150,23 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    public function testInvalidChoiceEmptyChoices()
+    {
+        $constraint = new Choice(array(
+            // May happen when the choices are provided dynamically, e.g. from
+            // the DB or the model
+            'choices' => array(),
+            'message' => 'myMessage',
+        ));
+
+        $this->validator->validate('baz', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"baz"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
+            ->assertRaised();
+    }
+
     public function testInvalidChoiceMultiple()
     {
         $constraint = new Choice(array(

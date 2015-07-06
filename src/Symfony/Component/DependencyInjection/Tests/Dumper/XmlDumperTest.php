@@ -25,12 +25,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new XmlDumper($container = new ContainerBuilder());
+        $dumper = new XmlDumper(new ContainerBuilder());
 
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
-
-        $container = new ContainerBuilder();
-        $dumper = new XmlDumper($container);
     }
 
     public function testExportParameters()
@@ -52,8 +49,6 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyAddService()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = include self::$fixturesPath.'/containers/legacy-container9.php';
         $dumper = new XmlDumper($container);
 
@@ -92,21 +87,21 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     {
         $container = include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+        $this->assertEquals('<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
-    <service id=\"foo\" class=\"FooClass\">
-      <argument type=\"service\">
-        <service class=\"BarClass\">
-          <argument type=\"service\">
-            <service class=\"BazClass\"/>
+    <service id="foo" class="FooClass">
+      <argument type="service">
+        <service class="BarClass">
+          <argument type="service">
+            <service class="BazClass"/>
           </argument>
         </service>
       </argument>
     </service>
   </services>
 </container>
-", $dumper->dump());
+', $dumper->dump());
     }
 
     public function testDumpEntities()
@@ -154,5 +149,36 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 </container>
 ", include $fixturesPath.'/containers/container16.php'),
         );
+    }
+
+    /**
+     * @dataProvider provideCompiledContainerData
+     */
+    public function testCompiledContainerCanBeDumped($containerFile)
+    {
+        $fixturesPath = __DIR__.'/../Fixtures';
+        $container = require $fixturesPath.'/containers/'.$containerFile.'.php';
+        $container->compile();
+        $dumper = new XmlDumper($container);
+        $dumper->dump();
+    }
+
+    public function provideCompiledContainerData()
+    {
+        return array(
+            array('container8'),
+            array('container9'),
+            array('container11'),
+            array('container12'),
+            array('container14'),
+        );
+    }
+
+    public function testDumpInlinedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container21.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services21.xml'), $dumper->dump());
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 /**
- * Catch deprecation notices and print a summary report at the end of the test suite
+ * Catch deprecation notices and print a summary report at the end of the test suite.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -26,14 +26,16 @@ class DeprecationErrorHandler
             return;
         }
         $deprecations = array(
+            'unsilencedCount' => 0,
             'remainingCount' => 0,
             'legacyCount' => 0,
             'otherCount' => 0,
+            'unsilenced' => array(),
             'remaining' => array(),
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $mode) {
             if (E_USER_DEPRECATED !== $type) {
                 return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
@@ -45,24 +47,25 @@ class DeprecationErrorHandler
                 // No-op
             }
 
-            if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
+            if (0 !== error_reporting()) {
+                $group = 'unsilenced';
+                $ref = &$deprecations[$group][$msg]['count'];
+                ++$ref;
+            } elseif (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
                 $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
                 $group = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true) ? 'legacy' : 'remaining';
 
-                if ('legacy' === $group && 0 === (error_reporting() & E_USER_DEPRECATED)) {
-                    $ref =& $deprecations[$group]['Silenced']['count'];
+                if ('legacy' !== $group && 'weak' !== $mode) {
+                    $ref = &$deprecations[$group][$msg]['count'];
                     ++$ref;
-                } else {
-                    $ref =& $deprecations[$group][$msg]['count'];
-                    ++$ref;
-                    $ref =& $deprecations[$group][$msg][$class.'::'.$method];
+                    $ref = &$deprecations[$group][$msg][$class.'::'.$method];
                     ++$ref;
                 }
             } else {
                 $group = 'other';
-                $ref =& $deprecations[$group][$msg]['count'];
+                $ref = &$deprecations[$group][$msg]['count'];
                 ++$ref;
             }
             ++$deprecations[$group.'Count'];
@@ -98,14 +101,14 @@ class DeprecationErrorHandler
                     return $b['count'] - $a['count'];
                 };
 
-                foreach (array('remaining', 'legacy', 'other') as $group) {
-                    if ($deprecations[$group]) {
+                foreach (array('unsilenced', 'remaining', 'legacy', 'other') as $group) {
+                    if ($deprecations[$group.'Count']) {
                         echo "\n", $colorize(sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']), 'legacy' !== $group), "\n";
 
                         uasort($deprecations[$group], $cmp);
 
                         foreach ($deprecations[$group] as $msg => $notices) {
-                            echo "\n", $msg, ': ', $notices['count'], "x\n";
+                            echo "\n", rtrim($msg, '.'), ': ', $notices['count'], "x\n";
 
                             arsort($notices);
 
@@ -120,13 +123,8 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if ('weak' !== $mode) {
-                    if ($deprecations['remaining'] || $deprecations['other']) {
-                        exit(1);
-                    }
-                    if ('strict' === $mode && $deprecations['legacy'] && $deprecations['legacyCount'] !== $ref =& $deprecations['legacy']['Silenced']['count']) {
-                        exit(1);
-                    }
+                if ('weak' !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
+                    exit(1);
                 }
             });
         }

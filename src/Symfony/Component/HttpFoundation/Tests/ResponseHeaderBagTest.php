@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Cookie;
 
+require_once __DIR__.'/ClockMock.php';
+
 class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -114,11 +116,11 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ResponseHeaderBag(array());
         $bag->setCookie(new Cookie('foo', 'bar'));
 
-        $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", explode("\r\n", $bag->__toString()));
+        $this->assertContains('Set-Cookie: foo=bar; path=/; httponly', explode("\r\n", $bag->__toString()));
 
         $bag->clearCookie('foo');
 
-        $this->assertContains("Set-Cookie: foo=deleted; expires=".gmdate("D, d-M-Y H:i:s T", time() - 31536001)."; path=/; httponly", explode("\r\n", $bag->__toString()));
+        $this->assertRegExp('#^Set-Cookie: foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/; httponly#m', $bag->__toString());
     }
 
     public function testClearCookieSecureNotHttpOnly()
@@ -127,7 +129,7 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $bag->clearCookie('foo', '/', null, true, false);
 
-        $this->assertContains("Set-Cookie: foo=deleted; expires=".gmdate("D, d-M-Y H:i:s T", time() - 31536001)."; path=/; secure", explode("\r\n", $bag->__toString()));
+        $this->assertRegExp('#^Set-Cookie: foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/; secure#m', $bag->__toString());
     }
 
     public function testReplace()
@@ -164,10 +166,10 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(4, $bag->getCookies());
 
         $headers = explode("\r\n", $bag->__toString());
-        $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
-        $this->assertContains("Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly", $headers);
-        $this->assertContains("Set-Cookie: foo=bar; path=/path/bar; domain=bar.foo; httponly", $headers);
-        $this->assertContains("Set-Cookie: foo=bar; path=/; httponly", $headers);
+        $this->assertContains('Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly', $headers);
+        $this->assertContains('Set-Cookie: foo=bar; path=/path/foo; domain=foo.bar; httponly', $headers);
+        $this->assertContains('Set-Cookie: foo=bar; path=/path/bar; domain=bar.foo; httponly', $headers);
+        $this->assertContains('Set-Cookie: foo=bar; path=/; httponly', $headers);
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $this->assertTrue(isset($cookies['foo.bar']['/path/foo']['foo']));

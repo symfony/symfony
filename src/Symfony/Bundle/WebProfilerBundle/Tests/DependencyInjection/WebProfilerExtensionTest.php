@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Component\DependencyInjection\Scope;
 
 class WebProfilerExtensionTest extends TestCase
 {
@@ -49,8 +48,6 @@ class WebProfilerExtensionTest extends TestCase
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 
         $this->container = new ContainerBuilder();
-        $this->container->addScope(new Scope('request'));
-        $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
         $this->container->register('twig', 'Twig_Environment');
         $this->container->setParameter('kernel.bundles', array());
@@ -125,7 +122,6 @@ class WebProfilerExtensionTest extends TestCase
         eval('?>'.$dumper->dump(array('class' => $class)));
 
         $container = new $class();
-        $container->enterScope('request');
         $container->set('kernel', $this->kernel);
 
         return $container;

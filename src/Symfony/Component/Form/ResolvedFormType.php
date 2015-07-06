@@ -93,11 +93,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     public function getTypeExtensions()
     {
-        // BC
-        if ($this->innerType instanceof AbstractType) {
-            return $this->innerType->getExtensions();
-        }
-
         return $this->typeExtensions;
     }
 
@@ -205,21 +200,35 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
             $this->innerType->setDefaultOptions($this->optionsResolver);
 
-            $reflector = new \ReflectionMethod($this->innerType, 'setDefaultOptions');
-            $isOverwritten = ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType');
+            if (method_exists($this->innerType, 'configureOptions')) {
+                $reflector = new \ReflectionMethod($this->innerType, 'setDefaultOptions');
+                $isOldOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType';
 
-            if (true === $isOverwritten) {
-                trigger_error('The FormTypeInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                $reflector = new \ReflectionMethod($this->innerType, 'configureOptions');
+                $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType';
+
+                if ($isOldOverwritten && !$isNewOverwritten) {
+                    @trigger_error(get_class($this->innerType).': The FormTypeInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                }
+            } else {
+                @trigger_error(get_class($this->innerType).': The FormTypeInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractType or implement it in your classes.', E_USER_DEPRECATED);
             }
 
             foreach ($this->typeExtensions as $extension) {
                 $extension->setDefaultOptions($this->optionsResolver);
 
-                $reflector = new \ReflectionMethod($extension, 'setDefaultOptions');
-                $isOverwritten = ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension');
+                if (method_exists($extension, 'configureOptions')) {
+                    $reflector = new \ReflectionMethod($extension, 'setDefaultOptions');
+                    $isOldOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension';
 
-                if (true === $isOverwritten) {
-                    trigger_error('The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                    $reflector = new \ReflectionMethod($extension, 'configureOptions');
+                    $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension';
+
+                    if ($isOldOverwritten && !$isNewOverwritten) {
+                        @trigger_error(get_class($extension).': The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                    }
+                } else {
+                    @trigger_error(get_class($this->innerType).': The FormTypeExtensionInterface::configureOptions() method will be added in Symfony 3.0. You should extend AbstractTypeExtension or implement it in your classes.', E_USER_DEPRECATED);
                 }
             }
         }

@@ -19,7 +19,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
@@ -31,7 +30,6 @@ use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
-use Symfony\Component\Validator\Validator\LegacyValidator;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 /**
@@ -95,11 +93,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var PropertyAccessorInterface|null
      */
     private $propertyAccessor;
-
-    /**
-     * @var int|null
-     */
-    private $apiVersion;
 
     /**
      * {@inheritdoc}
@@ -307,7 +300,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
 
         if (null !== $this->validatorFactory) {
             throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
@@ -320,17 +313,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function setApiVersion($apiVersion)
     {
-        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
-            throw new InvalidArgumentException(sprintf(
-                'The requested API version is invalid: "%s"',
-                $apiVersion
-            ));
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
-        $this->apiVersion = $apiVersion;
+        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
+            throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));
+        }
 
         return $this;
     }
@@ -341,11 +333,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
-        $apiVersion = $this->apiVersion;
-
-        if (null === $apiVersion) {
-            $apiVersion = Validation::API_VERSION_2_5_BC;
-        }
 
         if (!$metadataFactory) {
             $loaders = array();
@@ -393,14 +380,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $translator->setLocale('en');
         }
 
-        if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
+        $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
-            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
-        }
-
-        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
-
-        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }
 }

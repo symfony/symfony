@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Context\LegacyExecutionContext;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\StubGlobalExecutionContext;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -52,10 +51,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        if (Validation::API_VERSION_2_5 !== $this->getApiVersion()) {
-            $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-        }
-
         $this->group = 'MyGroup';
         $this->metadata = null;
         $this->object = null;
@@ -221,14 +216,24 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function expectValidateAt($i, $propertyPath, $value, $group)
     {
-        $validator = $this->context->getValidator()->inContext($this->context);
-        $validator->expects($this->at(2 * $i))
-            ->method('atPath')
-            ->with($propertyPath)
-            ->will($this->returnValue($validator));
-        $validator->expects($this->at(2 * $i + 1))
-            ->method('validate')
-            ->with($value, $this->logicalOr(null, array()), $group);
+        switch ($this->getApiVersion()) {
+            case Validation::API_VERSION_2_4:
+                $this->context->expects($this->at($i))
+                    ->method('validate')
+                    ->with($value, $propertyPath, $group);
+                break;
+            case Validation::API_VERSION_2_5:
+            case Validation::API_VERSION_2_5_BC:
+                $validator = $this->context->getValidator()->inContext($this->context);
+                $validator->expects($this->at(2 * $i))
+                    ->method('atPath')
+                    ->with($propertyPath)
+                    ->will($this->returnValue($validator));
+                $validator->expects($this->at(2 * $i + 1))
+                    ->method('validate')
+                    ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
+                break;
+        }
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
@@ -245,7 +250,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function assertNoViolation()
     {
-        $this->assertCount(0, $this->context->getViolations());
+        $this->assertSame(0, $violationsCount = count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
     }
 
     /**
@@ -261,7 +266,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
      */
     protected function assertViolation($message, array $parameters = array(), $propertyPath = 'property.path', $invalidValue = 'InvalidValue', $plural = null, $code = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
 
         $this->buildViolation($message)
             ->setParameters($parameters)
@@ -280,7 +285,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
      */
     protected function assertViolations(array $expected)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
 
         $violations = $this->context->getViolations();
 
@@ -303,7 +308,10 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
-    abstract protected function getApiVersion();
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
 
     abstract protected function createValidator();
 }
@@ -415,7 +423,7 @@ class ConstraintViolationAssertion
 
         $violations = iterator_to_array($this->context->getViolations());
 
-        \PHPUnit_Framework_Assert::assertCount(count($expected), $violations);
+        \PHPUnit_Framework_Assert::assertSame($expectedCount = count($expected), $violationsCount = count($violations), sprintf('%u violation(s) expected. Got %u.', $expectedCount, $violationsCount));
 
         reset($violations);
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The class '.__NAMESPACE__.'\DefaultTranslator is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.', E_USER_DEPRECATED);
+@trigger_error('The class '.__NAMESPACE__.'\DefaultTranslator is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
@@ -92,7 +92,7 @@ class DefaultTranslator implements TranslatorInterface
      * have the same expressiveness. While Translator supports intervals in
      * message translations, which are needed for languages other than English,
      * this translator does not. You should use Translator or a custom
-     * implementation of {@link TranslatorInterface} if you need this or similar
+     * implementation of {@link \Symfony\Component\Translation\TranslatorInterface} if you need this or similar
      * functionality.
      *
      * Example usage:

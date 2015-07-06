@@ -119,8 +119,9 @@ class Controller extends ContainerAware
      * @param mixed $attributes The attributes
      * @param mixed $object     The object
      *
-     * @throws \LogicException
      * @return bool
+     *
+     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null)
     {
@@ -230,7 +231,7 @@ class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
-    public function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -273,7 +274,7 @@ class Controller extends ContainerAware
      */
     public function getRequest()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The only reliable way to get the "Request" object is to inject it in the action method.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The only reliable way to get the "Request" object is to inject it in the action method.', E_USER_DEPRECATED);
 
         return $this->container->get('request_stack')->getCurrentRequest();
     }
@@ -334,7 +335,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Gets a service by id.
+     * Gets a container service by its id.
      *
      * @param string $id The service id
      *
@@ -343,14 +344,26 @@ class Controller extends ContainerAware
     public function get($id)
     {
         if ('request' === $id) {
-            trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
+            @trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
         }
-        
+
         return $this->container->get($id);
     }
 
     /**
-     * Checks the validity of a CSRF token
+     * Gets a container configuration parameter by its name.
+     *
+     * @param string $name The parameter name
+     *
+     * @return mixed
+     */
+    protected function getParameter($name)
+    {
+        return $this->container->getParameter($name);
+    }
+
+    /**
+     * Checks the validity of a CSRF token.
      *
      * @param string $id    The id used when generating the token
      * @param string $token The actual token sent with the request that should be validated

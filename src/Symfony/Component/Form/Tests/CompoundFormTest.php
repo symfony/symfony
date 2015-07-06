@@ -350,7 +350,7 @@ class CompoundFormTest extends AbstractFormTest
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
             ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child, $test) {
                 $test->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
-                $test->assertSame(array($child), iterator_to_array($iterator));
+                $test->assertSame(array($child->getName() => $child), iterator_to_array($iterator));
             }));
 
         $form->initialize();
@@ -810,10 +810,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsStringDeep()
+    public function testGetErrorsAsStringDeep()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $parent = $this->getBuilder()
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
@@ -834,10 +832,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsStringDeepWithIndentation()
+    public function testGetErrorsAsStringDeepWithIndentation()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $parent = $this->getBuilder()
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())

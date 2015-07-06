@@ -32,6 +32,7 @@
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
             <xsd:element name="property-access" type="property_access" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="serializer" type="serializer" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -182,6 +183,7 @@
     <xsd:complexType name="translator">
         <xsd:sequence>
             <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />
@@ -209,5 +211,11 @@
     <xsd:complexType name="property_access">
         <xsd:attribute name="magic-call" type="xsd:boolean" />
         <xsd:attribute name="throw-exception-on-invalid-index" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="serializer">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="cache" type="xsd:string" />
+        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

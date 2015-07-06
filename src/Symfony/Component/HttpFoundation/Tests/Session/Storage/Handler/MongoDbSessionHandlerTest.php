@@ -87,7 +87,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         // defining the timeout before the actual method call
         // allows to test for "greater than" values in the $criteria
-        $testTimeout = time();
+        $testTimeout = time() + 1;
 
         $collection->expects($this->once())
             ->method('findOne')

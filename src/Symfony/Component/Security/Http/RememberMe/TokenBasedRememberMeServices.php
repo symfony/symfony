@@ -42,19 +42,19 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
         try {
             $user = $this->getUserProvider($class)->loadUserByUsername($username);
-        } catch (\Exception $ex) {
-            if (!$ex instanceof AuthenticationException) {
-                $ex = new AuthenticationException($ex->getMessage(), $ex->getCode(), $ex);
+        } catch (\Exception $e) {
+            if (!$e instanceof AuthenticationException) {
+                $e = new AuthenticationException($e->getMessage(), $e->getCode(), $e);
             }
 
-            throw $ex;
+            throw $e;
         }
 
         if (!$user instanceof UserInterface) {
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
         }
 
-        if (true !== StringUtils::equals($hash, $this->generateCookieHash($class, $username, $expires, $user->getPassword()))) {
+        if (true !== StringUtils::equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 
@@ -95,12 +95,12 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param int    $expires  The Unix timestamp when the cookie expires
      * @param string $password The encoded password
      *
-     * @throws \RuntimeException if username contains invalid chars
-     *
      * @return string
      */
     protected function generateCookieValue($class, $username, $expires, $password)
     {
+        // $username is encoded because it might contain COOKIE_DELIMITER,
+        // we assume other values don't
         return $this->encodeCookie(array(
             $class,
             base64_encode($username),
@@ -117,12 +117,10 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param int    $expires  The Unix timestamp when the cookie expires
      * @param string $password The encoded password
      *
-     * @throws \RuntimeException when the private key is empty
-     *
      * @return string
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getKey());
+        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getSecret());
     }
 }

@@ -94,10 +94,10 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         }
 
         return array(
-            array("é", "utf8", true),
-            array("\xE9", "CP1252", true),
-            array("\xE9", "XXX", false),
-            array("\xE9", "utf8", false),
+            array('é', 'utf8', true),
+            array("\xE9", 'CP1252', true),
+            array("\xE9", 'XXX', false),
+            array("\xE9", 'utf8', false),
         );
     }
 
@@ -241,6 +241,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
                 ->setParameter('{{ value }}', '"'.$value.'"')
                 ->setParameter('{{ charset }}', $charset)
                 ->setInvalidValue($value)
+                ->setCode(Length::INVALID_CHARACTERS_ERROR)
                 ->assertRaised();
         }
     }

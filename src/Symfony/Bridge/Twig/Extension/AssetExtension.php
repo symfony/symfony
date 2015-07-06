@@ -61,9 +61,9 @@ class AssetExtension extends \Twig_Extension
     {
         // BC layer to be removed in 3.0
         if (2 < $count = func_num_args()) {
-            trigger_error('Generating absolute URLs with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use absolute_url() instead.', E_USER_DEPRECATED);
+            @trigger_error('Generating absolute URLs with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use absolute_url() instead.', E_USER_DEPRECATED);
             if (4 === $count) {
-                trigger_error('Forcing a version with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+                @trigger_error('Forcing a version with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
             }
 
             $args = func_get_args();
@@ -89,7 +89,7 @@ class AssetExtension extends \Twig_Extension
 
     public function getAssetsVersion($packageName = null)
     {
-        trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
+        @trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
 
         return $this->packages->getVersion('/', $packageName);
     }
@@ -98,10 +98,14 @@ class AssetExtension extends \Twig_Extension
     {
         if ($version) {
             $package = $this->packages->getPackage($packageName);
+            $class = new \ReflectionClass($package);
 
-            $v = new \ReflectionProperty($package, 'versionStrategy');
+            while ('Symfony\Component\Asset\Package' !== $class->getName()) {
+                $class = $class->getParentClass();
+            }
+
+            $v = $class->getProperty('versionStrategy');
             $v->setAccessible(true);
-
             $currentVersionStrategy = $v->getValue($package);
 
             $f = new \ReflectionProperty($currentVersionStrategy, 'format');

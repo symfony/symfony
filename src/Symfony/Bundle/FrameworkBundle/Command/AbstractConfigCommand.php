@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * A console command for dumping available configuration reference.
@@ -28,51 +28,44 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     protected function listBundles(OutputInterface $output)
     {
-        $output->writeln('Available registered bundles with their extension alias if available:');
-
-        $table = $this->getHelperSet()->get('table');
-        $table->setHeaders(array('Bundle name', 'Extension alias'));
+        $headers = array('Bundle name', 'Extension alias');
+        $rows = array();
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             $extension = $bundle->getContainerExtension();
-            $table->addRow(array($bundle->getName(), $extension ? $extension->getAlias() : ''));
+            $rows[] = array($bundle->getName(), $extension ? $extension->getAlias() : '');
         }
 
-        $table->render($output);
+        $message = 'Available registered bundles with their extension alias if available:';
+        if ($output instanceof StyleInterface) {
+            $output->writeln(' '.$message);
+            $output->table($headers, $rows);
+        } else {
+            $output->writeln($message);
+            $table = new Table($output);
+            $table->setHeaders($headers)->setRows($rows)->render($output);
+        }
     }
 
     protected function findExtension($name)
     {
         $extension = null;
+        $bundles = $this->initializeBundles();
+        foreach ($bundles as $bundle) {
+            $extension = $bundle->getContainerExtension();
 
-        $bundles = $this->getContainer()->get('kernel')->getBundles();
-
-        if (preg_match('/Bundle$/', $name)) {
-            // input is bundle name
-
-            if (isset($bundles[$name])) {
-                $extension = $bundles[$name]->getContainerExtension();
-            }
-
-            if (!$extension) {
-                throw new \LogicException(sprintf('No extensions with configuration available for "%s"', $name));
-            }
-        } else {
-            foreach ($bundles as $bundle) {
-                $extension = $bundle->getContainerExtension();
-
-                if ($extension && $name === $extension->getAlias()) {
-                    break;
-                }
-
-                $extension = null;
-            }
-
-            if (!$extension) {
-                throw new \LogicException(sprintf('No extension with alias "%s" is enabled', $name));
+            if ($extension && ($name === $extension->getAlias() || $name === $bundle->getName())) {
+                break;
             }
         }
 
-        $this->initializeExtensions($bundles);
+        if (!$extension) {
+            $message = sprintf('No extension with alias "%s" is enabled', $name);
+            if (preg_match('/Bundle$/', $name)) {
+                $message = sprintf('No extensions with configuration available for "%s"', $name);
+            }
+
+            throw new \LogicException($message);
+        }
 
         return $extension;
     }
@@ -88,12 +81,12 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
     }
 
-    private function initializeExtensions($bundles)
+    private function initializeBundles()
     {
         // Re-build bundle manually to initialize DI extensions that can be extended by other bundles in their build() method
         // as this method is not called when the container is loaded from the cache.
-        $parameters = $this->getContainer()->getParameterBag()->all();
-        $container = new ContainerBuilder(new ParameterBag($parameters));
+        $container = $this->getContainerBuilder();
+        $bundles = $this->getContainer()->get('kernel')->registerBundles();
         foreach ($bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
@@ -101,8 +94,9 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
 
         foreach ($bundles as $bundle) {
-            $bundle = clone $bundle;
             $bundle->build($container);
         }
+
+        return $bundles;
     }
 }

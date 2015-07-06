@@ -19,11 +19,6 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class LegacyProgressHelperTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-    }
-
     public function testAdvance()
     {
         $progress = new ProgressHelper();

@@ -167,15 +167,14 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->has('2'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testPreSubmitRequiresArrayOrTraversable()
+    public function testPreSubmitDealsWithNoArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, false);
         $listener->preSubmit($event);
+
+        $this->assertFalse($this->form->has('1'));
     }
 
     public function testPreSubmitDealsWithNullData()

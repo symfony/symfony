@@ -40,7 +40,7 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testCostInRange()
     {
-        for ($cost = 4; $cost <= 31; $cost++) {
+        for ($cost = 4; $cost <= 31; ++$cost) {
             new BCryptPasswordEncoder($cost);
         }
     }

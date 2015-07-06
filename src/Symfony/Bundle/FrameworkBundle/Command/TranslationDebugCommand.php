@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Translation\Catalogue\MergeOperation;
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
 
@@ -44,16 +47,17 @@ class TranslationDebugCommand extends ContainerAwareCommand
             ))
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
+                new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ))
-            ->setDescription('Displays translation messages informations')
+            ->setDescription('Displays translation messages information')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
-templates and translation files of a given bundle.
+templates and translation files of a given bundle or the app folder.
 
 You can display information about bundle translations in a specific locale:
 
@@ -71,6 +75,14 @@ You can only display unused messages:
 
   <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
+You can display information about app translations in a specific locale:
+
+  <info>php %command.full_name% en</info>
+
+You can display information about translations in all registered bundles in a specific locale:
+
+  <info>php %command.full_name% --all en</info>
+
 EOF
             )
         ;
@@ -81,24 +93,49 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.</comment>');
+            $output->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
         }
 
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
-        $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));
+        /** @var TranslationLoader $loader */
         $loader = $this->getContainer()->get('translation.loader');
+        /** @var Kernel $kernel */
+        $kernel = $this->getContainer()->get('kernel');
+
+        // Define Root Path to App folder
+        $transPaths = array($kernel->getRootDir().'/Resources/');
+
+        // Override with provided Bundle info
+        if (null !== $input->getArgument('bundle')) {
+            try {
+                $bundle = $kernel->getBundle($input->getArgument('bundle'));
+                $transPaths = array(
+                    $bundle->getPath().'/Resources/',
+                    sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName()),
+                );
+            } catch (\InvalidArgumentException $e) {
+                // such a bundle does not exist, so treat the argument as path
+                $transPaths = array($input->getArgument('bundle').'/Resources/');
+
+                if (!is_dir($transPaths[0])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
+                }
+            }
+        } elseif ($input->getOption('all')) {
+            foreach ($kernel->getBundles() as $bundle) {
+                $transPaths[] = $bundle->getPath().'/Resources/';
+                $transPaths[] = sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName());
+            }
+        }
 
         // Extract used messages
-        $extractedCatalogue = new MessageCatalogue($locale);
-        $this->getContainer()->get('translation.extractor')->extract($bundle->getPath().'/Resources/views', $extractedCatalogue);
+        $extractedCatalogue = $this->extractMessages($locale, $transPaths);
 
         // Load defined messages
-        $currentCatalogue = new MessageCatalogue($locale);
-        if (is_dir($bundle->getPath().'/Resources/translations')) {
-            $loader->loadMessages($bundle->getPath().'/Resources/translations', $currentCatalogue);
-        }
+        $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths, $loader);
 
         // Merge defined and extracted messages to get all message ids
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
@@ -109,42 +146,26 @@ EOF
 
         // No defined or extracted messages
         if (empty($allMessages) || null !== $domain && empty($allMessages[$domain])) {
-            $outputMessage = sprintf('<info>No defined or extracted messages for locale "%s"</info>', $locale);
+            $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
 
             if (null !== $domain) {
-                $outputMessage .= sprintf(' <info>and domain "%s"</info>', $domain);
+                $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            $output->writeln($outputMessage);
+            $output->warning($outputMessage);
 
             return;
         }
 
         // Load the fallback catalogues
-        $fallbackCatalogues = array();
-        $translator = $this->getContainer()->get('translator');
-        if ($translator instanceof Translator) {
-            foreach ($translator->getFallbackLocales() as $fallbackLocale) {
-                if ($fallbackLocale === $locale) {
-                    continue;
-                }
-
-                $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-                $loader->loadMessages($bundle->getPath().'/Resources/translations', $fallbackCatalogue);
-                $fallbackCatalogues[] = $fallbackCatalogue;
-            }
-        }
-
-        /** @var \Symfony\Component\Console\Helper\Table $table */
-        $table = new Table($output);
+        $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths, $loader);
 
         // Display header line
-        $headers = array('State(s)', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
-        $table->setHeaders($headers);
-
+        $rows = array();
         // Iterate all message ids and determine their state
         foreach ($allMessages as $domain => $messages) {
             foreach (array_keys($messages) as $messageId) {
@@ -177,31 +198,25 @@ EOF
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }
 
-                $table->addRow($row);
+                $rows[] = $row;
             }
         }
 
-        $table->render();
-
-        $output->writeln('');
-        $output->writeln('<info>Legend:</info>');
-        $output->writeln(sprintf(' %s Missing message', $this->formatState(self::MESSAGE_MISSING)));
-        $output->writeln(sprintf(' %s Unused message', $this->formatState(self::MESSAGE_UNUSED)));
-        $output->writeln(sprintf(' %s Same as the fallback message', $this->formatState(self::MESSAGE_EQUALS_FALLBACK)));
+        $output->table($headers, $rows);
     }
 
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<fg=red>x</>';
+            return '<error>missing</error>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<fg=yellow>o</>';
+            return '<comment>unused</comment>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<fg=green>=</>';
+            return '<info>fallback</info>';
         }
 
         return $state;
@@ -235,5 +250,75 @@ EOF
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $locale
+     * @param array  $transPaths
+     *
+     * @return MessageCatalogue
+     */
+    private function extractMessages($locale, $transPaths)
+    {
+        $extractedCatalogue = new MessageCatalogue($locale);
+        foreach ($transPaths as $path) {
+            $path = $path.'views';
+            if (is_dir($path)) {
+                $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
+            }
+        }
+
+        return $extractedCatalogue;
+    }
+
+    /**
+     * @param string            $locale
+     * @param array             $transPaths
+     * @param TranslationLoader $loader
+     *
+     * @return MessageCatalogue
+     */
+    private function loadCurrentMessages($locale, $transPaths, TranslationLoader $loader)
+    {
+        $currentCatalogue = new MessageCatalogue($locale);
+        foreach ($transPaths as $path) {
+            $path = $path.'translations';
+            if (is_dir($path)) {
+                $loader->loadMessages($path, $currentCatalogue);
+            }
+        }
+
+        return $currentCatalogue;
+    }
+
+    /**
+     * @param string            $locale
+     * @param array             $transPaths
+     * @param TranslationLoader $loader
+     *
+     * @return MessageCatalogue[]
+     */
+    private function loadFallbackCatalogues($locale, $transPaths, TranslationLoader $loader)
+    {
+        $fallbackCatalogues = array();
+        $translator = $this->getContainer()->get('translator');
+        if ($translator instanceof Translator) {
+            foreach ($translator->getFallbackLocales() as $fallbackLocale) {
+                if ($fallbackLocale === $locale) {
+                    continue;
+                }
+
+                $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
+                foreach ($transPaths as $path) {
+                    $path = $path.'translations';
+                    if (is_dir($path)) {
+                        $loader->loadMessages($path, $fallbackCatalogue);
+                    }
+                }
+                $fallbackCatalogues[] = $fallbackCatalogue;
+            }
+        }
+
+        return $fallbackCatalogues;
     }
 }

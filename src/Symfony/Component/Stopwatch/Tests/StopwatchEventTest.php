@@ -13,6 +13,8 @@ namespace Symfony\Component\Stopwatch\Tests;
 
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
+require_once __DIR__.'/ClockMock.php';
+
 /**
  * StopwatchEventTest.
  *
@@ -76,6 +78,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->start();
         usleep(100000);
         $event->stop();
+        usleep(50000);
         $event->start();
         usleep(100000);
         $event->stop();
@@ -93,6 +96,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->start();
         usleep(100000);
         $event->stop();
+        usleep(50000);
         $event->start();
         usleep(100000);
         $this->assertEquals(100, $event->getDuration(), null, self::DELTA);
@@ -135,12 +139,12 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     public function testStartTime()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertTrue($event->getStartTime() < 0.5);
+        $this->assertLessThanOrEqual(0.5, $event->getStartTime());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         $event->stop();
-        $this->assertTrue($event->getStartTime() < 1);
+        $this->assertLessThanOrEqual(1, $event->getStartTime());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -154,7 +158,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidOriginThrowsAnException()
     {
-        new StopwatchEvent("abc");
+        new StopwatchEvent('abc');
     }
 
     public function testHumanRepresentation()

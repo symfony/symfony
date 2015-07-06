@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
             ->beforeNormalization()
                 ->ifTrue(function ($v) { return isset($v['csrf_protection']['field_name']); })
                 ->then(function ($v) {
-                    trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
+                    @trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
 
                     return $v;
                 })
@@ -82,7 +82,7 @@ class Configuration implements ConfigurationInterface
                         || count($v['templating']['assets_base_urls']['ssl'])
                         || count($v['templating']['packages'])
                     ) {
-                        trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
+                        @trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
 
                         // convert the old configuration to the new one
                         if (isset($v['assets'])) {
@@ -108,6 +108,14 @@ class Configuration implements ConfigurationInterface
                     }
 
                     unset($v['templating']['assets_version'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+
+                    return $v;
+                })
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['validation']['api']); })
+                ->then(function ($v) {
+                    @trigger_error('The validation.api configuration key is deprecated since version 2.7 and will be removed in 3.0', E_USER_DEPRECATED);
 
                     return $v;
                 })
@@ -152,10 +160,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->arrayNode('trusted_hosts')
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) { return is_string($v); })
-                        ->then(function ($v) { return array($v); })
-                    ->end()
+                    ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                     ->prototype('scalar')->end()
                 ->end()
             ->end()
@@ -422,7 +427,7 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultChildrenIfNoneSet()
                                     ->prototype('scalar')->defaultValue('FrameworkBundle:Form')->end()
                                     ->validate()
-                                        ->ifTrue(function ($v) {return !in_array('FrameworkBundle:Form', $v); })
+                                        ->ifNotInArray(array('FrameworkBundle:Form'))
                                         ->then(function ($v) {
                                             return array_merge(array('FrameworkBundle:Form'), $v);
                                         })
@@ -574,6 +579,7 @@ class Configuration implements ConfigurationInterface
                     ->info('translator configuration')
                     ->canBeEnabled()
                     ->fixXmlConfig('fallback')
+                    ->fixXmlConfig('path')
                     ->children()
                         ->arrayNode('fallbacks')
                             ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
@@ -581,6 +587,9 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->arrayNode('paths')
+                            ->prototype('scalar')->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -614,6 +623,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
                         ->enumNode('api')
+                            ->info('Deprecated since version 2.7, to be removed in 3.0')
                             ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
                             ->beforeNormalization()
                                 // XML/YAML parse as numbers, not as strings
@@ -623,19 +633,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return !isset($v['validation']['api']) || 'auto' === $v['validation']['api']; })
-                ->then(function ($v) {
-                    // This condition is duplicated in ValidatorBuilder. This
-                    // duplication is necessary in order to know the desired
-                    // API version already during container configuration
-                    // (to adjust service classes etc.)
-                    // See https://github.com/symfony/symfony/issues/11580
-                    $v['validation']['api'] = '2.5-bc';
-
-                    return $v;
-                })
             ->end()
         ;
     }
@@ -664,6 +661,10 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                    ->children()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('cache')->end()
+                    ->end()
                 ->end()
             ->end()
         ;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale\Exception;
 
-trigger_error('The '.__NAMESPACE__.'\NotImplementedException class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\Exception\NotImplementedException class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\NotImplementedException class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\Exception\NotImplementedException class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Intl\Exception\NotImplementedException as BaseNotImplementedException;
 

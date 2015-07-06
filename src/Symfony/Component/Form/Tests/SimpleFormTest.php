@@ -736,10 +736,8 @@ class SimpleFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsString()
+    public function testGetErrorsAsString()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->form->addError(new FormError('Error!'));
 
         $this->assertEquals("ERROR: Error!\n", $this->form->getErrorsAsString());
@@ -1057,6 +1055,17 @@ class SimpleFormTest extends AbstractFormTest
         $child->setParent($parent);
 
         $child->initialize();
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Custom resolver "Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver" must extend "Symfony\Component\OptionsResolver\OptionsResolver".
+     */
+    public function testCustomOptionsResolver()
+    {
+        $fooType = new Fixtures\FooType();
+        $resolver = new Fixtures\CustomOptionsResolver();
+        $fooType->setDefaultOptions($resolver);
     }
 
     protected function createForm()

@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Validator Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -43,13 +43,12 @@
         "symfony/expression-language": "For using the 2.4 Expression validator"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator\\": "" }
+        "psr-4": { "Symfony\\Component\\Validator\\": "" }
     },
-    "target-dir": "Symfony/Component/Validator",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

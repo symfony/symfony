@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
+/**
+ * @group legacy
+ */
 class ChoiceListTest extends AbstractChoiceListTest
 {
     private $obj1;

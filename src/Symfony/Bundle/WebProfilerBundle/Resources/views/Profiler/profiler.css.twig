@@ -179,7 +179,7 @@ pre, code {
     width: 250px;
     margin-left: -100%;
 }
-#collector-content table td {
+table td {
     background-color: white;
 }
 h1 {
@@ -273,15 +273,15 @@ ul.alt li {
 ul.alt li.even {
     background: #f1f7e2;
 }
-ul.alt li.error {
+ul.alt li.error, tr.error td {
     background-color: #f66;
     margin-bottom: 1px;
 }
-ul.alt li.warning {
+ul.alt li.warning, tr.warning td {
     background-color: #ffcc00;
     margin-bottom: 1px;
 }
-ul.alt li.scream, ul.alt li.scream strong {
+ul.alt li.scream, ul.alt li.scream strong, tr.scream td, tr.scream strong {
     color: gray;
 }
 ul.sf-call-stack li {
@@ -400,9 +400,9 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
+.collapsed-menu span.label > :not(.icon) {
     display: none !important;
 }
-.collapsed-menu span.icon img {
-    display: inline !important;
+.collapsed-menu #minimizePanelIcon {
+    transform: rotate(180deg);
 }

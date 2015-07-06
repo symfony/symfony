@@ -35,7 +35,7 @@ class SessionHelper extends Helper
     public function __construct($requestStack)
     {
         if ($requestStack instanceof Request) {
-            trigger_error('Since version 2.5, passing a Request instance into the '.__METHOD__.' is deprecated and support for it will be removed in 3.0. Inject a Symfony\Component\HttpFoundation\RequestStack instance instead.', E_USER_DEPRECATED);
+            @trigger_error('Since version 2.5, passing a Request instance into the '.__METHOD__.' is deprecated and support for it will be removed in 3.0. Inject a Symfony\Component\HttpFoundation\RequestStack instance instead.', E_USER_DEPRECATED);
             $this->session = $requestStack->getSession();
         } elseif ($requestStack instanceof RequestStack) {
             $this->requestStack = $requestStack;
@@ -86,9 +86,7 @@ class SessionHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

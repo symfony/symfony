@@ -88,20 +88,6 @@ class File extends \SplFileInfo
     }
 
     /**
-     * Returns the extension of the file.
-     *
-     * \SplFileInfo::getExtension() is not available before PHP 5.3.6
-     *
-     * @return string The extension
-     *
-     * @api
-     */
-    public function getExtension()
-    {
-        return pathinfo($this->getBasename(), PATHINFO_EXTENSION);
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder
@@ -139,7 +125,7 @@ class File extends \SplFileInfo
 
         $target = rtrim($directory, '/\\').DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
 
-        return new File($target, false);
+        return new self($target, false);
     }
 
     /**

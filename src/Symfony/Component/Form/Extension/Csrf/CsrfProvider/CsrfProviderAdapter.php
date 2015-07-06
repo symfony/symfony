@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
-trigger_error('The '.__NAMESPACE__.'\CsrfProviderAdapter class is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\CsrfProviderAdapter class is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Security\Csrf\CsrfToken;

@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
 {
@@ -161,113 +163,63 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->values, $this->list->getValues());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoices()
+    public function testGetIndicesForChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice1, $this->choice2);
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoicesPreservesKeys()
+    public function testGetIndicesForChoicesPreservesKeys()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array(5 => $this->choice1, 8 => $this->choice2);
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoicesPreservesOrder()
+    public function testGetIndicesForChoicesPreservesOrder()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice2, $this->choice1);
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoicesIgnoresNonExistingChoices()
+    public function testGetIndicesForChoicesIgnoresNonExistingChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice1, $this->choice2, 'foobar');
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoicesEmpty()
+    public function testGetIndicesForChoicesEmpty()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertSame(array(), $this->list->getIndicesForChoices(array()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValues()
+    public function testGetIndicesForValues()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // values and indices are always the same
         $values = array($this->value1, $this->value2);
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValuesPreservesKeys()
+    public function testGetIndicesForValuesPreservesKeys()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // values and indices are always the same
         $values = array(5 => $this->value1, 8 => $this->value2);
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValuesPreservesOrder()
+    public function testGetIndicesForValuesPreservesOrder()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $values = array($this->value2, $this->value1);
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
+    public function testGetIndicesForValuesIgnoresNonExistingValues()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $values = array($this->value1, $this->value2, 'foobar');
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValuesEmpty()
+    public function testGetIndicesForValuesEmpty()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertSame(array(), $this->list->getIndicesForValues(array()));
     }
 

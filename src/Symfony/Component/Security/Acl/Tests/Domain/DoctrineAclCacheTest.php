@@ -72,7 +72,7 @@ class DoctrineAclCacheTest extends \PHPUnit_Framework_TestCase
         $acl->insertClassFieldAce('foo', $sid, 1);
         $acl->insertObjectAce($sid, 1);
         $acl->insertObjectFieldAce('foo', $sid, 1);
-        $id++;
+        ++$id;
 
         if ($depth > 0) {
             $acl->setParentAcl($this->getAcl($depth - 1));

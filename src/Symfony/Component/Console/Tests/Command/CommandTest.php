@@ -154,8 +154,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new \TestCommand();
         $command->addOption('foo');
-        $command->addArgument('foo');
-        $this->assertEquals('namespace:name [--foo] [foo]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+        $command->addArgument('bar');
+        $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
     public function testGetHelper()
@@ -165,15 +165,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command->setApplication($application);
         $formatterHelper = new FormatterHelper();
         $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
-    }
-
-    public function testGet()
-    {
-        $application = new Application();
-        $command = new \TestCommand();
-        $command->setApplication($application);
-        $formatterHelper = new FormatterHelper();
-        $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->__get() returns the correct helper');
     }
 
     public function testMergeApplicationDefinition()
@@ -293,6 +284,33 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
     }
 
+    public function getSetCodeBindToClosureTests()
+    {
+        return array(
+            array(true, 'not bound to the command'),
+            array(false, 'bound to the command'),
+        );
+    }
+
+    /** @dataProvider getSetCodeBindToClosureTests */
+    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    {
+        if (PHP_VERSION_ID < 50400) {
+            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
+        }
+
+        $code = createClosure();
+        if ($previouslyBound) {
+            $code = $code->bindTo($this);
+        }
+
+        $command = new \TestCommand();
+        $command->setCode($code);
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertEquals('interact called'.PHP_EOL.$expected.PHP_EOL, $tester->getDisplay());
+    }
+
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
@@ -323,8 +341,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyAsText()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
@@ -337,12 +353,20 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyAsXml()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
+}
+
+// In order to get an unbound closure, we should create it outside a class
+// scope.
+function createClosure()
+{
+    return function(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+    };
 }

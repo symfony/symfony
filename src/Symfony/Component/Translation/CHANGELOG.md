@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
+ * added options 'as_tree', 'inline' to YamlFileDumper
+
+2.7.0
+-----
+
+ * added DataCollectorTranslator for collecting the translated messages.
+
 2.6.0
 -----
 

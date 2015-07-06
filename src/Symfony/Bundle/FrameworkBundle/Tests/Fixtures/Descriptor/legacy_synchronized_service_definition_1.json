@@ -4,6 +4,7 @@
   "public": true,
   "synthetic": false,
   "lazy": true,
+  "shared": true,
   "synchronized": true,
   "abstract": true,
   "file": null,

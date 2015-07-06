@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony EventDispatcher Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -31,13 +31,12 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\EventDispatcher\\": "" }
+        "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" }
     },
-    "target-dir": "Symfony/Component/EventDispatcher",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

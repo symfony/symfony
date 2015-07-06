@@ -74,7 +74,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($to, $transformer->transform($from));
     }
 
-    public function testTransformWithPrecision()
+    public function testTransformWithScale()
     {
         $transformer = new NumberToLocalizedStringTransformer(2);
 
@@ -174,14 +174,14 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider transformWithRoundingProvider
      */
-    public function testTransformWithRounding($precision, $input, $output, $roundingMode)
+    public function testTransformWithRounding($scale, $input, $output, $roundingMode)
     {
-        $transformer = new NumberToLocalizedStringTransformer($precision, null, $roundingMode);
+        $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
 
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformDoesNotRoundIfNoPrecision()
+    public function testTransformDoesNotRoundIfNoScale()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
 
@@ -327,14 +327,14 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider reverseTransformWithRoundingProvider
      */
-    public function testReverseTransformWithRounding($precision, $input, $output, $roundingMode)
+    public function testReverseTransformWithRounding($scale, $input, $output, $roundingMode)
     {
-        $transformer = new NumberToLocalizedStringTransformer($precision, null, $roundingMode);
+        $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
 
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformDoesNotRoundIfNoPrecision()
+    public function testReverseTransformDoesNotRoundIfNoScale()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
 

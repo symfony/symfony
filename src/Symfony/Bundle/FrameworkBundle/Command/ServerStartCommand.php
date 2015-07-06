@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,9 +33,11 @@ class ServerStartCommand extends ServerCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force web server startup'),
             ))
             ->setName('server:start')
             ->setDescription('Starts PHP built-in web server in the background')
@@ -75,6 +78,12 @@ EOF
             $output->writeln('<error>This command needs the pcntl extension to run.</error>');
             $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');
 
+            if ($this->getHelper('question')->ask($input, $output, new ConfirmationQuestion('Do you want to start <info>server:run</info> immediately? [Yn] ', true))) {
+                $command = $this->getApplication()->find('server:run');
+
+                return $command->run($input, $output);
+            }
+
             return 1;
         }
 
@@ -91,16 +100,20 @@ EOF
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
-        $address = $input->getArgument('address');
 
-        if (false === strpos($address, ':')) {
-            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
-
+        if (false === $router = $this->determineRouterScript($input->getOption('router'), $env, $output)) {
             return 1;
         }
 
-        if ($this->isOtherServerProcessRunning($address)) {
+        $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $address = $address.':'.$input->getOption('port');
+        }
+
+        if (!$input->getOption('force') && $this->isOtherServerProcessRunning($address)) {
             $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+            $output->writeln(sprintf('<error>Use the --force option if the server process terminated unexpectedly to start a new web server process.</error>'));
 
             return 1;
         }
@@ -129,7 +142,7 @@ EOF
             return 1;
         }
 
-        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $input->getOption('router'), $env, null)) {
+        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $router)) {
             return 1;
         }
 
@@ -155,25 +168,33 @@ EOF
         }
     }
 
-    private function isOtherServerProcessRunning($address)
+    /**
+     * Determine the absolute file path for the router script, using the environment to choose a standard script
+     * if no custom router script is specified.
+     *
+     * @param string|null     $router File path of the custom router script, if set by the user; otherwise null
+     * @param string          $env    The application environment
+     * @param OutputInterface $output An OutputInterface instance
+     *
+     * @return string|bool The absolute file path of the router script, or false on failure
+     */
+    private function determineRouterScript($router, $env, OutputInterface $output)
     {
-        $lockFile = $this->getLockFile($address);
-
-        if (file_exists($lockFile)) {
-            return true;
+        if (null === $router) {
+            $router = $this
+                ->getContainer()
+                ->get('kernel')
+                ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+            ;
         }
 
-        list($hostname, $port) = explode(':', $address);
+        if (false === $path = realpath($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
 
-        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
-
-        if (false !== $fp) {
-            fclose($fp);
-
-            return true;
+            return false;
         }
 
-        return false;
+        return $path;
     }
 
     /**
@@ -183,19 +204,11 @@ EOF
      * @param string          $address      IP address and port to listen to
      * @param string          $documentRoot The application's document root
      * @param string          $router       The router filename
-     * @param string          $env          The application environment
-     * @param int             $timeout      Process timeout
      *
      * @return Process The process
      */
-    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router, $env, $timeout = null)
+    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router)
     {
-        $router = $router ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
-        ;
-
         $finder = new PhpExecutableFinder();
         if (false === $binary = $finder->find()) {
             $output->writeln('<error>Unable to find PHP binary to start server</error>');
@@ -210,6 +223,6 @@ EOF
             $router,
         )));
 
-        return new Process('exec '.$script, $documentRoot, null, null, $timeout);
+        return new Process('exec '.$script, $documentRoot, null, null, null);
     }
 }

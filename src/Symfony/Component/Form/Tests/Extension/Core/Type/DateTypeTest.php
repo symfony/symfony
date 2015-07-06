@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -380,91 +380,41 @@ class DateTypeTest extends TestCase
         ));
     }
 
-    public function testSetDataWithDifferentNegativeUTCTimezoneDateTime()
+    public function testSetDataWithNegativeTimezoneOffsetStringInput()
     {
         $form = $this->factory->create('date', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Pacific/Tahiti',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'America/New_York',
             'input' => 'string',
             'widget' => 'single_text',
         ));
 
         $form->setData('2010-06-02');
 
+        // 2010-06-02 00:00:00 UTC
+        // 2010-06-01 20:00:00 UTC-4
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
-    public function testSetDataWithDifferentTimezonesDateTime()
+    public function testSetDataWithNegativeTimezoneOffsetDateTimeInput()
     {
         $form = $this->factory->create('date', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Pacific/Tahiti',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'America/New_York',
             'input' => 'datetime',
             'widget' => 'single_text',
         ));
 
-        $dateTime = new \DateTime('2010-06-02 America/New_York');
+        $dateTime = new \DateTime('2010-06-02 UTC');
 
         $form->setData($dateTime);
 
+        // 2010-06-02 00:00:00 UTC
+        // 2010-06-01 20:00:00 UTC-4
         $this->assertDateTimeEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getViewData());
-    }
-
-    public function testSetDataWithDifferentPositiveUTCTimezoneDateTime()
-    {
-        date_default_timezone_set('Pacific/Tahiti');
-
-        $form = $this->factory->create('date', null, array(
-            'format' => \IntlDateFormatter::MEDIUM,
-            'input' => 'datetime',
-            'widget' => 'single_text',
-        ));
-
-        $dateTime = new \DateTime('2010-06-02 Australia/Melbourne');
-
-        $form->setData($dateTime);
-
-        $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
-    }
-
-    public function testSetDataWithSamePositiveUTCTimezoneDateTime()
-    {
-        date_default_timezone_set('Australia/Melbourne');
-
-        $form = $this->factory->create('date', null, array(
-            'format' => \IntlDateFormatter::MEDIUM,
-            'input' => 'datetime',
-            'widget' => 'single_text',
-        ));
-
-        $dateTime = new \DateTime('2010-06-02 Australia/Melbourne');
-
-        $form->setData($dateTime);
-
-        $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
-    }
-
-    public function testSetDataWithSameNegativeUTCTimezoneDateTime()
-    {
-        date_default_timezone_set('America/New_York');
-
-        $form = $this->factory->create('date', null, array(
-            'format' => \IntlDateFormatter::MEDIUM,
-            'input' => 'datetime',
-            'widget' => 'single_text',
-        ));
-
-        $dateTime = new \DateTime('2010-06-02 America/New_York');
-
-        $form->setData($dateTime);
-
-        $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testYearsOption()
@@ -675,6 +625,20 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertFalse(isset($view->vars['date_pattern']));
+    }
+
+    public function testDatePatternFormatWithQuotedStrings()
+    {
+        \Locale::setDefault('es_ES');
+
+        $form = $this->factory->create('date', null, array(
+            // EEEE, d 'de' MMMM 'de' y
+            'format' => \IntlDateFormatter::FULL,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassWidgetToView()

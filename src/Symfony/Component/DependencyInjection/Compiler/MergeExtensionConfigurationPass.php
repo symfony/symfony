@@ -55,10 +55,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $extension->load($config, $tmpContainer);
 
             $container->merge($tmpContainer);
+            $container->getParameterBag()->add($parameters);
         }
 
         $container->addDefinitions($definitions);
         $container->addAliases($aliases);
-        $container->getParameterBag()->add($parameters);
     }
 }

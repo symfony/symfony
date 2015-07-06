@@ -11,37 +11,13 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+@trigger_error('The '.__NAMESPACE__.'\NullValidator class is deprecated since version 2.7 and will be removed in 3.0. Use the IsNullValidator class in the same namespace instead.', E_USER_DEPRECATED);
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @api
+ * @deprecated since version 2.7, to be removed in 3.0. Use IsNullValidator instead.
  */
-class NullValidator extends ConstraintValidator
+class NullValidator extends IsNullValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (!$constraint instanceof Null) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Null');
-        }
-
-        if (null !== $value) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-            }
-        }
-    }
 }

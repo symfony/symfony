@@ -168,6 +168,16 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->store->lookup($req2));
     }
 
+    public function testDoesNotReturnEntriesThatSlightlyVaryWithLookup()
+    {
+        $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
+        $req2 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bam'));
+        $res = new Response('test', 200, array('Vary' => array('Foo', 'Bar')));
+        $this->store->write($req1, $res);
+
+        $this->assertNull($this->store->lookup($req2));
+    }
+
     public function testStoresMultipleResponsesForEachVaryCombination()
     {
         $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));

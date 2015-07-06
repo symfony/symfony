@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * Added possibility to extract translation messages from a file or files besides extracting from a directory
+ * Added `TranslationsCacheWarmer` to create catalogues at warmup
+
 2.6.0
 -----
 

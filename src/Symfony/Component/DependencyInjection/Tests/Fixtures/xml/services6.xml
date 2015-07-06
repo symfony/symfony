@@ -6,9 +6,7 @@
   <services>
     <service id="foo" class="FooClass" />
     <service id="baz" class="BazClass" />
-    <service id="scope.container" class="FooClass" scope="container" />
-    <service id="scope.custom" class="FooClass" scope="custom" />
-    <service id="scope.prototype" class="FooClass" scope="prototype" />
+    <service id="not_shared" class="FooClass" shared="false" />
     <service id="file" class="FooClass">
       <file>%path%/foo.php</file>
     </service>
@@ -47,7 +45,6 @@
     </service>
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="false" />
-    <service id="request" class="Request" synthetic="true" synchronized="true" lazy="true"/>
     <service id="decorator_service" decorates="decorated" />
     <service id="decorator_service_with_name" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="new_factory1" class="FooBarClass">

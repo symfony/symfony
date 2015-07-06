@@ -62,6 +62,6 @@ component. Find sources and license at https://github.com/Seldaek/hidden-input.
 Resources
 ---------
 
-[The Console Component](http://symfony.com/doc/current/components/console.html)
+[The Console Component](https://symfony.com/doc/current/components/console.html)
 
-[How to create a Console Command](http://symfony.com/doc/current/cookbook/console/console_command.html)
+[How to create a Console Command](https://symfony.com/doc/current/cookbook/console/console_command.html)

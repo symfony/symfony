@@ -61,6 +61,9 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $def->getProperties());
     }
 
+    /**
+     * @group legacy
+     */
     public function testStrictFlagIsPreserved()
     {
         $container = new ContainerBuilder();

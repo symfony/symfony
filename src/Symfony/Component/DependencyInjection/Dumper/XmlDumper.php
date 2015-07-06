@@ -126,7 +126,10 @@ class XmlDumper extends Dumper
         if ($definition->getFactoryService(false)) {
             $service->setAttribute('factory-service', $definition->getFactoryService(false));
         }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
+        if (!$definition->isShared()) {
+            $service->setAttribute('shared', 'false');
+        }
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
             $service->setAttribute('scope', $scope);
         }
         if (!$definition->isPublic()) {
@@ -178,7 +181,11 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $factory);
+                $factory->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $factory->setAttribute('method', $callable[1]);
             } else {
@@ -189,7 +196,11 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $configurator);
+                $configurator->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
@@ -275,7 +286,7 @@ class XmlDumper extends Dumper
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-                if (!$value->isStrict()) {
+                if (!$value->isStrict(false)) {
                     $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {

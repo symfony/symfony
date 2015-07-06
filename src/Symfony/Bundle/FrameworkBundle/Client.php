@@ -29,6 +29,7 @@ class Client extends BaseClient
 {
     private $hasPerformedRequest = false;
     private $profiler = false;
+    private $reboot = true;
 
     /**
      * {@inheritdoc}
@@ -85,6 +86,25 @@ class Client extends BaseClient
     }
 
     /**
+     * Disables kernel reboot between requests.
+     *
+     * By default, the Client reboots the Kernel for each request. This method
+     * allows to keep the same kernel across requests.
+     */
+    public function disableReboot()
+    {
+        $this->reboot = false;
+    }
+
+    /**
+     * Enables kernel reboot between requests.
+     */
+    public function enableReboot()
+    {
+        $this->reboot = true;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param Request $request A Request instance
@@ -95,7 +115,7 @@ class Client extends BaseClient
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
-        if ($this->hasPerformedRequest) {
+        if ($this->hasPerformedRequest && $this->reboot) {
             $this->kernel->shutdown();
         } else {
             $this->hasPerformedRequest = true;

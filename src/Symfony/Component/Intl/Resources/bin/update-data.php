@@ -57,7 +57,7 @@ MESSAGE
 }
 
 echo LINE;
-echo centered("ICU Resource Bundle Compilation")."\n";
+echo centered('ICU Resource Bundle Compilation')."\n";
 echo LINE;
 
 if (!Intl::isExtensionLoaded()) {
@@ -123,42 +123,42 @@ if ($argc >= 3) {
     // will run into problems when building genrb.
     $filesystem->mkdir($sourceDir.'/bin');
 
-    echo "[1/6] libicudata.so...";
+    echo '[1/6] libicudata.so...';
 
     cd($sourceDir.'/stubdata');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[2/6] libicuuc.so...";
+    echo '[2/6] libicuuc.so...';
 
     cd($sourceDir.'/common');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[3/6] libicui18n.so...";
+    echo '[3/6] libicui18n.so...';
 
     cd($sourceDir.'/i18n');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[4/6] libicutu.so...";
+    echo '[4/6] libicutu.so...';
 
     cd($sourceDir.'/tools/toolutil');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[5/6] libicuio.so...";
+    echo '[5/6] libicuio.so...';
 
     cd($sourceDir.'/io');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[6/6] genrb...";
+    echo '[6/6] genrb...';
 
     cd($sourceDir.'/tools/genrb');
     run('make 2>&1 && make install 2>&1');

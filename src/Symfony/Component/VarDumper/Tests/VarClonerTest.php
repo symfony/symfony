@@ -81,7 +81,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 1
                         )
@@ -96,7 +96,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 2
                         )
@@ -107,7 +107,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 3
                         )
@@ -122,6 +122,56 @@ Symfony\Component\VarDumper\Cloner\Data Object
             [3] => Array
                 (
                     [\000+\000var] => val
+                )
+
+        )
+
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
+
+    public function testCaster()
+    {
+        $cloner = new VarCloner(array(
+            '*' => function ($obj, $array) {
+                return array('foo' => 123);
+            },
+            __CLASS__ => function ($obj, $array) {
+                ++$array['foo'];
+
+                return $array;
+            },
+        ));
+        $clone = $cloner->cloneVar($this);
+
+        $expected = <<<EOTXT
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => object
+                            [class] => %s
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %i
+                            [refCount] => 0
+                            [position] => 1
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [foo] => 124
                 )
 
         )

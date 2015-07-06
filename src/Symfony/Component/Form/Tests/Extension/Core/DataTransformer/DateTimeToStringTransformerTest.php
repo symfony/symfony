@@ -94,6 +94,21 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
+    public function testTransformDateTimeImmutable()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
+        }
+
+        $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
+
+        $input = new \DateTimeImmutable('2010-02-03 12:05:06 America/New_York');
+        $output = $input->format('Y-m-d H:i:s');
+        $input = $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+
+        $this->assertEquals($output, $transformer->transform($input));
+    }
+
     public function testTransformExpectsDateTime()
     {
         $transformer = new DateTimeToStringTransformer();
@@ -140,7 +155,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime('2010-02-03 16:05:06 Asia/Hong_Kong');
         $input = $output->format('Y-m-d H:i:s');
-        $output->setTimeZone(new \DateTimeZone('America/New_York'));
+        $output->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }

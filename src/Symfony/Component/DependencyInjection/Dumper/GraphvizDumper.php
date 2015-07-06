@@ -173,14 +173,14 @@ class GraphvizDumper extends Dumper
             } catch (ParameterNotFoundException $e) {
             }
 
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $className), 'attributes' => array_merge($this->options['node.definition'], array('style' => ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope() ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $className), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope(false) ? 'filled' : 'dotted')));
             $container->setDefinition($id, new Definition('stdClass'));
         }
 
         foreach ($container->getServiceIds() as $id) {
             $service = $container->get($id);
 
-            if (in_array($id, array_keys($container->getAliases()))) {
+            if (array_key_exists($id, $container->getAliases())) {
                 continue;
             }
 
@@ -201,7 +201,7 @@ class GraphvizDumper extends Dumper
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
         $container->setResources($this->container->getResources());
-        foreach ($this->container->getScopes() as $scope => $parentScope) {
+        foreach ($this->container->getScopes(false) as $scope => $parentScope) {
             $container->addScope(new Scope($scope, $parentScope));
         }
         foreach ($this->container->getExtensions() as $extension) {
@@ -278,7 +278,7 @@ class GraphvizDumper extends Dumper
      */
     private function dotize($id)
     {
-        return strtolower(preg_replace('/[^\w]/i', '_', $id));
+        return strtolower(preg_replace('/\W/i', '_', $id));
     }
 
     /**

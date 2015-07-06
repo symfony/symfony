@@ -40,14 +40,63 @@ class Data
     /**
      * Returns a depth limited clone of $this.
      *
+     * @param int $maxDepth The max dumped depth level.
+     *
+     * @return self A clone of $this.
+     */
+    public function withMaxDepth($maxDepth)
+    {
+        $data = clone $this;
+        $data->maxDepth = (int) $maxDepth;
+
+        return $data;
+    }
+
+    /**
+     * Limits the numbers of elements per depth level.
+     *
+     * @param int $maxItemsPerDepth The max number of items dumped per depth level.
+     *
+     * @return self A clone of $this.
+     */
+    public function withMaxItemsPerDepth($maxItemsPerDepth)
+    {
+        $data = clone $this;
+        $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+
+        return $data;
+    }
+
+    /**
+     * Enables/disables objects' identifiers tracking.
+     *
+     * @param bool $useRefHandles False to hide global ref. handles.
+     *
+     * @return self A clone of $this.
+     */
+    public function withRefHandles($useRefHandles)
+    {
+        $data = clone $this;
+        $data->useRefHandles = $useRefHandles ? -1 : 0;
+
+        return $data;
+    }
+
+    /**
+     * Returns a depth limited clone of $this.
+     *
      * @param int  $maxDepth         The max dumped depth level.
      * @param int  $maxItemsPerDepth The max number of items dumped per depth level.
      * @param bool $useRefHandles    False to hide ref. handles.
      *
      * @return self A depth limited clone of $this.
+     *
+     * @deprecated since Symfony 2.7, to be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles instead.
      */
     public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles methods instead.', E_USER_DEPRECATED);
+
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
@@ -127,16 +176,20 @@ class Data
                     break;
 
                 case Stub::TYPE_ARRAY:
-                    $dumper->enterHash($cursor, $item->class, $item->value, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->class);
-                    $dumper->leaveHash($cursor, $item->class, $item->value, (bool) $children, $cut);
-                    break;
-
+                    $item = clone $item;
+                    $item->type = $item->class;
+                    $item->class = $item->value;
+                    // No break;
                 case Stub::TYPE_OBJECT:
                 case Stub::TYPE_RESOURCE:
-                    $dumper->enterHash($cursor, $item->type, $item->class, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
-                    $dumper->leaveHash($cursor, $item->type, $item->class, (bool) $children, $cut);
+                    $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
+                    $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
+                    if ($withChildren) {
+                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
+                    } elseif ($children && 0 <= $cut) {
+                        $cut += count($children);
+                    }
+                    $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
 
                 default:
@@ -166,26 +219,20 @@ class Data
      */
     private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType)
     {
-        if ($children) {
-            if ($parentCursor->depth !== $this->maxDepth && $this->maxItemsPerDepth) {
-                $cursor = clone $parentCursor;
-                ++$cursor->depth;
-                $cursor->hashType = $hashType;
-                $cursor->hashIndex = 0;
-                $cursor->hashLength = count($children);
-                $cursor->hashCut = $hashCut;
-                foreach ($children as $key => $child) {
-                    $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-                    $cursor->hashKey = $key;
-                    $this->dumpItem($dumper, $cursor, $refs, $child);
-                    if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
-                        $parentCursor->stop = true;
+        $cursor = clone $parentCursor;
+        ++$cursor->depth;
+        $cursor->hashType = $hashType;
+        $cursor->hashIndex = 0;
+        $cursor->hashLength = count($children);
+        $cursor->hashCut = $hashCut;
+        foreach ($children as $key => $child) {
+            $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
+            $cursor->hashKey = $key;
+            $this->dumpItem($dumper, $cursor, $refs, $child);
+            if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
+                $parentCursor->stop = true;
 
-                        return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
-                    }
-                }
-            } elseif ($hashCut >= 0) {
-                $hashCut += count($children);
+                return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
             }
         }
 

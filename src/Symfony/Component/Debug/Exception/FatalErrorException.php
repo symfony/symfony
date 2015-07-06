@@ -35,11 +35,19 @@ use Symfony\Component\HttpKernel\Exception\FatalErrorException as LegacyFatalErr
  */
 class FatalErrorException extends LegacyFatalErrorException
 {
-    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true)
+    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true, array $trace = null)
     {
         parent::__construct($message, $code, $severity, $filename, $lineno);
 
-        if (null !== $traceOffset) {
+        if (null !== $trace) {
+            if (!$traceArgs) {
+                foreach ($trace as &$frame) {
+                    unset($frame['args'], $frame['this'], $frame);
+                }
+            }
+
+            $this->setTrace($trace);
+        } elseif (null !== $traceOffset) {
             if (function_exists('xdebug_get_function_stack')) {
                 $trace = xdebug_get_function_stack();
                 if (0 < $traceOffset) {
@@ -48,7 +56,7 @@ class FatalErrorException extends LegacyFatalErrorException
 
                 foreach ($trace as &$frame) {
                     if (!isset($frame['type'])) {
-                        //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
+                        // XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
                         if (isset($frame['class'])) {
                             $frame['type'] = '::';
                         }
@@ -69,6 +77,11 @@ class FatalErrorException extends LegacyFatalErrorException
 
                 unset($frame);
                 $trace = array_reverse($trace);
+            } elseif (function_exists('symfony_debug_backtrace')) {
+                $trace = symfony_debug_backtrace();
+                if (0 < $traceOffset) {
+                    array_splice($trace, 0, $traceOffset);
+                }
             } else {
                 $trace = array();
             }

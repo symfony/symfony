@@ -344,8 +344,6 @@ EOF;
 
     protected function getKernelMockForIsClassInActiveBundleTest()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $bundle = new FooBarBundle();
 
         $kernel = $this->getKernel(array('getBundles'));

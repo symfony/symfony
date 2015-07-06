@@ -202,9 +202,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
-        }
     }
 
     /**
@@ -331,6 +328,10 @@ class Response
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
+        }
+
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
         }
 
         // status
@@ -644,7 +645,11 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**
@@ -1080,7 +1085,7 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if ($etags = $request->getEtags()) {
+        if ($etags = $request->getETags()) {
             $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
         }
 
@@ -1242,15 +1247,9 @@ class Response
     {
         $status = ob_get_status(true);
         $level = count($status);
+        $flags = PHP_VERSION_ID >= 50400 ? PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
 
-        while ($level-- > $targetLevel
-            && (!empty($status[$level]['del'])
-                || (isset($status[$level]['flags'])
-                    && ($status[$level]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)
-                    && ($status[$level]['flags'] & ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE))
-                )
-            )
-        ) {
+        while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || $flags === ($s['flags'] & $flags) : $s['del'])) {
             if ($flush) {
                 ob_end_flush();
             } else {
@@ -1267,7 +1266,7 @@ class Response
     protected function ensureIEOverSSLCompatibility(Request $request)
     {
         if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
-            if ((int) preg_replace("/(MSIE )(.*?);/", "$2", $match[0]) < 9) {
+            if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {
                 $this->headers->remove('Cache-Control');
             }
         }

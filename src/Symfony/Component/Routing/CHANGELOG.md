@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+
 2.5.0
 -----
 

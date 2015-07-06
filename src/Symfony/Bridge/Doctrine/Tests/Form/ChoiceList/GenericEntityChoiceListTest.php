@@ -19,6 +19,9 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Doctrine\ORM\Tools\SchemaTool;
 
+/**
+ * @group legacy
+ */
 class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 {
     const SINGLE_INT_ID_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
@@ -267,13 +270,8 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyInitShorthandEntityName()
+    public function testInitShorthandEntityName2()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $item1 = new SingleIntIdEntity(1, 'Foo');
         $item2 = new SingleIntIdEntity(2, 'Bar');
 

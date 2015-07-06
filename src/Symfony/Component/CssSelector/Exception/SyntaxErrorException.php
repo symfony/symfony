@@ -21,7 +21,7 @@ use Symfony\Component\CssSelector\Parser\Token;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class SyntaxErrorException extends ParseException implements ExceptionInterface
+class SyntaxErrorException extends ParseException
 {
     /**
      * @param string $expectedValue

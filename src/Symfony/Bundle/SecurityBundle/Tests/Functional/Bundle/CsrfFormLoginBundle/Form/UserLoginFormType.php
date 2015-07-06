@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
 
@@ -29,14 +29,14 @@ use Symfony\Component\Security\Core\Security;
  */
 class UserLoginFormType extends AbstractType
 {
-    private $request;
+    private $requestStack;
 
     /**
-     * @param Request $request A request instance
+     * @param RequestStack $requestStack A RequestStack instance
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -50,7 +50,7 @@ class UserLoginFormType extends AbstractType
             ->add('_target_path', 'hidden')
         ;
 
-        $request = $this->request;
+        $request = $this->requestStack->getCurrentRequest();
 
         /* Note: since the Security component's form login listener intercepts
          * the POST request, this form will never really be bound to the

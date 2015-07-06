@@ -15,8 +15,9 @@ help
 ----
 
 * Description: Displays help for a command
-* Usage: `help [--xml] [--format="..."] [--raw] [command_name]`
-* Aliases: <none>
+* Usage:
+
+  * `help [--xml] [--format FORMAT] [--raw] [--] [<command_name>]`
 
 The <info>help</info> command displays help for a given command:
 
@@ -57,7 +58,7 @@ To display the list of available commands, please use the <info>list</info> comm
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: To output help in other formats
+* Description: The output format (txt, xml, json, or md)
 * Default: `'txt'`
 
 **raw:**
@@ -144,8 +145,9 @@ list
 ----
 
 * Description: Lists commands
-* Usage: `list [--xml] [--raw] [--format="..."] [namespace]`
-* Aliases: <none>
+* Usage:
+
+  * `list [--xml] [--raw] [--format FORMAT] [--] [<namespace>]`
 
 The <info>list</info> command lists all commands:
 
@@ -202,15 +204,18 @@ It's also possible to get raw list of commands (useful for embedding command run
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: To output list in other formats
+* Description: The output format (txt, xml, json, or md)
 * Default: `'txt'`
 
 descriptor:command1
 -------------------
 
 * Description: command 1 description
-* Usage: `descriptor:command1`
-* Aliases: `alias1`, `alias2`
+* Usage:
+
+  * `descriptor:command1`
+  * `alias1`
+  * `alias2`
 
 command 1 help
 
@@ -290,8 +295,11 @@ descriptor:command2
 -------------------
 
 * Description: command 2 description
-* Usage: `descriptor:command2 [-o|--option_name] argument_name`
-* Aliases: <none>
+* Usage:
+
+  * `descriptor:command2 [-o|--option_name] [--] <argument_name>`
+  * `descriptor:command2 -o|--option_name <argument_name>`
+  * `descriptor:command2 <argument_name>`
 
 command 2 help
 

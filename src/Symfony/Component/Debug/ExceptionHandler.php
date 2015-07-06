@@ -371,7 +371,7 @@ EOF;
     {
         $parts = explode('\\', $class);
 
-        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+        return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
     }
 
     private function formatPath($path, $line)
@@ -380,7 +380,7 @@ EOF;
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
         if ($linkFormat = $this->fileLinkFormat) {
-            $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
+            $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, '%l' => (int) $line));
 
             return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
         }
@@ -400,9 +400,9 @@ EOF;
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf("<em>object</em>(%s)", $this->formatClass($item[1]));
+                $formattedValue = sprintf('<em>object</em>(%s)', $this->formatClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", $this->escapeHtml($item[1]));
             } elseif ('null' === $item[0]) {
@@ -422,19 +422,19 @@ EOF;
     }
 
     /**
-     * Returns an UTF-8 and HTML encoded string
+     * Returns an UTF-8 and HTML encoded string.
      *
      * @deprecated since version 2.7, to be removed in 3.0.
      */
     protected static function utf8Htmlize($str)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
     }
 
     /**
-     * HTML-encodes a string
+     * HTML-encodes a string.
      */
     private function escapeHtml($str)
     {

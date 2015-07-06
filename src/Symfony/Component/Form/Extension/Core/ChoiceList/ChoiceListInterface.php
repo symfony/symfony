@@ -25,6 +25,9 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  *              in the HTML "value" attribute.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ChoiceListInterface} instead.
  */
 interface ChoiceListInterface
 {
@@ -127,7 +130,7 @@ interface ChoiceListInterface
      * Returns the indices corresponding to the given choices.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *
@@ -147,7 +150,7 @@ interface ChoiceListInterface
      * Returns the indices corresponding to the given values.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *

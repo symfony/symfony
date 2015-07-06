@@ -41,17 +41,18 @@ class Glob
      * @param string $glob                The glob pattern
      * @param bool   $strictLeadingDot
      * @param bool   $strictWildcardSlash
+     * @param string $delimiter           Optional delimiter
      *
      * @return string regex The regexp
      */
-    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)
+    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true, $delimiter = '#')
     {
         $firstByte = true;
         $escaping = false;
         $inCurlies = 0;
         $regex = '';
         $sizeGlob = strlen($glob);
-        for ($i = 0; $i < $sizeGlob; $i++) {
+        for ($i = 0; $i < $sizeGlob; ++$i) {
             $car = $glob[$i];
             if ($firstByte) {
                 if ($strictLeadingDot && '.' !== $car) {
@@ -98,6 +99,6 @@ class Glob
             $escaping = false;
         }
 
-        return '#^'.$regex.'$#';
+        return $delimiter.'^'.$regex.'$'.$delimiter;
     }
 }

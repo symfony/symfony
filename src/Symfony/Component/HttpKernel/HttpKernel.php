@@ -229,7 +229,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         if (!$event->hasResponse()) {
             $this->finishRequest($request, $type);
 
-            throw new \LogicException('No listeners of the "kernel.exception" event set a Response', 0, $e);
+            throw $e;
         }
 
         $response = $event->getResponse();
@@ -269,7 +269,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("Array(%s)", implode(', ', $a));
+            return sprintf('Array(%s)', implode(', ', $a));
         }
 
         if (is_resource($var)) {

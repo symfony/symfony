@@ -59,40 +59,40 @@ class PdoCaster
 
     public static function castPdo(\PDO $c, array $a, Stub $stub, $isNested)
     {
-        $a = array();
+        $attr = array();
         $errmode = $c->getAttribute(\PDO::ATTR_ERRMODE);
         $c->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        foreach (self::$pdoAttributes as $attr => $values) {
-            if (!isset($attr[0])) {
-                $attr = $values;
-                $values = array();
+        foreach (self::$pdoAttributes as $k => $v) {
+            if (!isset($k[0])) {
+                $k = $v;
+                $v = array();
             }
 
             try {
-                $a[$attr] = 'ERRMODE' === $attr ? $errmode : $c->getAttribute(constant("PDO::ATTR_{$attr}"));
-                if ($values && isset($values[$a[$attr]])) {
-                    $a[$attr] = new ConstStub($values[$a[$attr]], $a[$attr]);
+                $attr[$k] = 'ERRMODE' === $k ? $errmode : $c->getAttribute(constant('PDO::ATTR_'.$k));
+                if ($v && isset($v[$attr[$k]])) {
+                    $attr[$k] = new ConstStub($v[$attr[$k]], $attr[$k]);
                 }
-            } catch (\Exception $m) {
+            } catch (\Exception $e) {
             }
         }
 
-        $m = "\0~\0";
-        $a = (array) $c + array(
-            $m.'inTransaction' => method_exists($c, 'inTransaction'),
-            $m.'errorInfo' => $c->errorInfo(),
-            $m.'attributes' => $a,
+        $prefix = Caster::PREFIX_VIRTUAL;
+        $a += array(
+            $prefix.'inTransaction' => method_exists($c, 'inTransaction'),
+            $prefix.'errorInfo' => $c->errorInfo(),
+            $prefix.'attributes' => $attr,
         );
 
-        if ($a[$m.'inTransaction']) {
-            $a[$m.'inTransaction'] = $c->inTransaction();
+        if ($a[$prefix.'inTransaction']) {
+            $a[$prefix.'inTransaction'] = $c->inTransaction();
         } else {
-            unset($a[$m.'inTransaction']);
+            unset($a[$prefix.'inTransaction']);
         }
 
-        if (!isset($a[$m.'errorInfo'][1], $a[$m.'errorInfo'][2])) {
-            unset($a[$m.'errorInfo']);
+        if (!isset($a[$prefix.'errorInfo'][1], $a[$prefix.'errorInfo'][2])) {
+            unset($a[$prefix.'errorInfo']);
         }
 
         $c->setAttribute(\PDO::ATTR_ERRMODE, $errmode);
@@ -102,11 +102,11 @@ class PdoCaster
 
     public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, $isNested)
     {
-        $m = "\0~\0";
-        $a[$m.'errorInfo'] = $c->errorInfo();
+        $prefix = Caster::PREFIX_VIRTUAL;
+        $a[$prefix.'errorInfo'] = $c->errorInfo();
 
-        if (!isset($a[$m.'errorInfo'][1], $a[$m.'errorInfo'][2])) {
-            unset($a[$m.'errorInfo']);
+        if (!isset($a[$prefix.'errorInfo'][1], $a[$prefix.'errorInfo'][2])) {
+            unset($a[$prefix.'errorInfo']);
         }
 
         return $a;

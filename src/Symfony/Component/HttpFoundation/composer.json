@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony HttpFoundation Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -23,14 +23,13 @@
         "symfony/expression-language": "~2.4|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },
-        "classmap": [ "Symfony/Component/HttpFoundation/Resources/stubs" ]
+        "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
+        "classmap": [ "Resources/stubs" ]
     },
-    "target-dir": "Symfony/Component/HttpFoundation",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

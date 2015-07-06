@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A console command for retrieving information about event dispatcher
+ * A console command for retrieving information about event dispatcher.
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
  */
@@ -34,7 +34,7 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
             ->setName('debug:event-dispatcher')
             ->setDefinition(array(
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays configured listeners for an application')
@@ -58,13 +58,27 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dispatcher = $this->getEventDispatcher();
+
         if ($event = $input->getArgument('event')) {
+            if (!$dispatcher->hasListeners($event)) {
+                $formatter = $this->getHelperSet()->get('formatter');
+
+                $formattedBlock = $formatter->formatBlock(
+                    sprintf('[NOTE] The event "%s" does not have any registered listeners.', $event),
+                    'fg=yellow',
+                    true
+                );
+
+                $output->writeln($formattedBlock);
+
+                return;
+            }
+
             $options = array('event' => $event);
         } else {
             $options = array();
         }
-
-        $dispatcher = $this->getEventDispatcher();
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
@@ -73,7 +87,7 @@ EOF
     }
 
     /**
-     * Loads the Event Dispatcher from the container
+     * Loads the Event Dispatcher from the container.
      *
      * @return EventDispatcherInterface
      */

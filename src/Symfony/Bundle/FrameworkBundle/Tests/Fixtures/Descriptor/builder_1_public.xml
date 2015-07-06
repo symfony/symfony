@@ -2,7 +2,7 @@
 <container>
   <alias id="alias_1" service="service_1" public="true"/>
   <alias id="alias_2" service="service_2" public="false"/>
-  <definition id="definition_1" class="Full\Qualified\Class1" scope="container" public="true" synthetic="false" lazy="true" synchronized="false" abstract="true" file="">
+  <definition id="definition_1" class="Full\Qualified\Class1" scope="container" public="true" synthetic="false" lazy="true" shared="true" synchronized="false" abstract="true" file="">
     <factory class="Full\Qualified\FactoryClass" method="get"/>
   </definition>
   <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>

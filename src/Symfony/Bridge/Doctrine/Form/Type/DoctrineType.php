@@ -12,17 +12,21 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
-use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
+use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 abstract class DoctrineType extends AbstractType
@@ -33,19 +37,81 @@ abstract class DoctrineType extends AbstractType
     protected $registry;
 
     /**
-     * @var array
+     * @var ChoiceListFactoryInterface
      */
-    private $choiceListCache = array();
+    private $choiceListFactory;
 
     /**
-     * @var PropertyAccessorInterface
+     * @var IdReader[]
      */
-    private $propertyAccessor;
+    private $idReaders = array();
 
-    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null)
+    /**
+     * @var DoctrineChoiceLoader[]
+     */
+    private $choiceLoaders = array();
+
+    /**
+     * Creates the label for a choice.
+     *
+     * For backwards compatibility, objects are cast to strings by default.
+     *
+     * @param object $choice The object.
+     *
+     * @return string The string representation of the object.
+     *
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public static function createChoiceLabel($choice)
+    {
+        return (string) $choice;
+    }
+
+    /**
+     * Creates the field name for a choice.
+     *
+     * This method is used to generate field names if the underlying object has
+     * a single-column integer ID. In that case, the value of the field is
+     * the ID of the object. That ID is also used as field name.
+     *
+     * @param object     $choice The object.
+     * @param int|string $key    The choice key.
+     * @param string     $value  The choice value. Corresponds to the object's
+     *                           ID here.
+     *
+     * @return string The field name.
+     *
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public static function createChoiceName($choice, $key, $value)
+    {
+        return (string) $value;
+    }
+
+    /**
+     * Gets important parts from QueryBuilder that will allow to cache its results.
+     * For instance in ORM two query builders with an equal SQL string and
+     * equal parameters are considered to be equal.
+     * 
+     * @param object $queryBuilder
+     * 
+     * @return array|false Array with important QueryBuilder parts or false if
+     *                     they can't be determined
+     * 
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    {
+        return false;
+    }
+
+    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
         $this->registry = $registry;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->choiceListFactory = $choiceListFactory ?: new PropertyAccessDecorator(new DefaultChoiceListFactory(), $propertyAccessor);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -60,84 +126,100 @@ abstract class DoctrineType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
-        $propertyAccessor = $this->propertyAccessor;
+        $choiceListFactory = $this->choiceListFactory;
+        $idReaders = &$this->idReaders;
+        $choiceLoaders = &$this->choiceLoaders;
         $type = $this;
 
-        $loader = function (Options $options) use ($type) {
-            if (null !== $options['query_builder']) {
-                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+        $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
+
+            // Unless the choices are given explicitly, load them on demand
+            if (null === $options['choices']) {
+
+                $hash = null;
+                $qbParts = null;
+
+                // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
+                // also if concrete Type can return important QueryBuilder parts to generate
+                // hash key we go for it as well
+                if (!$options['query_builder'] || false !== ($qbParts = $type->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
+
+                    $hash = CachingFactoryDecorator::generateHash(array(
+                        $options['em'],
+                        $options['class'],
+                        $qbParts,
+                        $options['loader'],
+                    ));
+
+                    if (isset($choiceLoaders[$hash])) {
+                        return $choiceLoaders[$hash];
+                    }
+                }
+
+                if ($options['loader']) {
+                    $entityLoader = $options['loader'];
+                } elseif (null !== $options['query_builder']) {
+                    $entityLoader = $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                } else {
+                    $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
+                    $entityLoader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
+                }
+
+                $doctrineChoiceLoader = new DoctrineChoiceLoader(
+                    $choiceListFactory,
+                    $options['em'],
+                    $options['class'],
+                    $options['id_reader'],
+                    $entityLoader
+                );
+
+                if ($hash !== null) {
+                    $choiceLoaders[$hash] = $doctrineChoiceLoader;
+                }
+
+                return $doctrineChoiceLoader;
             }
         };
 
-        $choiceList = function (Options $options) use (&$choiceListCache, $propertyAccessor) {
-            // Support for closures
-            $propertyHash = is_object($options['property'])
-                ? spl_object_hash($options['property'])
-                : $options['property'];
-
-            $choiceHashes = $options['choices'];
-
-            // Support for recursive arrays
-            if (is_array($choiceHashes)) {
-                // A second parameter ($key) is passed, so we cannot use
-                // spl_object_hash() directly (which strictly requires
-                // one parameter)
-                array_walk_recursive($choiceHashes, function (&$value) {
-                    $value = spl_object_hash($value);
-                });
-            } elseif ($choiceHashes instanceof \Traversable) {
-                $hashes = array();
-                foreach ($choiceHashes as $value) {
-                    $hashes[] = spl_object_hash($value);
-                }
-
-                $choiceHashes = $hashes;
+        $choiceLabel = function (Options $options) {
+            // BC with the "property" option
+            if ($options['property']) {
+                return $options['property'];
             }
 
-            $preferredChoiceHashes = $options['preferred_choices'];
+            // BC: use __toString() by default
+            return array(__CLASS__, 'createChoiceLabel');
+        };
 
-            if (is_array($preferredChoiceHashes)) {
-                array_walk_recursive($preferredChoiceHashes, function (&$value) {
-                    $value = spl_object_hash($value);
-                });
+        $choiceName = function (Options $options) {
+            /** @var IdReader $idReader */
+            $idReader = $options['id_reader'];
+
+            // If the object has a single-column, numeric ID, use that ID as
+            // field name. We can only use numeric IDs as names, as we cannot
+            // guarantee that a non-numeric ID contains a valid form name
+            if ($idReader->isIntId()) {
+                return array(__CLASS__, 'createChoiceName');
             }
 
-            // Support for custom loaders (with query builders)
-            $loaderHash = is_object($options['loader'])
-                ? spl_object_hash($options['loader'])
-                : $options['loader'];
+            // Otherwise, an incrementing integer is used as name automatically
+        };
 
-            // Support for closures
-            $groupByHash = is_object($options['group_by'])
-                ? spl_object_hash($options['group_by'])
-                : $options['group_by'];
+        // The choices are always indexed by ID (see "choices" normalizer
+        // and DoctrineChoiceLoader), unless the ID is composite. Then they
+        // are indexed by an incrementing integer.
+        // Use the ID/incrementing integer as choice value.
+        $choiceValue = function (Options $options) {
+            /** @var IdReader $idReader */
+            $idReader = $options['id_reader'];
 
-            $hash = hash('sha256', json_encode(array(
-                spl_object_hash($options['em']),
-                $options['class'],
-                $propertyHash,
-                $loaderHash,
-                $choiceHashes,
-                $preferredChoiceHashes,
-                $groupByHash,
-            )));
-
-            if (!isset($choiceListCache[$hash])) {
-                $choiceListCache[$hash] = new EntityChoiceList(
-                    $options['em'],
-                    $options['class'],
-                    $options['property'],
-                    $options['loader'],
-                    $options['choices'],
-                    $options['preferred_choices'],
-                    $options['group_by'],
-                    $propertyAccessor
-                );
+            // If the entity has a single-column ID, use that ID as value
+            if ($idReader->isSingleId()) {
+                return array($idReader, 'getIdValue');
             }
 
-            return $choiceListCache[$hash];
+            // Otherwise, an incrementing integer is used as value automatically
         };
 
         $emNormalizer = function (Options $options, $em) use ($registry) {
@@ -163,19 +245,78 @@ abstract class DoctrineType extends AbstractType
             return $em;
         };
 
+        // deprecation note
+        $propertyNormalizer = function (Options $options, $propertyName) {
+            if ($propertyName) {
+                @trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
+            }
+
+            return $propertyName;
+        };
+
+        // Invoke the query builder closure so that we can cache choice lists
+        // for equal query builders
+        $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
+            if (is_callable($queryBuilder)) {
+                $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+            }
+
+            return $queryBuilder;
+        };
+
+        // deprecation note
+        $loaderNormalizer = function (Options $options, $loader) {
+            if ($loader) {
+                @trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
+            }
+
+            return $loader;
+        };
+
+        // Set the "id_reader" option via the normalizer. This option is not
+        // supposed to be set by the user.
+        $idReaderNormalizer = function (Options $options) use (&$idReaders) {
+            $hash = CachingFactoryDecorator::generateHash(array(
+                $options['em'],
+                $options['class'],
+            ));
+
+            // The ID reader is a utility that is needed to read the object IDs
+            // when generating the field values. The callback generating the
+            // field values has no access to the object manager or the class
+            // of the field, so we store that information in the reader.
+            // The reader is cached so that two choice lists for the same class
+            // (and hence with the same reader) can successfully be cached.
+            if (!isset($idReaders[$hash])) {
+                $classMetadata = $options['em']->getClassMetadata($options['class']);
+                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
+            }
+
+            return $idReaders[$hash];
+        };
+
         $resolver->setDefaults(array(
             'em' => null,
-            'property' => null,
+            'property' => null, // deprecated, use "choice_label"
             'query_builder' => null,
-            'loader' => $loader,
+            'loader' => null, // deprecated, use "choice_loader"
             'choices' => null,
-            'choice_list' => $choiceList,
-            'group_by' => null,
+            'choices_as_values' => true,
+            'choice_loader' => $choiceLoader,
+            'choice_label' => $choiceLabel,
+            'choice_name' => $choiceName,
+            'choice_value' => $choiceValue,
+            'id_reader' => null, // internal
+            'choice_translation_domain' => false,
         ));
 
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('em', $emNormalizer);
+        $resolver->setNormalizer('property', $propertyNormalizer);
+        $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
+        $resolver->setNormalizer('loader', $loaderNormalizer);
+        $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
         $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));

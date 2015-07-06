@@ -17,8 +17,8 @@ use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
@@ -27,6 +27,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      * @var FormExtension
      */
     protected $extension;
+
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
 
     protected function setUp()
     {

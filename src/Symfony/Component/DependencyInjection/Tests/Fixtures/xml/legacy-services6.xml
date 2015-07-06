@@ -6,5 +6,9 @@
   <services>
     <service id="constructor" class="FooClass" factory-method="getInstance" />
     <service id="factory_service" factory-method="getInstance" factory-service="baz_factory" />
+    <service id="scope.container" class="FooClass" scope="container" />
+    <service id="scope.custom" class="FooClass" scope="custom" />
+    <service id="scope.prototype" class="FooClass" scope="prototype" />
+    <service id="request" class="Request" synthetic="true" synchronized="true" lazy="true"/>
   </services>
 </container>

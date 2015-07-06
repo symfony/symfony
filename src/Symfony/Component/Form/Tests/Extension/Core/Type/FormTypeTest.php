@@ -99,7 +99,10 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 
-    public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
+    /**
+     * @group legacy
+     */
+    public function testLegacyNonReadOnlyFormWithReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'form', null, array('read_only' => true))
             ->add('child', 'form')
@@ -109,7 +112,20 @@ class FormTypeTest extends BaseTypeTest
         $this->assertTrue($view['child']->vars['read_only']);
     }
 
-    public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
+    public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form', null, array('attr' => array('readonly' => true)))
+            ->add('child', 'form')
+            ->getForm()
+            ->createView();
+
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyReadOnlyFormWithNonReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'form')
             ->add('child', 'form', array('read_only' => true))
@@ -119,7 +135,20 @@ class FormTypeTest extends BaseTypeTest
         $this->assertTrue($view['child']->vars['read_only']);
     }
 
-    public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
+    public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', 'form', array('attr' => array('readonly' => true)))
+            ->getForm()
+            ->createView();
+
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'form')
                 ->add('child', 'form')
@@ -127,6 +156,16 @@ class FormTypeTest extends BaseTypeTest
                 ->createView();
 
         $this->assertFalse($view['child']->vars['read_only']);
+    }
+
+    public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', 'form')
+            ->getForm()
+            ->createView();
+
+        $this->assertArrayNotHasKey('readonly', $view['child']->vars['attr']);
     }
 
     public function testPassMaxLengthToView()
@@ -640,10 +679,8 @@ class FormTypeTest extends BaseTypeTest
     /**
      * @group legacy
      */
-    public function testLegacyCanGetErrorsWhenButtonInForm()
+    public function testCanGetErrorsWhenButtonInForm()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,

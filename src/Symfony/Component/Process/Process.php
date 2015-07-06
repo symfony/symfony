@@ -254,8 +254,6 @@ class Process
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return Process The process itself
-     *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
@@ -798,7 +796,7 @@ class Process
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
             if ('\\' === DIRECTORY_SEPARATOR && !$this->isSigchildEnabled()) {
-                exec(sprintf("taskkill /F /T /PID %d 2>&1", $this->getPid()), $output, $exitCode);
+                exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
                 if ($exitCode > 0) {
                     throw new RuntimeException('Unable to kill the process');
                 }
@@ -1071,7 +1069,7 @@ class Process
      */
     public function getStdin()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getInput() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getInput() method instead.', E_USER_DEPRECATED);
 
         return $this->getInput();
     }
@@ -1101,7 +1099,7 @@ class Process
      */
     public function setStdin($stdin)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the setInput() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the setInput() method instead.', E_USER_DEPRECATED);
 
         return $this->setInput($stdin);
     }

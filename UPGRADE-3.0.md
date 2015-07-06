@@ -106,6 +106,24 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The option "precision" was renamed to "scale".
+
+   Before:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'precision' => 3,
+   ));
+   ```
+
+   After:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'scale' => 3,
+   ));
+   ```
+
  * The method `AbstractType::setDefaultOptions(OptionsResolverInterface $resolver)` and
    `AbstractTypeExtension::setDefaultOptions(OptionsResolverInterface $resolver)` have been
    renamed. You should use `AbstractType::configureOptions(OptionsResolver $resolver)` and
@@ -288,6 +306,11 @@ UPGRADE FROM 2.x to 3.0
 
 ### FrameworkBundle
 
+ * The `config:debug`, `container:debug`, `router:debug`, `translation:debug`
+   and `yaml:lint` commands have been deprecated since Symfony 2.7 and will
+   be removed in Symfony 3.0. Use the `debug:config`, `debug:container`,
+   `debug:router`, `debug:translation` and `lint:yaml` commands instead.
+
  * The `getRequest` method of the base `Controller` class has been deprecated
    since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
    way to get the `Request` object is to inject it in the action method.
@@ -326,7 +349,7 @@ UPGRADE FROM 2.x to 3.0
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
 
- * The `templating.helper.assets` was moved to `templating_php.xml`. You can
+ * The `templating.helper.assets` was removed in Symfony 3.0. You should
    use the `assets.package` service instead.
 
    Before:
@@ -422,6 +445,21 @@ UPGRADE FROM 2.x to 3.0
    ```
 
  * The `RouterApacheDumperCommand` was removed.
+
+ * The `templating.helper.router` service was moved to `templating_php.xml`. You
+   have to ensure that the PHP templating engine is enabled to be able to use it:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['php']
+   ```
+
+ * The `form.csrf_provider` service is removed as it implements an adapter for
+   the new token manager to the deprecated
+   `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`
+   interface.
+   The `security.csrf.token_manager` should be used instead.
 
 ### HttpKernel
 
@@ -555,12 +593,95 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Resources/` directory was moved to `Core/Resources/`
 
+ * The `key` settings of `anonymous` and `remember_me` are renamed to `secret`.
+
+   Before:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { key: "%secret%" }
+               remember_me:
+                   key: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous key="%secret%"/>
+           <remember-me key="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('key' => '%secret%'),
+           'remember_me' => array('key' => '%secret%'),
+       ),
+   ));
+   ```
+
+   After:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { secret: "%secret%" }
+               remember_me:
+                   secret: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous secret="%secret%"/>
+           <remember-me secret="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('secret' => '%secret%'),
+           'remember_me' => array('secret' => '%secret%'),
+       ),
+   ));
+  ```
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
    `Translator::setFallbackLocales()`.
 
 ### Twig Bridge
+
+ * The `twig:lint` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `lint:twig` command instead.
 
  * The `render` tag is deprecated in favor of the `render` function.
 
@@ -613,6 +734,11 @@ UPGRADE FROM 2.x to 3.0
        ...
    {{ form_end(form) }}
    ```
+
+### TwigBundle
+
+ * The `twig:debug` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `debug:twig` command instead.
 
 ### Validator
 

@@ -44,7 +44,7 @@ class AssetsHelper extends Helper
     {
         // BC layer to be removed in 3.0
         if (3 === $count = func_num_args()) {
-            trigger_error('Forcing a version for an asset was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('Forcing a version for an asset was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
 
             $args = func_get_args();
 
@@ -66,7 +66,7 @@ class AssetsHelper extends Helper
     {
         // no arguments means old getVersion() for default package
         if (null === $path) {
-            trigger_error('The getVersion() method requires a path as a first argument since 2.7 and will be enforced as of 3.0.', E_USER_DEPRECATED);
+            @trigger_error('The getVersion() method requires a path as a first argument since 2.7 and will be enforced as of 3.0.', E_USER_DEPRECATED);
 
             return $this->packages->getVersion('/', $packageName);
         }
@@ -85,7 +85,7 @@ class AssetsHelper extends Helper
         }
 
         // path is a packageName, old version
-        trigger_error('The getVersion() method requires a path as a first argument since 2.7 and will be enforced as of 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The getVersion() method requires a path as a first argument since 2.7 and will be enforced as of 3.0.', E_USER_DEPRECATED);
 
         return $this->packages->getVersion('/', $path);
     }

@@ -8,25 +8,51 @@
         <parameter key="serializer.class">Symfony\Component\Serializer\Serializer</parameter>
         <parameter key="serializer.encoder.xml.class">Symfony\Component\Serializer\Encoder\XmlEncoder</parameter>
         <parameter key="serializer.encoder.json.class">Symfony\Component\Serializer\Encoder\JsonEncoder</parameter>
+        <parameter key="serializer.mapping.cache.prefix" />
     </parameters>
 
     <services>
-        <service id="serializer" class="%serializer.class%" >
+        <service id="serializer" class="%serializer.class%">
             <argument type="collection" />
             <argument type="collection" />
         </service>
 
+        <service id="serializer.property_accessor" alias="property_accessor" public="false" />
+
         <!-- Normalizer -->
-        <service id="serializer.normalizer.get_set_method" class="Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer" public="false">
+        <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer" public="false">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+            <argument>null</argument>
+            <argument type="service" id="serializer.property_accessor" />
+
             <!-- Run after all custom serializers -->
             <tag name="serializer.normalizer" priority="-1000" />
         </service>
 
+        <!-- Loader -->
+        <service id="serializer.mapping.chain_loader" class="Symfony\Component\Serializer\Mapping\Loader\LoaderChain" public="false">
+            <argument type="collection" />
+        </service>
+
+        <!-- Class Metadata Factory -->
+        <service id="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory" public="false">
+            <argument type="service" id="serializer.mapping.chain_loader" />
+            <argument>null</argument>
+        </service>
+
+        <!-- Cache -->
+        <service id="serializer.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
+            <call method="setNamespace">
+                <argument>%serializer.mapping.cache.prefix%</argument>
+            </call>
+        </service>
+
         <!-- Encoders -->
-        <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false" >
+        <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false">
             <tag name="serializer.encoder" />
         </service>
-        <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false" >
+
+        <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false">
             <tag name="serializer.encoder" />
         </service>
     </services>

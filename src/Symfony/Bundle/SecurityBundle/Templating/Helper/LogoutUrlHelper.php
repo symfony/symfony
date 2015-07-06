@@ -25,9 +25,6 @@ use Symfony\Component\Templating\Helper\Helper;
 class LogoutUrlHelper extends Helper
 {
     private $generator;
-    private $listeners = array();
-    private $router;
-    private $tokenStorage;
 
     /**
      * Constructor.
@@ -42,12 +39,12 @@ class LogoutUrlHelper extends Helper
     public function __construct($generator, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
         if ($generator instanceof ContainerInterface) {
-            trigger_error('The '.__CLASS__.' constructor will require a LogoutUrlGenerator instead of a ContainerInterface instance in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('The '.__CLASS__.' constructor will require a LogoutUrlGenerator instead of a ContainerInterface instance in 3.0.', E_USER_DEPRECATED);
 
-            if ($container->has('security.logout_url_generator')) {
-                $this->generator = $container->get('security.logout_url_generator');
+            if ($generator->has('security.logout_url_generator')) {
+                $this->generator = $generator->get('security.logout_url_generator');
             } else {
-                $this->generator = new LogoutUrlGenerator($container->get('request_stack'), $router, $tokenStorage);
+                $this->generator = new LogoutUrlGenerator($generator->get('request_stack'), $router, $tokenStorage);
             }
         } else {
             $this->generator = $generator;
@@ -79,9 +76,7 @@ class LogoutUrlHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

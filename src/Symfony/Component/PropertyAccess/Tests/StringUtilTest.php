@@ -99,6 +99,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('men', 'man'),
             array('mice', 'mouse'),
             array('moves', 'move'),
+            array('movies', 'movie'),
             array('nebulae', 'nebula'),
             array('neuroses', array('neuros', 'neurose', 'neurosis')),
             array('oases', array('oas', 'oase', 'oasis')),
@@ -118,6 +119,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('sandwiches', array('sandwich', 'sandwiche')),
             array('scarves', array('scarf', 'scarve', 'scarff')),
             array('schemas', 'schema'), //schemata
+            array('selfies', 'selfie'),
             array('sheriffs', 'sheriff'),
             array('shoes', array('sho', 'shoe')),
             array('spies', 'spy'),

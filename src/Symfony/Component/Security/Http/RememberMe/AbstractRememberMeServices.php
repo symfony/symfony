@@ -36,24 +36,24 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     protected $logger;
     protected $options;
     private $providerKey;
-    private $key;
+    private $secret;
     private $userProviders;
 
     /**
      * Constructor.
      *
      * @param array           $userProviders
-     * @param string          $key
+     * @param string          $secret
      * @param string          $providerKey
      * @param array           $options
      * @param LoggerInterface $logger
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
+    public function __construct(array $userProviders, $secret, $providerKey, array $options = array(), LoggerInterface $logger = null)
     {
-        if (empty($key)) {
-            throw new \InvalidArgumentException('$key must not be empty.');
+        if (empty($secret)) {
+            throw new \InvalidArgumentException('$secret must not be empty.');
         }
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -63,7 +63,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         }
 
         $this->userProviders = $userProviders;
-        $this->key = $key;
+        $this->secret = $secret;
         $this->providerKey = $providerKey;
         $this->options = $options;
         $this->logger = $logger;
@@ -81,11 +81,21 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * @return string
+     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
      */
     public function getKey()
     {
-        return $this->key;
+        @trigger_error(__method__.'() is deprecated since version 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
+
+        return $this->getSecret();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
     }
 
     /**
@@ -122,22 +132,22 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
                 $this->logger->info('Remember-me cookie accepted.');
             }
 
-            return new RememberMeToken($user, $this->providerKey, $this->key);
-        } catch (CookieTheftException $theft) {
+            return new RememberMeToken($user, $this->providerKey, $this->secret);
+        } catch (CookieTheftException $e) {
             $this->cancelCookie($request);
 
-            throw $theft;
-        } catch (UsernameNotFoundException $notFound) {
+            throw $e;
+        } catch (UsernameNotFoundException $e) {
             if (null !== $this->logger) {
                 $this->logger->info('User for remember-me cookie not found.');
             }
-        } catch (UnsupportedUserException $unSupported) {
+        } catch (UnsupportedUserException $e) {
             if (null !== $this->logger) {
                 $this->logger->warning('User class for remember-me cookie not supported.');
             }
-        } catch (AuthenticationException $invalid) {
+        } catch (AuthenticationException $e) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-Me authentication failed.', array('exception' => $invalid));
+                $this->logger->debug('Remember-Me authentication failed.', array('exception' => $e));
             }
         }
 
@@ -217,7 +227,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param array   $cookieParts
      * @param Request $request
      *
-     * @return TokenInterface
+     * @return UserInterface
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
 
@@ -268,9 +278,17 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param array $cookieParts
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException When $cookieParts contain the cookie delimiter. Extending class should either remove or escape it.
      */
     protected function encodeCookie(array $cookieParts)
     {
+        foreach ($cookieParts as $cookiePart) {
+            if (false !== strpos($cookiePart, self::COOKIE_DELIMITER)) {
+                throw new \InvalidArgumentException(sprintf('$cookieParts should not contain the cookie delimiter "%s"', self::COOKIE_DELIMITER));
+            }
+        }
+
         return base64_encode(implode(self::COOKIE_DELIMITER, $cookieParts));
     }
 

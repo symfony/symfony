@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * @group legacy
+ */
 class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -100,10 +103,10 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         try {
             $kernel->handle($request, $type);
             $this->fail('->handle() suppresses the controller exception');
-        } catch (\PHPUnit_Framework_Exception $exception) {
-            throw $exception;
-        } catch (\LogicException $actual) {
-            $this->assertSame($expected, $actual->getPrevious(), '->handle() throws the controller exception, wrapped when no listener');
+        } catch (\PHPUnit_Framework_Exception $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            $this->assertSame($expected, $e, '->handle() throws the controller exception');
         }
     }
 

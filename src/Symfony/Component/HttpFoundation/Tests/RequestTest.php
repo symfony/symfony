@@ -855,10 +855,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider testGetClientIpsProvider
-     * Kept to check backward compatibility
      * @group legacy
      */
-    public function legacyTestGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function testLegacyGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
@@ -869,10 +868,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider testGetClientIpsProvider
-     * Kept to check backward compatibility
      * @group legacy
      */
-    public function legacyTestGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function testLegacyGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
@@ -883,10 +881,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider testGetClientIpsForwardedProvider
-     * Kept to check backward compatibility
      * @group legacy
      */
-    public function legacyTestGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
+    public function testLegacyGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies);
 
@@ -1541,10 +1538,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $property->setValue(false);
     }
 
-    /**
-     * Kept to check backward compatibility
-     * @group legacy
-     */
     private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = new Request();
@@ -1563,10 +1556,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
-    /**
-     * Kept to check backward compatibility
-     * @group legacy
-     */
     private function getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies)
     {
         $request = new Request();
@@ -1586,7 +1575,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
-    public function legacyTestTrustedProxies()
+    /**
+     * @group legacy
+     */
+    public function testLegacyTrustedProxies()
     {
         $request = Request::create('http://example.com/');
         $request->server->set('REMOTE_ADDR', '3.3.3.3');

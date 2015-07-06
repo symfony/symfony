@@ -41,7 +41,7 @@ class IpRetriever implements IpRetrieverInterface
         self::HEADER_REAL_IP => 'X_REAL_IP',
     );
 
-    protected $trustedProxies = array();
+    private $trustedProxies = array();
 
     /**
      * {@inheritdoc}

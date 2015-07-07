@@ -139,4 +139,10 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($catalogue->getMetadata('extra', 'domain1'));
         $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux'))), $catalogue->getMetadata('key', 'domain1'));
     }
+
+    public function testHeaderAllowedButDoesNothing(){
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/withheader.xlf', 'en', 'domain1');
+        $this->assertSame( array('foo' => 'bar'), $catalogue->all('domain1') );
+    }
 }

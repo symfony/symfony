@@ -26,6 +26,16 @@ class XliffFileDumper extends FileDumper
     private $defaultLocale;
 
     /**
+     * Generator metadata for <tool> element.
+     *
+     * @var array
+     */
+    private $toolMeta = array(
+        'tool-id' => 'symfony',
+        'tool-name' => 'Symfony',
+    );
+
+    /**
      * {@inheritdoc}
      */
     public function dump(MessageCatalogue $messages, $options = array())
@@ -37,6 +47,21 @@ class XliffFileDumper extends FileDumper
         }
 
         parent::dump($messages, $options);
+    }
+
+    /**
+     * Set XLIFF tool element metadata.
+     *
+     * @link http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#tool_elem
+     *
+     * @param array attributes supported by the <tool> element
+     */
+    protected function setToolMetadata( array $meta ){
+        $required = array(
+            'tool-id' => 'symfony',
+            'tool-name' => get_class($this),
+        );
+        $this->toolMeta = array_merge( $required, $meta );
     }
 
     /**
@@ -56,6 +81,16 @@ class XliffFileDumper extends FileDumper
         $xliffFile->setAttribute('target-language', str_replace('_', '-', $messages->getLocale()));
         $xliffFile->setAttribute('datatype', 'plaintext');
         $xliffFile->setAttribute('original', 'file.ext');
+
+        // add generator metadata into <tool> element
+        if ($this->toolMeta) {
+            $xliffHead = $xliffFile->appendChild($dom->createElement('header'));
+            $xliffTool = $xliffHead->appendChild($dom->createElement('tool'));
+            foreach ($this->toolMeta as $toolProp => $toolValue) {
+                $xliffTool->setAttribute($toolProp, $toolValue);
+            }
+            $xliffFile->setAttribute('tool-id', $xliffTool->getAttribute('tool-id') );
+        }
 
         $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
         foreach ($messages->all($domain) as $source => $target) {

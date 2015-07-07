@@ -273,7 +273,7 @@ class Command
     {
         return implode(' ', array_filter(
             array_map(function ($bit) {
-                return $bit instanceof Command ? $bit->join() : ($bit ?: null);
+                return $bit instanceof self ? $bit->join() : ($bit ?: null);
             }, $this->bits),
             function ($bit) { return null !== $bit; }
         ));
@@ -289,7 +289,7 @@ class Command
      */
     public function addAtIndex($bit, $index)
     {
-        array_splice($this->bits, $index, 0, $bit);
+        array_splice($this->bits, $index, 0, $bit instanceof self ? array($bit) : $bit);
 
         return $this;
     }

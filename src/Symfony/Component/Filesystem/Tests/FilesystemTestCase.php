@@ -16,7 +16,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     private $umask;
 
     /**
-     * @var string $workspace
+     * @var string
      */
     protected $workspace = null;
 

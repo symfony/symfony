@@ -370,7 +370,7 @@ class ProgressBar
     }
 
     /**
-     * Sets whether to overwrite the progressbar, false for new line
+     * Sets whether to overwrite the progressbar, false for new line.
      *
      * @param bool $overwrite
      */

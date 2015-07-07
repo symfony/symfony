@@ -126,7 +126,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private $lockMode = self::LOCK_TRANSACTIONAL;
 
     /**
-     * It's an array to support multiple reads before closing which is manual, non-standard usage
+     * It's an array to support multiple reads before closing which is manual, non-standard usage.
      *
      * @var \PDOStatement[] An array of statements to release advisory locks
      */
@@ -680,7 +680,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a PDO instance
+     * Return a PDO instance.
      *
      * @return \PDO
      */

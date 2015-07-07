@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Lists twig functions, filters, globals and tests present in the current project
+ * Lists twig functions, filters, globals and tests present in the current project.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -111,7 +111,7 @@ EOF
         if ($type === 'functions' || $type === 'filters') {
             $args = array();
             $cb = $entity->getCallable();
-            if (is_null($cb)) {
+            if (null === $cb) {
                 return;
             }
             if (is_array($cb)) {

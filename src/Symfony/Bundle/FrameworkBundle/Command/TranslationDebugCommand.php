@@ -95,7 +95,7 @@ EOF
         );
 
         foreach ($bundlePaths as $path) {
-            $path = $path.'views';
+            $path .= 'views';
             if (is_dir($path)) {
                 $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
             }
@@ -104,7 +104,7 @@ EOF
         // Load defined messages
         $currentCatalogue = new MessageCatalogue($locale);
         foreach ($bundlePaths as $path) {
-            $path = $path.'translations';
+            $path .= 'translations';
             if (is_dir($path)) {
                 $loader->loadMessages($path, $currentCatalogue);
             }

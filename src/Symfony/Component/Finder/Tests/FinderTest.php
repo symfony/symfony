@@ -13,7 +13,6 @@ namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Adapter;
-use Symfony\Component\Finder\Shell\Command;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {

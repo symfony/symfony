@@ -105,11 +105,7 @@
 
                             <div id="parameters-{{ loop.index }}" style="display: none;">
                                 {% for parameters in message.parameters %}
-                                    {% if parameters|length > 0 %}
-                                        {{ profiler_dump(parameters) }}
-                                    {% else %}
-                                        {{ profiler_dump(null) }}
-                                    {% endif %}
+                                    {{ profiler_dump(parameters) }}
                                     {% if not loop.last %}<br />{% endif %}
                                 {% endfor %}
                             </div>

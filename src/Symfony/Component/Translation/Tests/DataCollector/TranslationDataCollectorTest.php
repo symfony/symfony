@@ -94,9 +94,7 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_DEFINED,
                   'count' => 1,
-                  'parameters' => array(
-                      array(),
-                  ),
+                  'parameters' => array(),
                   'transChoiceNumber' => null,
             ),
             array(
@@ -106,9 +104,7 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'domain' => 'messages',
                   'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
                   'count' => 1,
-                  'parameters' => array(
-                      array(),
-                  ),
+                  'parameters' => array(),
                   'transChoiceNumber' => null,
             ),
             array(

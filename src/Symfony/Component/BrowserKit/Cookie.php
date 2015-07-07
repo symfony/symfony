@@ -82,7 +82,6 @@ class Cookie
 
             $this->expires = $timestampAsDateTime->getTimestamp();
         }
-
     }
 
     /**

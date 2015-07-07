@@ -61,6 +61,13 @@ interface ParameterBagInterface
     public function get($name);
 
     /**
+     * Removes a parameter.
+     *
+     * @param string $name The parameter name
+     */
+    public function remove($name);
+
+    /**
      * Sets a service container parameter.
      *
      * @param string $name  The parameter name

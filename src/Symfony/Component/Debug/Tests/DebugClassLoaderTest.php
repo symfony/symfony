@@ -112,10 +112,10 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             restore_exception_handler();
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             if (PHP_VERSION_ID < 70000) {
-                $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
+                $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_STRICT, $exception->getSeverity());
             } else {
-                $this->assertRegexp('/^Warning: Declaration/', $exception->getMessage());
+                $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_WARNING, $exception->getSeverity());
             }
         } catch (\Exception $exception) {

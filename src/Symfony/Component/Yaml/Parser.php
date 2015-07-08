@@ -286,7 +286,7 @@ class Parser
             }
 
             if ($isRef) {
-                $this->refs[$isRef] = end($data);
+                $this->refs[$isRef] = 'mapping' === $context ? $data[$key] : end($data);
             }
         }
 

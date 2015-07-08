@@ -75,7 +75,7 @@ class TwigExtension extends Extension
             }
 
             $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
         }

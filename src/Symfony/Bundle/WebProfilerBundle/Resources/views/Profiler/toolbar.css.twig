@@ -232,6 +232,7 @@
     color: #FFF;
     font-size: 14px;
     margin-right: 4px;
+    max-height: 36px;
     padding: 10px;
 }
 
@@ -389,55 +390,26 @@
 /***** Override the setting when the toolbar is on the top *****/
 {% if position == 'top' %}
     .sf-minitoolbar {
-        top: 0;
         bottom: auto;
         right: 0;
-
-        background-color: #f7f7f7;
-
-        background-image: -moz-linear-gradient(225deg, #e4e4e4, #ffffff);
-        background-image: -webkit-gradient(linear, 100% 0%, 0% 0%, from(#e4e4e4), to(#ffffff));
-        background-image: -o-linear-gradient(135deg, #e4e4e4, #ffffff);
-        background: linear-gradient(225deg, #e4e4e4, #ffffff);
-
-        border-radius: 0 0 0 16px;
+        top: 0;
     }
 
     .sf-toolbarreset {
-        background-image: -moz-linear-gradient(225deg, #e4e4e4, #ffffff);
-        background-image: -webkit-gradient(linear, 100% 0%, 0% 0%, from(#e4e4e4), to(#ffffff));
-        background-image: -o-linear-gradient(135deg, #e4e4e4, #ffffff);
-        background: linear-gradient(225deg, #e4e4e4, #ffffff);
-
-        top: 0;
         bottom: auto;
-        border-bottom: 1px solid #bbb;
+        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2);
+        top: 0;
     }
 
     .sf-toolbar-block .sf-toolbar-info {
-        top: 39px;
         bottom: auto;
-        border-top-width: 0;
-        border-radius: 0 0 4px 4px;
-    }
-
-    .sf-toolbar-block:hover .sf-toolbar-icon {
-        border-top: none;
-        border-bottom: 1px dotted #DDD;
-        margin-top: 0;
-        margin-bottom: -1px;
+        top: 36px;
     }
 {% endif %}
 
 {% if not floatable %}
     .sf-toolbarreset {
         position: static;
-        background: #cbcbcb;
-
-        background-image: -moz-linear-gradient(90deg, #cbcbcb, #e8e8e8) !important;
-        background-image: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#cbcbcb), to(#e8e8e8)) !important;
-        background-image: -o-linear-gradient(180deg, #cbcbcb, #e8e8e8) !important;
-        background: linear-gradient(90deg, #cbcbcb, #e8e8e8) !important;
     }
 {% endif %}
 

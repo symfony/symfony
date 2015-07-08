@@ -21,17 +21,19 @@
 
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
-        <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ request_handler }}</span>
+        <span class="sf-toolbar-label">@</span>
+        <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
     {% endset %}
+
     {% set text %}
         {% spaceless %}
             <div class="sf-toolbar-info-piece">
                 <b>HTTP status</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span> {{ collector.statustext }}
+                <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Controller method</b>
-                {{ request_handler }}
+                <span>{{ request_handler }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Controller file</b>
@@ -47,6 +49,7 @@
             </div>
         {% endspaceless %}
     {% endset %}
+
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
 {% endblock %}
 

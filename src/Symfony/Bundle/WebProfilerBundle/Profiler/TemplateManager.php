@@ -146,6 +146,7 @@ class TemplateManager
      */
     protected function reorderTemplates($templates)
     {
+        $templates = $this->moveArrayElementToFirstPosition($templates, 'twig');
         $templates = $this->moveArrayElementToFirstPosition($templates, 'memory');
         $templates = $this->moveArrayElementToFirstPosition($templates, 'time');
         $templates = $this->moveArrayElementToFirstPosition($templates, 'request');

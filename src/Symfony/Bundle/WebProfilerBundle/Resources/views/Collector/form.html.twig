@@ -15,7 +15,7 @@
             </span>
         {% endset %}
 
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url, 'block_status': collector.data.nb_errors ? 'red' : '' } %}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: collector.data.nb_errors ? 'red' : '' }) }}
     {% endif %}
 {% endblock %}
 

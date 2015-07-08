@@ -1,8 +1,6 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-
-    {# Symfony Information #}
     {% if 'unknown' == collector.symfonyState %}
         {% set block_status = '' %}
         {% set symfony_version_status = 'Unable to retrieve information about the Symfony version.' %}
@@ -21,45 +19,34 @@
     {% endif %}
 
     {% set icon %}
-            {% if collector.applicationname %}
-                <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
-                <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
-            {% elseif collector.symfonyState is defined %}
+            {% if collector.symfonyState is defined %}
                 <a href="https://symfony.com/" title="{{ symfony_version_status }}">
-                    <span class="sf-toolbar-label">symfony</span>
+                    <span class="sf-toolbar-label">
+                        {{ include('@WebProfiler/Icon/symfony.svg.twig') }}
+                    </span>
                     <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
                 </a>
+            {% elseif collector.applicationname %}
+                <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
+                <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
             {% endif %}
     {% endset %}
+
     {% set text %}
+        {% if collector.symfonyversion is defined %}
+            <div class="sf-toolbar-info-piece">
+                <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
+                    Read Symfony {{ collector.symfonyversion }} Docs
+                </a>
+            </div>
+        {% endif %}
+
         {% if collector.applicationname %}
             <div class="sf-toolbar-info-piece">
                 {{ collector.applicationname }} <b>{{ collector.applicationversion }}</b>
             </div>
         {% endif %}
-        <div class="sf-toolbar-info-piece">
-            <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
-                Read Symfony {{ collector.symfonyversion }} Docs
-            </a>
-        </div>
-        {% if 'n/a' != collector.appname %}
-            <div class="sf-toolbar-info-piece">
-                <b>Kernel name</b>
-                <span>{{ collector.appname }}</span>
-            </div>
-        {% endif %}
-        {% if 'n/a' != collector.env %}
-            <div class="sf-toolbar-info-piece">
-                <b>Environment</b>
-                <span>{{ collector.env }}</span>
-            </div>
-        {% endif %}
-        {% if 'n/a' != collector.debug %}
-            <div class="sf-toolbar-info-piece">
-                <b>Debug</b>
-                <span class="{{ debug_status_class }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
-            </div>
-        {% endif %}
+
         <div class="sf-toolbar-info-piece">
             <b>Profiler token</b>
             <span>
@@ -70,34 +57,46 @@
                 {% endif %}
             </span>
         </div>
-    {% endset %}
-    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false, 'block_name': 'config-symfony', 'block_status': block_status } %}
 
-    {# PHP Information #}
-    {% set icon %}
-        <a href="{{ path('_profiler_phpinfo') }}">
-            <span class="sf-toolbar-label">php</span>
-            <span class="sf-toolbar-value">{{ collector.phpversion }}</span>
-        </a>
-    {% endset %}
-    {% set text %}
-        {% spaceless %}
-            <div class="sf-toolbar-info-piece sf-toolbar-info-php">
-                <b>PHP</b>
-                <span>{{ collector.phpversion }}</span>
-            </div>
-            <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
-                <b>PHP Extensions</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
-            </div>
+        {% if 'n/a' != collector.appname %}
             <div class="sf-toolbar-info-piece">
-                <b>PHP SAPI</b>
-                <span>{{ collector.sapiName }}</span>
+                <b>Kernel name</b>
+                <span>{{ collector.appname }}</span>
             </div>
-        {% endspaceless %}
+        {% endif %}
+
+        {% if 'n/a' != collector.env %}
+            <div class="sf-toolbar-info-piece">
+                <b>Environment</b>
+                <span>{{ collector.env }}</span>
+            </div>
+        {% endif %}
+
+        {% if 'n/a' != collector.debug %}
+            <div class="sf-toolbar-info-piece">
+                <b>Debug</b>
+                <span class="{{ debug_status_class }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
+            </div>
+        {% endif %}
+
+        <div class="sf-toolbar-info-piece sf-toolbar-info-php">
+            <b>PHP version</b>
+            <span>{{ collector.phpversion }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
+            <b>PHP Extensions</b>
+            <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
+            <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>PHP SAPI</b>
+            <span>{{ collector.sapiName }}</span>
+        </div>
     {% endset %}
-    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false, 'block_name': 'config-php' } %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, status: block_status }) }}
 {% endblock %}
 
 {% block menu %}

@@ -286,7 +286,11 @@ class Parser
             }
 
             if ($isRef) {
-                $this->refs[$isRef] = end($data);
+                if (!isset($key)) {
+                    $this->refs[$isRef] = end($data);
+                } else {
+                    $this->refs[$isRef] = $data[$key];
+                }
             }
         }
 

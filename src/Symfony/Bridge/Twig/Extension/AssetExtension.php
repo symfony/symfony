@@ -108,11 +108,15 @@ class AssetExtension extends \Twig_Extension
             $v->setAccessible(true);
             $currentVersionStrategy = $v->getValue($package);
 
-            $f = new \ReflectionProperty($currentVersionStrategy, 'format');
-            $f->setAccessible(true);
-            $format = $f->getValue($currentVersionStrategy);
+            if (property_exists($currentVersionStrategy, 'format')) {
+                $f = new \ReflectionProperty($currentVersionStrategy, 'format');
+                $f->setAccessible(true);
+                $format = $f->getValue($currentVersionStrategy);
 
-            $v->setValue($package, new StaticVersionStrategy($version, $format));
+                $v->setValue($package, new StaticVersionStrategy($version, $format));
+            } else {
+                $v->setValue($package, new StaticVersionStrategy($version));
+            }
         }
 
         try {

@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-02T10:42:32Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-07-02T10:43:53Z
+
+looks like a pretty straight up bug fix :) +1
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T10:44:33Z
+
+@dunglas could you write a test to prevent regressions ?
+
+Otherwise :+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-02T11:39:30Z
+
+Test added.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T13:07:31Z
+
+do we really need to involve APC here ? couldn't we just serialize the class and unserialize it ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-02T13:23:16Z
+
+We can but as APC is the only cache service pre-registered in the DIC and the only one documented it can be good to test the whole chain.
+
+And if we just serialize/deserialize `ClassMetadata` we don't test calls to `fetch()` and `save()` in `ClassMetadataFactory`.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T13:28:47Z
+
+If you need to test the caching behavior, why not using an ArrayCache ? This would avoid having to clear the APC user cache (which is not specific to the testsuite but to the whole CLI SAPI).
+
+But anyway, the bug was in ClassMetadata. so we should have a test in ClassMetadataTest to ensure that the serialization works (which is the bug we have here). covering ``ClassMetadataFactory::fetch`` and ``ClassMetadataFactory::save`` is a good idea, but it is not what is needed to prevent regressions here (and it would ensure it even when APC is not available btw)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T13:31:02Z
+
+Btw, the cache integration is already tested in the ClassMetadataTest (even though the mock returns a string, which looks wrong).
+what your test really add compared to the existing ones is that you try to test ApcCache itself, which does not make sense. It is already tested in doctrine.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-02T13:51:24Z
+
+You're right I've done it too fast. Tested using `serialize` instead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-07T05:07:28Z
+
+@stof OK for you? Can merge?

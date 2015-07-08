@@ -92,12 +92,6 @@
 .sf-toolbar-block-config svg {
     padding-right: 4px;
 }
-.sf-toolbar-block-time {
-    margin-right: 0;
-}
-.sf-toolbar-block-ajax {
-    display: none;
-}
 
 .sf-toolbar-block span {
     display: inline-block;
@@ -140,7 +134,7 @@
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece a {
-    color: #75D1EA;
+    color: #99CDD8;
     text-decoration: underline;
 }
 .sf-toolbar-block .sf-toolbar-info-piece a:hover {
@@ -288,16 +282,12 @@
     margin-top: 0;
 }
 
-.sf-toolbar-block .sf-toolbar-info-method {
+.sf-toolbar-block-time .sf-toolbar-icon {
+    padding-right: 5px;
 }
-
-.sf-toolbar-block .sf-toolbar-info-method[onclick=""] {
-    border-bottom: none;
-    cursor: inherit;
+.sf-toolbar-block-memory .sf-toolbar-icon {
+    padding-left: 5px;
 }
-
-.sf-toolbar-info-php {}
-.sf-toolbar-info-php-ext {}
 
 .sf-toolbar-info-php-ext .sf-toolbar-status + .sf-toolbar-status {
     margin-left: 4px;
@@ -339,20 +329,38 @@
     overflow-y: auto;
 }
 
-.sf-toolbar-ajax-requests th, .sf-toolbar-ajax-requests td {
-    border-bottom: 1px solid #ddd;
-    padding: 0 4px;
-    color: #2f2f2f;
-    background-color: #fff;
+.sf-toolbar-info-piece b.sf-toolbar-ajax-info {
+    color: #F5F5F5;
+}
+.sf-toolbar-ajax-requests {
+    width: 100%;
+}
+
+.sf-toolbar-ajax-requests td {
+    background-color: #444;
+    border-bottom: 1px solid #777;
+    color: #F5F5F5;
+    font-size: 12px;
+    padding: 4px;
 }
 .sf-toolbar-ajax-requests th {
-    background-color: #eee;
+    background-color: #222;
+    border-bottom: 0;
+    color: #AAA;
+    font-size: 11px;
+    padding: 4px;
 }
 .sf-ajax-request-url {
     max-width: 300px;
     line-height: 9px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.sf-toolbar-ajax-requests .sf-ajax-request-url a {
+    text-decoration: none;
+}
+.sf-toolbar-ajax-requests .sf-ajax-request-url a:hover {
+    text-decoration: underline;
 }
 .sf-ajax-request-duration {
     text-align: right;

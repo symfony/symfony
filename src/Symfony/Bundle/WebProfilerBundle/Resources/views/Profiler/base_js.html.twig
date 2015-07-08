@@ -165,7 +165,7 @@
                         tbody.appendChild(rows);
 
                         if (infoSpan) {
-                            var text = requestStack.length + ' call' + (requestStack.length > 1 ? 's' : '');
+                            var text = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
                             infoSpan.textContent = text;
                         }
                     } else {
@@ -181,15 +181,16 @@
                 requestCounter[0].textContent = requestStack.length;
 
                 var className = 'sf-toolbar-ajax-requests sf-toolbar-value';
-                if (state == 'ok') {
-                    className += ' sf-toolbar-status-green';
-                } else if (state == 'error') {
-                    className += ' sf-toolbar-status-red';
-                } else {
-                    className += ' sf-ajax-request-loading';
-                }
-
                 requestCounter[0].className = className;
+
+                var ajaxToolbarPanel = document.querySelectorAll('.sf-toolbar-block-ajax');
+                if (state == 'ok') {
+                    ajaxToolbarPanel.className = 'sf-toolbar-status-green';
+                } else if (state == 'error') {
+                    ajaxToolbarPanel.className = 'sf-toolbar-status-red';
+                } else {
+                    ajaxToolbarPanel.className = 'sf-ajax-request-loading';
+                }
             };
 
         var addEventListener;

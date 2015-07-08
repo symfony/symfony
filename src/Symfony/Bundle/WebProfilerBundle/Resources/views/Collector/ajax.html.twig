@@ -2,13 +2,13 @@
 
 {% block toolbar %}
     {% set icon %}
+        {{ include('@WebProfiler/Icon/ajax.svg.twig') }}
         <span class="sf-toolbar-value sf-toolbar-ajax-requests">0</span>
-        <span class="sf-toolbar-label">ajax</span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>AJAX requests</b>
-            <span class="sf-toolbar-ajax-info"></span>
+            <b class="sf-toolbar-ajax-info"></b>
         </div>
         <div class="sf-toolbar-info-piece">
             <table class="sf-toolbar-ajax-requests">
@@ -24,5 +24,6 @@
             </table>
         </div>
     {% endset %}
-    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
 {% endblock %}

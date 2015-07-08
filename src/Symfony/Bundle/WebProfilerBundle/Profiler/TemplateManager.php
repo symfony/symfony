@@ -72,6 +72,8 @@ class TemplateManager
     public function getTemplates(Profile $profile)
     {
         $templates = $this->getNames($profile);
+        $templates = $this->reorderTemplates($templates);
+
         foreach ($templates as $name => $template) {
             $templates[$name] = $this->twig->loadTemplate($template);
         }
@@ -133,5 +135,48 @@ class TemplateManager
         }
 
         return false;
+    }
+
+    /**
+     * It changes the default order of collector templates to show them in a
+     * different order which is better for design and aesthetic reasons.
+     *
+     * @param  array $templates
+     * @return array
+     */
+    protected function reorderTemplates($templates)
+    {
+        $templates = $this->moveArrayElementToFirstPosition($templates, 'memory');
+        $templates = $this->moveArrayElementToFirstPosition($templates, 'time');
+        $templates = $this->moveArrayElementToFirstPosition($templates, 'request');
+
+        $templates = $this->moveArrayElementToLastPosition($templates, 'config');
+
+        return $templates;
+    }
+
+    private function moveArrayElementToFirstPosition($array, $key)
+    {
+        if (!array_key_exists($key, $array)) {
+            return $array;
+        }
+
+        $value = $array[$key];
+        unset($array[$key]);
+
+        return array_merge(array($key => $value), $array);
+    }
+
+    private function moveArrayElementToLastPosition($array, $key)
+    {
+        if (!array_key_exists($key, $array)) {
+            return $array;
+        }
+
+        $value = $array[$key];
+        unset($array[$key]);
+        $array[$key] = $value;
+
+        return $array;
     }
 }

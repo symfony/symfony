@@ -169,12 +169,8 @@
                             infoSpan.textContent = text;
                         }
                     } else {
-                        var cell = document.createElement('td');
-                        cell.setAttribute('colspan', '4');
-                        cell.textContent = "No AJAX requests yet.";
-                        var row = document.createElement('tr');
-                        row.appendChild(cell);
-                        tbody.appendChild(row);
+                        var ajaxToolbarPanel = document.querySelectorAll('.sf-toolbar-block-ajax');
+                        ajaxToolbarPanel[0].style.display = 'none';
                     }
                 }
 

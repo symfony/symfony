@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-08T18:26:39Z
+
+I commited a test with a failing test first. Here's the failure: https://travis-ci.org/symfony/symfony/jobs/70103344#L589
+
+The test [doesn't fail](https://travis-ci.org/symfony/symfony/jobs/70105168#L547) with my fix applied.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-08T19:41:15Z
+
+:+1:

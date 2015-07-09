@@ -40,10 +40,12 @@
                 <b>Controller method</b>
                 <span>{{ request_handler }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Controller file</b>
-                <span>{{ collector.controller.class }}</span>
-            </div>
+            {% if collector.controller.class is defined %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Controller file</b>
+                    <span>{{ collector.controller.class }}</span>
+                </div>
+            {% endif %}
             <div class="sf-toolbar-info-piece">
                 <b>Route name</b>
                 <span>{{ collector.route|default('NONE') }}</span>

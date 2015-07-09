@@ -1,0 +1,179 @@
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2015-06-28T22:10:05Z
+
+:ok_hand:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-06-29T06:44:45Z
+
+:+1: looks good, but for `2.8`
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-06-30T08:56:11Z
+
+PR updated with the addition of `transChoice` (capture image updated in the main post).
+
+It look like I must close this PR and re-open on 2.8?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-30T08:59:58Z
+
+@damienalexandre we can rebase it on top of 2.8 at merging time with our merging tool (assuming there is no conflict), so it is not necessary. This would mark the PR as closed rather than merged though because of the rebase
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-30T09:03:34Z
+
+How does it behave when the same key is translated several times but with different parameter values (and potentially even different parameters) and a different pluralization count ?
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-07-01T07:41:52Z
+
+This code:
+
+```twig
+<p>{{ 'demo.homepage.introduction'|trans({'%username%': 'Damien'}) }}</p>
+<p>{{ 'demo.homepage.introduction'|trans({'%username%': 'Toto'}) }}</p>
+```
+
+produce this output:
+
+![image](https://cloud.githubusercontent.com/assets/225704/8449674/e10d4e5c-1fd3-11e5-8a48-10a5b96cfe2b.png)
+
+Only the first call is kept (see `TranslationDataCollector::sanitizeCollectedMessages`), so we only have the parameters used in the first one. For this reason I'm not sure about using `=`, because it's more like "could be this value"... Two solutions:
+
+- I improve sanitizeCollectedMessages to keep all the parameters and I display them all
+- I change the `=` in the view to reflect the fact this is only an extract, any idea how to do that?
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:00:33Z
+
+@damienalexandre I'm actually wondering whether the value of the parameter should really be kept here (same for the pluralization count). What we really care about IMO is which parameters are available, and whether it is pluralized or no.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:01:00Z
+
+keeping all parameters values would also look confusing IMO
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-01T10:45:19Z
+
+Instead of adding a new column I would propose  grouping parameters like we did in doctrine which can fix the confusion
+
+![selection_026](https://cloud.githubusercontent.com/assets/1753742/8452770/5be6f570-1fdd-11e5-9f88-824658e05170.jpg)
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-07-03T13:51:56Z
+
+Having the parameters values proved to be really helpful on the project I'm working on.
+For example you could need to check that a date is properly formatted before the translation actually use the key:
+![image](https://cloud.githubusercontent.com/assets/225704/8499206/4a868160-2190-11e5-8461-27f4b9e9630b.png)
+
+So I'm in favor of @aitboudad idea, specially because the folding table allow to display lots of information's without breaking the display to much.
+
+Here is what I've just pushed. For this code:
+
+```html
+<p>{{ 'demo.homepage.hello'|trans }}</p>
+<p>{{ 'demo.homepage.user_friends'|transchoice(5, {'%name%': 'Fabien'}) }}</p>
+<p>{{ 'demo.homepage.user_friends'|transchoice(0, {'%name%': 'Fabien'}) }}</p>
+<p>{{ 'demo.homepage.time'|trans({'%datetime%': 'now'|date}) }}</p>
+<p>{{ 'demo.homepage.introduction'|trans({'%username%': 'Damien'}) }}</p>
+<p>{{ 'demo.homepage.introduction'|trans({'%username%': 'Toto', '%foo%': 'bar'}) }}</p>
+```
+
+It produce this in the translation panel:
+
+![image](https://cloud.githubusercontent.com/assets/225704/8500291/fdc79e6c-219a-11e5-900e-0f87756010bb.png)
+
+Expended it looks like this:
+
+![image](https://cloud.githubusercontent.com/assets/225704/8500304/26e862ea-219b-11e5-819a-719167293d1f.png)
+
+As you can see I use the `dump` function,
+not sure this is accepted but the colors and the display are very very good, I wish more panels use this function to display data.
+
+Let my know what you think,
+cheers :metal:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-04T09:26:44Z
+
+@damienalexandre Using `dump()` everywhere in the profiler would be a huge win! That would also allow to deprecate and then remove a bunch of code. I like that! Can you work on that?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-06T05:00:29Z
+
+using `dump()` everywhere should be done in another PR.
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-07-06T08:00:36Z
+
+Ok so I replaced my `dump` by `profiler_dump`, and another PR will take care of replacing all the `profiler_dump` and remove the code needed for it.
+
+Here is what is looks like now:
+
+![image](https://cloud.githubusercontent.com/assets/225704/8517889/6497a7dc-23c5-11e5-920f-15af9fa53167.png)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-06T08:03:24Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-06T08:43:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-07T06:53:50Z
+
+Should we really include the parameters part if there were no parameters passed to `trans()`? Imho it is confusing to then see `null` there.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-07T07:02:17Z
+
+I agree with @xabbuh: displaying `null` when there are no parameters looks like an error (made by Symfony or our application).
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-07-07T08:42:14Z
+
+Ok, I mentioned [before](https://github.com/symfony/symfony/pull/15139#discussion_r33912010) why I made it this way,
+I need to find a way to make sure all the calls for a specific message don't have any parameters. Thanks for the feedbacks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-07T08:48:44Z
+
+Maybe it's sufficient to just show a message telling "no parameters" or something similar.
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2015-07-07T16:11:10Z
+
+Here we go; I've change the way I store the parameters in the DataCollector to allow a better display.
+
+Here is an example where the first call does not have parameters, so we do not display the expend link, and where the last translation is called 3 times but only have parameters 2 times:
+
+![image](https://cloud.githubusercontent.com/assets/225704/8550865/739b1a66-24d3-11e5-8ce2-4f89159ea43b.png)
+
+Looks better :+1: Good feedback :wink:

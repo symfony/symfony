@@ -670,22 +670,22 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname($r->getFilename()).'/../Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
         }
         $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
                 $dirs[] = $dir;
             }
             if (is_dir($dir = sprintf($overridePath, $bundle))) {
@@ -800,7 +800,7 @@ class FrameworkExtension extends Extension
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFilename());
+            $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
                 $files[0][] = realpath($file);
@@ -820,7 +820,15 @@ class FrameworkExtension extends Extension
                     $files[1][] = $file->getRealpath();
                 }
 
+<<<<<<< HEAD
                 $container->addResource(new DirectoryResource($dir));
+=======
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            if (is_file($file = dirname($reflection->getFileName()).'/Resources/config/validation.yml')) {
+                $files[] = realpath($file);
+                $container->addResource(new FileResource($file));
+>>>>>>> 2.6
             }
         }
 

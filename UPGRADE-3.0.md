@@ -300,10 +300,6 @@ UPGRADE FROM 2.x to 3.0
    echo $form->getErrors(true, false);
    ```
 
-   ```php
-   echo $form->getErrors(true, false);
-   ```
-
 ### FrameworkBundle
 
  * The `config:debug`, `container:debug`, `router:debug`, `translation:debug`

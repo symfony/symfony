@@ -940,7 +940,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCanBeCalledTwiceWithResources($first, $second)

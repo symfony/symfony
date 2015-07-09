@@ -9,6 +9,7 @@
             <span class="sf-toolbar-label">ms</span>
         </span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Render Time</b>
@@ -27,6 +28,7 @@
             <span class="sf-toolbar-status">{{ collector.macrocount }}</span>
         </div>
     {% endset %}
+
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
 {% endblock %}
 

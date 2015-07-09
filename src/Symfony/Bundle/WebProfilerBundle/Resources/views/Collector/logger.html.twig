@@ -5,31 +5,29 @@
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
         {% set icon %}
-            <svg width="16" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 28" enable-background="new 0 0 16 28" xml:space="preserve"><g><path fill="#AAA" d="M15 6h-1V5c0-0.5-0.5-1-1-1H2C1.4 4 1 4.4 1 5v2v13c0 1.6 1.3 3 3 3h11c0.5 0 1-0.5 1-1V7 C16 6.5 15.5 6 15 6z M6 15h3v3H6V15z M6 13V7h3v6H6z M15 21c0 0.6-0.4 1-1 1H5c-0.9 0-1.7-0.4-2.2-1H13c0.6 0 1-0.4 1-1V7 c0.5 0 1 0.5 1 1V21z"/></g></svg>
             {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
             {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            {{ include('@WebProfiler/Icon/logger.svg.twig') }}
             <span class="sf-toolbar-value">{{ error_count }}</span>
         {% endset %}
+
         {% set text %}
-            {% if collector.counterrors %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Errors</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.counterrors }}</span>
-                </div>
-            {% endif %}
-            {% if collector.countdeprecations %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Deprecated Calls</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.countdeprecations }}</span>
-                </div>
-            {% endif %}
-            {% if collector.countscreams %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Silenced Errors</b>
-                    <span class="sf-toolbar-status sf-toolbar-status">{{ collector.countscreams }}</span>
-                </div>
-            {% endif %}
+            <div class="sf-toolbar-info-piece">
+                <b>Errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.counterrors ? 'red' }}">{{ collector.counterrors|default(0) }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Deprecated Calls</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}">{{ collector.countdeprecations|default(0) }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Silenced Errors</b>
+                <span class="sf-toolbar-status">{{ collector.countscreams|default(0) }}</span>
+            </div>
         {% endset %}
+
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}

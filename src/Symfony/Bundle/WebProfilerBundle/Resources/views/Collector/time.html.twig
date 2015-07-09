@@ -16,18 +16,26 @@
 {% endif %}
 
 {% block toolbar %}
-    {% set duration = collector.events|length ? '%.0f'|format(collector.duration) : 'n/a' %}
+    {% set total_time = collector.events|length ? '%.0f'|format(collector.duration) : 'n/a' %}
+    {% set initialization_time = collector.events|length ? '%.0f'|format(collector.inittime) : 'n/a' %}
     {% set status_color = collector.events|length ? collector.duration > 1000 ? 'yellow' : '' %}
+
     {% set icon %}
-        <span class="sf-toolbar-value">{{ duration }}</span>
+        <span class="sf-toolbar-value">{{ total_time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Total time</b>
-            <span>{{ duration }} ms</span>
+            <span>{{ total_time }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Initialization time</b>
+            <span>{{ initialization_time }} ms</span>
         </div>
     {% endset %}
+
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
 {% endblock %}
 

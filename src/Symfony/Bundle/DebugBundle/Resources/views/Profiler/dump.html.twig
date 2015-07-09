@@ -5,17 +5,14 @@
 
     {% if dumps_count %}
         {% set icon %}
-            <svg width="21" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 21 28" enable-background="new 0 0 21 28" xml:space="preserve"><path fill="#3F3F3F" d="M21 14h-1c-0.3-4.8-4.1-8.7-9-9V4h-1v1c-4.8 0.3-8.7 4.1-9 9H0v1h1c0.3 4.8 4.1 8.7 9 9v1h1v-1 c4.8-0.3 8.7-4.1 9-9h1V14z M11 22v-4h-1v4c-3.7-0.2-6.7-3.2-7-7h4v-1H3c0.2-3.7 3.2-6.7 7-7v4h1V7c3.7 0.2 6.7 3.2 7 7h-4v1h4 C17.7 18.7 14.7 21.7 11 22z"/></svg>
-            <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ dumps_count }}</span>
+            <svg width="21" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 21 28" enable-background="new 0 0 21 28" xml:space="preserve"><path fill="#AAA" d="M21 14h-1c-0.3-4.8-4.1-8.7-9-9V4h-1v1c-4.8 0.3-8.7 4.1-9 9H0v1h1c0.3 4.8 4.1 8.7 9 9v1h1v-1 c4.8-0.3 8.7-4.1 9-9h1V14z M11 22v-4h-1v4c-3.7-0.2-6.7-3.2-7-7h4v-1H3c0.2-3.7 3.2-6.7 7-7v4h1V7c3.7 0.2 6.7 3.2 7 7h-4v1h4 C17.7 18.7 14.7 21.7 11 22z"/></svg>
+            <span class="sf-toolbar-value">{{ dumps_count }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
-                <b>dump()</b>
-            </div>
             {% for dump in collector.getDumps('html') %}
                 <div class="sf-toolbar-info-piece">
-                    in
+                    <span>
                     {% if dump.file %}
                         {% set link = dump.file|file_link(dump.line) %}
                         {% if link %}
@@ -26,14 +23,15 @@
                     {% else %}
                         {{ dump.name }}
                     {% endif %}
-                    line {{ dump.line }}:
+                    </span>
+                    <span class="sf-toolbar-file-line">line {{ dump.line }}</span>
                     {{ dump.data|raw }}
                 </div>
             {% endfor %}
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
         {% endset %}
 
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': true } %}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
     {% endif %}
 {% endblock %}
 

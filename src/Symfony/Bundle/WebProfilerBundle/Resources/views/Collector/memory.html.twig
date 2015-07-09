@@ -8,6 +8,7 @@
             <span class="sf-toolbar-label">MB</span>
         </span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Peak memory usage</b>
@@ -16,8 +17,9 @@
 
         <div class="sf-toolbar-info-piece">
             <b>PHP memory limit</b>
-            <span>{{ collector.memoryLimit == -1 ? '&infin;' : '%.1f'|format(collector.memoryLimit / 1024 / 1024)|escape }} MB</span>
+            <span>{{ collector.memoryLimit == -1 ? '&infin;' : '%.0f'|format(collector.memoryLimit / 1024 / 1024)|escape }} MB</span>
         </div>
     {% endset %}
+
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, status: status_color }) }}
 {% endblock %}

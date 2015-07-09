@@ -81,6 +81,7 @@
     margin-right: 0px;
     white-space: nowrap;
 }
+.sf-toolbar-block a,
 .sf-toolbar-block a:hover {
     text-decoration: none;
 }
@@ -369,6 +370,24 @@
     0% { color: black; }
     50% { color: #bbb; }
     100% { color: black; }
+}
+
+.sf-toolbar-block-dump pre.sf-dump {
+    background-color: #222;
+    border-color: #777;
+    border-radius: 0;
+    margin: 6px 0 12px 0;
+    width: 200px;
+}
+.sf-toolbar-block-dump pre.sf-dump:last-child {
+    margin-bottom: 0;
+}
+.sf-toolbar-block-dump .sf-toolbar-info-piece .sf-toolbar-file-line {
+    color: #AAA;
+    margin-left: 4px;
+}
+.sf-toolbar-block-dump .sf-toolbar-info img {
+    display: none;
 }
 
 /***** Override the setting when the toolbar is on the top *****/

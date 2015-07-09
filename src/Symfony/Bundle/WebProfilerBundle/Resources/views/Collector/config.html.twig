@@ -90,9 +90,11 @@
         {% if collector.symfonyversion is defined %}
             <div class="sf-toolbar-info-piece">
                 <b>Resources</b>
-                <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
-                    Read Symfony {{ collector.symfonyversion }} Docs
-                </a>
+                <span>
+                    <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
+                        Read Symfony {{ collector.symfonyversion }} Docs
+                    </a>
+                </span>
             </div>
         {% endif %}
     {% endset %}

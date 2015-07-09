@@ -30,7 +30,8 @@ class Groups
 
     /**
      * @param array $data
-     * @throws \InvalidArgumentException
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct(array $data)
     {
@@ -52,7 +53,7 @@ class Groups
     }
 
     /**
-     * Gets groups
+     * Gets groups.
      *
      * @return array
      */

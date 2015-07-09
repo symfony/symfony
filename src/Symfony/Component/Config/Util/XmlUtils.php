@@ -196,7 +196,7 @@ class XmlUtils
                 return '0' == $value[0] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
                 $raw = $value;
-                $cast = intval($value);
+                $cast = (int) $value;
 
                 return '0' == $value[1] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:

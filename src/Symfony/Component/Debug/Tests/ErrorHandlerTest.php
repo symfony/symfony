@@ -77,7 +77,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $this->assertEquals(E_NOTICE, $exception->getSeverity());
             $this->assertEquals(__FILE__, $exception->getFile());
-            $this->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+            $this->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $this->assertArrayHasKey('foobar', $exception->getContext());
 
             $trace = $exception->getTrace();

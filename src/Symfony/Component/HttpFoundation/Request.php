@@ -517,7 +517,6 @@ class Request
      */
     public function __toString()
     {
-        $content = '';
         try {
             $content = $this->getContent();
         } catch (\LogicException $e) {

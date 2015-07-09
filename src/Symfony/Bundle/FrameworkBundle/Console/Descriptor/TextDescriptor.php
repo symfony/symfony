@@ -266,7 +266,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
-            $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
+            $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ?: '-');
         }
 
         if ($factory = $definition->getFactory()) {

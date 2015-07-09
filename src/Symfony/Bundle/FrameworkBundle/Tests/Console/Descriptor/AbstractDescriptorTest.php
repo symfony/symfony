@@ -98,7 +98,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->getDescriptionTestData(ObjectsProvider::getContainerParameter());
 
-        array_push($data[0], array('parameter' => 'database_name'));
+        $data[0][] = array('parameter' => 'database_name');
 
         return $data;
     }

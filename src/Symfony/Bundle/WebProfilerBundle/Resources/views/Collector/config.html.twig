@@ -19,17 +19,15 @@
     {% endif %}
 
     {% set icon %}
-            {% if collector.symfonyState is defined %}
-                <a href="https://symfony.com/" title="{{ symfony_version_status }}">
-                    <span class="sf-toolbar-label">
-                        {{ include('@WebProfiler/Icon/symfony.svg.twig') }}
-                    </span>
-                    <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
-                </a>
-            {% elseif collector.applicationname %}
-                <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
-                <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
-            {% endif %}
+        {% if collector.symfonyState is defined %}
+            <span class="sf-toolbar-label">
+                {{ include('@WebProfiler/Icon/symfony.svg.twig') }}
+            </span>
+            <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
+        {% elseif collector.applicationname %}
+            <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
+            <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
+        {% endif %}
     {% endset %}
 
     {% set text %}

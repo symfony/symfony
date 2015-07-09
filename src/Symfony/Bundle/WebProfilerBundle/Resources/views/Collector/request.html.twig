@@ -1,24 +1,22 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
+
+
     {% set request_handler %}
         {% if collector.controller.class is defined %}
             {% set link = collector.controller.file|file_link(collector.controller.line) %}
-            {% if link %}<a href="#" onclick="window.location='{{link|e('js')}}';window.event.stopPropagation();return false;">{% endif %}
+            {% if link %}<a href="{{ link }}" title="{{ collector.controller.file }}">{% else %}<span>{% endif %}
 
-            <span class="sf-toolbar-info-class">
-                {{ collector.controller.class|abbr_class }}
-            </span>
+                {{ collector.controller.class|abbr_class|striptags }}
 
-            {% if collector.controller.method %}
-                <span class="sf-toolbar-info-method">
-                    {{ collector.controller.method }}
-                </span>
-            {% endif %}
+                {%- if collector.controller.method -%}
+                    &nbsp;::&nbsp;{{ collector.controller.method }}
+                {%- endif -%}
 
-            {% if link %}</a>{% endif %}
+            {% if link %}</a>{% else %}</span>{% endif %}
         {% else %}
-            <span class="sf-toolbar-info-class">{{ collector.controller }}</span>
+            <span>{{ collector.controller }}</span>
         {% endif %}
     {% endset %}
 
@@ -26,8 +24,10 @@
 
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
-        <span class="sf-toolbar-label">@</span>
-        <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
+        {% if collector.route %}
+            <span class="sf-toolbar-label">@</span>
+            <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
+        {% endif %}
     {% endset %}
 
     {% set text %}

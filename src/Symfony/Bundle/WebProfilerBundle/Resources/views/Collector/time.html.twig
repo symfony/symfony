@@ -21,6 +21,7 @@
     {% set status_color = collector.events|length ? collector.duration > 1000 ? 'yellow' : '' %}
 
     {% set icon %}
+        {{ include('@WebProfiler/Icon/time.svg.twig') }}
         <span class="sf-toolbar-value">{{ total_time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}

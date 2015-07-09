@@ -3,10 +3,9 @@
 {% block toolbar %}
     {% set icon %}
         {% set status_color = (collector.memory / 1024 / 1024) > 50 ? 'yellow' : '' %}
-        <span>
-            <span class="sf-toolbar-value">{{ '%.1f'|format(collector.memory / 1024 / 1024) }}</span>
-            <span class="sf-toolbar-label">MB</span>
-        </span>
+        {{ include('@WebProfiler/Icon/memory.svg.twig') }}
+        <span class="sf-toolbar-value">{{ '%.1f'|format(collector.memory / 1024 / 1024) }}</span>
+        <span class="sf-toolbar-label">MB</span>
     {% endset %}
 
     {% set text %}

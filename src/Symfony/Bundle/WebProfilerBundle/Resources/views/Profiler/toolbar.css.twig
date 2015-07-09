@@ -1,15 +1,12 @@
 .sf-minitoolbar {
-    display: none;
-
-    position: fixed;
-    bottom: 0;
-    right: 0;
-
-    padding: 5px 5px 0;
-
     background-color: #222;
-
-    z-index: 6000000;
+    bottom: 0;
+    display: none;
+    height: 36px;
+    padding: 5px 6px 0;
+    position: fixed;
+    right: 0;
+    z-index: 9999;
 }
 
 .sf-toolbarreset * {
@@ -21,8 +18,8 @@
 
 .sf-toolbarreset {
     background-color: #222;
-    box-shadow: 0 -1px 0px rgba(0, 0, 0, 0.2);
     bottom: 0;
+    box-shadow: 0 -1px 0px rgba(0, 0, 0, 0.2);
     color: #EEE;
     font: 11px Arial, sans-serif;
     height: 36px;
@@ -32,29 +29,15 @@
     position: fixed;
     right: 0;
     text-align: left;
-    z-index: 6000000;
+    z-index: 9999;
 }
 .sf-toolbarreset abbr {
     border: none;
     cursor: text;
 }
-.sf-toolbarreset img {
-    width: auto;
-    display: inline;
-}
 .sf-toolbarreset svg,
 .sf-toolbarreset img {
     max-height: 24px;
-}
-.sf-toolbarreset table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    background-color: #000;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    width: 100%;
-    table-layout: auto;
 }
 .sf-toolbarreset .hide-button {
     background: #444;
@@ -78,20 +61,17 @@
     cursor: default;
     display: block;
     float: left;
-    margin-right: 0px;
+    height: 36px;
+    margin-right: 0;
     white-space: nowrap;
 }
-.sf-toolbar-block a,
-.sf-toolbar-block a:hover {
+.sf-toolbar-block > a,
+.sf-toolbar-block > a:hover {
+    display: block;
     text-decoration: none;
 }
-.sf-toolbar-block-config {
-    float: right;
-    margin-left: 0;
-    margin-right: 0;
-}
 .sf-toolbar-block-config svg {
-    padding-right: 4px;
+    max-height: 22px;
 }
 
 .sf-toolbar-block span {
@@ -103,25 +83,33 @@
     line-height: 36px;
     padding: 0;
 }
-.sf-toolbar-block .sf-toolbar-label {
+.sf-toolbar-block .sf-toolbar-label,
+.sf-toolbar-block .sf-toolbar-class-separator {
     color: #AAA;
     font-size: 12px;
 }
-.sf-toolbar-block-config-php .sf-toolbar-label,
-.sf-toolbar-block-config-symfony .sf-toolbar-label {
-    font-size: 11px;
-}
+/* TODO: remove it when Twig uses SVG icons */
 .sf-toolbar-block-twig img {
     opacity: .8;
 }
 
 .sf-toolbar-block .sf-toolbar-info {
+    border-collapse: collapse;
     display: table;
 }
+.sf-toolbar-block .sf-toolbar-info-piece-group {
+    border-top: 1px solid #777;
+    margin-top: 4px;
+    padding-top: 4px;
+}
 .sf-toolbar-block .sf-toolbar-info-piece {
+    /* this 'border-bottom' trick is needed because 'margin-bottom' doesn't work for table rows */
+    border-bottom: solid transparent 3px;
     display: table-row;
-    line-height: 1.4;
-    margin-bottom: 8px;
+}
+.sf-toolbar-block .sf-toolbar-info-piece-additional,
+.sf-toolbar-block .sf-toolbar-info-piece-additional-detail {
+    display: none;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status {
@@ -198,7 +186,7 @@
     background-color: rgba(200, 43, 43, 0.8);
 }
 .sf-toolbar-block .sf-toolbar-status-yellow {
-    background-color: rgba(255, 158, 43, 0.8);
+    background-color: rgb(189, 132, 0);
 }
 
 .sf-toolbar-block.sf-toolbar-status-green {
@@ -213,16 +201,21 @@
     fill: #FFF;
 }
 .sf-toolbar-block.sf-toolbar-status-yellow {
-    background-color: rgba(255, 158, 43, 0.8);
+    background-color: rgb(189, 132, 0);
     color: #FFF;
 }
 
 .sf-toolbar-block-request .sf-toolbar-status {
     color: #FFF;
     font-size: 14px;
-    margin-right: 4px;
     max-height: 36px;
-    padding: 10px;
+    padding: 10px 7px;
+}
+.sf-toolbar-block-request .sf-toolbar-info-piece a {
+    text-decoration: none;
+}
+.sf-toolbar-block-request .sf-toolbar-info-piece a:hover {
+    text-decoration: underline;
 }
 
 .sf-toolbar-status-green .sf-toolbar-label,
@@ -238,17 +231,23 @@
 
 .sf-toolbar-block .sf-toolbar-icon {
     display: block;
-    padding: 0 10px;
+    height: 36px;
+    padding: 0 7px;
 }
 .sf-toolbar-block-request .sf-toolbar-icon {
     padding-left: 0;
+    padding-right: 0;
 }
 
-.sf-toolbar-block .sf-toolbar-icon img, .sf-toolbar-block .sf-toolbar-icon svg {
+.sf-toolbar-block .sf-toolbar-icon img,
+.sf-toolbar-block .sf-toolbar-icon svg {
     border-width: 0;
-    vertical-align: middle;
     position: relative;
-    top: -1px;
+    top: 5px;
+}
+.sf-toolbar-block-translation .sf-toolbar-icon svg,
+.sf-toolbar-block-config .sf-toolbar-icon svg {
+    top: 8px;
 }
 
 .sf-toolbar-block .sf-toolbar-icon img + span,
@@ -256,25 +255,8 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block-time .sf-toolbar-icon {
-    padding-right: 5px;
-}
-.sf-toolbar-block-memory .sf-toolbar-icon {
-    padding-left: 5px;
-}
-
 .sf-toolbar-info-php-ext .sf-toolbar-status + .sf-toolbar-status {
     margin-left: 4px;
-}
-
-.sf-toolbar-block a .sf-toolbar-info-piece-additional,
-.sf-toolbar-block a .sf-toolbar-info-piece-additional-detail {
-    display: inline-block;
-}
-
-.sf-toolbar-block a .sf-toolbar-info-piece-additional:empty,
-.sf-toolbar-block a .sf-toolbar-info-piece-additional-detail:empty {
-    display: none;
 }
 
 .sf-toolbar-block:hover {
@@ -289,13 +271,7 @@
 
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
-    min-width: -webkit-calc(100% + 2px);
-    min-width: calc(100% + 2px);
-    z-index: 10001;
-    box-sizing: border-box;
-    padding: 9px;
-    line-height: 1.5;
-
+    padding: 8px;
     max-width: 480px;
     max-height: 480px;
     word-wrap: break-word;
@@ -309,7 +285,6 @@
 .sf-toolbar-ajax-requests {
     width: 100%;
 }
-
 .sf-toolbar-ajax-requests td {
     background-color: #444;
     border-bottom: 1px solid #777;
@@ -342,9 +317,6 @@
 .sf-ajax-request-duration {
     text-align: right;
 }
-.sf-ajax-request-error {
-    color: #a33 !important;
-}
 .sf-ajax-request-loading {
     -webkit-animation: sf-blink .5s ease-in-out infinite;
     -o-animation: sf-blink .5s ease-in-out infinite;
@@ -352,24 +324,24 @@
     animation: sf-blink .5s ease-in-out infinite;
 }
 @-webkit-keyframes sf-blink {
-    0% { color: black; }
-    50% { color: #bbb; }
-    100% { color: black; }
+    0% { background: #222; }
+    50% { background: #444; }
+    100% { background: #222; }
 }
 @-moz-keyframes sf-blink {
-    0% { color: black; }
-    50% { color: #bbb; }
-    100% { color: black; }
+    0% { background: #222; }
+    50% { background: #444; }
+    100% { background: #222; }
 }
 @-o-keyframes sf-blink {
-    0% { color: black; }
-    50% { color: #bbb; }
-    100% { color: black; }
+    0% { background: #222; }
+    50% { background: #444; }
+    100% { background: #222; }
 }
 @keyframes sf-blink {
-    0% { color: black; }
-    50% { color: #bbb; }
-    100% { color: black; }
+    0% { background: #222; }
+    50% { background: #444; }
+    100% { background: #222; }
 }
 
 .sf-toolbar-block-dump pre.sf-dump {
@@ -390,7 +362,7 @@
     display: none;
 }
 
-/***** Override the setting when the toolbar is on the top *****/
+/* Override the setting when the toolbar is on the top */
 {% if position == 'top' %}
     .sf-minitoolbar {
         bottom: auto;
@@ -416,38 +388,75 @@
     }
 {% endif %}
 
-/***** Media query *****/
-@media screen and (max-width: 779px) {
-    .sf-toolbar-block .sf-toolbar-icon > * > :first-child ~ * {
+/* Responsive Design */
+.sf-toolbar-icon .sf-toolbar-label,
+.sf-toolbar-icon .sf-toolbar-value {
+    display: none;
+}
+.sf-toolbar-block-config .sf-toolbar-icon .sf-toolbar-label {
+    display: inline-block;
+}
+
+@media (min-width: 768px) {
+.navbar-brand::before { content: "768 px"; background: red;
+    color: white;
+    position: absolute; }
+
+    .sf-toolbar-icon .sf-toolbar-label,
+    .sf-toolbar-icon .sf-toolbar-value {
+        display: inline;
+    }
+
+    .sf-toolbar-block .sf-toolbar-icon img,
+    .sf-toolbar-block .sf-toolbar-icon svg {
+        top: 6px;
+    }
+    .sf-toolbar-block-config .sf-toolbar-icon svg {
+        top: 8px;
+    }
+    .sf-toolbar-block-time .sf-toolbar-icon svg,
+    .sf-toolbar-block-memory .sf-toolbar-icon svg {
         display: none;
     }
 
-    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional,
-    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional-detail {
-        display: none !important;
+    .sf-toolbar-block .sf-toolbar-icon {
+        padding: 0 10px;
+    }
+    .sf-toolbar-block-time .sf-toolbar-icon {
+        padding-right: 5px;
+    }
+    .sf-toolbar-block-memory .sf-toolbar-icon {
+        padding-left: 5px;
+    }
+    .sf-toolbar-block-request .sf-toolbar-icon {
+        padding-left: 0;
+    }
+    .sf-toolbar-block-request .sf-toolbar-status {
+        margin-right: 4px;
+        padding: 10px;
+    }
+    .sf-toolbar-block-config {
+        float: right;
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
-@media screen and (min-width: 880px) {
-    .sf-toolbar-block .sf-toolbar-icon a[href$="config"] .sf-toolbar-info-piece-additional {
+@media (min-width: 1024px) {
+.navbar-brand::before { content: "1024 px"; }
+
+    .sf-toolbar-block .sf-toolbar-info-piece-additional,
+    .sf-toolbar-block .sf-toolbar-info-piece-additional-detail {
         display: inline-block;
     }
-}
 
-@media screen and (min-width: 980px) {
-    .sf-toolbar-block .sf-toolbar-icon a[href$="security"] .sf-toolbar-info-piece-additional {
-        display: inline-block;
-    }
-}
-
-@media screen and (max-width: 1179px) {
-    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional {
+    .sf-toolbar-block .sf-toolbar-info-piece-additional:empty,
+    .sf-toolbar-block .sf-toolbar-info-piece-additional-detail:empty {
         display: none;
     }
 }
 
-@media screen and (max-width: 1439px) {
-    .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional-detail {
-        display: none;
-    }
+@media (min-width: 1200px) {
+.navbar-brand::before { content: "1200 px"; }
+
 }

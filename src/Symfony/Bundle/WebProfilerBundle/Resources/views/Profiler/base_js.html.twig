@@ -180,12 +180,10 @@
                 requestCounter[0].className = className;
 
                 var ajaxToolbarPanel = document.querySelectorAll('.sf-toolbar-block-ajax');
-                if (state == 'ok') {
-                    ajaxToolbarPanel.className = 'sf-toolbar-status-green';
-                } else if (state == 'error') {
-                    ajaxToolbarPanel.className = 'sf-toolbar-status-red';
+                if (state == 'error') {
+                    Sfjs.addClass(ajaxToolbarPanel[0], 'sf-toolbar-status-red');
                 } else {
-                    ajaxToolbarPanel.className = 'sf-ajax-request-loading';
+                    Sfjs.addClass(ajaxToolbarPanel[0], 'sf-ajax-request-loading');
                 }
             };
 

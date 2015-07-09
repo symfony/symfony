@@ -142,6 +142,7 @@ class TemplateManager
      * different order which is better for design and aesthetic reasons.
      *
      * @param array $templates
+     *
      * @return array
      */
     protected function reorderTemplates($templates)

@@ -141,7 +141,7 @@ class TemplateManager
      * It changes the default order of collector templates to show them in a
      * different order which is better for design and aesthetic reasons.
      *
-     * @param  array $templates
+     * @param array $templates
      * @return array
      */
     protected function reorderTemplates($templates)

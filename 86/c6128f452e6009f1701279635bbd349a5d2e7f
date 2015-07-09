@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-09T11:54:58Z
+
+That's probably a bug that should be part of 2.3.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-09T12:17:06Z
+
+:+1: (and I'm also in favor of treating this as a bug)
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-07-09T12:21:46Z
+
+Not sure if i need to rebase this against other branches, but ping me when something is needed that i can do.

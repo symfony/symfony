@@ -29,6 +29,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'magenta' => 35,
         'cyan' => 36,
         'white' => 37,
+        'default' => 39,
     );
     private static $availableBackgroundColors = array(
         'black' => 40,
@@ -39,6 +40,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'magenta' => 45,
         'cyan' => 46,
         'white' => 47,
+        'default' => 49,
     );
     private static $availableOptions = array(
         'bold' => 1,

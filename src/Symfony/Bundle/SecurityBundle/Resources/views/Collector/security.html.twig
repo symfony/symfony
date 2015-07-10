@@ -24,6 +24,17 @@
                 {{ collector.tokenClass|abbr_class }}
             </div>
             {% endif %}
+            {% if 'ROLE_PREVIOUS_ADMIN' in collector.roles %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Switch to user</b>
+                    <a href="?_switch_user=_exit" title="Switch back">Exit</a>
+                </div>
+            {% elseif 'ROLE_ALLOWED_TO_SWITCH' in collector.roles %}
+                <form class="sf-toolbar-info-piece">
+                    <b>Switch to user</b>
+                    <input name="_switch_user" placeholder="username" required="required" size="15"/>
+                </form>
+            {% endif %}
         {% elseif collector.enabled %}
             You are not authenticated.
         {% else %}

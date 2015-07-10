@@ -393,10 +393,21 @@
     .sf-toolbar-icon .sf-toolbar-value {
         display: inline;
     }
+    .sf-toolbar-block .sf-toolbar-value {
+        /* needed for perfect vertical aligning */
+        line-height: 37px;
+    }
 
     .sf-toolbar-block .sf-toolbar-icon img,
     .sf-toolbar-block .sf-toolbar-icon svg {
         top: 6px;
+    }
+    /* TODO: needed for perfect vertical aligning, remove when icons are recreated */
+    .sf-toolbar-block-twig .sf-toolbar-icon img {
+        top: 7px;
+    }
+    .sf-toolbar-block-security .sf-toolbar-icon svg {
+        top: 7px;
     }
     .sf-toolbar-block-config .sf-toolbar-icon svg {
         top: 8px;

@@ -399,10 +399,6 @@
 }
 
 @media (min-width: 768px) {
-.navbar-brand::before { content: "768 px"; background: red;
-    color: white;
-    position: absolute; }
-
     .sf-toolbar-icon .sf-toolbar-label,
     .sf-toolbar-icon .sf-toolbar-value {
         display: inline;
@@ -414,6 +410,9 @@
     }
     .sf-toolbar-block-config .sf-toolbar-icon svg {
         top: 8px;
+    }
+    .sf-toolbar-block-config:hover .sf-toolbar-info {
+        right: 0;
     }
     .sf-toolbar-block-time .sf-toolbar-icon svg,
     .sf-toolbar-block-memory .sf-toolbar-icon svg {
@@ -444,8 +443,6 @@
 }
 
 @media (min-width: 1024px) {
-.navbar-brand::before { content: "1024 px"; }
-
     .sf-toolbar-block .sf-toolbar-info-piece-additional,
     .sf-toolbar-block .sf-toolbar-info-piece-additional-detail {
         display: inline-block;
@@ -458,6 +455,4 @@
 }
 
 @media (min-width: 1200px) {
-.navbar-brand::before { content: "1200 px"; }
-
 }

@@ -26,13 +26,17 @@
             {% if collector.tokenClass != null %}
             <div class="sf-toolbar-info-piece">
                 <b>Token class</b>
-                {{ collector.tokenClass|abbr_class }}
+                <span>{{ collector.tokenClass|abbr_class }}</span>
             </div>
             {% endif %}
         {% elseif collector.enabled %}
-            You are not authenticated.
+            <div class="sf-toolbar-info-piece">
+                <span>You are not authenticated.</span>
+            </div>
         {% else %}
-            The security is disabled.
+            <div class="sf-toolbar-info-piece">
+                <span>The security is disabled.</span>
+            </div>
         {% endif %}
     {% endset %}
 

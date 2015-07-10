@@ -133,27 +133,15 @@
 .sf-toolbar-block .sf-toolbar-info-piece b {
     color: #AAA;
     display: table-cell;
-    font-size: 11px;
+    font-size: 12px;
     padding: 4px 8px 4px 4px;
 }
 .sf-toolbar-block .sf-toolbar-info-piece span {
 
 }
-.sf-toolbar-block .sf-toolbar-info-piece span,
-.sf-toolbar-block .sf-toolbar-info-piece abbr {
+.sf-toolbar-block .sf-toolbar-info-piece span {
     color: #F5F5F5;
-    font-size: 12px;
-}
-
-.sf-toolbar-block .sf-toolbar-info-with-next-pointer:after {
-    content: ' :: ';
-    color: #999;
-}
-
-.sf-toolbar-block .sf-toolbar-info-with-delimiter {
-    border-right: 1px solid #999;
-    padding-right: 5px;
-    margin-right: 5px;
+    font-size: 13px;
 }
 
 .sf-toolbar-block .sf-toolbar-info {
@@ -279,7 +267,9 @@
     overflow: hidden;
     overflow-y: auto;
 }
-
+.sf-toolbar-block-request:hover .sf-toolbar-info {
+    max-width: none;
+}
 .sf-toolbar-info-piece b.sf-toolbar-ajax-info {
     color: #F5F5F5;
 }

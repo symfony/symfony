@@ -827,15 +827,7 @@ class FrameworkExtension extends Extension
                     $files[1][] = $file->getRealpath();
                 }
 
-<<<<<<< HEAD
                 $container->addResource(new DirectoryResource($dir));
-=======
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFileName()).'/Resources/config/validation.yml')) {
-                $files[] = realpath($file);
-                $container->addResource(new FileResource($file));
->>>>>>> 2.6
             }
         }
 
@@ -930,7 +922,7 @@ class FrameworkExtension extends Extension
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFilename());
+            $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
                 $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));

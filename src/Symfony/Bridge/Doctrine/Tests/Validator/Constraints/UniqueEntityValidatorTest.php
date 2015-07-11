@@ -455,4 +455,34 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($entity, $constraint);
     }
+
+    public function testCustomMessage()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'An entity with name "{{ name }}" already exists.',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+        ));
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Foo');
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity1);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($entity2, $constraint);
+
+        $this->buildViolation('An entity with name "Foo" already exists.')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->assertRaised();
+    }
 }

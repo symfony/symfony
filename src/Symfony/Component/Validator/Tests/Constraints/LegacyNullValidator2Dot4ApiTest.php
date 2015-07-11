@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validation;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group  legacy
  */
-class LegacyNullValidator2Dot4ApiTest extends NullValidatorTest
+class LegacyNullValidator2Dot4ApiTest extends IsNullValidatorTest
 {
     protected function getApiVersion()
     {

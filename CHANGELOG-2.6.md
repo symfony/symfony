@@ -7,6 +7,38 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.9 (2015-05-30)
+
+ * bug #14777 Avoid using the app global variable in the profiler templates (stof)
+ * bug #14262 [REVERTED] [TwigBundle] Refresh twig paths when resources change. (aitboudad)
+
+* 2.6.8 (2015-05-27)
+
+ * security #14759 CVE-2015-4050 [HttpKernel] Do not call the FragmentListener if _controller is already defined (jakzal)
+ * bug #14743 [DebugBundle] Fix config XSD (nicolas-grekas)
+ * bug #14726 [Translation] fixed JSON loader on PHP 7 when file is empty (fabpot)
+ * bug #14715 [Form] Check instance of FormBuilderInterface instead of FormBuilder (dosten)
+ * bug #14678 [Security] AbstractRememberMeServices::encodeCookie() validates cookie parts (MacDada)
+ * bug #14635 [HttpKernel] Handle an array vary header in the http cache store (jakzal)
+ * bug #14513 [console][formater] allow format toString object. (aitboudad)
+ * bug #14335 [HttpFoundation] Fix baseUrl when script filename is contained in pathInfo (danez)
+ * bug #14593 [Security][Firewall] Avoid redirection to XHR URIs (asiragusa)
+ * bug #14618 [DomCrawler] Throw an exception if a form field path is incomplete (jakzal)
+ * bug #14699  Fix HTML escaping of to-source links (amenk, nicolas-grekas)
+ * bug #14698  Fix HTML escaping of to-source links (nicolas-grekas)
+ * bug #14690 [HttpFoundation] IpUtils::checkIp4() should allow `/0` networks (zerkms)
+ * bug #14696 Fix the rendering of deprecation log messages (stof)
+ * bug #14683 Fixed the indentation in the compiled template for the DumpNode (stof)
+ * bug #14262 [TwigBundle] Refresh twig paths when resources change. (aitboudad)
+ * bug #13633 [ServerBag] Handled bearer authorization header in REDIRECT_ form (Lance0312)
+ * bug #13637 [CSS] WebProfiler break words (nicovak)
+ * bug #14217 [WebProfilerBundle] Fix regexp (romqin)
+ * bug #14644 [Bridge\Twig] Adding a space between the icon and the error message (zmikael, nicolas-grekas)
+ * bug #14640 [DebugBundle] Allow alternative destination for dumps (nicolas-grekas)
+ * bug #14633 [EventDispatcher] make listeners removable from an executed listener (xabbuh)
+ * bug #14609 [DebugBundle] Remove inlined dumps on XHR (nicolas-grekas)
+ * bug #14605 [PropertyAccess] Fix setting public property on a class having a magic getter (lolautruche)
+
 * 2.6.7 (2015-05-11)
 
  * bug #14266 [HttpKernel] Check if "symfony/proxy-manager-bridge" package is installed (hason)

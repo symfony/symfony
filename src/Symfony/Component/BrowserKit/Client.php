@@ -547,7 +547,7 @@ abstract class Client
     protected function getAbsoluteUri($uri)
     {
         // already absolute?
-        if (0 === strpos($uri, 'http')) {
+        if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
             return $uri;
         }
 

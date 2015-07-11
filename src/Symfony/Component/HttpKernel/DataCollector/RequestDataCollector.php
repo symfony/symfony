@@ -125,10 +125,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     $this->data['controller'] = array(
                         'class' => is_object($controller[0]) ? get_class($controller[0]) : $controller[0],
                         'method' => $controller[1],
-                        'file' => $r->getFilename(),
+                        'file' => $r->getFileName(),
                         'line' => $r->getStartLine(),
                     );
-                } catch (\ReflectionException $re) {
+                } catch (\ReflectionException $e) {
                     if (is_callable($controller)) {
                         // using __call or  __callStatic
                         $this->data['controller'] = array(
@@ -144,7 +144,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 $this->data['controller'] = array(
                     'class' => $r->getName(),
                     'method' => null,
-                    'file' => $r->getFilename(),
+                    'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 );
             } elseif (is_object($controller)) {

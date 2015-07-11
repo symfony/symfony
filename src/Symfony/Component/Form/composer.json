@@ -25,7 +25,7 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.6",
+        "symfony/validator": "~2.6,>=2.6.8",
         "symfony/http-foundation": "~2.2",
         "symfony/http-kernel": "~2.4",
         "symfony/security-csrf": "~2.4",

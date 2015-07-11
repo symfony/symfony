@@ -35,13 +35,16 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $rootRefs;
     private $charset;
     private $dumper;
+    private $dumperIsInjected;
 
-    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null)
+    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null, DataDumperInterface $dumper = null)
     {
         $this->stopwatch = $stopwatch;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->charset = $charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8';
         $this->requestStack = $requestStack;
+        $this->dumper = $dumper;
+        $this->dumperIsInjected = null !== $dumper;
 
         // All clones share these properties by reference:
         $this->rootRefs = array(
@@ -97,9 +100,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $name = $info->getTemplateName();
                         $src = $info->getEnvironment()->getLoader()->getSource($name);
                         $info = $info->getDebugInfo();
-                        if (isset($info[$trace[$i-1]['line']])) {
+                        if (isset($info[$trace[$i - 1]['line']])) {
                             $file = false;
-                            $line = $info[$trace[$i-1]['line']];
+                            $line = $info[$trace[$i - 1]['line']];
                             $src = explode("\n", $src);
                             $fileExcerpt = array();
 
@@ -123,10 +126,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         if ($this->dumper) {
             $this->doDump($data, $name, $file, $line);
-        } else {
-            $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
-            ++$this->dataCount;
         }
+
+        $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
+        ++$this->dataCount;
 
         if ($this->stopwatch) {
             $this->stopwatch->stop('dump');
@@ -136,7 +139,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         // Sub-requests and programmatic calls stay in the collected profile.
-        if (($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
+        if ($this->dumper || ($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
             return;
         }
 
@@ -154,13 +157,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $this->dumper = new CliDumper('php://output', $this->charset);
             }
 
-            foreach ($this->data as $i => $dump) {
-                $this->data[$i] = null;
+            foreach ($this->data as $dump) {
                 $this->doDump($dump['data'], $dump['name'], $dump['file'], $dump['line']);
             }
-
-            $this->data = array();
-            $this->dataCount = 0;
         }
     }
 
@@ -174,7 +173,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->data = array();
         $this->dataCount = 0;
         $this->isCollected = true;
-        $this->dumper = null;
+        if (!$this->dumperIsInjected) {
+            $this->dumper = null;
+        }
 
         return $ser;
     }
@@ -250,20 +251,33 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     private function doDump($data, $name, $file, $line)
     {
-        if ($this->dumper instanceof HtmlDumper) {
-            $name = $this->htmlEncode($name);
-            $file = $this->htmlEncode($file);
-            if ('' !== $file) {
-                if ($this->fileLinkFormat) {
-                    $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
-                    $name = sprintf('<a href="%s" title="%s">%s</a>', $link, $file, $name);
+        if (PHP_VERSION_ID >= 50400 && $this->dumper instanceof CliDumper) {
+            $contextDumper = function ($name, $file, $line, $fileLinkFormat) {
+                if ($this instanceof HtmlDumper) {
+                    if ('' !== $file) {
+                        $s = $this->style('meta', '%s');
+                        $name = strip_tags($this->style('', $name));
+                        $file = strip_tags($this->style('', $file));
+                        if ($fileLinkFormat) {
+                            $link = strtr(strip_tags($this->style('', $fileLinkFormat)), array('%f' => $file, '%l' => (int) $line));
+                            $name = sprintf('<a href="%s" title="%s">'.$s.'</a>', $link, $file, $name);
+                        } else {
+                            $name = sprintf('<abbr title="%s">'.$s.'</abbr>', $file, $name);
+                        }
+                    } else {
+                        $name = $this->style('meta', $name);
+                    }
+                    $this->line = $name.' on line '.$this->style('meta', $line).':';
                 } else {
-                    $name = sprintf('<abbr title="%s">%s</abbr>', $file, $name);
+                    $this->line = $this->style('meta', $name).' on line '.$this->style('meta', $line).':';
                 }
-            }
-            echo "\n<span class=\"sf-dump-meta\">{$name} on line {$line}:</span>";
+                $this->dumpLine(0);
+            };
+            $contextDumper = $contextDumper->bindTo($this->dumper, $this->dumper);
+            $contextDumper($name, $file, $line, $this->fileLinkFormat);
         } else {
-            echo "{$name} on line {$line}:\n";
+            $cloner = new VarCloner();
+            $this->dumper->dump($cloner->cloneVar($name.' on line '.$line.':'));
         }
         $this->dumper->dump($data);
     }

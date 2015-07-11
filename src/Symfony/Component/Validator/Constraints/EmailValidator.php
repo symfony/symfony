@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class EmailValidator extends ConstraintValidator
 {
     /**
-     * isStrict
-     *
      * @var bool
      */
     private $isStrict;
@@ -73,7 +71,7 @@ class EmailValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!preg_match('/.+\@.+\..+/', $value)) {
+        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::INVALID_FORMAT_ERROR)

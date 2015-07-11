@@ -79,6 +79,6 @@ class DumpNode extends \Twig_Node
 
         $compiler
             ->outdent()
-            ->raw("}\n");
+            ->write("}\n");
     }
 }

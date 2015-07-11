@@ -156,7 +156,7 @@
 {%- endblock radio_label %}
 
 {% block checkbox_radio_label %}
-    {# Do no display the label if widget is not defined in order to prevent double label rendering #}
+    {# Do not display the label if widget is not defined in order to prevent double label rendering #}
     {% if widget is defined %}
         {% if required %}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
@@ -231,7 +231,7 @@
     {% if form.parent %}<span class="help-block">{% else %}<div class="alert alert-danger">{% endif %}
     <ul class="list-unstyled">
         {%- for error in errors -%}
-            <li><span class="glyphicon glyphicon-exclamation-sign"></span>{{ error.message }}</li>
+            <li><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
         {%- endfor -%}
     </ul>
     {% if form.parent %}</span>{% else %}</div>{% endif %}

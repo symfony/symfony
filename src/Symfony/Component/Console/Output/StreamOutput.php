@@ -94,7 +94,7 @@ class StreamOutput extends Output
      */
     protected function hasColorSupport()
     {
-        if (DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
         }
 

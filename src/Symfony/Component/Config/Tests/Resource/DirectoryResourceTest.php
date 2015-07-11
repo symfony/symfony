@@ -69,7 +69,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if the resource has not changed');
         $this->assertFalse($resource->isFresh(time() - 86400), '->isFresh() returns false if the resource has been updated');
 
-        $resource = new DirectoryResource('/____foo/foobar'.rand(1, 999999));
+        $resource = new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
         $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the resource does not exist');
     }
 

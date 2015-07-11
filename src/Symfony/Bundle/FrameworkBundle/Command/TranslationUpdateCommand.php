@@ -67,6 +67,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $kernel = $this->getContainer()->get('kernel');
+
         // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
@@ -85,18 +87,19 @@ EOF
         }
 
         // Define Root Path to App folder
-        $rootPath = $this->getApplication()->getKernel()->getRootDir();
-        $currentName = "app folder";
+        $transPaths = array($kernel->getRootDir().'/Resources/');
+        $currentName = 'app folder';
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
-            $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-            $rootPath = $foundBundle->getPath();
+            $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
+            $transPaths = array(
+                $foundBundle->getPath().'/Resources/',
+                sprintf('%s/Resources/%s/', $kernel->getRootDir(), $foundBundle->getName()),
+            );
             $currentName = $foundBundle->getName();
         }
 
-        // get bundle directory
-        $translationsPath = $rootPath.'/Resources/translations';
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         // load any messages from templates
@@ -104,13 +107,23 @@ EOF
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
-        $extractor->extract($rootPath.'/Resources/views/', $extractedCatalogue);
+        foreach ($transPaths as $path) {
+            $path .= 'views';
+            if (is_dir($path)) {
+                $extractor->extract($path, $extractedCatalogue);
+            }
+        }
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
-        $loader->loadMessages($translationsPath, $currentCatalogue);
+        foreach ($transPaths as $path) {
+            $path .= 'translations';
+            if (is_dir($path)) {
+                $loader->loadMessages($path, $currentCatalogue);
+            }
+        }
 
         // process catalogues
         $operation = $input->getOption('clean')
@@ -153,7 +166,17 @@ EOF
         // save the files
         if ($input->getOption('force') === true) {
             $output->writeln('Writing files');
-            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $translationsPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
+            $bundleTransPath = false;
+            foreach ($transPaths as $path) {
+                $path .= 'translations';
+                if (is_dir($path)) {
+                    $bundleTransPath = $path;
+                }
+            }
+
+            if ($bundleTransPath) {
+                $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath));
+            }
         }
     }
 }

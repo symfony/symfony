@@ -81,7 +81,7 @@ class User
     }
 
     /**
-     * @Assert\True(message = "The user should have a Google Mail account")
+     * @Assert\IsTrue(message = "The user should have a Google Mail account")
      */
     public function isGmailUser()
     {

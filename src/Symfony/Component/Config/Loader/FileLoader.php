@@ -91,7 +91,7 @@ abstract class FileLoader extends Loader
             }
 
             $resources = is_array($resource) ? $resource : array($resource);
-            for ($i = 0; $i < $resourcesCount = count($resources); $i++) {
+            for ($i = 0; $i < $resourcesCount = count($resources); ++$i) {
                 if (isset(self::$loading[$resources[$i]])) {
                     if ($i == $resourcesCount - 1) {
                         throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));

@@ -273,10 +273,6 @@ UPGRADE FROM 2.x to 3.0
    echo $form->getErrors(true, false);
    ```
 
-   ```php
-   echo $form->getErrors(true, false);
-   ```
-
 ### FrameworkBundle
 
  * The `getRequest` method of the base `Controller` class has been deprecated

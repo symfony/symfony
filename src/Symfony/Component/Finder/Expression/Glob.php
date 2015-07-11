@@ -105,7 +105,7 @@ class Glob implements ValueInterface
         $inCurlies = 0;
         $regex = '';
         $sizeGlob = strlen($this->pattern);
-        for ($i = 0; $i < $sizeGlob; $i++) {
+        for ($i = 0; $i < $sizeGlob; ++$i) {
             $car = $this->pattern[$i];
             if ($firstByte) {
                 if ($strictLeadingDot && '.' !== $car) {

@@ -61,7 +61,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
             array_map('spl_autoload_register', $autoloaders);
         }
 
-        $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
+        $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
         $this->assertSame($translatedMessage, $exception->getMessage());
         $this->assertSame($error['type'], $exception->getSeverity());
         $this->assertSame($error['file'], $exception->getFile());
@@ -197,6 +197,6 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $handler = new ClassNotFoundFatalErrorHandler();
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
 
-        $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
+        $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
     }
 }

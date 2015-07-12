@@ -117,7 +117,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
-        $def->setProperties($parentDef->getProperties());
+        $def->setPropertiesByClass($parentDef->getClass(), $parentDef->getProperties());
         if ($parentDef->getFactoryClass(false)) {
             $def->setFactoryClass($parentDef->getFactoryClass(false));
         }
@@ -188,7 +188,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // merge properties
         foreach ($definition->getProperties() as $k => $v) {
-            $def->setProperty($k, $v);
+            $def->setPropertyByClass($definition->getClass(), $k, $v);
         }
 
         // append method calls

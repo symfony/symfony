@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -456,8 +457,37 @@ class PhpDumper extends Dumper
     private function addServiceProperties($id, $definition, $variableName = 'instance')
     {
         $code = '';
-        foreach ($definition->getProperties() as $name => $value) {
-            $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
+        foreach ($definition->getPropertiesByClass() as $classPath => $properties) {
+            if($classPath === null) {
+                foreach($properties as $name => $value) {
+                    $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
+                }
+
+                continue;
+            }
+
+            foreach($properties as $name => $value) {
+                $reflectionClass = new ReflectionClass($classPath);
+                $hasProperty = $reflectionClass->hasProperty($name);
+                if(!$hasProperty || $hasProperty && $reflectionClass->getProperty($name)->isPublic()) {
+                    $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
+                    continue;
+                }
+
+                $reflectionVariableName = 'reflectionClassObject';
+                $reflectionPropertyVariableName = 'reflectionPropertyObject';
+                $code .= sprintf(
+                    "        $%s = new \\ReflectionClass('%s');\n".
+                    "        $%s = $%s->getProperty('%s');\n".
+                    "        $%s->setAccessible(true);\n".
+                    "        $%s->setValue($%s, %s);\n",
+                    $reflectionVariableName, addslashes($classPath),
+                    $reflectionPropertyVariableName, $reflectionVariableName, $name,
+                    $reflectionPropertyVariableName,
+                    $reflectionPropertyVariableName, $variableName, $this->dumpValue($value)
+                );
+            }
+
         }
 
         return $code;

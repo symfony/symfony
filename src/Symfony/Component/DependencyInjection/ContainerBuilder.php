@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -89,6 +90,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
+
+    /**
+     * @var ReflectionClass[]
+     */
+    private $injectReflectionCache = array();
 
     /**
      * Sets the track resources flag.
@@ -989,10 +995,35 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->callMethod($service, $call);
         }
 
-        $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
-        foreach ($properties as $name => $value) {
-            $service->$name = $value;
+        // inject property to class
+        $propertiesByClass = $definition->getPropertiesByClass();
+        foreach ($propertiesByClass as $classPath => $properties) {
+            $properties = $this->resolveServices($parameterBag->resolveValue($properties));
+
+            if ($classPath !== null && strpos($classPath, '%')) {
+                $classPath = $parameterBag->resolveValue($classPath);
+            }
+
+            // initialize reflection class
+            if ($classPath !== null && $properties && !isset($this->injectReflectionCache[$classPath])) {
+                $reflectionClass = new ReflectionClass($classPath);
+                $this->injectReflectionCache[$classPath] = $reflectionClass;
+            }
+
+            foreach ($properties as $name => $value) {
+                if ($classPath === null) {
+                    $service->$name = $value;
+                    continue;
+                }
+
+                // inject value to service
+                $reflectionProperty = $this->injectReflectionCache[$classPath]->getProperty($name);
+                $reflectionProperty->setAccessible(true);
+                $reflectionProperty->setValue($service, $value);
+            }
         }
+
+
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {

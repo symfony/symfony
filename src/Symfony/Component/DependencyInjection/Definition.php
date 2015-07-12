@@ -32,6 +32,7 @@ class Definition
     private $shared = true;
     private $scope = ContainerInterface::SCOPE_CONTAINER;
     private $properties = array();
+    private $propertiesByClass = array();
     private $calls = array();
     private $configurator;
     private $tags = array();
@@ -286,6 +287,21 @@ class Definition
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
+        $this->propertiesByClass[$this->class] = $properties;
+
+        return $this;
+    }
+
+    /**
+     * @param string $classPath  Propertiest class path
+     * @param array  $properties Property list
+     *
+     * @return $this
+     */
+    public function setPropertiesByClass($classPath, array $properties)
+    {
+        $this->properties = $properties;
+        $this->propertiesByClass[$classPath] = $properties;
 
         return $this;
     }
@@ -299,11 +315,35 @@ class Definition
     }
 
     /**
+     * @return array
+     */
+    public function getPropertiesByClass()
+    {
+        return $this->propertiesByClass;
+    }
+
+    /**
      * @api
      */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
+        $this->propertiesByClass[$this->class][$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $classPath
+     * @param $name
+     * @param $value
+     *
+     * @return Definition
+     */
+    public function setPropertyByClass($classPath, $name, $value)
+    {
+        $this->properties[$name] = $value;
+        $this->propertiesByClass[$classPath][$name] = $value;
 
         return $this;
     }

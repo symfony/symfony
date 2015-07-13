@@ -162,7 +162,7 @@ class ChoiceQuestion extends Question
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
 
-                $multiselectChoices[] = $choices[(string) $result];
+                $multiselectChoices[] = $choices[$value];
             }
 
             if ($multiselect) {

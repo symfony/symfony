@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-09T12:10:36Z
+
+looks like this tackles the same issue as #15067
+
+---------------------------------------------------------------------------
+
+by nmacherey at 2015-07-09T12:16:43Z
+
+Yes true. I looked for it but i did not find it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-09T18:04:58Z
+
+@nmacherey The fix in #15067 is way more complex than yours. Could you please apply the tests that were added there here too so that we can see if both patches actually do the same thing?
+
+---------------------------------------------------------------------------
+
+by nmacherey at 2015-07-10T04:48:01Z
+
+ @xabbuh Tests from #15067 included and passed. Agreed that the patch is simplier, it only follows the condition in the readIndex method that set the IS_REF to true when the index in the array is an object.

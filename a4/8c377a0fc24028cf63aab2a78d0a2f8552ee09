@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-07T13:52:19Z
+
+Is it possible to add a `removeParameter` method in the `ContainerBuilder` or is that out of this scope?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-07T15:46:23Z
+
+> Is it possible to add a removeParameter method in the ContainerBuilder or is that out of this scope?
+
+I guess  it's out of this scope
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-08T12:51:58Z
+
+@lyrixx what is the gain ? This sound like a free BC for no gain.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-08T13:51:27Z
+
+@mickaelandrieu Now, we can be sure the method exist before calling it.

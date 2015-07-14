@@ -85,7 +85,7 @@ class ConfigCache implements ConfigCacheInterface
         }
 
         $time = filemtime($this->file);
-        $meta = unserialize(file_get_contents($metadata));
+        $meta = $this->unserialize(file_get_contents($metadata));
         foreach ($meta as $resource) {
             if (!$resource->isFresh($time)) {
                 return false;
@@ -116,7 +116,7 @@ class ConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            $filesystem->dumpFile($this->getMetaFile(), $this->serialize($metadata), null);
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {
@@ -133,5 +133,40 @@ class ConfigCache implements ConfigCacheInterface
     private function getMetaFile()
     {
         return $this->file.'.meta';
+    }
+
+    /**
+     *  Serialize metadata
+     *
+     * @param ResourceInterface[] $metadata An array of ResourceInterface instances
+     *
+     * @return string serialized array of ResourceInterface instances
+     */
+    public function serialize(array $metadata)
+    {
+        foreach ($metadata as $key => $val) {
+            $metadata[$key] = serialize($val);
+        }
+        return serialize($metadata);
+    }
+
+    /**
+     *  Deserialize metadata
+     *
+     * @param string $serializedMetadata serialized array of ResourceInterface instances
+     *
+     * @return ResourceInterface[]  An array of ResourceInterface instances
+     */
+    public function unserialize($serializedMetadata)
+    {
+        $metadata = unserialize($serializedMetadata);
+        //BC
+        if ($metadata[0] instanceof ResourceInterface) {
+            return $metadata;
+        }
+        foreach ($metadata as $key => $val) {
+            $metadata[$key] = unserialize($val);
+        }
+        return $metadata;
     }
 }

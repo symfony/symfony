@@ -495,6 +495,31 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame('3', $field['3']->getViewData());
     }
 
+    public function testSubmitMultipleExpandedWithNegativeIntegerId()
+    {
+        $entity1 = new SingleIntIdEntity(-1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $field->submit(array('-1'));
+
+        $expected = new ArrayCollection(array($entity1));
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertEquals($expected, $field->getData());
+        $this->assertTrue($field['_1']->getData());
+        $this->assertFalse($field['2']->getData());
+    }
+
     public function testOverrideChoices()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');

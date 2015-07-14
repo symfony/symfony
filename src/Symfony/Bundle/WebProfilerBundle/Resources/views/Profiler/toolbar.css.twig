@@ -37,7 +37,7 @@
 }
 .sf-toolbarreset svg,
 .sf-toolbarreset img {
-    max-height: 24px;
+    max-height: 20px;
 }
 .sf-toolbarreset .hide-button {
     background: #444;
@@ -47,14 +47,10 @@
     top: 0;
     right: 0;
     width: 36px;
-    height: 30px;
+    height: 28px;
     cursor: pointer;
-    padding-top: 6px;
+    padding-top: 8px;
     text-align: center;
-}
-.sf-toolbarreset .hide-button svg {
-    max-height: 24px;
-    max-width: 24px;
 }
 
 .sf-toolbar-block {
@@ -69,9 +65,6 @@
 .sf-toolbar-block > a:hover {
     display: block;
     text-decoration: none;
-}
-.sf-toolbar-block-config svg {
-    max-height: 22px;
 }
 
 .sf-toolbar-block span {
@@ -117,6 +110,9 @@
     padding: 2px 5px;
     margin-bottom: 0px;
 }
+.sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status + .sf-toolbar-status {
+    margin-left: 4px;
+}
 
 .sf-toolbar-block .sf-toolbar-info-piece:last-child {
     margin-bottom: 0;
@@ -134,7 +130,7 @@
     color: #AAA;
     display: table-cell;
     font-size: 12px;
-    padding: 4px 8px 4px 4px;
+    padding: 4px 8px 4px 0;
 }
 .sf-toolbar-block .sf-toolbar-info-piece span {
 
@@ -186,9 +182,6 @@
     background-color: rgba(200, 43, 43, 0.8);
     color: #FFF;
 }
-.sf-toolbar-block.sf-toolbar-status-red svg > g > path {
-    fill: #FFF;
-}
 .sf-toolbar-block.sf-toolbar-status-yellow {
     background-color: rgb(189, 132, 0);
     color: #FFF;
@@ -196,9 +189,11 @@
 
 .sf-toolbar-block-request .sf-toolbar-status {
     color: #FFF;
+    display: inline-block;
     font-size: 14px;
-    max-height: 36px;
-    padding: 10px 7px;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
 }
 .sf-toolbar-block-request .sf-toolbar-info-piece a {
     text-decoration: none;
@@ -212,9 +207,12 @@
 .sf-toolbar-status-red .sf-toolbar-label {
     color: #FFF;
 }
-.sf-toolbar-status-green svg > g > path,
-.sf-toolbar-status-red svg > g > path,
-.sf-toolbar-status-yellow svg > g > path {
+.sf-toolbar-status-green svg path,
+.sf-toolbar-status-red svg path,
+.sf-toolbar-status-yellow svg path {
+    fill: #FFF;
+}
+.sf-toolbar-block-config svg path {
     fill: #FFF;
 }
 
@@ -232,10 +230,6 @@
 .sf-toolbar-block .sf-toolbar-icon svg {
     border-width: 0;
     position: relative;
-    top: 5px;
-}
-.sf-toolbar-block-translation .sf-toolbar-icon svg,
-.sf-toolbar-block-config .sf-toolbar-icon svg {
     top: 8px;
 }
 
@@ -243,24 +237,21 @@
 .sf-toolbar-block .sf-toolbar-icon svg + span {
     margin-left: 4px;
 }
-
-.sf-toolbar-info-php-ext .sf-toolbar-status + .sf-toolbar-status {
+.sf-toolbar-block-config .sf-toolbar-icon .sf-toolbar-value {
     margin-left: 4px;
 }
 
 .sf-toolbar-block:hover {
     position: relative;
 }
-
 .sf-toolbar-block:hover .sf-toolbar-icon {
     background-color: #444;
     position: relative;
     z-index: 10002;
 }
-
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
-    padding: 8px;
+    padding: 10px;
     max-width: 480px;
     max-height: 480px;
     word-wrap: break-word;
@@ -393,24 +384,10 @@
     .sf-toolbar-icon .sf-toolbar-value {
         display: inline;
     }
-    .sf-toolbar-block .sf-toolbar-value {
-        /* needed for perfect vertical aligning */
-        line-height: 37px;
-    }
 
     .sf-toolbar-block .sf-toolbar-icon img,
     .sf-toolbar-block .sf-toolbar-icon svg {
         top: 6px;
-    }
-    /* TODO: needed for perfect vertical aligning, remove when icons are recreated */
-    .sf-toolbar-block-twig .sf-toolbar-icon img {
-        top: 7px;
-    }
-    .sf-toolbar-block-security .sf-toolbar-icon svg {
-        top: 7px;
-    }
-    .sf-toolbar-block-config .sf-toolbar-icon svg {
-        top: 8px;
     }
     .sf-toolbar-block-config:hover .sf-toolbar-info {
         right: 0;
@@ -432,10 +409,11 @@
     .sf-toolbar-block-request .sf-toolbar-icon {
         padding-left: 0;
     }
+
     .sf-toolbar-block-request .sf-toolbar-status {
         margin-right: 4px;
-        padding: 10px;
     }
+
     .sf-toolbar-block-config {
         float: right;
         margin-left: 0;

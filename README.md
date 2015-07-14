@@ -47,7 +47,7 @@ Running Symfony Tests
 Information on how to run the Symfony test suite can be found in the
 [Running Symfony Tests][6] section.
 
-[1]: https://symfony.com/get_started
+[1]: https://symfony.com/doc/current/quick_tour
 [2]: https://symfony.com/doc/current/
 [3]: https://symfony.com/doc/current/contributing/code/index.html
 [4]: https://symfony.com/doc/current/contributing/code/patches.html#check-list

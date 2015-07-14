@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2015-07-14T12:38:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by AlexKovalevych at 2015-07-14T12:39:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pjcdawkins at 2015-07-14T12:46:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-07-14T12:53:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2015-07-14T12:53:55Z
+
+![no-unit-tests-hasta-la-vista-baby-thumb](https://cloud.githubusercontent.com/assets/154256/8673594/c2007690-2a2f-11e5-9651-ede2bb158ff9.jpg)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-07-14T12:59:55Z
+
+@Ocramius The tests are broken already without this change :skull: I'm surprised no one noticed this!
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-07-14T13:00:44Z
+
+I think he means "prove it" with a test
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-07-14T13:24:21Z
+
+https://travis-ci.org/symfony/symfony/jobs/70802714#L2482
+
+`No output has been received in the last 10 minutes, this potentially indicates a stalled build or something wrong with the build itself.`
+
+Every build after 2.7 is broken https://travis-ci.org/symfony/symfony/builds
+https://travis-ci.org/symfony/symfony/jobs/70247919
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2015-07-14T13:32:15Z
+
+Yes, I was expecting a specific test for the bit of code that is causing the issue, rather than a fix for the actual integration case (the test runner itself)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-07-14T13:55:45Z
+
+Thats really really hard :) as the actual cause happens much deeper.
+
+Say you have the following choices `['Badman', 'Spiderman']` and select 1 (Spiderman).
+
+`$result` at `array_search` holds the selected choice (1), then in `if (!$isAssoc)` this is converted back to the actual value (Spiderman), so `$result` is now 'Spiderman', not 1.
+
+Line 165 tries convert the `$result` (Spiderman) back to a choice `$choices['Spiderman']` (which is wrong) causing an undefined index and thus an exception in PHPUnit. This exception is then cached in `QuestionHelper::validateAttempts()` as an 'failed attempt'. Making the QuestionHelper ask for another attempt, which it never receives! and in the end causing PHPUnit to hang :boom:
+
+If you have any idea how to prevent this little devil for spreading in the future pleas do so  :thumbsup:

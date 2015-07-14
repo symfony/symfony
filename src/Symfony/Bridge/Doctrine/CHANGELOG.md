@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added "{{ value }}" message placeholder to UniqueEntityValidator 
+
 3.0.0
 -----
 

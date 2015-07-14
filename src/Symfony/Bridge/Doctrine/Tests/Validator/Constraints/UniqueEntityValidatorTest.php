@@ -166,6 +166,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -189,6 +190,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.bar')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -240,6 +242,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -271,6 +274,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name2')
+            ->setParameter('{{ value }}', 'Bar')
             ->setInvalidValue('Bar')
             ->assertRaised();
     }
@@ -365,6 +369,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
+            ->setParameter('{{ value }}', 1)
             ->setInvalidValue(1)
             ->assertRaised();
     }

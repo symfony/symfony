@@ -287,7 +287,6 @@ class Definition
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
-        $this->propertiesByClass[$this->class] = $properties;
 
         return $this;
     }
@@ -300,7 +299,6 @@ class Definition
      */
     public function setPropertiesByClass($classPath, array $properties)
     {
-        $this->properties = $properties;
         $this->propertiesByClass[$classPath] = $properties;
 
         return $this;
@@ -319,7 +317,12 @@ class Definition
      */
     public function getPropertiesByClass()
     {
-        return $this->propertiesByClass;
+        $properties = $this->propertiesByClass;
+        if ($this->properties) {
+            $properties[$this->class] = $this->properties;
+        }
+
+        return $properties;
     }
 
     /**
@@ -328,7 +331,6 @@ class Definition
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
-        $this->propertiesByClass[$this->class][$name] = $value;
 
         return $this;
     }
@@ -342,7 +344,6 @@ class Definition
      */
     public function setPropertyByClass($classPath, $name, $value)
     {
-        $this->properties[$name] = $value;
         $this->propertiesByClass[$classPath][$name] = $value;
 
         return $this;

@@ -998,20 +998,23 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         // inject property to class
         $propertiesByClass = $definition->getPropertiesByClass();
         foreach ($propertiesByClass as $classPath => $properties) {
+            if(!$properties) {
+                continue;
+            }
             $properties = $this->resolveServices($parameterBag->resolveValue($properties));
 
-            if ($classPath !== null && strpos($classPath, '%')) {
+            if ($classPath != null && strpos($classPath, '%')) {
                 $classPath = $parameterBag->resolveValue($classPath);
             }
 
             // initialize reflection class
-            if ($classPath !== null && $properties && !isset($this->injectReflectionCache[$classPath])) {
+            if ($classPath != null && $properties && !isset($this->injectReflectionCache[$classPath])) {
                 $reflectionClass = new ReflectionClass($classPath);
                 $this->injectReflectionCache[$classPath] = $reflectionClass;
             }
 
             foreach ($properties as $name => $value) {
-                if ($classPath === null) {
+                if ($classPath == null || !$this->injectReflectionCache[$classPath]->hasProperty($name)) {
                     $service->$name = $value;
                     continue;
                 }

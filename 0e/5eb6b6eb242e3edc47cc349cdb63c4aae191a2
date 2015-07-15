@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-08T00:00:39Z
+
+:+1: you need also change https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/info.html.twig#L30 when token == latest
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-04-08T18:24:09Z
+
+Thanks for the review. The PR is updated to show a more precise message, if there are no profiles.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-05-16T17:05:26Z
+
+@fabpot I changed the code as suggested.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-07-15T21:03:57Z
+
+I think this can be merged in 2.8 as it is, can't it?

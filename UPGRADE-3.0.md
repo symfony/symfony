@@ -94,6 +94,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### DependencyInjection
 
+ * The method `remove` was added to `Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface`.
+
  * The methods `Definition::setFactoryClass()`,
    `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
    been removed in favor of `Definition::setFactory()`. Services defined using

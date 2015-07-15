@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+use Symfony\Component\HttpFoundation\Header\AcceptItem;
 
 class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,10 +41,10 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('', array()),
-            array('gzip', array(new AcceptHeaderItem('gzip'))),
-            array('gzip,deflate,sdch', array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
-            array("gzip, deflate\t,sdch", array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
-            array('"this;should,not=matter"', array(new AcceptHeaderItem('this;should,not=matter'))),
+            array('gzip', array(new AcceptItem('gzip'))),
+            array('gzip,deflate,sdch', array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch'))),
+            array("gzip, deflate\t,sdch", array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch'))),
+            array('"this;should,not=matter"', array(new AcceptItem('this;should,not=matter'))),
         );
     }
 
@@ -60,9 +61,9 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array(), ''),
-            array(array(new AcceptHeaderItem('gzip')), 'gzip'),
-            array(array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch')), 'gzip,deflate,sdch'),
-            array(array(new AcceptHeaderItem('this;should,not=matter')), 'this;should,not=matter'),
+            array(array(new AcceptItem('gzip')), 'gzip'),
+            array(array(new AcceptItem('gzip'), new AcceptItem('deflate'), new AcceptItem('sdch')), 'gzip,deflate,sdch'),
+            array(array(new AcceptItem('this;should,not=matter')), 'this;should,not=matter'),
         );
     }
 

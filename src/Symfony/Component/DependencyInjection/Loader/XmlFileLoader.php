@@ -48,7 +48,7 @@ class XmlFileLoader extends FileLoader
         $this->parseImports($xml, $path);
 
         // parameters
-        $this->parseParameters($xml, $path);
+        $this->parseParameters($xml);
 
         // extensions
         $this->loadFromExtensions($xml);
@@ -69,9 +69,8 @@ class XmlFileLoader extends FileLoader
      * Parses parameters.
      *
      * @param SimpleXMLElement $xml
-     * @param string           $file
      */
-    private function parseParameters(SimpleXMLElement $xml, $file)
+    private function parseParameters(SimpleXMLElement $xml)
     {
         if (!$xml->parameters) {
             return;

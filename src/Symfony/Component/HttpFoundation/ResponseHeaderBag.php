@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Header\CacheControl;
+use Symfony\Component\HttpFoundation\Header\ContentDisposition;
+
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
  *
@@ -27,9 +30,9 @@ class ResponseHeaderBag extends HeaderBag
     const DISPOSITION_INLINE = 'inline';
 
     /**
-     * @var array
+     * @var CacheControl
      */
-    protected $computedCacheControl = array();
+    protected $computedCacheControl;
 
     /**
      * @var array
@@ -115,7 +118,7 @@ class ResponseHeaderBag extends HeaderBag
             $computed = $this->computeCacheControlValue();
             $this->headers['cache-control'] = array($computed);
             $this->headerNames['cache-control'] = 'Cache-Control';
-            $this->computedCacheControl = $this->parseCacheControl($computed);
+            $this->computedCacheControl = CacheControl::fromString($computed);
         }
     }
 
@@ -132,7 +135,7 @@ class ResponseHeaderBag extends HeaderBag
         unset($this->headerNames[$uniqueKey]);
 
         if ('cache-control' === $uniqueKey) {
-            $this->computedCacheControl = array();
+            $this->computedCacheControl = new CacheControl();
         }
     }
 
@@ -141,7 +144,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function hasCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl);
+        return $this->computedCacheControl->hasDirective($key);
     }
 
     /**
@@ -149,7 +152,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+        return $this->computedCacheControl->getDirective($key);
     }
 
     /**
@@ -256,36 +259,9 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
-        if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
-            throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
-        }
+        $header = new ContentDisposition($disposition, $filename, $filenameFallback);
 
-        if ('' == $filenameFallback) {
-            $filenameFallback = $filename;
-        }
-
-        // filenameFallback is not ASCII.
-        if (!preg_match('/^[\x20-\x7e]*$/', $filenameFallback)) {
-            throw new \InvalidArgumentException('The filename fallback must only contain ASCII characters.');
-        }
-
-        // percent characters aren't safe in fallback.
-        if (false !== strpos($filenameFallback, '%')) {
-            throw new \InvalidArgumentException('The filename fallback cannot contain the "%" character.');
-        }
-
-        // path separators aren't allowed in either.
-        if (false !== strpos($filename, '/') || false !== strpos($filename, '\\') || false !== strpos($filenameFallback, '/') || false !== strpos($filenameFallback, '\\')) {
-            throw new \InvalidArgumentException('The filename and the fallback cannot contain the "/" and "\\" characters.');
-        }
-
-        $output = sprintf('%s; filename="%s"', $disposition, str_replace('"', '\\"', $filenameFallback));
-
-        if ($filename !== $filenameFallback) {
-            $output .= sprintf("; filename*=utf-8''%s", rawurlencode($filename));
-        }
-
-        return $output;
+        return (string) $header;
     }
 
     /**
@@ -298,22 +274,22 @@ class ResponseHeaderBag extends HeaderBag
      */
     protected function computeCacheControlValue()
     {
-        if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
+        if (!$this->cacheControl->allDirectives() && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
             return 'no-cache';
         }
 
-        if (!$this->cacheControl) {
+        if (!$this->cacheControl->allDirectives()) {
             // conservative by default
             return 'private, must-revalidate';
         }
 
-        $header = $this->getCacheControlHeader();
-        if (isset($this->cacheControl['public']) || isset($this->cacheControl['private'])) {
+        $header = (string) $this->cacheControl;
+        if ($this->cacheControl->hasDirective('public') || $this->cacheControl->hasDirective('private')) {
             return $header;
         }
 
         // public if s-maxage is defined, private otherwise
-        if (!isset($this->cacheControl['s-maxage'])) {
+        if (!$this->cacheControl->hasDirective('s-maxage')) {
             return $header.', private';
         }
 

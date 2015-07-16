@@ -1267,7 +1267,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertEquals(array(), $request->getCharsets());
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
-        $this->assertEquals(array(), $request->getCharsets()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
@@ -1283,7 +1282,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertEquals(array(), $request->getEncodings());
         $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
-        $this->assertEquals(array(), $request->getEncodings()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
@@ -1299,7 +1297,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertEquals(array(), $request->getAcceptableContentTypes());
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
-        $this->assertEquals(array(), $request->getAcceptableContentTypes()); // testing caching
 
         $request = new Request();
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
@@ -1498,10 +1495,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
+        $helper = new Request\UriHelper(new Request\RequestHelper());
+        $me = new \ReflectionMethod($helper, 'getUrlencodedPrefix');
         $me->setAccessible(true);
 
-        $this->assertSame($expect, $me->invoke($request, $string, $prefix));
+        $this->assertSame($expect, $me->invoke($helper, $string, $prefix));
     }
 
     public function urlencodedStringPrefixData()
@@ -1520,10 +1518,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     private function disableHttpMethodParameterOverride()
     {
-        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
+        $requestHelper = Request::getRequestHelper();
+        $class = new \ReflectionClass($requestHelper);
         $property = $class->getProperty('httpMethodParameterOverride');
         $property->setAccessible(true);
-        $property->setValue(false);
+        $property->setValue($requestHelper, false);
     }
 
     private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)

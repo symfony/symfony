@@ -88,7 +88,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         return $this->strategy->decide($token, $attributes, $object);
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -108,6 +107,5 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         return $this->strategy->supportsAttribute($attribute);
     }
-
 
 }

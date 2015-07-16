@@ -4,7 +4,6 @@ namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -18,13 +17,13 @@ class DecideHighestNotAbstainedVoterStrategy extends AbstractDecideStrategy impl
 
     /**
      * DecideHighestNotAbstainedVoterStrategy constructor.
+     *
      * @param $allowIfAllAbstainDecisions
      */
     public function __construct($allowIfAllAbstainDecisions)
     {
         $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
     }
-
 
     /**
      * {@inheritdoc}

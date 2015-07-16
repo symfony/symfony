@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-16T10:25:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-16T10:34:01Z
+
+Let's wait for a green build. Previous one failed on PHP 5.3 ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-16T11:23:12Z
+
+What about merging this one on 2.3? Cloning a container does not work anyway, so it should be safe.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-16T12:10:49Z
+
+I'm fine with merging to 2.3. I just checked and there should be no issues in merging this PR to the 2.3 branch.
+
+We can't get a green build, as tests from the tty group are blocking phpunit process on travis. Once 2.7 is merged to 2.8, there should be no blocking, but tests will still be failing. I'll work on fixing them as soon as 2.8 is updated.

@@ -662,6 +662,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($c->has('alias'));
         $this->assertSame($c->get('alias'), $c->get('bar'));
     }
+
+    public function testThatCloningIsNotSupported()
+    {
+        $class = new \ReflectionClass('Symfony\Component\DependencyInjection\Container');
+        $clone = $class->getMethod('__clone');
+        if (PHP_VERSION_ID >= 540000) {
+            $this->assertFalse($class->isCloneable());
+        }
+        $this->assertTrue($clone->isPrivate());
+    }
 }
 
 class ProjectServiceContainer extends Container

@@ -33,7 +33,7 @@ before_install:
     - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
 install:
-    - if [[ "$TRAVIS_PHP_VERSION" != "5.3" ]] && [[ "$TRAVIS_PHP_VERSION" != "5.4" ]]; then composer require --no-update zendframework/zend-diactoros; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "5.3" ]; then composer require --no-update zendframework/zend-diactoros; fi;
     - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
     - if [ "$deps" = "high" ]; then composer --prefer-source update; fi;

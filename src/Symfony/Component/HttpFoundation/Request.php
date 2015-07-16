@@ -1094,6 +1094,9 @@ class Request
     /**
      * Returns the requested URI (path and query string).
      *
+     * In case you want to output the request URI in HTML better use
+     * Request::getSafeRequestUri().
+     *
      * @return string The raw URI (i.e. not URI decoded)
      *
      * @api
@@ -1105,6 +1108,20 @@ class Request
         }
 
         return $this->requestUri;
+    }
+
+    /**
+     * Returns the safe request URI (path and query string).
+     *
+     * This return is safe in the sense that it protects against information
+     * closure when put into form actions for example, by removing double
+     * slashes.
+     *
+     * @return string The URI (not URI decoded).
+     */
+    public function getSafeRequestUri()
+    {
+        return '/' . ltrim($this->getRequestUri(), '/');
     }
 
     /**

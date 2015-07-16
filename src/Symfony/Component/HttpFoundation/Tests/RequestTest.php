@@ -1746,6 +1746,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetSafeRequestUri()
+    {
+        $request = Request::create('//new-horizon.com');
+
+        $this->assertEquals('//new-horizon.com', $request->getRequestUri());
+        $this->assertEquals('/new-horizon.com', $request->getSafeRequestUri());
+    }
+
     public function testTrustedHosts()
     {
         // create a request

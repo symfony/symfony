@@ -987,7 +987,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return array(
             'Resource then fetch' => array(true, false),
             'Resource then resource' => array(true, true),
-            'Fetch then resource' => array(false, true),
         );
     }
 

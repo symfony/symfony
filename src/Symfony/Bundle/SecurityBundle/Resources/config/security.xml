@@ -29,13 +29,6 @@
 
         <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Core\Authorization\AccessDecisionManager</parameter>
 
-        <parameter key="security.decide_affirmative_strategy.class">Symfony\Component\Security\Core\Authorization\Strategy\DecideAffirmativeStrategy</parameter>
-        <parameter key="security.decide_consensus_strategy.class">Symfony\Component\Security\Core\Authorization\Strategy\DecideConsensusStrategy</parameter>
-        <parameter key="security.decide_unanimous_strategy.class">Symfony\Component\Security\Core\Authorization\Strategy\DecideUnanimousStrategy</parameter>
-        <parameter key="security.decide_highest_not_abstained_voter_strategy.class">
-            Symfony\Component\Security\Core\Authorization\Strategy\DecideHighestNotAbstainedVoterStrategy
-        </parameter>
-
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
         <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter</parameter>
@@ -116,24 +109,6 @@
 
         <service id="security.role_hierarchy" class="%security.role_hierarchy.class%" public="false">
             <argument>%security.role_hierarchy.roles%</argument>
-        </service>
-
-        <!-- Access Strategies -->
-        <service id="security.access.decide_affirmative_strategy" class="%security.decide_affirmative_strategy.class%" public="false">
-            <tag name="security.access_strategy" strategy="affirmative"></tag>
-        </service>
-
-        <service id="security.access.decide_consensus_strategy" class="%security.decide_consensus_strategy.class%" public="false">
-            <tag name="security.access_strategy" strategy="consensus"></tag>
-        </service>
-
-        <service id="security.access.decide_unanimous_strategy" class="%security.decide_unanimous_strategy.class%" public="false">
-            <tag name="security.access_strategy" strategy="unanimous"></tag>
-        </service>
-
-        <service id="security.access.decide_highest_not_abstained_boter_strategy"
-                 class="%security.decide_highest_not_abstained_voter_strategy.class%" public="false">
-            <tag name="security.access_strategy" strategy="highest"></tag>
         </service>
 
 

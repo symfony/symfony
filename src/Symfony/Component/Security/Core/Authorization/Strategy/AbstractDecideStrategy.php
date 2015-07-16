@@ -6,10 +6,6 @@ abstract class AbstractDecideStrategy
 {
     protected $voters;
 
-    protected $allowIfAllAbstainDecisions;
-
-    protected $allowIfEqualGrantedDeniedDecisions;
-
     /**
      * {@inheritdoc}
      */
@@ -21,16 +17,28 @@ abstract class AbstractDecideStrategy
     /**
      * {@inheritdoc}
      */
-    public function setAllowIfAllAbstainDecisions($allowIfAllAbstainDecisions)
+    public function supportsAttribute($attribute)
     {
-        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+        foreach ($this->voters as $voter) {
+            if ($voter->supportsAttribute($attribute)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setAllowIfEqualGrantedDeniedDecisions($allowIfEqualGrantedDeniedDecisions)
+    public function supportsClass($class)
     {
-        $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
+        foreach ($this->voters as $voter) {
+            if ($voter->supportsClass($class)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

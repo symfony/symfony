@@ -51,25 +51,7 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetUnsupportedStrategy()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $manager = new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
-        $manager->decide($token, array('ROLE_FOO'));
-
-    }
-
-    public function testCustomStrategy()
-    {
-        $decisionStrategy = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionStrategyInterface');
-        $decisionStrategy->expects($this->once())
-            ->method('decide')
-            ->will($this->returnValue(true));
-
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $manager = new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'testStrategy');
-        $manager->addStrategy('testStrategy', $decisionStrategy);
-
-        $this->assertTrue($manager->decide($token, array('ROLE_FOO')));
-
+        new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
     }
 
     /**
@@ -115,11 +97,12 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
         $voter->expects($this->exactly(2))
-            ->method('vote')
-            ->will($this->returnValueMap(array(
-                array($token, null, array('ROLE_FOO'), $vote1),
-                array($token, null, array('ROLE_BAR'), $vote2),
-            )));
+              ->method('vote')
+              ->will($this->returnValueMap(array(
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
+              )))
+        ;
 
         return $voter;
     }
@@ -186,8 +169,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
         $voter->expects($this->any())
-            ->method('vote')
-            ->will($this->returnValue($vote));
+              ->method('vote')
+              ->will($this->returnValue($vote));
 
         return $voter;
     }
@@ -196,8 +179,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
         $voter->expects($this->any())
-            ->method('supportsClass')
-            ->will($this->returnValue($ret));
+              ->method('supportsClass')
+              ->will($this->returnValue($ret));
 
         return $voter;
     }
@@ -206,8 +189,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
         $voter->expects($this->any())
-            ->method('supportsAttribute')
-            ->will($this->returnValue($ret));
+              ->method('supportsAttribute')
+              ->will($this->returnValue($ret));
 
         return $voter;
     }

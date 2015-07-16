@@ -3,6 +3,7 @@
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -20,8 +21,24 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * If all voters abstained from voting, the decision will be based on the
  * allowIfAllAbstainDecisions property value (defaults to false).
  */
-class DecideConsensusStrategy extends AbstractDecideStrategy implements AccessDecisionStrategyInterface
+class DecideConsensusStrategy extends AbstractDecideStrategy implements AccessDecisionManagerInterface
 {
+    private $allowIfEqualGrantedDeniedDecisions;
+
+    private $allowIfAllAbstainDecisions;
+
+    /**
+     * DecideConsensusStrategy constructor.
+     * @param $allowIfEqualGrantedDeniedDecisions
+     * @param $allowIfAllAbstainDecisions
+     */
+    public function __construct($allowIfEqualGrantedDeniedDecisions, $allowIfAllAbstainDecisions)
+    {
+        $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
+        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+    }
+
+
     /**
      * {@inheritdoc}
      */

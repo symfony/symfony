@@ -32,7 +32,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     const STRATEGY_HIGHEST_NOT_ABSTAINED = 'highest';
 
     private $voters;
-    private $strategies;
     private $strategy;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
@@ -49,11 +48,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
-        $this->strategies = array();
-        $this->voters = $voters;
-        $this->strategy = $strategy;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+        $this->strategy = $this->createStrategy($strategy);
+        $this->setVoters($voters);
     }
 
     /**
@@ -63,38 +61,23 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function setVoters(array $voters)
     {
-        $this->voters = $voters;
+        $this->strategy->setVoters($voters);
     }
 
-    /**
-     * @param mixed $strategies
-     */
-    public function addStrategy($name,$strategy)
+    private function createStrategy($strategyName)
     {
-        $this->strategies[$name] = $strategy;
-    }
-
-    private function getStrategy($strategyName)
-    {
-        if(!array_key_exists($strategyName,$this->strategies))
-        {
-            switch($strategyName){
-                case self::STRATEGY_UNANIMOUS:
-                    return new DecideUnanimousStrategy();
-                case self::STRATEGY_CONSENSUS:
-                    return new DecideConsensusStrategy();
-                case self::STRATEGY_AFFIRMATIVE:
-                    return new DecideAffirmativeStrategy();
-                case self::STRATEGY_HIGHEST_NOT_ABSTAINED:
-                    return new DecideHighestNotAbstainedVoterStrategy();
-                default:
-                    break;
-            }
-        } elseif($this->strategies[$strategyName] instanceof AccessDecisionStrategyInterface) {
-            return $this->strategies[$strategyName];
+        switch($strategyName){
+            case self::STRATEGY_UNANIMOUS:
+                return new DecideUnanimousStrategy($this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_CONSENSUS:
+                return new DecideConsensusStrategy($this->allowIfEqualGrantedDeniedDecisions,$this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_AFFIRMATIVE:
+                return new DecideAffirmativeStrategy($this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_HIGHEST_NOT_ABSTAINED:
+                return new DecideHighestNotAbstainedVoterStrategy($this->allowIfAllAbstainDecisions);
+            default:
+                throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategyName));
         }
-
-        throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategyName));
     }
 
     /**
@@ -102,39 +85,29 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
-        $strategy = $this->getStrategy($this->strategy);
-        $strategy->setVoters($this->voters);
-        $strategy->setAllowIfAllAbstainDecisions($this->allowIfAllAbstainDecisions);
-        $strategy->setAllowIfEqualGrantedDeniedDecisions($this->allowIfEqualGrantedDeniedDecisions);
-
-        return $strategy->decide($token, $attributes, $object);
+        return $this->strategy->decide($token, $attributes, $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsAttribute($attribute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * {@inheritdoc}
      */
     public function supportsClass($class)
     {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsClass($class)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->strategy->supportsClass($class);
     }
+
+    /**
+     * Checks if the access decision manager supports the given attribute.
+     *
+     * @param string $attribute An attribute
+     *
+     * @return bool true if this decision manager supports the attribute, false otherwise
+     */
+    public function supportsAttribute($attribute)
+    {
+        return $this->strategy->supportsAttribute($attribute);
+    }
+
+
 }

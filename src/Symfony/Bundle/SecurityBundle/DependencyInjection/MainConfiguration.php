@@ -72,7 +72,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS))
+                            ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS, AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED))
                             ->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)
                         ->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()

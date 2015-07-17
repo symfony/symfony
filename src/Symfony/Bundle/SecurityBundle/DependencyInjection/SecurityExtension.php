@@ -75,6 +75,11 @@ class SecurityExtension extends Extension
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
+
+        if(isset($config['authorization_checker']['access_decision_manager_service'])) {
+            $container->setParameter('security.access.manager.service', $config['authorization_checker']['access_decision_manager_service']);
+        }
+
         $container
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])

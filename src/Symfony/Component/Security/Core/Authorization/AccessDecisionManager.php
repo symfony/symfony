@@ -31,7 +31,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     const STRATEGY_UNANIMOUS = 'unanimous';
     const STRATEGY_HIGHEST_NOT_ABSTAINED = 'highest';
 
-    private $voters;
     private $strategy;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
@@ -64,22 +63,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy->setVoters($voters);
     }
 
-    private function createStrategy($strategyName)
-    {
-        switch($strategyName){
-            case self::STRATEGY_UNANIMOUS:
-                return new DecideUnanimousStrategy($this->allowIfAllAbstainDecisions);
-            case self::STRATEGY_CONSENSUS:
-                return new DecideConsensusStrategy($this->allowIfEqualGrantedDeniedDecisions,$this->allowIfAllAbstainDecisions);
-            case self::STRATEGY_AFFIRMATIVE:
-                return new DecideAffirmativeStrategy($this->allowIfAllAbstainDecisions);
-            case self::STRATEGY_HIGHEST_NOT_ABSTAINED:
-                return new DecideHighestNotAbstainedVoterStrategy($this->allowIfAllAbstainDecisions);
-            default:
-                throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategyName));
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -106,6 +89,22 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function supportsAttribute($attribute)
     {
         return $this->strategy->supportsAttribute($attribute);
+    }
+
+    private function createStrategy($strategyName)
+    {
+        switch($strategyName){
+            case self::STRATEGY_UNANIMOUS:
+                return new DecideUnanimousStrategy($this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_CONSENSUS:
+                return new DecideConsensusStrategy($this->allowIfEqualGrantedDeniedDecisions,$this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_AFFIRMATIVE:
+                return new DecideAffirmativeStrategy($this->allowIfAllAbstainDecisions);
+            case self::STRATEGY_HIGHEST_NOT_ABSTAINED:
+                return new DecideHighestNotAbstainedVoterStrategy($this->allowIfAllAbstainDecisions);
+            default:
+                throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategyName));
+        }
     }
 
 }

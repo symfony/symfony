@@ -94,10 +94,13 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
+                $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
+                $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
+                $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
 
             // Append generic carry-along options
@@ -205,6 +208,23 @@ class DateType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('year' => $default, 'month' => $default, 'day' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'year' => $choiceTranslationDomain,
+                'month' => $choiceTranslationDomain,
+                'day' => $choiceTranslationDomain,
+            );
+        };
+
         $format = function (Options $options) {
             return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
@@ -231,10 +251,12 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
         $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',

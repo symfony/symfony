@@ -69,6 +69,7 @@ class TimeType extends AbstractType
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
+                $hourOptions['choice_translation_domain'] = $options['choice_translation_domain']['hour'];
 
                 if ($options['with_minutes']) {
                     foreach ($options['minutes'] as $minute) {
@@ -77,6 +78,7 @@ class TimeType extends AbstractType
 
                     $minuteOptions['choices'] = $minutes;
                     $minuteOptions['placeholder'] = $options['placeholder']['minute'];
+                    $minuteOptions['choice_translation_domain'] = $options['choice_translation_domain']['minute'];
                 }
 
                 if ($options['with_seconds']) {
@@ -88,6 +90,7 @@ class TimeType extends AbstractType
 
                     $secondOptions['choices'] = $seconds;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
+                    $secondOptions['choice_translation_domain'] = $options['choice_translation_domain']['second'];
                 }
 
                 // Append generic carry-along options
@@ -194,6 +197,23 @@ class TimeType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('hour' => $default, 'minute' => $default, 'second' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'hour' => $choiceTranslationDomain,
+                'minute' => $choiceTranslationDomain,
+                'second' => $choiceTranslationDomain,
+            );
+        };
+
         $resolver->setDefaults(array(
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
@@ -217,10 +237,12 @@ class TimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
         $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',

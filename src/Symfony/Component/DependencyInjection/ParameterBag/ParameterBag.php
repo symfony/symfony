@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Holds parameters.
@@ -196,6 +197,10 @@ class ParameterBag implements ParameterBagInterface
             }
 
             return $args;
+        }
+
+        if ($value instanceof Reference && false !== strpos((string) $value, '%')) {
+            return new Reference($this->resolveString((string) $value, $resolving), $value->getInvalidBehavior(), $value->isStrict());
         }
 
         if (!is_string($value)) {

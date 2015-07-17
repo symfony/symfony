@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\Validator\Tests\Fixtures\Reference;
+use Symfony\Component\DependencyInjection\Reference as DicReference;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -196,6 +198,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new ParameterBag(array('host' => 'foo.bar', 'port' => 1337));
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
+
+        $bag = new ParameterBag(array('foo' => 'bar'));
+        $this->assertEquals('bar.bar', (string) $bag->resolveValue(new DicReference('bar.%foo%')), '->resolveValue() replaces placeholders in ids of References');
     }
 
     /**

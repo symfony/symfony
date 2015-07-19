@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ExpressionLanguage\Expression;
 
-
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -868,7 +867,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
                 'testPrivate1' => 'updated1',
                 'testProtected1' => 'updated2',
                 'testPublic1' => 'updated3',
-                'testPublic4' => 'updated4'
+                'testPublic4' => 'updated4',
             )
         );
         $definition->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
@@ -905,7 +904,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
                 'testPrivate1' => new Reference('test0'),
                 'testProtected1' => 'updated2',
                 'testPublic1' => 'updated3',
-                'testPublic4' => 'updated4'
+                'testPublic4' => 'updated4',
             )
         );
         $definition->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
@@ -919,7 +918,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
                 'testProtected2' => 'updated121',
                 'testPublic2' => 'updated13',
                 'testPublic3' => 'updated14',
-                'testPublic1' => 'updated15'
+                'testPublic1' => 'updated15',
             )
         );
         $definition2->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest2');

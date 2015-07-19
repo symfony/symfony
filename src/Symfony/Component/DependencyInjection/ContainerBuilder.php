@@ -1026,8 +1026,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-
-
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
                 $callable[0] = $parameterBag->resolveValue($callable[0]);

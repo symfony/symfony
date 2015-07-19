@@ -330,8 +330,6 @@ class Definition
             $properties[$this->class] = $this->properties;
         }
 
-
-
         return $properties;
     }
 

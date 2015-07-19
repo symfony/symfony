@@ -30,7 +30,7 @@ class DiffOperation extends AbstractOperation
         );
 
         foreach ($this->source->all($domain) as $id => $message) {
-            if ($this->target->has($id, $domain)) {
+            if (!$this->target->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->result->add(array($id => $message), $domain);
             } else {

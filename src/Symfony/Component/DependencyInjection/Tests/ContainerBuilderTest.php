@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -856,10 +857,120 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($classInList);
     }
+
+    public function testPrivatePropertySet()
+    {
+        $container = new ContainerBuilder();
+        $definition = new Definition();
+        $definition->setProperties(
+            array(
+                'testPrivate1' => 'updated1',
+                'testProtected1' => 'updated2',
+                'testPublic1' => 'updated3',
+                'testPublic4' => 'updated4',
+            )
+        );
+        $definition->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
+
+        $container->setDefinition('test1', $definition);
+        $container->compile();
+        $testObject = $container->get('test1');
+
+        $reflectionClass = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
+        $testPrivate1 = $reflectionClass->getProperty('testPrivate1');
+        $testPrivate1->setAccessible(true);
+
+        $testProtected1 = $reflectionClass->getProperty('testProtected1');
+        $testProtected1->setAccessible(true);
+
+        $this->assertEquals('updated1', $testPrivate1->getValue($testObject));
+        $this->assertEquals('updated2', $testProtected1->getValue($testObject));
+        $this->assertEquals('updated3', $testObject->testPublic1);
+        $this->assertEquals('updated4', $testObject->testPublic4);
+    }
+
+    public function testPrivatePropertySetWithParent()
+    {
+        $container = new ContainerBuilder();
+
+        $definition0 = new Definition();
+        $definition0->setProperties(array('testPublic' => 'updated4'));
+        $definition0->setClass('stdClass');
+        $container->setDefinition('test0', $definition0);
+
+        $definition = new Definition();
+        $definition->setProperties(
+            array(
+                'testPrivate1' => new Reference('test0'),
+                'testProtected1' => 'updated2',
+                'testPublic1' => 'updated3',
+                'testPublic4' => 'updated4',
+            )
+        );
+        $definition->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
+        $container->setDefinition('test1', $definition);
+
+        $definition2 = new DefinitionDecorator('test1');
+        $definition2->setProperties(
+            array(
+                'testPrivate1' => 'updated11',
+                'testProtected1' => 'updated12',
+                'testProtected2' => 'updated121',
+                'testPublic2' => 'updated13',
+                'testPublic3' => 'updated14',
+                'testPublic1' => 'updated15',
+            )
+        );
+        $definition2->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest2');
+        $container->setDefinition('test2', $definition2);
+
+        $container->compile();
+
+        $testObject2 = $container->get('test2');
+
+        $reflectionClass1 = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
+        $testPrivate1Parent = $reflectionClass1->getProperty('testPrivate1');
+        $testPrivate1Parent->setAccessible(true);
+        $stdClassValue = $testPrivate1Parent->getValue($testObject2);
+        $this->assertEquals('updated4', $stdClassValue->testPublic);
+
+        $reflectionClass2 = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\ServiceTest2');
+        $testPrivate1 = $reflectionClass2->getProperty('testPrivate1');
+        $testPrivate1->setAccessible(true);
+
+        $testProtected1 = $reflectionClass2->getProperty('testProtected1');
+        $testProtected1->setAccessible(true);
+
+        $testProtected2 = $reflectionClass2->getProperty('testProtected2');
+        $testProtected2->setAccessible(true);
+
+        $this->assertEquals('updated11', $testPrivate1->getValue($testObject2));
+        $this->assertEquals('updated12', $testProtected1->getValue($testObject2));
+        $this->assertEquals('updated121', $testProtected2->getValue($testObject2));
+        $this->assertEquals('updated15', $testObject2->testPublic1);
+        $this->assertEquals('updated13', $testObject2->testPublic2);
+        $this->assertEquals('updated13', $testObject2->testPublic2);
+        $this->assertEquals('updated14', $testObject2->testPublic3);
+    }
 }
 
 class FooClass
 {
+}
+
+class ServiceTest1
+{
+    private $testPrivate1 = 'default1';
+    protected $testProtected1 = 'default1';
+    public $testPublic1 = 'default1';
+}
+
+class ServiceTest2 extends ServiceTest1
+{
+    private $testPrivate1 = 'default2';
+    protected $testProtected1 = 'default2';
+    protected $testProtected2 = 'default2';
+    public $testPublic2 = 'default2';
 }
 
 class ProjectContainer extends ContainerBuilder

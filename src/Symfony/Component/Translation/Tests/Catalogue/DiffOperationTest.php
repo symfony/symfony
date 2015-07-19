@@ -25,7 +25,7 @@ class DiffOperationTest extends AbstractOperationTest
         );
 
         $this->assertEquals(
-            array('a' => 'old_a', 'c' => 'new_c'),
+            array('b' => 'old_b', 'c' => 'new_c'),
             $operation->getMessages('messages')
         );
 
@@ -35,7 +35,7 @@ class DiffOperationTest extends AbstractOperationTest
         );
 
         $this->assertEquals(
-            array('b' => 'old_b'),
+            array('a' => 'old_a'),
             $operation->getObsoleteMessages('messages')
         );
     }
@@ -44,7 +44,7 @@ class DiffOperationTest extends AbstractOperationTest
     {
         $this->assertEquals(
             new MessageCatalogue('en', array(
-                'messages' => array('a' => 'old_a', 'c' => 'new_c'),
+                'messages' => array('b' => 'old_b', 'c' => 'new_c'),
             )),
             $this->createOperation(
                 new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b'))),

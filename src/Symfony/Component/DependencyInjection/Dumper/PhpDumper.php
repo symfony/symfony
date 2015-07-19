@@ -458,7 +458,7 @@ class PhpDumper extends Dumper
     {
         $code = '';
         foreach ($definition->getPropertiesByClass() as $classPath => $properties) {
-            if($classPath === null) {
+            if(!$classPath || !class_exists($classPath)) {
                 foreach($properties as $name => $value) {
                     $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
                 }

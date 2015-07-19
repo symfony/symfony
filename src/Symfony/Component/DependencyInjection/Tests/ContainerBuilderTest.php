@@ -893,10 +893,16 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testPrivatePropertySetWithParent()
     {
         $container = new ContainerBuilder();
+
+        $definition0 = new Definition();
+        $definition0->setProperties(array('testPublic' => 'updated4'));
+        $definition0->setClass('stdClass');
+        $container->setDefinition('test0', $definition0);
+
         $definition = new Definition();
         $definition->setProperties(
             array(
-                'testPrivate1' => 'updated1',
+                'testPrivate1' => new Reference('test0'),
                 'testProtected1' => 'updated2',
                 'testPublic1' => 'updated3',
                 'testPublic4' => 'updated4'
@@ -917,7 +923,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             )
         );
         $definition2->setClass('Symfony\Component\DependencyInjection\Tests\ServiceTest2');
-        $definition2->setDecoratedService('test1');
         $container->setDefinition('test2', $definition2);
 
         $container->compile();
@@ -927,7 +932,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $reflectionClass1 = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\ServiceTest1');
         $testPrivate1Parent = $reflectionClass1->getProperty('testPrivate1');
         $testPrivate1Parent->setAccessible(true);
-        $this->assertEquals('updated1', $testPrivate1Parent->getValue($testObject2));
+        $stdClassValue = $testPrivate1Parent->getValue($testObject2);
+        $this->assertEquals('updated4', $stdClassValue->testPublic);
 
         $reflectionClass2 = new \ReflectionClass('Symfony\Component\DependencyInjection\Tests\ServiceTest2');
         $testPrivate1 = $reflectionClass2->getProperty('testPrivate1');
@@ -947,7 +953,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('updated13', $testObject2->testPublic2);
         $this->assertEquals('updated14', $testObject2->testPublic3);
     }
-
 }
 
 class FooClass

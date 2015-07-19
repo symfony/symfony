@@ -299,7 +299,11 @@ class Definition
      */
     public function setPropertiesByClass($classPath, array $properties)
     {
-        $this->propertiesByClass[$classPath] = $properties;
+        if (!$classPath || $classPath === $this->class) {
+            $this->properties = array_replace($this->properties, $properties);
+        } else {
+            $this->propertiesByClass[$classPath] = $properties;
+        }
 
         return $this;
     }
@@ -318,9 +322,15 @@ class Definition
     public function getPropertiesByClass()
     {
         $properties = $this->propertiesByClass;
-        if ($this->properties) {
+        // merge property list
+        if (isset($properties[$this->class])) {
+            $fullProperties = array_replace($properties[$this->class], $this->properties);
+            $properties[$this->class] = $fullProperties;
+        } else {
             $properties[$this->class] = $this->properties;
         }
+
+
 
         return $properties;
     }
@@ -344,7 +354,12 @@ class Definition
      */
     public function setPropertyByClass($classPath, $name, $value)
     {
-        $this->propertiesByClass[$classPath][$name] = $value;
+        // if class not set or class == current class
+        if (!$classPath || $classPath === $this->class) {
+            $this->properties[$name] = $value;
+        } else {
+            $this->propertiesByClass[$classPath][$name] = $value;
+        }
 
         return $this;
     }

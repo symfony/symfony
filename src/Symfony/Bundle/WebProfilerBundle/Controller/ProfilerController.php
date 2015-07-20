@@ -11,13 +11,14 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -27,6 +28,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ProfilerController
 {
+    const TOOLBAR_VERSION_1 = 1;
+    const TOOLBAR_VERSION_2 = 2;
+
     private $templateManager;
     private $generator;
     private $profiler;
@@ -201,12 +205,15 @@ class ProfilerController
             // the profiler is not enabled
         }
 
+        $toolbarVersion = Kernel::VERSION_ID < 20800 ? self::TOOLBAR_VERSION_1 : self::TOOLBAR_VERSION_2;
+
         return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
             'position' => $position,
             'profile' => $profile,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
             'token' => $token,
+            'toolbar_version' => $toolbarVersion,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

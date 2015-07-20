@@ -46,7 +46,10 @@
                         toolbarInfo.style.right = '';
                         toolbarInfo.style.left = '';
 
-                        if (leftValue > 0 && rightValue > 0) {
+                        if (elementWidth > pageWidth) {
+                            toolbarInfo.style.left = 0;
+                        }
+                        else if (leftValue > 0 && rightValue > 0) {
                             toolbarInfo.style.right = (rightValue * -1) + 'px';
                         } else if (leftValue < 0) {
                             toolbarInfo.style.left = 0;

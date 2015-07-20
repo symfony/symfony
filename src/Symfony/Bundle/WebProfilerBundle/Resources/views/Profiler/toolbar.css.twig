@@ -370,6 +370,10 @@
     .sf-toolbarreset {
         position: static;
     }
+
+    .sf-toolbar-block:hover .sf-toolbar-icon {
+        background-color: inherit;
+    }
 {% endif %}
 
 /* Responsive Design */
@@ -398,6 +402,10 @@
     .sf-toolbar-block-time .sf-toolbar-icon svg,
     .sf-toolbar-block-memory .sf-toolbar-icon svg {
         display: none;
+    }
+    .sf-toolbar-block-time .sf-toolbar-icon svg + span,
+    .sf-toolbar-block-memory .sf-toolbar-icon svg + span {
+        margin-left: 0;
     }
 
     .sf-toolbar-block .sf-toolbar-icon {

@@ -33,6 +33,7 @@ env:
 
 before_install:
     - composer self-update
+    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "memory_limit = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
@@ -44,7 +45,7 @@ before_install:
 install:
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
     - components=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
-    - if [ "$deps" != "no" ]; then sh .travis.sh $TRAVIS_BRANCH $components; fi;
+    - if [ "$deps" != "no" ]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $components; fi;
 
 script:
     - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

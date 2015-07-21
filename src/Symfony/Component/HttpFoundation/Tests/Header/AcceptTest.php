@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Component\HttpFoundation\Tests\Header;
 
 use Symfony\Component\HttpFoundation\Header\Accept;
@@ -72,6 +71,7 @@ class AcceptTest extends \PHPUnit_Framework_TestCase
         $item1 = new AcceptItem('gzip');
         $item2 = new AcceptItem('deflate');
         $item2->setIndex(1);
+
         $accept = new Accept(array($item1, $item2));
         $this->assertTrue($accept->has('gzip'));
         $this->assertEquals($item1, $accept->get('gzip'));
@@ -79,6 +79,7 @@ class AcceptTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($item2, $accept->get('deflate'));
         $this->assertFalse($accept->has('sdch'));
         $this->assertNull($accept->get('sdch'));
+
         $accept = Accept::fromString('gzip,deflate');
         $this->assertTrue($accept->has('gzip'));
         $this->assertEquals($item1, $accept->get('gzip'));

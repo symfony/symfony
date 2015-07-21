@@ -67,6 +67,27 @@ class AcceptTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAccessors()
+    {
+        $item1 = new AcceptItem('gzip');
+        $item2 = new AcceptItem('deflate');
+        $item2->setIndex(1);
+        $accept = new Accept(array($item1, $item2));
+        $this->assertTrue($accept->has('gzip'));
+        $this->assertEquals($item1, $accept->get('gzip'));
+        $this->assertTrue($accept->has('deflate'));
+        $this->assertEquals($item2, $accept->get('deflate'));
+        $this->assertFalse($accept->has('sdch'));
+        $this->assertNull($accept->get('sdch'));
+        $accept = Accept::fromString('gzip,deflate');
+        $this->assertTrue($accept->has('gzip'));
+        $this->assertEquals($item1, $accept->get('gzip'));
+        $this->assertTrue($accept->has('deflate'));
+        $this->assertEquals($item2, $accept->get('deflate'));
+        $this->assertFalse($accept->has('sdch'));
+        $this->assertNull($accept->get('sdch'));
+    }
+
     /**
      * @dataProvider provideFilterData
      */

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Header\IfNoneMatch;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -1609,7 +1610,7 @@ class Request
      */
     public function getETags()
     {
-        return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
+        return IfNoneMatch::fromString($this->headers->get('if_none_match'))->getETags();;
     }
 
     /**

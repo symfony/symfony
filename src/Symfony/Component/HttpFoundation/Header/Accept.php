@@ -93,7 +93,7 @@ class Accept
      */
     public function get($value)
     {
-        return isset($this->items[$value]) ? $this->items[$value] : null;
+        return $this->has($value) ? $this->items[$value] : null;
     }
 
     /**

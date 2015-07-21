@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Header\Accept;
-use Symfony\Component\HttpFoundation\Header\AcceptItem;
 
 /**
  * Represents an Accept-* header.
@@ -31,7 +30,7 @@ class AcceptHeader extends Accept
         $index = 0;
 
         return new self(array_map(function ($itemValue) use (&$index) {
-            $item = AcceptItem::fromString($itemValue);
+            $item = AcceptHeaderItem::fromString($itemValue);
             $item->setIndex($index++);
 
             return $item;

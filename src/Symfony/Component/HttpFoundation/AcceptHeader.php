@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Header\Accept;
+use Symfony\Component\HttpFoundation\Header\AcceptItem;
 
 /**
  * Represents an Accept-* header.
@@ -25,4 +26,16 @@ use Symfony\Component\HttpFoundation\Header\Accept;
  */
 class AcceptHeader extends Accept
 {
+    public static function fromString($headerValue)
+    {
+        $index = 0;
+
+        return new self(array_map(function ($itemValue) use (&$index) {
+            $item = AcceptItem::fromString($itemValue);
+            $item->setIndex($index++);
+
+            return $item;
+        }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
+    }
+
 }

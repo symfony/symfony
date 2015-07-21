@@ -78,7 +78,7 @@ class AcceptItem
             }
         }
 
-        return new self(($start = substr($value, 0, 1)) === ($end = substr($value, -1)) && ($start === '"' || $start === '\'') ? substr($value, 1, -1) : $value, $attributes);
+        return new static(($start = substr($value, 0, 1)) === ($end = substr($value, -1)) && ($start === '"' || $start === '\'') ? substr($value, 1, -1) : $value, $attributes);
     }
 
     /**
@@ -103,7 +103,7 @@ class AcceptItem
      *
      * @param string $value
      *
-     * @return AcceptHeaderItem
+     * @return AcceptItem
      */
     public function setValue($value)
     {
@@ -127,7 +127,7 @@ class AcceptItem
      *
      * @param float $quality
      *
-     * @return AcceptHeaderItem
+     * @return AcceptItem
      */
     public function setQuality($quality)
     {
@@ -151,7 +151,7 @@ class AcceptItem
      *
      * @param int $index
      *
-     * @return AcceptHeaderItem
+     * @return AcceptItem
      */
     public function setIndex($index)
     {
@@ -211,7 +211,7 @@ class AcceptItem
      * @param string $name
      * @param string $value
      *
-     * @return AcceptHeaderItem
+     * @return AcceptItem
      */
     public function setAttribute($name, $value)
     {

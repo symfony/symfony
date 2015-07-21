@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationKeyEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
@@ -42,6 +43,7 @@ class EntityTypeTest extends TypeTestCase
     const SINGLE_ASSOC_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity';
     const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
     const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
+    const ASSOCIATION_KEY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationKeyEntity';
 
     /**
      * @var EntityManager
@@ -69,6 +71,7 @@ class EntityTypeTest extends TypeTestCase
             $this->em->getClassMetadata(self::SINGLE_ASSOC_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(self::ASSOCIATION_KEY_CLASS),
         );
 
         try {
@@ -578,6 +581,26 @@ class EntityTypeTest extends TypeTestCase
         $this->assertEquals($expected, $field->getData());
         $this->assertTrue($field['_1']->getData());
         $this->assertFalse($field['2']->getData());
+    }
+
+    public function testSubmitAssociationKey()
+    {
+        $single = new SingleIntIdEntity(1, 'Foo');
+        $assoc = new AssociationKeyEntity($single);
+
+        $this->persist(array($single, $assoc));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'em' => 'default',
+            'class' => self::ASSOCIATION_KEY_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $field->submit('1');
+
+        $this->assertSame($assoc, $field->getData());
     }
 
     public function testOverrideChoices()

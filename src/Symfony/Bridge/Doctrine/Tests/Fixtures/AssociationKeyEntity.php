@@ -23,12 +23,14 @@ class AssociationKeyEntity
 {
     /**
      * @ORM\Id @ORM\OneToOne(targetEntity="SingleIntIdEntity")
+     *
      * @var SingleIntIdEntity
      */
     public $single;
 
     /**
      * AssociationKeyEntity constructor.
+     *
      * @param SingleIntIdEntity $single
      */
     public function __construct(SingleIntIdEntity $single)

@@ -498,7 +498,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
-        throw new BadMethodCallException('Buttons do not support form processors.');
+        throw new BadMethodCallException('Buttons do not support request handlers.');
     }
 
     /**

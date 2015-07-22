@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-21T19:31:29Z
+
+Great job! During the rename (https://github.com/issei-m/symfony/commit/ae7c3781b5292d8f3ea579f4101528abaa66f39c) people forgot to update the exception message.
+
+This should be merged into the 2.3 branch, but good news: The mergers will handle that for you
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-21T20:59:08Z
+
+:+1:

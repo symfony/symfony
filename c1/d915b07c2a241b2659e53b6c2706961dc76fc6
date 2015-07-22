@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T21:35:36Z
+
+what is making them incompatible here ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-02T22:38:39Z
+
+See failing tests on master:
+https://travis-ci.org/symfony/symfony/jobs/69306380

@@ -87,7 +87,7 @@ abstract class DoctrineType extends AbstractType
      */
     public static function createChoiceName($choice, $key, $value)
     {
-        return (string) $value;
+        return str_replace('-', '_', (string) $value);
     }
 
     /**

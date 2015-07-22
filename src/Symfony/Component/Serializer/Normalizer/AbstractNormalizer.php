@@ -272,19 +272,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function prepareForDenormalization($data)
     {
-        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
-            $normalizedData = $data;
-        } elseif (is_object($data)) {
-            $normalizedData = array();
-
-            foreach ($data as $attribute => $value) {
-                $normalizedData[$attribute] = $value;
-            }
-        } else {
-            $normalizedData = array();
-        }
-
-        return $normalizedData;
+        return (array) $data;
     }
 
     /**

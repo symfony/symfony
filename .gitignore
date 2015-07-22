@@ -1,8 +1,7 @@
-.php_cs.cache
-autoload.php
+vendor/
 composer.lock
-composer.phar
-package*.tar
-packages.json
 phpunit.xml
-/vendor/
+.php_cs.cache
+composer.phar
+package.tar
+/packages.json

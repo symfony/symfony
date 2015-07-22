@@ -18,8 +18,8 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/asset": "~2.8|~3.0",
-        "symfony/dependency-injection" : "~2.8|~3.0",
-        "symfony/config" : "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",

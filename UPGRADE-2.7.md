@@ -599,7 +599,7 @@ FrameworkBundle
  * The `templating.helper.assets` was refactored and returns now an object of the type
    `Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper` instead of
    `Symfony\Component\Templating\Helper\CoreAssetsHelper`. You can update your class definition
-   or use the `assets.package` service instead. Using the `assets.package` service is the recommended 
+   or use the `assets.packages` service instead. Using the `assets.packages` service is the recommended 
    way. The `templating.helper.assets` service will be removed in Symfony 3.0.
 
    Before:

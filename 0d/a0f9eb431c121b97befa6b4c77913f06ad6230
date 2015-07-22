@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-21T18:49:34Z
+
+Can you also fix some other occurences of empty + username? As there are more https://github.com/symfony/symfony/search?utf8=%E2%9C%93&q=if+%28empty%28%24username%29%29
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-21T19:27:52Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-22T06:53:10Z
+
+@WouterJ done
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-22T07:47:54Z
+
+Perfect!
+
+Status: Reviewed

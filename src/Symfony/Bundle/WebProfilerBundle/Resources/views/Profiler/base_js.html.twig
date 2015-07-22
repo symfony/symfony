@@ -169,8 +169,8 @@
                             infoSpan.textContent = text;
                         }
                     } else {
-                        var ajaxToolbarPanel = document.querySelectorAll('.sf-toolbar-block-ajax');
-                        ajaxToolbarPanel[0].style.display = 'none';
+                        var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
+                        ajaxToolbarPanel.style.display = 'none';
                     }
                 }
 
@@ -179,11 +179,11 @@
                 var className = 'sf-toolbar-ajax-requests sf-toolbar-value';
                 requestCounter[0].className = className;
 
-                var ajaxToolbarPanel = document.querySelectorAll('.sf-toolbar-block-ajax');
+                var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
                 if (state == 'error') {
-                    Sfjs.addClass(ajaxToolbarPanel[0], 'sf-toolbar-status-red');
+                    Sfjs.addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
                 } else {
-                    Sfjs.addClass(ajaxToolbarPanel[0], 'sf-ajax-request-loading');
+                    Sfjs.addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 }
             };
 

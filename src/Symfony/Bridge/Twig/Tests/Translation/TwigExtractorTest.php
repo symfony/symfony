@@ -74,14 +74,15 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException              \Twig_Error
      * @expectedExceptionMessageRegExp /Unclosed "block" in "extractor(\/|\\)syntax_error\.twig" at line 1/
+     * @dataProvider resourcesWithSyntaxErrorsProvider
      */
-    public function testExtractSyntaxError()
+    public function testExtractSyntaxError($resources)
     {
         $twig = new \Twig_Environment(new \Twig_Loader_Array(array()));
         $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
 
         $extractor = new TwigExtractor($twig);
-        $extractor->extract(__DIR__.'/../Fixtures', new MessageCatalogue('en'));
+        $extractor->extract($resources, new MessageCatalogue('en'));
     }
 
     /**
@@ -119,6 +120,17 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
             array(array(new \SplFileInfo($directory.'with_translations.html.twig'))),
             array(new \ArrayObject(array($directory.'with_translations.html.twig'))),
             array(new \ArrayObject(array(new \SplFileInfo($directory.'with_translations.html.twig')))),
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function resourcesWithSyntaxErrorsProvider()
+    {
+        return array(
+            array(__DIR__.'/../Fixtures'),
+            array(new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')),
         );
     }
 }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-06-29T08:12:30Z
+
+Discovered the same applies to `SimplePreAuthenticatorInterface`, updated the PR accordingly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-16T21:07:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-22T09:05:55Z
+
+Rebased and ready to merge imo

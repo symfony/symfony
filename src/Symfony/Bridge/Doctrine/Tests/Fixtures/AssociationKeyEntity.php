@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * An entity whose primary key is a foreign key to another entity.
  *
- * @see http://doctrine-orm.readthedocs.org/en/latest/tutorials/composite-primary-keys.html#use-case-2-simple-derived-identity
+ * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/composite-primary-keys.html#identity-through-foreign-entities
  * @ORM\Entity
  */
 class AssociationKeyEntity

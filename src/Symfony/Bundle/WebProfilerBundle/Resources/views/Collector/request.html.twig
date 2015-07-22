@@ -37,12 +37,12 @@
                 <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
-                <b>Controller method</b>
+                <b>Controller</b>
                 <span>{{ request_handler }}</span>
             </div>
             {% if collector.controller.class is defined %}
                 <div class="sf-toolbar-info-piece">
-                    <b>Controller file</b>
+                    <b>Controller class</b>
                     <span>{{ collector.controller.class }}</span>
                 </div>
             {% endif %}

@@ -115,4 +115,14 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     {
         $this->engine->get('form')->setTheme($view, $themes);
     }
+
+    public function testRange()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
 }

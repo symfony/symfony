@@ -128,4 +128,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
             array(array('TestBundle:Parent'), array('TestBundle:Child')),
         );
     }
+
+    public function testRange()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
 }

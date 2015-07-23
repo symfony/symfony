@@ -208,4 +208,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             array(array('parent_label.html.twig'), array('child_label.html.twig')),
         );
     }
+
+    public function testRange()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
 }

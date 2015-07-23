@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-22T17:09:15Z
+
+Fixes https://travis-ci.org/symfony/symfony/jobs/72100346#L3434
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-22T21:03:41Z
+
+It tests that the token created by the AnonymousAuthenticationListener has the same secret as the one configured in the constructor. This is quite important, as a different secret means authentication fails.
+
+To test this in a nicer way (and one that works in a BC matter), is by using a callback argument validator and the return value of `$token->getKey()`:
+
+```php
+->will($this->callback(function ($token) {
+    return 'TheKey' === $token->getKey();
+})
+```
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-22T21:55:31Z
+
+Updated, thank you @WouterJ
+Status: Needs Review

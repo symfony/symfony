@@ -456,7 +456,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($entity, $constraint);
     }
 
-    public function testCustomMessage()
+    public function testCustomMessageWithOneUniqueField()
     {
         $constraint = new UniqueEntity(array(
             'message' => 'An entity with name "{{ name }}" already exists.',
@@ -483,6 +483,37 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('An entity with name "Foo" already exists.')
             ->atPath('property.path.name')
             ->setInvalidValue('Foo')
+            ->assertRaised();
+    }
+
+    public function testCustomMessageWithTwoUniqueFields()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'An entity with name1 "{{ name }}" and name2 "{{ name2 }}" already exists.',
+            'fields' => array('name', 'name2'),
+            'em' => self::EM_NAME,
+            'errorPath' => 'name2',
+        ));
+
+        $entity1 = new DoubleNameEntity(1, 'Foo', 'Bar');
+        $entity2 = new DoubleNameEntity(2, 'Foo', 'Bar');
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity1);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($entity2, $constraint);
+
+        $this->buildViolation('An entity with name1 "Foo" and name2 "Bar" already exists.')
+            ->atPath('property.path.name2')
+            ->setInvalidValue('Bar')
             ->assertRaised();
     }
 }

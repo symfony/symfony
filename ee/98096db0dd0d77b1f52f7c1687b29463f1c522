@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-22T20:09:09Z
+
+Travis failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-22T20:54:20Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-22T20:56:34Z
+
+Btw, I've no idea why https://github.com/symfony/symfony/pull/15339/files#diff-e2998c2631b530a4d068d957e491b267L515 was not failing before that (the bug seems to be here from a while). Any hint @nicolas-grekas?

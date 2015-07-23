@@ -92,6 +92,7 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(__DIR__.'/../Fixtures'),
+            array(__DIR__.'/../Fixtures/extractor/syntax_error.twig'),
             array(new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')),
         );
     }

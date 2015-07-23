@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-07-03T12:41:28Z
+
+I renamed it to ``ResettableContainerInterface::reset()``
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-03T12:47:25Z
+
+> I'm not sure a doc PR is needed here: users of the fullstack framework should never use this feature
+
+And others are not aware of it, sadly. Maybe a little section on http://symfony.com/doc/current/components/dependency_injection/introduction.html is enough, what do you think ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-03T12:48:30Z
+
+@mickaelandrieu it does not belong to the introduction IMO, given it is an edge case feature
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-07-03T12:49:45Z
+
+Maybe this behavior can be used for Testing purpose? When you need to run multiple kernels in a test and check some datas in the container, you may have a reference of it, so clearing the container when shutting the kernel down might be good anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-03T12:50:58Z
+
+@Pierstoval I don't understand what you mean
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-07-03T12:59:06Z
+
+For example, when running a phpunit test, one might test compiler passes, so in a single test, he instantiates a first kernel, gets the container and make assertions to check consistency, and then instantiates another kernel, also make assertions on the new container.
+In this case, maybe one could keep the container reference even after shutting down the first kernel, so if you clear this reference, no human error is possible when checking the different containers: the first one will be cleared if the associated kernel has been shut down.
+
+I don't know if it's clear enough, but if it's not, then don't mind :p
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-03T13:03:28Z
+
+@Pierstoval unit testing a compiler pass should not involve booting a kernel (this would be functional testing of the whole app, which is totally inefficient for that).
+And anyway, you would still be the one shutting down the kernel if you do it your way. Symfony will not shut down the kernel until the teardown of the WebTestCase.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-03T13:43:48Z
+
+I don't think we need to doc anything here :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-03T13:52:25Z
+
+yeah, for the few cases where it could be useful to know about it, we can probably tell developers about this feature.
+
+I'm thinking it might maybe benefit Drupal in their testing environment if they recreate a container each time. As they don't use the kernel, they won't benefit form the automatic usage of the feature. but this would be only once they move to 2.8+ though. /cc @Crell
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-03T13:56:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-07-06T07:34:11Z
+
+I truly believe it should be documented. Every project using the single components instead of the full stack framework could make use of it and there is some case here it could be very useful.
+
+Maybe an entry in the cookbook? Actually I don't see where it could be in the component documentation... Or just leave it undocumented and rely to the docblock? As you said this feature will not be used by a lot of people.
+
+For the record, phpbb/phpbb:master will make use of it as soon as it will be merged (especially because there is one edge case where we have to build a first container to build the real one (dynamic extension/bundle definition of loading...))
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-14T06:55:25Z
+
+@stof Can you address the comments before merging?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-14T19:06:07Z
+
+@Nicofuma Yea, I was thinking that we rely on the PHP documentation for this. And also, since the `Container` class itself implements the interface, I figure that most people will use that or *at least* look at it to see how it works (and then they'll notice that resettable stuff). Happy this will be useful for phpbb :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-21T15:52:11Z
+
+updated.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-22T08:11:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by theofidry at 2015-07-22T13:29:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-22T13:31:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-22T20:11:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-22T22:52:57Z
+
+FYI, I tried this patch on my work project (I backported the patch on Symfony 2.6 and then ran my Behat testsuite).
+Blackfire reports 37% less memory usage, and the time spent in the garbage collector dropped from 37s to 17s (-54%), making the testsuite win several percents of its execution time.
+So this is a clear win.

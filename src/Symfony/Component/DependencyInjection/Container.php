@@ -61,7 +61,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @api
  */
-class Container implements IntrospectableContainerInterface, ResettableContainerInterface
+class Container implements ResettableContainerInterface
 {
     /**
      * @var ParameterBagInterface

@@ -116,9 +116,9 @@ class SwitchUserListener implements ListenerInterface
         if (false !== $originalToken) {
             if ($token->getUsername() === $request->get($this->usernameParameter)) {
                 return $token;
-            } else {
-                throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
             }
+
+            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
         if (false === $this->accessDecisionManager->decide($token, array($this->role))) {

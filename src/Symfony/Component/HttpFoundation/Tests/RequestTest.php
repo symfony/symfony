@@ -924,6 +924,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(feof($retval));
     }
 
+    public function testGetContentReturnsResourceWhenContentSetInConstructor()
+    {
+        $req = new Request(array(), array(), array(), array(), array(), array(), 'MyContent');
+        $resource = $req->getContent(true);
+
+        $this->assertTrue(is_resource($resource));
+        $this->assertEquals('MyContent', stream_get_contents($resource));
+    }
+
+    public function testContentAsResource()
+    {
+        $resource = fopen('php://memory','r+');
+        fwrite($resource, 'My other content');
+        rewind($resource);
+
+        $req = new Request(array(), array(), array(), array(), array(), array(), $resource);
+        $this->assertEquals('My other content', stream_get_contents($req->getContent(true)));
+        $this->assertEquals('My other content', $req->getContent());
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
@@ -968,7 +988,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return array(
             'Resource then fetch' => array(true, false),
             'Resource then resource' => array(true, true),
-            'Fetch then resource' => array(false, true),
         );
     }
 

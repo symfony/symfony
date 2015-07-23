@@ -88,7 +88,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $this->writeProperty($objectOrArray, $property, $value);
             }
 
-            if ($propertyValues[$i][self::IS_REF]) {
+            if ($propertyValues[$i][self::IS_REF] && is_object($objectOrArray)) {
                 return;
             }
 
@@ -149,7 +149,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
                 }
 
-                if ($propertyValues[$i][self::IS_REF]) {
+                if ($propertyValues[$i][self::IS_REF] && is_object($objectOrArray)) {
                     return true;
                 }
             }

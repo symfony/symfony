@@ -1,4 +1,4 @@
-id="<?php echo $view->escape($id) ?>" name="<?php echo $view->escape($full_name) ?>" <?php if ($read_only): ?>readonly="readonly" <?php endif ?>
+id="<?php echo $view->escape($id) ?>" name="<?php echo $view->escape($full_name) ?>" <?php if ($read_only && !isset($attr['readonly'])): ?>readonly="readonly" <?php endif ?>
 <?php if ($disabled): ?>disabled="disabled" <?php endif ?>
 <?php if ($required): ?>required="required" <?php endif ?>
 <?php foreach ($attr as $k => $v): ?>

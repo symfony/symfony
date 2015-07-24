@@ -1790,6 +1790,10 @@ class Request
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
             $this->server->remove('IIS_WasUrlRewritten');
+        } elseif ($this->server->has('REDIRECT_URL')) {
+            // Apache with mod_rewrite.
+            $requestUri = $this->server->get('REDIRECT_URL');
+            $this->server->remove('REDIRECT_URL');
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path, only use URL path

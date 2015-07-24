@@ -178,8 +178,7 @@ echo "Preparing resource bundle compilation (version $icuVersionInDownload)...\n
 $compiler = new GenrbCompiler($genrb, $genrbEnv);
 $config = new GeneratorConfig($sourceDir.'/data', $icuVersionInDownload);
 
-// Don't wrap "/data" in realpath(), in case the directory does not exist
-$baseDir = realpath(__DIR__.'/..').'/data';
+$baseDir = dirname(__DIR__).'/data';
 
 //$txtDir = $baseDir.'/txt';
 $jsonDir = $baseDir;

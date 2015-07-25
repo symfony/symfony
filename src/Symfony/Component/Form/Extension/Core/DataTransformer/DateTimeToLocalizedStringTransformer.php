@@ -70,7 +70,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTime|\DateTimeImmutable $dateTime A DateTime object
      *
      * @return string|array Localized date string/array.
      *
@@ -84,8 +84,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeImmutable) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeImmutable.');
         }
 
         $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());

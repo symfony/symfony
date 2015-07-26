@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by tomazahlin at 2015-07-02T08:57:38Z
+
+I agree, in this case, it could be merged later to some newer version? And I can revert the changes to the interface in this PR.
+
+---------------------------------------------------------------------------
+
+by tomazahlin at 2015-07-03T08:13:24Z
+
+Maybe the remove method in the interface can be merged into 3.0?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-26T15:45:37Z
+
+@tomazahlin rebase needed

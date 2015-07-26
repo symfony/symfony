@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -60,7 +61,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @api
  */
-class Container implements IntrospectableContainerInterface
+class Container implements IntrospectableContainerInterface, ResettableContainerInterface
 {
     /**
      * @var ParameterBagInterface
@@ -365,6 +366,18 @@ class Container implements IntrospectableContainerInterface
         }
 
         return isset($this->services[$id]) || array_key_exists($id, $this->services);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if (!empty($this->scopedServices)) {
+            throw new LogicException('Resetting the container is not allowed when a scope is active.');
+        }
+
+        $this->services = array();
     }
 
     /**

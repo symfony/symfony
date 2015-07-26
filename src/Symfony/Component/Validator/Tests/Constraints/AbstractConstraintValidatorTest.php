@@ -216,24 +216,14 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function expectValidateAt($i, $propertyPath, $value, $group)
     {
-        switch ($this->getApiVersion()) {
-            case Validation::API_VERSION_2_4:
-                $this->context->expects($this->at($i))
-                    ->method('validate')
-                    ->with($value, $propertyPath, $group);
-                break;
-            case Validation::API_VERSION_2_5:
-            case Validation::API_VERSION_2_5_BC:
-                $validator = $this->context->getValidator()->inContext($this->context);
-                $validator->expects($this->at(2 * $i))
-                    ->method('atPath')
-                    ->with($propertyPath)
-                    ->will($this->returnValue($validator));
-                $validator->expects($this->at(2 * $i + 1))
-                    ->method('validate')
-                    ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
-                break;
-        }
+        $validator = $this->context->getValidator()->inContext($this->context);
+        $validator->expects($this->at(2 * $i))
+            ->method('atPath')
+            ->with($propertyPath)
+            ->will($this->returnValue($validator));
+        $validator->expects($this->at(2 * $i + 1))
+            ->method('validate')
+            ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)

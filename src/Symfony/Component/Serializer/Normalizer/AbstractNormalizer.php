@@ -242,7 +242,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array $data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
         if (
             isset($context['object_to_populate']) &&

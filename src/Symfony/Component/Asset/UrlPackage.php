@@ -36,7 +36,6 @@ use Symfony\Component\Asset\Exception\LogicException;
 class UrlPackage extends Package
 {
     private $baseUrls = array();
-    private $sslUrls;
     private $sslPackage;
 
     /**
@@ -62,7 +61,7 @@ class UrlPackage extends Package
         $sslUrls = $this->getSslUrls($baseUrls);
 
         if ($sslUrls && $baseUrls !== $sslUrls) {
-            $this->sslPackage = new UrlPackage($sslUrls, $versionStrategy);
+            $this->sslPackage = new self($sslUrls, $versionStrategy);
         }
     }
 

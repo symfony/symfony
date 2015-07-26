@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Symfony WebProfilerBundle",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -22,6 +22,7 @@
         "symfony/twig-bridge": "~2.2"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.2",
         "symfony/console": "~2.3",
         "symfony/dependency-injection": "~2.2",

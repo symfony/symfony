@@ -60,11 +60,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.3.26-DEV';
-    const VERSION_ID = '20326';
+    const VERSION = '2.3.32-DEV';
+    const VERSION_ID = '20332';
     const MAJOR_VERSION = '2';
     const MINOR_VERSION = '3';
-    const RELEASE_VERSION = '26';
+    const RELEASE_VERSION = '32';
     const EXTRA_VERSION = 'DEV';
 
     /**
@@ -243,7 +243,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws \RuntimeException if a custom resource is hidden by a resource in a derived bundle
      */
@@ -605,7 +605,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
             if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true)) {
+                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                     throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
@@ -662,7 +662,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
-        if (class_exists('ProxyManager\Configuration')) {
+        if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
         }
 
@@ -682,8 +682,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if (class_exists('ProxyManager\Configuration')) {
-            $dumper->setProxyDumper(new ProxyDumper());
+        if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')) {
+            $dumper->setProxyDumper(new ProxyDumper(md5((string) $cache)));
         }
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => (string) $cache));

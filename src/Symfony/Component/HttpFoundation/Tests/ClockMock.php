@@ -9,6 +9,16 @@
  * file that was distributed with this source code.
  */
 
-$loader = require __DIR__.'/../vendor/autoload.php';
+namespace Symfony\Component\HttpFoundation;
 
-Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+function time($asFloat = false)
+{
+    return Tests\time();
+}
+
+namespace Symfony\Component\HttpFoundation\Tests;
+
+function time()
+{
+    return $_SERVER['REQUEST_TIME'];
+}

@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
  * This class contains the configuration information.
@@ -59,14 +60,17 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
-                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->info('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
+                ->enumNode('session_fixation_strategy')
+                    ->values(array(SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE))
+                    ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
+                ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('strategy')->defaultValue('affirmative')->end()
+                        ->enumNode('strategy')->values(array('affirmative', 'consensus', 'unanimous'))->defaultValue('affirmative')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
@@ -154,6 +158,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->cannotBeOverwritten()
                     ->prototype('array')
                         ->fixXmlConfig('ip')
+                        ->fixXmlConfig('method')
                         ->children()
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')

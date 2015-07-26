@@ -3,7 +3,7 @@
     "type": "library",
     "description": "The Symfony PHP framework",
     "keywords": ["framework"],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -61,6 +61,7 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",

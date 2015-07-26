@@ -154,7 +154,7 @@ class Link
         }
 
         if ('.' === substr($path, -1)) {
-            $path = $path.'/';
+            $path .= '/';
         }
 
         $output = array();
@@ -163,7 +163,7 @@ class Link
             if ('..' === $segment) {
                 array_pop($output);
             } elseif ('.' !== $segment) {
-                array_push($output, $segment);
+                $output[] = $segment;
             }
         }
 

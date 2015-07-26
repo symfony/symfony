@@ -35,9 +35,10 @@ class Crawler extends \SplObjectStorage
     /**
      * Constructor.
      *
-     * @param mixed  $node A Node to use as the base for the crawling
+     * @param mixed  $node       A Node to use as the base for the crawling
      * @param string $currentUri The current URI
-     * @param string $baseHref The base href value
+     * @param string $baseHref   The base href value
+     *
      * @api
      */
     public function __construct($node = null, $currentUri = null, $baseHref = null)
@@ -784,7 +785,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return sprintf("concat(%s)", implode($parts, ', '));
+        return sprintf('concat(%s)', implode($parts, ', '));
     }
 
     /**

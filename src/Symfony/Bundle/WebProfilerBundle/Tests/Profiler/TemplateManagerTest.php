@@ -41,7 +41,7 @@ class TemplateManagerTest extends TestCase
      */
     protected $templateManager;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

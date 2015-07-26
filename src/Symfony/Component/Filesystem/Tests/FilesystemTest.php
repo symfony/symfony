@@ -47,16 +47,16 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
-        $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
+        $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().mt_rand(0, 1000);
         mkdir($this->workspace, 0777, true);
         $this->workspace = realpath($this->workspace);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->clean($this->workspace);
         umask($this->umask);
@@ -675,7 +675,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenameThrowsExceptionOnError()
     {
-        $file = $this->workspace.DIRECTORY_SEPARATOR.uniqid();
+        $file = $this->workspace.DIRECTORY_SEPARATOR.uniqid('fs_test_', true);
         $newPath = $this->workspace.DIRECTORY_SEPARATOR.'new_file';
 
         $this->filesystem->rename($file, $newPath);

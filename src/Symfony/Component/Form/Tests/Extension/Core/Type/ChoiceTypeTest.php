@@ -67,16 +67,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_Error
-     */
-    public function testChoicesOptionExpectsArray()
-    {
-        $this->factory->create('choice', null, array(
-            'choices' => new \ArrayObject(),
-        ));
-    }
-
-    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testChoiceListOptionExpectsChoiceListInterface()

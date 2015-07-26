@@ -179,7 +179,7 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         $file = new FakeFile($realpath, __DIR__.'/File/Fixtures/test');
 
-        BinaryFileResponse::trustXSendFileTypeHeader();
+        BinaryFileResponse::trustXSendfileTypeHeader();
         $response = new BinaryFileResponse($file);
         $reflection = new \ReflectionObject($response);
         $property = $reflection->getProperty('file');
@@ -222,8 +222,8 @@ class BinaryFileResponseTest extends ResponseTestCase
     public function getSampleXAccelMappings()
     {
         return array(
-            array('/var/www/var/www/files/foo.txt', '/files/=/var/www/', '/files/var/www/files/foo.txt'),
-            array('/home/foo/bar.txt', '/files/=/var/www/,/baz/=/home/foo/', '/baz/bar.txt'),
+            array('/var/www/var/www/files/foo.txt', '/var/www/=/files/', '/files/var/www/files/foo.txt'),
+            array('/home/foo/bar.txt', '/var/www/=/files/,/home/foo/=/baz/', '/baz/bar.txt'),
         );
     }
 

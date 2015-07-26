@@ -9,6 +9,12 @@
  * file that was distributed with this source code.
  */
 
-$loader = require __DIR__.'/../vendor/autoload.php';
+namespace Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\DependencyInjection;
 
-Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(function ($class) {return class_exists($class);});
+class ExtensionNotValidExtension
+{
+    public function getAlias()
+    {
+        return 'extension_not_valid';
+    }
+}

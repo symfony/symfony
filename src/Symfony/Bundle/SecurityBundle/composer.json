@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Symfony SecurityBundle",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -21,6 +21,7 @@
         "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/browser-kit": "~2.3",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dependency-injection": "~2.3",

@@ -143,7 +143,7 @@ EOF
         $optionsCount = 0;
         foreach ($options as $option) {
             if ($input->getOption($option)) {
-                $optionsCount++;
+                ++$optionsCount;
             }
         }
 
@@ -207,12 +207,12 @@ EOF
             }
         }
         $format = '%-'.$maxName.'s ';
-        $format .= implode("", array_map(function ($length) { return "%-{$length}s "; }, $maxTags));
+        $format .= implode('', array_map(function ($length) { return "%-{$length}s "; }, $maxTags));
         $format .= '%-'.$maxScope.'s %s';
 
         // the title field needs extra space to make up for comment tags
         $format1 = '%-'.($maxName + 19).'s ';
-        $format1 .= implode("", array_map(function ($length) { return '%-'.($length + 19).'s '; }, $maxTags));
+        $format1 .= implode('', array_map(function ($length) { return '%-'.($length + 19).'s '; }, $maxTags));
         $format1 .= '%-'.($maxScope + 19).'s %s';
 
         $tags = array();
@@ -230,7 +230,7 @@ EOF
                     foreach ($definition->getTag($showTagAttributes) as $key => $tag) {
                         $tagValues = array();
                         foreach (array_keys($maxTags) as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
                         }
                         if (0 === $key) {
                             $lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
@@ -247,11 +247,11 @@ EOF
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
+                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), '') : array())));
             } else {
                 // we have no information (happens with "service_container")
                 $service = $definition;
-                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, '', get_class($service), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
+                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, '', get_class($service), count($maxTags) ? array_fill(0, count($maxTags), '') : array())));
             }
         }
     }
@@ -281,7 +281,7 @@ EOF
 
         if ($definition instanceof Definition) {
             $output->writeln(sprintf('<comment>Service Id</comment>       %s', $serviceId));
-            $output->writeln(sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-"));
+            $output->writeln(sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: '-'));
 
             $tags = $definition->getTags();
             if (count($tags)) {
@@ -305,7 +305,7 @@ EOF
             $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
             $output->writeln(sprintf('<comment>Synthetic</comment>        %s', $synthetic));
 
-            $file = $definition->getFile() ? $definition->getFile() : '-';
+            $file = $definition->getFile() ?: '-';
             $output->writeln(sprintf('<comment>Required File</comment>    %s', $file));
         } elseif ($definition instanceof Alias) {
             $alias = $definition;

@@ -3,7 +3,7 @@
     "type": "symfony-bridge",
     "description": "Symfony Swiftmailer Bridge",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,12 +12,15 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
         "php": ">=5.3.3",
         "swiftmailer/swiftmailer": ">=4.2.0,<6.0-dev"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.7"
     },
     "suggest": {
         "symfony/http-kernel": ""

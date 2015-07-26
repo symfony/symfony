@@ -42,7 +42,7 @@ class IssnValidator extends ConstraintValidator
         // Compose regex pattern
         $digitsPattern = $constraint->requireHyphen ? '\d{4}-\d{3}' : '\d{4}-?\d{3}';
         $checkSumPattern = $constraint->caseSensitive ? '[\d|X]' : '[\d|X|x]';
-        $pattern = "/^".$digitsPattern.$checkSumPattern."$/";
+        $pattern = '/^'.$digitsPattern.$checkSumPattern.'$/';
 
         if (!preg_match($pattern, $value)) {
             $this->context->addViolation($constraint->message, array(
@@ -60,7 +60,7 @@ class IssnValidator extends ConstraintValidator
 
         for ($i = 0; $i < 7; ++$i) {
             // Multiply the first digit by 8, the second by 7, etc.
-            $checkSum += (8-$i) * $canonical{$i};
+            $checkSum += (8 - $i) * $canonical{$i};
         }
 
         if (0 !== $checkSum % 11) {

@@ -1037,7 +1037,7 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if ($etags = $request->getEtags()) {
+        if ($etags = $request->getETags()) {
             $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
         }
 
@@ -1195,7 +1195,7 @@ class Response
     protected function ensureIEOverSSLCompatibility(Request $request)
     {
         if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
-            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
+            if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {
                 $this->headers->remove('Cache-Control');
             }
         }

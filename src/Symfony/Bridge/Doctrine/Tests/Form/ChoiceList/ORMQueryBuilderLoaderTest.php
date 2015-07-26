@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Doctrine\DBAL\Connection;
 
-class ORMQueryBuilderLoaderTest extends DoctrineTestHelper
+class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
@@ -27,6 +27,7 @@ class ORMQueryBuilderLoaderTest extends DoctrineTestHelper
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @group legacy
      */
     public function testClosureRequiresTheEntityManager()
     {
@@ -47,7 +48,7 @@ class ORMQueryBuilderLoaderTest extends DoctrineTestHelper
 
     protected function checkIdentifierType($classname, $expectedType)
     {
-        $em = $this->createTestEntityManager();
+        $em = DoctrineTestHelper::createTestEntityManager();
 
         $query = $this->getMockBuilder('QueryMock')
             ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
@@ -55,8 +56,8 @@ class ORMQueryBuilderLoaderTest extends DoctrineTestHelper
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(), $expectedType)
-            ->will($this->returnValue($query));
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(1, 2), $expectedType)
+            ->willReturn($query);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->setConstructorArgs(array($em))
@@ -65,12 +66,41 @@ class ORMQueryBuilderLoaderTest extends DoctrineTestHelper
 
         $qb->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
         $qb->select('e')
             ->from($classname, 'e');
 
         $loader = new ORMQueryBuilderLoader($qb);
-        $loader->getEntitiesByIds('id', array());
+        $loader->getEntitiesByIds('id', array(1, 2));
+    }
+
+    public function testFilterNonIntegerValues()
+    {
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getMockBuilder('QueryMock')
+            ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
+            ->getMock();
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(1, 2, 3), Connection::PARAM_INT_ARRAY)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setConstructorArgs(array($em))
+            ->setMethods(array('getQuery'))
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity', 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id', array(1, '', 2, 3, 'foo'));
     }
 }

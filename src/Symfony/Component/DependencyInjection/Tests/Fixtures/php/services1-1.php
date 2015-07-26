@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
- * Container
+ * Container.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.

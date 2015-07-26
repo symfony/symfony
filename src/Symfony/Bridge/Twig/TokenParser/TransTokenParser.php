@@ -53,7 +53,7 @@ class TransTokenParser extends \Twig_TokenParser
             if ($stream->test('into')) {
                 // {% trans into "fr" %}
                 $stream->next();
-                $locale =  $this->parser->getExpressionParser()->parseExpression();
+                $locale = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
                 throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with", "from", or "into" keyword.', $stream->getCurrent()->getLine(), $stream->getFilename());
             }

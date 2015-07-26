@@ -13,6 +13,8 @@ namespace Symfony\Component\Stopwatch\Tests;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 
+require_once __DIR__.'/ClockMock.php';
+
 /**
  * StopwatchTest.
  *
@@ -27,7 +29,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $stopwatch = new Stopwatch();
         $event = $stopwatch->start('foo', 'cat');
 
-        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
+        $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals('cat', $event->getCategory());
     }
 
@@ -74,7 +76,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         usleep(200000);
         $event = $stopwatch->stop('foo');
 
-        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
+        $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 

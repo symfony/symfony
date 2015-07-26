@@ -22,7 +22,7 @@ use Symfony\Component\Config\Resource\FileResource;
  *
  * @api
  */
-class CsvFileLoader extends ArrayLoader implements LoaderInterface
+class CsvFileLoader extends ArrayLoader
 {
     private $delimiter = ';';
     private $enclosure = '"';
@@ -71,7 +71,10 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }

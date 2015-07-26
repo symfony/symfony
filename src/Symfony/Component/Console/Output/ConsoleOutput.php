@@ -30,6 +30,9 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
+    /**
+     * @var StreamOutput
+     */
     private $stderr;
 
     /**
@@ -48,18 +51,13 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         OutputFormatterInterface $stdoutFormatter = null,
         OutputFormatterInterface $stderrFormatter = null
     ) {
-        $outputStream = 'php://stdout';
-        if (!$this->hasStdoutSupport()) {
-            $outputStream = 'php://output';
-        }
-
-        parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $stdoutFormatter);
+        parent::__construct($this->openOutputStream(), $verbosity, $decorated, $stdoutFormatter);
 
         if (null === $stderrFormatter) {
             $stderrFormatter = clone $this->getFormatter();
         }
 
-        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $stderrFormatter);
+        $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $stderrFormatter);
     }
 
     /**
@@ -109,14 +107,52 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * Returns true if current environment supports writing console output to
      * STDOUT.
      *
-     * IBM iSeries (OS400) exhibits character-encoding issues when writing to
-     * STDOUT and doesn't properly convert ASCII to EBCDIC, resulting in garbage
-     * output.
-     *
      * @return bool
      */
     protected function hasStdoutSupport()
     {
-        return ('OS400' != php_uname('s'));
+        return false === $this->isRunningOS400();
+    }
+
+    /**
+     * Returns true if current environment supports writing console output to
+     * STDERR.
+     *
+     * @return bool
+     */
+    protected function hasStderrSupport()
+    {
+        return false === $this->isRunningOS400();
+    }
+
+    /**
+     * Checks if current executing environment is IBM iSeries (OS400), which
+     * doesn't properly convert character-encodings between ASCII to EBCDIC.
+     *
+     * @return bool
+     */
+    private function isRunningOS400()
+    {
+        return 'OS400' === php_uname('s');
+    }
+
+    /**
+     * @return resource
+     */
+    private function openOutputStream()
+    {
+        $outputStream = $this->hasStdoutSupport() ? 'php://stdout' : 'php://output';
+
+        return @fopen($outputStream, 'w') ?: fopen('php://output', 'w');
+    }
+
+    /**
+     * @return resource
+     */
+    private function openErrorStream()
+    {
+        $errorStream = $this->hasStderrSupport() ? 'php://stderr' : 'php://output';
+
+        return fopen($errorStream, 'w');
     }
 }

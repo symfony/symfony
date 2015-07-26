@@ -36,7 +36,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      */
     public function __construct($username, $class)
     {
-        if (empty($username)) {
+        if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('$username must not be empty.');
         }
         if (empty($class)) {
@@ -102,7 +102,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      */
     public function equals(SecurityIdentityInterface $sid)
     {
-        if (!$sid instanceof UserSecurityIdentity) {
+        if (!$sid instanceof self) {
             return false;
         }
 

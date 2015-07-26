@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony HttpKernel Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -23,6 +23,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/browser-kit": "~2.3",
         "symfony/class-loader": "~2.1",
         "symfony/config": "~2.0,>=2.0.5",

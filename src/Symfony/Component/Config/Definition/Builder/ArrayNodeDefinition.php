@@ -287,9 +287,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Allows extra config keys to be specified under an array without
      * throwing an exception.
      *
-     * Those config values are simply ignored. This should be used only
-     * in special cases where you want to send an entire configuration
-     * array through a special tree that processes only part of the array.
+     * Those config values are simply ignored and removed from the
+     * resulting array. This should be used only in special cases where
+     * you want to send an entire configuration array through a special
+     * tree that processes only part of the array.
      *
      * @return ArrayNodeDefinition
      */
@@ -480,7 +481,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 );
             }
 
-            if (null !== $this->key && (null === $this->addDefaultChildren || is_integer($this->addDefaultChildren) && $this->addDefaultChildren > 0)) {
+            if (null !== $this->key && (null === $this->addDefaultChildren || is_int($this->addDefaultChildren) && $this->addDefaultChildren > 0)) {
                 throw new InvalidDefinitionException(
                     sprintf('->addDefaultChildrenIfNoneSet() should set default children names as ->useAttributeAsKey() is used at path "%s"', $path)
                 );

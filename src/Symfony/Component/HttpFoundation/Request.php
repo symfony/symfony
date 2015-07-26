@@ -199,13 +199,13 @@ class Request
     /**
      * Constructor.
      *
-     * @param array  $query      The GET parameters
-     * @param array  $request    The POST parameters
-     * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array  $cookies    The COOKIE parameters
-     * @param array  $files      The FILES parameters
-     * @param array  $server     The SERVER parameters
-     * @param string $content    The raw body data
+     * @param array           $query      The GET parameters
+     * @param array           $request    The POST parameters
+     * @param array           $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array           $cookies    The COOKIE parameters
+     * @param array           $files      The FILES parameters
+     * @param array           $server     The SERVER parameters
+     * @param string|resource $content    The raw body data
      *
      * @api
      */
@@ -219,13 +219,13 @@ class Request
      *
      * This method also re-initializes all properties.
      *
-     * @param array  $query      The GET parameters
-     * @param array  $request    The POST parameters
-     * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array  $cookies    The COOKIE parameters
-     * @param array  $files      The FILES parameters
-     * @param array  $server     The SERVER parameters
-     * @param string $content    The raw body data
+     * @param array           $query      The GET parameters
+     * @param array           $request    The POST parameters
+     * @param array           $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array           $cookies    The COOKIE parameters
+     * @param array           $files      The FILES parameters
+     * @param array           $server     The SERVER parameters
+     * @param string|resource $content    The raw body data
      *
      * @api
      */
@@ -476,10 +476,16 @@ class Request
      */
     public function __toString()
     {
+        try {
+            $content = $this->getContent();
+        } catch (\LogicException $e) {
+            return trigger_error($e, E_USER_ERROR);
+        }
+
         return
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
             $this->headers."\r\n".
-            $this->getContent();
+            $content;
     }
 
     /**
@@ -553,7 +559,7 @@ class Request
     public static function setTrustedHosts(array $hostPatterns)
     {
         self::$trustedHostPatterns = array_map(function ($hostPattern) {
-            return sprintf('{%s}i', str_replace('}', '\\}', $hostPattern));
+            return sprintf('#%s#i', $hostPattern);
         }, $hostPatterns);
         // we need to reset trusted hosts on trusted host patterns change
         self::$trustedHosts = array();
@@ -575,8 +581,8 @@ class Request
      * The following header keys are supported:
      *
      *  * Request::HEADER_CLIENT_IP:    defaults to X-Forwarded-For   (see getClientIp())
-     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getClientHost())
-     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getClientPort())
+     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getHost())
+     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getPort())
      *  * Request::HEADER_CLIENT_PROTO: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
      *
      * Setting an empty value allows to disable the trusted header for the given key.
@@ -791,7 +797,7 @@ class Request
     {
         $ip = $this->server->get('REMOTE_ADDR');
 
-        if (!self::$trustedProxies) {
+        if (!$this->isFromTrustedProxy()) {
             return array($ip);
         }
 
@@ -957,7 +963,7 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustedProxies) {
+        if ($this->isFromTrustedProxy()) {
             if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
                 return $port;
             }
@@ -975,7 +981,7 @@ class Request
             }
 
             if (false !== $pos) {
-                return intval(substr($host, $pos + 1));
+                return (int) substr($host, $pos + 1);
             }
 
             return 'https' === $this->getScheme() ? 443 : 80;
@@ -1138,7 +1144,7 @@ class Request
      */
     public function isSecure()
     {
-        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
+        if ($this->isFromTrustedProxy() && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
             return in_array(strtolower(current(explode(',', $proto))), array('https', 'on', 'ssl', '1'));
         }
 
@@ -1166,7 +1172,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
+        if ($this->isFromTrustedProxy() && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
             $elements = explode(',', $host);
 
             $host = $elements[count($elements) - 1];
@@ -1459,14 +1465,36 @@ class Request
      */
     public function getContent($asResource = false)
     {
-        if (false === $this->content || (true === $asResource && null !== $this->content)) {
-            throw new \LogicException('getContent() can only be called once when using the resource return type.');
+        $currentContentIsResource = is_resource($this->content);
+        if (PHP_VERSION_ID < 50600 && false === $this->content) {
+            throw new \LogicException('getContent() can only be called once when using the resource return type and PHP below 5.6.');
         }
 
         if (true === $asResource) {
+            if ($currentContentIsResource) {
+                rewind($this->content);
+
+                return $this->content;
+            }
+
+            // Content passed in parameter (test)
+            if (is_string($this->content)) {
+                $resource = fopen('php://temp','r+');
+                fwrite($resource, $this->content);
+                rewind($resource);
+
+                return $resource;
+            }
+
             $this->content = false;
 
             return fopen('php://input', 'rb');
+        }
+
+        if ($currentContentIsResource) {
+            rewind($this->content);
+
+            return stream_get_contents($this->content);
         }
 
         if (null === $this->content) {
@@ -1546,10 +1574,10 @@ class Request
 
         $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
         $this->languages = array();
-        foreach (array_keys($languages) as $lang) {
-            if (strstr($lang, '-')) {
+        foreach ($languages as $lang => $acceptHeaderItem) {
+            if (false !== strpos($lang, '-')) {
                 $codes = explode('-', $lang);
-                if ($codes[0] == 'i') {
+                if ('i' === $codes[0]) {
                     // Language not listed in ISO 639 that are not variants
                     // of any listed language, which can be registered with the
                     // i-prefix, such as i-cherokee
@@ -1557,8 +1585,8 @@ class Request
                         $lang = $codes[1];
                     }
                 } else {
-                    for ($i = 0, $max = count($codes); $i < $max; $i++) {
-                        if ($i == 0) {
+                    for ($i = 0, $max = count($codes); $i < $max; ++$i) {
+                        if ($i === 0) {
                             $lang = strtolower($codes[0]);
                         } else {
                             $lang .= '_'.strtoupper($codes[$i]);
@@ -1712,7 +1740,7 @@ class Request
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl).'/')) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(dirname($baseUrl), '/').'/')) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/');
         }
@@ -1784,7 +1812,8 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        if (null !== $baseUrl && false === $pathInfo = substr($requestUri, strlen($baseUrl))) {
+        $pathInfo = substr($requestUri, strlen($baseUrl));
+        if (null !== $baseUrl && (false === $pathInfo || '' === $pathInfo)) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         } elseif (null === $baseUrl) {
@@ -1852,5 +1881,10 @@ class Request
         }
 
         return false;
+    }
+
+    private function isFromTrustedProxy()
+    {
+        return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
     }
 }

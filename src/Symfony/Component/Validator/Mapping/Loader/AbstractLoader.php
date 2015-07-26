@@ -14,17 +14,38 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Base loader for validation metadata.
+ *
+ * This loader supports the loading of constraints from Symfony's default
+ * namespace (see {@link DEFAULT_NAMESPACE}) using the short class names of
+ * those constraints. Constraints can also be loaded using their fully
+ * qualified class names. At last, namespace aliases can be defined to load
+ * constraints with the syntax "alias:ShortName".
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 abstract class AbstractLoader implements LoaderInterface
 {
     /**
-     * Contains all known namespaces indexed by their prefix.
-     *
+     * The namespace to load constraints from by default.
+     */
+    const DEFAULT_NAMESPACE = '\\Symfony\\Component\\Validator\\Constraints\\';
+
+    /**
      * @var array
      */
     protected $namespaces;
 
     /**
      * Adds a namespace alias.
+     *
+     * The namespace alias can be used to reference constraints from specific
+     * namespaces in {@link newConstraint()}:
+     *
+     *     $this->addNamespaceAlias('mynamespace', '\\Acme\\Package\\Constraints\\');
+     *
+     *     $constraint = $this->newConstraint('mynamespace:NotNull');
      *
      * @param string $alias     The alias
      * @param string $namespace The PHP namespace
@@ -39,14 +60,17 @@ abstract class AbstractLoader implements LoaderInterface
      *
      * @param string $name    The constraint name. Either a constraint relative
      *                        to the default constraint namespace, or a fully
-     *                        qualified class name
+     *                        qualified class name. Alternatively, the constraint
+     *                        may be preceded by a namespace alias and a colon.
+     *                        The namespace alias must have been defined using
+     *                        {@link addNamespaceAlias()}.
      * @param mixed  $options The constraint options
      *
      * @return Constraint
      *
      * @throws MappingException If the namespace prefix is undefined
      */
-    protected function newConstraint($name, $options)
+    protected function newConstraint($name, $options = null)
     {
         if (strpos($name, '\\') !== false && class_exists($name)) {
             $className = (string) $name;
@@ -59,7 +83,7 @@ abstract class AbstractLoader implements LoaderInterface
 
             $className = $this->namespaces[$prefix].$className;
         } else {
-            $className = 'Symfony\\Component\\Validator\\Constraints\\'.$name;
+            $className = self::DEFAULT_NAMESPACE.$name;
         }
 
         return new $className($options);

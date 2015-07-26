@@ -83,7 +83,7 @@ EOT
         $bundlesDir = $targetArg.'/bundles/';
         $filesystem->mkdir($bundlesDir, 0777);
 
-        $output->writeln(sprintf("Installing assets using the <comment>%s</comment> option", $input->getOption('symlink') ? 'symlink' : 'hard copy'));
+        $output->writeln(sprintf('Installing assets using the <comment>%s</comment> option', $input->getOption('symlink') ? 'symlink' : 'hard copy'));
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {

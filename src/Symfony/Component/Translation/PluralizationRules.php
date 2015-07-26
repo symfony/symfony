@@ -31,9 +31,9 @@ class PluralizationRules
      */
     public static function get($number, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' == $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {
@@ -56,6 +56,7 @@ class PluralizationRules
          * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
          */
         switch ($locale) {
+            case 'az':
             case 'bo':
             case 'dz':
             case 'id':
@@ -74,7 +75,6 @@ class PluralizationRules
                 break;
 
             case 'af':
-            case 'az':
             case 'bn':
             case 'bg':
             case 'ca':
@@ -197,9 +197,9 @@ class PluralizationRules
      */
     public static function set($rule, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' == $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {

@@ -3,7 +3,7 @@
     "type": "symfony-bridge",
     "description": "Symfony Propel1 Bridge",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -24,6 +24,7 @@
         "propel/propel1": "~1.6,>=1.6.5"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {

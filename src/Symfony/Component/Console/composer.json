@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Console Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,13 +12,14 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/event-dispatcher": "~2.1"
     },
     "suggest": {

@@ -539,7 +539,7 @@ class PhpDumper extends Dumper
         if ($definition->isSynthetic()) {
             $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
         } elseif ($class = $definition->getClass()) {
-            $return[] = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'object' : "\\".$class, $class);
+            $return[] = sprintf('@return %s A %s instance.', 0 === strpos($class, '%') ? 'object' : '\\'.$class, $class);
         } elseif ($definition->getFactoryClass()) {
             $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
         } elseif ($definition->getFactoryService()) {
@@ -761,7 +761,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $bagClass
 
 /**
- * $class
+ * $class.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
@@ -797,8 +797,8 @@ EOF;
 
         if (count($scopes = $this->container->getScopes()) > 0) {
             $code .= "\n";
-            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
-            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
         }
 
         $code .= $this->addMethodMap();
@@ -839,15 +839,12 @@ EOF;
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
-
-        \$this->set('service_container', \$this);
-
 EOF;
 
         $code .= "\n";
         if (count($scopes = $this->container->getScopes()) > 0) {
-            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
-            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
         } else {
             $code .= "        \$this->scopes = array();\n";
             $code .= "        \$this->scopeChildren = array();\n";
@@ -1087,7 +1084,7 @@ EOF;
                     $behavior[$id] = $argument->getInvalidBehavior();
                 }
 
-                $calls[$id] += 1;
+                ++$calls[$id];
             }
         }
     }
@@ -1151,7 +1148,7 @@ EOF;
      *
      * @return bool
      */
-    private function hasReference($id, array $arguments, $deep = false, $visited = array())
+    private function hasReference($id, array $arguments, $deep = false, &$visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1213,23 +1210,29 @@ EOF;
             foreach ($value->getArguments() as $argument) {
                 $arguments[] = $this->dumpValue($argument);
             }
-            $class = $this->dumpValue($value->getClass());
-
-            if (false !== strpos($class, '$')) {
-                throw new RuntimeException('Cannot dump definitions which have a variable class name.');
-            }
 
             if (null !== $value->getFactoryMethod()) {
                 if (null !== $value->getFactoryClass()) {
                     return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                 } elseif (null !== $value->getFactoryService()) {
-                    return sprintf("%s->%s(%s)", $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
+                    $service = $this->dumpValue($value->getFactoryService());
+
+                    return sprintf('%s->%s(%s)', 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {
                     throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }
             }
 
-            return sprintf("new \\%s(%s)", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
+            $class = $value->getClass();
+            if (null === $class) {
+                throw new RuntimeException('Cannot dump definitions which have no class nor factory.');
+            }
+            $class = $this->dumpValue($class);
+            if (false !== strpos($class, '$')) {
+                throw new RuntimeException('Cannot dump definitions which have a variable class name.');
+            }
+
+            return sprintf('new \\%s(%s)', substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -1340,17 +1343,17 @@ EOF;
             $i = $this->variableCount;
 
             if ('' === $name) {
-                $name .= $firstChars[$i%$firstCharsLength];
-                $i = intval($i/$firstCharsLength);
+                $name .= $firstChars[$i % $firstCharsLength];
+                $i = (int) ($i / $firstCharsLength);
             }
 
             while ($i > 0) {
-                $i -= 1;
-                $name .= $nonFirstChars[$i%$nonFirstCharsLength];
-                $i = intval($i/$nonFirstCharsLength);
+                --$i;
+                $name .= $nonFirstChars[$i % $nonFirstCharsLength];
+                $i = (int) ($i / $nonFirstCharsLength);
             }
 
-            $this->variableCount += 1;
+            ++$this->variableCount;
 
             // check that the name is not reserved
             if (in_array($name, $this->reservedVariables, true)) {

@@ -31,14 +31,29 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadClassMetadataThrowsExceptionIfNotAnArray()
     {
         $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+
+        $this->setExpectedException('\InvalidArgumentException');
         $loader->loadClassMetadata($metadata);
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/pull/12158
+     */
+    public function testDoNotModifyStateIfExceptionIsThrown()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
+        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        try {
+            $loader->loadClassMetadata($metadata);
+        } catch (\InvalidArgumentException $e) {
+            // Call again. Again an exception should be thrown
+            $this->setExpectedException('\InvalidArgumentException');
+            $loader->loadClassMetadata($metadata);
+        }
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()

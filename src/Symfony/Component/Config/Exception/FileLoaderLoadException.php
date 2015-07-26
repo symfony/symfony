@@ -36,7 +36,8 @@ class FileLoaderLoadException extends \Exception
         if ('@' === $resource[0]) {
             $parts = explode(DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
-            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
         } elseif ($previous) {
             // include the previous exception, to help the user see what might be the underlying cause
             $message .= ' '.sprintf('(%s)', $previous->getMessage());
@@ -57,7 +58,7 @@ class FileLoaderLoadException extends \Exception
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("Array(%s)", implode(', ', $a));
+            return sprintf('Array(%s)', implode(', ', $a));
         }
 
         if (is_resource($var)) {

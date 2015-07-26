@@ -29,6 +29,20 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
+    public function getPathsWithUnexpectedType()
+    {
+        return array(
+            array('', 'foobar'),
+            array('foo', 'foobar'),
+            array(null, 'foobar'),
+            array(123, 'foobar'),
+            array((object) array('prop' => null), 'prop.foobar'),
+            array((object) array('prop' => (object) array('subProp' => null)), 'prop.subProp.foobar'),
+            array(array('index' => null), '[index][foobar]'),
+            array(array('index' => array('subIndex' => null)), '[index][subIndex][foobar]'),
+        );
+    }
+
     public function testGetValueReadsArray()
     {
         $array = array('firstName' => 'Bernhard');
@@ -198,27 +212,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getPathsWithUnexpectedType
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "object or array"
      */
-    public function testGetValueThrowsExceptionIfNotObjectOrArray()
+    public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->propertyAccessor->getValue('baz', 'foobar');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
-    public function testGetValueThrowsExceptionIfNull()
-    {
-        $this->propertyAccessor->getValue(null, 'foobar');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
-    public function testGetValueThrowsExceptionIfEmpty()
-    {
-        $this->propertyAccessor->getValue('', 'foobar');
+        $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
     public function testGetValueWhenArrayValueIsNull()
@@ -311,33 +311,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getPathsWithUnexpectedType
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "object or array"
      */
-    public function testSetValueThrowsExceptionIfNotObjectOrArray()
+    public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $value = 'baz';
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
-    public function testSetValueThrowsExceptionIfNull()
-    {
-        $value = null;
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     */
-    public function testSetValueThrowsExceptionIfEmpty()
-    {
-        $value = '';
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+        $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
     }
 
     /**

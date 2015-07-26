@@ -1,5 +1,7 @@
-phpunit.xml
+vendor/
 composer.lock
+phpunit.xml
+.php_cs.cache
 composer.phar
-autoload.php
-/vendor/
+package.tar
+/packages.json

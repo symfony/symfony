@@ -341,7 +341,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             new InputOption('foo7', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, '', array(1, 2)),
         ));
         $defaults = array(
-            'foo1' => null,
+            'foo1' => false,
             'foo2' => null,
             'foo3' => 'default',
             'foo4' => null,
@@ -349,7 +349,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             'foo6' => array(),
             'foo7' => array(1, 2),
         );
-        $this->assertEquals($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
+        $this->assertSame($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
     }
 
     public function testGetSynopsis()
@@ -373,6 +373,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo1 ... [fooN]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAsText()
     {
         $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
@@ -390,6 +393,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAsXml()
     {
         $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);

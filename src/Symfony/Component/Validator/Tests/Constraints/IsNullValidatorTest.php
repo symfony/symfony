@@ -11,19 +11,19 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\Null;
-use Symfony\Component\Validator\Constraints\NullValidator;
+use Symfony\Component\Validator\Constraints\IsNull;
+use Symfony\Component\Validator\Constraints\IsNullValidator;
 
-class NullValidatorTest extends AbstractConstraintValidatorTest
+class IsNullValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {
-        return new NullValidator();
+        return new IsNullValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Null());
+        $this->validator->validate(null, new IsNull());
 
         $this->assertNoViolation();
     }
@@ -33,7 +33,7 @@ class NullValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testInvalidValues($value, $valueAsString)
     {
-        $constraint = new Null(array(
+        $constraint = new IsNull(array(
             'message' => 'myMessage',
         ));
 

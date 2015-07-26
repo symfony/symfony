@@ -56,6 +56,21 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
+    public function testTransformDateTimeImmutable()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
+        }
+
+        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
+
+        $input = new \DateTimeImmutable('2010-02-03 04:05:06 America/New_York');
+        $output = $input->format('U');
+        $input = $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+
+        $this->assertEquals($output, $transformer->transform($input));
+    }
+
     public function testTransformExpectsDateTime()
     {
         $transformer = new DateTimeToTimestampTransformer();

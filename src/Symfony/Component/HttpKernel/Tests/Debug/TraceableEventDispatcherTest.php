@@ -98,8 +98,8 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $tdispatcher->addListener('foo', $listener1 = function () {; });
         $tdispatcher->addListener('foo', $listener2 = function () {; });
 
-        $logger->expects($this->at(0))->method('debug')->with("Notified event \"foo\" to listener \"closure\".");
-        $logger->expects($this->at(1))->method('debug')->with("Notified event \"foo\" to listener \"closure\".");
+        $logger->expects($this->at(0))->method('debug')->with('Notified event "foo" to listener "closure".');
+        $logger->expects($this->at(1))->method('debug')->with('Notified event "foo" to listener "closure".');
 
         $tdispatcher->dispatch('foo');
     }
@@ -113,9 +113,9 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $tdispatcher->addListener('foo', $listener1 = function (Event $event) { $event->stopPropagation(); });
         $tdispatcher->addListener('foo', $listener2 = function () {; });
 
-        $logger->expects($this->at(0))->method('debug')->with("Notified event \"foo\" to listener \"closure\".");
-        $logger->expects($this->at(1))->method('debug')->with("Listener \"closure\" stopped propagation of the event \"foo\".");
-        $logger->expects($this->at(2))->method('debug')->with("Listener \"closure\" was not called for event \"foo\".");
+        $logger->expects($this->at(0))->method('debug')->with('Notified event "foo" to listener "closure".');
+        $logger->expects($this->at(1))->method('debug')->with('Listener "closure" stopped propagation of the event "foo".');
+        $logger->expects($this->at(2))->method('debug')->with('Listener "closure" was not called for event "foo".');
 
         $tdispatcher->dispatch('foo');
     }
@@ -221,6 +221,19 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
         $request = Request::create('/');
         $kernel->handle($request);
+    }
+
+    public function testListenerCanRemoveItselfWhenExecuted()
+    {
+        $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $listener1 = function () use ($eventDispatcher, &$listener1) {
+            $eventDispatcher->removeListener('foo', $listener1);
+        };
+        $eventDispatcher->addListener('foo', $listener1);
+        $eventDispatcher->addListener('foo', function () {});
+        $eventDispatcher->dispatch('foo');
+
+        $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
     protected function getHttpKernel($dispatcher, $controller)

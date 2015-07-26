@@ -120,7 +120,7 @@ class ReferenceDumper
         if ($info = $node->getInfo()) {
             $this->writeLine('');
             // indenting multi-line info
-            $info = str_replace("\n", sprintf("\n%".($depth * 4)."s# ", ' '), $info);
+            $info = str_replace("\n", sprintf("\n%".($depth * 4).'s# ', ' '), $info);
             $this->writeLine('# '.$info, $depth * 4);
         }
 

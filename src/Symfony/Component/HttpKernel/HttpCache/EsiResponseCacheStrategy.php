@@ -45,7 +45,7 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
             $this->maxAges[] = $response->getMaxAge();
         }
 
-        $this->embeddedResponses++;
+        ++$this->embeddedResponses;
     }
 
     /**

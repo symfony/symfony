@@ -21,6 +21,9 @@ class UnloadedEntityChoiceListSingleIntIdTest extends AbstractEntityChoiceListSi
         $this->markTestSkipped('Non-existing values are not detected for unloaded choice lists.');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
     {
         $this->markTestSkipped('Non-existing values are not detected for unloaded choice lists.');

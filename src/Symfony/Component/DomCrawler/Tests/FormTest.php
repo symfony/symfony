@@ -397,7 +397,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testMultiselectSetValues()
     {
         $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit" /></form>');
-        $form->setValues(array('multi' => array("foo", "bar")));
+        $form->setValues(array('multi' => array('foo', 'bar')));
         $this->assertEquals(array('multi' => array('foo', 'bar')), $form->getValues(), '->setValue() sets the values of select');
     }
 
@@ -572,6 +572,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 '<form action="/foo?bar=bar"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
                 array(),
                 '/foo?bar=bar&foo=foo',
+            ),
+            array(
+                'replaces query values with the form values',
+                '<form action="/foo?bar=bar"><input type="text" name="bar" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/foo?bar=foo',
             ),
             array(
                 'returns an empty URI if the action is empty',
@@ -779,6 +785,30 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'baz' => 'fbb',
              ),
         ));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cannot set value on a compound field "foo[bar]".
+     */
+    public function testFormRegistrySetValueOnCompoundField()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('foo[bar][baz]'));
+
+        $registry->set('foo[bar]', 'fbb');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Unreachable field "0"
+     */
+    public function testFormRegistrySetArrayOnNotCompoundField()
+    {
+        $registry = new FormFieldRegistry();
+        $registry->add($this->getFormFieldMock('bar'));
+
+        $registry->set('bar', array('baz'));
     }
 
     public function testDifferentFieldTypesWithSameName()

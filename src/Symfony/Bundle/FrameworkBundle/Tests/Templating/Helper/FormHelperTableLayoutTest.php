@@ -66,7 +66,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function renderEnctype(FormView $view)
     {
         if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf("Deprecated method %s->enctype() is not implemented.", get_class($form)));
+            $this->markTestSkipped(sprintf('Deprecated method %s->enctype() is not implemented.', get_class($form)));
         }
 
         return (string) $form->enctype($view);

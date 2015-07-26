@@ -40,13 +40,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
+        $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -56,13 +54,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
+        $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
         $overwrite = true;
 
         // Add the root object to the list
@@ -72,13 +68,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         ));
 
         for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
-            $objectOrArray = & $propertyValues[$i][self::VALUE];
+            $objectOrArray = &$propertyValues[$i][self::VALUE];
 
             if ($overwrite) {
-                if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
-                }
-
                 $property = $propertyPath->getElement($i);
                 //$singular = $propertyPath->singulars[$i];
                 $singular = null;
@@ -90,7 +82,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
             }
 
-            $value = & $objectOrArray;
+            $value = &$objectOrArray;
             $overwrite = !$propertyValues[$i][self::IS_REF];
         }
     }
@@ -108,13 +100,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
         $propertyValues = array();
 
         for ($i = 0; $i < $lastIndex; ++$i) {
-            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
@@ -130,14 +122,19 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             if ($isIndex) {
-                $propertyValue = & $this->readIndex($objectOrArray, $property);
+                $propertyValue = &$this->readIndex($objectOrArray, $property);
             } else {
-                $propertyValue = & $this->readProperty($objectOrArray, $property);
+                $propertyValue = &$this->readProperty($objectOrArray, $property);
             }
 
-            $objectOrArray = & $propertyValue[self::VALUE];
+            $objectOrArray = &$propertyValue[self::VALUE];
 
-            $propertyValues[] = & $propertyValue;
+            // the final value of the path must not be validated
+            if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+            }
+
+            $propertyValues[] = &$propertyValue;
         }
 
         return $propertyValues;
@@ -167,7 +164,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (isset($array[$index])) {
             if (is_array($array)) {
-                $result[self::VALUE] = & $array[$index];
+                $result[self::VALUE] = &$array[$index];
                 $result[self::IS_REF] = true;
             } else {
                 $result[self::VALUE] = $array[$index];
@@ -219,7 +216,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
             $result[self::VALUE] = $object->$property;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
-            $result[self::VALUE] = & $object->$property;
+            $result[self::VALUE] = &$object->$property;
             $result[self::IS_REF] = true;
         } elseif (!$classHasProperty && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
@@ -227,7 +224,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // a *protected* property was found on the class, property_exists()
             // returns true, consequently the following line will result in a
             // fatal error.
-            $result[self::VALUE] = & $object->$property;
+            $result[self::VALUE] = &$object->$property;
             $result[self::IS_REF] = true;
         } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
             // we call the getter and hope the __call do the job
@@ -307,8 +304,10 @@ class PropertyAccessor implements PropertyAccessorInterface
                 // see https://github.com/symfony/symfony/issues/4670
                 $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
                 $itemToRemove = array();
-                $propertyValue = $this->readProperty($object, $property);
+                $propertyValue = &$this->readProperty($object, $property);
                 $previousValue = $propertyValue[self::VALUE];
+                // remove reference to avoid modifications
+                unset($propertyValue);
 
                 if (is_array($previousValue) || $previousValue instanceof \Traversable) {
                     foreach ($previousValue as $previousItem) {

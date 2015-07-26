@@ -302,14 +302,10 @@ abstract class BaseNode implements NodeInterface
         foreach ($this->finalValidationClosures as $closure) {
             try {
                 $value = $closure($value);
-            } catch (Exception $correctEx) {
-                throw $correctEx;
-            } catch (\Exception $invalid) {
-                throw new InvalidConfigurationException(sprintf(
-                    'Invalid configuration for path "%s": %s',
-                    $this->getPath(),
-                    $invalid->getMessage()
-                ), $invalid->getCode(), $invalid);
+            } catch (Exception $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": %s', $this->getPath(), $e->getMessage()), $e->getCode(), $e);
             }
         }
 

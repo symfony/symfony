@@ -103,7 +103,7 @@ abstract class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } elseif (null !== $options && ! (is_array($options) && count($options) === 0)) {
+        } elseif (null !== $options && !(is_array($options) && count($options) === 0)) {
             $option = $this->getDefaultOption();
 
             if (null === $option) {
@@ -154,7 +154,7 @@ abstract class Constraint
      */
     public function addImplicitGroupName($group)
     {
-        if (in_array(Constraint::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
+        if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }

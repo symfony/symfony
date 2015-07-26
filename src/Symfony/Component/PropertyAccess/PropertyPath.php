@@ -76,7 +76,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function __construct($propertyPath)
     {
         // Can be used as copy constructor
-        if ($propertyPath instanceof PropertyPath) {
+        if ($propertyPath instanceof self) {
             /* @var PropertyPath $propertyPath */
             $this->elements = $propertyPath->elements;
             $this->singulars = $propertyPath->singulars;

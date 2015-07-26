@@ -62,6 +62,9 @@ class ActionsExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'actions';

@@ -76,7 +76,7 @@
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
-            <argument type="collection"></argument>
+            <argument type="collection" />
             <argument /> <!-- Provider Key -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
@@ -88,7 +88,9 @@
             <argument type="service" id="security.logout.success_handler" />
             <argument /> <!-- Options -->
         </service>
+
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false" />
+
         <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false" abstract="true" />
 
         <service id="security.logout.success_handler" class="%security.logout.success_handler.class%" public="false" abstract="true">
@@ -109,7 +111,7 @@
             <argument />
             <argument type="service" id="security.authentication.success_handler" />
             <argument type="service" id="security.authentication.failure_handler" />
-            <argument type="collection"></argument>
+            <argument type="collection" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />
         </service>
@@ -130,8 +132,7 @@
         <service id="security.authentication.listener.form"
                  class="%security.authentication.listener.form.class%"
                  parent="security.authentication.listener.abstract"
-                 abstract="true">
-        </service>
+                 abstract="true" />
 
         <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\Collator;
 
 use Symfony\Component\Intl\Collator\Collator;
-use Symfony\Component\Intl\Locale;
 
 /**
  * Test case for Collator implementations.

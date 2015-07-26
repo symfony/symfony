@@ -36,13 +36,13 @@ class TwigExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
 
-        foreach ($configs as &$config) {
+        foreach ($configs as $key => $config) {
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {
                     if (is_array($value) && isset($value['key'])) {
-                        $config['globals'][$name] = array(
+                        $configs[$key]['globals'][$name] = array(
                             'key' => $name,
-                            'value' => $config['globals'][$name],
+                            'value' => $value,
                         );
                     }
                 }

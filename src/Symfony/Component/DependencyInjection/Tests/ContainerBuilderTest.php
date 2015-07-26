@@ -190,6 +190,13 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->get('bar') === $builder->get('foo'), '->setAlias() creates a service that is an alias to another one');
 
         try {
+            $builder->setAlias('foobar', 'foobar');
+            $this->fail('->setAlias() throws an InvalidArgumentException if the alias references itself');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('An alias can not reference itself, got a circular reference on "foobar".', $e->getMessage(), '->setAlias() throws an InvalidArgumentException if the alias references itself');
+        }
+
+        try {
             $builder->getAlias('foobar');
             $this->fail('->getAlias() throws an InvalidArgumentException if the alias does not exist');
         } catch (\InvalidArgumentException $e) {
@@ -259,7 +266,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->setResourceTracking(false);
         $builderCompilerPasses = $builder->getCompiler()->getPassConfig()->getPasses();
         $builder->addCompilerPass($this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
-        $this->assertEquals(sizeof($builderCompilerPasses) + 1, sizeof($builder->getCompiler()->getPassConfig()->getPasses()));
+
+        $this->assertCount(count($builder->getCompiler()->getPassConfig()->getPasses()) - 1, $builderCompilerPasses);
     }
 
     /**
@@ -321,8 +329,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
-        $builder->register('foo1', 'FooClass')->setFactoryClass('FooClass')->setFactoryMethod('getInstance')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
+        $builder
+            ->register('foo1', 'FooClass')
+            ->setFactoryClass('%foo_class%')
+            ->setFactoryMethod('getInstance')
+            ->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')))
+        ;
         $builder->setParameter('value', 'bar');
+        $builder->setParameter('foo_class', 'FooClass');
         $this->assertTrue($builder->get('foo1')->called, '->createService() calls the factory method to create the service instance');
         $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
     }
@@ -333,10 +347,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateServiceFactoryService()
     {
         $builder = new ContainerBuilder();
-        $builder->register('baz_service')->setFactoryService('baz_factory')->setFactoryMethod('getInstance');
-        $builder->register('baz_factory', 'BazClass');
-
-        $this->assertInstanceOf('BazClass', $builder->get('baz_service'));
+        $builder->register('foo_service', 'FooClass');
+        $builder
+            ->register('foo', 'FooClass')
+            ->setFactoryService('%foo_service%')
+            ->setFactoryMethod('getInstance')
+        ;
+        $builder->setParameter('foo_service', 'foo_service');
+        $this->assertTrue($builder->get('foo')->called, '->createService() calls the factory method to create the service instance');
     }
 
     /**

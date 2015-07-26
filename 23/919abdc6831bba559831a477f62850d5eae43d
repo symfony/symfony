@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-23T11:42:47Z
+
+This is a BC break, isn't it? As people typehinting for the new interface will have to update their code for Symfony 3.0
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-07-23T12:49:07Z
+
+Yes, it is a BC, everyone who hast implemented ```ContainerInterface```before, has to add the new method ```initialize()``` to his code
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-07-24T10:06:00Z
+
+Why not make a separate optional interface?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-07-24T10:10:30Z
+
+@hhamon thats, what it was before...or i don't understand what you mean
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-24T10:11:02Z
+
+@hhamon #15336
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-07-24T13:11:49Z
+
+@fabpot thanks for the link, I didn't know there was a discussion about it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-26T09:07:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by znerol at 2015-07-26T09:38:15Z
+
+Last commit resolves merge conflicts due to the recent introduction of `ResettableContainerInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-26T15:51:56Z
+
+:+1:

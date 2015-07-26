@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2015-07-24T15:23:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-24T15:52:26Z
+
+:+1: for 2.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-25T21:51:19Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-26T08:58:02Z
+
+I'm not sure about this one, the target URL is only store when there is an existing session, in which case the app is already not stateless anymore.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-07-26T09:27:18Z
+
+Yes and no:
+
+* The session listener is [configured globally](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/EventListener/SessionListener.php#L36-L40t) for an application ([and not for a subpath](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L81-L84))
+* The session listener will "just" test if there is a [session object in the DIC](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/EventListener/SessionListener.php#L36-L40). If so it injects [the session object in the request](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/HttpKernel/EventListener/SessionListener.php#L25-L38).
+
+So at this point, an application may not have used the session yet
+So you can still have a session empty and so a stateless application.

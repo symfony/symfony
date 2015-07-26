@@ -46,8 +46,9 @@ class ExceptionListener
     private $errorPage;
     private $logger;
     private $httpUtils;
+    private $stateless;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, $stateless = false)
     {
         $this->context = $context;
         $this->accessDeniedHandler = $accessDeniedHandler;
@@ -57,6 +58,7 @@ class ExceptionListener
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
         $this->logger = $logger;
+        $this->stateless = $stateless;
     }
 
     /**
@@ -178,7 +180,9 @@ class ExceptionListener
             $this->logger->debug('Calling Authentication entry point');
         }
 
-        $this->setTargetPath($request);
+        if (!$this->stateless) {
+            $this->setTargetPath($request);
+        }
 
         if ($authException instanceof AccountStatusException) {
             // remove the security token to prevent infinite redirect loops

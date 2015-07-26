@@ -46,12 +46,9 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        $outputStream = $this->hasStdoutSupport() ? 'php://stdout' : 'php://output';
-        $errorStream = $this->hasStderrSupport() ? 'php://stderr' : 'php://output';
+        parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
 
-        parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
-
-        $this->stderr = new StreamOutput(fopen($errorStream, 'w'), $verbosity, $decorated, $this->getFormatter());
+        $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
     }
 
     /**
@@ -128,5 +125,25 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     private function isRunningOS400()
     {
         return 'OS400' === php_uname('s');
+    }
+
+    /**
+     * @return resource
+     */
+    private function openOutputStream()
+    {
+        $outputStream = $this->hasStdoutSupport() ? 'php://stdout' : 'php://output';
+
+        return @fopen($outputStream, 'w') ?: fopen('php://output', 'w');
+    }
+
+    /**
+     * @return resource
+     */
+    private function openErrorStream()
+    {
+        $errorStream = $this->hasStderrSupport() ? 'php://stderr' : 'php://output';
+
+        return fopen($errorStream, 'w');
     }
 }

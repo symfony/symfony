@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by m14t at 2015-07-17T19:09:22Z
+
+Note the fabbot.io check that fails here is not introduced by this pull request, but I would be happy to add a separate commit for this (one line white space change) if desired.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-17T20:31:49Z
+
+:+1: looks reasonable to me, it just should be merged into the `2.7` branch
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by m14t at 2015-07-17T21:24:50Z
+
+Thanks for the thumbs up @xabbuh.  Sorry about the wrong branch, I wasn't exactly sure how to interpret the [Choose the right Branch](http://symfony.com/doc/current/contributing/code/patches.html#choose-the-right-branch) section of the Contributing guide for something like this.
+
+Should I close and re-open a PR against 2.7, or was that note for the person that would be merging this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-17T21:35:31Z
+
+@m14t I guess we can safely apply the changes on the `2.7` branch. :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-26T15:32:06Z
+
+:+1:

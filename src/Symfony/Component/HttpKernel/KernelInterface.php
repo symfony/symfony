@@ -147,6 +147,15 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getEnvironment();
 
     /**
+     * Checks if current environment is dev.
+     *
+     * @return bool true if current environment is dev
+     *
+     * @api
+     */
+    public function isDevEnvironment();
+
+    /**
      * Checks if debug mode is enabled.
      *
      * @return bool true if debug mode is enabled, false otherwise

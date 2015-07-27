@@ -764,6 +764,15 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testKernelIsDevEnvironment()
+    {
+        $devKernel = new KernelForTest('dev', true);
+        $this->assertTrue($devKernel->isDevEnvironment());
+
+        $prodKernel = new KernelForTest('prod', false);
+        $this->assertFalse($prodKernel->isDevEnvironment());
+    }
+
     /**
      * Returns a mock for the BundleInterface
      *

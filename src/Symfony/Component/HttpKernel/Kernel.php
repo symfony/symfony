@@ -348,6 +348,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @api
      */
+    public function isDevEnvironment()
+    {
+        return $this->getEnvironment() === 'dev';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
     public function isDebug()
     {
         return $this->debug;

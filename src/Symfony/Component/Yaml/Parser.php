@@ -320,7 +320,7 @@ class Parser
             return;
         }
 
-        if ($inSequence && $oldLineIndentation === $newIndent && '-' === $data[0][0]) {
+        if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
             // the previous line contained a dash but no item content, this line is a sequence item with the same indentation
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();

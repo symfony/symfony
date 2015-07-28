@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-28T12:51:25Z
+
+FYI, I don't have the remaining failure on the Yaml component. I believe a php7 bug has been fixed that is currently not deployed on travis.

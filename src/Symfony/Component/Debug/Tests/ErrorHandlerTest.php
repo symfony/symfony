@@ -121,11 +121,11 @@ PHP
             $that->assertEquals('->', $trace[0]['type']);
 
             $that->assertEquals(__FILE__, $trace[1]['file']);
-            $that->assertEquals(__CLASS__, $trace[1]['class']);
+            $that->assertEquals('Symfony\Component\Debug\Tests\ErrorHandlerTest', $trace[1]['class']);
             $that->assertEquals('triggerNotice', $trace[1]['function']);
             $that->assertEquals('::', $trace[1]['type']);
 
-            $that->assertEquals(__CLASS__, $trace[2]['class']);
+            $that->assertEquals('Symfony\Component\Debug\Tests\ErrorHandlerTest', $trace[2]['class']);
             $that->assertEquals('testNotice', $trace[2]['function']);
             $that->assertEquals('->', $trace[2]['type']);
         };

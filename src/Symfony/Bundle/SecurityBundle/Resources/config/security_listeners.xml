@@ -244,6 +244,7 @@
             <argument>%security.access.denied_url%</argument>
             <argument type="service" id="security.access.denied_handler" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>false</argument> <!-- Stateless -->
         </service>
 
         <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%" public="false" abstract="true">

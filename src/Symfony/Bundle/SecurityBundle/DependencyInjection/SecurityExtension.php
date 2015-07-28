@@ -366,7 +366,7 @@ class SecurityExtension extends Extension
         $listeners[] = new Reference('security.access_listener');
 
         // Exception listener
-        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint));
+        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
         return array($matcher, $listeners, $exceptionListener);
     }
@@ -551,12 +551,13 @@ class SecurityExtension extends Extension
         return 'security.user.provider.concrete.'.$name;
     }
 
-    private function createExceptionListener($container, $config, $id, $defaultEntryPoint)
+    private function createExceptionListener($container, $config, $id, $defaultEntryPoint, $stateless)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(4, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(8, $stateless);
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {

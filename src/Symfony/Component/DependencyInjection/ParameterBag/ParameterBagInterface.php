@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
@@ -25,6 +26,8 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      *
+     * @throws LogicException if the ParameterBagInterface can not be cleared
+     *
      * @api
      */
     public function clear();
@@ -33,6 +36,8 @@ interface ParameterBagInterface
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @throws LogicException if the parameter can not be added
      *
      * @api
      */
@@ -65,6 +70,8 @@ interface ParameterBagInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @throws LogicException if the parameter can not be set
      *
      * @api
      */

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 
 /**
@@ -34,7 +32,7 @@ ReflectionClass {
   constants: array:3 [
     "IS_IMPLICIT_ABSTRACT" => 16
     "IS_EXPLICIT_ABSTRACT" => 32
-    "IS_FINAL" => 64
+    "IS_FINAL" => %d
   ]
   properties: array:%d [
     "name" => ReflectionProperty {

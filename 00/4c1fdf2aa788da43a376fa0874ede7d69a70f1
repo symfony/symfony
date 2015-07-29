@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-28T20:10:44Z
+
+Which third party router do you use that does not set this parameter?
+
+I agree with this PR since the UrlMatcherInterface does not specify that a `_route` parameter must be returned so it cannot be assumed in this listener.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-29T06:54:44Z
+
+:+1:

@@ -256,10 +256,12 @@ class ResponseHeaderBag extends HeaderBag
      * @throws \InvalidArgumentException
      *
      * @see RFC 6266
-     * @deprecated since 2.8, to be removed in 3.0. Use an instance of Symfony\Component\HttpFoundation\Header\ContentDisposition instead.
+     * @deprecated since 2.8, to be removed in 3.0. Create an instance of Symfony\Component\HttpFoundation\Header\ContentDisposition instead.
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Create an instance of Symfony\Component\HttpFoundation\Header\ContentDisposition instead.', E_USER_DEPRECATED);
+
         $header = new ContentDisposition($disposition, $filename, $filenameFallback);
 
         return (string) $header;

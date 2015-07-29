@@ -1610,7 +1610,7 @@ class Request
      */
     public function getETags()
     {
-        return IfNoneMatch::fromString($this->headers->get('if_none_match'))->getETags();;
+        return IfNoneMatch::fromString($this->headers->get('if_none_match'))->getETags();
     }
 
     /**

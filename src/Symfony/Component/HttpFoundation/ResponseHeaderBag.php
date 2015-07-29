@@ -256,6 +256,7 @@ class ResponseHeaderBag extends HeaderBag
      * @throws \InvalidArgumentException
      *
      * @see RFC 6266
+     * @deprecated since 2.8, to be removed in 3.0. Use an instance of Symfony\Component\HttpFoundation\Header\ContentDisposition instead.
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {

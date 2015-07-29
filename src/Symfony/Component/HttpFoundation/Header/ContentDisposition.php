@@ -73,14 +73,25 @@ class ContentDisposition
 
     public static function fromString($header)
     {
-        preg_match('/(?<disposition>attachment|inline);\s?filename="(?<filenameFallback>[\x20-\x7e]*)"(?:;\s?filename\*=utf-8\'\'(?<filename>[\x20-\x7e]*))?/', $header, $matches);
+        preg_match('/(?<disposition>attachment|inline);\s*filename="(?<filenameFallback>[\x20-\x7e]*)"(?:;\s*filename\*=utf-8\'\'(?<filename>[\x20-\x7e]*))?/', $header, $matches);
         $matches = array_merge(array(
             'disposition' => self::DISPOSITION_ATTACHMENT,
             'filename' => '',
             'filenameFallback' => '',
         ), $matches);
 
-        return new static($matches['disposition'], $matches['filename'], $matches['filenameFallback']);
+        $matches['filename'] = rawurldecode($matches['filename']);
+        $matches['filenameFallback'] = str_replace('\"', '"', $matches['filenameFallback']);
+
+        if (!$matches['filename']) {
+            $matches['filename'] = $matches['filenameFallback'];
+        }
+
+        return new static(
+            $matches['disposition'],
+            $matches['filename'],
+            $matches['filenameFallback']
+        );
     }
 
     /**

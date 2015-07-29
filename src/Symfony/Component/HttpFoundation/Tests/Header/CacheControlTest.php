@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Header\CacheControl;
 
 class CacheControlTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetHeader()
     {
         $cacheControl = new CacheControl();

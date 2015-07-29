@@ -1,13 +1,12 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: yosefderay
  * Date: 7/20/15
- * Time: 10:31 PM
+ * Time: 10:31 PM.
  */
-
 namespace Symfony\Component\HttpFoundation\Tests\Header;
-
 
 use Symfony\Component\HttpFoundation\Header\IfNoneMatch;
 

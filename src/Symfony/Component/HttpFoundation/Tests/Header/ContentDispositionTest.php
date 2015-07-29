@@ -49,7 +49,7 @@ class ContentDispositionTest extends \PHPUnit_Framework_TestCase
     public function testFromString($disposition, $filename, $filenameFallback, $header)
     {
         $contentDisposition = ContentDisposition::fromString($header);
-        $this->assertEquals($header, (string)$contentDisposition);
+        $this->assertEquals($header, (string) $contentDisposition);
         $this->assertEquals($disposition, $contentDisposition->getDisposition());
         $this->assertEquals($filename, $contentDisposition->getFilename());
         $this->assertEquals($filenameFallback, $contentDisposition->getFilenameFallback());

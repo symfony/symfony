@@ -401,7 +401,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {
-            $node->setNormalizationClosures($this->normalization->before);
+            $node->setNormalizationCallbacks($this->normalization->before);
             $node->setXmlRemappings($this->normalization->remappings);
         }
 
@@ -411,7 +411,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         if (null !== $this->validation) {
-            $node->setFinalValidationClosures($this->validation->rules);
+            $node->setFinalValidationCallbacks($this->validation->rules);
         }
 
         return $node;

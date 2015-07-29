@@ -38,7 +38,7 @@ class VariableNodeDefinition extends NodeDefinition
         $node = $this->instantiateNode();
 
         if (null !== $this->normalization) {
-            $node->setNormalizationClosures($this->normalization->before);
+            $node->setNormalizationCallbacks($this->normalization->before);
         }
 
         if (null !== $this->merge) {
@@ -56,7 +56,7 @@ class VariableNodeDefinition extends NodeDefinition
         $node->setRequired($this->required);
 
         if (null !== $this->validation) {
-            $node->setFinalValidationClosures($this->validation->rules);
+            $node->setFinalValidationCallbacks($this->validation->rules);
         }
 
         return $node;

@@ -1,4 +1,4 @@
-﻿UPGRADE FROM 2.7 to 2.8
+UPGRADE FROM 2.7 to 2.8
 =======================
 
 Form
@@ -136,3 +136,13 @@ DependencyInjection
        <service id="foo" class="stdClass" shared="false" />
    </services>
    ```
+
+Config
+------
+
+ * The methods `setNormalizationClosures()` and `setFinalValidationClosures()` in
+   `BaseNode` were deprecated, `setNormalizationCallbacks()` and
+   `setFinalValidationCallbacks()` should be used instead.
+
+ * The protected properties `normalizationClosures` and `finalValidationClosures` in
+   `BaseNode` were renamed to `normalizationCallbacks` and `finalValidationCallbacks`.

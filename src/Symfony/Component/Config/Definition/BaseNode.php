@@ -25,7 +25,15 @@ abstract class BaseNode implements NodeInterface
 {
     protected $name;
     protected $parent;
+    protected $normalizationCallbacks = array();
+    /**
+     * @deprecated since version 2.8, to be removed in 3.0. Use the normalizationCallbacks property instead.
+     */
     protected $normalizationClosures = array();
+    protected $finalValidationCallbacks = array();
+    /**
+     * @deprecated since version 2.8, to be removed in 3.0. Use the finalValidationCallbacks property instead.
+     */
     protected $finalValidationClosures = array();
     protected $allowOverwrite = true;
     protected $required = false;
@@ -48,6 +56,10 @@ abstract class BaseNode implements NodeInterface
 
         $this->name = $name;
         $this->parent = $parent;
+
+        // Backwards compatibility for old property names, to be removed in 3.0
+        $this->normalizationClosures = &$this->normalizationCallbacks;
+        $this->finalValidationClosures = &$this->finalValidationCallbacks;
     }
 
     public function setAttribute($key, $value)
@@ -152,23 +164,51 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Sets the callbacks used for normalization.
+     *
+     * @param callable[] $callbacks An array of callbacks used for normalization
+     */
+    public function setNormalizationCallbacks(array $callbacks)
+    {
+        $this->normalizationCallbacks = $callbacks;
+    }
+
+    /**
      * Sets the closures used for normalization.
      *
      * @param \Closure[] $closures An array of Closures used for normalization
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use setNormalizationCallbacks() instead
      */
     public function setNormalizationClosures(array $closures)
     {
-        $this->normalizationClosures = $closures;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use the setNormalizationCallbacks() method instead.', E_USER_DEPRECATED);
+
+        $this->normalizationCallbacks = $closures;
+    }
+
+    /**
+     * Sets the callbacks used for final validation.
+     *
+     * @param callable[] $callbacks An array of callbacks used for final validation
+     */
+    public function setFinalValidationCallbacks(array $callbacks)
+    {
+        $this->finalValidationCallbacks = $callbacks;
     }
 
     /**
      * Sets the closures used for final validation.
      *
      * @param \Closure[] $closures An array of Closures used for final validation
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use setFinalValidationCallbacks() instead
      */
     public function setFinalValidationClosures(array $closures)
     {
-        $this->finalValidationClosures = $closures;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use the setFinalValidationCallbacks() method instead.', E_USER_DEPRECATED);
+
+        $this->finalValidationCallbacks = $closures;
     }
 
     /**
@@ -235,7 +275,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Normalizes a value, applying all normalization closures.
+     * Normalizes a value, applying all normalization callbacks.
      *
      * @param mixed $value Value to normalize.
      *
@@ -245,9 +285,9 @@ abstract class BaseNode implements NodeInterface
     {
         $value = $this->preNormalize($value);
 
-        // run custom normalization closures
-        foreach ($this->normalizationClosures as $closure) {
-            $value = $closure($value);
+        // run custom normalization callbacks
+        foreach ($this->normalizationCallbacks as $callback) {
+            $value = call_user_func($callback, $value);
         }
 
         // replace value with their equivalent
@@ -287,7 +327,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Finalizes a value, applying all finalization closures.
+     * Finalizes a value, applying all finalization callbacks.
      *
      * @param mixed $value The value to finalize
      *
@@ -302,11 +342,11 @@ abstract class BaseNode implements NodeInterface
 
         $value = $this->finalizeValue($value);
 
-        // Perform validation on the final value if a closure has been set.
-        // The closure is also allowed to return another value.
-        foreach ($this->finalValidationClosures as $closure) {
+        // Perform validation on the final value if a callback has been set.
+        // The callback is also allowed to return another value.
+        foreach ($this->finalValidationCallbacks as $callback) {
             try {
-                $value = $closure($value);
+                $value = call_user_func($callback, $value);
             } catch (Exception $e) {
                 throw $e;
             } catch (\Exception $e) {
@@ -315,6 +355,17 @@ abstract class BaseNode implements NodeInterface
         }
 
         return $value;
+    }
+
+    public function __clone()
+    {
+        // Backwards compatibility for old property names, to be removed in 3.0
+        // Break cross-clones references but preserve them inside each one.
+        unset($this->normalizationCallbacks, $this->finalValidationCallbacks);
+        $this->normalizationCallbacks = $this->normalizationClosures;
+        $this->finalValidationCallbacks = $this->finalValidationClosures;
+        $this->normalizationClosures = &$this->normalizationCallbacks;
+        $this->finalValidationClosures = &$this->finalValidationCallbacks;
     }
 
     /**

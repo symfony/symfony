@@ -85,6 +85,33 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
                   'parameters' => array('%count%' => 4, '%foo%' => 'bar'),
                   'transChoiceNumber' => 4,
             ),
+            array(
+                  'id' => 12,
+                  'translation' => 12,
+                  'locale' => 'en',
+                  'domain' => 'messages',
+                  'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
+            ),
+            array(
+                  'id' => '64',
+                  'translation' => '64',
+                  'locale' => 'en',
+                  'domain' => 'messages',
+                  'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
+            ),
+            array(
+                  'id' => '',
+                  'translation' => '',
+                  'locale' => 'en',
+                  'domain' => 'messages',
+                  'state' => DataCollectorTranslator::MESSAGE_MISSING,
+                  'parameters' => array(),
+                  'transChoiceNumber' => null,
+            ),
         );
         $expectedMessages = array(
             array(

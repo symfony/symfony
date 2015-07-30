@@ -97,6 +97,10 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     {
         $result = array();
         foreach ($messages as $key => $message) {
+            if (empty($message['id']) || is_int($message['id']) || intval($message['id']) !== 0 && intval($message['id']) == $message['id']) {
+                continue;
+            }
+
             $messageId = $message['locale'].$message['domain'].$message['id'];
 
             if (!isset($result[$messageId])) {
@@ -109,7 +113,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
                     $result[$messageId]['parameters'][] = $message['parameters'];
                 }
 
-                $result[$messageId]['count']++;
+                ++$result[$messageId]['count'];
             }
 
             unset($messages[$key]);

@@ -207,6 +207,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
             'token' => $token,
+            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
         )), 200, array('Content-Type' => 'text/html'));
     }
 

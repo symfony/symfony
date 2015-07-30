@@ -139,15 +139,15 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $request = Request::create('http://localhost/');
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), $logger, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, new RequestContext(), $logger);
         $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function getLoggingParameterData()
     {
         return array(
-            array(array('_route' => 'foo'), 'Matched route "foo".'),
-            array(array(), 'Matched route "n/a".'),
+            array(array('_route' => 'foo'), 'Matched route "foo" (parameters: "_route": "foo")'),
+            array(array(), 'Matched route "n/a" (parameters: )'),
         );
     }
 }

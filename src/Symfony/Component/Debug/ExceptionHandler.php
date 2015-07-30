@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Debug;
 
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
@@ -197,13 +198,25 @@ class ExceptionHandler
      * Creates the error Response associated with the given Exception.
      *
      * @param \Exception|FlattenException $exception An \Exception instance
+     * @param ResponseInterface           $response  An optional prototype PSR-7 response
      *
-     * @return Response A Response instance
+     * @return Response|ResponseInterface A response instance
      */
-    public function createResponse($exception)
+    public function createResponse($exception, ResponseInterface $response = null)
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
+        }
+
+        if (null !== $response) {
+            $response = $response->withStatus($exception->getStatusCode());
+            foreach ($exception->getHeaders() as $k => $v) {
+                $response = $response->withAddedHeader($k, $v);
+            }
+            $response = $response->withHeader('Content-Type', 'text/html; charset='.$this->charset);
+            $response->getBody()->write($this->decorate($this->getContent($exception), $this->getStylesheet($exception)));
+
+            return $response;
         }
 
         return Response::create($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);

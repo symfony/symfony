@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -87,6 +88,46 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         });
 
         $handler->handle($exception);
+    }
+
+    public function testPsr7()
+    {
+        $exception = FlattenException::create(new \Exception('foo'), 123, array('Header' => 'Value'));
+
+        $body = $this->getMock('Psr\Http\Message\StreamInterface');
+        $body
+            ->expects($this->exactly(1))
+            ->method('write')
+            ->with($this->stringContains('Whoops, looks like something went wrong.'));
+
+        $response0 = $this->getMock('Psr\Http\Message\ResponseInterface');
+        $response1 = $this->getMock('Psr\Http\Message\ResponseInterface');
+        $response2 = $this->getMock('Psr\Http\Message\ResponseInterface');
+        $response3 = $this->getMock('Psr\Http\Message\ResponseInterface');
+        $response0
+            ->expects($this->exactly(1))
+            ->method('withStatus')
+            ->with(123)
+            ->will($this->returnValue($response1));
+        $response1
+            ->expects($this->exactly(1))
+            ->method('withAddedHeader')
+            ->with('Header', 'Value')
+            ->will($this->returnValue($response2));
+        $response2
+            ->expects($this->exactly(1))
+            ->method('withHeader')
+            ->with('Content-Type', 'text/html; charset=UTF-8')
+            ->will($this->returnValue($response3));
+        $response3
+            ->expects($this->exactly(1))
+            ->method('getBody')
+            ->will($this->returnValue($body));
+
+        $handler = new ExceptionHandler(false);
+        $response = $handler->createResponse($exception, $response0);
+
+        $this->assertSame($response3, $response);
     }
 
     public function testHandleOutOfMemoryException()

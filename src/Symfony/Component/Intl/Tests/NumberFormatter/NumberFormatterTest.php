@@ -70,6 +70,14 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
         $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, null);
     }
 
+    public function testConstructWithoutLocale()
+    {
+        $this->assertInstanceOf(
+            '\Symfony\Component\Intl\NumberFormatter\NumberFormatter',
+            $this->getNumberFormatter(null, NumberFormatter::DECIMAL)
+        );
+    }
+
     public function testCreate()
     {
         $this->assertInstanceOf(

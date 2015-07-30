@@ -125,7 +125,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function get($key, $default = null, $first = true)
     {
-        $key = strtr(strtolower($key), '_', '-');
+        $key = str_replace('_', '-', strtolower($key));
 
         if (!array_key_exists($key, $this->headers)) {
             if (null === $default) {
@@ -153,7 +153,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function set($key, $values, $replace = true)
     {
-        $key = strtr(strtolower($key), '_', '-');
+        $key = str_replace('_', '-', strtolower($key));
 
         $values = array_values((array) $values);
 
@@ -179,7 +179,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function has($key)
     {
-        return array_key_exists(strtr(strtolower($key), '_', '-'), $this->headers);
+        return array_key_exists(str_replace('_', '-', strtolower($key)), $this->headers);
     }
 
     /**
@@ -206,7 +206,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function remove($key)
     {
-        $key = strtr(strtolower($key), '_', '-');
+        $key = str_replace('_', '-', strtolower($key));
 
         unset($this->headers[$key]);
 

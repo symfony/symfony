@@ -136,3 +136,64 @@ DependencyInjection
        <service id="foo" class="stdClass" shared="false" />
    </services>
    ```
+
+Web Development Toolbar
+-----------------------
+
+The web development toolbar has been completely redesigned. This update has
+introduced some changes in the HTML markup of the toolbar items.
+
+Before:
+
+Information was wrapped with simple `<span>` elements:
+
+```twig
+{% block toolbar %}
+    {% set icon %}
+        <span>
+            <svg ...></svg>
+            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
+        </span>
+    {% endset %}
+{% endblock %}
+```
+
+After:
+
+Information is now semantically divided into values and labels according to
+the `class` attribute of each `<span>` element:
+
+```twig
+{% block toolbar %}
+    {% set icon %}
+        <svg ...></svg>
+        <span class="sf-toolbar-value">
+            {{ '%.1f'|format(collector.memory / 1024 / 1024) }}
+        </span>
+        <span class="sf-toolbar-label">MB</span>
+    {% endset %}
+{% endblock %}
+```
+
+Most of the blocks designed for the previous toolbar will still be displayed
+correctly. However, if you want to support both the old and the new toolbar,
+it's better to make use of the new `profiler_markup_version` variable passed
+to the toolbar templates:
+
+```twig
+{% block toolbar %}
+    {% set profiler_markup_version = profiler_markup_version|default(1) %}
+
+    {% set icon %}
+        {% if profiler_markup_version == 1 %}
+
+            {# code for the original toolbar #}
+
+        {% else %}
+
+            {# code for the new toolbar (Symfony 2.8+) #}
+
+        {% endif %}
+    {% endset %}
+{% endblock %}
+```

@@ -1,0 +1,769 @@
+---------------------------------------------------------------------------
+
+by aderuwe at 2015-07-01T07:42:18Z
+
+Very nice, I like it!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T07:46:42Z
+
+How would it look on smaller screens ? currently, we keep only the icons, but you dropped them. So I think it may still be hard :smile:
+
+However, I like the idea. I have 1 request though: please make it easy for third-party bundles to provide toolbar integrations compatible with both 2.x and 3.x, otherwise most bundles will provide a crappy integration on some versions (these bundles will need to keep supporting the 2.7 and 2.8 LTS for a while).
+and btw, should we include it in 3.0 only ? I would vote to have it in 2.8 instead if we can make it BC for bundles providing panels.
+
+---------------------------------------------------------------------------
+
+by kashike at 2015-07-01T07:47:05Z
+
+This looks wonderful, good job!
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-07-01T07:55:33Z
+
+One of the problems with the current web debug toolbar is that it is almost actively hostile to Content Security Policy. I'm not suggesting that you put in any effort to work with it, but It'd be nice if you could make sure to keep any twig related logic out of the javascript code, so it's at least easier to override.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T07:58:49Z
+
+There is another weird thing: you have removed some icons, but not all of them.
+
+> and btw, should we include it in 3.0 only ? I would vote to have it in 2.8 instead if we can make it BC for bundles providing panels.
+
+looks like you actually agree with me @javiereguiluz as you submitted it to 2.8 :smile:
+
+@jrobeson please open a separate issue about the CSP compatibility. It is not related to a redesign.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-07-01T08:01:03Z
+
+ yeah i was just about to retract my comment. This PR didn't make the situation worse.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-01T08:01:19Z
+
+@stof if this proposal is approved, I'm going to reintroduce all icons to display them in smaller screens.
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-07-01T08:21:05Z
+
+Hi,
+
+This is a very good idea. The new look & feel is prettier but I find it harder to read. If icons are back, like you suggest it in your previous comment, that will be just fine.
+
+So that's a :+1:  for symfony 3.0 for me.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-07-01T08:48:01Z
+
+:+1: for any Symfony version, it looks awesome and reminds me the look of all SensioLabs related websites :+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-01T11:50:42Z
+
+A thousand times :+1:. Improving it's UI has been on my create-an-issue-about-it list for a long time :)
+
+I like the black background, this seems to be the industry standard for toolbars (see WordPress, Drupal, StackOverflow, etc.).
+
+However, white text on a black background is harder to read than black text on a white background. I think we can improve UI of the toolbar by making the text some pixels bigger (at least the white text). Some text (like "anon.") a hard to read.
+Also, the close icon seems to be very large, compared to other icons/text. I think it should be smaller than or the same as the rest of the icons.
+
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-07-01T12:40:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Baachi at 2015-07-01T13:26:28Z
+
+Big :+1: for this. Love it :heart:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-01T15:11:06Z
+
+Btw, nothing in the bar now indicates that's a toolbar from Symfony. I would prefer if the symfony logo was added somewhere in the bar (right/left), just like in the old toolbar.
+
+Also, when hiding the toolbar, I think the color of the symfony logo is too white.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-01T23:56:08Z
+
+:+1:  and I (also) agree this can be part of  Symfony 2.8
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-02T06:53:32Z
+
+You have my vote, this looks a lot more user-friendly to me! :+1:
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-07-02T07:53:02Z
+
+I'm :+1: with it even if I'm not really fan of the new redesign.
+
+There is a small bug:
+![capture d ecran 2015-07-02 09 49 21](https://cloud.githubusercontent.com/assets/334432/8472242/cf5ca582-209f-11e5-9bea-e155c947f780.png)
+
+When I want to hide the web debug toolbar (on the symfony demo app):
+![capture d ecran 2015-07-02 09 49 29](https://cloud.githubusercontent.com/assets/334432/8472243/cf683f00-209f-11e5-8e12-7d821f71283c.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-02T08:03:32Z
+
+Thank you all for your comments! So far the feedback from the communty has been mostly positive. Next steps:
+
+1) Let's wait a few hours/days for the Symfony Deciders to vote on this proposal.
+2) If approved, I'll finish it, fix all the reported issues, etc.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-07-02T08:05:10Z
+
+I'm :+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-02T08:07:46Z
+
+@javiereguiluz maybe it's more about the details, but the "invalid entities" green rounded corner square is not in style with the rest anymore. Is it an idea to just make the "0" green or the "N" red instead?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-02T08:42:23Z
+
+I'm also interested in seeing what we can come up with by redesigning the toolbar.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-02T08:52:12Z
+
+Looks good so far.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-02T08:57:35Z
+
+@javiereguiluz also, there is a WIP to make the Profiler a standalone component: does this WIP have an impact on your redesign ?
+
+I mean, maybe we can have a new component in 2.8, which introduce a new design.
+Also, is there a way to make a nice redesign *without* remove any html but by adding a new css file and add some new informations ?
+
+I'm not sure we need to break the actual HTML in order to make a new UI, what do you think ?
+
+Last question: in the database panel, when we read "3sql/XXms" is it to add the information on the actual database engine used ? For example, what is the behavior if I use mongoDB  ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-02T09:04:31Z
+
+> Last question: in the database panel, when we read "3sql/XXms" is it to add the information on the actual database engine used ? For example, what is the behavior if I use mongoDB ?
+
+It might be a little bit too generic, I have some applications that have both propel and doctrine (legacy + migration), this would yield "incorrect" results.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T09:18:14Z
+
+I'm also in favor of continuing this redesign.
+
+@javiereguiluz please try to keep BC on the HTML markup needed for bundles hooking in the profiler, with a way to support both the 2.3 and the 2.8 designs
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-02T09:22:57Z
+
+@stof yes, let's try to keep BC. I plan to update all the official bundles, so I guess you refer to third-party bundles. My question: would be enough to make sure that there are some CSS rules that make the old HTML panels look good enough in the new toolbar?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T09:27:19Z
+
+@javiereguiluz even "official" bundles. I want to keep support for Symfony 2.7 in DoctrineBundle without having multiple branches. this means that there should be a way to have a markup compatible with both CSS without hassle (it is good for me if bundles are encouraged to do some changes to make their panel look better in the new design, for instance by adding a few more classes in some places, as long as the markup still looks good in the old design). So the idea is to have the same markup being good enough in both design (and more than good enough in one of them)
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-02T09:38:31Z
+
+@stof @javiereguiluz yes ! :+1:
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2015-07-02T14:42:46Z
+
+@javiereguiluz I haven't tried the patch yet, but it would be nice if we handled nicely a couple of odd cases:
+
+* When many panels are used (Doctrine, Solr, Security, Translation and so on), currently it overflows to another line. The only current fix is to find a window size that compresses the information, allowing you to not cause line break on toolbar.
+My suggestion here would be an approach similar to this ( http://jsfiddle.net/jbrosi/c6kf2/ ) which calculates the size of the next visible item and scroll it entirely. That would prevent the double sized debug toolbar because every bundle has its own panel.
+
+* When resizing the screen, it would be nice to shrink the information visible at a glance, the same way we do currently. Currently, as you reduce the screen size, we show less and less information until we reach the point where only icons are being displayed.
+
+Also I'd share some personal suggestions:
+
+* There's no need to display PHP and Symfony versions. A mouse over already provides this information and this is not an every day task to look at them. Folding this information should give an extra breathe of space for more tooling for daily tasks.
+
+* And use their icons instead of text. =)
+
+* Keep the icons for every panel, as shrinking the window size should at the end keep only the icons
+
+* Use route names instead of Controller:Action. They exist to simplify our lives, generally they're shorter than the other and hovering it should give all info we need. I'd say we could even remove it (and rely on hover of status code as first resizing strategy)
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-07-02T14:52:38Z
+
+> Use route names instead of Controller:Action. They exist to simplify our lives, generally they're shorter than the other and hovering it should give all info we need. I'd say we could even remove it (and rely on hover of status code as first resizing strategy)
+
+I'd recommend using both like now, because in very complex apps you need the controller and action in order to remember the bundle (and then the "concept") in which is handled the action, especially when you are using the shortcuts with `framework: { ide: "..." }` config options, which is already implemented in the debug toolbar
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T14:56:24Z
+
+@Pierstoval but do they need to be in the toolbar itself, or in the extra information added on hover ? currently, the controller and route are taking 30% of the width of my toolbar, while all other infos are small
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-07-02T14:56:58Z
+
+> I'd recommend using both like now
+
+In fact, we removed the route name. See #14903
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-02T14:58:32Z
+
+ah indeed. I missed that the route name is now only displayed in the hover panel.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-08T10:21:41Z
+
+Here it is a quick update of the latest changes made to this PR:
+
+**1)** The config panel has been merged into a single panel (you'll no longer see the PHP panel). And the Symfony logo is back for branding reasons and to save space:
+
+![config_panel](https://cloud.githubusercontent.com/assets/73419/8568116/35771ad0-256b-11e5-9576-3d352b7df964.png)
+
+All the previous PHP information is now included in the "info panel":
+
+![config_panel_reveal](https://cloud.githubusercontent.com/assets/73419/8568126/54ff3bda-256b-11e5-8010-a420015f0395.png)
+
+**2)** The request panel no longer displays the controller + method, but just the route name:
+
+![request_panel](https://cloud.githubusercontent.com/assets/73419/8568133/6578920e-256b-11e5-858e-52a46d76c70b.png)
+
+I know that this may be shocking for some of you, but this is "mandatory" to save space and therefore display all the toolbar's panels. Again, the rest of the information is available in the "info panel":
+
+![request_panel_review](https://cloud.githubusercontent.com/assets/73419/8568155/94e69400-256b-11e5-8bb5-db42692cb15c.png)
+
+**3)** Minor cleaning changes (we use `include()` instead of `{% include %}`, the inlined SVG icons have been moved to individual templates, we have updated the CSS code (for example to use `display: table` instead of some ugly hacks), etc.)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-08T10:45:02Z
+
+> 2) The request panel no longer displays the controller + method, but just the route name: [...]
+
+Is it really necessary to save so much space? I would be more happy if the toolbar displayed the controller class and method name instead of the route name (most of the time I am more interested in the concrete method that is responsible for serving a request).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-08T10:49:36Z
+
+I don't know if this is the best solution to our problem ... but it's true that we have a space problem that needs to be solved.
+
+Take a look at the typical toolbar of a common page:
+
+![crowded_panel](https://cloud.githubusercontent.com/assets/73419/8568622/a14f5890-256f-11e5-8181-51385916ceb2.png)
+
+Even if the screen resolution is generous, we are a bit short of space, because that toolbar doesn't include yet the panel for Ajax requests, Swiftmailer, exception/logs, VarDumper and all the third-party panels (Sonata, etc.)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-09T16:18:45Z
+
+**The toolbar redesign has just been completed**, so you can fully review it and test it. Please report bugs and missing features. Thanks!  Note: I'm aware of some CSS vertical aligning issues.
+
+A quick overview of the final version:
+
+### When the toolbar is minimized
+
+![toolbar-minimized](https://cloud.githubusercontent.com/assets/73419/8600418/2b232096-2666-11e5-9d3c-26029d1cc4bb.png)
+
+### Simplest toolbar possible
+
+Panels without information are not shown:
+
+![toolbar-minimal](https://cloud.githubusercontent.com/assets/73419/8600720/c5601104-2667-11e5-9dc3-70d0d7d37440.png)
+
+### Responsive design
+
+#### Smartphones
+
+![toolbar-mobiles](https://cloud.githubusercontent.com/assets/73419/8600477/6d5f222a-2666-11e5-84d0-01d941691399.png)
+
+#### Tablets
+
+![toolbar-tablets](https://cloud.githubusercontent.com/assets/73419/8600495/83bfa3a0-2666-11e5-82e8-1d35786ab04e.png)
+
+#### 1024px
+
+![toolbar-1024](https://cloud.githubusercontent.com/assets/73419/8600482/760c6720-2666-11e5-86e2-125f71a2d461.png)
+
+#### 1200px
+
+![toolbar-1200](https://cloud.githubusercontent.com/assets/73419/8600485/774d92b2-2666-11e5-881e-9bc16c42008c.png)
+
+### Ajax requests
+
+![toolbar-ajax](https://cloud.githubusercontent.com/assets/73419/8600504/8ed69708-2666-11e5-8135-64e6e6c2ec52.gif)
+
+### Toolbar Panels
+
+#### Request
+
+![panel-request](https://cloud.githubusercontent.com/assets/73419/8600515/9bd9c7fe-2666-11e5-914f-7f0f7e6a5979.png)
+
+#### Time
+
+![panel-time](https://cloud.githubusercontent.com/assets/73419/8600524/9f261714-2666-11e5-9dc8-53f9cae0f502.png)
+
+#### Memory
+
+![panel-memory](https://cloud.githubusercontent.com/assets/73419/8600529/a4bc3168-2666-11e5-9227-12ac8f44510c.png)
+
+#### Twig
+
+![panel-twig](https://cloud.githubusercontent.com/assets/73419/8600538/a8d4155e-2666-11e5-99b0-c9b5e8c82222.png)
+
+#### Log
+
+![panel-log](https://cloud.githubusercontent.com/assets/73419/8600542/ac2db854-2666-11e5-9e46-2c4c84e8521c.png)
+
+#### Form
+
+![panel-form](https://cloud.githubusercontent.com/assets/73419/8600549/afb75cc8-2666-11e5-9e61-0d1e99cc2201.png)
+
+#### Translation
+
+![panel-i18n](https://cloud.githubusercontent.com/assets/73419/8600558/b6e0d3da-2666-11e5-9e6d-c2178dff6204.png)
+
+#### Security
+
+![panel-security](https://cloud.githubusercontent.com/assets/73419/8600562/ba9a13d8-2666-11e5-9261-07670bcf98ca.png)
+
+#### Database
+
+![panel-db](https://cloud.githubusercontent.com/assets/73419/8600567/bf521f10-2666-11e5-9c94-293d97aa4522.png)
+
+#### Dumper
+
+![panel-dump](https://cloud.githubusercontent.com/assets/73419/8600570/c27e1234-2666-11e5-9d98-e680484edfbc.png)
+
+#### Config
+
+![panel-config](https://cloud.githubusercontent.com/assets/73419/8600573/c5c34e8c-2666-11e5-9cc4-9c99f4b26825.png)
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-07-09T16:23:53Z
+
+@javiereguiluz this is realy nice, thank you for this amazing work ! Do you think your pull request may have impact on the extraction of Profiler component ? I have the objective to "port" this profiler inside BackBee CMS with only small data to override and panels to add :+1:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-07-09T16:27:54Z
+
+@javiereguiluz : It looks awesome :+1:
+
+---------------------------------------------------------------------------
+
+by skigun at 2015-07-09T16:28:43Z
+
+@javiereguiluz great job :+1: :clap:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-09T18:01:40Z
+
+@javiereguiluz Overall I like your changes very much! :+1: I just think that we need to improve constrast a bit. I assume that especially the grey font on black background and the blue links will probably not be very readable for users with handicaps.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-07-09T18:30:22Z
+
+I also have an issue with the `.sf-toolbar-block-config > .sf-toolbar-info` not being aligned right on profiler page :/
+
+<img width="382" alt="screenshot 2015-07-09 a 20 28 16" src="https://cloud.githubusercontent.com/assets/2211145/8603514/1629d8a2-2679-11e5-84ee-cc21900e6c3a.PNG">
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-09T21:00:29Z
+
+@ogizanagi the error in the profiler already happens in any Symfony version. It's not easy to solve. The magic that prevents this issue is included in `toolbar_js.html.twig`, which is not included in the profiler layout. I've tried to include it and causes side-effects and problems :(
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-07-09T21:12:57Z
+
+@javiereguiluz : Why not simply adding a css rule such as:
+```css
+@media (min-width: 768px) {
+    .sf-toolbar-block-config:hover .sf-toolbar-info {
+        right: 0;
+    }
+}
+```
+?
+
+Also, another minor issue:
+<img width="364" alt="screenshot 2015-07-09 a 23 10 36" src="https://cloud.githubusercontent.com/assets/2211145/8606984/012f3a48-2690-11e5-8059-71c49bfd224d.PNG">
+
+**Edit:** You might have solved that in fact considering your latest commits... :smile:
+**Edit2:** well, actually not :/  `.sf-toolbar-info` will also need `z-index: 99999`
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2015-07-09T21:21:15Z
+
+Awesome. But I think symfony version is not so important on each request as profile token for example
+
+---------------------------------------------------------------------------
+
+by jorgelbg at 2015-07-10T00:52:23Z
+
+:+1: this looks awesome!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-10T09:17:51Z
+
+Update:
+
+  * All `z-index` issues are fixed
+  * When displayed inside the profiler, the toolbar panels now display correctly (thanks @ogizanagi for the tip)
+  * Most vertical aligning issues are fixed
+  * The font size in the information panels have been increased slightly to improve readability (thanks @xabbuh for the heads-up)
+
+@shoomyth I'm curious about the profiler token. How do you use it? Why do you want to see it displayed in the toolbar? Thanks.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-07-10T09:32:53Z
+
+@javiereguiluz The profiler token can be used with XDebug and PHPStorm, for example, to profile each page load directly in the IDE
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2015-07-10T12:24:18Z
+
+@javiereguiluz hmm, iirc i need it to find token in profiler history.
+I mean this symfony section is most about "static" parameters (server environment), but token, kernel name, app environment belong to each request and maybe should be placed on left side of toolbar? But at the same time I'm not sure they deserve own separate sections on it.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-07-10T13:13:54Z
+
+@javiereguiluz amazing!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-20T07:11:03Z
+
+Is there anything left we can do before merging this change?
+
+The reported Travis error isn't related to this PR:
+
+```
+1) Symfony\Component\Process\Tests\SigchildDisabledProcessTest::
+   testIdleTimeoutNotExceededWhenOutputIsSent
+
+A general timeout is expected.
+Failed asserting that false is true.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Process/
+Tests/AbstractProcessTest.php:855
+```
+
+---------------------------------------------------------------------------
+
+by hason at 2015-07-20T07:41:37Z
+
+Minor issue with padding:
+![image](https://cloud.githubusercontent.com/assets/288535/8771557/71672a6a-2ec3-11e5-87ef-28a025d94a1c.png)
+
+---------------------------------------------------------------------------
+
+by hason at 2015-07-20T07:47:28Z
+
+Issue in profiler:
+![image](https://cloud.githubusercontent.com/assets/288535/8771634/434372a0-2ec4-11e5-8b37-9d2184bbe75b.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-20T10:15:35Z
+
+@hason thanks for reporting these errors. They should be fixed now.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-20T12:03:34Z
+
+@javiereguiluz what would happen in this new design in case third-party panels still make things too wide for the screen ?
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2015-07-20T12:44:18Z
+
+@javiereguiluz I would ask @hason to double check this again, but it seems Doctrine panel is showed twice in Profiler (as I can see in the provided screenshot). Is this issue still happening?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-20T12:51:18Z
+
+@stof regarding the "too many panels issue", the new toolbar behaves exactly as the old one: if a panel doesn't fit, it's not displayed. Example:
+
+Old toolbar at 1900px shows the SonataAdmin panel:
+
+![old_1900](https://cloud.githubusercontent.com/assets/73419/8776075/a676e602-2eee-11e5-9675-98242b4d2fdb.png)
+
+Old toolbar at 1200px doesn't show it:
+
+![old_1200](https://cloud.githubusercontent.com/assets/73419/8776074/a173ccd8-2eee-11e5-8290-aa049827658c.png)
+
+@guilhermeblanco I can't reproduce the issue. Maybe @hason is toying with the toolbar or using a panel which reuses the Doctrine icon.
+
+---------------------------------------------------------------------------
+
+by nesl247 at 2015-07-20T13:46:20Z
+
+Why not solve the "too many panels issue" like Zend's Z-Ray does? They use left/right arrows to be able to scroll.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-07-20T14:00:10Z
+
+@guilhermeblanco The first icon is for DoctrineBundle and second for PHPCRDoctrineBundle.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2015-07-21T11:43:34Z
+
+@hason About the profiler, I think the design should be also reviewed to be like the new toolbar, isn't it?
+
+---------------------------------------------------------------------------
+
+by razmo at 2015-07-21T12:13:24Z
+
+@javiereguiluz nice job :+1:
+
+---------------------------------------------------------------------------
+
+by Mondane at 2015-07-26T10:34:57Z
+
+Does this redesign show the file and line number again in the profiler? I'm missing that in 2.7 but as I read this, it was there in 2.2: http://symfony.com/blog/new-in-symfony-2-2-logging-of-deprecated-calls . Now I have to open the log file to see the file for the message.
+
+NB Looking at the log file in more detail, it turns out that hasn't any more info, it only shows the file and line number where the deprecated message is thrown. I now need to add a traceback in those spots to see which bundle needs to be adjusted.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-30T09:17:26Z
+
+All reported errors seem to be fixed now. What about merging this PR as it is so more people can easily test the new toolbar and report any other error?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T09:34:13Z
+
+@Mondane the profile still displays these informations in 2.7 when they are available. but the error handler does not pass the stack trace to the logger anymore, so there is no info to display. It is not a profiler issue.
+
+@javiereguiluz what would be the way for a bundle to know which version of the toolbar markup it should provide ? You don't seem to provide a way to detect that WebProfilerBundle 2.8+ is used (and no, using the kernel version in the template is not a working solution as bundles and components can be installed at different versions)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T09:34:42Z
+
+and what are you plans for the design of the profiler itself. Will it be done in a separate PR or not at all ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-30T10:06:39Z
+
+I think that the profiler design is another topic that could be done in another PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-30T10:34:21Z
+
+@stof I appreciate your patience and your code review in the PR that I submitted to DoctrineBundle. However, the sad truth is that I don't understand you :(  If someone who understands this problem well can send me the needed code, I'll integrate it right away. Thanks!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-30T10:42:23Z
+
+@javiereguiluz it is possible to use HttpKernel 2.3 with WebProfilerBundle 2.8 (for instance, in a Silex app). So relying on the HttpKernel version to choose the web profiler bundle isn't possible.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T10:45:50Z
+
+@javiereguiluz you need to pass a variable to the template which would allow the bundle to know that the new WebProfilerBundle is calling the template. And the value of the variable should be something future-proof (i.e. being able to change the value for a future redesign). Bundles would then assume that when this variable is not available, it is the old version of the bundle (as symfony 2.7- is not passing this variable).
+
+Here is how it could work:
+
+- Symfony 2.7 and older: no ``webprofiler_markup`` variable
+- Symfony 2.8: ``webprofiler_markup = 2``
+- future Symfony version redesigning the profiler again: ``webprofiler_markup = 3``
+- even future version of Symfony: ``webprofiler_markup = 4``
+
+And then DoctrineBundle could support all versions like this (in my example, it supports version 1, 2 and 3 but not yet version 4):
+
+```twig
+{# ensure the variable is defined even for Symfony 2.7- #}
+{% set webprofiler_markup = webprofiler_markup|default(1) %}
+
+{% if webprofiler_markup = 1 %}
+    {# markup for the WebProfilerBundle 2.7- (first design of the profiler) #}
+{% elseif webprofiler_markup = 2 %}
+    {# markup for the WebProfilerBundle 2.8+ (second design of the profiler) #}
+{% else %}
+    {# markup for newer version, coded against webprofiler_markup=3 but
+        displayed for any higher version so that a new webprofiler version would
+       get the markup of the previous one instead of nothing, until the template is
+       updated to support the new version 4.
+     #}
+{% endif %}
+```
+
+note the order of the different markup version in the template, to ensure that when we introduce a new design of the profiler, bundles not updated to support them would provide the previous markup because it is better to have a slightly broken design rather than displaying nothing.
+
+The ``webprofiler_markup`` variable should be bumped when doing design changes in the WebProfilerBundle which require to change the markup of toolbar items, so it should not happen too often.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-30T11:25:27Z
+
+@stof thanks for this new explanation. I've made the required changes in 5070861 and https://github.com/doctrine/DoctrineBundle/pull/445   Should I also do the same changes for SwiftmailerBundle and SecurityBundle?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T11:45:08Z
+
+@SecurityBundle does not need it IMO as it is in the symfony repo. SwiftmailerBundle would need an update of the template, yes
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-30T12:08:47Z
+
+Is it an idea to add a summary of the markup changes in the UPGRADE guide?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T15:07:23Z
+
+it would be great yeah
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-31T09:53:52Z
+
+:+1: Let's merge this one
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T09:58:15Z
+
+I would like to have the description of markup changes in the upgrade file. but otherwise, :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-31T10:03:03Z
+
+@stof give me 1 minute and I'll add the changes in UPGRADE file.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T10:25:31Z
+
+I actually made a couple more comments
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T10:33:15Z
+
+@javiereguiluz Icons are used in 2 places in the WebProfiler: in the toolbar items, and in the left menu of the profiler. As you are changing icons in the toolbar here, we now have inconsistent icons in the profiler. Should we keep it like that until the profiler itself is redesigned, or should we use the new icons in the left menu already to have consistency ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T11:38:38Z
+
+> egarding the "too many panels issue", the new toolbar behaves exactly as the old one: if a panel doesn't fit, it's not displayed
+
+@javiereguiluz this is not the behavior of the old one. On Symfony 2.6.4+, the toolbar spans multiple lines instead of having items being placed off screen: https://github.com/symfony/symfony/pull/12649
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-31T13:16:16Z
+
+There are some BC breaks in the menu that are not in the update file:
+
+ * `<div class="sf-toolbar-icon">` now has to live inside the `<a>` (which is incorrect btw, but is supported by browsers), whereas the other way around was supported previously (well, SonataBlockBundle did it this way, so I think it was supported)
+ * Toolbars now have to have an icon (or at least an `<img>` element), otherwise `.sf-toolbar-value/label` aren't styled correctly.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T13:27:25Z
+
+@WouterJ a div inside a a is not invalid anymore in the HTML5 spec (it was indeed invalid in the HTML4 spec, while supported by browsers)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-31T13:49:14Z
+
+@WouterJ I can't reproduce this:
+
+> Toolbars now have to have an icon (or at least an <img> element), otherwise .sf-toolbar-value/label aren't styled correctly.
+
+Panels without icons (svg or img) look OK.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-31T13:58:41Z
+
+Hmm, indeed. Must have been something else than that broke SonataBlockBundle's toolbar block
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-31T15:22:31Z
+
+Update:
+
+  * All reported errors have been fixed.
+  * All proposed changes have been implemented.
+
+The error displayed by Travis for PHP 5.3 is unrelated to this PR:
+
+1) Symfony\Component\Console\Tests\Helper\ProgressBarTest::testAnsiColorsAndEmojis
+Failed asserting that two strings are equal.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-31T15:39:56Z
+
+:+1: Imo, it's better to merge this PR now. We have 3 months to improve the current toolbar in further PRs.
+
+Btw, should we create a list with popular bundles that needs an update? Apart from the doctrine bundles and sonata block, I don't know any other.

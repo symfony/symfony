@@ -1,9 +1,8 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Authorization\Strategy;
+namespace Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -11,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  *
  * If all voters abstain from voting, the decission will be base on the allowIfAllAbstainDecisionsProperty
  */
-class DecideHighestNotAbstainedVoterStrategy extends AbstractDecideStrategy implements AccessDecisionManagerInterface
+class HighestNotAbstainedVoterAccessDecisionManager extends AbstractAccessDecisionManager
 {
     private $allowIfAllAbstainDecisions;
 
@@ -44,5 +43,4 @@ class DecideHighestNotAbstainedVoterStrategy extends AbstractDecideStrategy impl
 
         return $this->allowIfAllAbstainDecisions;
     }
-
 }

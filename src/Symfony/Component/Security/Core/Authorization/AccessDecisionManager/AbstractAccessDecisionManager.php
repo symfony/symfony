@@ -1,8 +1,11 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Authorization\Strategy;
+namespace Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
-abstract class AbstractDecideStrategy
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+
+abstract class AbstractAccessDecisionManager implements AccessDecisionManagerInterface
 {
     protected $voters;
 
@@ -41,4 +44,9 @@ abstract class AbstractDecideStrategy
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function decide(TokenInterface $token, array $attributes, $object = null);
 }

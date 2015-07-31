@@ -1,9 +1,8 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Authorization\Strategy;
+namespace Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * If all voters abstained from voting, the decision will be based on the
  * allowIfAllAbstainDecisions property value (defaults to false).
  */
-class DecideConsensusStrategy extends AbstractDecideStrategy implements AccessDecisionManagerInterface
+class ConsensusAccessDecisionManager extends AbstractAccessDecisionManager
 {
     private $allowIfEqualGrantedDeniedDecisions;
 
@@ -74,5 +73,4 @@ class DecideConsensusStrategy extends AbstractDecideStrategy implements AccessDe
 
         return $this->allowIfAllAbstainDecisions;
     }
-
 }

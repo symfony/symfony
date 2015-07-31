@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Symfony\Component\Security\Core\Authorization\Strategy\DecideAffirmativeStrategy;
-use Symfony\Component\Security\Core\Authorization\Strategy\DecideConsensusStrategy;
-use Symfony\Component\Security\Core\Authorization\Strategy\DecideHighestNotAbstainedVoterStrategy;
-use Symfony\Component\Security\Core\Authorization\Strategy\DecideUnanimousStrategy;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager\AffirmativeAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager\ConsensusAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager\HighestNotAbstainedVoterAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager\UnanimousAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -93,18 +93,17 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
     private function createStrategy($strategyName)
     {
-        switch($strategyName){
+        switch ($strategyName) {
             case self::STRATEGY_UNANIMOUS:
-                return new DecideUnanimousStrategy($this->allowIfAllAbstainDecisions);
+                return new UnanimousAccessDecisionManager($this->allowIfAllAbstainDecisions);
             case self::STRATEGY_CONSENSUS:
-                return new DecideConsensusStrategy($this->allowIfEqualGrantedDeniedDecisions,$this->allowIfAllAbstainDecisions);
+                return new ConsensusAccessDecisionManager($this->allowIfEqualGrantedDeniedDecisions, $this->allowIfAllAbstainDecisions);
             case self::STRATEGY_AFFIRMATIVE:
-                return new DecideAffirmativeStrategy($this->allowIfAllAbstainDecisions);
+                return new AffirmativeAccessDecisionManager($this->allowIfAllAbstainDecisions);
             case self::STRATEGY_HIGHEST_NOT_ABSTAINED:
-                return new DecideHighestNotAbstainedVoterStrategy($this->allowIfAllAbstainDecisions);
+                return new HighestNotAbstainedVoterAccessDecisionManager($this->allowIfAllAbstainDecisions);
             default:
                 throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategyName));
         }
     }
-
 }

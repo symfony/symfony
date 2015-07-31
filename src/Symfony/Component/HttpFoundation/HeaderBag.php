@@ -23,7 +23,8 @@ use Symfony\Component\HttpFoundation\Header\CacheControl;
 class HeaderBag implements \IteratorAggregate, \Countable
 {
     protected $headers = array();
-    protected $cacheControl;
+    protected $cacheControl = array();
+    protected $cacheControlObject;
 
     /**
      * Constructor.
@@ -34,7 +35,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function __construct(array $headers = array())
     {
-        $this->cacheControl = new CacheControl();
+        $this->cacheControlObject = new CacheControl();
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
         }
@@ -167,7 +168,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ('cache-control' === $key) {
-            $this->cacheControl = CacheControl::fromString($values[0]);
+            $this->cacheControlObject = CacheControl::fromString($values[0]);
+            $this->syncCacheControl();
         }
     }
 
@@ -214,7 +216,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
         unset($this->headers[$key]);
 
         if ('cache-control' === $key) {
-            $this->cacheControl = new CacheControl();
+            $this->cacheControlObject = new CacheControl();
+            $this->syncCacheControl();
         }
     }
 
@@ -251,9 +254,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function addCacheControlDirective($key, $value = true)
     {
-        $this->cacheControl->addDirective($key, $value);
+        $this->cacheControlObject->addDirective($key, $value);
+        $this->syncCacheControl();
 
-        $this->set('Cache-Control', (string) $this->cacheControl);
+        $this->set('Cache-Control', (string) $this->cacheControlObject);
     }
 
     /**
@@ -265,7 +269,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function hasCacheControlDirective($key)
     {
-        return $this->cacheControl->hasDirective($key);
+        return $this->cacheControlObject->hasDirective($key);
     }
 
     /**
@@ -277,7 +281,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function getCacheControlDirective($key)
     {
-        return $this->cacheControl->getDirective($key);
+        return $this->cacheControlObject->getDirective($key);
     }
 
     /**
@@ -287,9 +291,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function removeCacheControlDirective($key)
     {
-        $this->cacheControl->removeDirective($key);
+        $this->cacheControlObject->removeDirective($key);
+        $this->syncCacheControl();
 
-        $this->set('Cache-Control', (string) $this->cacheControl);
+        $this->set('Cache-Control', (string) $this->cacheControlObject);
     }
 
     /**
@@ -310,5 +315,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
     public function count()
     {
         return count($this->headers);
+    }
+
+    protected function syncCacheControl()
+    {
+        $this->cacheControl = $this->cacheControlObject->allDirectives();
     }
 }

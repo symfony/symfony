@@ -29,10 +29,11 @@ class ResponseHeaderBag extends HeaderBag
     const DISPOSITION_ATTACHMENT = 'attachment';
     const DISPOSITION_INLINE = 'inline';
 
+    protected $computedCacheControl = array();
     /**
      * @var CacheControl
      */
-    protected $computedCacheControl;
+    protected $computedCacheControlObject;
 
     /**
      * @var array
@@ -53,6 +54,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function __construct(array $headers = array())
     {
+        $this->computedCacheControlObject = new CacheControl();
         parent::__construct($headers);
 
         if (!isset($this->headers['cache-control'])) {
@@ -118,7 +120,8 @@ class ResponseHeaderBag extends HeaderBag
             $computed = $this->computeCacheControlValue();
             $this->headers['cache-control'] = array($computed);
             $this->headerNames['cache-control'] = 'Cache-Control';
-            $this->computedCacheControl = CacheControl::fromString($computed);
+            $this->computedCacheControlObject = CacheControl::fromString($computed);
+            $this->syncCacheControl();
         }
     }
 
@@ -135,7 +138,8 @@ class ResponseHeaderBag extends HeaderBag
         unset($this->headerNames[$uniqueKey]);
 
         if ('cache-control' === $uniqueKey) {
-            $this->computedCacheControl = new CacheControl();
+            $this->computedCacheControlObject = new CacheControl();
+            $this->syncCacheControl();
         }
     }
 
@@ -144,7 +148,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function hasCacheControlDirective($key)
     {
-        return $this->computedCacheControl->hasDirective($key);
+        return $this->computedCacheControlObject->hasDirective($key);
     }
 
     /**
@@ -152,7 +156,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCacheControlDirective($key)
     {
-        return $this->computedCacheControl->getDirective($key);
+        return $this->computedCacheControlObject->getDirective($key);
     }
 
     /**
@@ -262,9 +266,7 @@ class ResponseHeaderBag extends HeaderBag
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Create an instance of Symfony\Component\HttpFoundation\Header\ContentDisposition instead.', E_USER_DEPRECATED);
 
-        $header = new ContentDisposition($disposition, $filename, $filenameFallback);
-
-        return (string) $header;
+        return (string) new ContentDisposition($disposition, $filename, $filenameFallback);
     }
 
     /**
@@ -277,25 +279,31 @@ class ResponseHeaderBag extends HeaderBag
      */
     protected function computeCacheControlValue()
     {
-        if (!$this->cacheControl->allDirectives() && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
+        if (!$this->cacheControlObject->allDirectives() && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
             return 'no-cache';
         }
 
-        if (!$this->cacheControl->allDirectives()) {
+        if (!$this->cacheControlObject->allDirectives()) {
             // conservative by default
             return 'private, must-revalidate';
         }
 
-        $header = (string) $this->cacheControl;
-        if ($this->cacheControl->hasDirective('public') || $this->cacheControl->hasDirective('private')) {
+        $header = (string) $this->cacheControlObject;
+        if ($this->cacheControlObject->hasDirective('public') || $this->cacheControlObject->hasDirective('private')) {
             return $header;
         }
 
         // public if s-maxage is defined, private otherwise
-        if (!$this->cacheControl->hasDirective('s-maxage')) {
+        if (!$this->cacheControlObject->hasDirective('s-maxage')) {
             return $header.', private';
         }
 
         return $header;
+    }
+
+    protected function syncCacheControl()
+    {
+        parent::syncCacheControl();
+        $this->computedCacheControl = $this->computedCacheControlObject->allDirectives();
     }
 }

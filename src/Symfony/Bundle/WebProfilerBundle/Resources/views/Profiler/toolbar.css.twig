@@ -22,7 +22,6 @@
     box-shadow: 0 -1px 0px rgba(0, 0, 0, 0.2);
     color: #EEE;
     font: 11px Arial, sans-serif;
-    height: 36px;
     left: 0;
     margin: 0;
     padding: 0 36px 0 0;
@@ -348,7 +347,6 @@
         bottom: auto;
         box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2);
         top: 0;
-        overflow: hidden; /* needed to aovid issues for toolbars with lots of elements */
     }
 
     .sf-toolbar-block .sf-toolbar-info {
@@ -360,10 +358,6 @@
 {% if not floatable %}
     .sf-toolbarreset {
         position: static;
-    }
-
-    .sf-toolbar-block:hover .sf-toolbar-icon {
-        background-color: inherit;
     }
 {% endif %}
 

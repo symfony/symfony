@@ -241,7 +241,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
             ->setDecoratedService('foo', 'foo_inner')
         ;
 
-        $this->assertEquals(array('foo', 'foo_inner'), $container->getDefinition('child1')->getDecoratedService());
+        $this->assertEquals(array('foo', 'foo_inner', 0), $container->getDefinition('child1')->getDecoratedService());
     }
 
     protected function process(ContainerBuilder $container)

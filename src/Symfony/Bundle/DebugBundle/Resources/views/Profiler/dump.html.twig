@@ -5,17 +5,17 @@
 
     {% if dumps_count %}
         {% set icon %}
-            <svg width="21" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 21 28" enable-background="new 0 0 21 28" xml:space="preserve"><path fill="#3F3F3F" d="M21 14h-1c-0.3-4.8-4.1-8.7-9-9V4h-1v1c-4.8 0.3-8.7 4.1-9 9H0v1h1c0.3 4.8 4.1 8.7 9 9v1h1v-1 c4.8-0.3 8.7-4.1 9-9h1V14z M11 22v-4h-1v4c-3.7-0.2-6.7-3.2-7-7h4v-1H3c0.2-3.7 3.2-6.7 7-7v4h1V7c3.7 0.2 6.7 3.2 7 7h-4v1h4 C17.7 18.7 14.7 21.7 11 22z"/></svg>
-            <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ dumps_count }}</span>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" height="24" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+                <path fill="#AAAAAA" d="M12,22.6c-5.8,0-10.5-4.7-10.5-10.5C1.5,6.3,6.2,1.5,12,1.5s10.5,4.7,10.5,10.5C22.5,17.9,17.8,22.6,12,22.6z M12,4.5c-4.2,0-7.5,3.4-7.5,7.5c0,4.2,3.4,7.5,7.5,7.5s7.5-3.4,7.5-7.5C19.5,7.9,16.2,4.5,12,4.5z"/>
+                <path fill="#AAAAAA" d="M12,9.1c-0.8,0-1.5-0.7-1.5-1.5v-6c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v6C13.5,8.4,12.8,9.1,12,9.1zM13.5,22.4v-6c0-0.8-0.7-1.5-1.5-1.5s-1.5,0.7-1.5,1.5v6c0,0.8,0.7,1.5,1.5,1.5S13.5,23.2,13.5,22.4z M23.9,12c0-0.8-0.7-1.5-1.5-1.5h-6c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h6C23.2,13.5,23.9,12.8,23.9,12z M9.1,12c0-0.8-0.7-1.5-1.5-1.5h-6c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h6C8.4,13.5,9.1,12.8,9.1,12z"/>
+            </svg>
+            <span class="sf-toolbar-value">{{ dumps_count }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
-                <b>dump()</b>
-            </div>
             {% for dump in collector.getDumps('html') %}
                 <div class="sf-toolbar-info-piece">
-                    in
+                    <span>
                     {% if dump.file %}
                         {% set link = dump.file|file_link(dump.line) %}
                         {% if link %}
@@ -26,14 +26,15 @@
                     {% else %}
                         {{ dump.name }}
                     {% endif %}
-                    line {{ dump.line }}:
+                    </span>
+                    <span class="sf-toolbar-file-line">line {{ dump.line }}</span>
                     {{ dump.data|raw }}
                 </div>
             {% endfor %}
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
         {% endset %}
 
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': true } %}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
     {% endif %}
 {% endblock %}
 

@@ -79,7 +79,7 @@
         <service id="twig.profile" class="Twig_Profiler_Profile" />
 
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="257" />
             <argument type="service" id="twig.profile" />
         </service>
 

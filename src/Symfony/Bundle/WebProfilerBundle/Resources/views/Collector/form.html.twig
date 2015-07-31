@@ -3,13 +3,31 @@
 {% from _self import form_tree_entry, form_tree_details %}
 
 {% block toolbar %}
-    {% if collector.data|length %}
+    {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
+        {% set status_color = collector.data.nb_errors ? 'red' : '' %}
         {% set icon %}
-            <svg width="20" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 20 28" enable-background="new 0 0 20 28" xml:space="preserve"><g><polygon fill="#3F3F3F" points="16,5 13,5 13,3 7,3 7,5 4,5 4,9 16,9"/><path fill="#3F3F3F" d="M17 6v4H3V6H0v19h20V6H17z M8 22H3v-1h5V22z M17 20H3v-1h14V20z M17 18H3v-1h14V18z M17 16H3v-1h14V16z M17 14H4v-1h13V14z"/></g></svg>
-            <span class="sf-toolbar-status sf-toolbar-status-{% if collector.data.nb_errors %}red{% else %}green{% endif %}">{% if collector.data.nb_errors %}{{ collector.data.nb_errors }}{% else %}{{ collector.data.forms|length }}{% endif %}</span>
+            {{ include('@WebProfiler/Icon/form.svg') }}
+            <span class="sf-toolbar-value">
+                {% if collector.data.nb_errors %}
+                    {{ collector.data.nb_errors }}
+                {% else %}
+                    {{ collector.data.forms|length }}
+                {% endif %}
+            </span>
         {% endset %}
 
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Number of forms</b>
+                <span class="sf-toolbar-status">{{ collector.data.forms|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Number of errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.data.nb_errors > 0 ? 'red' }}">{{ collector.data.nb_errors }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}
 

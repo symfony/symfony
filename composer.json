@@ -76,6 +76,7 @@
         "monolog/monolog": "~1.11",
         "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0",
+        "psr/http-message": "~1.0",
         "egulias/email-validator": "~1.2"
     },
     "autoload": {

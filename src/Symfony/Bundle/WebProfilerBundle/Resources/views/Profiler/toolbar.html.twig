@@ -15,7 +15,7 @@
 
             Sfjs.setPreference('toolbar/displayState', 'block');
         ">
-            {{ include('@WebProfiler/Icon/symfony.svg.twig') }}
+            {{ include('@WebProfiler/Icon/symfony.svg') }}
         </a>
     </div>
     <style>
@@ -44,7 +44,7 @@
             document.getElementById('sfMiniToolbar-{{ token }}').style.display = 'block';
             Sfjs.setPreference('toolbar/displayState', 'none');
         ">
-            {{ include('@WebProfiler/Icon/close.svg.twig') }}
+            {{ include('@WebProfiler/Icon/close.svg') }}
         </a>
     {% endif %}
 </div>

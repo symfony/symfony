@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
     {% set icon %}
-        {{ include('@WebProfiler/Icon/twig.html.twig') }}
+        {{ include('@WebProfiler/Icon/twig.svg') }}
         <span class="sf-toolbar-value">{{ time }}</span>
         <span class="sf-toolbar-label">ms</span>
     {% endset %}

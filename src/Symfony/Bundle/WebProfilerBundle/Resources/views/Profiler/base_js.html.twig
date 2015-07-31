@@ -86,6 +86,7 @@
                     return;
                 }
 
+                var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
                 var tbodies = document.querySelectorAll('.sf-toolbar-ajax-request-list');
                 var state = 'ok';
                 if (tbodies.length) {
@@ -169,7 +170,6 @@
                             infoSpan.textContent = text;
                         }
                     } else {
-                        var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
                         ajaxToolbarPanel.style.display = 'none';
                     }
                 }
@@ -179,7 +179,6 @@
                 var className = 'sf-toolbar-ajax-requests sf-toolbar-value';
                 requestCounter[0].className = className;
 
-                var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
                 if (state == 'error') {
                     Sfjs.addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
                 } else {

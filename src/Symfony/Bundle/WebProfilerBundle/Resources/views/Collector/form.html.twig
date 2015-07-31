@@ -6,7 +6,7 @@
     {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
         {% set status_color = collector.data.nb_errors ? 'red' : '' %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/form.svg.twig') }}
+            {{ include('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">
                 {% if collector.data.nb_errors %}
                     {{ collector.data.nb_errors }}

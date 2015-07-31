@@ -7,7 +7,7 @@
         {% set icon %}
             {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
             {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
-            {{ include('@WebProfiler/Icon/logger.svg.twig') }}
+            {{ include('@WebProfiler/Icon/logger.svg') }}
             <span class="sf-toolbar-value">{{ error_count }}</span>
         {% endset %}
 
@@ -80,7 +80,7 @@
         </tr>
     </table>
 
-{% if collector.logs %}
+    {% if collector.logs %}
         <table>
             <tr>
                 <th>#</th>

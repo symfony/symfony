@@ -5,7 +5,7 @@
 {% block toolbar %}
     {% if collector.messages|length %}
         {% set icon %}
-            {{ include('@WebProfiler/Icon/translation.svg.twig') }}
+            {{ include('@WebProfiler/Icon/translation.svg') }}
             {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' : '' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
             <span class="sf-toolbar-value">{{ error_count ?: collector.countdefines }}</span>
@@ -15,20 +15,20 @@
             <div class="sf-toolbar-info-piece">
                 <b>Missing messages</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
-                    {{ collector.countMissings|default(0) }}
+                    {{ collector.countMissings }}
                 </span>
             </div>
 
             <div class="sf-toolbar-info-piece">
                 <b>Fallback messages</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countFallbacks ? 'yellow' }}">
-                    {{ collector.countFallbacks|default(0) }}
+                    {{ collector.countFallbacks }}
                 </span>
             </div>
 
             <div class="sf-toolbar-info-piece">
                 <b>Defined messages</b>
-                <span class="sf-toolbar-status">{{ collector.countdefines|default(0) }}</span>
+                <span class="sf-toolbar-status">{{ collector.countdefines }}</span>
             </div>
         {% endset %}
 

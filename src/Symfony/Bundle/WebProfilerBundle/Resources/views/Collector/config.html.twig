@@ -21,7 +21,7 @@
     {% set icon %}
         {% if collector.symfonyState is defined %}
             <span class="sf-toolbar-label">
-                {{ include('@WebProfiler/Icon/symfony.svg.twig') }}
+                {{ include('@WebProfiler/Icon/symfony.svg') }}
             </span>
             <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
         {% elseif collector.applicationname %}
@@ -71,7 +71,10 @@
 
         <div class="sf-toolbar-info-piece sf-toolbar-info-php">
             <b>PHP version</b>
-            <span>{{ collector.phpversion }}</span>
+            <span>
+                {{ collector.phpversion }}
+                &nbsp; <a href="{{ path('_profiler_phpinfo') }}">View phpinfo()</a>
+            </span>
         </div>
 
         <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">

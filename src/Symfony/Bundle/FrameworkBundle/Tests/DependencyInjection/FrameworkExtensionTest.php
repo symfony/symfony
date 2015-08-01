@@ -446,6 +446,13 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
         $this->assertTrue($container->has('serializer'));
+
+        $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+
+        $this->assertCount(1, $argument);
+        $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
+        $this->assertEquals(new Reference('serializer.mapping.cache.apc'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
+        $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

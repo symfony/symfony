@@ -39,6 +39,6 @@
         </framework:translator>
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
-        <framework:serializer enabled="true" />
+        <framework:serializer enabled="true" enable-annotations="true" cache="serializer.mapping.cache.apc" name-converter="serializer.name_converter.camel_case_to_snake_case" />
     </framework:config>
 </container>

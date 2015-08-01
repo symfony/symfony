@@ -17,6 +17,8 @@ use Symfony\Component\Locale\Locale;
  * Test case for the {@link Locale} class.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 class LocaleTest extends \PHPUnit_Framework_TestCase
 {

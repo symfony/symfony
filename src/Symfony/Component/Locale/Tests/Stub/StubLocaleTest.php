@@ -15,6 +15,8 @@ use Symfony\Component\Locale\Stub\StubLocale;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 class StubLocaleTest extends \PHPUnit_Framework_TestCase
 {

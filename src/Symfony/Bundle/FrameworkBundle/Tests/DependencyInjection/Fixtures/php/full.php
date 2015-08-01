@@ -32,7 +32,7 @@ $container->loadFromExtension('framework', array(
         'cookie_path' => '/',
         'cookie_domain' => 'example.com',
         'cookie_secure' => true,
-        'cookie_httponly' => true,
+        'cookie_httponly' => false,
         'gc_maxlifetime' => 90000,
         'gc_divisor' => 108,
         'gc_probability' => 1,

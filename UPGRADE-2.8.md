@@ -8,32 +8,32 @@ Form
    option together with the `Valid` constraint instead. Contrary to
    "cascade_validation", "constraints" must be set on the respective child forms,
    not the parent form.
-   
+
    Before:
-   
+
    ```php
    $form = $this->createForm('form', $article, array('cascade_validation' => true))
        ->add('author', new AuthorType())
        ->getForm();
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Validator\Constraints\Valid;
-   
+
    $form = $this->createForm('form', $article)
        ->add('author', new AuthorType(), array(
            'constraints' => new Valid(),
        ))
        ->getForm();
    ```
-   
+
    Alternatively, you can set the `Valid` constraint in the model itself:
-   
+
    ```php
    use Symfony\Component\Validator\Constraints as Assert;
-   
+
    class Article
    {
        /**
@@ -197,3 +197,17 @@ to the toolbar templates:
     {% endset %}
 {% endblock %}
 ```
+
+FrameworkBundle
+---------------
+
+ * The default value of the parameter `session`.`cookie_httponly` is now `true`.
+   It prevents scripting languages, such as JavaScript to access the cookie,
+   which help to reduce identity theft through XSS attacks. If your
+   application needs to access the session cookie, override this parameter:
+
+   ```yaml
+   framework:
+       session:
+           cookie_httponly: false
+   ```

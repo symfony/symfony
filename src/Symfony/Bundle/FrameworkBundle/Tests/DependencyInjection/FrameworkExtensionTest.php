@@ -149,7 +149,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('/', $options['cookie_path']);
         $this->assertEquals('example.com', $options['cookie_domain']);
         $this->assertTrue($options['cookie_secure']);
-        $this->assertTrue($options['cookie_httponly']);
+        $this->assertFalse($options['cookie_httponly']);
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);

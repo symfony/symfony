@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-06T08:53:23Z
+
+@afurculita thanks for submitting this nice pull request.
+
+I'd like to ask you something: reading the attached PDF, I found some constraints specific to some countries. For example: for Estonia (`EE`) *"first digit of bank code can not be 0"* (page 29 of the PDF). The proposed regular expressions don't take into account these details. I agree with that to not overcomplicate regular expressions, but I'd like to know what others think about this.
+
+Another question is related to France (page 31). There are some *régions d'outre-mer* which use the same format but with a different country code (Guyana (GF), Guadeloupe (GP), Martinique (MQ), etc.) Should we take into account these details or again is too complicated and not that important?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2015-03-06T17:27:09Z
+
+Hi and thanks for the PR :)
+I think is a great idea to improve this validator. Beside the questions @javiereguiluz raised I have one.
+I did a little check against a project of mine running https://code.google.com/p/php-iban/source/browse/tags/1.4.7/registry.txt on top of/beside the Symfony validator and spotted two things. That project also doesn't echek the `EE` "not be 0". The second is about your changes;
+what about the following country codes?
+Aland Islands AX
+United Arab Emirates AE
+BL, GF, GP, MF, MQ, NC, PF, PM, QA, PM, RE, TF, YT, WF
+I didn't check, but are these unofficial/canidates?
+
+I think a great addition would be to have to the option to check entries against:
+- official countries only
+- official + candidates
+- SEPA only
+- custom set of countries codes only (maybe on top of the SEPA list)
+
+Would such a change be possible?
+
+---------------------------------------------------------------------------
+
+by afurculita at 2015-03-26T22:21:41Z
+
+@javiereguiluz @SpacePossum  first thank you for your attention on this PR.
+
+> reading the attached PDF, I found some constraints specific to some countries. For example: for Estonia (EE) "first digit of bank code can not be 0" (page 29 of the PDF). The proposed regular expressions don't take into account these details.
+
+I was thinking about that too. I've seen on [Wikipedia](http://www.wikiwand.com/en/International_Bank_Account_Number#/IBAN_formats_by_country), that there are more rules like the one you found. For example: Macedonia always has 07 as the IBAN check digits, same Mauritania with 13. It is very unlikely that these will change anytime soon, so I was thinking to add them too. What do you think?
+
+> There are some régions d'outre-mer which use the same format but with a different country code (Guyana (GF), Guadeloupe (GP), Martinique (MQ), etc.) Should we take into account these details or again is too complicated and not that important?
+
+We may add these too. They are having the same format as France (*'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}'*), even if their ISO code is not *FR*. But they can be useful if we implement some country groups functionality in case someone wants to accept credit cards only from a determined list of countries.
+
+> what about the following country codes? Aland Islands AX, United Arab Emirates AE, BL, GF, GP, MF, MQ, NC, PF, PM, QA, PM, RE, TF, YT, WF. I didn't check, but are these unofficial/canidates?
+
+I have included validation for AE. AX has the same format as Finland. French Guyana (GF), Guadeloupe (GP), Martinique (MQ), Reunion (RE), French Polynesia (PF), French Southern Territories (TF), Mayotte (YT), New Caledonia (NC), Saint Barthelemy (BL), Saint Martin (French part) (MF), Saint Pierre et Miquelon (PM), and Wallis and Futuna Islands (WF) has the same format as France. We can add them for the same reason I specified in the previous answer.
+
+> I think a great addition would be to have to the option to check entries against: official countries only, official + candidates, SEPA only, custom set of countries codes only (maybe on top of the SEPA list)
+
+I was thinking about that too. I think it will be enough to add a way to specify a group of countries and have a predefined one: SEPA (or 2, by adding the ALL group, and make it the default one).
+
+What do you think, guys?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2015-03-28T14:10:07Z
+
+@afurculita Thanks for the feedback. I think you are on the right track. Having a rule for each ISO code  might help to speed up checking against a configured list of ISO codes people want to accept. (and it makes it easy to maintain if such a code is changed, removed or a new code is added), so :+1:  :)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-04-24T12:14:46Z
+
+Thank you for working on this @afurculita! I think we should limit the scope of this PR and work on formats only. Other features like country groups should be implemented in separate PRs.
+
+---------------------------------------------------------------------------
+
+by afurculita at 2015-05-24T13:29:27Z
+
+Thanks @SpacePossum and @webmozart for the help with this PR.
+
+I have committed new changes: https://github.com/afurculita/symfony/commit/d7533daf660ab60ebadc9c3de611204decc19274. I removed the dependency on Intl, added 20 more countries to our formats list, added a new error type and added a lot more tests. As @webmozart  recommended the other features like country groups will be addressed in other PRs.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2015-05-24T14:03:48Z
+
+Looking good, thanks!
+Nice to see the dependency on Intl is removed. I agree with you and @webmozart to address other features in new PR's.
+
+Failing tests are not related to the changes made in this PR and I don't know were fabbot went (having the weekend off maybe ;) )
+
+I'm not sure if I scanned all the test correctly, but did you add a test for some IBAN's that have a valid country code and a valid checksum but are in an invalid format for that country?
+
+---------------------------------------------------------------------------
+
+by afurculita at 2015-05-24T14:39:59Z
+
+I have added tests for IBANs with invalid formats and also for IBANs with valid formats but invalid checksum. If the format is invalid, the validator will be stopped before reaching the checksum validation. Should I still add tests for IBAN's that have a valid country code and a valid checksum but are in an invalid format for that country?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2015-05-24T15:08:42Z
+
+ah that makes sense, you are right, no point adding more tests :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-25T07:41:56Z
+
+fabbpot is back from holidays with some good suggestions :)
+
+---------------------------------------------------------------------------
+
+by rgeraads at 2015-06-26T19:50:04Z
+
+I think this change would make the 4 character length check obsolete as well :)
+https://github.com/afurculita/symfony/blob/better-iban-validation/src/Symfony/Component/Validator/Constraints/IbanValidator.php#L162
+
+---------------------------------------------------------------------------
+
+by afurculita at 2015-07-31T18:54:22Z
+
+@rgeraads I have removed the 4 character length as I consider it too to be obsolete now.
+@fabpot I have removed the case check, as I consider it too unnecessary.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T06:00:52Z
+
+@afurculita Can you check the constants comment? As this is a bug fix, it should be merged into 2.3, but cannot contain BC breaks.
+
+---------------------------------------------------------------------------
+
+by afurculita at 2015-08-01T08:24:10Z
+
+@fabpot The constant changes has been reverted and `TOO_SHORT_ERROR` and `INVALID_CASE_ERROR` are deprecated

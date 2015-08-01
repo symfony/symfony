@@ -64,8 +64,12 @@ class YamlDumper extends Dumper
     private function addService($id, $definition)
     {
         $code = "    $id:\n";
-        if ($definition->getClass()) {
-            $code .= sprintf("        class: %s\n", $definition->getClass());
+        if ($class = $definition->getClass()) {
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
+            }
+
+            $code .= sprintf("        class: %s\n", $class);
         }
 
         if (!$definition->isPublic()) {

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-24T07:59:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2015-03-24T15:19:15Z
+
+Is it ok for merge? I added a unit test to cover this case.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-24T16:38:09Z
+
+phpdoc for ORMQueryBuilderLoader::queryBuilder must be changed to `@var QueryBuilder|null`
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-18T14:22:15Z
+
+What do you think about this @beberlei? Should we support `null` or should we return a query builder that returns no entities instead?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T07:05:59Z
+
+ping @symfony/deciders @beberlei Any decisions on this one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-01T09:17:25Z
+
+:+1: looks like a simple but effective solution

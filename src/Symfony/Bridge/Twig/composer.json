@@ -29,6 +29,7 @@
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.2",
         "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/security-acl": "~2.0,>=2.0.5",
         "symfony/security": "~2.0,>=2.0.5"
     },
     "suggest": {

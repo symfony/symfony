@@ -233,7 +233,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSingleChoiceWithoutTranslation()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => false,
@@ -654,7 +654,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSingleChoiceExpandedWithoutTranslation()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => true,
@@ -853,7 +853,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testMultipleChoiceExpandedWithoutTranslation()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a', '&c'), array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
             'multiple' => true,
             'expanded' => true,

@@ -102,6 +102,9 @@ class EntityTypeTest extends TypeTestCase
         // be managed!
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $field = $this->factory->createNamed('name', 'entity', null, array(
@@ -512,7 +515,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => true,
             'expanded' => true,
             'em' => 'default',

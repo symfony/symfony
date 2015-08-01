@@ -27,8 +27,8 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeImmutable) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeImmutable.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {

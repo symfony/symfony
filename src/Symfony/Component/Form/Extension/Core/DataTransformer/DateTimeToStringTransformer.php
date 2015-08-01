@@ -90,7 +90,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * Transforms a DateTime object into a date string with the configured format
      * and timezone.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTime|\DateTimeImmutable $dateTime A DateTime object
      *
      * @return string A value as produced by PHP's date() function
      *
@@ -104,8 +104,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$value instanceof \DateTime && !$value instanceof \DateTimeImmutable) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeImmutable.');
         }
 
         if (!$value instanceof \DateTimeImmutable) {

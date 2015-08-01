@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T15:19:21Z
+
+OK, looks like ``ResourceBundle`` does not handle loading with fallback disabled in the same way than PHP
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T16:02:40Z
+
+given this is an internal class used only by the script updating the ICU data, I will just skip these tests on HHVM (as done on old PHP 5.3 versions)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T16:55:17Z
+
+Looks like we have a time-sensitive test in the HttpCacheTest

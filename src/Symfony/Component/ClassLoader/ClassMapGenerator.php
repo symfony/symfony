@@ -110,6 +110,25 @@ class ClassMapGenerator
                 case T_CLASS:
                 case T_INTERFACE:
                 case T_TRAIT:
+                    // Skip usage of ::class constant
+                    $isClassConstant = false;
+                    for ($j = $i - 1; $j > 0; --$j) {
+                        if (is_string($tokens[$j])) {
+                            break;
+                        }
+
+                        if (T_DOUBLE_COLON === $tokens[$j][0]) {
+                            $isClassConstant = true;
+                            break;
+                        } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                            break;
+                        }
+                    }
+
+                    if ($isClassConstant) {
+                        continue;
+                    }
+
                     // Find the classname
                     while (($t = $tokens[++$i]) && is_array($t)) {
                         if (T_STRING === $t[0]) {

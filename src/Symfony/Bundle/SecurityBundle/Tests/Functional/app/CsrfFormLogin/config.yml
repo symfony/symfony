@@ -3,11 +3,11 @@ imports:
 
 services:
     csrf_form_login.form.type:
-        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginFormType
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType
         arguments:
             - @request_stack
         tags:
-            - { name: form.type, alias: user_login }
+            - { name: form.type }
 
 security:
     encoders:

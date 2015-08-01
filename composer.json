@@ -49,7 +49,6 @@
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "2.99.99",
-        "symfony/security-acl": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
         "symfony/security-http": "self.version",
@@ -73,7 +72,8 @@
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0",
-        "egulias/email-validator": "~1.2"
+        "egulias/email-validator": "~1.2",
+        "symfony/security-acl": "self.version"
     },
     "autoload": {
         "psr-4": {

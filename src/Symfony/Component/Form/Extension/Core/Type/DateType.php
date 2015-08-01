@@ -37,6 +37,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::SHORT,
     );
 
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -101,9 +106,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -253,6 +258,14 @@ class DateType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'date';
     }

@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/security": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0"
     },
     "require-dev": {

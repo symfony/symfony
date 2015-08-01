@@ -114,8 +114,12 @@ class XmlDumper extends Dumper
         if (null !== $id) {
             $service->setAttribute('id', $id);
         }
-        if ($definition->getClass()) {
-            $service->setAttribute('class', $definition->getClass());
+        if ($class = $definition->getClass()) {
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
+            }
+
+            $service->setAttribute('class', $class);
         }
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');

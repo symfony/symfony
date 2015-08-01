@@ -65,7 +65,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -80,7 +80,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -95,7 +95,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingDynamicExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 

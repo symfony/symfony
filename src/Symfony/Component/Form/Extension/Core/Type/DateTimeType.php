@@ -161,8 +161,8 @@ class DateTimeType extends AbstractType
                         'time' => $timeParts,
                     )),
                 )))
-                ->add('date', 'date', $dateOptions)
-                ->add('time', 'time', $timeOptions)
+                ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
+                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
             ;
         }
 
@@ -284,6 +284,14 @@ class DateTimeType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'datetime';
     }

@@ -37,6 +37,8 @@
             <argument type="collection" />
             <!-- All services with tag "form.type_guesser" are inserted here by FormPass -->
             <argument type="collection" />
+            <!-- The deprecated type names are inserted here by FormPass -->
+            <argument type="collection" />
         </service>
 
         <!-- ValidatorTypeGuesser -->

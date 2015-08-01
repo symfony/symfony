@@ -19,14 +19,14 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testHasType()
     {
         $loader = new ConcreteExtension();
-        $this->assertTrue($loader->hasType('foo'));
-        $this->assertFalse($loader->hasType('bar'));
+        $this->assertTrue($loader->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
+        $this->assertFalse($loader->hasType('foo'));
     }
 
     public function testGetType()
     {
         $loader = new ConcreteExtension();
-        $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('foo'));
+        $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 }
 

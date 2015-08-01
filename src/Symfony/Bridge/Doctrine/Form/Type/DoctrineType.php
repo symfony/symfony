@@ -94,12 +94,12 @@ abstract class DoctrineType extends AbstractType
      * Gets important parts from QueryBuilder that will allow to cache its results.
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
-     * 
+     *
      * @param object $queryBuilder
-     * 
+     *
      * @return array|false Array with important QueryBuilder parts or false if
      *                     they can't be determined
-     * 
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
@@ -328,6 +328,6 @@ abstract class DoctrineType extends AbstractType
 
     public function getParent()
     {
-        return 'choice';
+        return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
 }

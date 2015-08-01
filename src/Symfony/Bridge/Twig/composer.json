@@ -31,6 +31,7 @@
         "symfony/translation": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/security": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/console": "~2.8|~3.0",
         "symfony/var-dumper": "~2.8|~3.0",

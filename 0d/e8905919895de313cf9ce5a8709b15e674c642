@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-15T17:33:51Z
+
+Technically, the methods won't be removed, but will throw exceptions instead. Though I think this doesn't make a different for users of the classes and they should not need to bother with internal details. That's why I chose to say that they will be removed in the deprecation messages.

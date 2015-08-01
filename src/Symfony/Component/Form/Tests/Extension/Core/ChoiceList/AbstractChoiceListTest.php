@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
 {

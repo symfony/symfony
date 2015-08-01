@@ -4,13 +4,13 @@
   command [options] [arguments]
 
 <comment>Options:</comment>
-  <info>--help</info>           <info>-h</info> Display this help message
-  <info>--quiet</info>          <info>-q</info> Do not output any message
-  <info>--verbose</info>        <info>-v|vv|vvv</info> Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
-  <info>--version</info>        <info>-V</info> Display this application version
-  <info>--ansi</info>              Force ANSI output
-  <info>--no-ansi</info>           Disable ANSI output
-  <info>--no-interaction</info> <info>-n</info> Do not ask any interactive question
+  <info>-h, --help</info>            Display this help message
+  <info>-q, --quiet</info>           Do not output any message
+  <info>-V, --version</info>         Display this application version
+  <info>    --ansi</info>            Force ANSI output
+  <info>    --no-ansi</info>         Disable ANSI output
+  <info>-n, --no-interaction</info>  Do not ask any interactive question
+  <info>-v|vv|vvv, --verbose</info>  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 <comment>Available commands for the "foo" namespace:</comment>
-  <info>foo:bar  </info> The foo:bar command
+  <info>foo:bar</info>  The foo:bar command

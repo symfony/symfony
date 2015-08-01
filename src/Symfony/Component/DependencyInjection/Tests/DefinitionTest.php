@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,28 +28,19 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo'), $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
     }
 
-    public function testSetGetFactoryClass()
+    /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setFactory
+     * @covers Symfony\Component\DependencyInjection\Definition::getFactory
+     */
+    public function testSetGetFactory()
     {
         $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryClass());
-        $this->assertSame($def, $def->setFactoryClass('stdClass2'), '->setFactoryClass() implements a fluent interface.');
-        $this->assertEquals('stdClass2', $def->getFactoryClass(), '->getFactoryClass() returns current class to construct this service.');
-    }
 
-    public function testSetGetFactoryMethod()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryMethod());
-        $this->assertSame($def, $def->setFactoryMethod('foo'), '->setFactoryMethod() implements a fluent interface');
-        $this->assertEquals('foo', $def->getFactoryMethod(), '->getFactoryMethod() returns the factory method name');
-    }
+        $this->assertSame($def, $def->setFactory('foo'), '->setFactory() implements a fluent interface');
+        $this->assertEquals('foo', $def->getFactory(), '->getFactory() returns the factory');
 
-    public function testSetGetFactoryService()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryService());
-        $this->assertSame($def, $def->setFactoryService('foo.bar'), '->setFactoryService() implements a fluent interface.');
-        $this->assertEquals('foo.bar', $def->getFactoryService(), '->getFactoryService() returns current service to construct this service.');
+        $def->setFactory('Foo::bar');
+        $this->assertEquals(array('Foo', 'bar'), $def->getFactory(), '->setFactory() converts string static method call to the array');
     }
 
     /**
@@ -60,6 +52,26 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
+    }
+
+    public function testSetGetDecoratedService()
+    {
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed');
+        $this->assertEquals(array('foo', 'foo.renamed'), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $def->setDecoratedService('foo');
+        $this->assertEquals(array('foo', null), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
+        $def->setDecoratedService('foo', 'foo');
     }
 
     /**
@@ -117,8 +129,33 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setShared
+     * @covers Symfony\Component\DependencyInjection\Definition::isShared
+     */
+    public function testSetIsShared()
+    {
+        $def = new Definition('stdClass');
+        $this->assertTrue($def->isShared(), '->isShared() returns true by default');
+        $this->assertSame($def, $def->setShared(false), '->setShared() implements a fluent interface');
+        $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testPrototypeScopedDefinitionAreNotShared()
+    {
+        $def = new Definition('stdClass');
+        $def->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+
+        $this->assertFalse($def->isShared());
+        $this->assertEquals(ContainerInterface::SCOPE_PROTOTYPE, $def->getScope());
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setScope
      * @covers Symfony\Component\DependencyInjection\Definition::getScope
+     * @group legacy
      */
     public function testSetGetScope()
     {
@@ -150,18 +187,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isSynthetic(), '->isSynthetic() returns false by default');
         $this->assertSame($def, $def->setSynthetic(true), '->setSynthetic() implements a fluent interface');
         $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the service is synthetic.');
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setSynchronized
-     * @covers Symfony\Component\DependencyInjection\Definition::isSynchronized
-     */
-    public function testSetIsSynchronized()
-    {
-        $def = new Definition('stdClass');
-        $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');
-        $this->assertSame($def, $def->setSynchronized(true), '->setSynchronized() implements a fluent interface');
-        $this->assertTrue($def->isSynchronized(), '->isSynchronized() returns true if the service is synchronized.');
     }
 
     /**

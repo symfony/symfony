@@ -32,9 +32,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $kernel;
     private $store;
     private $request;
-    private $esi;
-    private $esiCacheStrategy;
-    private $traces;
+    private $surrogate;
+    private $surrogateCacheStrategy;
+    private $options = array();
+    private $traces = array();
 
     /**
      * Constructor.
@@ -71,15 +72,16 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      *
-     * @param HttpKernelInterface $kernel  An HttpKernelInterface instance
-     * @param StoreInterface      $store   A Store instance
-     * @param Esi                 $esi     An Esi instance
-     * @param array               $options An array of options
+     * @param HttpKernelInterface $kernel    An HttpKernelInterface instance
+     * @param StoreInterface      $store     A Store instance
+     * @param SurrogateInterface  $surrogate A SurrogateInterface instance
+     * @param array               $options   An array of options
      */
-    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
+    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, SurrogateInterface $surrogate = null, array $options = array())
     {
         $this->store = $store;
         $this->kernel = $kernel;
+        $this->surrogate = $surrogate;
 
         // needed in case there is a fatal error because the backend is too slow to respond
         register_shutdown_function(array($this->store, 'cleanup'));
@@ -93,8 +95,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'stale_while_revalidate' => 2,
             'stale_if_error' => 60,
         ), $options);
-        $this->esi = $esi;
-        $this->traces = array();
     }
 
     /**
@@ -153,13 +153,19 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Esi instance.
+     * Gets the Surrogate instance.
      *
-     * @return Esi An Esi instance
+     * @throws \LogicException
+     *
+     * @return SurrogateInterface A Surrogate instance
      */
-    public function getEsi()
+    public function getSurrogate()
     {
-        return $this->esi;
+        if (!$this->surrogate instanceof Esi) {
+            throw new \LogicException('This instance of HttpCache was not set up to use ESI as surrogate handler. You must overwrite and use createSurrogate');
+        }
+
+        return $this->surrogate;
     }
 
     /**
@@ -173,8 +179,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
-            if (null !== $this->esi) {
-                $this->esiCacheStrategy = $this->esi->createCacheStrategy();
+            if (null !== $this->surrogate) {
+                $this->surrogateCacheStrategy = $this->surrogate->createCacheStrategy();
             }
         }
 
@@ -200,11 +206,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
 
-        if (null !== $this->esi) {
+        if (null !== $this->surrogate) {
             if (HttpKernelInterface::MASTER_REQUEST === $type) {
-                $this->esiCacheStrategy->update($response);
+                $this->surrogateCacheStrategy->update($response);
             } else {
-                $this->esiCacheStrategy->add($response);
+                $this->surrogateCacheStrategy->add($response);
             }
         }
 
@@ -266,7 +272,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 // As per the RFC, invalidate Location and Content-Location URLs if present
                 foreach (array('Location', 'Content-Location') as $header) {
                     if ($uri = $response->headers->get($header)) {
-                        $subRequest = $request::create($uri, 'get', array(), array(), array(), $request->server->all());
+                        $subRequest = Request::create($uri, 'get', array(), array(), array(), $request->server->all());
 
                         $this->store->invalidate($subRequest);
                     }
@@ -445,8 +451,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function forward(Request $request, $catch = false, Response $entry = null)
     {
-        if ($this->esi) {
-            $this->esi->addSurrogateEsiCapability($request);
+        if ($this->surrogate) {
+            $this->surrogate->addSurrogateCapability($request);
         }
 
         // modify the X-Forwarded-For header if needed
@@ -643,8 +649,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     protected function processResponseBody(Request $request, Response $response)
     {
-        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
-            $this->esi->process($request, $response);
+        if (null !== $this->surrogate && $this->surrogate->needsParsing($response)) {
+            $this->surrogate->process($request, $response);
         }
     }
 

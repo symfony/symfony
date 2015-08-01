@@ -607,12 +607,11 @@ class HttpCacheTest extends HttpCacheTestCase
         $values = $this->getMetaStorageValues();
         $this->assertCount(1, $values);
         $tmp = unserialize($values[0]);
-        $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();
@@ -657,12 +656,11 @@ class HttpCacheTest extends HttpCacheTestCase
         $values = $this->getMetaStorageValues();
         $this->assertCount(1, $values);
         $tmp = unserialize($values[0]);
-        $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();
@@ -722,7 +720,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness
         $this->request('GET', '/');
@@ -850,11 +848,10 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->setContent('');
             $response->setStatusCode(200);
-            $that->assertEquals('HEAD', $request->getMethod());
+            $this->assertEquals('HEAD', $request->getMethod());
         });
 
         $this->request('HEAD', '/', array('HTTP_EXPECT' => 'something ...'));
@@ -864,12 +861,11 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
-            $that->assertNotEquals('HEAD', $request->getMethod());
+            $this->assertNotEquals('HEAD', $request->getMethod());
         });
 
         $this->request('GET', '/');
@@ -886,8 +882,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testSendsNoContentWhenFresh()
     {
         $time = \DateTime::createFromFormat('U', time());
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });

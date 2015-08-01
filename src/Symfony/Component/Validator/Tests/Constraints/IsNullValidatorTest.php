@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\IsNull;
 use Symfony\Component\Validator\Constraints\IsNullValidator;
+use Symfony\Component\Validator\Validation;
 
 class IsNullValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new IsNullValidator();
@@ -41,6 +47,7 @@ class IsNullValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
+            ->setCode(IsNull::NOT_NULL_ERROR)
             ->assertRaised();
     }
 

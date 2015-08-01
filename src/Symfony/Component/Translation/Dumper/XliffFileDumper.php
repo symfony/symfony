@@ -21,6 +21,25 @@ use Symfony\Component\Translation\MessageCatalogue;
 class XliffFileDumper extends FileDumper
 {
     /**
+     * @var string
+     */
+    private $defaultLocale;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dump(MessageCatalogue $messages, $options = array())
+    {
+        if (array_key_exists('default_locale', $options)) {
+            $this->defaultLocale = $options['default_locale'];
+        } else {
+            $this->defaultLocale = \Locale::getDefault();
+        }
+
+        parent::dump($messages, $options);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function format(MessageCatalogue $messages, $domain)
@@ -33,7 +52,8 @@ class XliffFileDumper extends FileDumper
         $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:1.2');
 
         $xliffFile = $xliff->appendChild($dom->createElement('file'));
-        $xliffFile->setAttribute('source-language', $messages->getLocale());
+        $xliffFile->setAttribute('source-language', str_replace('_', '-', $this->defaultLocale));
+        $xliffFile->setAttribute('target-language', str_replace('_', '-', $messages->getLocale()));
         $xliffFile->setAttribute('datatype', 'plaintext');
         $xliffFile->setAttribute('original', 'file.ext');
 
@@ -52,6 +72,26 @@ class XliffFileDumper extends FileDumper
 
             $t = $translation->appendChild($dom->createElement('target'));
             $t->appendChild($text);
+
+            $metadata = $messages->getMetadata($source, $domain);
+            if (null !== $metadata && array_key_exists('notes', $metadata) && is_array($metadata['notes'])) {
+                foreach ($metadata['notes'] as $note) {
+                    if (!isset($note['content'])) {
+                        continue;
+                    }
+
+                    $n = $translation->appendChild($dom->createElement('note'));
+                    $n->appendChild($dom->createTextNode($note['content']));
+
+                    if (isset($note['priority'])) {
+                        $n->setAttribute('priority', $note['priority']);
+                    }
+
+                    if (isset($note['from'])) {
+                        $n->setAttribute('from', $note['from']);
+                    }
+                }
+            }
 
             $xliffBody->appendChild($translation);
         }

@@ -175,7 +175,7 @@
                 <target>Նկարի բարձրությունը չափազանց փոքր է ({{ height }}px). Մինիմալ չափն է {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Այս արժեքը պետք է լինի օգտագործողի ներկա ծածկագիրը.</target>
             </trans-unit>
             <trans-unit id="48">

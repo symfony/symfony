@@ -1,13 +1,59 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `Symfony\Component\HttpKernel\Kernel::init()`
+ * removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
+ * removed `Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher::setProfiler()`
+ * removed `Symfony\Component\HttpKernel\EventListener\FragmentListener::getLocalIpAddresses()`
+ * removed `Symfony\Component\HttpKernel\EventListener\LocaleListener::setRequest()`
+ * removed `Symfony\Component\HttpKernel\EventListener\RouterListener::setRequest()`
+ * removed `Symfony\Component\HttpKernel\EventListener\ProfilerListener::onKernelRequest()`
+ * removed `Symfony\Component\HttpKernel\Fragment\FragmentHandler::setRequest()`
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::hasSurrogateEsiCapability()` 
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::addSurrogateEsiCapability()` 
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::needsEsiParsing()`
+ * removed `Symfony\Component\HttpKernel\HttpCache\HttpCache::getEsi()`
+ * removed `Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel`
+ * removed `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass`
+ * removed `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener`
+ * removed `Symfony\Component\HttpKernel\EventListener\EsiListener`
+ * removed `Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategy`
+ * removed `Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategyInterface`
+ * removed `Symfony\Component\HttpKernel\Log\LoggerInterface`
+ * removed `Symfony\Component\HttpKernel\Log\NullLogger`
+
+2.7.0
+-----
+
+ * added the HTTP status code to profiles
+
+2.6.0
+-----
+
+ * deprecated `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener`, use `Symfony\Component\HttpKernel\EventListener\DebugHandlersListener` instead
+ * deprecated unused method `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle`
+
+2.5.0
+-----
+
+ * deprecated `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass`, use `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` instead
+
+2.4.0
+-----
+
+ * added event listeners for the session
+ * added the KernelEvents::FINISH_REQUEST event
+
 2.3.0
 -----
 
  * [BC BREAK] renamed `Symfony\Component\HttpKernel\EventListener\DeprecationLoggerListener` to `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener` and changed its constructor
  * deprecated `Symfony\Component\HttpKernel\Debug\ErrorHandler`, `Symfony\Component\HttpKernel\Debug\ExceptionHandler`,
    `Symfony\Component\HttpKernel\Exception\FatalErrorException` and `Symfony\Component\HttpKernel\Exception\FlattenException`
- * deprecated `Symfony\Component\HttpKernel\Kernel::init()``
+ * deprecated `Symfony\Component\HttpKernel\Kernel::init()`
  * added the possibility to specify an id an extra attributes to hinclude tags
  * added the collect of data if a controller is a Closure in the Request collector
  * pass exceptions from the ExceptionListener to the logger using the logging context to allow for more

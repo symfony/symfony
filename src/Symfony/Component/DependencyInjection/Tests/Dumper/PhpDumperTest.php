@@ -31,25 +31,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container = new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
 
         $container = new ContainerBuilder();
         new PhpDumper($container);
-    }
-
-    public function testDumpFrozenContainerWithNoParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->setResourceTracking(false);
-        $container->register('foo', 'stdClass');
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
-        $dumpedString = $dumper->dump();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services11.php', $dumpedString, '->dump() does not add getDefaultParameters() method call if container have no parameters.');
-        $this->assertNotRegExp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
     }
 
     public function testDumpOptimizationString()
@@ -137,6 +122,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
             $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
+    }
+
+    public function testServicesWithAnonymousFactories()
+    {
+        $container = include self::$fixturesPath.'/containers/container19.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
     }
 
     /**

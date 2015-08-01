@@ -1,0 +1,88 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
+    {% set icon %}
+        {{ include('@WebProfiler/Icon/twig.svg') }}
+        <span class="sf-toolbar-value">{{ time }}</span>
+        <span class="sf-toolbar-label">ms</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Render Time</b>
+            <span>{{ time }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Template Calls</b>
+            <span class="sf-toolbar-status">{{ collector.templatecount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Block Calls</b>
+            <span class="sf-toolbar-status">{{ collector.blockcount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Macro Calls</b>
+            <span class="sf-toolbar-status">{{ collector.macrocount }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img alt="Twig" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbklEQVRIx2NgGAVDHTDCGGlpaf9pZcmsWbPg9rAgS6SlpdHCMhQ+E72DlAWbYHFJCcUG9/b0YBWnuw9HLaRPosEV4cPHh9iyBczXxGaZ0WxBfBwwM4/mw1ELRy0c4MK7s7NzCPsQvYU1CkYBNgAAV5UW+fU+ZL4AAAAASUVORK5CYII="></span>
+    <strong>Twig</strong>
+    <span class="count">
+        <span>{{ collector.templatecount }}</span>
+        <span>{{ '%0.0f ms'|format(collector.time) }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    {% if collector.templatecount %}
+        <h2>Twig Stats</h2>
+
+        <table>
+            <tr>
+                <th>Total Render Time<br /><small>including sub-requests rendering time</small></th>
+                <td><pre>{{ '%0.0f ms'|format(collector.time) }}</pre></td>
+            </tr>
+            <tr>
+                <th scope="col" style="width: 30%">Template Calls</th>
+                <td scope="col" style="width: 60%"><pre>{{ collector.templatecount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Block Calls</th>
+                <td><pre>{{ collector.blockcount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Macro Calls</th>
+                <td><pre>{{ collector.macrocount }}</pre></td>
+            </tr>
+        </table>
+
+        <h2>Rendered Templates</h2>
+
+        <table>
+            <tr>
+                <th scope="col">Template Name</th>
+                <th scope="col">Render Count</th>
+            </tr>
+            {% for template, count in collector.templates %}
+                <tr>
+                    <td><code>{{ template }}</code></td>
+                    <td><pre>{{ count }}</pre></td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Rendering Call Graph</h2>
+
+        {{ collector.htmlcallgraph }}
+    {% else %}
+        <p><em>No Twig templates were rendered for this request.</em></p>
+    {% endif %}
+{% endblock %}

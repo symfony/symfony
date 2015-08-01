@@ -16,6 +16,8 @@ use Symfony\Component\Console\Command\Command;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class ApplicationDescription
 {

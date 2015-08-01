@@ -16,19 +16,22 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "psr/log": "For using debug logging in loaders"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Templating\\": "" }
+        "psr-4": { "Symfony\\Component\\Templating\\": "" }
     },
-    "target-dir": "Symfony/Component/Templating",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

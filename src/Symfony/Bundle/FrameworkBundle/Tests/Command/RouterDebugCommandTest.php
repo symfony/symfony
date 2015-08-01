@@ -56,7 +56,7 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
         $command->setContainer($this->getContainer());
         $application->add($command);
 
-        return new CommandTester($application->find('router:debug'));
+        return new CommandTester($application->find('debug:router'));
     }
 
     private function getContainer()
@@ -65,10 +65,14 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
         $routeCollection->add('foo', new Route('foo'));
         $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router
-            ->expects($this->atLeastOnce())
+            ->expects($this->any())
             ->method('getRouteCollection')
             ->will($this->returnValue($routeCollection))
         ;
+
+        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
+             ->disableOriginalConstructor()
+             ->getMock();
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
@@ -77,12 +81,13 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
             ->with('router')
             ->will($this->returnValue(true))
         ;
+
         $container
-            ->expects($this->atLeastOnce())
             ->method('get')
-            ->with('router')
-            ->will($this->returnValue($router))
-        ;
+            ->will($this->returnValueMap(array(
+                array('router', 1, $router),
+                array('controller_name_converter', 1, $loader),
+            )));
 
         return $container;
     }

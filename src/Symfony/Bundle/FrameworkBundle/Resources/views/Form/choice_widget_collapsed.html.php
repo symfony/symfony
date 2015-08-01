@@ -1,5 +1,5 @@
 <select
-    <?php if ($required && null === $empty_value && $empty_value_in_choices === false && $multiple === false):
+    <?php if ($required && null === $placeholder && $placeholder_in_choices === false && $multiple === false):
         $required = false;
     endif; ?>
     <?php echo $view['form']->block($form, 'widget_attributes', array(
@@ -7,7 +7,7 @@
     )) ?>
     <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
 >
-    <?php if (null !== $empty_value): ?><option value=""<?php if ($required and empty($value) && '0' !== $value): ?> selected="selected"<?php endif?>><?php echo '' != $empty_value ? $view->escape($view['translator']->trans($empty_value, array(), $translation_domain)) : '' ?></option><?php endif; ?>
+    <?php if (null !== $placeholder): ?><option value=""<?php if ($required and empty($value) && '0' !== $value): ?> selected="selected"<?php endif?>><?php echo '' != $placeholder ? $view->escape($view['translator']->trans($placeholder, array(), $translation_domain)) : '' ?></option><?php endif; ?>
     <?php if (count($preferred_choices) > 0): ?>
         <?php echo $view['form']->block($form, 'choice_widget_options', array('choices' => $preferred_choices)) ?>
         <?php if (count($choices) > 0 && null !== $separator): ?>

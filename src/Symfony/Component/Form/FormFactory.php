@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\StringUtil;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -34,7 +35,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type = 'form', $data = null, array $options = array())
+    public function create($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
@@ -42,7 +43,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type = 'form', $data = null, array $options = array())
+    public function createNamed($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
         return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
@@ -58,11 +59,37 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type = 'form', $data = null, array $options = array())
+    public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
-        $name = $type instanceof FormTypeInterface || $type instanceof ResolvedFormTypeInterface
-            ? $type->getName()
-            : $type;
+        $name = null;
+        $typeName = null;
+
+        if ($type instanceof ResolvedFormTypeInterface) {
+            if (method_exists($type, 'getBlockPrefix')) {
+                // As of Symfony 3.0, the block prefix of the type is used as
+                // default name
+                $name = $type->getBlockPrefix();
+            } else {
+                // BC
+                $typeName = $type->getName();
+            }
+        } elseif ($type instanceof FormTypeInterface) {
+            // BC
+            $typeName = $type->getName();
+        } else {
+            // BC
+            $typeName = $type;
+        }
+
+        if (null === $name) {
+            if (false === strpos($typeName, '\\')) {
+                // No FQCN - leave unchanged for BC
+                $name = $typeName;
+            } else {
+                // FQCN
+                $name = StringUtil::fqcnToBlockPrefix($typeName);
+            }
+        }
 
         return $this->createNamedBuilder($name, $type, $data, $options);
     }
@@ -70,21 +97,30 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array())
+    public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
         }
 
         if ($type instanceof FormTypeInterface) {
+            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
             $type = $this->resolveType($type);
         } elseif (is_string($type)) {
             $type = $this->registry->getType($type);
-        } elseif (!$type instanceof ResolvedFormTypeInterface) {
+        } elseif ($type instanceof ResolvedFormTypeInterface) {
+            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
+        } else {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
-        return $type->createBuilder($this, $name, $options);
+        $builder = $type->createBuilder($this, $name, $options);
+
+        // Explicitly call buildForm() in order to be able to override either
+        // createBuilder() or buildForm() in the resolved form type
+        $type->buildForm($builder, $builder->getOptions());
+
+        return $builder;
     }
 
     /**
@@ -93,7 +129,7 @@ class FormFactory implements FormFactoryInterface
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'text', $data, $options);
+            return $this->createNamedBuilder($property, 'Symfony\Component\Form\Extension\Core\Type\TextType', $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
@@ -101,17 +137,17 @@ class FormFactory implements FormFactoryInterface
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
-        $type = $typeGuess ? $typeGuess->getType() : 'text';
+        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $pattern = $patternGuess ? $patternGuess->getValue() : null;
 
         if (null !== $pattern) {
-            $options = array_merge(array('pattern' => $pattern), $options);
+            $options = array_replace_recursive(array('attr' => array('pattern' => $pattern)), $options);
         }
 
         if (null !== $maxLength) {
-            $options = array_merge(array('max_length' => $maxLength), $options);
+            $options = array_replace_recursive(array('attr' => array('maxlength' => $maxLength)), $options);
         }
 
         if ($requiredGuess) {

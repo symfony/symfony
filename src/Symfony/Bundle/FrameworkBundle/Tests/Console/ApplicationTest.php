@@ -74,6 +74,18 @@ class ApplicationTest extends TestCase
             ->with($this->equalTo('event_dispatcher'))
             ->will($this->returnValue($dispatcher))
         ;
+        $container
+            ->expects($this->once())
+            ->method('hasParameter')
+            ->with($this->equalTo('console.command.ids'))
+            ->will($this->returnValue(true))
+        ;
+        $container
+            ->expects($this->once())
+            ->method('getParameter')
+            ->with($this->equalTo('console.command.ids'))
+            ->will($this->returnValue(array()))
+        ;
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $kernel

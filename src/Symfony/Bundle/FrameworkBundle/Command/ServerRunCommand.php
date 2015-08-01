@@ -23,14 +23,14 @@ use Symfony\Component\Process\ProcessBuilder;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ContainerAwareCommand
+class ServerRunCommand extends ServerCommand
 {
     /**
      * {@inheritdoc}
      */
     public function isEnabled()
     {
-        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
+        if (defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -44,7 +44,8 @@ class ServerRunCommand extends ContainerAwareCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', 'localhost:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
@@ -68,10 +69,11 @@ router script using <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
 
-Specifing a router script is required when the used environment is not "dev" or
-"prod".
+Specifing a router script is required when the used environment is not "dev",
+"prod", or "test".
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
+
 EOF
             )
         ;
@@ -98,9 +100,7 @@ EOF
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
-
-            return 1;
+            $address = $address.':'.$input->getOption('port');
         }
 
         if ($this->isOtherServerProcessRunning($address)) {
@@ -113,46 +113,34 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
+        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $address));
+        $output->writeln('Quit the server with CONTROL-C.');
+
         if (null === $builder = $this->createPhpProcessBuilder($output, $address, $input->getOption('router'), $env)) {
             return 1;
         }
 
-        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $address));
-        $output->writeln('Quit the server with CONTROL-C.');
-
         $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
         $process = $builder->getProcess();
-        $process->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $output->write($buffer);
-            }
-        });
+
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            $process->disableOutput();
+        }
+
+        $this
+            ->getHelper('process')
+            ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
 
         if (!$process->isSuccessful()) {
             $output->writeln('<error>Built-in server terminated unexpectedly</error>');
 
-            if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            if ($process->isOutputDisabled()) {
                 $output->writeln('<error>Run the command again with -v option for more details</error>');
             }
         }
 
         return $process->getExitCode();
-    }
-
-    private function isOtherServerProcessRunning($address)
-    {
-        list($hostname, $port) = explode(':', $address);
-
-        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
-
-        if (false !== $fp) {
-            fclose($fp);
-
-            return true;
-        }
-
-        return false;
     }
 
     private function createPhpProcessBuilder(OutputInterface $output, $address, $router, $env)

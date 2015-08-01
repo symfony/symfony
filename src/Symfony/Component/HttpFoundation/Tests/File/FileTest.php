@@ -161,12 +161,6 @@ class FileTest extends \PHPUnit_Framework_TestCase
         @rmdir($targetDir);
     }
 
-    public function testGetExtension()
-    {
-        $file = new File(__DIR__.'/Fixtures/test.gif');
-        $this->assertEquals('gif', $file->getExtension());
-    }
-
     protected function createMockGuesser($path, $mimeType)
     {
         $guesser = $this->getMock('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface');

@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\Alias;
 class ServiceReferenceGraphNode
 {
     private $id;
-    private $inEdges;
-    private $outEdges;
+    private $inEdges = array();
+    private $outEdges = array();
     private $value;
 
     /**
@@ -38,8 +38,6 @@ class ServiceReferenceGraphNode
     {
         $this->id = $id;
         $this->value = $value;
-        $this->inEdges = array();
-        $this->outEdges = array();
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+namespace Symfony\Component\DependencyInjection\Dump;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;

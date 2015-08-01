@@ -31,6 +31,9 @@ class BooleanNode extends ScalarNode
                 $this->getPath(),
                 gettype($value)
             ));
+            if ($hint = $this->getInfo()) {
+                $ex->addHint($hint);
+            }
             $ex->setPath($this->getPath());
 
             throw $ex;

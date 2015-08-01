@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
 /**
  * A form group bundling multiple forms in a hierarchical structure.
  *
@@ -92,11 +94,19 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function all();
 
     /**
-     * Returns all errors.
+     * Returns the errors of this form.
      *
-     * @return FormError[] An array of FormError instances that occurred during validation
+     * @param bool $deep    Whether to include errors of child forms as well
+     * @param bool $flatten Whether to flatten the list of errors in case
+     *                      $deep is set to true
+     *
+     * @return FormErrorIterator An iterator over the {@link FormError}
+     *                           instances that where added to this form
+     *
+     * @since 2.5 Since version 2.5 this method returns a
+     *            {@link FormErrorIterator} instance instead of an array
      */
-    public function getErrors();
+    public function getErrors($deep = false, $flatten = true);
 
     /**
      * Updates the form with default data.
@@ -222,9 +232,19 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the data in the different formats is synchronized.
      *
+     * If the data is not synchronized, you can get the transformation failure
+     * by calling {@link getTransformationFailure()}.
+     *
      * @return bool
      */
     public function isSynchronized();
+
+    /**
+     * Returns the data transformation failure, if any.
+     *
+     * @return TransformationFailedException|null The transformation failure
+     */
+    public function getTransformationFailure();
 
     /**
      * Initializes the form tree.

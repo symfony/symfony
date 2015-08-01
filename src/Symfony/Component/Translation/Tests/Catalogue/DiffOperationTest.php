@@ -53,6 +53,28 @@ class DiffOperationTest extends AbstractOperationTest
         );
     }
 
+    public function testGetResultWithMetadata()
+    {
+        $leftCatalogue = new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b')));
+        $leftCatalogue->setMetadata('a', 'foo', 'messages');
+        $leftCatalogue->setMetadata('b', 'bar', 'messages');
+        $rightCatalogue = new MessageCatalogue('en', array('messages' => array('b' => 'new_b', 'c' => 'new_c')));
+        $rightCatalogue->setMetadata('b', 'baz', 'messages');
+        $rightCatalogue->setMetadata('c', 'qux', 'messages');
+
+        $diffCatalogue = new MessageCatalogue('en', array('messages' => array('b' => 'old_b', 'c' => 'new_c')));
+        $diffCatalogue->setMetadata('b', 'bar', 'messages');
+        $diffCatalogue->setMetadata('c', 'qux', 'messages');
+
+        $this->assertEquals(
+            $diffCatalogue,
+            $this->createOperation(
+                $leftCatalogue,
+                $rightCatalogue
+            )->getResult()
+        );
+    }
+
     protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
     {
         return new DiffOperation($source, $target);

@@ -11,40 +11,20 @@
 
 namespace Symfony\Component\Security\Core;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+@trigger_error('The '.__NAMESPACE__.'\SecurityContextInterface interface is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * The SecurityContextInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @deprecated since version 2.6, to be removed in 3.0.
  */
-interface SecurityContextInterface
+interface SecurityContextInterface extends TokenStorageInterface, AuthorizationCheckerInterface
 {
-    const ACCESS_DENIED_ERROR = '_security.403_error';
-    const AUTHENTICATION_ERROR = '_security.last_error';
-    const LAST_USERNAME = '_security.last_username';
-
-    /**
-     * Returns the current security token.
-     *
-     * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
-     */
-    public function getToken();
-
-    /**
-     * Sets the authentication token.
-     *
-     * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
-     */
-    public function setToken(TokenInterface $token = null);
-
-    /**
-     * Checks if the attributes are granted against the current authentication token and optionally supplied object.
-     *
-     * @param mixed $attributes
-     * @param mixed $object
-     *
-     * @return bool
-     */
-    public function isGranted($attributes, $object = null);
+    const ACCESS_DENIED_ERROR = Security::ACCESS_DENIED_ERROR;
+    const AUTHENTICATION_ERROR = Security::AUTHENTICATION_ERROR;
+    const LAST_USERNAME = Security::LAST_USERNAME;
 }

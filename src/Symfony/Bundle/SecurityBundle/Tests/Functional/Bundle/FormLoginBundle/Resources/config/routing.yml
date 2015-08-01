@@ -37,3 +37,6 @@ form_logout:
 form_secure_action:
     path:     /secure-but-not-covered-by-access-control
     defaults: { _controller: FormLoginBundle:Login:secure }
+
+protected-via-expression:
+    path:     /protected-via-expression

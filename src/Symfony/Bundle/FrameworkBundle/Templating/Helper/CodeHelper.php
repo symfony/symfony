@@ -33,7 +33,7 @@ class CodeHelper extends Helper
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
-        $this->fileLinkFormat = empty($fileLinkFormat) ? ini_get('xdebug.file_link_format') : $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
         $this->charset = $charset;
     }
@@ -121,7 +121,7 @@ class CodeHelper extends Helper
             if (extension_loaded('fileinfo')) {
                 $finfo = new \Finfo();
 
-                // Check if the file is an application/octet-stream (eg. Phar file) because hightlight_file cannot parse these files
+                // Check if the file is an application/octet-stream (eg. Phar file) because highlight_file cannot parse these files
                 if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
                     return;
                 }
@@ -154,11 +154,7 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line, $text = null)
     {
-        if (PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
+        $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
         if (null === $text) {
             $file = trim($file);
@@ -198,10 +194,8 @@ class CodeHelper extends Helper
 
     public function formatFileFromText($text)
     {
-        $that = $this;
-
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[2], $match[3]);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
+            return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
     }
 

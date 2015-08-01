@@ -38,12 +38,26 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         new PropertyPath('.property');
     }
 
+    public function providePathsContainingUnexpectedCharacters()
+    {
+        return array(
+            array('property.'),
+            array('property.['),
+            array('property..'),
+            array('property['),
+            array('property[['),
+            array('property[.'),
+            array('property[]'),
+        );
+    }
+
     /**
+     * @dataProvider providePathsContainingUnexpectedCharacters
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testUnexpectedCharacters()
+    public function testUnexpectedCharacters($path)
     {
-        new PropertyPath('property.$foo');
+        new PropertyPath($path);
     }
 
     /**
@@ -55,7 +69,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testPathCannotBeNull()
     {
@@ -63,7 +77,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      */
     public function testPathCannotBeFalse()
     {

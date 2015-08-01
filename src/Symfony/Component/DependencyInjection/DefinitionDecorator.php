@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 class DefinitionDecorator extends Definition
 {
     private $parent;
-    private $changes;
+    private $changes = array();
 
     /**
      * Constructor.
@@ -38,7 +38,6 @@ class DefinitionDecorator extends Definition
         parent::__construct();
 
         $this->parent = $parent;
-        $this->changes = array();
     }
 
     /**
@@ -79,38 +78,12 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
-    public function setFactoryClass($class)
+    public function setFactory($callable)
     {
-        $this->changes['factory_class'] = true;
+        $this->changes['factory'] = true;
 
-        return parent::setFactoryClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryMethod($method)
-    {
-        $this->changes['factory_method'] = true;
-
-        return parent::setFactoryMethod($method);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryService($service)
-    {
-        $this->changes['factory_service'] = true;
-
-        return parent::setFactoryService($service);
+        return parent::setFactory($callable);
     }
 
     /**
@@ -159,6 +132,16 @@ class DefinitionDecorator extends Definition
         $this->changes['lazy'] = true;
 
         return parent::setLazy($boolean);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        $this->changes['decorated_service'] = true;
+
+        return parent::setDecoratedService($id, $renamedId);
     }
 
     /**

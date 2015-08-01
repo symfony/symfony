@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Esi
+class Esi implements SurrogateInterface
 {
     private $contentTypes;
     private $phpEscapeMap = array(
@@ -45,14 +45,19 @@ class Esi
         $this->contentTypes = $contentTypes;
     }
 
+    public function getName()
+    {
+        return 'esi';
+    }
+
     /**
      * Returns a new cache strategy instance.
      *
-     * @return EsiResponseCacheStrategyInterface A EsiResponseCacheStrategyInterface instance
+     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
      */
     public function createCacheStrategy()
     {
-        return new EsiResponseCacheStrategy();
+        return new ResponseCacheStrategy();
     }
 
     /**
@@ -62,7 +67,7 @@ class Esi
      *
      * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      */
-    public function hasSurrogateEsiCapability(Request $request)
+    public function hasSurrogateCapability(Request $request)
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
@@ -76,7 +81,7 @@ class Esi
      *
      * @param Request $request A Request instance
      */
-    public function addSurrogateEsiCapability(Request $request)
+    public function addSurrogateCapability(Request $request)
     {
         $current = $request->headers->get('Surrogate-Capability');
         $new = 'symfony2="ESI/1.0"';
@@ -105,7 +110,7 @@ class Esi
      *
      * @return bool true if the Response needs to be parsed, false otherwise
      */
-    public function needsEsiParsing(Response $response)
+    public function needsParsing(Response $response)
     {
         if (!$control = $response->headers->get('Surrogate-Control')) {
             return false;
@@ -180,7 +185,7 @@ class Esi
                 throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
             }
 
-            $chunks[$i] = sprintf('<?php echo $this->esi->handle($this, %s, %s, %s) ?>'."\n",
+            $chunks[$i] = sprintf('<?php echo $this->surrogate->handle($this, %s, %s, %s) ?>'."\n",
                 var_export($options['src'], true),
                 var_export(isset($options['alt']) ? $options['alt'] : '', true),
                 isset($options['onerror']) && 'continue' === $options['onerror'] ? 'true' : 'false'

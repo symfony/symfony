@@ -19,6 +19,9 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpBasic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\HttpDigestFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUserFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 
 /**
@@ -38,6 +41,9 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new HttpDigestFactory());
         $extension->addSecurityListenerFactory(new RememberMeFactory());
         $extension->addSecurityListenerFactory(new X509Factory());
+        $extension->addSecurityListenerFactory(new RemoteUserFactory());
+        $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory());
+        $extension->addSecurityListenerFactory(new SimpleFormFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());

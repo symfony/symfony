@@ -39,10 +39,6 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $input = new StringInput('--foo=bar');
         $input->bind($definition);
         $this->assertEquals('bar', $input->getOption('foo'));
-
-        // definition in constructor
-        $input = new StringInput('--foo=bar', $definition);
-        $this->assertEquals('bar', $input->getOption('foo'));
     }
 
     public function getTokenizeData()

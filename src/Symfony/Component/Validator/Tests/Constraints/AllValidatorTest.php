@@ -15,9 +15,15 @@ use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Validation;
 
 class AllValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new AllValidator();
@@ -48,7 +54,7 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint), 'MyGroup');
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint));
         }
 
         $this->validator->validate($array, new All($constraint));
@@ -69,7 +75,7 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint1, $constraint2), 'MyGroup');
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint1, $constraint2));
         }
 
         $this->validator->validate($array, new All($constraints));

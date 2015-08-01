@@ -11,17 +11,20 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates that a card number belongs to a specified scheme.
  *
+ * @author Tim Nagel <t.nagel@infinite.net.au>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @see http://en.wikipedia.org/wiki/Bank_card_number
  * @see http://www.regular-expressions.info/creditcard.html
  * @see http://www.barclaycard.co.uk/business/files/Ranges_and_Rules_September_2014.pdf
- *
- * @author Tim Nagel <t.nagel@infinite.net.au>
  */
 class CardSchemeValidator extends ConstraintValidator
 {
@@ -88,14 +91,26 @@ class CardSchemeValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof CardScheme) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\CardScheme');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
 
         if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(CardScheme::NOT_NUMERIC_ERROR)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(CardScheme::NOT_NUMERIC_ERROR)
+                    ->addViolation();
+            }
 
             return;
         }
@@ -111,8 +126,16 @@ class CardSchemeValidator extends ConstraintValidator
             }
         }
 
-        $this->context->addViolation($constraint->message, array(
-            '{{ value }}' => $this->formatValue($value),
-        ));
+        if ($this->context instanceof ExecutionContextInterface) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(CardScheme::INVALID_FORMAT_ERROR)
+                ->addViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(CardScheme::INVALID_FORMAT_ERROR)
+                ->addViolation();
+        }
     }
 }

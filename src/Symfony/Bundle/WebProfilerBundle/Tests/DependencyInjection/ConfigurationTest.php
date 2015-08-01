@@ -31,11 +31,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function getDebugModes()
     {
         return array(
-            array(array(), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom')),
-            array(array('intercept_redirects' => true), array('intercept_redirects' => true, 'toolbar' => false, 'position' => 'bottom')),
-            array(array('intercept_redirects' => false), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom')),
-            array(array('toolbar' => true), array('intercept_redirects' => false, 'toolbar' => true, 'position' => 'bottom')),
-            array(array('position' => 'top'), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'top')),
+            array(array(), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom', 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
+            array(array('intercept_redirects' => true), array('intercept_redirects' => true, 'toolbar' => false, 'position' => 'bottom', 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
+            array(array('intercept_redirects' => false), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom', 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
+            array(array('toolbar' => true), array('intercept_redirects' => false, 'toolbar' => true, 'position' => 'bottom', 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
+            array(array('position' => 'top'), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'top', 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt')),
+            array(array('excluded_ajax_paths' => 'test'), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom', 'excluded_ajax_paths' => 'test')),
         );
     }
 }

@@ -143,10 +143,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransformDateTimeImmutableTimezones()
     {
-        if (PHP_VERSION_ID < 50500) {
-            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
-        }
-
         $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = new \DateTimeImmutable('2010-02-03 04:05:06 America/New_York');

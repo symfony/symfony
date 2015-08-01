@@ -62,6 +62,11 @@ class Route implements \Serializable
     private $compiled;
 
     /**
+     * @var string
+     */
+    private $condition = '';
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -75,24 +80,20 @@ class Route implements \Serializable
      * @param string       $host         The host pattern to match
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
+     * @param string       $condition    A condition that should evaluate to true for the route to match
      *
      * @api
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array())
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
         $this->setHost($host);
-        // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
-        // They can be removed when the BC layer is removed.
-        if ($schemes) {
-            $this->setSchemes($schemes);
-        }
-        if ($methods) {
-            $this->setMethods($methods);
-        }
+        $this->setSchemes($schemes);
+        $this->setMethods($methods);
+        $this->setCondition($condition);
     }
 
     /**
@@ -108,6 +109,7 @@ class Route implements \Serializable
             'options' => $this->options,
             'schemes' => $this->schemes,
             'methods' => $this->methods,
+            'condition' => $this->condition,
             'compiled' => $this->compiled,
         ));
     }
@@ -125,37 +127,13 @@ class Route implements \Serializable
         $this->options = $data['options'];
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
+
+        if (isset($data['condition'])) {
+            $this->condition = $data['condition'];
+        }
         if (isset($data['compiled'])) {
             $this->compiled = $data['compiled'];
         }
-    }
-
-    /**
-     * Returns the pattern for the path.
-     *
-     * @return string The pattern
-     *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
-     */
-    public function getPattern()
-    {
-        return $this->path;
-    }
-
-    /**
-     * Sets the pattern for the path.
-     *
-     * This method implements a fluent interface.
-     *
-     * @param string $pattern The path pattern
-     *
-     * @return Route The current Route instance
-     *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
-     */
-    public function setPattern($pattern)
-    {
-        return $this->setPath($pattern);
     }
 
     /**
@@ -238,14 +216,6 @@ class Route implements \Serializable
     public function setSchemes($schemes)
     {
         $this->schemes = array_map('strtolower', (array) $schemes);
-
-        // this is to keep BC and will be removed in a future version
-        if ($this->schemes) {
-            $this->requirements['_scheme'] = implode('|', $this->schemes);
-        } else {
-            unset($this->requirements['_scheme']);
-        }
-
         $this->compiled = null;
 
         return $this;
@@ -287,14 +257,6 @@ class Route implements \Serializable
     public function setMethods($methods)
     {
         $this->methods = array_map('strtoupper', (array) $methods);
-
-        // this is to keep BC and will be removed in a future version
-        if ($this->methods) {
-            $this->requirements['_method'] = implode('|', $this->methods);
-        } else {
-            unset($this->requirements['_method']);
-        }
-
         $this->compiled = null;
 
         return $this;
@@ -566,6 +528,33 @@ class Route implements \Serializable
     }
 
     /**
+     * Returns the condition.
+     *
+     * @return string The condition
+     */
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    /**
+     * Sets the condition.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $condition The condition
+     *
+     * @return Route The current Route instance
+     */
+    public function setCondition($condition)
+    {
+        $this->condition = (string) $condition;
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
      * Compiles the route.
      *
      * @return CompiledRoute A CompiledRoute instance
@@ -602,13 +591,6 @@ class Route implements \Serializable
 
         if ('' === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
-        }
-
-        // this is to keep BC and will be removed in a future version
-        if ('_scheme' === $key) {
-            $this->setSchemes(explode('|', $regex));
-        } elseif ('_method' === $key) {
-            $this->setMethods(explode('|', $regex));
         }
 
         return $regex;

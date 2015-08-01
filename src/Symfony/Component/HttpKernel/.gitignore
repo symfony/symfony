@@ -1,5 +1,5 @@
 vendor/
 composer.lock
 phpunit.xml
-Tests/ProjectContainer.php
-Tests/classes.map
+Tests/Fixtures/cache/
+Tests/Fixtures/logs/

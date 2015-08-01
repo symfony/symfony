@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
+@trigger_error('The '.__NAMESPACE__.'\DefaultCsrfProvider is deprecated since version 2.4 and will be removed in version 3.0. Use the \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage class instead.', E_USER_DEPRECATED);
+
 /**
  * Default implementation of CsrfProviderInterface.
  *
@@ -18,6 +20,11 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  * user-defined secret value to secure the CSRF token.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Security\Csrf\CsrfTokenManager} in
+ *             combination with {@link \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage}
+ *             instead.
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
@@ -66,11 +73,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     protected function getSessionId()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            if (PHP_SESSION_NONE === session_status()) {
-                session_start();
-            }
-        } elseif (!session_id()) {
+        if (PHP_SESSION_NONE === session_status()) {
             session_start();
         }
 

@@ -77,14 +77,49 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.channel_listener',
                 'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
+                'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
                 'security.authentication.listener.digest.secure',
+                'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
                 'security.authentication.switchuser_listener.secure',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.0',
+                'security.authentication.listener.basic.host',
+                'security.authentication.listener.anonymous.host',
+                'security.access_listener',
+            ),
         ), $listeners);
+    }
+
+    public function testFirewallRequestMatchers()
+    {
+        $container = $this->getContainer('container1');
+
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
+        $matchers = array();
+
+        foreach ($arguments[1] as $reference) {
+            if ($reference instanceof Reference) {
+                $definition = $container->getDefinition((string) $reference);
+                $matchers[] = $definition->getArguments();
+            }
+        }
+
+        $this->assertEquals(array(
+            array(
+                '/login',
+            ),
+            array(
+                '/test',
+                'foo\\.example\\.org',
+                array('GET', 'POST'),
+            ),
+        ), $matchers);
     }
 
     public function testAccess()
@@ -100,7 +135,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $matcherIds = array();
         foreach ($rules as $rule) {
-            list($matcherId, $roles, $channel) = $rule;
+            list($matcherId, $attributes, $channel) = $rule;
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));
@@ -108,19 +143,23 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
             $i = count($matcherIds);
             if (1 === $i) {
-                $this->assertEquals(array('ROLE_USER'), $roles);
+                $this->assertEquals(array('ROLE_USER'), $attributes);
                 $this->assertEquals('https', $channel);
                 $this->assertEquals(
                     array('/blog/524', null, array('GET', 'POST')),
                     $requestMatcher->getArguments()
                 );
             } elseif (2 === $i) {
-                $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
+                $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $attributes);
                 $this->assertNull($channel);
                 $this->assertEquals(
                     array('/blog/.*'),
                     $requestMatcher->getArguments()
                 );
+            } elseif (3 === $i) {
+                $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
+                $expression = $container->getDefinition($attributes[1])->getArgument(0);
+                $this->assertEquals("token.getUsername() matches '/^admin/'", $expression);
             }
         }
     }
@@ -141,24 +180,24 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(array(
             'JMS\FooBundle\Entity\User1' => array(
-                'class' => new Parameter('security.encoder.plain.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
                 'arguments' => array(false),
             ),
             'JMS\FooBundle\Entity\User2' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
                 'arguments' => array('sha1', false, 5),
             ),
             'JMS\FooBundle\Entity\User3' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
                 'arguments' => array('md5', true, 5000),
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => array(
-                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
                 'arguments' => array('sha1', false, 5, 30),
             ),
             'JMS\FooBundle\Entity\User6' => array(
-                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => array(15),
             ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
@@ -178,6 +217,20 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
         $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
+    }
+
+    public function testRememberMeThrowExceptionsDefault()
+    {
+        $container = $this->getContainer('container1');
+        $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
+    }
+
+    public function testRememberMeThrowExceptions()
+    {
+        $container = $this->getContainer('remember_me_options');
+        $service = $container->getDefinition('security.authentication.listener.rememberme.main');
+        $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
+        $this->assertFalse($service->getArgument(5));
     }
 
     protected function getContainer($file)

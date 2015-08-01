@@ -175,7 +175,7 @@
                 <target>Die beeld hoogte is te klein ({{ height }}px). Minimum hoogte verwag is {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Hierdie waarde moet die huidige wagwoord van die gebruiker wees.</target>
             </trans-unit>
             <trans-unit id="48">

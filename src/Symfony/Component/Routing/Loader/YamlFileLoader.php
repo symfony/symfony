@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition',
     );
     private $yamlParser;
 
@@ -76,15 +76,6 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($config as $name => $config) {
-            if (isset($config['pattern'])) {
-                if (isset($config['path'])) {
-                    throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
-                }
-
-                $config['path'] = $config['pattern'];
-                unset($config['pattern']);
-            }
-
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {
@@ -123,8 +114,27 @@ class YamlFileLoader extends FileLoader
         $host = isset($config['host']) ? $config['host'] : '';
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
+        $condition = isset($config['condition']) ? $config['condition'] : null;
 
-        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods);
+        if (isset($requirements['_method'])) {
+            if (0 === count($methods)) {
+                $methods = explode('|', $requirements['_method']);
+            }
+
+            unset($requirements['_method']);
+            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
+        }
+
+        if (isset($requirements['_scheme'])) {
+            if (0 === count($schemes)) {
+                $schemes = explode('|', $requirements['_scheme']);
+            }
+
+            unset($requirements['_scheme']);
+            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
+        }
+
+        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
         $collection->add($name, $route);
     }
@@ -145,6 +155,7 @@ class YamlFileLoader extends FileLoader
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
         $host = isset($config['host']) ? $config['host'] : null;
+        $condition = isset($config['condition']) ? $config['condition'] : null;
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
@@ -155,6 +166,9 @@ class YamlFileLoader extends FileLoader
         $subCollection->addPrefix($prefix);
         if (null !== $host) {
             $subCollection->setHost($host);
+        }
+        if (null !== $condition) {
+            $subCollection->setCondition($condition);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);

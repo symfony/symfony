@@ -42,33 +42,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Inject the escaping
-     *             strategy on Twig_Environment instead
-     */
-    public function setDefaultEscapingStrategy($strategy)
-    {
-        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
-    }
-
-    /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use TwigDefaultEscapingStrategy instead.
-     */
-    public function guessDefaultEscapingStrategy($filename)
-    {
-        return TwigDefaultEscapingStrategy::guess($filename);
-    }
-
-    /**
-     * Renders a template.
-     *
-     * @param mixed $name       A template name
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @return string The evaluated template as a string
-     *
-     * @throws \InvalidArgumentException if the template does not exist
-     * @throws \RuntimeException         if the template cannot be rendered
-     * @throws \Twig_Error
+     * {@inheritdoc}
      */
     public function render($name, array $parameters = array())
     {
@@ -88,13 +62,9 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * Renders a view and returns a Response.
+     * {@inheritdoc}
      *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
+     * @throws \Twig_Error if something went wrong like a thrown exception while rendering the template
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

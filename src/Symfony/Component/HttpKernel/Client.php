@@ -42,11 +42,11 @@ class Client extends BaseClient
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
+        // These class properties must be set before calling the parent constructor, as it may depend on it.
         $this->kernel = $kernel;
+        $this->followRedirects = false;
 
         parent::__construct($server, $history, $cookieJar);
-
-        $this->followRedirects = false;
     }
 
     /**
@@ -101,7 +101,7 @@ class Client extends BaseClient
 
         $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
         $requirePath = str_replace("'", "\\'", $r->getFileName());
-        $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
+        $symfonyPath = str_replace("'", "\\'", dirname(dirname(dirname(__DIR__))));
         $errorReporting = error_reporting();
 
         $code = <<<EOF

@@ -32,20 +32,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validpattern.xml');
-        $routes = $routeCollection->all();
+        $route = $routeCollection->get('blog_show');
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-
-        foreach ($routes as $route) {
-            $this->assertSame('/blog/{slug}', $route->getPath());
-            $this->assertSame('{locale}.example.com', $route->getHost());
-            $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
-            $this->assertSame('\w+', $route->getRequirement('locale'));
-            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
-            $this->assertEquals(array('https'), $route->getSchemes());
-        }
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
+        $this->assertSame('/blog/{slug}', $route->getPath());
+        $this->assertSame('{locale}.example.com', $route->getHost());
+        $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+        $this->assertSame('\w+', $route->getRequirement('locale'));
+        $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+        $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+        $this->assertEquals(array('https'), $route->getSchemes());
+        $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
     public function testLoadWithNamespacePrefix()
@@ -80,6 +77,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('\d+', $route->getRequirement('foo'));
             $this->assertSame('bar', $route->getOption('foo'));
             $this->assertSame('', $route->getHost());
+            $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
         }
     }
 

@@ -75,6 +75,26 @@ class NullOutput implements OutputInterface
         return self::VERBOSITY_QUIET;
     }
 
+    public function isQuiet()
+    {
+        return true;
+    }
+
+    public function isVerbose()
+    {
+        return false;
+    }
+
+    public function isVeryVerbose()
+    {
+        return false;
+    }
+
+    public function isDebug()
+    {
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */

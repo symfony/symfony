@@ -23,9 +23,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigDataCollector extends DataCollector
 {
+    /**
+     * @var KernelInterface
+     */
     private $kernel;
     private $name;
     private $version;
+    private $cacheVersionInfo = true;
 
     /**
      * Constructor.
@@ -59,6 +63,7 @@ class ConfigDataCollector extends DataCollector
             'app_version' => $this->version,
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
+            'symfony_state' => 'unknown',
             'name' => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
             'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
@@ -77,6 +82,8 @@ class ConfigDataCollector extends DataCollector
             foreach ($this->kernel->getBundles() as $name => $bundle) {
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
+
+            $this->data['symfony_state'] = $this->determineSymfonyState();
         }
     }
 
@@ -108,6 +115,21 @@ class ConfigDataCollector extends DataCollector
     public function getSymfonyVersion()
     {
         return $this->data['symfony_version'];
+    }
+
+    /**
+     * Returns the state of the current Symfony release.
+     *
+     * @return string One of: unknown, dev, stable, eom, eol
+     */
+    public function getSymfonyState()
+    {
+        return $this->data['symfony_state'];
+    }
+
+    public function setCacheVersionInfo($cacheVersionInfo)
+    {
+        $this->cacheVersionInfo = $cacheVersionInfo;
     }
 
     /**
@@ -241,5 +263,29 @@ class ConfigDataCollector extends DataCollector
     public function getName()
     {
         return 'config';
+    }
+
+    /**
+     * Tries to retrieve information about the current Symfony version.
+     *
+     * @return string One of: dev, stable, eom, eol
+     */
+    private function determineSymfonyState()
+    {
+        $now = new \DateTime();
+        $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
+        $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE)->modify('last day of this month');
+
+        if ($now > $eol) {
+            $versionState = 'eol';
+        } elseif ($now > $eom) {
+            $versionState = 'eom';
+        } elseif ('' !== Kernel::EXTRA_VERSION) {
+            $versionState = 'dev';
+        } else {
+            $versionState = 'stable';
+        }
+
+        return $versionState;
     }
 }

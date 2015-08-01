@@ -17,6 +17,7 @@
         <testsuite name="Symfony Test Suite">
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/Tests/</directory>
+            <directory>./src/Symfony/Component/*/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -34,6 +35,7 @@
             <exclude>
                 <directory>./src/Symfony/Bridge/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/Tests</directory>
+                <directory>./src/Symfony/Component/*/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>

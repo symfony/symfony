@@ -18,14 +18,8 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler\Mock;
  */
 class RedisMock
 {
-    private $connected;
-    private $storage;
-
-    public function __construct()
-    {
-        $this->connected = false;
-        $this->storage = array();
-    }
+    private $connected = false;
+    private $storage = array();
 
     /**
      * Add a server to connection pool.

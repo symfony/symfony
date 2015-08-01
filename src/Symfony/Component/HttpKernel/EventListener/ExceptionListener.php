@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -43,18 +44,7 @@ class ExceptionListener implements EventSubscriberInterface
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
 
-        $attributes = array(
-            '_controller' => $this->controller,
-            'exception' => FlattenException::create($exception),
-            'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            // keep for BC -- as $format can be an argument of the controller callable
-            // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php
-            // @deprecated in 2.4, to be removed in 3.0
-            'format' => $request->getRequestFormat(),
-        );
-
-        $request = $request->duplicate(null, null, $attributes);
-        $request->setMethod('GET');
+        $request = $this->duplicateRequest($exception, $request);
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
@@ -91,20 +81,36 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
-     * @param bool       $original  False when the handling of the exception thrown another exception
      */
-    protected function logException(\Exception $exception, $message, $original = true)
+    protected function logException(\Exception $exception, $message)
     {
-        $isCritical = !$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500;
-        $context = array('exception' => $exception);
         if (null !== $this->logger) {
-            if ($isCritical) {
-                $this->logger->critical($message, $context);
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+                $this->logger->critical($message, array('exception' => $exception));
             } else {
-                $this->logger->error($message, $context);
+                $this->logger->error($message, array('exception' => $exception));
             }
-        } elseif (!$original || $isCritical) {
-            error_log($message);
         }
+    }
+
+    /**
+     * Clones the request for the exception.
+     *
+     * @param \Exception $exception The thrown exception.
+     * @param Request    $request   The original request.
+     *
+     * @return Request $request The cloned request.
+     */
+    protected function duplicateRequest(\Exception $exception, Request $request)
+    {
+        $attributes = array(
+            '_controller' => $this->controller,
+            'exception' => FlattenException::create($exception),
+            'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
+        );
+        $request = $request->duplicate(null, null, $attributes);
+        $request->setMethod('GET');
+
+        return $request;
     }
 }

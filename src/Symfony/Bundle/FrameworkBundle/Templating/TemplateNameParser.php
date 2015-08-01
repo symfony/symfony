@@ -25,7 +25,7 @@ use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 class TemplateNameParser extends BaseTemplateNameParser
 {
     protected $kernel;
-    protected $cache;
+    protected $cache = array();
 
     /**
      * Constructor.
@@ -35,7 +35,6 @@ class TemplateNameParser extends BaseTemplateNameParser
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->cache = array();
     }
 
     /**

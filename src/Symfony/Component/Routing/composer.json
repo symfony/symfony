@@ -2,7 +2,7 @@
     "name": "symfony/routing",
     "type": "library",
     "description": "Symfony Routing Component",
-    "keywords": [],
+    "keywords": ["routing", "router", "URL", "URI"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -16,29 +16,34 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/config": "~2.2",
-        "symfony/http-foundation": "~2.3",
-        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "doctrine/annotations": "~1.0",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/config": "<2.8"
+    },
     "suggest": {
-        "symfony/config": "",
-        "symfony/yaml": "",
-        "doctrine/common": ""
+        "symfony/config": "For using the all-in-one router or any loader",
+        "symfony/yaml": "For using the YAML loader",
+        "symfony/expression-language": "For using expression matching",
+        "doctrine/annotations": "For using the annotation loader"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Routing\\": "" }
+        "psr-4": { "Symfony\\Component\\Routing\\": "" }
     },
-    "target-dir": "Symfony/Component/Routing",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

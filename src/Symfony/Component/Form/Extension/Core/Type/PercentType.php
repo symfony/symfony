@@ -14,7 +14,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PercentType extends AbstractType
 {
@@ -23,32 +24,52 @@ class PercentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addViewTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
+        $builder->addViewTransformer(new PercentToLocalizedStringTransformer($options['scale'], $options['type']));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
+        $scale = function (Options $options) {
+            if (null !== $options['precision']) {
+                @trigger_error('The form option "precision" is deprecated since version 2.7 and will be removed in 3.0. Use "scale" instead.', E_USER_DEPRECATED);
+
+                return $options['precision'];
+            }
+
+            return 0;
+        };
+
         $resolver->setDefaults(array(
-            'precision' => 0,
+            // deprecated as of Symfony 2.7, to be removed in Symfony 3.0.
+            'precision' => null,
+            'scale' => $scale,
             'type' => 'fractional',
             'compound' => false,
         ));
 
-        $resolver->setAllowedValues(array(
-            'type' => array(
-                'fractional',
-                'integer',
-            ),
+        $resolver->setAllowedValues('type', array(
+            'fractional',
+            'integer',
         ));
+
+        $resolver->setAllowedTypes('scale', 'int');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'percent';
     }

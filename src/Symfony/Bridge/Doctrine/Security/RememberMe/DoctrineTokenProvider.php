@@ -46,7 +46,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     private $conn;
 
     /**
-     * new DoctrineTokenProvider for the RemembeMe authentication service.
+     * new DoctrineTokenProvider for the RememberMe authentication service.
      *
      * @param Connection $conn
      */

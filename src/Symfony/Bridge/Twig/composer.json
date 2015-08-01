@@ -16,40 +16,48 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "twig/twig": "~1.12,>=1.12.3"
+        "php": ">=5.5.9",
+        "twig/twig": "~1.18"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/finder": "~2.3",
-        "symfony/form": "~2.3.31",
-        "symfony/http-kernel": "~2.3",
-        "symfony/intl": "~2.3",
-        "symfony/routing": "~2.2",
-        "symfony/templating": "~2.1",
-        "symfony/translation": "~2.2",
-        "symfony/yaml": "~2.0,>=2.0.5",
-        "symfony/security-acl": "~2.0,>=2.0.5",
-        "symfony/security": "~2.0,>=2.0.5"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/asset": "~2.8|~3.0",
+        "symfony/finder": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/routing": "~2.8|~3.0",
+        "symfony/templating": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "symfony/console": "~2.8|~3.0",
+        "symfony/var-dumper": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/finder": "",
-        "symfony/form": "",
-        "symfony/http-kernel": "",
-        "symfony/routing": "",
-        "symfony/templating": "",
-        "symfony/translation": "",
-        "symfony/yaml": "",
-        "symfony/security": ""
+        "symfony/asset": "For using the AssetExtension",
+        "symfony/form": "For using the FormExtension",
+        "symfony/http-kernel": "For using the HttpKernelExtension",
+        "symfony/routing": "For using the RoutingExtension",
+        "symfony/templating": "For using the TwigEngine",
+        "symfony/translation": "For using the TranslationExtension",
+        "symfony/yaml": "For using the YamlExtension",
+        "symfony/security": "For using the SecurityExtension",
+        "symfony/stopwatch": "For using the StopwatchExtension",
+        "symfony/var-dumper": "For using the DumpExtension",
+        "symfony/expression-language": "For using the ExpressionExtension"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Twig\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Twig",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

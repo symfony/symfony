@@ -24,6 +24,14 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Count extends Constraint
 {
+    const TOO_FEW_ERROR = 'bef8e338-6ae5-4caf-b8e2-50e7b0579e69';
+    const TOO_MANY_ERROR = '756b1212-697c-468d-a9ad-50dd783bb169';
+
+    protected static $errorNames = array(
+        self::TOO_FEW_ERROR => 'TOO_FEW_ERROR',
+        self::TOO_MANY_ERROR => 'TOO_MANY_ERROR',
+    );
+
     public $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
     public $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
     public $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';

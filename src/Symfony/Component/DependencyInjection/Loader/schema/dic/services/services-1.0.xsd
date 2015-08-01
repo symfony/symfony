@@ -64,7 +64,10 @@
     <xsd:attribute name="ignore-errors" type="boolean" />
   </xsd:complexType>
 
-  <xsd:complexType name="configurator">
+  <xsd:complexType name="callable">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="service" type="service" minOccurs="0" maxOccurs="1" />
+    </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="service" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
@@ -76,24 +79,24 @@
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
-      <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="shared" type="boolean" />
     <xsd:attribute name="scope" type="xsd:string" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
-    <xsd:attribute name="synchronized" type="boolean" />
     <xsd:attribute name="lazy" type="boolean" />
     <xsd:attribute name="abstract" type="boolean" />
-    <xsd:attribute name="factory-class" type="xsd:string" />
-    <xsd:attribute name="factory-method" type="xsd:string" />
-    <xsd:attribute name="factory-service" type="xsd:string" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
+    <xsd:attribute name="decorates" type="xsd:string" />
+    <xsd:attribute name="decoration-inner-name" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="tag">
@@ -165,6 +168,7 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="service" />
+      <xsd:enumeration value="expression" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
     </xsd:restriction>

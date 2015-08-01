@@ -11,29 +11,31 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getCollectTestData
      */
-    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
     {
         $logger = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
         $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
 
         $c = new LoggerDataCollector($logger);
-        $c->collect(new Request(), new Response());
+        $c->lateCollect();
 
         $this->assertSame('logger', $c->getName());
         $this->assertSame($nb, $c->countErrors());
         $this->assertSame($expectedLogs ?: $logs, $c->getLogs());
         $this->assertSame($expectedDeprecationCount, $c->countDeprecations());
+        $this->assertSame($expectedScreamCount, $c->countScreams());
+
+        if (isset($expectedPriorities)) {
+            $this->assertSame($expectedPriorities, $c->getPriorities());
+        }
     }
 
     public function getCollectTestData()
@@ -41,30 +43,42 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 1,
-                array(array('message' => 'foo', 'context' => array())),
+                array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
                 null,
                 0,
-            ),
-            array(
-                1,
-                array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')))),
-                array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'))),
                 0,
             ),
             array(
                 1,
-                array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()))),
-                array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'))),
+                array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                0,
+                0,
+            ),
+            array(
+                1,
+                array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                0,
                 0,
             ),
             array(
                 1,
                 array(
-                    array('message' => 'foo', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION)),
-                    array('message' => 'foo2', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION)),
+                    array('message' => 'foo', 'context' => array('type' => E_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                    array('message' => 'foo2', 'context' => array('type' => E_USER_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
                 ),
                 null,
                 2,
+                0,
+                array(100 => array('count' => 2, 'name' => 'DEBUG')),
+            ),
+            array(
+                1,
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                0,
+                1,
             ),
         );
     }

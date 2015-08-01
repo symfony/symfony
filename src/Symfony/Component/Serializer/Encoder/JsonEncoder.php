@@ -32,28 +32,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
     {
-        $this->encodingImpl = null === $encodingImpl ? new JsonEncode() : $encodingImpl;
-        $this->decodingImpl = null === $decodingImpl ? new JsonDecode(true) : $decodingImpl;
-    }
-
-    /**
-     * Returns the last encoding error (if any).
-     *
-     * @return int
-     */
-    public function getLastEncodingError()
-    {
-        return $this->encodingImpl->getLastError();
-    }
-
-    /**
-     * Returns the last decoding error (if any).
-     *
-     * @return int
-     */
-    public function getLastDecodingError()
-    {
-        return $this->decodingImpl->getLastError();
+        $this->encodingImpl = $encodingImpl ?: new JsonEncode();
+        $this->decodingImpl = $decodingImpl ?: new JsonDecode(true);
     }
 
     /**
@@ -86,5 +66,15 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     public function supportsDecoding($format)
     {
         return self::FORMAT === $format;
+    }
+
+    /**
+     * Resolves json_last_error message.
+     *
+     * @return string
+     */
+    public static function getLastErrorMessage()
+    {
+        return json_last_error_msg();
     }
 }

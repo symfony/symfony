@@ -23,6 +23,9 @@ namespace Symfony\Component\Validator;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see MetadataInterface
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Mapping\PropertyMetadataInterface} instead.
  */
 interface PropertyMetadataInterface extends MetadataInterface
 {

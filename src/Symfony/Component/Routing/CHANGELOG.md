@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+
+2.5.0
+-----
+
+ * [DEPRECATION] The `ApacheMatcherDumper` and `ApacheUrlMatcher` were deprecated and
+   will be removed in Symfony 3.0, since the performance gains were minimal and
+   it's hard to replicate the behaviour of PHP implementation.
+
 2.3.0
 -----
 

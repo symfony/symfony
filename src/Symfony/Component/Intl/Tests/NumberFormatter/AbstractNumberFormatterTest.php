@@ -467,6 +467,102 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider formatRoundingModeRoundCeilingProvider
+     */
+    public function testFormatRoundingModeCeiling($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_CEILING);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_CEILING rounding mode.');
+    }
+
+    public function formatRoundingModeRoundCeilingProvider()
+    {
+        return array(
+            array(1.123, '1.13'),
+            array(1.125, '1.13'),
+            array(1.127, '1.13'),
+            array(-1.123, '-1.12'),
+            array(-1.125, '-1.12'),
+            array(-1.127, '-1.12'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundFloorProvider
+     */
+    public function testFormatRoundingModeFloor($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_FLOOR);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_FLOOR rounding mode.');
+    }
+
+    public function formatRoundingModeRoundFloorProvider()
+    {
+        return array(
+            array(1.123, '1.12'),
+            array(1.125, '1.12'),
+            array(1.127, '1.12'),
+            array(-1.123, '-1.13'),
+            array(-1.125, '-1.13'),
+            array(-1.127, '-1.13'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundDownProvider
+     */
+    public function testFormatRoundingModeDown($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_DOWN);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_DOWN rounding mode.');
+    }
+
+    public function formatRoundingModeRoundDownProvider()
+    {
+        return array(
+            array(1.123, '1.12'),
+            array(1.125, '1.12'),
+            array(1.127, '1.12'),
+            array(-1.123, '-1.12'),
+            array(-1.125, '-1.12'),
+            array(-1.127, '-1.12'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundUpProvider
+     */
+    public function testFormatRoundingModeUp($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_UP);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_UP rounding mode.');
+    }
+
+    public function formatRoundingModeRoundUpProvider()
+    {
+        return array(
+            array(1.123, '1.13'),
+            array(1.125, '1.13'),
+            array(1.127, '1.13'),
+            array(-1.123, '-1.13'),
+            array(-1.125, '-1.13'),
+            array(-1.127, '-1.13'),
+        );
+    }
+
     public function testGetLocale()
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
@@ -582,13 +678,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $parsedValue = $formatter->parse('-2,147,483,648', NumberFormatter::TYPE_INT64);
 
-        // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
-        // The negative PHP_INT_MAX was being converted to float
-        if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404) {
-            $this->assertInternalType('int', $parsedValue);
-        } else {
-            $this->assertInternalType('float', $parsedValue);
-        }
+        $this->assertInternalType('int', $parsedValue);
 
         $this->assertEquals(-2147483648, $parsedValue);
     }
@@ -639,24 +729,12 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $parsedValue = $formatter->parse('2,147,483,648', NumberFormatter::TYPE_INT64);
         $this->assertInternalType('integer', $parsedValue);
 
-        // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
-        // A 32 bit integer was being generated instead of a 64 bit integer
-        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
-            $this->assertEquals(-2147483648, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range (PHP < 5.3.14 and PHP < 5.4.4).');
-        } else {
-            $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
-        }
+        $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
 
         $parsedValue = $formatter->parse('-2,147,483,649', NumberFormatter::TYPE_INT64);
         $this->assertInternalType('integer', $parsedValue);
 
-        // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
-        // A 32 bit integer was being generated instead of a 64 bit integer
-        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
-            $this->assertEquals(2147483647, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range  (PHP < 5.3.14 and PHP < 5.4.4).');
-        } else {
-            $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
-        }
+        $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
     }
 
     /**

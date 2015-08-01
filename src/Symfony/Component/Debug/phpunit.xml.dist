@@ -9,9 +9,13 @@
     <php>
         <ini name="error_reporting" value="-1" />
     </php>
+
     <testsuites>
         <testsuite name="Symfony Debug Component Test Suite">
             <directory>./Tests/</directory>
+        </testsuite>
+        <testsuite name="Symfony Debug Extension Test Suite">
+            <directory suffix=".phpt">./Resources/ext/tests/</directory>
         </testsuite>
     </testsuites>
 

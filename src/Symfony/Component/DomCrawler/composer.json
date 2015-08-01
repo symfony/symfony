@@ -16,23 +16,22 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/css-selector": "~2.0,>=2.0.5"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/css-selector": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/css-selector": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
+        "psr-4": { "Symfony\\Component\\DomCrawler\\": "" }
     },
-    "target-dir": "Symfony/Component/DomCrawler",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

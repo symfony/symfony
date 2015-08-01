@@ -1,0 +1,7 @@
+<info>[container]</info> <comment>Public</comment> and <comment>private</comment> services with tag <info>tag1</info>
++--------------+-------+-------+-------+-----------------------+
+|[32m Service ID   [39m|[32m attr1 [39m|[32m attr2 [39m|[32m attr3 [39m|[32m Class name            [39m|
++--------------+-------+-------+-------+-----------------------+
+| definition_2 | val1  | val2  |       | Full\Qualified\Class2 |
+|   "          |       |       | val3  |                       |
++--------------+-------+-------+-------+-----------------------+

@@ -87,7 +87,7 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $factory = new Definition();
-        $factory->setFactoryService('a');
+        $factory->setFactory(array(new Reference('a'), 'a'));
 
         $container
             ->register('b')
@@ -124,13 +124,11 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('foo', 'stdClass')
-            ->setFactoryClass('stdClass')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array('stdClass', 'getInstance'));
 
         $container
             ->register('bar', 'stdClass')
-            ->setFactoryService('foo')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('foo'), 'getInstance'));
 
         $graph = $this->process($container);
 

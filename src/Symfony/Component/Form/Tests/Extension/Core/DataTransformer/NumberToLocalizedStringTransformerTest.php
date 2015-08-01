@@ -77,7 +77,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($to, $transformer->transform($from));
     }
 
-    public function testTransformWithPrecision()
+    public function testTransformWithScale()
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -90,7 +90,111 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('678,92', $transformer->transform(678.916));
     }
 
-    public function testTransformWithRoundingMode()
+    public function transformWithRoundingProvider()
+    {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        return array(
+            // towards positive infinity (1.6 -> 2, -1.6 -> -1)
+            array(0, 1234.5, '1235', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, 1234.4, '1235', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, -1234.5, '-1234', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, -1234.4, '-1234', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, 123.45, '123,5', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, 123.44, '123,5', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, -123.45, '-123,4', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, -123.44, '-123,4', NumberToLocalizedStringTransformer::ROUND_CEILING),
+            // towards negative infinity (1.6 -> 1, -1.6 -> -2)
+            array(0, 1234.5, '1234', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, 1234.4, '1234', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, -1234.5, '-1235', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, -1234.4, '-1235', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, 123.45, '123,4', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, 123.44, '123,4', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, -123.45, '-123,5', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, -123.44, '-123,5', NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            // away from zero (1.6 -> 2, -1.6 -> 2)
+            array(0, 1234.5, '1235', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, 1234.4, '1235', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, -1234.5, '-1235', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, -1234.4, '-1235', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, 123.45, '123,5', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, 123.44, '123,5', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, -123.45, '-123,5', NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, -123.44, '-123,5', NumberToLocalizedStringTransformer::ROUND_UP),
+            // towards zero (1.6 -> 1, -1.6 -> -1)
+            array(0, 1234.5, '1234', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, 1234.4, '1234', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, -1234.5, '-1234', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, -1234.4, '-1234', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, 123.45, '123,4', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, 123.44, '123,4', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, -123.45, '-123,4', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, -123.44, '-123,4', NumberToLocalizedStringTransformer::ROUND_DOWN),
+            // round halves (.5) to the next even number
+            array(0, 1234.6, '1235', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, 1234.5, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, 1234.4, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, 1233.5, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, 1232.5, '1232', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, -1234.6, '-1235', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, -1234.5, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, -1234.4, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, -1233.5, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, -1232.5, '-1232', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, 123.46, '123,5', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, 123.45, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, 123.44, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, 123.35, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, 123.25, '123,2', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, -123.46, '-123,5', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, -123.45, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, -123.44, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, -123.35, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, -123.25, '-123,2', NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            // round halves (.5) away from zero
+            array(0, 1234.6, '1235', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, 1234.5, '1235', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, 1234.4, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, -1234.6, '-1235', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, -1234.5, '-1235', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, -1234.4, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, 123.46, '123,5', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, 123.45, '123,5', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, 123.44, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, -123.46, '-123,5', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, -123.45, '-123,5', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, -123.44, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            // round halves (.5) towards zero
+            array(0, 1234.6, '1235', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, 1234.5, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, 1234.4, '1234', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, -1234.6, '-1235', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, -1234.5, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, -1234.4, '-1234', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, 123.46, '123,5', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, 123.45, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, 123.44, '123,4', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, -123.46, '-123,5', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, -123.45, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, -123.44, '-123,4', NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+        );
+    }
+
+    /**
+     * @dataProvider transformWithRoundingProvider
+     */
+    public function testTransformWithRounding($scale, $input, $output, $roundingMode)
+    {
+        $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
+
+        $this->assertEquals($output, $transformer->transform($input));
+    }
+
+    public function testTransformDoesNotRoundIfNoScale()
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -98,10 +202,8 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('de_AT');
 
         $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
-        $this->assertEquals('1234,547', $transformer->transform(1234.547), '->transform() only applies rounding mode if precision set');
 
-        $transformer = new NumberToLocalizedStringTransformer(2, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
-        $this->assertEquals('1234,54', $transformer->transform(1234.547), '->transform() rounding-mode works');
+        $this->assertEquals('1234,547', $transformer->transform(1234.547));
     }
 
     /**
@@ -163,6 +265,112 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         // omit group separator
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
+    }
+
+    public function reverseTransformWithRoundingProvider()
+    {
+        return array(
+            // towards positive infinity (1.6 -> 2, -1.6 -> -1)
+            array(0, '1234,5', 1235, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, '1234,4', 1235, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, '-1234,5', -1234, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(0, '-1234,4', -1234, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, '123,45', 123.5, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, '123,44', 123.5, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, '-123,45', -123.4, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_CEILING),
+            // towards negative infinity (1.6 -> 1, -1.6 -> -2)
+            array(0, '1234,5', 1234, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, '1234,4', 1234, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, '-1234,5', -1235, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(0, '-1234,4', -1235, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, '123,45', 123.4, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, '-123,45', -123.5, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            array(1, '-123,44', -123.5, NumberToLocalizedStringTransformer::ROUND_FLOOR),
+            // away from zero (1.6 -> 2, -1.6 -> 2)
+            array(0, '1234,5', 1235, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, '1234,4', 1235, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, '-1234,5', -1235, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(0, '-1234,4', -1235, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, '123,45', 123.5, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, '123,44', 123.5, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, '-123,45', -123.5, NumberToLocalizedStringTransformer::ROUND_UP),
+            array(1, '-123,44', -123.5, NumberToLocalizedStringTransformer::ROUND_UP),
+            // towards zero (1.6 -> 1, -1.6 -> -1)
+            array(0, '1234,5', 1234, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, '1234,4', 1234, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, '-1234,5', -1234, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(0, '-1234,4', -1234, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, '123,45', 123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, '-123,45', -123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_DOWN),
+            // round halves (.5) to the next even number
+            array(0, '1234,6', 1235, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '1234,5', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '1234,4', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '1233,5', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '1232,5', 1232, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '-1234,6', -1235, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '-1234,5', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '-1234,4', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '-1233,5', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(0, '-1232,5', -1232, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '123,46', 123.5, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '123,45', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '123,35', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '123,25', 123.2, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '-123,46', -123.5, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '-123,45', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '-123,35', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            array(1, '-123,25', -123.2, NumberToLocalizedStringTransformer::ROUND_HALF_EVEN),
+            // round halves (.5) away from zero
+            array(0, '1234,6', 1235, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, '1234,5', 1235, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, '1234,4', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, '-1234,6', -1235, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, '-1234,5', -1235, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(0, '-1234,4', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '123,46', 123.5, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '123,45', 123.5, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '-123,46', -123.5, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '-123,45', -123.5, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_UP),
+            // round halves (.5) towards zero
+            array(0, '1234,6', 1235, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, '1234,5', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, '1234,4', 1234, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, '-1234,6', -1235, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, '-1234,5', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(0, '-1234,4', -1234, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '123,46', 123.5, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '123,45', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '123,44', 123.4, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '-123,46', -123.5, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '-123,45', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+            array(1, '-123,44', -123.4, NumberToLocalizedStringTransformer::ROUND_HALF_DOWN),
+        );
+    }
+
+    /**
+     * @dataProvider reverseTransformWithRoundingProvider
+     */
+    public function testReverseTransformWithRounding($scale, $input, $output, $roundingMode)
+    {
+        $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
+
+        $this->assertEquals($output, $transformer->reverseTransform($input));
+    }
+
+    public function testReverseTransformDoesNotRoundIfNoScale()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
+
+        $this->assertEquals(1234.547, $transformer->reverseTransform('1234,547'));
     }
 
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()

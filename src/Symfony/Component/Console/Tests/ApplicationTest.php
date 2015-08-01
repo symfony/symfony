@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -40,6 +42,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
+        require_once self::$fixturesPath.'/Foo5Command.php';
+        require_once self::$fixturesPath.'/FoobarCommand.php';
+        require_once self::$fixturesPath.'/BarBucCommand.php';
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
     }
@@ -92,7 +97,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testHelp()
     {
         $application = new Application();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $this->normalizeLineBreaks($application->getHelp()), '->setHelp() returns a help message');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $this->normalizeLineBreaks($application->getHelp()), '->getHelp() returns a help message');
     }
 
     public function testAll()
@@ -124,6 +129,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
         $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Command class "Foo5Command" is not correctly initialized. You probably forgot to call the parent constructor.
+     */
+    public function testAddCommandWithEmptyConstructor()
+    {
+        $application = new Application();
+        $application->add(new \Foo5Command());
     }
 
     public function testHasGet()
@@ -203,6 +218,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAmbiguousNamespace()
     {
         $application = new Application();
+        $application->add(new \BarBucCommand());
         $application->add(new \FooCommand());
         $application->add(new \Foo2Command());
         $application->findNamespace('f');
@@ -216,6 +232,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $application = new Application();
         $application->findNamespace('bar');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Command "foo1" is not defined
+     */
+    public function testFindUniqueNameButNamespaceName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        $application->find($commandName = 'foo1');
     }
 
     public function testFind()
@@ -250,7 +280,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         return array(
             array('f', 'Command "f" is not defined.'),
             array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
-            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).'),
+            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1 and 1 more).'),
         );
     }
 
@@ -264,6 +294,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Foo4Command', $application->find('foo3:bar:toh'), '->find() returns a command even if its namespace equals another command name');
     }
 
+    public function testFindCommandWithAmbiguousNamespacesButUniqueName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \FoobarCommand());
+
+        $this->assertInstanceOf('FoobarCommand', $application->find('f:f'));
+    }
+
+    public function testFindCommandWithMissingNamespace()
+    {
+        $application = new Application();
+        $application->add(new \Foo4Command());
+
+        $this->assertInstanceOf('Foo4Command', $application->find('f::t'));
+    }
+
     /**
      * @dataProvider             provideInvalidCommandNamesSingle
      * @expectedException        \InvalidArgumentException
@@ -272,15 +319,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAlternativeExceptionMessageSingle($name)
     {
         $application = new Application();
-        $application->add(new \FooCommand());
+        $application->add(new \Foo3Command());
         $application->find($name);
     }
 
     public function provideInvalidCommandNamesSingle()
     {
         return array(
-            array('foo:baR'),
-            array('foO:bar'),
+            array('foo3:baR'),
+            array('foO3:bar'),
         );
     }
 
@@ -298,6 +345,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/foo1:bar/', $e->getMessage());
+            $this->assertRegExp('/foo:bar/', $e->getMessage());
         }
 
         // Namespace + plural
@@ -307,6 +356,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/foo1/', $e->getMessage());
         }
 
         $application->add(new \Foo3Command());
@@ -339,27 +389,31 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without alternatives');
         }
 
+        // Test if "bar1" command throw an "\InvalidArgumentException" and does not contain
+        // "foo:bar" as alternative because "bar1" is too far from "foo:bar"
         try {
-            $application->find($commandName = 'foo');
+            $application->find($commandName = 'bar1');
             $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
             $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertRegExp('/foo:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar"');
-            $this->assertRegExp('/foo1:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo1:bar"');
+            $this->assertRegExp('/afoobar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "afoobar1"');
             $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar1"');
+            $this->assertNotRegExp('/foo:bar(?>!1)/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
         }
+    }
 
-        // Test if "foo1" command throw an "\InvalidArgumentException" and does not contain
-        // "foo:bar" as alternative because "foo1" is too far from "foo:bar"
-        try {
-            $application->find($commandName = 'foo1');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
-            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertFalse(strpos($e->getMessage(), 'foo:bar'), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
-        }
+    public function testFindAlternativeCommandsWithAnAlias()
+    {
+        $fooCommand = new \FooCommand();
+        $fooCommand->setAliases(array('foo2'));
+
+        $application = new Application();
+        $application->add($fooCommand);
+
+        $result = $application->find('foo');
+
+        $this->assertSame($fooCommand, $result);
     }
 
     public function testFindAlternativeNamespace()
@@ -401,6 +455,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo:sublong', $application->findNamespace('f:sub'));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Command "foo::bar" is not defined.
+     */
+    public function testFindWithDoubleColonInNameThrowsException()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo4Command());
+        $application->find('foo::bar');
+    }
+
     public function testSetCatchExceptions()
     {
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
@@ -422,34 +488,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsText()
-    {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
-
-        $application = new Application();
-        $application->add(new \FooCommand());
-        $this->ensureStaticCommandHelp($application);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $this->normalizeLineBreaks($application->asText()), '->asText() returns a text representation of the application');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsXml()
-    {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
-
-        $application = new Application();
-        $application->add(new \FooCommand());
-        $this->ensureStaticCommandHelp($application);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
     }
 
     public function testRenderException()
@@ -612,6 +650,29 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
+    /**
+     * Issue #9285.
+     *
+     * If the "verbose" option is just before an argument in ArgvInput,
+     * an argument value should not be treated as verbosity value.
+     * This test will fail with "Not enough arguments." if broken
+     */
+    public function testVerboseValueNotBreakArguments()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \FooCommand());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(array('cli.php', '-v', 'foo:bar'));
+        $application->run($input, $output);
+
+        $input = new ArgvInput(array('cli.php', '--verbose', 'foo:bar'));
+        $application->run($input, $output);
+    }
+
     public function testRunReturnsIntegerExitCode()
     {
         $exception = new \Exception('', 4);
@@ -680,8 +741,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $helperSet = $application->getHelperSet();
 
         $this->assertTrue($helperSet->has('formatter'));
-        $this->assertTrue($helperSet->has('dialog'));
-        $this->assertTrue($helperSet->has('progress'));
     }
 
     public function testAddingSingleHelperSetOverwritesDefaultValues()
@@ -834,16 +893,53 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('before.foo.after.caught.', $tester->getDisplay());
     }
 
-    protected function getDispatcher()
+    public function testRunWithDispatcherSkippingCommand()
+    {
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher(true));
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $exitCode = $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.after.', $tester->getDisplay());
+        $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
+    }
+
+    public function testTerminalDimensions()
+    {
+        $application = new Application();
+        $originalDimensions = $application->getTerminalDimensions();
+        $this->assertCount(2, $originalDimensions);
+
+        $width = 80;
+        if ($originalDimensions[0] == $width) {
+            $width = 100;
+        }
+
+        $application->setTerminalDimensions($width, 80);
+        $this->assertSame(array($width, 80), $application->getTerminalDimensions());
+    }
+
+    protected function getDispatcher($skipCommand = false)
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use ($skipCommand) {
             $event->getOutput()->write('before.');
+
+            if ($skipCommand) {
+                $event->disableCommand();
+            }
         });
-        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) {
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($skipCommand) {
             $event->getOutput()->write('after.');
 
-            $event->setExitCode(128);
+            if (!$skipCommand) {
+                $event->setExitCode(113);
+            }
         });
         $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
             $event->getOutput()->writeln('caught.');
@@ -852,6 +948,46 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         });
 
         return $dispatcher;
+    }
+
+    public function testSetRunCustomDefaultCommand()
+    {
+        $command = new \FooCommand();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->setDefaultCommand($command->getName());
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array());
+        $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+
+        $application = new CustomDefaultCommandApplication();
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array());
+
+        $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+    }
+
+    public function testCanCheckIfTerminalIsInteractive()
+    {
+        if (!function_exists('posix_isatty')) {
+            $this->markTestSkipped('posix_isatty function is required');
+        }
+
+        $application = new CustomDefaultCommandApplication();
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'help'));
+
+        $this->assertFalse($tester->getInput()->hasParameterOption(array('--no-interaction', '-n')));
+
+        $inputStream = $application->getHelperSet()->get('question')->getInputStream();
+        $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
     }
 }
 
@@ -875,5 +1011,20 @@ class CustomApplication extends Application
     protected function getDefaultHelperSet()
     {
         return new HelperSet(array(new FormatterHelper()));
+    }
+}
+
+class CustomDefaultCommandApplication extends Application
+{
+    /**
+     * Overwrites the constructor in order to set a different default command.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $command = new \FooCommand();
+        $this->add($command);
+        $this->setDefaultCommand($command->getName());
     }
 }

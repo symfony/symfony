@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Resources\stubs\FakeFile;
+use Symfony\Component\HttpFoundation\Tests\File\FakeFile;
 
 class BinaryFileResponseTest extends ResponseTestCase
 {
@@ -190,14 +190,22 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
     }
 
-    public function testSplFileObject()
+    public function testDeleteFileAfterSend()
     {
-        $filePath = __DIR__.'/File/Fixtures/test';
-        $file = new \SplFileObject($filePath);
+        $request = Request::create('/');
 
-        $response = new BinaryFileResponse($file);
+        $path = __DIR__.'/File/Fixtures/to_delete';
+        touch($path);
+        $realPath = realpath($path);
+        $this->assertFileExists($realPath);
 
-        $this->assertEquals(realpath($response->getFile()->getPathname()), realpath($filePath));
+        $response = new BinaryFileResponse($realPath);
+        $response->deleteFileAfterSend(true);
+
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertFileNotExists($path);
     }
 
     public function testAcceptRangeOnUnsafeMethods()
@@ -230,5 +238,13 @@ class BinaryFileResponseTest extends ResponseTestCase
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__.'/../README.md');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        $path = __DIR__.'/../Fixtures/to_delete';
+        if (file_exists($path)) {
+            @unlink($path);
+        }
     }
 }

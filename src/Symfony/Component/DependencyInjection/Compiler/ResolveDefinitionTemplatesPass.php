@@ -21,12 +21,13 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * merged Definition instance.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 {
-    private $container;
     private $compiler;
     private $formatter;
+    private $currentId;
 
     /**
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
@@ -35,44 +36,80 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $this->container = $container;
         $this->compiler = $container->getCompiler();
         $this->formatter = $this->compiler->getLoggingFormatter();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            // yes, we are specifically fetching the definition from the
-            // container to ensure we are not operating on stale data
-            $definition = $container->getDefinition($id);
-            if (!$definition instanceof DefinitionDecorator || $definition->isAbstract()) {
-                continue;
-            }
+        $container->setDefinitions($this->resolveArguments($container, $container->getDefinitions(), true));
+    }
 
-            $this->resolveDefinition($id, $definition);
+    /**
+     * Resolves definition decorator arguments.
+     *
+     * @param ContainerBuilder $container The ContainerBuilder
+     * @param array            $arguments An array of arguments
+     * @param bool             $isRoot    If we are processing the root definitions or not
+     *
+     * @return array
+     */
+    private function resolveArguments(ContainerBuilder $container, array $arguments, $isRoot = false)
+    {
+        foreach ($arguments as $k => $argument) {
+            if ($isRoot) {
+                // yes, we are specifically fetching the definition from the
+                // container to ensure we are not operating on stale data
+                $arguments[$k] = $argument = $container->getDefinition($k);
+                $this->currentId = $k;
+            }
+            if (is_array($argument)) {
+                $arguments[$k] = $this->resolveArguments($container, $argument);
+            } elseif ($argument instanceof Definition) {
+                if ($argument instanceof DefinitionDecorator) {
+                    $arguments[$k] = $argument = $this->resolveDefinition($container, $argument);
+                    if ($isRoot) {
+                        $container->setDefinition($k, $argument);
+                    }
+                }
+                $argument->setArguments($this->resolveArguments($container, $argument->getArguments()));
+                $argument->setMethodCalls($this->resolveArguments($container, $argument->getMethodCalls()));
+                $argument->setProperties($this->resolveArguments($container, $argument->getProperties()));
+
+                $configurator = $this->resolveArguments($container, array($argument->getConfigurator()));
+                $argument->setConfigurator($configurator[0]);
+
+                $factory = $this->resolveArguments($container, array($argument->getFactory()));
+                $argument->setFactory($factory[0]);
+            }
         }
+
+        return $arguments;
     }
 
     /**
      * Resolves the definition.
      *
-     * @param string              $id         The definition identifier
+     * @param ContainerBuilder    $container  The ContainerBuilder
      * @param DefinitionDecorator $definition
      *
      * @return Definition
      *
      * @throws \RuntimeException When the definition is invalid
      */
-    private function resolveDefinition($id, DefinitionDecorator $definition)
+    private function resolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
     {
-        if (!$this->container->hasDefinition($parent = $definition->getParent())) {
-            throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));
+        if (!$container->hasDefinition($parent = $definition->getParent())) {
+            throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $this->currentId));
         }
 
-        $parentDef = $this->container->getDefinition($parent);
+        $parentDef = $container->getDefinition($parent);
         if ($parentDef instanceof DefinitionDecorator) {
-            $parentDef = $this->resolveDefinition($parent, $parentDef);
+            $id = $this->currentId;
+            $this->currentId = $parent;
+            $parentDef = $this->resolveDefinition($container, $parentDef);
+            $container->setDefinition($parent, $parentDef);
+            $this->currentId = $id;
         }
 
-        $this->compiler->addLogMessage($this->formatter->formatResolveInheritance($this, $id, $parent));
+        $this->compiler->addLogMessage($this->formatter->formatResolveInheritance($this, $this->currentId, $parent));
         $def = new Definition();
 
         // merge in parent definition
@@ -81,9 +118,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
-        $def->setFactoryClass($parentDef->getFactoryClass());
-        $def->setFactoryMethod($parentDef->getFactoryMethod());
-        $def->setFactoryService($parentDef->getFactoryService());
+        $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
@@ -94,14 +129,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if (isset($changes['class'])) {
             $def->setClass($definition->getClass());
         }
-        if (isset($changes['factory_class'])) {
-            $def->setFactoryClass($definition->getFactoryClass());
-        }
-        if (isset($changes['factory_method'])) {
-            $def->setFactoryMethod($definition->getFactoryMethod());
-        }
-        if (isset($changes['factory_service'])) {
-            $def->setFactoryService($definition->getFactoryService());
+        if (isset($changes['factory'])) {
+            $def->setFactory($definition->getFactory());
         }
         if (isset($changes['configurator'])) {
             $def->setConfigurator($definition->getConfigurator());
@@ -114,6 +143,14 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
+        }
+        if (isset($changes['decorated_service'])) {
+            $decoratedService = $definition->getDecoratedService();
+            if (null === $decoratedService) {
+                $def->setDecoratedService($decoratedService);
+            } else {
+                $def->setDecoratedService($decoratedService[0], $decoratedService[1]);
+            }
         }
 
         // merge arguments
@@ -143,11 +180,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope());
+        $def->setScope($definition->getScope(false), false);
         $def->setTags($definition->getTags());
-
-        // set new definition on container
-        $this->container->setDefinition($id, $def);
 
         return $def;
     }

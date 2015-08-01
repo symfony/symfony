@@ -1,0 +1,45 @@
+{
+    "name": "symfony/security-core",
+    "type": "library",
+    "description": "Symfony Security Component - Core Library",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/validator": "~2.8|~3.0",
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "symfony/event-dispatcher": "",
+        "symfony/http-foundation": "",
+        "symfony/validator": "For using the user password constraint",
+        "symfony/expression-language": "For using the expression voter"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Security\\Core\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev"
+        }
+    }
+}

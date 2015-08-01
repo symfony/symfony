@@ -14,9 +14,8 @@ namespace Symfony\Bridge\Twig\Tests\Translation;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class TwigExtractorTest extends TestCase
+class TwigExtractorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getExtractData
@@ -74,14 +73,65 @@ class TwigExtractorTest extends TestCase
 
     /**
      * @expectedException              \Twig_Error
-     * @expectedExceptionMessageRegExp /Unclosed "block" in "extractor(\/|\\)syntax_error\.twig" at line 1/
+     * @expectedExceptionMessageRegExp /Unclosed "block" in ".*extractor(\/|\\)syntax_error\.twig" at line 1/
+     * @dataProvider resourcesWithSyntaxErrorsProvider
      */
-    public function testExtractSyntaxError()
+    public function testExtractSyntaxError($resources)
     {
         $twig = new \Twig_Environment(new \Twig_Loader_Array(array()));
         $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
 
         $extractor = new TwigExtractor($twig);
-        $extractor->extract(__DIR__.'/../Fixtures', new MessageCatalogue('en'));
+        $extractor->extract($resources, new MessageCatalogue('en'));
+    }
+
+    /**
+     * @return array
+     */
+    public function resourcesWithSyntaxErrorsProvider()
+    {
+        return array(
+            array(__DIR__.'/../Fixtures'),
+            array(__DIR__.'/../Fixtures/extractor/syntax_error.twig'),
+            array(new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')),
+        );
+    }
+
+    /**
+     * @dataProvider resourceProvider
+     */
+    public function testExtractWithFiles($resource)
+    {
+        $loader = new \Twig_Loader_Array(array());
+        $twig = new \Twig_Environment($loader, array(
+            'strict_variables' => true,
+            'debug' => true,
+            'cache' => false,
+            'autoescape' => false,
+        ));
+        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+
+        $extractor = new TwigExtractor($twig);
+        $catalogue = new MessageCatalogue('en');
+        $extractor->extract($resource, $catalogue);
+
+        $this->assertTrue($catalogue->has('Hi!', 'messages'));
+        $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
+    }
+
+    /**
+     * @return array
+     */
+    public function resourceProvider()
+    {
+        $directory = __DIR__.'/../Fixtures/extractor/';
+
+        return array(
+            array($directory.'with_translations.html.twig'),
+            array(array($directory.'with_translations.html.twig')),
+            array(array(new \SplFileInfo($directory.'with_translations.html.twig'))),
+            array(new \ArrayObject(array($directory.'with_translations.html.twig'))),
+            array(new \ArrayObject(array(new \SplFileInfo($directory.'with_translations.html.twig')))),
+        );
     }
 }

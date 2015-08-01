@@ -16,23 +16,26 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/event-dispatcher": "~2.1"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/event-dispatcher": ""
+        "symfony/event-dispatcher": "",
+        "symfony/process": "",
+        "psr/log": "For using the console logger"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Console\\": "" }
+        "psr-4": { "Symfony\\Component\\Console\\": "" }
     },
-    "target-dir": "Symfony/Component/Console",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

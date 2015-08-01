@@ -32,19 +32,19 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server;
+    protected $server = array();
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
     protected $response;
     protected $crawler;
-    protected $insulated;
+    protected $insulated = false;
     protected $redirect;
-    protected $followRedirects;
+    protected $followRedirects = true;
 
-    private $maxRedirects;
-    private $redirectCount;
-    private $isMainRequest;
+    private $maxRedirects = -1;
+    private $redirectCount = 0;
+    private $isMainRequest = true;
 
     /**
      * Constructor.
@@ -58,13 +58,8 @@ abstract class Client
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = null === $history ? new History() : $history;
-        $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
-        $this->insulated = false;
-        $this->followRedirects = true;
-        $this->maxRedirects = -1;
-        $this->redirectCount = 0;
-        $this->isMainRequest = true;
+        $this->history = $history ?: new History();
+        $this->cookieJar = $cookieJar ?: new CookieJar();
     }
 
     /**
@@ -102,9 +97,7 @@ abstract class Client
     public function insulate($insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
-            // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
-            // @codeCoverageIgnoreEnd
         }
 
         $this->insulated = (bool) $insulated;
@@ -120,7 +113,6 @@ abstract class Client
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_HOST' => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
@@ -303,21 +295,19 @@ abstract class Client
 
         $uri = $this->getAbsoluteUri($uri);
 
-        if (!empty($server['HTTP_HOST'])) {
-            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
-        }
+        $server = array_merge($this->server, $server);
 
         if (isset($server['HTTPS'])) {
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
-        $server = array_merge($this->server, $server);
-
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
 
-        $server['HTTP_HOST'] = $this->extractHost($uri);
+        if (empty($server['HTTP_HOST'])) {
+          $server['HTTP_HOST'] = $this->extractHost($uri);
+        }
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
@@ -393,9 +383,7 @@ abstract class Client
      */
     protected function getScript($request)
     {
-        // @codeCoverageIgnoreStart
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
-        // @codeCoverageIgnoreEnd
     }
 
     /**

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -162,16 +163,19 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
+        }
+
         if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+            if ('request' !== $id) {
+                @trigger_error(sprintf('The "scope" key of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
+            }
+            $definition->setScope($service['scope'], false);
         }
 
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
-        }
-
-        if (isset($service['synchronized'])) {
-            $definition->setSynchronized($service['synchronized']);
         }
 
         if (isset($service['lazy'])) {
@@ -186,16 +190,17 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
-        if (isset($service['factory_class'])) {
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            $definition->setFactoryService($service['factory_service']);
+        if (isset($service['factory'])) {
+            if (is_string($service['factory'])) {
+                if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
+                    $parts = explode(':', $service['factory']);
+                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
+                } else {
+                    $definition->setFactory($service['factory']);
+                }
+            } else {
+                $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
+            }
         }
 
         if (isset($service['file'])) {
@@ -224,8 +229,15 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service['calls'] as $call) {
-                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
-                $definition->addMethodCall($call[0], $args);
+                if (isset($call['method'])) {
+                    $method = $call['method'];
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                } else {
+                    $method = $call[0];
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                }
+
+                $definition->addMethodCall($method, $args);
             }
         }
 
@@ -246,14 +258,19 @@ class YamlFileLoader extends FileLoader
                 $name = $tag['name'];
                 unset($tag['name']);
 
-                foreach ($tag as $value) {
-                    if (!is_scalar($value)) {
-                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s" in %s. Check your YAML syntax.', $id, $name, $file));
+                foreach ($tag as $attribute => $value) {
+                    if (!is_scalar($value) && null !== $value) {
+                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s. Check your YAML syntax.', $id, $name, $attribute, $file));
                     }
                 }
 
                 $definition->addTag($name, $tag);
             }
+        }
+
+        if (isset($service['decorates'])) {
+            $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
+            $definition->setDecoratedService($service['decorates'], $renameId);
         }
 
         $this->container->setDefinition($id, $definition);
@@ -340,6 +357,8 @@ class YamlFileLoader extends FileLoader
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
+        } elseif (is_string($value) &&  0 === strpos($value, '@=')) {
+            return new Expression(substr($value, 2));
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
             if (0 === strpos($value, '@@')) {
                 $value = substr($value, 1);

@@ -75,12 +75,10 @@ class FormLoginFactory extends AbstractFactory
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
 
-        if (isset($config['csrf_provider'])) {
-            $container
-                ->getDefinition($listenerId)
-                ->addArgument(new Reference($config['csrf_provider']))
-            ;
-        }
+        $container
+            ->getDefinition($listenerId)
+            ->addArgument(isset($config['csrf_provider']) ? new Reference($config['csrf_provider']) : null)
+        ;
 
         return $listenerId;
     }

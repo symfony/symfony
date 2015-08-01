@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
+use Symfony\Component\Validator\Validation;
 
 class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new NotBlankValidator();
@@ -52,6 +58,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }
 
@@ -65,6 +72,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }
 
@@ -78,6 +86,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'false')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }
 
@@ -91,6 +100,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }
 }

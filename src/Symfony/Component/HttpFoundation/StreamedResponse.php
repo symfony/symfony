@@ -34,9 +34,9 @@ class StreamedResponse extends Response
     /**
      * Constructor.
      *
-     * @param mixed $callback A valid PHP callback
-     * @param int   $status   The response status code
-     * @param array $headers  An array of response headers
+     * @param callable|null $callback A valid PHP callback or null to set it later
+     * @param int           $status   The response status code
+     * @param array         $headers  An array of response headers
      *
      * @api
      */
@@ -51,7 +51,13 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
+     * Factory method for chainability
+     *
+     * @param callable|null $callback A valid PHP callback or null to set it later
+     * @param int           $status   The response status code
+     * @param array         $headers  An array of response headers
+     *
+     * @return StreamedResponse
      */
     public static function create($callback = null, $status = 200, $headers = array())
     {
@@ -61,7 +67,7 @@ class StreamedResponse extends Response
     /**
      * Sets the PHP callback associated with this Response.
      *
-     * @param mixed $callback A valid PHP callback
+     * @param callable $callback A valid PHP callback
      *
      * @throws \LogicException
      */
@@ -71,16 +77,6 @@ class StreamedResponse extends Response
             throw new \LogicException('The Response callback must be a valid PHP callable.');
         }
         $this->callback = $callback;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prepare(Request $request)
-    {
-        $this->headers->set('Cache-Control', 'no-cache');
-
-        return parent::prepare($request);
     }
 
     /**

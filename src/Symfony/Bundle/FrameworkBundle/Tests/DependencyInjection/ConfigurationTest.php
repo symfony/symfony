@@ -19,7 +19,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
+        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
             array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
@@ -33,7 +33,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testValidTrustedProxies($trustedProxies, $processedProxies)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, array(array(
             'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
@@ -62,7 +62,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidTypeTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -77,13 +77,30 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValueTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
                 'trusted_proxies' => array('Not an IP address'),
             ),
         ));
+    }
+
+    public function testAssetsCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
     }
 
     protected static function getBundleDefaultConfig()
@@ -93,12 +110,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'trusted_proxies' => array(),
             'ide' => null,
             'default_locale' => 'en',
-            'form' => array('enabled' => false),
+            'form' => array(
+                'enabled' => false,
+                'csrf_protection' => array(
+                    'enabled' => null, // defaults to csrf_protection.enabled
+                    'field_name' => null,
+                ),
+            ),
             'csrf_protection' => array(
-                'enabled' => true,
+                'enabled' => false,
                 'field_name' => '_token',
             ),
             'esi' => array('enabled' => false),
+            'ssi' => array('enabled' => false),
             'fragments' => array(
                 'enabled' => false,
                 'path' => '/_fragment',
@@ -116,11 +140,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'translator' => array(
                 'enabled' => false,
                 'fallbacks' => array('en'),
+                'logging' => true,
+                'paths' => array(),
             ),
             'validation' => array(
                 'enabled' => false,
                 'enable_annotations' => false,
+                'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
+                'strict_email' => false,
             ),
             'annotations' => array(
                 'cache' => 'file',
@@ -129,6 +157,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer' => array(
                 'enabled' => false,
+                'enable_annotations' => false,
+            ),
+            'property_access' => array(
+                'magic_call' => false,
+                'throw_exception_on_invalid_index' => false,
             ),
         );
     }

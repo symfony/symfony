@@ -19,8 +19,8 @@ namespace Symfony\Component\Config\Definition\Builder;
 class NormalizationBuilder
 {
     protected $node;
-    public $before;
-    public $remappings;
+    public $before = array();
+    public $remappings = array();
 
     /**
      * Constructor.
@@ -30,9 +30,6 @@ class NormalizationBuilder
     public function __construct(NodeDefinition $node)
     {
         $this->node = $node;
-        $this->keys = false;
-        $this->remappings = array();
-        $this->before = array();
     }
 
     /**

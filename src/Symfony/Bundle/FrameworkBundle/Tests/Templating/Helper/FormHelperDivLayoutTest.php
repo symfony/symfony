@@ -44,7 +44,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         ));
 
         return array_merge(parent::getExtensions(), array(
-            new TemplatingExtension($this->engine, $this->csrfProvider, array(
+            new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
                 'FrameworkBundle:Form',
             )),
         ));
@@ -60,15 +60,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf('Deprecated method %s->enctype() is not implemented.', get_class($form)));
-        }
-
-        return (string) $form->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())

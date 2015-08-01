@@ -121,27 +121,6 @@ class FormHelper extends Helper
     }
 
     /**
-     * Renders the HTML enctype in the form tag, if necessary.
-     *
-     * Example usage templates:
-     *
-     *     <form action="..." method="post" <?php echo $view['form']->enctype($form) ?>>
-     *
-     * @param FormView $view The view for which to render the encoding type
-     *
-     * @return string The HTML markup
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link start} instead.
-     */
-    public function enctype(FormView $view)
-    {
-        // Uncomment this as soon as the deprecation note should be shown
-        // trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
-        return $this->renderer->searchAndRenderBlock($view, 'enctype');
-    }
-
-    /**
      * Renders the HTML for a given view.
      *
      * Example usage:
@@ -247,7 +226,7 @@ class FormHelper extends Helper
      * Check the token in your action using the same intention.
      *
      * <code>
-     * $csrfProvider = $this->get('form.csrf_provider');
+     * $csrfProvider = $this->get('security.csrf.token_generator');
      * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *     throw new \RuntimeException('CSRF attack detected.');
      * }

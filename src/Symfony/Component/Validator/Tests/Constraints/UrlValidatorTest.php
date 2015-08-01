@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
+use Symfony\Component\Validator\Validation;
 
 class UrlValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new UrlValidator();
@@ -58,7 +64,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array('http://a.pl'),
             array('http://www.google.com'),
-            //array('http://www.google.com.') OK as of 2.5
+            array('http://www.google.com.'),
             array('http://www.google.museum'),
             array('https://google.com/'),
             array('https://google.com:80/'),
@@ -72,7 +78,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://symfony.com/#?'),
             array('http://www.symfony.com/doc/current/book/validation.html#supported-constraints'),
             array('http://very.long.domain.name.com/'),
-            //array('http://localhost/') OK as of 2.5
+            array('http://localhost/'),
             array('http://127.0.0.1/'),
             array('http://127.0.0.1:80/'),
             array('http://[::1]/'),
@@ -120,6 +126,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$url.'"')
+            ->setCode(Url::INVALID_URL_ERROR)
             ->assertRaised();
     }
 

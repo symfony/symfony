@@ -11,10 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Tests\Node;
 
-use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 
-class SearchAndRenderBlockNodeTest extends TestCase
+class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 {
     public function testCompileWidget()
     {
@@ -264,10 +263,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     protected function getVariableGetter($name)
     {
-        if (PHP_VERSION_ID >= 50400) {
-            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
-        }
-
-        return sprintf('$this->getContext($context, "%s")', $name);
+        return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
     }
 }

@@ -1,0 +1,6 @@
+<info>[container]</info> Tagged services
+<info>[tag]</info> tag1
+definition_2
+
+<info>[tag]</info> tag2
+definition_2

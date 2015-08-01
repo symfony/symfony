@@ -17,8 +17,8 @@ use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
@@ -36,7 +36,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));
-        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
+        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
 
         $this->extension = new FormExtension($renderer);
 
@@ -65,7 +65,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -80,7 +80,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -95,7 +95,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingDynamicExtend()
     {
         $view = $this->factory
-            ->createNamed('name', 'email')
+            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
             ->createView()
         ;
 
@@ -106,17 +106,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function isSelectedChoiceProvider()
     {
-        // The commented cases should not be necessary anymore, because the
-        // choice lists should assure that both values passed here are always
-        // strings
         return array(
-//             array(true, 0, 0),
             array(true, '0', '0'),
             array(true, '1', '1'),
-//             array(true, false, 0),
-//             array(true, true, 1),
             array(true, '', ''),
-//             array(true, null, ''),
             array(true, '1.23', '1.23'),
             array(true, 'foo', 'foo'),
             array(true, 'foo10', 'foo10'),
@@ -140,11 +133,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())

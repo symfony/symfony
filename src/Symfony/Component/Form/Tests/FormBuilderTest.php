@@ -67,21 +67,21 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddIsFluent()
     {
-        $builder = $this->builder->add('foo', 'text', array('bar' => 'baz'));
+        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', array('bar' => 'baz'));
         $this->assertSame($builder, $this->builder);
     }
 
     public function testAdd()
     {
         $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->assertTrue($this->builder->has('foo'));
     }
 
     public function testAddIntegerName()
     {
         $this->assertFalse($this->builder->has(0));
-        $this->builder->add(0, 'text');
+        $this->builder->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->assertTrue($this->builder->has(0));
     }
 
@@ -89,13 +89,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'text')
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType')
             ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
 
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
 
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $children = $this->builder->all();
 
         $this->assertTrue($this->builder->has('foo'));
@@ -108,9 +108,9 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaintainOrderOfLazyAndExplicitChildren()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->add($this->getFormBuilder('bar'));
-        $this->builder->add('baz', 'text');
+        $this->builder->add('baz', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
         $children = $this->builder->all();
 
@@ -126,7 +126,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testRemove()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $this->assertFalse($this->builder->has('foo'));
     }
@@ -140,7 +140,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     // https://github.com/symfony/symfony/pull/4826
     public function testRemoveAndGetForm()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
@@ -150,7 +150,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'text', null, array())
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array())
         ;
 
         $this->builder->create('foo');
@@ -170,7 +170,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExplicitType()
     {
-        $expectedType = 'text';
+        $expectedType = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 

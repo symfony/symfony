@@ -63,12 +63,18 @@ table th, table td {
     font-size: 12px;
     padding: 8px 10px;
 }
+table td em {
+    color: #aaa;
+}
 fieldset {
     border: none;
 }
 abbr {
     border-bottom: 1px dotted #000;
     cursor: help;
+}
+pre, code {
+    font-size: 0.9em;
 }
 .clear {
     clear: both;
@@ -164,6 +170,10 @@ abbr {
     margin-left: 250px;
     padding: 30px 40px 40px;
 }
+#collector-content pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
 #navigation {
     float: left;
     width: 250px;
@@ -199,14 +209,15 @@ li {
 #resume {
     background-color: #f6f6f6;
     border-bottom: 1px solid #dfdfdf;
-    padding: 18px 10px 0px;
+    padding: 18px 10px 14px;
     margin-left: 250px;
-    height: 34px;
+    min-height: 20px;
     color: #313131;
     font-size: 12px;
     border-top-right-radius: 16px;
+    line-height: 18px;
 }
-a#resume-view-all {
+a#resume-view-all, a#resume-view-latest {
     display: inline-block;
     padding: 0.2em 0.7em;
     margin-right: 0.5em;
@@ -215,6 +226,11 @@ a#resume-view-all {
     color: white;
     font-weight: bold;
     text-decoration: none;
+    line-height: 14px;
+}
+#resume-url {
+    word-wrap: break-word;
+    word-break: break-all;
 }
 table th.value {
     width: 450px;
@@ -264,6 +280,9 @@ ul.alt li.error {
 ul.alt li.warning {
     background-color: #ffcc00;
     margin-bottom: 1px;
+}
+ul.alt li.scream, ul.alt li.scream strong {
+    color: gray;
 }
 ul.sf-call-stack li {
     text-size: small;
@@ -381,9 +400,9 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
+.collapsed-menu span.label > :not(.icon) {
     display: none !important;
 }
-.collapsed-menu span.icon img {
-    display: inline !important;
+.collapsed-menu #minimizePanelIcon {
+    transform: rotate(180deg);
 }

@@ -1,0 +1,43 @@
+{
+    "name": "symfony/debug-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony DebugBundle",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/twig-bridge": "~2.8|~3.0",
+        "symfony/var-dumper": "~2.8|~3.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/web-profiler-bundle": "~2.8|~3.0"
+    },
+    "suggest": {
+        "symfony/config": "For service container configuration",
+        "symfony/dependency-injection": "For using as a service from the container"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev"
+        }
+    }
+}

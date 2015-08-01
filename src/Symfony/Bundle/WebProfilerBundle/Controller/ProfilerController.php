@@ -11,13 +11,13 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -90,6 +90,10 @@ class ProfilerController
 
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
+
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+            $token = $latest['token'];
+        }
 
         if (!$profile = $this->profiler->loadProfile($token)) {
             return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
@@ -203,6 +207,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
             'token' => $token,
+            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
         )), 200, array('Content-Type' => 'text/html'));
     }
 
@@ -241,15 +246,20 @@ class ProfilerController
             $token = $session->get('_profiler_search_token');
         }
 
-        return new Response($this->twig->render('@WebProfiler/Profiler/search.html.twig', array(
-            'token' => $token,
-            'ip' => $ip,
-            'method' => $method,
-            'url' => $url,
-            'start' => $start,
-            'end' => $end,
-            'limit' => $limit,
-        )), 200, array('Content-Type' => 'text/html'));
+        return new Response(
+            $this->twig->render('@WebProfiler/Profiler/search.html.twig', array(
+                'token' => $token,
+                'ip' => $ip,
+                'method' => $method,
+                'url' => $url,
+                'start' => $start,
+                'end' => $end,
+                'limit' => $limit,
+                'request' => $request,
+            )),
+            200,
+            array('Content-Type' => 'text/html')
+        );
     }
 
     /**

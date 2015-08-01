@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\DebuggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Loader is the base class for all template loader classes.
@@ -20,15 +20,18 @@ use Symfony\Component\Templating\DebuggerInterface;
  */
 abstract class Loader implements LoaderInterface
 {
-    protected $debugger;
+    /**
+     * @var LoggerInterface|null
+     */
+    protected $logger;
 
     /**
-     * Sets the debugger to use for this loader.
+     * Sets the debug logger to use for this loader.
      *
-     * @param DebuggerInterface $debugger A debugger instance
+     * @param LoggerInterface $logger A logger instance
      */
-    public function setDebugger(DebuggerInterface $debugger)
+    public function setLogger(LoggerInterface $logger)
     {
-        $this->debugger = $debugger;
+        $this->logger = $logger;
     }
 }

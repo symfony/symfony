@@ -24,9 +24,12 @@ namespace Symfony\Component\Console\Input;
  */
 abstract class Input implements InputInterface
 {
+    /**
+     * @var InputDefinition
+     */
     protected $definition;
-    protected $options;
-    protected $arguments;
+    protected $options = array();
+    protected $arguments = array();
     protected $interactive = true;
 
     /**
@@ -37,8 +40,6 @@ abstract class Input implements InputInterface
     public function __construct(InputDefinition $definition = null)
     {
         if (null === $definition) {
-            $this->arguments = array();
-            $this->options = array();
             $this->definition = new InputDefinition();
         } else {
             $this->bind($definition);

@@ -30,11 +30,26 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
+    const HEADER_FORWARDED = 'forwarded';
     const HEADER_CLIENT_IP = 'client_ip';
     const HEADER_CLIENT_HOST = 'client_host';
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT = 'client_port';
 
+    const METHOD_HEAD = 'HEAD';
+    const METHOD_GET = 'GET';
+    const METHOD_POST = 'POST';
+    const METHOD_PUT = 'PUT';
+    const METHOD_PATCH = 'PATCH';
+    const METHOD_DELETE = 'DELETE';
+    const METHOD_PURGE = 'PURGE';
+    const METHOD_OPTIONS = 'OPTIONS';
+    const METHOD_TRACE = 'TRACE';
+    const METHOD_CONNECT = 'CONNECT';
+
+    /**
+     * @var string[]
+     */
     protected static $trustedProxies = array();
 
     /**
@@ -51,10 +66,13 @@ class Request
      * Names for headers that can be trusted when
      * using trusted proxies.
      *
-     * The default names are non-standard, but widely used
+     * The FORWARDED header is the standard as of rfc7239.
+     *
+     * The other headers are non-standard, but widely used
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
      */
     protected static $trustedHeaders = array(
+        self::HEADER_FORWARDED => 'FORWARDED',
         self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
         self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
         self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
@@ -144,6 +162,11 @@ class Request
     /**
      * @var array
      */
+    protected $encodings;
+
+    /**
+     * @var array
+     */
     protected $acceptableContentTypes;
 
     /**
@@ -196,6 +219,8 @@ class Request
      */
     protected static $formats;
 
+    protected static $requestFactory;
+
     /**
      * Constructor.
      *
@@ -242,6 +267,7 @@ class Request
         $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
+        $this->encodings = null;
         $this->acceptableContentTypes = null;
         $this->pathInfo = null;
         $this->requestUri = null;
@@ -273,7 +299,7 @@ class Request
             }
         }
 
-        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $server);
+        $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $server);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
@@ -392,7 +418,21 @@ class Request
         $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
 
-        return new static($query, $request, array(), $cookies, $files, $server, $content);
+        return self::createRequestFromFactory($query, $request, array(), $cookies, $files, $server, $content);
+    }
+
+    /**
+     * Sets a callable able to create a Request instance.
+     *
+     * This is mainly useful when you need to override the Request class
+     * to keep BC with an existing system. It should not be used for any
+     * other purpose.
+     *
+     * @param callable|null $callable A PHP callable
+     */
+    public static function setFactory($callable)
+    {
+        self::$requestFactory = $callable;
     }
 
     /**
@@ -433,6 +473,7 @@ class Request
         }
         $dup->languages = null;
         $dup->charsets = null;
+        $dup->encodings = null;
         $dup->acceptableContentTypes = null;
         $dup->pathInfo = null;
         $dup->requestUri = null;
@@ -795,24 +836,26 @@ class Request
      */
     public function getClientIps()
     {
+        $clientIps = array();
         $ip = $this->server->get('REMOTE_ADDR');
 
         if (!$this->isFromTrustedProxy()) {
             return array($ip);
         }
 
-        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return array($ip);
+        if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
+            $forwardedHeader = $this->headers->get(self::$trustedHeaders[self::HEADER_FORWARDED]);
+            preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
+            $clientIps = $matches[3];
+        } elseif (self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         }
 
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
-
         $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
 
-        // Eliminate all IPs from the forwarded IP chain which are trusted proxies
         foreach ($clientIps as $key => $clientIp) {
-            // Remove port on IPv4 address (unfortunately, it does happen)
+            // Remove port (unfortunately, it does happen)
             if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
                 $clientIps[$key] = $clientIp = $match[1];
             }
@@ -1110,6 +1153,61 @@ class Request
     }
 
     /**
+     * Returns the path as relative reference from the current Request path.
+     *
+     * Only the URIs path component (no schema, host etc.) is relevant and must be given.
+     * Both paths must be absolute and not contain relative parts.
+     * Relative URLs from one resource to another are useful when generating self-contained downloadable document archives.
+     * Furthermore, they can be used to reduce the link size in documents.
+     *
+     * Example target paths, given a base path of "/a/b/c/d":
+     * - "/a/b/c/d"     -> ""
+     * - "/a/b/c/"      -> "./"
+     * - "/a/b/"        -> "../"
+     * - "/a/b/c/other" -> "other"
+     * - "/a/x/y"       -> "../../x/y"
+     *
+     * @param string $path The target path
+     *
+     * @return string The relative target path
+     */
+    public function getRelativeUriForPath($path)
+    {
+        // be sure that we are dealing with an absolute path
+        if (!isset($path[0]) || '/' !== $path[0]) {
+            return $path;
+        }
+
+        if ($path === $basePath = $this->getPathInfo()) {
+            return '';
+        }
+
+        $sourceDirs = explode('/', isset($basePath[0]) && '/' === $basePath[0] ? substr($basePath, 1) : $basePath);
+        $targetDirs = explode('/', isset($path[0]) && '/' === $path[0] ? substr($path, 1) : $path);
+        array_pop($sourceDirs);
+        $targetFile = array_pop($targetDirs);
+
+        foreach ($sourceDirs as $i => $dir) {
+            if (isset($targetDirs[$i]) && $dir === $targetDirs[$i]) {
+                unset($sourceDirs[$i], $targetDirs[$i]);
+            } else {
+                break;
+            }
+        }
+
+        $targetDirs[] = $targetFile;
+        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
+
+        // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
+        // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
+        // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
+        // (see http://tools.ietf.org/html/rfc3986#section-4.2).
+        return !isset($path[0]) || '/' === $path[0]
+            || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
+            ? "./$path" : $path;
+    }
+
+    /**
      * Generates the normalized query string for the Request.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized
@@ -1190,7 +1288,7 @@ class Request
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
-            throw new \UnexpectedValueException('Invalid Host "'.$host.'"');
+            throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1208,7 +1306,7 @@ class Request
                 }
             }
 
-            throw new \UnexpectedValueException('Untrusted Host "'.$host.'"');
+            throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
         }
 
         return $host;
@@ -1618,6 +1716,20 @@ class Request
     }
 
     /**
+     * Gets a list of encodings acceptable by the client browser.
+     *
+     * @return array List of encodings in preferable order
+     */
+    public function getEncodings()
+    {
+        if (null !== $this->encodings) {
+            return $this->encodings;
+        }
+
+        return $this->encodings = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all());
+    }
+
+    /**
      * Gets a list of content types acceptable by the client browser.
      *
      * @return array List of content types in preferable order
@@ -1838,6 +1950,7 @@ class Request
             'rdf' => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),
             'rss' => array('application/rss+xml'),
+            'form' => array('application/x-www-form-urlencoded'),
         );
     }
 
@@ -1881,6 +1994,21 @@ class Request
         }
 
         return false;
+    }
+
+    private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    {
+        if (self::$requestFactory) {
+            $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
+
+            if (!$request instanceof Request) {
+                throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
+            }
+
+            return $request;
+        }
+
+        return new static($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
     private function isFromTrustedProxy()

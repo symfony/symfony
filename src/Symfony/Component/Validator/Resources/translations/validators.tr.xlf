@@ -175,7 +175,7 @@
                 <target>Resmin yüksekliği çok küçük ({{ height }}px). En az {{ min_height }}px olmalıdır.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Bu değer kullanıcının şu anki şifresi olmalıdır.</target>
             </trans-unit>
             <trans-unit id="48">

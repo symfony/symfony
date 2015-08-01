@@ -11,6 +11,10 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
     - Symfony\Component\Validator\Tests\Fixtures\ConstraintA: ~
     # Custom constraint with namespaces prefix
     - "custom:ConstraintB": ~
+    # Callbacks
+    - Callback: validateMe
+    - Callback: validateMeStatic
+    - Callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
 
   properties:
     firstName:
@@ -49,6 +53,10 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
   getters:
     lastName:
       - NotNull: ~
+    valid:
+      - "IsTrue": ~
+    permissions:
+      - "IsTrue": ~
 
 Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity:
   group_sequence_provider: true

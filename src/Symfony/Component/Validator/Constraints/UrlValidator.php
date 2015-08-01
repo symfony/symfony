@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -43,6 +44,10 @@ class UrlValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Url) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Url');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -55,9 +60,37 @@ class UrlValidator extends ConstraintValidator
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::INVALID_URL_ERROR)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::INVALID_URL_ERROR)
+                    ->addViolation();
+            }
+
+            return;
+        }
+
+        if ($constraint->checkDNS) {
+            $host = parse_url($value, PHP_URL_HOST);
+
+            if (!checkdnsrr($host, 'ANY')) {
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($constraint->dnsMessage)
+                        ->setParameter('{{ value }}', $this->formatValue($host))
+                        ->setCode(Url::INVALID_URL_ERROR)
+                        ->addViolation();
+                } else {
+                    $this->buildViolation($constraint->dnsMessage)
+                        ->setParameter('{{ value }}', $this->formatValue($host))
+                        ->setCode(Url::INVALID_URL_ERROR)
+                        ->addViolation();
+                }
+            }
         }
     }
 }

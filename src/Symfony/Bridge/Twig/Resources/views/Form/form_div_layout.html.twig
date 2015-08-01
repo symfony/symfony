@@ -44,20 +44,20 @@
 
 {%- block choice_widget_expanded -%}
     <div {{ block('widget_container_attributes') }}>
-    {% for child in form %}
+    {%- for child in form %}
         {{- form_widget(child) -}}
-        {{- form_label(child) -}}
-    {% endfor %}
+        {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
+    {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded -%}
 
 {%- block choice_widget_collapsed -%}
-    {%- if required and empty_value is none and not empty_value_in_choices and not multiple -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple -%}
         {% set required = false %}
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-        {%- if empty_value is not none -%}
-            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value != '' ? empty_value|trans({}, translation_domain) }}</option>
+        {%- if placeholder is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? placeholder|trans({}, translation_domain) }}</option>
         {%- endif -%}
         {%- if preferred_choices|length > 0 -%}
             {% set options = preferred_choices %}
@@ -74,12 +74,13 @@
 {%- block choice_widget_options -%}
     {% for group_label, choice in options %}
         {%- if choice is iterable -%}
-            <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+            <optgroup label="{{ choice_translation_domain is sameas(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
                 {% set options = choice %}
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
-            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            {% set attr = choice.attr %}
+            <option value="{{ choice.value }}" {{ block('attributes') }}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is sameas(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</option>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}
@@ -137,8 +138,8 @@
 {%- endblock number_widget -%}
 
 {%- block integer_widget -%}
-    {% set type = type|default('number') %}
-    {{- block('form_widget_simple') -}}
+    {%- set type = type|default('number') -%}
+    {{ block('form_widget_simple') }}
 {%- endblock integer_widget -%}
 
 {%- block money_widget -%}
@@ -175,9 +176,21 @@
     {{ block('form_widget_simple') }}
 {%- endblock email_widget -%}
 
+{%- block range_widget -%}
+    {% set type = type|default('range') %}
+    {{- block('form_widget_simple') -}}
+{%- endblock range_widget %}
+
 {%- block button_widget -%}
     {%- if label is empty -%}
-        {% set label = name|humanize %}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
     {%- endif -%}
     <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
 {%- endblock button_widget -%}
@@ -195,17 +208,24 @@
 {# Labels #}
 
 {%- block form_label -%}
-    {% if label is not sameas(false) %}
-        {%- if not compound -%}
+    {% if label is not sameas(false) -%}
+        {% if not compound -%}
             {% set label_attr = label_attr|merge({'for': id}) %}
-        {%- endif -%}
-        {%- if required -%}
+        {%- endif %}
+        {% if required -%}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif %}
+        {% if label is empty -%}
+            {%- if label_format is not empty -%}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {%- else -%}
+                {% set label = name|humanize %}
+            {%- endif -%}
         {%- endif -%}
-        {%- if label is empty -%}
-            {% set label = name|humanize %}
-        {%- endif -%}
-        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ translation_domain is sameas(false) ? label : label|trans({}, translation_domain) }}</label>
     {%- endif -%}
 {%- endblock form_label -%}
 
@@ -254,7 +274,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form method="{{ form_method|lower }}" action="{{ action }}"{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form name="{{ name }}" method="{{ form_method|lower }}" action="{{ action }}"{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
@@ -267,10 +287,6 @@
     </form>
 {%- endblock form_end -%}
 
-{%- block form_enctype -%}
-    {% if multipart %}enctype="multipart/form-data"{% endif %}
-{%- endblock form_enctype -%}
-
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
     <ul>
@@ -282,32 +298,74 @@
 {%- endblock form_errors -%}
 
 {%- block form_rest -%}
-    {%- for child in form -%}
-        {%- if not child.rendered -%}
-            {{ form_row(child) }}
-        {%- endif -%}
-    {%- endfor -%}
-{%- endblock form_rest -%}
+    {% for child in form -%}
+        {% if not child.rendered %}
+            {{- form_row(child) -}}
+        {% endif %}
+    {%- endfor %}
+{% endblock form_rest %}
 
 {# Support #}
 
 {%- block form_rows -%}
-    {%- for child in form -%}
-        {{ form_row(child) }}
-    {%- endfor -%}
+    {% for child in form %}
+        {{- form_row(child) -}}
+    {% endfor %}
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
-    {%- for attrname, attrvalue in attr %} {% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{%- endfor -%}
+    id="{{ id }}" name="{{ full_name }}"
+    {%- if disabled %} disabled="disabled"{% endif -%}
+    {%- if required %} required="required"{% endif -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+        {%- elseif attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
 {%- endblock widget_attributes -%}
 
 {%- block widget_container_attributes -%}
-    {% if id is not empty %}id="{{ id }}" {% endif %}
-    {%- for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {%- endfor -%}
+    {%- if id is not empty %}id="{{ id }}"{% endif -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+        {%- elseif attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
 {%- endblock widget_container_attributes -%}
 
 {%- block button_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif %}
-    {%- for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{%- endfor -%}
+    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+        {%- elseif attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
 {%- endblock button_attributes -%}
+
+{% block attributes -%}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {%- if attrname in ['placeholder', 'title'] -%}
+            {{- attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+        {%- elseif attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{%- endblock attributes -%}

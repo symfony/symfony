@@ -63,9 +63,20 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services14.dot')), $dumper->dump(), '->dump() dumps services');
     }
 
+    public function testDumpWithUnresolvedParameter()
+    {
+        $container = include self::$fixturesPath.'/containers/container17.php';
+        $dumper = new GraphvizDumper($container);
+
+        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services17.dot')), $dumper->dump(), '->dump() dumps services');
+    }
+
+    /**
+     * @group legacy
+     */
     public function testDumpWithScopes()
     {
-        $container = include self::$fixturesPath.'/containers/container18.php';
+        $container = include self::$fixturesPath.'/containers/legacy-container18.php';
         $dumper = new GraphvizDumper($container);
         $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services18.dot')), $dumper->dump(), '->dump() dumps services');
     }

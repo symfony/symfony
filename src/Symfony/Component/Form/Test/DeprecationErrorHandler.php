@@ -20,7 +20,7 @@ class DeprecationErrorHandler
 {
     public static function handle($errorNumber, $message, $file, $line, $context)
     {
-        if ($errorNumber & E_USER_DEPRECATED) {
+        if ($errorNumber & ~E_USER_DEPRECATED) {
             return true;
         }
 
@@ -29,7 +29,7 @@ class DeprecationErrorHandler
 
     public static function handleBC($errorNumber, $message, $file, $line, $context)
     {
-        if ($errorNumber & E_USER_DEPRECATED) {
+        if ($errorNumber & ~E_USER_DEPRECATED) {
             return true;
         }
 

@@ -23,7 +23,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * @var EngineInterface[]
      */
-    protected $engines;
+    protected $engines = array();
 
     /**
      * Constructor.
@@ -34,7 +34,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      */
     public function __construct(array $engines = array())
     {
-        $this->engines = array();
         foreach ($engines as $engine) {
             $this->addEngine($engine);
         }
@@ -106,7 +105,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * Get an engine able to render the given template.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return EngineInterface The engine
      *
@@ -114,7 +113,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @api
      */
-    protected function getEngine($name)
+    public function getEngine($name)
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($name)) {

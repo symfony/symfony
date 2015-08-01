@@ -35,7 +35,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
         ));
-        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
+        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
 
         $this->extension = new FormExtension($renderer);
 
@@ -62,11 +62,6 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())

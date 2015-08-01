@@ -41,7 +41,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage The command name cannot be empty.
+     * @expectedExceptionMessage The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.
      */
     public function testCommandNameCannotBeEmpty()
     {
@@ -154,8 +154,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new \TestCommand();
         $command->addOption('foo');
-        $command->addArgument('foo');
-        $this->assertEquals('namespace:name [--foo] [foo]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+        $command->addArgument('bar');
+        $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
     public function testGetHelper()
@@ -284,6 +284,29 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
     }
 
+    public function getSetCodeBindToClosureTests()
+    {
+        return array(
+            array(true, 'not bound to the command'),
+            array(false, 'bound to the command'),
+        );
+    }
+
+    /** @dataProvider getSetCodeBindToClosureTests */
+    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    {
+        $code = createClosure();
+        if ($previouslyBound) {
+            $code = $code->bindTo($this);
+        }
+
+        $command = new \TestCommand();
+        $command->setCode($code);
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertEquals('interact called'.PHP_EOL.$expected.PHP_EOL, $tester->getDisplay());
+    }
+
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
@@ -308,32 +331,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $output->writeln('from the code...');
     }
+}
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsText()
+// In order to get an unbound closure, we should create it outside a class
+// scope.
+function createClosure()
+{
+    return function(InputInterface $input, OutputInterface $output)
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
-
-        $command = new \TestCommand();
-        $command->setApplication(new Application());
-        $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getName()));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/command_astext.txt', $command->asText(), '->asText() returns a text representation of the command');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsXml()
-    {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
-
-        $command = new \TestCommand();
-        $command->setApplication(new Application());
-        $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getName()));
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
-    }
+        $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+    };
 }

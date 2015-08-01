@@ -58,6 +58,25 @@ class ScalarNodeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNormalizeThrowsExceptionWithoutHint()
+    {
+        $node = new ScalarNode('test');
+
+        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidTypeException', 'Invalid type for path "test". Expected scalar, but got array.');
+
+        $node->normalize(array());
+    }
+
+    public function testNormalizeThrowsExceptionWithErrorMessage()
+    {
+        $node = new ScalarNode('test');
+        $node->setInfo('"the test value"');
+
+        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidTypeException', "Invalid type for path \"test\". Expected scalar, but got array.\nHint: \"the test value\"");
+
+        $node->normalize(array());
+    }
+
     /**
      * @dataProvider getValidNonEmptyValues
      *

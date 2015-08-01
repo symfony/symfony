@@ -19,7 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
- * debugging tools such as the container:debug console command.
+ * debugging tools such as the debug:container console command.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  * @author Fabien Potencier <fabien@symfony.com>

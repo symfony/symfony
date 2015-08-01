@@ -21,7 +21,9 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -48,24 +50,27 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * @var BundleInterface[]
      */
-    protected $bundles;
+    protected $bundles = array();
 
     protected $bundleMap;
     protected $container;
     protected $rootDir;
     protected $environment;
     protected $debug;
-    protected $booted;
+    protected $booted = false;
     protected $name;
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.3.32-DEV';
-    const VERSION_ID = '20332';
-    const MAJOR_VERSION = '2';
-    const MINOR_VERSION = '3';
-    const RELEASE_VERSION = '32';
+    const VERSION = '3.0.0-DEV';
+    const VERSION_ID = '30000';
+    const MAJOR_VERSION = '3';
+    const MINOR_VERSION = '0';
+    const RELEASE_VERSION = '0';
     const EXTRA_VERSION = 'DEV';
+
+    const END_OF_MAINTENANCE = '05/2018';
+    const END_OF_LIFE = '05/2019';
 
     /**
      * Constructor.
@@ -79,23 +84,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $this->environment = $environment;
         $this->debug = (bool) $debug;
-        $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
-        $this->bundles = array();
 
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
-
-        $this->init();
-    }
-
-    /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
-     */
-    public function init()
-    {
     }
 
     public function __clone()
@@ -171,6 +165,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundle->setContainer(null);
         }
 
+        if ($this->container instanceof ResettableContainerInterface) {
+            $this->container->reset();
+        }
+
         $this->container = null;
     }
 
@@ -206,22 +204,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getBundles()
     {
         return $this->bundles;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function isClassInActiveBundle($class)
-    {
-        foreach ($this->getBundles() as $bundle) {
-            if (0 === strpos($class, $bundle->getNamespace())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -537,7 +519,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $fresh = false;
         }
 
-        require_once $cache;
+        require_once $cache->getPath();
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
@@ -683,10 +665,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $dumper = new PhpDumper($container);
 
         if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')) {
-            $dumper->setProxyDumper(new ProxyDumper(md5((string) $cache)));
+            $dumper->setProxyDumper(new ProxyDumper(md5($cache->getPath())));
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => (string) $cache));
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));
         if (!$this->debug) {
             $content = static::stripComments($content);
         }
@@ -709,6 +691,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
             new PhpFileLoader($container, $locator),
+            new DirectoryLoader($container, $locator),
             new ClosureLoader($container),
         ));
 

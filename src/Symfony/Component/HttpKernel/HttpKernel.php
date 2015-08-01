@@ -16,11 +16,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -35,19 +37,22 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     protected $dispatcher;
     protected $resolver;
+    protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
+     * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
+     * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack A stack for master/sub requests
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
+        $this->requestStack = $requestStack ?: new RequestStack();
     }
 
     /**
@@ -57,10 +62,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        $request->headers->set('X-Php-Ob-Level', ob_get_level());
+
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
             if (false === $catch) {
+                $this->finishRequest($request, $type);
+
                 throw $e;
             }
 
@@ -79,6 +88,25 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
+     * @throws \LogicException If the request stack is empty
+     *
+     * @internal
+     */
+    public function terminateWithException(\Exception $exception)
+    {
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            throw new \LogicException('Request stack is empty', 0, $exception);
+        }
+
+        $response = $this->handleException($exception, $request, self::MASTER_REQUEST);
+
+        $response->sendHeaders();
+        $response->sendContent();
+
+        $this->terminate($request, $response);
+    }
+
+    /**
      * Handles a request to convert it to a response.
      *
      * Exceptions are not caught.
@@ -93,6 +121,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
+        $this->requestStack->push($request);
+
         // request
         $event = new GetResponseEvent($this, $request, $type);
         $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
@@ -103,7 +133,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // load controller
         if (false === $controller = $this->resolver->getController($request)) {
-            throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". The route is wrongly configured.', $request->getPathInfo()));
         }
 
         $event = new FilterControllerEvent($this, $controller, $request, $type);
@@ -156,7 +186,25 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
+        $this->finishRequest($request, $type);
+
         return $event->getResponse();
+    }
+
+    /**
+     * Publishes the finish request event, then pop the request from the stack.
+     *
+     * Note that the order of the operations is important here, otherwise
+     * operations such as {@link RequestStack::getParentRequest()} can lead to
+     * weird results.
+     *
+     * @param Request $request
+     * @param int     $type
+     */
+    private function finishRequest(Request $request, $type)
+    {
+        $this->dispatcher->dispatch(KernelEvents::FINISH_REQUEST, new FinishRequestEvent($this, $request, $type));
+        $this->requestStack->pop();
     }
 
     /**
@@ -179,6 +227,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $e = $event->getException();
 
         if (!$event->hasResponse()) {
+            $this->finishRequest($request, $type);
+
             throw $e;
         }
 

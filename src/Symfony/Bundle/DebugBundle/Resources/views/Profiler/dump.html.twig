@@ -1,0 +1,103 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set dumps_count = collector.dumpsCount %}
+
+    {% if dumps_count %}
+        {% set icon %}
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" height="24" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+                <path fill="#AAAAAA" d="M12,22.6c-5.8,0-10.5-4.7-10.5-10.5C1.5,6.3,6.2,1.5,12,1.5s10.5,4.7,10.5,10.5C22.5,17.9,17.8,22.6,12,22.6z M12,4.5c-4.2,0-7.5,3.4-7.5,7.5c0,4.2,3.4,7.5,7.5,7.5s7.5-3.4,7.5-7.5C19.5,7.9,16.2,4.5,12,4.5z"/>
+                <path fill="#AAAAAA" d="M12,9.1c-0.8,0-1.5-0.7-1.5-1.5v-6c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v6C13.5,8.4,12.8,9.1,12,9.1zM13.5,22.4v-6c0-0.8-0.7-1.5-1.5-1.5s-1.5,0.7-1.5,1.5v6c0,0.8,0.7,1.5,1.5,1.5S13.5,23.2,13.5,22.4z M23.9,12c0-0.8-0.7-1.5-1.5-1.5h-6c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h6C23.2,13.5,23.9,12.8,23.9,12z M9.1,12c0-0.8-0.7-1.5-1.5-1.5h-6c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h6C8.4,13.5,9.1,12.8,9.1,12z"/>
+            </svg>
+            <span class="sf-toolbar-value">{{ dumps_count }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% for dump in collector.getDumps('html') %}
+                <div class="sf-toolbar-info-piece">
+                    <span>
+                    {% if dump.file %}
+                        {% set link = dump.file|file_link(dump.line) %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                        {% else %}
+                            <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                        {% endif %}
+                    {% else %}
+                        {{ dump.name }}
+                    {% endif %}
+                    </span>
+                    <span class="sf-toolbar-file-line">line {{ dump.line }}</span>
+                    {{ dump.data|raw }}
+                </div>
+            {% endfor %}
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">
+        {{- "" -}}
+        <svg width="28" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 28 28" enable-background="new 0 0 28 28" xml:space="preserve"><path fill="#3F3F3F" d="M28 13h-1.1C26.5 6.6 21.4 1.5 15 1.1V0h-2v1.1C6.6 1.5 1.5 6.6 1.1 13H0v2h1.1C1.5 21.4 6.6 26.5 13 26.9 V28h2v-1.1c6.4-0.5 11.5-5.6 11.9-11.9H28V13z M15 24.9V19h-2v5.9c-5.3-0.5-9.5-4.7-9.9-9.9H9v-2H3.1C3.5 7.7 7.7 3.5 13 3.1V9h2 V3.1c5.3 0.5 9.5 4.7 9.9 9.9H19v2h5.9C24.5 20.3 20.3 24.5 15 24.9z"/></svg>
+        {{- "" -}}
+        </span>
+        <strong>dump()</strong>
+        <span class="count">
+            <span>{{ collector.dumpsCount }}</span>
+        </span>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>dump()</h2>
+
+    <style>
+        li.sf-dump {
+            list-style-type: disc;
+        }
+        .sf-dump ol>li {
+            padding: 0;
+        }
+        .sf-dump a {
+            cursor: pointer;
+        }
+        .sf-dump-compact {
+            display: none;
+        }
+    </style>
+
+    {% if collector.dumpsCount %}
+        <ul class="alt">
+            {% for dump in collector.getDumps('html') %}
+            <li class="sf-dump sf-reset">
+                in
+                {% if dump.line %}
+                    {% set link = dump.file|file_link(dump.line) %}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                    {% else %}
+                        <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                    {% endif %}
+                {% else %}
+                    {{ dump.name }}
+                {% endif %}
+                line {{ dump.line }}:
+                <a onclick="var s = this.nextElementSibling; if ('sf-dump-compact' == s.className) {this.innerHTML = '&#9660;'; s.className = 'sf-dump-expanded';} else {this.innerHTML = '&#9654;'; s.className = 'sf-dump-compact';}">&#9654;</a>
+                <span class="sf-dump-compact">
+                {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
+                </span>
+
+                {{ dump.data|raw }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            <em>No dumped variable</em>
+        </p>
+    {% endif %}
+{% endblock %}

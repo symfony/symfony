@@ -79,6 +79,19 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isCacheable());
     }
 
+    public function testIsCacheableWithErrorCode()
+    {
+        $response = new Response('', 500);
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithNoStoreDirective()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'private');
+        $this->assertFalse($response->isCacheable());
+    }
+
     public function testIsCacheableWithSetTtl()
     {
         $response = new Response();
@@ -468,10 +481,45 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('foo');
         $request = Request::create('/', 'HEAD');
 
+        $length = 12345;
+        $response->headers->set('Content-Length', $length);
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
-        $this->assertTrue($response->headers->has('Content-Type'));
+        $this->assertEquals($length, $response->headers->get('Content-Length'), 'Content-Length should be as if it was GET; see RFC2616 14.13');
+    }
+
+    public function testPrepareRemovesContentForInformationalResponse()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->setContent('content');
+        $response->setStatusCode(101);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+        $this->assertFalse($response->headers->has('Content-Type'));
+        $this->assertFalse($response->headers->has('Content-Type'));
+
+        $response->setContent('content');
+        $response->setStatusCode(304);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+        $this->assertFalse($response->headers->has('Content-Type'));
+        $this->assertFalse($response->headers->has('Content-Length'));
+    }
+
+    public function testPrepareRemovesContentLength()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->headers->set('Content-Length', 12345);
+        $response->prepare($request);
+        $this->assertEquals(12345, $response->headers->get('Content-Length'));
+
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $response->prepare($request);
         $this->assertFalse($response->headers->has('Content-Length'));
     }
 

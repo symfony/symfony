@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Monolog\Processor;
 
 use Monolog\Processor\WebProcessor as BaseWebProcessor;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * WebProcessor override to read from the HttpFoundation's Request.
@@ -30,7 +29,7 @@ class WebProcessor extends BaseWebProcessor
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+        if ($event->isMasterRequest()) {
             $this->serverData = $event->getRequest()->server->all();
         }
     }

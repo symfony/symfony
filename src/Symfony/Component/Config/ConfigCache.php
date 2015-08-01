@@ -23,14 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigCache
+class ConfigCache implements ConfigCacheInterface
 {
     private $debug;
     private $file;
 
     /**
-     * Constructor.
-     *
      * @param string $file  The absolute cache path
      * @param bool   $debug Whether debugging is enabled or not
      */
@@ -45,7 +43,7 @@ class ConfigCache
      *
      * @return string The cache file path
      */
-    public function __toString()
+    public function getPath()
     {
         return $this->file;
     }
@@ -97,7 +95,7 @@ class ConfigCache
         $mode = 0666;
         $umask = umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, null);
+        $filesystem->dumpFile($this->file, $content);
         try {
             $filesystem->chmod($this->file, $mode, $umask);
         } catch (IOException $e) {
@@ -105,7 +103,7 @@ class ConfigCache
         }
 
         if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {

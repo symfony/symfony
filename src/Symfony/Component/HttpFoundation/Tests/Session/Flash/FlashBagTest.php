@@ -131,24 +131,4 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
             ), $this->bag->peekAll()
         );
     }
-
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Flash\FlashBag::getIterator
-     */
-    public function testGetIterator()
-    {
-        $flashes = array('hello' => 'world', 'beep' => 'boop', 'notice' => 'nope');
-        foreach ($flashes as $key => $val) {
-            $this->bag->set($key, $val);
-        }
-
-        $i = 0;
-        foreach ($this->bag as $key => $val) {
-            $this->assertEquals(array($flashes[$key]), $val);
-            ++$i;
-        }
-
-        $this->assertEquals(count($flashes), $i);
-        $this->assertCount(0, $this->bag->all());
-    }
 }

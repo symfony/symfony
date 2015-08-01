@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +47,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMElement');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
@@ -283,7 +284,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMElement');
     }
 
     public function testClear()
@@ -312,6 +313,16 @@ EOF
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
     }
 
+    public function testSlice()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
+        $this->assertNotSame($crawler->slice(), $crawler, '->slice() returns a new instance of a crawler');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler->slice(), '->slice() returns a new instance of a crawler');
+
+        $this->assertCount(3, $crawler->slice(), '->slice() does not slice the nodes in the list if any param is entered');
+        $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
+    }
+
     public function testReduce()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
@@ -333,6 +344,29 @@ EOF
             $this->fail('->attr() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
+    public function testMissingAttrValueIsNull()
+    {
+        $crawler = new Crawler();
+        $crawler->addContent('<html><div non-empty-attr="sample value" empty-attr=""></div></html>', 'text/html; charset=UTF-8');
+        $div = $crawler->filterXPath('//div');
+
+        $this->assertEquals('sample value', $div->attr('non-empty-attr'), '->attr() reads non-empty attributes correctly');
+        $this->assertEquals('', $div->attr('empty-attr'), '->attr() reads empty attributes correctly');
+        $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
+    }
+
+    public function testNodeName()
+    {
+        $this->assertEquals('li', $this->createTestCrawler()->filterXPath('//li')->nodeName(), '->nodeName() returns the node name of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->nodeName();
+            $this->fail('->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->nodeName() throws an \InvalidArgumentException if the node list is empty');
         }
     }
 
@@ -408,6 +442,55 @@ EOF
 
         $crawler = $this->createTestCrawler();
         $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+    }
+
+    public function testFilterXPathWithDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//default:entry/default:id');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterXPathWithCustomDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->setDefaultNamespacePrefix('x');
+        $crawler = $crawler->filterXPath('//x:entry/x:id');
+
+        $this->assertCount(1, $crawler, '->filterXPath() lets to override the default namespace prefix');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterXPathWithNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//yt:accessControl');
+        $this->assertCount(2, $crawler, '->filterXPath() automatically registers a namespace');
+    }
+
+    public function testFilterXPathWithMultipleNamespaces()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
+        $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterXPathWithManuallyRegisteredNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->registerNamespace('m', 'http://search.yahoo.com/mrss/');
+
+        $crawler = $crawler->filterXPath('//m:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() uses manually registered namespace');
+        $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterXPathWithAnUrl()
+    {
+        $crawler = $this->createTestXmlCrawler();
+
+        $crawler = $crawler->filterXPath('//media:category[@scheme="http://gdata.youtube.com/schemas/2007/categories.cat"]');
+        $this->assertCount(1, $crawler);
+        $this->assertSame('Music', $crawler->text());
     }
 
     public function testFilterXPathWithFakeRoot()
@@ -522,6 +605,52 @@ EOF
         $crawler = $this->createTestCrawler()->filter('ul');
 
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
+    }
+
+    public function testFilterWithDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterWithNamespace()
+    {
+        CssSelector::disableHtmlExtension();
+
+        $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
+        $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
+    }
+
+    public function testFilterWithMultipleNamespaces()
+    {
+        CssSelector::disableHtmlExtension();
+
+        $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterWithDefaultNamespaceOnly()
+    {
+        $crawler = new Crawler('<?xml version="1.0" encoding="UTF-8"?>
+            <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+                <url>
+                    <loc>http://localhost/foo</loc>
+                    <changefreq>weekly</changefreq>
+                    <priority>0.5</priority>
+                    <lastmod>2012-11-16</lastmod>
+               </url>
+               <url>
+                    <loc>http://localhost/bar</loc>
+                    <changefreq>weekly</changefreq>
+                    <priority>0.5</priority>
+                    <lastmod>2012-11-16</lastmod>
+                </url>
+            </urlset>
+        ');
+
+        $this->assertEquals(2, $crawler->filter('url')->count());
     }
 
     public function testSelectLink()
@@ -857,6 +986,13 @@ HTML;
         );
     }
 
+    public function testCountOfNestedElements()
+    {
+        $crawler = new Crawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
+
+        $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();
@@ -905,6 +1041,23 @@ HTML;
         ');
 
         return new Crawler($dom, $uri);
+    }
+
+    protected function createTestXmlCrawler($uri = null)
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+            <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+                <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+                <yt:accessControl action="comment" permission="allowed"/>
+                <yt:accessControl action="videoRespond" permission="moderated"/>
+                <media:group>
+                    <media:title type="plain">Chordates - CrashCourse Biology #24</media:title>
+                    <yt:aspectRatio>widescreen</yt:aspectRatio>
+                </media:group>
+                <media:category label="Music" scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
+            </entry>';
+
+        return new Crawler($xml, $uri);
     }
 
     protected function createDomDocument()

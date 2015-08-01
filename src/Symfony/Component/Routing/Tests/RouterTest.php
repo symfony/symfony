@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests;
 
 use Symfony\Component\Routing\Router;
+use Symfony\Component\HttpFoundation\Request;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
@@ -132,5 +133,29 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             array('cache_dir'),
             array('generator_cache_class'),
         );
+    }
+
+    public function testMatchRequestWithUrlMatcherInterface()
+    {
+        $matcher = $this->getMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
+        $matcher->expects($this->once())->method('match');
+
+        $p = new \ReflectionProperty($this->router, 'matcher');
+        $p->setAccessible(true);
+        $p->setValue($this->router, $matcher);
+
+        $this->router->matchRequest(Request::create('/'));
+    }
+
+    public function testMatchRequestWithRequestMatcherInterface()
+    {
+        $matcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
+        $matcher->expects($this->once())->method('matchRequest');
+
+        $p = new \ReflectionProperty($this->router, 'matcher');
+        $p->setAccessible(true);
+        $p->setValue($this->router, $matcher);
+
+        $this->router->matchRequest(Request::create('/'));
     }
 }

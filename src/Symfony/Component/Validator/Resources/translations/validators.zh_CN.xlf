@@ -175,7 +175,7 @@
                 <target>图片高度不够 ({{ height }}px)，最小高度为 {{ min_height }}px 。</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>该变量的值应为用户当前的密码。</target>
             </trans-unit>
             <trans-unit id="48">

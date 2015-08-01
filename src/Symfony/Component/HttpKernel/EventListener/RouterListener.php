@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -28,6 +30,11 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
+ * This listener works in 2 modes:
+ *
+ *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
+ *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterListener implements EventSubscriberInterface
@@ -36,17 +43,21 @@ class RouterListener implements EventSubscriberInterface
     private $context;
     private $logger;
     private $request;
+    private $requestStack;
 
     /**
      * Constructor.
      *
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
-     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
-     * @param LoggerInterface|null                        $logger  The logger
+     * RequestStack will become required in 3.0.
+     *
+     * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
+     * @param RequestContext|null                         $context      The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+     * @param LoggerInterface|null                        $logger       The logger
+     * @param RequestStack|null                           $requestStack A RequestStack instance
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null, RequestStack $requestStack = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -58,25 +69,26 @@ class RouterListener implements EventSubscriberInterface
 
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
 
-    /**
-     * Sets the current Request.
-     *
-     * The application should call this method whenever the Request
-     * object changes (entering a Request scope for instance, but
-     * also when leaving a Request scope -- especially when they are
-     * nested).
-     *
-     * @param Request|null $request A Request instance
-     */
-    public function setRequest(Request $request = null)
+    private function setCurrentRequest(Request $request = null)
     {
         if (null !== $request && $this->request !== $request) {
             $this->context->fromRequest($request);
         }
+
         $this->request = $request;
+    }
+
+    public function onKernelFinishRequest(FinishRequestEvent $event)
+    {
+        if (null === $this->requestStack) {
+            return; // removed when requestStack is required
+        }
+
+        $this->setCurrentRequest($this->requestStack->getParentRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -84,9 +96,12 @@ class RouterListener implements EventSubscriberInterface
         $request = $event->getRequest();
 
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        // we call setRequest even if most of the time, it has already been done to keep compatibility
+        // we call setCurrentRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        $this->setRequest($request);
+        // when we have a RequestStack, no need to do it
+        if (null !== $this->requestStack) {
+            $this->setCurrentRequest($request);
+        }
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -103,7 +118,10 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', isset($parameters['_route']) ? $parameters['_route'] : 'n/a', $this->parametersToString($parameters)));
+                $this->logger->info(sprintf('Matched route "%s".', isset($parameters['_route']) ? $parameters['_route'] : 'n/a'), array(
+                    'route_parameters' => $parameters,
+                    'request_uri' => $request->getUri(),
+                ));
             }
 
             $request->attributes->add($parameters);
@@ -111,6 +129,10 @@ class RouterListener implements EventSubscriberInterface
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
             $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
+
+            if ($referer = $request->headers->get('referer')) {
+                $message .= sprintf(' (from "%s")', $referer);
+            }
 
             throw new NotFoundHttpException($message, $e);
         } catch (MethodNotAllowedException $e) {
@@ -120,20 +142,11 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    private function parametersToString(array $parameters)
-    {
-        $pieces = array();
-        foreach ($parameters as $key => $val) {
-            $pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
-        }
-
-        return implode(', ', $pieces);
-    }
-
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
         );
     }
 }

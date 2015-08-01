@@ -72,6 +72,7 @@ class TemplateManager
     public function getTemplates(Profile $profile)
     {
         $templates = $this->getNames($profile);
+
         foreach ($templates as $name => $template) {
             $templates[$name] = $this->twig->loadTemplate($template);
         }

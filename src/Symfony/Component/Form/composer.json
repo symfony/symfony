@@ -16,31 +16,39 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/intl": "~2.3",
-        "symfony/options-resolver": "~2.1",
-        "symfony/property-access": "~2.3"
+        "php": ">=5.5.9",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/options-resolver": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.3.29",
-        "symfony/translation": "~2.0,>=2.0.5",
-        "symfony/http-foundation": "~2.2"
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0"
+    },
+    "conflict": {
+        "symfony/doctrine-bridge": "<2.7",
+        "symfony/framework-bundle": "<2.7",
+        "symfony/twig-bridge": "<2.7"
     },
     "suggest": {
-        "symfony/validator": "",
-        "symfony/http-foundation": ""
+        "symfony/validator": "For form validation.",
+        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symfony/twig-bridge": "For templating with Twig.",
+        "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form\\": "" }
+        "psr-4": { "Symfony\\Component\\Form\\": "" }
     },
-    "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

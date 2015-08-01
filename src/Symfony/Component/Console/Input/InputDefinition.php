@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Console\Input;
 
-use Symfony\Component\Console\Descriptor\TextDescriptor;
-use Symfony\Component\Console\Descriptor\XmlDescriptor;
-
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
  *
@@ -390,54 +387,52 @@ class InputDefinition
     /**
      * Gets the synopsis.
      *
+     * @param bool $short Whether to return the short version (with options folded) or not
+     *
      * @return string The synopsis
      */
-    public function getSynopsis()
+    public function getSynopsis($short = false)
     {
         $elements = array();
-        foreach ($this->getOptions() as $option) {
-            $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
-            $elements[] = sprintf('['.($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')).']', $shortcut, $option->getName());
-        }
 
-        foreach ($this->getArguments() as $argument) {
-            $elements[] = sprintf($argument->isRequired() ? '%s' : '[%s]', $argument->getName().($argument->isArray() ? '1' : ''));
+        if ($short && $this->getOptions()) {
+            $elements[] = '[options]';
+        } elseif (!$short) {
+            foreach ($this->getOptions() as $option) {
+                $value = '';
+                if ($option->acceptValue()) {
+                    $value = sprintf(
+                        ' %s%s%s',
+                        $option->isValueOptional() ? '[' : '',
+                        strtoupper($option->getName()),
+                        $option->isValueOptional() ? ']' : ''
+                    );
+                }
 
-            if ($argument->isArray()) {
-                $elements[] = sprintf('... [%sN]', $argument->getName());
+                $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
+                $elements[] = sprintf('[%s--%s%s]', $shortcut, $option->getName(), $value);
             }
         }
 
+        if (count($elements) && $this->getArguments()) {
+            $elements[] = '[--]';
+        }
+
+        foreach ($this->getArguments() as $argument) {
+            $element = '<'.$argument->getName().'>';
+            if (!$argument->isRequired()) {
+                $element = '['.$element.']';
+            } elseif ($argument->isArray()) {
+                $element = $element.' ('.$element.')';
+            }
+
+            if ($argument->isArray()) {
+                $element .= '...';
+            }
+
+            $elements[] = $element;
+        }
+
         return implode(' ', $elements);
-    }
-
-    /**
-     * Returns a textual representation of the InputDefinition.
-     *
-     * @return string A string representing the InputDefinition
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asText()
-    {
-        $descriptor = new TextDescriptor();
-
-        return $descriptor->describe($this);
-    }
-
-    /**
-     * Returns an XML representation of the InputDefinition.
-     *
-     * @param bool $asDom Whether to return a DOM or an XML string
-     *
-     * @return string|\DOMDocument An XML string representing the InputDefinition
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asXml($asDom = false)
-    {
-        $descriptor = new XmlDescriptor();
-
-        return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 }

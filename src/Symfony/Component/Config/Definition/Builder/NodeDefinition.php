@@ -25,15 +25,16 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $normalization;
     protected $validation;
     protected $defaultValue;
-    protected $default;
-    protected $required;
+    protected $default = false;
+    protected $required = false;
     protected $merge;
-    protected $allowEmptyValue;
+    protected $allowEmptyValue = true;
     protected $nullEquivalent;
-    protected $trueEquivalent;
-    protected $falseEquivalent;
+    protected $trueEquivalent = true;
+    protected $falseEquivalent = false;
+
     /**
-     * @var NodeParentInterface|NodeInterface
+     * @var NodeParentInterface|null
      */
     protected $parent;
     protected $attributes = array();
@@ -41,17 +42,13 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Constructor.
      *
-     * @param string              $name   The name of the node
-     * @param NodeParentInterface $parent The parent
+     * @param string                   $name   The name of the node
+     * @param NodeParentInterface|null $parent The parent
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
         $this->parent = $parent;
         $this->name = $name;
-        $this->default = false;
-        $this->required = false;
-        $this->trueEquivalent = true;
-        $this->falseEquivalent = false;
     }
 
     /**
@@ -110,7 +107,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return NodeParentInterface The builder of the parent node
+     * @return NodeParentInterface|null The builder of the parent node
      */
     public function end()
     {

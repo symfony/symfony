@@ -25,7 +25,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends AbstractType
 {
@@ -115,8 +115,10 @@ class DateTimeType extends AbstractType
                 'months',
                 'days',
                 'empty_value',
+                'placeholder',
                 'required',
                 'translation_domain',
+                'html5',
                 'invalid_message',
                 'invalid_message_parameters',
             )));
@@ -128,8 +130,10 @@ class DateTimeType extends AbstractType
                 'with_minutes',
                 'with_seconds',
                 'empty_value',
+                'placeholder',
                 'required',
                 'translation_domain',
+                'html5',
                 'invalid_message',
                 'invalid_message_parameters',
             )));
@@ -157,8 +161,8 @@ class DateTimeType extends AbstractType
                         'time' => $timeParts,
                     )),
                 )))
-                ->add('date', 'date', $dateOptions)
-                ->add('time', 'time', $timeOptions)
+                ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
+                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
             ;
         }
 
@@ -184,10 +188,11 @@ class DateTimeType extends AbstractType
     {
         $view->vars['widget'] = $options['widget'];
 
-        // Change the input to a HTML5 date input if
+        // Change the input to a HTML5 datetime input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
-        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+        //  * the html5 is set to true
+        if ($options['html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'datetime';
         }
     }
@@ -195,7 +200,7 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
             return $options['widget'] !== 'single_text';
@@ -222,6 +227,7 @@ class DateTimeType extends AbstractType
             'time_widget' => $timeWidget,
             'with_minutes' => true,
             'with_seconds' => false,
+            'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference' => false,
@@ -236,8 +242,9 @@ class DateTimeType extends AbstractType
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
-        $resolver->setOptional(array(
-            'empty_value',
+        $resolver->setDefined(array(
+            'empty_value', // deprecated
+            'placeholder',
             'years',
             'months',
             'days',
@@ -246,32 +253,30 @@ class DateTimeType extends AbstractType
             'seconds',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'date_widget' => array(
-                null, // inherit default from DateType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            'time_widget' => array(
-                null, // inherit default from TimeType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            // This option will overwrite "date_widget" and "time_widget" options
-            'widget' => array(
-                null, // default, don't overwrite options
-                'single_text',
-                'text',
-                'choice',
-            ),
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('date_widget', array(
+            null, // inherit default from DateType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        $resolver->setAllowedValues('time_widget', array(
+            null, // inherit default from TimeType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        // This option will overwrite "date_widget" and "time_widget" options
+        $resolver->setAllowedValues('widget', array(
+            null, // default, don't overwrite options
+            'single_text',
+            'text',
+            'choice',
         ));
     }
 
@@ -279,6 +284,14 @@ class DateTimeType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'datetime';
     }

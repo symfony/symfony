@@ -81,7 +81,7 @@ class User
     }
 
     /**
-     * @Assert\True(message = "The user should have a Google Mail account")
+     * @Assert\IsTrue(message = "The user should have a Google Mail account")
      */
     public function isGmailUser()
     {
@@ -113,7 +113,7 @@ https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceP
 
 Documentation:
 
-https://symfony.com/doc/2.3/book/validation.html
+https://symfony.com/doc/3.0/book/validation.html
 
 JSR-303 Specification:
 

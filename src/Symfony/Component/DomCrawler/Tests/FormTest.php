@@ -357,6 +357,26 @@ class FormTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDisableValidation()
+    {
+        $form = $this->createForm('<form>
+            <select name="foo[bar]">
+                <option value="bar">bar</option>
+            </select>
+            <select name="foo[baz]">
+                <option value="foo">foo</option>
+            </select>
+            <input type="submit" />
+        </form>');
+
+        $form->disableValidation();
+
+        $form['foo[bar]']->select('foo');
+        $form['foo[baz]']->select('bar');
+        $this->assertEquals('foo', $form['foo[bar]']->getValue(), '->disableValidation() disables validation of all ChoiceFormField.');
+        $this->assertEquals('bar', $form['foo[baz]']->getValue(), '->disableValidation() disables validation of all ChoiceFormField.');
+    }
+
     public function testOffsetUnset()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');

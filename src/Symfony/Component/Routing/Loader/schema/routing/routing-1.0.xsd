@@ -29,6 +29,7 @@
       <xsd:element name="default" nillable="true" type="element" />
       <xsd:element name="requirement" type="element" />
       <xsd:element name="option" type="element" />
+      <xsd:element name="condition" type="xsd:string" />
     </xsd:choice>
   </xsd:group>
 
@@ -36,8 +37,7 @@
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" use="required" />
-    <xsd:attribute name="path" type="xsd:string" />
-    <xsd:attribute name="pattern" type="xsd:string" />
+    <xsd:attribute name="path" type="xsd:string" use="required" />
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />

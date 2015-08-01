@@ -26,10 +26,32 @@ class FileLoaderLoadException extends \Exception
      */
     public function __construct($resource, $sourceResource = null, $code = null, $previous = null)
     {
-        if (null === $sourceResource) {
-            $message = sprintf('Cannot load resource "%s".', $this->varToString($resource));
+        $message = '';
+        if ($previous) {
+            // Include the previous exception, to help the user see what might be the underlying cause
+
+            // Trim the trailing period of the previous message. We only want 1 period remove so no rtrim...
+            if ('.' === substr($previous->getMessage(), -1)) {
+                $trimmedMessage = substr($previous->getMessage(), 0, -1);
+                $message .= sprintf('%s', $trimmedMessage).' in ';
+            } else {
+                $message .= sprintf('%s', $previous->getMessage()).' in ';
+            }
+            $message .= $resource.' ';
+
+            // show tweaked trace to complete the human readable sentence
+            if (null === $sourceResource) {
+                $message .= sprintf('(which is loaded in resource "%s")', $this->varToString($resource));
+            } else {
+                $message .= sprintf('(which is being imported from "%s")', $this->varToString($sourceResource));
+            }
+            $message .= '.';
+
+        // if there's no previous message, present it the default way
+        } elseif (null === $sourceResource) {
+            $message .= sprintf('Cannot load resource "%s".', $this->varToString($resource));
         } else {
-            $message = sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
+            $message .= sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
         }
 
         // Is the resource located inside a bundle?
@@ -38,9 +60,6 @@ class FileLoaderLoadException extends \Exception
             $bundle = substr($parts[0], 1);
             $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
             $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
-        } elseif ($previous) {
-            // include the previous exception, to help the user see what might be the underlying cause
-            $message .= ' '.sprintf('(%s)', $previous->getMessage());
         }
 
         parent::__construct($message, $code, $previous);

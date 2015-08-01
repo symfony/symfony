@@ -74,6 +74,28 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('bar', $form->getViewData());
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Unable to transform value for property path "name": No mapping for value "arg"
+     */
+    public function testDataTransformationFailure()
+    {
+        $model = new FixedDataTransformer(array(
+            'default' => 'foo',
+        ));
+        $view = new FixedDataTransformer(array(
+            'foo' => 'bar',
+        ));
+
+        $config = new FormConfigBuilder('name', null, $this->dispatcher);
+        $config->addViewTransformer($view);
+        $config->addModelTransformer($model);
+        $config->setData('arg');
+        $form = new Form($config);
+
+        $form->getData();
+    }
+
     // https://github.com/symfony/symfony/commit/d4f4038f6daf7cf88ca7c7ab089473cce5ebf7d8#commitcomment-1632879
     public function testDataIsInitializedFromSubmit()
     {
@@ -100,16 +122,16 @@ class SimpleFormTest extends AbstractFormTest
     public function testFalseIsConvertedToNull()
     {
         $mock = $this->getMockBuilder('\stdClass')
-            ->setMethods(array('preBind'))
+            ->setMethods(array('preSubmit'))
             ->getMock();
         $mock->expects($this->once())
-            ->method('preBind')
+            ->method('preSubmit')
             ->with($this->callback(function ($event) {
                 return null === $event->getData();
             }));
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
-        $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preBind'));
+        $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preSubmit'));
         $form = new Form($config);
 
         $form->submit(false);
@@ -632,12 +654,11 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyDataFromClosure()
     {
-        $test = $this;
         $form = $this->getBuilder()
-            ->setEmptyData(function ($form) use ($test) {
+            ->setEmptyData(function ($form) {
             // the form instance is passed to the closure to allow use
             // of form data when creating the empty value
-            $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+            $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
 
             return 'foo';
         })
@@ -658,7 +679,7 @@ class SimpleFormTest extends AbstractFormTest
         $this->form->addError(new FormError('Error!'));
         $this->form->submit('foobar');
 
-        $this->assertSame(array(), $this->form->getErrors());
+        $this->assertCount(0, $this->form->getErrors());
     }
 
     public function testCreateView()
@@ -711,6 +732,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame($view, $form->createView($parentView));
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetErrorsAsString()
     {
         $this->form->addError(new FormError('Error!'));
@@ -877,12 +901,10 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmittingWrongDataIsIgnored()
     {
-        $test = $this;
-
         $child = $this->getBuilder('child', $this->dispatcher);
-        $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($test) {
+        $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             // child form doesn't receive the wrong data that is submitted on parent
-            $test->assertNull($event->getData());
+            $this->assertNull($event->getData());
         });
 
         $parent = $this->getBuilder('parent', new EventDispatcher())
@@ -982,10 +1004,9 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testPostSubmitDataIsNullIfInheritData()
     {
-        $test = $this;
         $form = $this->getBuilder()
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($test) {
-                $test->assertNull($event->getData());
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $this->assertNull($event->getData());
             })
             ->setInheritData(true)
             ->getForm();
@@ -995,10 +1016,9 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmitIsNeverFiredIfInheritData()
     {
-        $test = $this;
         $form = $this->getBuilder()
-            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($test) {
-                $test->fail('The SUBMIT event should not be fired');
+            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+                $this->fail('The SUBMIT event should not be fired');
             })
             ->setInheritData(true)
             ->getForm();

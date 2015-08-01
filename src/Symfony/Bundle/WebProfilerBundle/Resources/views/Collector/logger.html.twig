@@ -3,41 +3,41 @@
 {% import _self as logger %}
 
 {% block toolbar %}
-    {% if collector.counterrors or collector.countdeprecations %}
+    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
         {% set icon %}
-            <img width="15" height="28" alt="Logs" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAAA4klEQVQ4y2P4//8/AyWYYXgYwOPp6Xnc3t7+P7EYpB6k7+zZs2ADNEjRjIwDAgKWgAywIUfz8+fPVzg7O/8AGeCATQEQnAfi/SAah/wcV1dXvAYUgORANA75ehcXl+/4DHAABRIe+ZrhbgAhTHsDiEgHBA0glA6GfSDiw5mZma+A+sphBlhVVFQ88vHx+Xfu3Ll7QP5haOjjwtuAuGHv3r3NIMNABqh8+/atsaur666vr+9XUlwSHx//AGQANxCbAnEWyGQicRMQ9wBxIQM0qjiBWAFqkB00/glhayBWHwb1AgB38EJsUtxtWwAAAABJRU5ErkJggg==" />
-            {% if collector.counterrors %}
-                {% set status_color = "red" %}
-            {% else %}
-                {% set status_color = "yellow" %}
-            {% endif %}
-            {% set error_count = collector.counterrors + collector.countdeprecations %}
-            <span class="sf-toolbar-status sf-toolbar-status-{{ status_color }}">{{ error_count }}</span>
+            {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
+            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            {{ include('@WebProfiler/Icon/logger.svg') }}
+            <span class="sf-toolbar-value">{{ error_count }}</span>
         {% endset %}
+
         {% set text %}
-            {% if collector.counterrors %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Exception</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.counterrors }}</span>
-                </div>
-            {% endif %}
-            {% if collector.countdeprecations %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Deprecated Calls</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.countdeprecations }}</span>
-                </div>
-            {% endif %}
+            <div class="sf-toolbar-info-piece">
+                <b>Errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.counterrors ? 'red' }}">{{ collector.counterrors|default(0) }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Deprecated Calls</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}">{{ collector.countdeprecations|default(0) }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Silenced Errors</b>
+                <span class="sf-toolbar-status">{{ collector.countscreams|default(0) }}</span>
+            </div>
         {% endset %}
-        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAgCAYAAAAMq2gFAAABjElEQVRIx2MIDw+vd3R0/GFvb/+fGtjFxeVJSUmJ1f///5nv37/PAMMMzs7OVLMEhoODgy/k5+cHJCYmagAtZAJbRG1L0DEwxCYALeOgiUXbt2+/X1NT8xTEdnd3/wi0SI4mFgHBDCBeCLXoF5BtwkCEpvNAvB8JnydCTwgQR0It+g1kWxNjUQEQOyDhAiL0gNUiWWRDjEUOyMkUZsCoRaMWjVpEvEVkFkGjFmEUqgc+fvx4hVYWIReqzi9evKileaoDslnu3LkTNLQtGk3edLPIycnpL9Bge5pb1NXVdQNosDmGRcAm7F+QgKur6783b95cBQoeRGv1kII3QPOdAoZF8+fPP4PUqnx55syZVKCEI1rLh1hsAbWEZ8aMGaUoFoFcMG3atKdIjfSPISEhawICAlaQgwMDA1f6+/sfB5rzE2Sej4/PD3C7DkjoAHHVoUOHLpSVlX3w8vL6Sa34Alr6Z8WKFaCoMARZxAHEoFZ/HBD3A/FyIF4BxMvIxCC964F4G6hZDMTxQCwJAGWE8pur5kFDAAAAAElFTkSuQmCC" alt="Logger"></span>
+    <span class="icon"><svg width="26" height="32" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 32" enable-background="new 0 0 26 32" xml:space="preserve"><path fill="#3F3F3F" d="M23.6 3.4h-1.7V1.7c0-0.9-0.8-1.7-1.7-1.7H1.7C0.8 0 0 0.8 0 1.7v3.4v21.9C0 29.7 2.3 32 5.1 32h18.5 c0.9 0 1.7-0.8 1.7-1.7V5.1C25.3 4.1 24.5 3.4 23.6 3.4z M8.4 18.5h5.1v5.1H8.4V18.5z M8.4 15.2V5.1h5.1v10.1H8.4z M23.6 28.6 c0 0.9-0.8 1.7-1.7 1.7H6.7c-1.5 0-2.8-0.7-3.7-1.7h17.2c0.9 0 1.7-0.8 1.7-1.7V5.1c0.9 0 1.7 0.8 1.7 1.7V28.6z"/></svg></span>
     <strong>Logs</strong>
-    {% if collector.counterrors or collector.countdeprecations %}
-        {% set error_count = collector.counterrors + collector.countdeprecations %}
+    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
+        {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
         <span class="count">
             <span>{{ error_count }}</span>
         </span>
@@ -56,12 +56,21 @@
             <td>
                 <form id="priority-form" action="" method="get" style="display: inline">
                     <input type="hidden" name="panel" value="logger">
-                    <label for="priority">Priority</label>
+                    <label for="priority">Min. Priority</label>
                     <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
                         {# values < 0 are custom levels #}
-                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 250: 'NOTICE', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT', 600: 'EMERGENCY', '-100': 'DEPRECATION only' } %}
-                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
+                        {% for value, level in collector.priorities %}
+                            {% if not priority and value > 100 %}
+                                {% set priority = value %}
+                            {% endif %}
+                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ level.name }} ({{ level.count }})</option>
                         {% endfor %}
+                        {% if collector.countdeprecations %}
+                            {% if not priority %}
+                                {% set priority = "-100" %}
+                            {% endif %}
+                            <option value="-100"{{ "-100" == priority ? ' selected' : '' }}>DEPRECATION only ({{ collector.countdeprecations }})</option>
+                        {% endif %}
                     </select>
                     <noscript>
                         <input type="submit" value="refresh">
@@ -72,15 +81,30 @@
     </table>
 
     {% if collector.logs %}
-        <ul class="alt">
-            {% for log in collector.logs if priority >= 0 and log.priority >= priority or priority < 0 and log.context.type|default(0) == priority %}
-                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
-                    {{ logger.display_message(loop.index, log) }}
-                </li>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Priority</th>
+                <th>Channel</th>
+                <th>Message and context</th>
+            </tr>
+
+            {% set log_loop_index = 0 %}
+            {% for log in collector.logs %}
+                {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
+                {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
+                    {% set log_loop_index = log_loop_index + 1 %}
+                    <tr class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
+                        <td>{{ log_loop_index }}</td>
+                        <td>{{ is_deprecation ? 'DEPRECATION' : log.priorityName }}</td>
+                        <td>{{ log.channel is defined ? log.channel }}</td>
+                        <td>{{ logger.display_message(loop.index, log, is_deprecation) }}</td>
+                    </tr>
+                {% endif %}
             {% else %}
-                <li><em>No logs available for this priority.</em></li>
+                <tr><td colspan="4"><em>No logs available for {{ priority }} priority.</em></td></tr>
             {% endfor %}
-        </ul>
+        </table>
     {% else %}
         <p>
             <em>No logs available.</em>
@@ -89,15 +113,23 @@
 {% endblock %}
 
 
-{% macro display_message(log_index, log) %}
-    {% if constant('Symfony\\Component\\Debug\\ErrorHandler::TYPE_DEPRECATION') == log.context.type|default(0) %}
-        DEPRECATION -  {{ log.message }}
+{% macro display_message(log_index, log, is_deprecation) %}
+    {{ is_deprecation ? 'DEPRECATED' : log.priorityName }} - {{ log.message }}
+
+    {% if is_deprecation %}
+        {% set stack = log.context.stack|default([]) %}
         {% set id = 'sf-call-stack-' ~ log_index %}
-        <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
-            <img class="toggle" id="{{ id }}-off" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display:none">
-            <img class="toggle" id="{{ id }}-on" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display:inline">
-        </a>
-        {% for index, call in log.context.stack if index > 1 %}
+
+        {{ log.message }}
+
+        {% if stack %}
+            <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
+                <img class="toggle" id="{{ id }}-off" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display:none">
+                <img class="toggle" id="{{ id }}-on" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display:inline">
+            </a>
+        {% endif %}
+
+        {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
                 <ul class="sf-call-stack" id="{{ id }}" style="display: none">
             {% endif %}
@@ -113,12 +145,11 @@
 
             <li>Called from {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
 
-            {% if index == log.context.stack|length - 1 %}
+            {% if index == stack|length - 1 %}
                 </ul>
             {% endif %}
         {% endfor %}
     {% else %}
-        {{ log.priorityName }} - {{ log.message }}
         {% if log.context is defined and log.context is not empty %}
             <br />
             <small>

@@ -1,1 +1,1 @@
-{{ exception.toarray|json_encode|raw }}
+{{ { 'error': { 'code': status_code, 'message': status_text, 'exception': exception.toarray } }|json_encode|raw }}

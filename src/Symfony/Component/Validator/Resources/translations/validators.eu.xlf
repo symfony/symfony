@@ -175,7 +175,7 @@
                 <target>Irudiaren altuera txikiegia da ({{ height }}px). Onartutako gutxieneko altuera {{ min_height }}px dira.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Balio hau uneko erabiltzailearen pasahitza izan beharko litzateke.</target>
             </trans-unit>
             <trans-unit id="48">

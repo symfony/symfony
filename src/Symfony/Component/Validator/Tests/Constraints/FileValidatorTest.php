@@ -38,6 +38,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
+        fwrite($this->file, ' ', 1);
     }
 
     protected function tearDown()
@@ -98,7 +99,6 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         // We have various interesting limit - size combinations to test.
         // Assume a limit of 1000 bytes (1 kB). Then the following table
         // lists the violation messages for different file sizes:
-
         // -----------+--------------------------------------------------------
         // Size       | Violation Message
         // -----------+--------------------------------------------------------
@@ -124,25 +124,39 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             // limit in bytes
             array(1001, 1000, '1001', '1000', 'bytes'),
             array(1004, 1000, '1004', '1000', 'bytes'),
-            array(1005, 1000, '1005', '1000', 'bytes'),
+            array(1005, 1000, '1.01', '1', 'kB'),
 
             array(1000001, 1000000, '1000001', '1000000', 'bytes'),
-            array(1004999, 1000000, '1004999', '1000000', 'bytes'),
-            array(1005000, 1000000, '1005000', '1000000', 'bytes'),
+            array(1004999, 1000000, '1005', '1000', 'kB'),
+            array(1005000, 1000000, '1.01', '1', 'MB'),
 
             // limit in kB
-            //array(1001, '1k') OK in 2.4, not in 2.5
-            //array(1004, '1k') OK in 2.4, not in 2.5
+            array(1001, '1k', '1001', '1000', 'bytes'),
+            array(1004, '1k', '1004', '1000', 'bytes'),
             array(1005, '1k', '1.01', '1', 'kB'),
 
-            //array(1000001, '1000k') OK in 2.4, not in 2.5
+            array(1000001, '1000k', '1000001', '1000000', 'bytes'),
             array(1004999, '1000k', '1005', '1000', 'kB'),
-            array(1005000, '1000k', '1005', '1000', 'kB'),
+            array(1005000, '1000k', '1.01', '1', 'MB'),
 
             // limit in MB
-            //array(1000001, '1M') OK in 2.4, not in 2.5
-            //array(1004999, '1M') OK in 2.4, not in 2.5
+            array(1000001, '1M', '1000001', '1000000', 'bytes'),
+            array(1004999, '1M', '1005', '1000', 'kB'),
             array(1005000, '1M', '1.01', '1', 'MB'),
+
+            // limit in KiB
+            array(1025, '1Ki', '1025', '1024', 'bytes'),
+            array(1029, '1Ki', '1029', '1024', 'bytes'),
+            array(1030, '1Ki', '1.01', '1', 'KiB'),
+
+            array(1048577, '1024Ki', '1048577', '1048576', 'bytes'),
+            array(1053818, '1024Ki', '1029.12', '1024', 'KiB'),
+            array(1053819, '1024Ki', '1.01', '1', 'MiB'),
+
+            // limit in MiB
+            array(1048577, '1Mi', '1048577', '1048576', 'bytes'),
+            array(1053818, '1Mi', '1029.12', '1024', 'KiB'),
+            array(1053819, '1Mi', '1.01', '1', 'MiB'),
         );
     }
 
@@ -167,6 +181,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ size }}', $sizeAsString)
             ->setParameter('{{ suffix }}', $suffix)
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::TOO_LARGE_ERROR)
             ->assertRaised();
     }
 
@@ -181,17 +196,15 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             array(1000, '1k'),
             array(1000000, '1000k'),
 
-            // as of Symfony 2.5, the following are not accepted anymore
-            array(1001, '1k'),
-            array(1004, '1k'),
-            array(1000001, '1000k'),
-
             // limit in MB
             array(1000000, '1M'),
 
-            // as of Symfony 2.5, the following are not accepted anymore
-            array(1000001, '1M'),
-            array(1004999, '1M'),
+            // limit in KiB
+            array(1024, '1Ki'),
+            array(1048576, '1024Ki'),
+
+            // limit in MiB
+            array(1048576, '1Mi'),
         );
     }
 
@@ -224,6 +237,54 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         ));
 
         $this->validator->validate($this->path, $constraint);
+    }
+
+    public function provideBinaryFormatTests()
+    {
+        return array(
+            array(11, 10, null, '11', '10', 'bytes'),
+            array(11, 10, true, '11', '10', 'bytes'),
+            array(11, 10, false, '11', '10', 'bytes'),
+
+            // round(size) == 1.01kB, limit == 1kB
+            array(ceil(1000*1.01), 1000, null, '1.01', '1', 'kB'),
+            array(ceil(1000*1.01), '1k', null, '1.01', '1', 'kB'),
+            array(ceil(1024*1.01), '1Ki', null, '1.01', '1', 'KiB'),
+
+            array(ceil(1024*1.01), 1024, true, '1.01', '1', 'KiB'),
+            array(ceil(1024*1.01*1000), '1024k', true, '1010', '1000', 'KiB'),
+            array(ceil(1024*1.01), '1Ki', true, '1.01', '1', 'KiB'),
+
+            array(ceil(1000*1.01), 1000, false, '1.01', '1', 'kB'),
+            array(ceil(1000*1.01), '1k', false, '1.01', '1', 'kB'),
+            array(ceil(1024*1.01*10), '10Ki', false, '10.34', '10.24', 'kB'),
+        );
+    }
+
+    /**
+     * @dataProvider provideBinaryFormatTests
+     */
+    public function testBinaryFormat($bytesWritten, $limit, $binaryFormat, $sizeAsString, $limitAsString, $suffix)
+    {
+        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
+
+        $constraint = new File(array(
+            'maxSize' => $limit,
+            'binaryFormat' => $binaryFormat,
+            'maxSizeMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', $limitAsString)
+            ->setParameter('{{ size }}', $sizeAsString)
+            ->setParameter('{{ suffix }}', $suffix)
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::TOO_LARGE_ERROR)
+            ->assertRaised();
     }
 
     public function testValidMimeType()
@@ -300,6 +361,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/png", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
 
@@ -329,6 +391,23 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/*", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testDisallowEmpty()
+    {
+        ftruncate($this->file, 0);
+
+        $constraint = new File(array(
+            'disallowEmptyMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::EMPTY_ERROR)
             ->assertRaised();
     }
 
@@ -348,6 +427,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameters($params)
+            ->setCode($error)
             ->assertRaised();
     }
 
@@ -365,8 +445,8 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
             // when no maxSize is specified on constraint, it should use the ini value
             $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
-                '{{ limit }}' => UploadedFile::getMaxFilesize(),
-                '{{ suffix }}' => 'bytes',
+                '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
+                '{{ suffix }}' => 'MiB',
             ));
 
             // it should use the smaller limitation (maxSize option in this case)
@@ -378,9 +458,16 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             // it correctly parses the maxSize option and not only uses simple string comparison
             // 1000M should be bigger than the ini value
             $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
-                '{{ limit }}' => UploadedFile::getMaxFilesize(),
-                '{{ suffix }}' => 'bytes',
+                '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
+                '{{ suffix }}' => 'MiB',
             ), '1000M');
+
+            // it correctly parses the maxSize option and not only uses simple string comparison
+            // 1000M should be bigger than the ini value
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => '0.1',
+                '{{ suffix }}' => 'MB',
+            ), '100K');
         }
 
         return $tests;

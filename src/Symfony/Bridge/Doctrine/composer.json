@@ -16,19 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.5.9",
         "doctrine/common": "~2.3"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0,>=2.0.5",
-        "symfony/form": "~2.3,>=2.3.8",
-        "symfony/http-kernel": "~2.2",
-        "symfony/property-access": "~2.3",
-        "symfony/security": "~2.2",
-        "symfony/validator": "~2.3.0,>=2.3.20",
-        "symfony/translation": "~2.0,>=2.0.5",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3"
@@ -41,13 +42,12 @@
         "doctrine/orm": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Doctrine",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

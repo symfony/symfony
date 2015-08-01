@@ -24,6 +24,8 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -77,6 +79,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var InstantiatorInterface|null
      */
     private $proxyInstantiator;
+
+    /**
+     * @var ExpressionLanguage|null
+     */
+    private $expressionLanguage;
+
+    /**
+     * @var ExpressionFunctionProviderInterface[]
+     */
+    private $expressionLanguageProviders = array();
 
     /**
      * Sets the track resources flag.
@@ -305,11 +317,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler();
-        }
-
-        $this->compiler->addPass($pass, $type);
+        $this->getCompiler()->addPass($pass, $type);
 
         $this->addObjectResource($pass);
 
@@ -325,11 +333,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompilerPassConfig()
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler();
-        }
-
-        return $this->compiler->getPassConfig();
+        return $this->getCompiler()->getPassConfig();
     }
 
     /**
@@ -354,9 +358,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scopes
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function getScopes()
+    public function getScopes($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->scopes;
     }
 
@@ -366,14 +376,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scope children.
      *
      * @api
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
-    public function getScopeChildren()
+    public function getScopeChildren($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->scopeChildren;
     }
 
     /**
      * Sets a service.
+     *
+     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
@@ -407,10 +425,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         unset($this->definitions[$id], $this->aliasDefinitions[$id]);
 
         parent::set($id, $service, $scope);
-
-        if (isset($this->obsoleteDefinitions[$id]) && $this->obsoleteDefinitions[$id]->isSynchronized()) {
-            $this->synchronize($id);
-        }
     }
 
     /**
@@ -464,10 +478,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
             return $service;
-        }
-
-        if (isset($this->loading[$id])) {
-            throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
         }
 
         if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
@@ -603,17 +613,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function compile()
     {
-        if (null === $this->compiler) {
-            $this->compiler = new Compiler();
-        }
+        $compiler = $this->getCompiler();
 
         if ($this->trackResources) {
-            foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+            foreach ($compiler->getPassConfig()->getPasses() as $pass) {
                 $this->addObjectResource($pass);
             }
         }
 
-        $this->compiler->compile($this);
+        $compiler->compile($this);
 
         if ($this->trackResources) {
             foreach ($this->definitions as $definition) {
@@ -910,25 +918,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the factory definition is incomplete
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
-     *
-     * @internal this method is public because of PHP 5.3 limitations, do not use it explicitly in your code
      */
-    public function createService(Definition $definition, $id, $tryProxy = true)
+    private function createService(Definition $definition, $id, $tryProxy = true)
     {
         if ($definition->isSynthetic()) {
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
 
         if ($tryProxy && $definition->isLazy()) {
-            $container = $this;
-
             $proxy = $this
                 ->getProxyInstantiator()
                 ->instantiateProxy(
-                    $container,
+                    $this,
                     $definition,
-                    $id, function () use ($definition, $id, $container) {
-                        return $container->createService($definition, $id, false);
+                    $id, function () use ($definition, $id) {
+                        return $this->createService($definition, $id, false);
                     }
                 );
             $this->shareService($definition, $proxy, $id);
@@ -944,16 +948,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
-        if (null !== $definition->getFactoryMethod()) {
-            if (null !== $definition->getFactoryClass()) {
-                $factory = $parameterBag->resolveValue($definition->getFactoryClass());
-            } elseif (null !== $definition->getFactoryService()) {
-                $factory = $this->get($parameterBag->resolveValue($definition->getFactoryService()));
-            } else {
-                throw new RuntimeException(sprintf('Cannot create service "%s" from factory method without a factory service or factory class.', $id));
+        if (null !== $factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
+            } elseif (!is_string($factory)) {
+                throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }
 
-            $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
+            $service = call_user_func_array($factory, $arguments);
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
@@ -976,7 +978,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
-                $callable[0] = $callable[0] instanceof Reference ? $this->get((string) $callable[0]) : $parameterBag->resolveValue($callable[0]);
+                $callable[0] = $parameterBag->resolveValue($callable[0]);
+
+                if ($callable[0] instanceof Reference) {
+                    $callable[0] = $this->get((string) $callable[0], $callable[0]->getInvalidBehavior());
+                } elseif ($callable[0] instanceof Definition) {
+                    $callable[0] = $this->createService($callable[0], null);
+                }
             }
 
             if (!is_callable($callable)) {
@@ -990,11 +998,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Replaces service references by the real service instance.
+     * Replaces service references by the real service instance and evaluates expressions.
      *
      * @param mixed $value A value
      *
-     * @return mixed The same value with all service references replaced by the real service instances
+     * @return mixed The same value with all service references replaced by
+     *               the real service instances and all expressions evaluated
      */
     public function resolveServices($value)
     {
@@ -1004,6 +1013,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
+        } elseif ($value instanceof Expression) {
+            $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
         }
 
         return $value;
@@ -1056,6 +1067,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return array_unique($tags);
     }
 
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    {
+        $this->expressionLanguageProviders[] = $provider;
+    }
+
+    /**
+     * @return ExpressionFunctionProviderInterface[]
+     */
+    public function getExpressionLanguageProviders()
+    {
+        return $this->expressionLanguageProviders;
+    }
+
     /**
      * Returns the Service Conditionals.
      *
@@ -1092,32 +1116,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->proxyInstantiator;
     }
 
-    /**
-     * Synchronizes a service change.
-     *
-     * This method updates all services that depend on the given
-     * service by calling all methods referencing it.
-     *
-     * @param string $id A service id
-     */
-    private function synchronize($id)
-    {
-        foreach ($this->definitions as $definitionId => $definition) {
-            // only check initialized services
-            if (!$this->initialized($definitionId)) {
-                continue;
-            }
-
-            foreach ($definition->getMethodCalls() as $call) {
-                foreach ($call[1] as $argument) {
-                    if ($argument instanceof Reference && $id == (string) $argument) {
-                        $this->callMethod($this->get($definitionId), $call);
-                    }
-                }
-            }
-        }
-    }
-
     private function callMethod($service, $call)
     {
         $services = self::getServiceConditionals($call[1]);
@@ -1142,7 +1140,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function shareService(Definition $definition, $service, $id)
     {
-        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        if ($definition->isShared() && self::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
             if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
                 throw new InactiveScopeException($id, $scope);
             }
@@ -1153,5 +1151,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $this->scopedServices[$scope][$lowerId] = $service;
             }
         }
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
+        }
+
+        return $this->expressionLanguage;
     }
 }

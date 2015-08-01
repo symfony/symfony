@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
@@ -46,25 +43,6 @@ class PropertyAccessorCollectionTest_Car
     }
 }
 
-class PropertyAccessorCollectionTest_CarCustomSingular
-{
-    public function addFoo($axis)
-    {
-    }
-
-    public function removeFoo($axis)
-    {
-    }
-
-    public function getAxes()
-    {
-    }
-}
-
-class PropertyAccessorCollectionTest_Engine
-{
-}
-
 class PropertyAccessorCollectionTest_CarOnlyAdder
 {
     public function addAxis($axis)
@@ -89,15 +67,6 @@ class PropertyAccessorCollectionTest_CarOnlyRemover
 
 class PropertyAccessorCollectionTest_CarNoAdderAndRemover
 {
-    public function getAxes()
-    {
-    }
-}
-
-class PropertyAccessorCollectionTest_CarNoAdderAndRemoverWithProperty
-{
-    protected $axes = array();
-
     public function getAxes()
     {
     }
@@ -129,73 +98,13 @@ class PropertyAccessorCollectionTest_CarStructure
     }
 }
 
-abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCase
+abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
-
-    protected function setUp()
-    {
-        $this->propertyAccessor = new PropertyAccessor();
-    }
-
-    abstract protected function getCollection(array $array);
-
-    public function testGetValueReadsArrayAccess()
-    {
-        $object = $this->getCollection(array('firstName' => 'Bernhard'));
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, '[firstName]'));
-    }
-
-    public function testGetValueReadsNestedArrayAccess()
-    {
-        $object = $this->getCollection(array('person' => array('firstName' => 'Bernhard')));
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, '[person][firstName]'));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
-    public function testGetValueThrowsExceptionIfArrayAccessExpected()
-    {
-        $this->propertyAccessor->getValue(new \stdClass(), '[firstName]');
-    }
-
-    public function testSetValueUpdatesArrayAccess()
-    {
-        $object = $this->getCollection(array());
-
-        $this->propertyAccessor->setValue($object, '[firstName]', 'Bernhard');
-
-        $this->assertEquals('Bernhard', $object['firstName']);
-    }
-
-    public function testSetValueUpdatesNestedArrayAccess()
-    {
-        $object = $this->getCollection(array());
-
-        $this->propertyAccessor->setValue($object, '[person][firstName]', 'Bernhard');
-
-        $this->assertEquals('Bernhard', $object['person']['firstName']);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
-    public function testSetValueThrowsExceptionIfArrayAccessExpected()
-    {
-        $this->propertyAccessor->setValue(new \stdClass(), '[firstName]', 'Bernhard');
-    }
-
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
-        $axesMerged = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
-        $axesAfter = $this->getCollection(array(1 => 'second', 5 => 'first', 6 => 'third'));
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
+        $axesMerged = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axesAfter = $this->getContainer(array(1 => 'second', 5 => 'first', 6 => 'third'));
         $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
 
         // Don't use a mock in order to test whether the collections are
@@ -214,8 +123,8 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     {
         $car = $this->getMock(__CLASS__.'_CompositeCar');
         $structure = $this->getMock(__CLASS__.'_CarStructure');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
+        $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         $car->expects($this->any())
             ->method('getStructure')
@@ -237,115 +146,52 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
-    public function testSetValueCallsCustomAdderAndRemover()
-    {
-        $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
-
-        $car = $this->getMock(__CLASS__.'_CarCustomSingular');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $car->expects($this->at(0))
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-        $car->expects($this->at(1))
-            ->method('removeFoo')
-            ->with('fourth');
-        $car->expects($this->at(2))
-            ->method('addFoo')
-            ->with('first');
-        $car->expects($this->at(3))
-            ->method('addFoo')
-            ->with('third');
-
-        $this->propertyAccessor->setValue($car, 'axes|foo', $axesAfter);
-    }
-
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "axes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
      */
-    public function testSetValueFailsIfOnlyAdderFound()
+    public function testSetValueFailsIfNoAdderNorRemoverFound()
+    {
+        $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
+        $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        $car->expects($this->any())
+            ->method('getAxes')
+            ->will($this->returnValue($axesBefore));
+
+        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
+    }
+
+    public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
+    {
+        $car = $this->getMock(__CLASS__.'_Car');
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+
+        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
+    }
+
+    public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
-        $car->expects($this->any())
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-
-        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
-    public function testSetValueFailsIfOnlyRemoverFound()
+    public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
-        $car->expects($this->any())
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-
-        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
 
-    /**
-     * @dataProvider noAdderRemoverData
-     */
-    public function testNoAdderAndRemoverThrowsSensibleError($car, $path, $message)
+    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
-        $axes = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        try {
-            $this->propertyAccessor->setValue($car, $path, $axes);
-            $this->fail('An expected exception was not thrown!');
-        } catch (ExceptionInterface $e) {
-            $this->assertEquals($message, $e->getMessage());
-        }
-    }
-
-    public function noAdderRemoverData()
-    {
-        $data = array();
-
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
-        $propertyPath = 'axes';
-        $expectedMessage = sprintf(
-            'Neither the property "axes" nor one of the methods "addAx()", '.
-            '"addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have '.
-            'public access in class "%s".',
-            get_class($car)
-        );
-        $data[] = array($car, $propertyPath, $expectedMessage);
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
-        /*
-        Temporarily disabled in 2.1
-
-        $propertyPath = new PropertyPath('axes|boo');
-        $expectedMessage = sprintf(
-            'Neither element "axes" nor method "setAxes()" exists in class '
-                .'"%s", nor could adders and removers be found based on the '
-                .'passed singular: %s',
-            get_class($car),
-            'boo'
-        );
-        $data[] = array($car, $propertyPath, $expectedMessage);
-         */
-
-        $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemoverWithProperty');
-        $propertyPath = 'axes';
-        $expectedMessage = sprintf(
-            'Neither the property "axes" nor one of the methods "addAx()", '.
-            '"addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have '.
-            'public access in class "%s".',
-            get_class($car)
-        );
-        $data[] = array($car, $propertyPath, $expectedMessage);
-
-        return $data;
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
 }

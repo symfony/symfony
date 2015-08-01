@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Decodes JSON data.
  *
@@ -33,6 +35,7 @@ class JsonDecode implements DecoderInterface
     private $recursionDepth;
 
     private $lastError = JSON_ERROR_NONE;
+
     protected $serializer;
 
     /**
@@ -45,18 +48,6 @@ class JsonDecode implements DecoderInterface
     {
         $this->associative = $associative;
         $this->recursionDepth = (int) $depth;
-    }
-
-    /**
-     * Returns the last decoding error (if any).
-     *
-     * @return int
-     *
-     * @see http://php.net/manual/en/function.json-last-error.php json_last_error
-     */
-    public function getLastError()
-    {
-        return $this->lastError;
     }
 
     /**
@@ -82,6 +73,8 @@ class JsonDecode implements DecoderInterface
      *
      * @return mixed
      *
+     * @throws UnexpectedValueException
+     *
      * @see http://php.net/json_decode json_decode
      */
     public function decode($data, $format, array $context = array())
@@ -92,13 +85,11 @@ class JsonDecode implements DecoderInterface
         $recursionDepth = $context['json_decode_recursion_depth'];
         $options = $context['json_decode_options'];
 
-        if (PHP_VERSION_ID >= 50400) {
-            $decodedData = json_decode($data, $associative, $recursionDepth, $options);
-        } else {
-            $decodedData = json_decode($data, $associative, $recursionDepth);
-        }
+        $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
-        $this->lastError = json_last_error();
+        if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
+            throw new UnexpectedValueException(JsonEncoder::getLastErrorMessage());
+        }
 
         return $decodedData;
     }

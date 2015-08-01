@@ -25,24 +25,10 @@ class PrototypedArrayNode extends ArrayNode
 {
     protected $prototype;
     protected $keyAttribute;
-    protected $removeKeyAttribute;
-    protected $minNumberOfElements;
-    protected $defaultValue;
+    protected $removeKeyAttribute = false;
+    protected $minNumberOfElements = 0;
+    protected $defaultValue = array();
     protected $defaultChildren;
-
-    /**
-     * Constructor.
-     *
-     * @param string        $name   The Node's name
-     * @param NodeInterface $parent The node parent
-     */
-    public function __construct($name, NodeInterface $parent = null)
-    {
-        parent::__construct($name, $parent);
-
-        $this->minNumberOfElements = 0;
-        $this->defaultValue = array();
-    }
 
     /**
      * Sets the minimum number of elements that a prototype based node must

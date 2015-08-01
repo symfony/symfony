@@ -16,26 +16,32 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": "~2.3,>=2.3.4",
-        "symfony/debug": "~2.3.24|~2.5.9|~2.6,>=2.6.2",
+        "php": ">=5.5.9",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/debug": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/browser-kit": "~2.3",
-        "symfony/class-loader": "~2.1",
-        "symfony/config": "~2.0,>=2.0.5",
-        "symfony/console": "~2.2",
-        "symfony/css-selector": "~2.0,>=2.0.5",
-        "symfony/dependency-injection": "~2.2",
-        "symfony/dom-crawler": "~2.0,>=2.0.5",
-        "symfony/finder": "~2.0,>=2.0.5",
-        "symfony/process": "~2.0,>=2.0.5",
-        "symfony/routing": "~2.2",
-        "symfony/stopwatch": "~2.3",
-        "symfony/templating": "~2.2"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/class-loader": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/console": "~2.8|~3.0",
+        "symfony/css-selector": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/finder": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "symfony/routing": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "symfony/templating": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
+        "symfony/var-dumper": "~2.8|~3.0"
+    },
+    "conflict": {
+        "symfony/config": "<2.8"
     },
     "suggest": {
         "symfony/browser-kit": "",
@@ -43,16 +49,16 @@
         "symfony/config": "",
         "symfony/console": "",
         "symfony/dependency-injection": "",
-        "symfony/finder": ""
+        "symfony/finder": "",
+        "symfony/var-dumper": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }
+        "psr-4": { "Symfony\\Component\\HttpKernel\\": "" }
     },
-    "target-dir": "Symfony/Component/HttpKernel",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

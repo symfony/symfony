@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * YamlDumper dumps a service container as a YAML string.
@@ -99,24 +100,8 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synthetic: true\n");
         }
 
-        if ($definition->isSynchronized()) {
-            $code .= sprintf("        synchronized: true\n");
-        }
-
-        if ($definition->getFactoryClass()) {
-            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
-        }
-
         if ($definition->isLazy()) {
             $code .= sprintf("        lazy: true\n");
-        }
-
-        if ($definition->getFactoryMethod()) {
-            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
-        }
-
-        if ($definition->getFactoryService()) {
-            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
         }
 
         if ($definition->getArguments()) {
@@ -131,20 +116,28 @@ class YamlDumper extends Dumper
             $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
 
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
+        if (!$definition->isShared()) {
+            $code .= "        shared: false\n";
+        }
+
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
             $code .= sprintf("        scope: %s\n", $scope);
         }
 
-        if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable)) {
-                if ($callable[0] instanceof Reference) {
-                    $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
-                } else {
-                    $callable = array($callable[0], $callable[1]);
-                }
+        if (null !== $decorated = $definition->getDecoratedService()) {
+            list($decorated, $renamedId) = $decorated;
+            $code .= sprintf("        decorates: %s\n", $decorated);
+            if (null !== $renamedId) {
+                $code .= sprintf("        decoration_inner_name: %s\n", $renamedId);
             }
+        }
 
-            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($callable, 0));
+        if ($callable = $definition->getFactory()) {
+            $code .= sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+        }
+
+        if ($callable = $definition->getConfigurator()) {
+            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
         }
 
         return $code;
@@ -211,6 +204,26 @@ class YamlDumper extends Dumper
     }
 
     /**
+     * Dumps callable to YAML format.
+     *
+     * @param callable $callable
+     *
+     * @return callable
+     */
+    private function dumpCallable($callable)
+    {
+        if (is_array($callable)) {
+            if ($callable[0] instanceof Reference) {
+                $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
+            } else {
+                $callable = array($callable[0], $callable[1]);
+            }
+        }
+
+        return $callable;
+    }
+
+    /**
      * Dumps the value to YAML format.
      *
      * @param mixed $value
@@ -232,6 +245,8 @@ class YamlDumper extends Dumper
             return $this->getServiceCall((string) $value, $value);
         } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
+        } elseif ($value instanceof Expression) {
+            return $this->getExpressionCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
@@ -266,6 +281,11 @@ class YamlDumper extends Dumper
     private function getParameterCall($id)
     {
         return sprintf('%%%s%%', $id);
+    }
+
+    private function getExpressionCall($expression)
+    {
+        return sprintf('@=%s', $expression);
     }
 
     /**

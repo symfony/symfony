@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer;
 
 class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +21,7 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateFragmentUri($uri, $controller)
     {
-        $this->assertEquals($uri, $this->getRenderer()->doGenerateFragmentUri($controller, Request::create('/')));
+        $this->assertEquals($uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/')));
     }
 
     /**
@@ -30,7 +29,7 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateAbsoluteFragmentUri($uri, $controller)
     {
-        $this->assertEquals('http://localhost'.$uri, $this->getRenderer()->doGenerateFragmentUri($controller, Request::create('/'), true));
+        $this->assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
     }
 
     public function getGenerateFragmentUriData()
@@ -41,6 +40,7 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
             array('/_fragment?_path=foo%3Dfoo%26_format%3Djson%26_locale%3Den%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo', '_format' => 'json'), array())),
             array('/_fragment?bar=bar&_path=foo%3Dfoo%26_format%3Dhtml%26_locale%3Den%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo'), array('bar' => 'bar'))),
             array('/_fragment?foo=foo&_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dcontroller', new ControllerReference('controller', array(), array('foo' => 'foo'))),
+            array('/_fragment?_path=foo%255B0%255D%3Dfoo%26foo%255B1%255D%3Dbar%26_format%3Dhtml%26_locale%3Den%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => array('foo', 'bar')), array())),
         );
     }
 
@@ -51,26 +51,43 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $request->setLocale('fr');
         $controller = new ControllerReference('controller', array(), array());
 
-        $this->assertEquals('/_fragment?_path=_format%3Djson%26_locale%3Dfr%26_controller%3Dcontroller', $this->getRenderer()->doGenerateFragmentUri($controller, $request));
+        $this->assertEquals('/_fragment?_path=_format%3Djson%26_locale%3Dfr%26_controller%3Dcontroller', $this->callGenerateFragmentUriMethod($controller, $request));
     }
 
-    private function getRenderer()
+    /**
+     * @expectedException LogicException
+     * @dataProvider      getGenerateFragmentUriDataWithNonScalar
+     */
+    public function testGenerateFragmentUriWithNonScalar($controller)
     {
-        return new Renderer();
+        $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
+    }
+
+    public function getGenerateFragmentUriDataWithNonScalar()
+    {
+        return array(
+            array(new ControllerReference('controller', array('foo' => new Foo(), 'bar' => 'bar'), array())),
+            array(new ControllerReference('controller', array('foo' => array('foo' => 'foo'), 'bar' => array('bar' => new Foo())), array())),
+        );
+    }
+
+    private function callGenerateFragmentUriMethod(ControllerReference $reference, Request $request, $absolute = false)
+    {
+        $renderer = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer');
+        $r = new \ReflectionObject($renderer);
+        $m = $r->getMethod('generateFragmentUri');
+        $m->setAccessible(true);
+
+        return $m->invoke($renderer, $reference, $request, $absolute);
     }
 }
 
-class Renderer extends RoutableFragmentRenderer
+class Foo
 {
-    public function render($uri, Request $request, array $options = array())
-    {
-    }
-    public function getName()
-    {
-    }
+    public $foo;
 
-    public function doGenerateFragmentUri(ControllerReference $reference, Request $request, $absolute = false)
+    public function getFoo()
     {
-        return parent::generateFragmentUri($reference, $request, $absolute);
+        return $this->foo;
     }
 }

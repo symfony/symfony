@@ -5,15 +5,21 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.errors_logger_listener.class">Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener</parameter>
+        <parameter key="debug.error_handler.throw_at">0</parameter>
     </parameters>
 
     <services>
-        <service id="debug.emergency_logger_listener" class="%debug.errors_logger_listener.class%">
+        <service id="debug.debug_handlers_listener" class="Symfony\Component\HttpKernel\EventListener\DebugHandlersListener">
             <tag name="kernel.event_subscriber" />
-            <tag name="monolog.logger" channel="emergency" />
-            <argument>emergency</argument>
+            <tag name="monolog.logger" channel="php" />
+            <argument /><!-- Exception handler -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>null</argument><!-- Log levels map for enabled error levels -->
+            <argument>null</argument>
+            <argument>true</argument>
+            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
         </service>
+
+        <service id="debug.stopwatch" class="Symfony\Component\Stopwatch\Stopwatch" />
     </services>
 </container>

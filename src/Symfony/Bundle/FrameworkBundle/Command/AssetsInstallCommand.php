@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -47,7 +48,7 @@ A "bundles" directory will be created inside the target directory and the
 "Resources/public" directory of each bundle will be copied into it.
 
 To create a symlink to each bundle instead of copying its assets, use the
-<info>--symlink</info> option:
+<info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
 
   <info>php %command.full_name% web --symlink</info>
 
@@ -73,17 +74,20 @@ EOT
             throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
         }
 
-        if (!function_exists('symlink') && $input->getOption('symlink')) {
-            throw new \InvalidArgumentException('The symlink() function is not available on your system. You need to install the assets without the --symlink option.');
-        }
-
         $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
         $filesystem->mkdir($bundlesDir, 0777);
 
-        $output->writeln(sprintf('Installing assets using the <comment>%s</comment> option', $input->getOption('symlink') ? 'symlink' : 'hard copy'));
+        // relative implies symlink
+        $symlink = $input->getOption('symlink') || $input->getOption('relative');
+
+        if ($symlink) {
+            $output->writeln('Trying to install assets as <comment>symbolic links</comment>.');
+        } else {
+            $output->writeln('Installing assets as <comment>hard copies</comment>.');
+        }
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
@@ -93,19 +97,54 @@ EOT
 
                 $filesystem->remove($targetDir);
 
-                if ($input->getOption('symlink')) {
+                if ($symlink) {
                     if ($input->getOption('relative')) {
                         $relativeOriginDir = $filesystem->makePathRelative($originDir, realpath($bundlesDir));
                     } else {
                         $relativeOriginDir = $originDir;
                     }
-                    $filesystem->symlink($relativeOriginDir, $targetDir);
+
+                    try {
+                        $filesystem->symlink($relativeOriginDir, $targetDir);
+                        if (!file_exists($targetDir)) {
+                            throw new IOException('Symbolic link is broken');
+                        }
+                        $output->writeln('The assets were installed using symbolic links.');
+                    } catch (IOException $e) {
+                        if (!$input->getOption('relative')) {
+                            $this->hardCopy($originDir, $targetDir);
+                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                        }
+
+                        // try again without the relative option
+                        try {
+                            $filesystem->symlink($originDir, $targetDir);
+                            if (!file_exists($targetDir)) {
+                                throw new IOException('Symbolic link is broken');
+                            }
+                            $output->writeln('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
+                        } catch (IOException $e) {
+                            $this->hardCopy($originDir, $targetDir);
+                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                        }
+                    }
                 } else {
-                    $filesystem->mkdir($targetDir, 0777);
-                    // We use a custom iterator to ignore VCS files
-                    $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+                    $this->hardCopy($originDir, $targetDir);
                 }
             }
         }
+    }
+
+    /**
+     * @param string $originDir
+     * @param string $targetDir
+     */
+    private function hardCopy($originDir, $targetDir)
+    {
+        $filesystem = $this->getContainer()->get('filesystem');
+
+        $filesystem->mkdir($targetDir, 0777);
+        // We use a custom iterator to ignore VCS files
+        $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
     }
 }

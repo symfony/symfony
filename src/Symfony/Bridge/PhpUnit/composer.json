@@ -1,0 +1,34 @@
+{
+    "name": "symfony/phpunit-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony PHPUnit Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "suggest": {
+        "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
+    },
+    "autoload": {
+        "files": [ "bootstrap.php" ],
+        "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev"
+        }
+    }
+}

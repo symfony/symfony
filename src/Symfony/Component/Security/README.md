@@ -11,10 +11,10 @@ Resources
 
 Documentation:
 
-https://symfony.com/doc/2.3/book/security.html
+https://symfony.com/doc/3.0/book/security.html
 
-Resources
----------
+Tests
+-----
 
 You can run the unit tests with the following command:
 

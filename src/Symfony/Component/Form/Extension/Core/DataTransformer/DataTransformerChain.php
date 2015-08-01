@@ -84,4 +84,12 @@ class DataTransformerChain implements DataTransformerInterface
 
         return $value;
     }
+
+    /**
+     * @return DataTransformerInterface[]
+     */
+    public function getTransformers()
+    {
+        return $this->transformers;
+    }
 }

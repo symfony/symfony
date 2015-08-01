@@ -7,34 +7,39 @@
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr" trusted-proxies="127.0.0.1, 10.0.0.1" http-method-override="false">
-        <framework:csrf-protection enabled="true" field-name="_csrf" />
-        <framework:form />
+        <framework:csrf-protection enabled="true" />
+        <framework:form>
+            <framework:csrf-protection field-name="_csrf"/>
+        </framework:form>
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" enabled="false" />
         <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
-        <framework:session gc-maxlifetime="90000" gc-probability="1" gc-divisor="108" storage-id="session.storage.native" handler-id="session.handler.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="true" save-path="/path/to/sessions" />
-        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
+        <framework:session gc-maxlifetime="90000" gc-probability="1" gc-divisor="108" storage-id="session.storage.native" handler-id="session.handler.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="false" use-cookies="true" save-path="/path/to/sessions" />
+        <framework:request>
+            <framework:format name="csv">
+                <framework:mime-type>text/csv</framework:mime-type>
+                <framework:mime-type>text/plain</framework:mime-type>
+            </framework:format>
+            <framework:format name="pdf">
+                <framework:mime-type>application/pdf</framework:mime-type>
+            </framework:format>
+        </framework:request>
+        <framework:templating cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>
             <framework:engine>twig</framework:engine>
-            <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
-            <framework:package name="images" version="1.0.0">
-                <framework:base-url>http://images1.example.com</framework:base-url>
-                <framework:base-url>http://images2.example.com</framework:base-url>
-            </framework:package>
-            <framework:package name="foo" version="1.0.0" />
-            <framework:package name="bar">
-                <framework:base-url>http://bar1.example.com</framework:base-url>
-                <framework:base-url>http://bar2.example.com</framework:base-url>
-            </framework:package>
             <framework:form>
                  <framework:resource>theme1</framework:resource>
                  <framework:resource>theme2</framework:resource>
             </framework:form>
         </framework:templating>
-        <framework:translator enabled="true" fallback="fr" />
+        <framework:assets version="v1" />
+        <framework:translator enabled="true" fallback="fr" logging="true">
+            <framework:path>%kernel.root_dir%/Fixtures/translations</framework:path>
+        </framework:translator>
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+        <framework:serializer enabled="true" enable-annotations="true" cache="serializer.mapping.cache.apc" name-converter="serializer.name_converter.camel_case_to_snake_case" />
     </framework:config>
 </container>

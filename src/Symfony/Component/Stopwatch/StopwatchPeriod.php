@@ -25,8 +25,8 @@ class StopwatchPeriod
     /**
      * Constructor.
      *
-     * @param int $start The relative time of the start of the period
-     * @param int $end   The relative time of the end of the period
+     * @param int $start The relative time of the start of the period (in milliseconds)
+     * @param int $end   The relative time of the end of the period (in milliseconds)
      */
     public function __construct($start, $end)
     {

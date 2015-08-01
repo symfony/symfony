@@ -46,21 +46,39 @@ class RequestMatcher implements RequestMatcherInterface
     private $attributes = array();
 
     /**
+     * @var string[]
+     */
+    private $schemes = array();
+
+    /**
      * @param string|null          $path
      * @param string|null          $host
      * @param string|string[]|null $methods
      * @param string|string[]|null $ips
      * @param array                $attributes
+     * @param string|string[]|null $schemes
      */
-    public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array())
+    public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null)
     {
         $this->matchPath($path);
         $this->matchHost($host);
         $this->matchMethod($methods);
         $this->matchIps($ips);
+        $this->matchScheme($schemes);
+
         foreach ($attributes as $k => $v) {
             $this->matchAttribute($k, $v);
         }
+    }
+
+    /**
+     * Adds a check for the HTTP scheme.
+     *
+     * @param string|string[]|null $scheme An HTTP scheme or an array of HTTP schemes
+     */
+    public function matchScheme($scheme)
+    {
+        $this->schemes = array_map('strtolower', (array) $scheme);
     }
 
     /**
@@ -106,7 +124,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|string[]|null $method An HTTP method or an array of HTTP methods
+     * @param string|string[] $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {
@@ -131,6 +149,10 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
+        if ($this->schemes && !in_array($request->getScheme(), $this->schemes)) {
+            return false;
+        }
+
         if ($this->methods && !in_array($request->getMethod(), $this->methods)) {
             return false;
         }

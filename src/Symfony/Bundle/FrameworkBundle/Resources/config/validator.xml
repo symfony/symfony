@@ -5,63 +5,56 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
-        <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
-        <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
         <parameter key="validator.mapping.cache.prefix" />
-        <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
-        <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
-        <parameter key="validator.mapping.loader.annotation_loader.class">Symfony\Component\Validator\Mapping\Loader\AnnotationLoader</parameter>
-        <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
-        <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
-        <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.mapping.loader.xml_files_loader.mapping_files" type="collection" />
-        <parameter key="validator.mapping.loader.yaml_files_loader.mapping_files" type="collection" />
     </parameters>
 
     <services>
-        <service id="validator" class="%validator.class%">
-            <argument type="service" id="validator.mapping.class_metadata_factory" />
-            <argument type="service" id="validator.validator_factory" />
-            <argument type="service" id="translator.default" />
-            <argument>%validator.translation_domain%</argument>
-            <argument type="collection" />
+        <service id="validator" class="Symfony\Component\Validator\Validator\ValidatorInterface">
+            <factory service="validator.builder" method="getValidator" />
         </service>
 
-        <service id="validator.mapping.class_metadata_factory" class="%validator.mapping.class_metadata_factory.class%" public="false">
-            <argument type="service" id="validator.mapping.loader.loader_chain" />
-            <argument>null</argument>
+        <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilderInterface">
+            <factory class="Symfony\Component\Validator\Validation" method="createValidatorBuilder" />
+            <call method="setConstraintValidatorFactory">
+                <argument type="service" id="validator.validator_factory" />
+            </call>
+            <call method="setTranslator">
+                <argument type="service" id="translator" />
+            </call>
+            <call method="setTranslationDomain">
+                <argument>%validator.translation_domain%</argument>
+            </call>
         </service>
 
-        <service id="validator.mapping.cache.apc" class="%validator.mapping.cache.apc.class%" public="false">
+        <service id="validator.mapping.class_metadata_factory" alias="validator" public="false" />
+
+        <service id="validator.mapping.cache.apc" class="Symfony\Component\Validator\Mapping\Cache\ApcCache" public="false">
             <argument>%validator.mapping.cache.prefix%</argument>
         </service>
 
-        <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
+        <service id="validator.mapping.cache.doctrine.apc" class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">
+            <argument type="service">
+                <service class="Doctrine\Common\Cache\ApcCache">
+                    <call method="setNamespace">
+                        <argument>%validator.mapping.cache.prefix%</argument>
+                    </call>
+                </service>
+            </argument>
+        </service>
+
+        <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />
         </service>
 
-        <service id="validator.mapping.loader.loader_chain" class="%validator.mapping.loader.loader_chain.class%" public="false">
-            <argument type="collection">
-                <argument type="service" id="validator.mapping.loader.static_method_loader" />
-                <argument type="service" id="validator.mapping.loader.xml_files_loader" />
-                <argument type="service" id="validator.mapping.loader.yaml_files_loader" />
-            </argument>
+        <service id="validator.expression" class="Symfony\Component\Validator\Constraints\ExpressionValidator">
+            <argument type="service" id="property_accessor" />
+            <tag name="validator.constraint_validator" alias="validator.expression" />
         </service>
 
-        <service id="validator.mapping.loader.static_method_loader" class="%validator.mapping.loader.static_method_loader.class%" public="false" />
-
-        <service id="validator.mapping.loader.annotation_loader" class="%validator.mapping.loader.annotation_loader.class%" public="false">
-            <argument type="service" id="annotation_reader" />
-        </service>
-
-        <service id="validator.mapping.loader.xml_files_loader" class="%validator.mapping.loader.xml_files_loader.class%" public="false">
-            <argument>%validator.mapping.loader.xml_files_loader.mapping_files%</argument>
-        </service>
-
-        <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
-            <argument>%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
+        <service id="validator.email" class="Symfony\Component\Validator\Constraints\EmailValidator">
+            <argument></argument>
+            <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
         </service>
     </services>
 </container>

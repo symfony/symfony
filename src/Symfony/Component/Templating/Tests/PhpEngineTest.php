@@ -103,16 +103,42 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
-        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $view[\'foo\'].$foo ?>');
-        $this->loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
+        $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $this[\'foo\'].$foo ?>');
+        $this->loader->setTemplate('layout.php', '-<?php echo $this[\'slots\']->get("_content") ?>-');
         $this->assertEquals('-barfoo-', $engine->render('foo.php', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
         $this->loader->setTemplate('bar.php', 'bar');
-        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $foo ?>');
-        $this->loader->setTemplate('layout.php', '<?php echo $view->render("bar.php") ?>-<?php echo $view[\'slots\']->get("_content") ?>-');
+        $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $foo ?>');
+        $this->loader->setTemplate('layout.php', '<?php echo $this->render("bar.php") ?>-<?php echo $this[\'slots\']->get("_content") ?>-');
         $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
+    }
+
+    public function testRenderParameter()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
+        $this->assertEquals('foobar', $engine->render('foo.php', array('template' => 'foo', 'parameters' => 'bar')), '->render() extract variables');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @dataProvider forbiddenParameterNames
+     */
+    public function testRenderForbiddenParameter($name)
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', 'bar');
+        $engine->render('foo.php', array($name => 'foo'));
+    }
+
+    public function forbiddenParameterNames()
+    {
+        return array(
+            array('this'),
+            array('view'),
+        );
     }
 
     public function testEscape()

@@ -21,7 +21,7 @@ class StopwatchEvent
     /**
      * @var StopwatchPeriod[]
      */
-    private $periods;
+    private $periods = array();
 
     /**
      * @var float
@@ -36,13 +36,13 @@ class StopwatchEvent
     /**
      * @var float[]
      */
-    private $started;
+    private $started = array();
 
     /**
      * Constructor.
      *
-     * @param float  $origin   The origin time in milliseconds
-     * @param string $category The event category
+     * @param float       $origin   The origin time in milliseconds
+     * @param string|null $category The event category or null to use the default
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */
@@ -50,8 +50,6 @@ class StopwatchEvent
     {
         $this->origin = $this->formatTime($origin);
         $this->category = is_string($category) ? $category : 'default';
-        $this->started = array();
-        $this->periods = array();
     }
 
     /**
@@ -67,7 +65,7 @@ class StopwatchEvent
     /**
      * Gets the origin.
      *
-     * @return int The origin in milliseconds
+     * @return float The origin in milliseconds
      */
     public function getOrigin()
     {
@@ -175,12 +173,21 @@ class StopwatchEvent
      */
     public function getDuration()
     {
+        $periods = $this->periods;
+        $stopped = count($periods);
+        $left = count($this->started) - $stopped;
+
+        for ($i = 0; $i < $left; $i++) {
+            $index = $stopped + $i;
+            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow());
+        }
+
         $total = 0;
-        foreach ($this->periods as $period) {
+        foreach ($periods as $period) {
             $total += $period->getDuration();
         }
 
-        return $this->formatTime($total);
+        return $total;
     }
 
     /**
@@ -226,5 +233,13 @@ class StopwatchEvent
         }
 
         return round($time, 1);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s: %.2F MiB - %d ms', $this->getCategory(), $this->getMemory() / 1024 / 1024, $this->getDuration());
     }
 }

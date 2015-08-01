@@ -2,16 +2,23 @@
 
 {% block toolbar %}
     {% set icon %}
-        <span>
-            <img width="13" height="28" alt="Memory Usage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAcBAMAAABITyhxAAAAJ1BMVEXNzc3///////////////////////8/Pz////////////+NjY0/Pz9lMO+OAAAADHRSTlMAABAgMDhAWXCvv9e8JUuyAAAAQ0lEQVQI12MQBAMBBmLpMwoMDAw6BxjOOABpHyCdAKRzsNDp5eXl1KBh5oHBAYY9YHoDQ+cqIFjZwGCaBgSpBrjcCwCZgkUHKKvX+wAAAABJRU5ErkJggg==" />
-            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
-        </span>
+        {% set status_color = (collector.memory / 1024 / 1024) > 50 ? 'yellow' : '' %}
+        {{ include('@WebProfiler/Icon/memory.svg') }}
+        <span class="sf-toolbar-value">{{ '%.1f'|format(collector.memory / 1024 / 1024) }}</span>
+        <span class="sf-toolbar-label">MB</span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>Memory usage</b>
-            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} / {{ collector.memoryLimit == -1 ? '&infin;' : '%.1f'|format(collector.memoryLimit / 1024 / 1024)|escape }} MB</span>
+            <b>Peak memory usage</b>
+            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>PHP memory limit</b>
+            <span>{{ collector.memoryLimit == -1 ? '&infin;' : '%.0f'|format(collector.memoryLimit / 1024 / 1024)|escape }} MB</span>
         </div>
     {% endset %}
-    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, status: status_color }) }}
 {% endblock %}

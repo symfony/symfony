@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 class FilesLoaderTest extends \PHPUnit_Framework_TestCase
 {

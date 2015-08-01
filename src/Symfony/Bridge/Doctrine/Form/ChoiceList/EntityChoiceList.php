@@ -11,17 +11,22 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
+@trigger_error('The '.__NAMESPACE__.'\EntityChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
+
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link DoctrineChoiceLoader} instead.
  */
 class EntityChoiceList extends ObjectChoiceList
 {
@@ -295,9 +300,12 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see ChoiceListInterface
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $entities)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         // Performance optimization
         if (empty($entities)) {
             return array();
@@ -335,9 +343,12 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see ChoiceListInterface
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         // Performance optimization
         if (empty($values)) {
             return array();

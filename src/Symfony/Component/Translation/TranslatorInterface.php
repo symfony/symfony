@@ -23,10 +23,10 @@ interface TranslatorInterface
     /**
      * Translates the given message.
      *
-     * @param string $id         The message id (may also be an object that can be cast to string)
-     * @param array  $parameters An array of parameters for the message
-     * @param string $domain     The domain for the message
-     * @param string $locale     The locale
+     * @param string      $id         The message id (may also be an object that can be cast to string)
+     * @param array       $parameters An array of parameters for the message
+     * @param string|null $domain     The domain for the message or null to use the default
+     * @param string|null $locale     The locale or null to use the default
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      *
@@ -39,11 +39,11 @@ interface TranslatorInterface
     /**
      * Translates the given choice message by choosing a translation according to a number.
      *
-     * @param string $id         The message id (may also be an object that can be cast to string)
-     * @param int    $number     The number to use to find the indice of the message
-     * @param array  $parameters An array of parameters for the message
-     * @param string $domain     The domain for the message
-     * @param string $locale     The locale
+     * @param string      $id         The message id (may also be an object that can be cast to string)
+     * @param int         $number     The number to use to find the indice of the message
+     * @param array       $parameters An array of parameters for the message
+     * @param string|null $domain     The domain for the message or null to use the default
+     * @param string|null $locale     The locale or null to use the default
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      *

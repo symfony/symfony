@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+@trigger_error('The '.__NAMESPACE__.'\ChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
@@ -29,10 +31,13 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * <code>
  * $choices = array(true, false);
  * $labels = array('Agree', 'Disagree');
- * $choiceList = new ChoiceList($choices, $labels);
+ * $choiceList = new ArrayChoiceList($choices, $labels);
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList} instead.
  */
 class ChoiceList implements ChoiceListInterface
 {
@@ -41,14 +46,14 @@ class ChoiceList implements ChoiceListInterface
      *
      * @var array
      */
-    private $choices = array();
+    protected $choices = array();
 
     /**
      * The choice values with the indices of the matching choices as keys.
      *
      * @var array
      */
-    private $values = array();
+    protected $values = array();
 
     /**
      * The preferred view objects as hierarchy containing also the choice groups
@@ -198,9 +203,13 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $choices = $this->fixChoices($choices);
         $indices = array();
 
@@ -222,9 +231,13 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $values = $this->fixValues($values);
         $indices = array();
 
@@ -485,9 +498,9 @@ class ChoiceList implements ChoiceListInterface
      * Extension point. In this implementation, choices are guaranteed to
      * always maintain their type and thus can be typesafely compared.
      *
-     * @param mixed $choice The choice.
+     * @param mixed $choice The choice
      *
-     * @return mixed The fixed choice.
+     * @return mixed The fixed choice
      */
     protected function fixChoice($choice)
     {

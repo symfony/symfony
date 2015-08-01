@@ -591,6 +591,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getRelativeUriForPathData()
+     */
+    public function testGetRelativeUriForPath($expected, $pathinfo, $path)
+    {
+        $this->assertEquals($expected, Request::create($pathinfo)->getRelativeUriForPath($path));
+    }
+
+    public function getRelativeUriForPathData()
+    {
+        return array(
+            array('me.png', '/foo', '/me.png'),
+            array('../me.png', '/foo/bar', '/me.png'),
+            array('me.png', '/foo/bar', '/foo/me.png'),
+            array('../baz/me.png', '/foo/bar/b', '/foo/baz/me.png'),
+            array('../../fooz/baz/me.png', '/foo/bar/b', '/fooz/baz/me.png'),
+            array('baz/me.png', '/foo/bar/b', 'baz/me.png'),
+        );
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::getUserInfo
      */
     public function testGetUserInfo()
@@ -617,6 +637,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
+        $server = array();
         $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '90';
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -856,6 +877,31 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         Request::setTrustedProxies(array());
     }
 
+    /**
+     * @dataProvider testGetClientIpsForwardedProvider
+     */
+    public function testGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
+    {
+        $request = $this->getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies);
+
+        $this->assertEquals($expected, $request->getClientIps());
+
+        Request::setTrustedProxies(array());
+    }
+
+    public function testGetClientIpsForwardedProvider()
+    {
+        //              $expected                                  $remoteAddr  $httpForwarded                                       $trustedProxies
+        return array(
+            array(array('127.0.0.1'),                              '127.0.0.1', 'for="_gazonk"',                                      null),
+            array(array('_gazonk'),                                '127.0.0.1', 'for="_gazonk"',                                      array('127.0.0.1')),
+            array(array('88.88.88.88'),                            '127.0.0.1', 'for="88.88.88.88:80"',                               array('127.0.0.1')),
+            array(array('192.0.2.60'),                             '::1',       'for=192.0.2.60;proto=http;by=203.0.113.43',          array('::1')),
+            array(array('2620:0:1cfe:face:b00c::3', '192.0.2.43'), '::1',       'for=192.0.2.43, for=2620:0:1cfe:face:b00c::3',       array('::1')),
+            array(array('2001:db8:cafe::17'),                      '::1',       'for="[2001:db8:cafe::17]:4711',                      array('::1')),
+        );
+    }
+
     public function testGetClientIpsProvider()
     {
         //        $expected                   $remoteAddr                $httpForwardedFor            $trustedProxies
@@ -1078,6 +1124,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
+        $request->headers->set('CONTENT_TYPE', 'multipart/form-data');
+        $request->headers->set('CONTENT_LENGTH', 12345);
+
+        $request->overrideGlobals();
+
+        $this->assertArrayHasKey('CONTENT_TYPE', $_SERVER);
+        $this->assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
+
         $request->initialize(array('foo' => 'bar', 'baz' => 'foo'));
         $request->query->remove('baz');
 
@@ -1241,6 +1295,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
         $this->assertEquals(array('ISO-8859-1', 'utf-8', '*'), $request->getCharsets());
+    }
+
+    public function testGetEncodings()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getEncodings());
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array(), $request->getEncodings()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array('gzip', 'deflate', 'sdch'), $request->getEncodings());
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip;q=0.4,deflate;q=0.9,compress;q=0.7');
+        $this->assertEquals(array('deflate', 'compress', 'gzip'), $request->getEncodings());
     }
 
     public function testGetAcceptableContentTypes()
@@ -1493,6 +1563,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
+    private function getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies)
+    {
+        $request = new Request();
+
+        $server = array('REMOTE_ADDR' => $remoteAddr);
+
+        if (null !== $httpForwarded) {
+            $server['HTTP_FORWARDED'] = $httpForwarded;
+        }
+
+        if ($trustedProxies) {
+            Request::setTrustedProxies($trustedProxies);
+        }
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        return $request;
+    }
+
     public function testTrustedProxies()
     {
         $request = Request::create('http://example.com/');
@@ -1570,6 +1659,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTrustedProxiesInvalidHeaderName()
+    {
+        Request::create('http://example.com/');
+        Request::setTrustedHeaderName('bogus name', 'X_MY_FOR');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetTrustedProxiesInvalidHeaderName()
+    {
+        Request::create('http://example.com/');
+        Request::getTrustedHeaderName('bogus name');
+    }
+
+    /**
      * @dataProvider iisRequestUriProvider
      */
     public function testIISRequestUri($headers, $server, $expectedRequestUri)
@@ -1581,7 +1688,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
 
         $subRequestUri = '/bar/foo';
-        $subRequest = $request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
+        $subRequest = Request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
         $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
@@ -1701,6 +1808,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         Request::setTrustedHosts(array());
     }
 
+    public function testFactory()
+    {
+        Request::setFactory(function (array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null) {
+            return new NewRequest();
+        });
+
+        $this->assertEquals('foo', Request::create('/')->getFoo());
+
+        Request::setFactory(null);
+    }
+
     /**
      * @dataProvider getLongHostNames
      */
@@ -1760,5 +1878,13 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class NewRequest extends Request
+{
+    public function getFoo()
+    {
+        return 'foo';
     }
 }

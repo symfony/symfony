@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  *
  * @author Drak <drak@zikula.org>
  */
-class FlashBag implements FlashBagInterface, \IteratorAggregate
+class FlashBag implements FlashBagInterface
 {
     private $name = 'flashes';
 
@@ -162,15 +162,5 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
     public function clear()
     {
         return $this->all();
-    }
-
-    /**
-     * Returns an iterator for flashes.
-     *
-     * @return \ArrayIterator An \ArrayIterator instance
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->all());
     }
 }

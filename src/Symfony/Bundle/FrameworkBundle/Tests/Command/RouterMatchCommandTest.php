@@ -74,19 +74,22 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($requestContext))
         ;
 
+        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
+             ->disableOriginalConstructor()
+             ->getMock();
+
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->once())
             ->method('has')
             ->with('router')
-            ->will($this->returnValue(true))
-        ;
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->with('router')
-            ->will($this->returnValue($router))
-        ;
+            ->will($this->returnValue(true));
+        $container->method('get')
+            ->will($this->returnValueMap(array(
+                array('router', 1, $router),
+                array('controller_name_converter', 1, $loader),
+
+            )));
 
         return $container;
     }

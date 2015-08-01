@@ -13,10 +13,20 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('file');
+
+        $this->assertSame('file', $form->getConfig()->getType()->getName());
+    }
+
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()
     {
-        $form = $this->factory->createBuilder('file')->getForm();
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
 
         $form->setData($data);
@@ -26,7 +36,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmit()
     {
-        $form = $this->factory->createBuilder('file')->getForm();
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
 
         $form->submit($data);
@@ -37,18 +47,37 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     // https://github.com/symfony/symfony/issues/6134
     public function testSubmitEmpty()
     {
-        $form = $this->factory->createBuilder('file')->getForm();
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
 
         $form->submit(null);
 
         $this->assertNull($form->getData());
     }
 
+    public function testSubmitMultiple()
+    {
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
+            'multiple' => true,
+        ))->getForm();
+
+        $data = array(
+            $this->createUploadedFileMock('abcdef', 'first.jpg', true),
+            $this->createUploadedFileMock('zyxwvu', 'second.jpg', true),
+        );
+
+        $form->submit($data);
+        $this->assertSame($data, $form->getData());
+
+        $view = $form->createView();
+        $this->assertSame('file[]', $view->vars['full_name']);
+        $this->assertArrayHasKey('multiple', $view->vars['attr']);
+    }
+
     public function testDontPassValueToView()
     {
-        $form = $this->factory->create('file');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FileType');
         $form->submit(array(
-            'file' => $this->createUploadedFileMock('abcdef', 'original.jpg', true),
+            'Symfony\Component\Form\Extension\Core\Type\FileType' => $this->createUploadedFileMock('abcdef', 'original.jpg', true),
         ));
         $view = $form->createView();
 

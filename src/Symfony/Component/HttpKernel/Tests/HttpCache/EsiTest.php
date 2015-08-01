@@ -23,14 +23,14 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        $this->assertTrue($esi->hasSurrogateEsiCapability($request));
+        $this->assertTrue($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'foobar');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
     }
 
     public function testAddSurrogateEsiCapability()
@@ -38,10 +38,10 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $esi = new Esi();
 
         $request = Request::create('/');
-        $esi->addSurrogateEsiCapability($request);
+        $esi->addSurrogateCapability($request);
         $this->assertEquals('symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
 
-        $esi->addSurrogateEsiCapability($request);
+        $esi->addSurrogateCapability($request);
         $this->assertEquals('symfony2="ESI/1.0", symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
@@ -64,10 +64,10 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
         $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
-        $this->assertTrue($esi->needsEsiParsing($response));
+        $this->assertTrue($esi->needsParsing($response));
 
         $response = new Response();
-        $this->assertFalse($esi->needsEsiParsing($response));
+        $this->assertFalse($esi->needsParsing($response));
     }
 
     public function testRenderIncludeTag()
@@ -100,23 +100,23 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="..." alt="alt" onerror="continue" />');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
         $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
 
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="foo\'" alt="bar\'" onerror="continue" />');
         $esi->process($request, $response);
 
-        $this->assertEquals("foo <?php echo \$this->esi->handle(\$this, 'foo\\'', 'bar\\'', true) ?>"."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'foo\\\'\', \'bar\\\'\', true) ?>'."\n", $response->getContent());
 
         $response = new Response('foo <esi:include src="..." />');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
 
         $response = new Response('foo <esi:include src="..."></esi:include>');
         $esi->process($request, $response);
 
-        $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
     }
 
     public function testProcessEscapesPhpTags()

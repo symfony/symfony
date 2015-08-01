@@ -86,13 +86,13 @@ class UriSigner
 
     private function computeHash($uri)
     {
-        return urlencode(base64_encode(hash_hmac('sha1', $uri, $this->secret, true)));
+        return urlencode(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)));
     }
 
     private function buildUrl(array $url, array $params = array())
     {
         ksort($params);
-        $url['query'] = http_build_query($params);
+        $url['query'] = http_build_query($params, '', '&');
 
         $scheme = isset($url['scheme']) ? $url['scheme'].'://' : '';
         $host = isset($url['host']) ? $url['host'] : '';

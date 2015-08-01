@@ -29,8 +29,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
-    protected $reflected;
     protected $extension;
+    protected $path;
 
     /**
      * Boots the Bundle.
@@ -72,9 +72,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     public function getContainerExtension()
     {
         if (null === $this->extension) {
-            $basename = preg_replace('/Bundle$/', '', $this->getName());
-
-            $class = $this->getNamespace().'\\DependencyInjection\\'.$basename.'Extension';
+            $class = $this->getContainerExtensionClass();
             if (class_exists($class)) {
                 $extension = new $class();
 
@@ -83,12 +81,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
                 }
 
                 // check naming convention
+                $basename = preg_replace('/Bundle$/', '', $this->getName());
                 $expectedAlias = Container::underscore($basename);
                 if ($expectedAlias != $extension->getAlias()) {
                     throw new \LogicException(sprintf(
-                        'The extension alias for the default extension of a '.
-                        'bundle must be the underscored version of the '.
-                        'bundle name ("%s" instead of "%s")',
+                        'Users will expect the alias of the default extension of a bundle to be the underscored version of the bundle name ("%s"). You can override "Bundle::getContainerExtension()" if you want to use "%s" or another alias.',
                         $expectedAlias, $extension->getAlias()
                     ));
                 }
@@ -113,11 +110,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getNamespace()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
-        }
+        $class = get_class($this);
 
-        return $this->reflected->getNamespaceName();
+        return substr($class, 0, strrpos($class, '\\'));
     }
 
     /**
@@ -129,11 +124,12 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getPath()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
         }
 
-        return dirname($this->reflected->getFileName());
+        return $this->path;
     }
 
     /**
@@ -191,10 +187,29 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             if ($relativePath = $file->getRelativePath()) {
                 $ns .= '\\'.strtr($relativePath, '/', '\\');
             }
-            $r = new \ReflectionClass($ns.'\\'.$file->getBasename('.php'));
+            $class = $ns.'\\'.$file->getBasename('.php');
+            if ($this->container) {
+                $alias = 'console.command.'.strtolower(str_replace('\\', '_', $class));
+                if ($this->container->has($alias)) {
+                    continue;
+                }
+            }
+            $r = new \ReflectionClass($class);
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract() && !$r->getConstructor()->getNumberOfRequiredParameters()) {
                 $application->add($r->newInstance());
             }
         }
+    }
+
+    /**
+     * Returns the bundle's container extension class.
+     *
+     * @return string
+     */
+    protected function getContainerExtensionClass()
+    {
+        $basename = preg_replace('/Bundle$/', '', $this->getName());
+
+        return $this->getNamespace().'\\DependencyInjection\\'.$basename.'Extension';
     }
 }

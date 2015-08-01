@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-29T07:07:54Z
+
+Could you please add a failing test case to avoid future regressions of this fix?
+
+---------------------------------------------------------------------------
+
+by bokonet at 2015-07-29T11:45:31Z
+
+@xabbuh: i tried to reproduce this failure in two other symfony projects with the same user/userRole structure unsuccessfully. The error occured only in one project, and we dont know why. I can not find any different configurations between the projects. I realy dont understand this error!
+Sorry, i dont know how to add a failing test case...
+
+---------------------------------------------------------------------------
+
+by bokonet at 2015-07-29T12:04:59Z
+
+We looked into it again and discovered that this "nesting level to deep" error is in some way related to the count of doctrin entity-realtions. We removed a oneToMany relation and the error was gone. So it should be better to compare php objects strict, to avoid comparing every attribute and value of the first object with the second.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-30T16:08:00Z
+
+I think this happens when you have an uninitialized Doctrine proxy as one of your roles, as this object will then have a reference to the entity manager, which itself keeps the proxy in its identity map, leading to an infinite loop when comparing the 2 big object graphs

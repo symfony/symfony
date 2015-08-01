@@ -181,7 +181,7 @@ Form
    {
        public function getExtendedType()
        {
-           method_exists(AbstractType::class, 'getBlockPrefix') ? FormType::class : 'form';
+           return method_exists(AbstractType::class, 'getBlockPrefix') ? FormType::class : 'form';
        }
    }
    ```

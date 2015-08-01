@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-24T12:56:55Z
+
+Why did you close?
+
+---------------------------------------------------------------------------
+
+by johnnypeck at 2015-06-30T06:47:51Z
+
+@jakzal For some reason I thought I hadn't followed the contributing guidelines as my fork is way out of date. I'll reopen. Thanks for the push ;-)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-30T06:55:09Z
+
+@johnnypeck here's the contribution guide that should help you: http://symfony.com/doc/current/contributing/code/patches.html
+
+Please update PR's description and include [the checklist table](http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request).

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 $container = new ContainerBuilder();
 $container->
-    register('foo', 'FooClass')->
+    register('foo', '\FooClass')->
     addTag('foo', array('foo' => 'foo'))->
     addTag('foo', array('bar' => 'bar', 'baz' => 'baz'))->
     setFactoryClass('FooClass')->

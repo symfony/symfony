@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-06-18T21:28:41Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-19T14:52:02Z
+
+Can you also create the PR for the docs?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-20T06:14:05Z
+
+Don't you have to set the default value of the `name_converter` option to `serializer.name_converter.camel_case_to_snake_case` so that it is taken by default? Otherwise, the service were only used in the tests.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-06-20T07:00:14Z
+
+No. If you do that everything will be converted by default and this is not intended nor a best practice.
+
+The name converter definition is here just for convenience and will be removed during the container compilation when not used.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-04T10:22:15Z
+
+Code updated and doc added (symfony/symfony-docs#5483)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-07T17:12:17Z
+
+> No. If you do that everything will be converted by default and this is not intended nor a best practice.
+
+> The name converter definition is here just for convenience and will be removed during the container compilation when not used.
+
+Thanks for explaining your intentions.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-07T17:12:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-07T18:31:30Z
+
+:+1:

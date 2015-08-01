@@ -13,13 +13,12 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
-use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeTypeTest extends TestCase
 {
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        \Locale::setDefault('en');
 
         parent::setUp();
     }
@@ -269,16 +268,6 @@ class DateTimeTypeTest extends TestCase
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
         $this->factory->create('datetime', new \DateTime());
-    }
-
-    public function testSingleTextWidgetShouldUseTheRightInputType()
-    {
-        $form = $this->factory->create('datetime', null, array(
-            'widget' => 'single_text',
-        ));
-
-        $view = $form->createView();
-        $this->assertEquals('datetime', $view->vars['type']);
     }
 
     public function testPassDefaultEmptyValueToViewIfNotRequired()

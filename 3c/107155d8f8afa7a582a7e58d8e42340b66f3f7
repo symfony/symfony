@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-31T08:03:57Z
+
+Or could I drop this method in 2.7? The comments in #5367 make me think that the answer could be *yes*.
+I don't see any side effect, did I miss something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-31T14:43:10Z
+
+PR is ready but is to be merged after #15417 (which is included for now)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T06:24:31Z
+
+Ok, can you rebase then?

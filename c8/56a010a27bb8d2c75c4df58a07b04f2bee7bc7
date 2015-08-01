@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T07:57:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2015-08-01T08:36:40Z
+
+@fabpot I inlined the check on the availability of readline.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-01T09:31:10Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by michaelperrin at 2015-08-01T09:48:07Z
+
+@xabbuh I made the change according to you second comment. My comments about your first one are above.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-01T10:32:42Z
+
+@michaelperrin I could imagine that people find `stream_get_line()` more readable. But I don't have any hard feelings about it. :+1:
+
+Status: Reviewed

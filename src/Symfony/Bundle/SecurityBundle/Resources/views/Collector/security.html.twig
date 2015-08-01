@@ -34,7 +34,7 @@
             {% if collector.providerKey %}
             <div class="sf-toolbar-info-piece">
                 <b>Actions</b>
-                <a class="sf-btn" title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}">Logout</a>
+                <span><a href="{{ logout_path(collector.providerKey) }}">Logout</a></span>
             </div>
             {% endif %}
         {% elseif collector.enabled %}

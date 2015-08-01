@@ -115,7 +115,7 @@ class ExceptionHandler
     public function handle(\Exception $exception)
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
-            $this->failSafeHandle($exception);
+            $this->sendPhpResponse($exception);
 
             return;
         }
@@ -128,8 +128,7 @@ class ExceptionHandler
             return '';
         });
 
-
-        $this->failSafeHandle($exception);
+        $this->sendPhpResponse($exception);
         while (null === $this->caughtBuffer && ob_end_flush()) {
             // Empty loop, everything is in the condition
         }
@@ -163,33 +162,6 @@ class ExceptionHandler
     }
 
     /**
-     * Sends a response for the given Exception.
-     *
-     * If you have the Symfony HttpFoundation component installed,
-     * this method will use it to create and send the response. If not,
-     * it will fallback to plain PHP functions.
-     *
-     * @param \Exception $exception An \Exception instance
-     */
-    private function failSafeHandle(\Exception $exception)
-    {
-        if (class_exists('Symfony\Component\HttpFoundation\Response', false)
-            && __CLASS__ !== get_class($this)
-            && ($reflector = new \ReflectionMethod($this, 'createResponse'))
-            && __CLASS__ !== $reflector->class
-        ) {
-            $response = $this->createResponse($exception);
-            $response->sendHeaders();
-            $response->sendContent();
-            @trigger_error(sprintf("The %s::createResponse method is deprecated since 2.8 and won't be called anymore when handling an exception in 3.0.", $reflector->class), E_USER_DEPRECATED);
-
-            return;
-        }
-
-        $this->sendPhpResponse($exception);
-    }
-
-    /**
      * Sends the error associated with the given Exception as a plain PHP response.
      *
      * This method uses plain PHP functions like header() and echo to output
@@ -212,26 +184,6 @@ class ExceptionHandler
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
-    }
-
-    /**
-     * Creates the error Response associated with the given Exception.
-     *
-     * @param \Exception|FlattenException $exception An \Exception instance
-     *
-     * @return Response A Response instance
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function createResponse($exception)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
-        }
-
-        return Response::create($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);
     }
 
     /**

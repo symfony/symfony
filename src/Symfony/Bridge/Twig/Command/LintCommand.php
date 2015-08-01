@@ -196,7 +196,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0));
+        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT);
 
         return min($errors, 1);
     }

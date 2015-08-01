@@ -281,7 +281,7 @@ class Command
             throw new \InvalidArgumentException('Invalid callable provided to Command::setCode.');
         }
 
-        if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
+        if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
                 $code = \Closure::bind($code, $this);

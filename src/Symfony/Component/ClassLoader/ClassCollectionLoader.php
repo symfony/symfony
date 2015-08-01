@@ -280,12 +280,10 @@ class ClassCollectionLoader
 
         $traits = array();
 
-        if (function_exists('get_declared_traits')) {
-            foreach ($classes as $c) {
-                foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
-                    if ($trait !== $c) {
-                        $traits[] = $trait;
-                    }
+        foreach ($classes as $c) {
+            foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
+                if ($trait !== $c) {
+                    $traits[] = $trait;
                 }
             }
         }

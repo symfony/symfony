@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-01T23:03:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-07T17:32:35Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-07T18:30:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-07-07T19:56:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-07T22:27:33Z
+
+I'd rather say, as also stated in the ticket, that `cannotBeEmpty` on a boolean node (etc.) makes no sense. So it should rather throw an exception.
+
+So I'm +-0 with this solution.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-08T06:22:55Z
+
+I thought about that too, but decided to go this way as throwing an exception would potentially break many existing applications.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-08T09:24:52Z
+
+Then just change it in 2.8 or 3.0
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-08T10:47:25Z
+
+Then I suggest to mark the method as deprecated in 2.8 and throw the exception in 3.0. Do you agree with this plan?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-14T06:58:43Z
+
+@xabbuh I agree
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-15T17:34:35Z
+
+see #15285 for the deprecations
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-15T17:52:36Z
+
+I just discovered that the changes did not cover float nodes properly. I moved the check from `IntegerNode` to `NumericNode`.

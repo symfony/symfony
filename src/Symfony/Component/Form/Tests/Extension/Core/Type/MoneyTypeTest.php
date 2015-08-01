@@ -25,6 +25,9 @@ class MoneyTypeTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('money');

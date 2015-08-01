@@ -15,6 +15,9 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
 class UrlTypeTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('url');

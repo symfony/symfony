@@ -37,6 +37,9 @@ class DateTypeTest extends TestCase
         date_default_timezone_set($this->defaultTimezone);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('date');

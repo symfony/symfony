@@ -17,6 +17,9 @@ use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('collection', array(

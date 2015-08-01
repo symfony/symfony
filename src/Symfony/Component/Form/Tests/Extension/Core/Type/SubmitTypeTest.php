@@ -18,6 +18,9 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
  */
 class SubmitTypeTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('submit');

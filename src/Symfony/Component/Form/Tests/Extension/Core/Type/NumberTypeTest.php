@@ -26,6 +26,9 @@ class NumberTypeTest extends TestCase
         \Locale::setDefault('de_DE');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('number');

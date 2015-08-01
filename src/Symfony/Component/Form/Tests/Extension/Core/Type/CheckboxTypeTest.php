@@ -15,6 +15,9 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('checkbox');

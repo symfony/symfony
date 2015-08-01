@@ -16,6 +16,9 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
  */
 class BirthdayTypeTest extends BaseTypeTest
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('birthday');

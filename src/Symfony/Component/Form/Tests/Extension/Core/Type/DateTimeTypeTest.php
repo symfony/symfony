@@ -24,6 +24,9 @@ class DateTimeTypeTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('datetime');

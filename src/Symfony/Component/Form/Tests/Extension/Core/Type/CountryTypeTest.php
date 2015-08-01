@@ -24,6 +24,9 @@ class CountryTypeTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('country');

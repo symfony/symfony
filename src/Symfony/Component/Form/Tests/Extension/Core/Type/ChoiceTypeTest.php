@@ -67,6 +67,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->objectChoices = null;
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyName()
     {
         $form = $this->factory->create('choice');

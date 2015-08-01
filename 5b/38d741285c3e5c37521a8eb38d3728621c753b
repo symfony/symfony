@@ -1,0 +1,528 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-23T21:49:19Z
+
+I think you can simply add the service id to the `$types` additionally to the class name. This way both work as alias and there is no BC break.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T13:32:52Z
+
+Updated. Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-06-24T13:59:07Z
+
+@webmozart I have a question. You say that when using PHP 5.5, the needed changes are minimal:
+
+Before:
+
+```php
+$form = $this->createFormBuilder()
+    ->add('name', 'text')
+    ->add('age', 'integer')
+    ->getForm();
+
+$form = $this->createForm(new AuthorType());
+```
+
+After:
+
+```php
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use AppBundle\Form\Type\AuthorType;
+
+$form = $this->createFormBuilder()
+    ->add('name', TextType::class)
+    ->add('age', IntegerType::class)
+    ->getForm();
+
+$form = $this->createForm(AuthorType::class);
+```
+
+My question is: if you use PHP 5.3 or PHP 5.4, you should use the following?
+
+```php
+$form = $this->createFormBuilder()
+    ->add('name', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+    ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
+    ->getForm();
+
+$form = $this->createForm('AppBundle\Form\Type\AuthorType');
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:01:13Z
+
+@javiereguiluz yes
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T14:01:58Z
+
+@javiereguiluz Exactly. However, passing "text" or similar type names is still supported until Symfony 3.0 (although you'll get deprecation notes). Symfony 3.0 has a higher minimum PHP version anyway so there this is not a problem anymore.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-06-24T14:04:01Z
+
+@webmozart the original idea of this change was to improve DX by getting rid of the `getName()`. However, I find this change anti-DX because you now have to type a lot more.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:04:26Z
+
+@webmozart can you fix the SecurityBundle form login test failures ? These tests are passing on the current 2.8 branch
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-06-24T14:04:41Z
+
+Does it possible use dynamic form names? Currently we are using inline editing for cities in grid:
+
+```php
+$form = $this->container->get('form.factory')->createNamed(
+            CityInlineEditType::getNameForCity($city),
+            new CityInlineEditType(),
+            $city
+        );
+```
+
+Is this code still walid after this PR?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T14:05:43Z
+
+@Koc Sure, you can use any form name you like. However, the *type* needs to be passed as FQCN, i.e.
+
+```php
+$form = $this->container->get('form.factory')->createNamed(
+    CityInlineEditType::getNameForCity($city),
+    CityInlineEditType::class,
+    $city
+);
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:05:44Z
+
+@Koc this PR is about **type** names, not about **forms** names.
+
+@webmozart how does this impact the block names in form themes ?
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-06-24T14:06:12Z
+
+Is it still possible to use alias? What if you have a type and you want then use this with various dependencies? I have to extend my class to solve this problem?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T14:09:39Z
+
+@javiereguiluz That's FUD. As I've shown above, you are writing less code than before. As of using types in forms, instead of typing `'text'` (6 chars) you now type `TextT` + ENTER and let the IDE do the rest. That's one character less + type safety.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-24T14:09:44Z
+
+@DavidBadura you should add the type as a service
+
+```xml
+<service id="my.type" class="Vendor\Type\MyType">
+    <tag name="form.type" />
+    <argument type="service" id="some.service.id" />
+</service>
+```
+
+and do something like this
+
+```php
+$form = $this->createFormBuilder()
+    ->add('name', MyType::class)¿
+    ->getForm();
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-24T14:10:48Z
+
+I agree with @javiereguiluz The new way looks "weird" to me (`TextType::class` vs `text`).
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-06-24T14:13:14Z
+
+@webmozart Well, IMO is more code to write, you should also add the `use` statement (or in the best case) you can do something like this:
+
+```php
+use Vendor\Type;
+
+$form = $this->createFormBuilder()
+    ->add('name', Type\TextType::class)¿
+    ->getForm()
+;
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-06-24T14:14:23Z
+
+@webmozart I'm sorry if I offended you because it wasn't my intention. Let me add a code example to show the differences:
+
+**Now we use this**
+
+```php
+// No imports and the same for PHP 5.3, 5.4 and 5.5
+
+$form = $this->createFormBuilder()
+    ->add('name', 'text')
+    ->...
+```
+
+**This proposal**
+
+```php
+// PHP 5.5
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
+$form = $this->createFormBuilder()
+    ->add('name', TextType::class)
+    ->...
+
+// PHP 5.3 and 5.4
+$form = $this->createFormBuilder()
+    ->add('name', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+    ->...
+```
+
+**A more DX proposal**
+
+```php
+// No imports and the same for PHP 5.3, 5.4 and 5.5
+
+$form = $this->createFormBuilder()
+    ->addText('name')
+    ->...
+```
+
+Of course `->add()` would be still available for custom types.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-24T14:16:36Z
+
+@webmozart Not sure it's FUD, it's not just about the number of chars you need to type. It's also about the **perceived complexity** of what you need to type. We know that using the right `use` statement is "difficult" for some people (not everyone - unfortunately - use a good IDE).
+
+Personally, I'm more concerned about the code needed to upgrade an existing application. We already talked about that and this is typically the kind of things that could be upgrade automatically with a simple script. I know it's out of the scope of this PR and I don't want to derail the discussion here, but if we had a tool that made it simple to upgrade by automatically doing some changes, that would help a lot.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:16:57Z
+
+@javiereguiluz this would mean that the FormBuilder would mean a special knowledge about builtin types, making them special. currently, they are not special. They are provided like any other types.
+and then, you would have to explain why there is no ``addEntity`` in the FormBuilder (it cannot be there as there is no ``entity`` type in the component)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:18:17Z
+
+There is another drawback with this change: it becomes impossible to write form types compatible with Symfony 2.3+ and not throwing any deprecations on 2.8 (while it is possible currently, as shown by lots of third-part bundles out there supporting 2.7 without deprecation warnings while keeping support for the 2.3 LTS)
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-06-24T14:21:29Z
+
+@dosten no i mean:
+
+```xml
+<service id="my.type" class="Vendor\Type\MyType">
+    <tag name="form.type" alias="my_type_service1" />
+    <argument type="service" id="service1"  />
+</service>
+
+<service id="my.type" class="Vendor\Type\MyType">
+    <tag name="form.type" alias="my_type_service2"  />
+    <argument type="service" id="service2" />
+</service>
+```
+
+We have one Type with different dependencies. With this change we have to extend the "base" type like this:
+
+```php
+class MyType {}
+class Service1MyType extends MyType {}
+class Service2MyType extends MyType {}
+```
+
+```xml
+<service id="my.type" class="Vendor\Type\Service1MyType ">
+    <tag name="form.type" />
+    <argument type="service" id="service1" />
+</service>
+
+<service id="my.type" class="Vendor\Type\Service2MyType ">
+    <tag name="form.type" />
+    <argument type="service" id="service2" />
+</service>
+```
+
+```php
+$form = $this->createFormBuilder()
+    ->add('service1', Service1MyType::class)
+    ->add('service2', Service2MyType::class)
+    ->...
+```
+
+I know it can be solved with form options, but it looks like dependency injection pattern would be injured.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T14:25:52Z
+
+@dosten You're IDE/editor is responsible for adding the use statement and auto-completing the class name + constant. If it doesn't, consider using a better one. :)
+
+@javiereguiluz I see you're worried about PHP < 5.5, but you needn't. **Users of PHP < 5.5 don't have to change anything**. They'll do as they do now. When you upgrade to Symfony 3.0, you *do* have to change your code, but then you need to use a higher PHP version anyway.
+
+@fabpot I agree that a script to automate the upgrade would be fabulous. That's out of scope of this PR though, as you said.
+
+@stof Yes, but that's the case for any functionality that was supported in 2.3 and deprecated/changed later. I understand what you're saying, but I think this is a more fundamental problem than this PR.
+
+@DavidBadura This seems like a very rare edge case to me. I think creating separate sub-classes should be a reasonable solution here.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-06-24T14:32:15Z
+
+@webmozart we can change it. I just wanted to have said it. :wink:
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-06-24T14:34:20Z
+
+I also see another issue with this PR. What happens if you happen to use a proxy class (e.g. a lazy-loaded service)? Will the proxy's FQCN be used instead?
+
+Also, this will break compatibility with many projects which rely on the form type name in order to generate a dynamic form (i.e. with the form type's name stored in the DB).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T14:38:38Z
+
+@csarrazi Depends on how the proxy is generated, but I don't think that this is necessary. A proxy type should remain a hidden implementation detail.
+
+I'd like to reinforce that the existing functionality (custom type names) **will not be touched** until end of Symfony 2.8 LTS. That's plenty of time to upgrade. Let's put this into perspective please. :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-24T14:50:55Z
+
+@webmozart lazy services are generated as a child class of the actual service class. And this would indeed change the way the type is registered (it may still work for now because the original class will be used when registering the type lazily though)
+
+@DavidBadura Symfony is already validating that ``getName`` returns the same value than the alias, so your code snippet is already broken.
+
+@webmozart regarding any other feature deprecated/changed since 2.3, it was possible to write backward compatible code quite easily. This change would make it much more complex though.
+
+@webmozart can you answer about my question regarding the way block names in form themes are impacted ? Currently, block names are guessed based on the type name. and the FQCN cannot be used directly here because of restrictions on valid block names in twig (the regex restricting type names was helping us here by being more restrictive than Twig).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T15:10:19Z
+
+@stof Block names default to the form name, which defaults to the lowercase type name minus namespace minus "Type" suffix. You can customize block names with the "block_name" option. We *could* additionally convert the form name to underscore notation (e.g. `UserProfileType` => `user_profile` instead of `UserProfileType` => `userprofile`).
+
+About 2.3-compatible bundles not showing deprecation notes on 2.8, do you have any suggestion what we could do?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-24T16:07:20Z
+
+@stof I just pushed an update that converts the type classes to underscore syntax both for form names and for Twig block names. This update should also fix the remaining broken tests.
+
+---------------------------------------------------------------------------
+
+by harikt at 2015-06-24T16:36:25Z
+
+Hey @webmozart ,
+
+What is the advantage of using `Symfony\Component\Form\Extension\Core\Type\EmailType` than `email` or other fields like `text` ? Basically I am not a huge fan of the approach .
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T08:08:41Z
+
+@harikt The advantage is that we remove one unnecessary layer of abstraction (form names), which reduces the amount of code (no more `getName()` and type aliases) written by the user, the amount of code in the component itself and which makes the use of custom types much more straight forward.
+
+In practice, your IDE imports the class for you, so it's the same amount of code to *type*, even if the result is a bit longer. Please see the examples in my initial post for reference.
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-06-25T08:30:27Z
+
+@webmozart there are plugins for IDE that autocompletes form types and allows ctrl+click http://symfony2-plugin.espend.de/languages/php/index.html#forms for example
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-06-25T08:31:57Z
+
+~~if you keep talking about IDEs, maybe we should update `SymfonyRequirements.php` or `composer.json` to actually require an IDE to use Symfony ;)~~
+
+One person told me privately that this kind of messages don't help to maintain the positive vibe of the discussion. I fully agree so I've "deleted" the original comment. This is what I should have written instead:
+
+"You are right about the IDE auto-completion, but please think about the thousands of developers who don't use an IDE. If that developer is a newcomer, having to import the types becomes a problem (a lot of PHP developers still have problems importing classes)."
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-25T09:13:21Z
+
+Another advantage is that is will remove the possibility of type naming conflicts and people wondering why things don't work as intended which is hard to debug.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T09:17:30Z
+
+Well, most cases where people have issues with conflicts, it is because of conflicts in the rendering. and this PR does **not** prevent conflicts in rendering as the generated block_name is based on the short class name, which is not unique
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T09:22:07Z
+
+@webmozart I don't understand what you mean about form theming being based on the form name. Selecting the ``email_widget`` block is based on the type name here, not on the form name (even though there are ways to overwrite specific fields by name). This is the place where I see an issue.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T09:25:11Z
+
+@stof You are right, I was mistaken.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T12:31:20Z
+
+I just pushed another update. Types have a new method `getBlockPrefix()` now which allows to customize the Twig template block prefix (formerly the result of `getName()`). By default, the short class in underscore notation minus "Type" prefix is used (e.g. `UserProfileType` => `user_profile`).
+
+It is possible to write types compatible with 2.3-2.8 now by implementing both `getName()` and `getBlockPrefix()`. No deprecation error will be shown in this case.
+
+Setting the "form.type" alias does not trigger deprecation errors anymore. Instead, *accessing* types by their alias or by their service ID triggers the error now. This again is a way to ensure compatibility with 2.3-2.8.
+
+The only remaining "problem" for my side is writing type extensions: If an extension wants to be compatible with 2.3, it needs to return the explicit type name (e.g. "form") from `getExtendedType()`. However, this triggers a deprecation error in 2.8. I don't see a way to fix this though because you can only either return the explicit name or the FQCN.
+
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T12:45:38Z
+
+I also updated the description of the PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-25T13:03:48Z
+
+@webmozart for the type extensions, I think it could be easy though:
+
+```php
+class MyTypeExtension extends AbstractTypeExtension
+{
+    public function getExtendedType()
+    {
+        method_exists(AbstractType::class, 'getBlockPrefix') ? Form::class : 'form';
+    }
+}
+```
+
+This is already similar to the way bundles are doing for DI service factories for instance.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T13:06:30Z
+
+@stof You're right! I'll add this to the UPGRADE file after lunch.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-25T13:43:04Z
+
+According to http://php.net/manual/en/language.namespaces.rules.php
+> Fully qualified name: This is an identifier with a namespace separator that begins with a namespace separator, such as \Foo\Bar.
+
+But neither `get_class` nor `FormType::class` return the class with a leading slash. So using them would not actually return a FQCN according to this definition. So something is inconsistent.
+
+I guess the difference is that class name as a string is always relative to the global namespace, so the leading slash is irrelevant. But when referencing a class as an PHP identifier, it's relative to the current namespace. But it's confusing that FQCN has different definitions depending on the context.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-25T13:56:53Z
+
+So using `$this->createForm('\App\AuthorType');` would not work currently I guess.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-25T14:30:20Z
+
+I updated the UPGRADE file according to @stof's comments. It should be possible now to write bundles compatible with 2.3 to 2.8 without deprecation errors.
+
+@Tobion That's correct. I think this problem is out of scope of this PR.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-30T12:31:45Z
+
+This PR is ready for merge.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-30T12:38:25Z
+
+The upgrade path looks good to me now; thanks for working on smoothing the experience for our users.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-07-01T13:39:46Z
+
+Updated. Thanks @Tobion.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-07-01T14:12:05Z
+
+I think the old way of forcing people to implement `getName` was NOT good for three reasons:
+
+1. there is already a class name to identify it, meaning getName is redundant
+2. as we know, naming things is hard. thus forcing people to invent a name just creates a burden
+3. easily creates conflicting names
+
+This is why I proposed to remove/deprecate this concept completely instead of just making it optional.
+The new way also has another advantage: It makes code __self-documenting__.
+Writing/seeing code like `$formBuilder->add('property', 'entity')` is not expressive (what options are available, what does `entity` do?), but `$formBuilder->add('property', EntityType::class)` is. It allows you to easily open the EntityType class to look at documention and exposed options.
+So I think it is DX-friendly. IDEs could even go futher now and propose/autocomplete all classes in your project that implement FormTypeInterface when building a form. Such things wouldn't be easily possible to automate when using abstract names which are resolved at runtime.
+
+The only disadvantage I see is that using the class name does not correspond to type extensions. Using a class name as reference (in contrast to an abstract name) makes people assume it's really just this class. But type extensions can do anything on top of it which somehow clashes with the object-oriented way of using a class name. But I think type extensions are not so common anyway (esp. in user-defined ones).
+
+All in all, I'm :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T16:16:43Z
+
+> The only disadvantage I see is that using the class name does not correspond to type extensions. Using a class name as reference (in contrast to an abstract name) makes people assume it's really just this class. But type extensions can do anything on top of it which somehow clashes with the object-oriented way of using a class name. But I think type extensions are not so common anyway (esp. in user-defined ones).
+
+not only type extension but also type inheritance. but this is just a documentation thing IMO.
+
+---------------------------------------------------------------------------
+
+by aderuwe at 2015-07-01T16:26:12Z
+
+This looks really good. Thanks @webmozart.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-07-02T08:03:29Z
+
+Updated.

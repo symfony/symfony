@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-17T08:41:55Z
+
+``symfony/security`` should not replace ``symfony/security-acl`` anymore either
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-06-17T09:07:17Z
+
+@stof ah yes, I will update those accordingly
+
+---------------------------------------------------------------------------
+
+by stof at 2015-06-17T09:11:28Z
+
+btw, the not-removed replacement is the reason why tests are failing
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-06-17T09:17:51Z
+
+Lets see what happens after a push. For some reason my 2.8 keeps complaining about objects not being equal in form tests;
+```
+73) Symfony\Component\Validator\Tests\Constraints\RangeValidatorTest::testInvalidDatesCombinedMin with data set #3 (DateTimeImmutable Object (...), 'Mar 9, 2014, 12:00 AM')
+Failed asserting that two objects are equal.
+--- Expected
++++ Actual
+@@ @@
+ Symfony\Component\Validator\ConstraintViolation Object (
+     'message' => null
+     'messageTemplate' => 'myMinMessage'
+     'parameters' => Array (
+-        '{{ value }}' => 'Mar 9, 2014, 12:00 AM'
+-        '{{ limit }}' => 'Mar 10, 2014, 12:00 AM'
++        '{{ value }}' => 'Mar 9, 2014 12:00 AM'
++        '{{ limit }}' => 'Mar 10, 2014 12:00 AM'
+     )
+     'plural' => null
+     'root' => 'root'
+     'propertyPath' => 'property.path'
+     'invalidValue' => 'InvalidValue'
+     'constraint' => Symfony\Component\Validator\Constraints\NotNull Object (...)
+     'code' => 3
+     'cause' => null
+ )
+
+```

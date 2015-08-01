@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses;
+namespace Symfony\Component\Routing\Tests\Fixtures\OtherAnnotatedClasses;
 
 class VariadicClass
 {

@@ -245,7 +245,7 @@ class NumberFormatter
     /**
      * Constructor.
      *
-     * @param string $locale  The locale code. The only currently supported locale is "en".
+     * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en").
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
@@ -257,13 +257,13 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
     public function __construct($locale = 'en', $style = null, $pattern = null)
     {
-        if ('en' != $locale) {
+        if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
@@ -282,7 +282,7 @@ class NumberFormatter
     /**
      * Static constructor.
      *
-     * @param string $locale  The locale code. The only supported locale is "en".
+     * @param string $locale  The locale code. The only supported locale is "en" (or null using the default locale, i.e. "en").
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only currently supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
@@ -296,7 +296,7 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */

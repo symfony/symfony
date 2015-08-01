@@ -171,12 +171,7 @@ class JsonDescriptor extends Descriptor
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
-
-        if (defined('JSON_PRETTY_PRINT')) {
-            $flags |= JSON_PRETTY_PRINT;
-        }
-
-        $this->write(json_encode($data, $flags)."\n");
+        $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 
     /**

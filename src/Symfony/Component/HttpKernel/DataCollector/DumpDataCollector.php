@@ -247,7 +247,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     private function doDump($data, $name, $file, $line)
     {
-        if (PHP_VERSION_ID >= 50400 && $this->dumper instanceof CliDumper) {
+        if ($this->dumper instanceof CliDumper) {
             $contextDumper = function ($name, $file, $line, $fileLinkFormat) {
                 if ($this instanceof HtmlDumper) {
                     if ('' !== $file) {

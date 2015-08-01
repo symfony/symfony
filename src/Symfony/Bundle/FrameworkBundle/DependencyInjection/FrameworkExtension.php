@@ -396,7 +396,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -969,6 +969,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        }
+
+        if ($config['name_converter']) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
         }
     }
 

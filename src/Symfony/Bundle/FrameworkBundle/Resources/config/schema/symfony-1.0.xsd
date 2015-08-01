@@ -107,6 +107,7 @@
         <xsd:attribute name="cookie-domain" type="xsd:string" />
         <xsd:attribute name="cookie-secure" type="xsd:boolean" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
+        <xsd:attribute name="use-cookies" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
         <xsd:attribute name="gc-divisor" type="xsd:string" />
@@ -203,5 +204,6 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
+        <xsd:attribute name="name-converter" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

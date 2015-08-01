@@ -150,7 +150,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $grant = 0;
         $deny = 0;
-        $abstain = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
@@ -164,11 +163,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     ++$deny;
 
                     break;
-
-                default:
-                    ++$abstain;
-
-                    break;
             }
         }
 
@@ -180,7 +174,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return false;
         }
 
-        if ($grant == $deny && $grant != 0) {
+        if ($grant > 0) {
             return $this->allowIfEqualGrantedDeniedDecisions;
         }
 

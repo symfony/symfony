@@ -161,7 +161,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     public function getSurrogate()
     {
-        return $this->getEsi();
+        if (!$this->surrogate instanceof Esi) {
+            throw new \LogicException('This instance of HttpCache was not set up to use ESI as surrogate handler. You must overwrite and use createSurrogate');
+        }
+
+        return $this->surrogate;
     }
 
     /**

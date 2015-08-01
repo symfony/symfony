@@ -20,13 +20,13 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder(
-            'form',
+            'Symfony\Component\Form\Extension\Core\Type\FormType',
             null,
             array(
                 'validation_groups' => 'group',
             )
         );
-        $builder->add('firstName', 'form');
+        $builder->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\FormType');
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
@@ -93,6 +93,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = array())
     {
-        return $this->factory->create('form', null, $options);
+        return $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, $options);
     }
 }

@@ -88,7 +88,7 @@ class CollectionType extends AbstractType
             'prototype' => true,
             'prototype_data' => null,
             'prototype_name' => '__name__',
-            'type' => 'text',
+            'type' => __NAMESPACE__.'\TextType',
             'options' => array(),
             'delete_empty' => false,
         ));
@@ -100,6 +100,14 @@ class CollectionType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'collection';
     }

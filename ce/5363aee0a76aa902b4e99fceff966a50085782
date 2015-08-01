@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by jderusse at 2015-07-27T07:55:11Z
+
+It's a BC break because the default value changed. But it's for the own good of the application. It could be a issue on an application which retrieve the cookie value in javascript on purpose.
+
+BTW I don't see how to notify the developper: I'm :-1: for adding a deprecated notice when the parameter is not overrided.
+
+Other question, should I add a tests who asserts defaults values?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-07-27T08:00:42Z
+
+@jderusse I wasn't thinking about a deprecation notice. If I understand this change right, any Symfony app that uses JavaScript to read cookies values will stop working. I was wondering if we could say that explicitly somewhere.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2015-07-27T08:04:08Z
+
+@javiereguiluz You're right, thats why it's a BC break.
+
+Adding a deprecated notice when the parameter is not overrided will force everybody to explicitly sets this optional parameter :(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-27T14:28:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-28T07:25:45Z
+
+If this should be merged into the `2.8` branch, the upgrade docs for 2.8 must be updated.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-28T08:16:51Z
+
+I think this change is worth the (minor) BC break it provides pre-3.0.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-28T08:19:34Z
+
+@javiereguiluz this will only break things if you use Javascript to read the session cookie.
+
+and :+1: for this change. It makes the session cookie safer by default
+
+---------------------------------------------------------------------------
+
+by jderusse at 2015-07-28T09:53:16Z
+
+I set the description in both `UPGRADE-2.8.md` and `UPGRADE-3.0.md`. Is it ok ?
+ping @xabbuh
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-28T10:59:35Z
+
+if the change is done in 2.8, there is nothing to add in ``UPGRADE-3.0.md``, as upgrading from 2.8 to 3.0 won't change anything
+
+---------------------------------------------------------------------------
+
+by jderusse at 2015-07-28T11:02:38Z
+
+fixed

@@ -24,8 +24,13 @@ class EnumNode extends ScalarNode
 
     public function __construct($name, NodeInterface $parent = null, array $values = array())
     {
+        $values = array_unique($values);
+        if (empty($values)) {
+            throw new \InvalidArgumentException('$values must contain at least one element.');
+        }
+
         parent::__construct($name, $parent);
-        $this->values = array_unique($values);
+        $this->values = $values;
     }
 
     public function getValues()

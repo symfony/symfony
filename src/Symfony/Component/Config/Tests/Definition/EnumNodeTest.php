@@ -21,6 +21,15 @@ class EnumNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $values must contain at least one element.
+     */
+    public function testConstructionWithNoValues()
+    {
+        new EnumNode('foo', null, array());
+    }
+
     public function testConstructionWithOneValue()
     {
         $node = new EnumNode('foo', null, array('foo'));

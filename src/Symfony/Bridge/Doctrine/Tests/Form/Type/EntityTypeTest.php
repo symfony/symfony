@@ -215,7 +215,7 @@ class EntityTypeTest extends TypeTestCase
     
     public function testConfigureQueryBuilderWithClosureReturningNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {

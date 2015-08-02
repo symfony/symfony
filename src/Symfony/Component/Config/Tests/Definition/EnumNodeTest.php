@@ -21,12 +21,16 @@ class EnumNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructionWithOneValue()
     {
-        new EnumNode('foo', null, array('foo', 'foo'));
+        $node = new EnumNode('foo', null, array('foo'));
+        $this->assertSame('foo', $node->finalize('foo'));
+    }
+
+    public function testConstructionWithOneDistinctValue()
+    {
+        $node = new EnumNode('foo', null, array('foo', 'foo'));
+        $this->assertSame('foo', $node->finalize('foo'));
     }
 
     /**

@@ -24,13 +24,8 @@ class EnumNode extends ScalarNode
 
     public function __construct($name, NodeInterface $parent = null, array $values = array())
     {
-        $values = array_unique($values);
-        if (count($values) <= 1) {
-            throw new \InvalidArgumentException('$values must contain at least two distinct elements.');
-        }
-
         parent::__construct($name, $parent);
-        $this->values = $values;
+        $this->values = array_unique($values);
     }
 
     public function getValues()

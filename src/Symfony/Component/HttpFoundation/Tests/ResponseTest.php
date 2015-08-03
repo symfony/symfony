@@ -92,6 +92,22 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->mustRevalidate());
     }
 
+    public function testMustRevalidateWithMustRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'must-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
+    }
+
+    public function testMustRevalidateWithProxyRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'proxy-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
+    }
+
     public function testSetNotModified()
     {
         $response = new Response();

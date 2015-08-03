@@ -25,7 +25,7 @@ class Definition
 {
     private $class;
     private $file;
-    private $factory;
+    private $factory = 'factory';
     private $factoryClass;
     private $factoryMethod;
     private $factoryService;

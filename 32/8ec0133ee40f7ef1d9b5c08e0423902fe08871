@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-12T10:50:24Z
+
+The change looks good to me, but you should add a test for this to avoid future regressions.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-27T17:35:51Z
+
+@axiac have you got time to add a test? Would be also nice if you rebased to the latest 2.3 branch as tests are currently failing on your PR.
+
+---------------------------------------------------------------------------
+
+by axiac at 2015-07-30T09:08:45Z
+
+Sorry to answer so late, I was away from computer during the last two weeks and a half.
+
+The directive `proxy-revalidate` is not used anywhere else in the Symfony's code or tests, the only place where it appears is the line I changed. I'm not sure how to test it (I'm not even sure I understand correctly how the `Cache-Control` directives work together).
+
+In order to have something to test I think I should add a way to set the `proxy-revalidate` directive to the `Response`.
+
+I am new to Symfony (I started working with it this year) and I am not sure what is the best way to do this. This is why I tried these alternative approaches:
+
+* add a new method `setProxyRevalidate()` to the public API of class `Response` - see commit 337e288; for symmetry I should also add the method `setMustRevalidate()`;
+* change method `Response#setCache()` to provide support for `must-revalidate` and `proxy-revalidate` cache control directives - see commit 440bba7;
+* both of the above - combined in commit cc92569.
+
+Which approach do you think fits best with the current API (and design) of the `Response` class?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-02T19:26:39Z
+
+@axiac For example, you could add the following two tests after `testMustValidate()` to the `ResponseTest` class (the second test would fail without your patch):
+
+```php
+    public function testMustRevalidateWithMustRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'must-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
+    }
+
+    public function testMustRevalidateWithProxyRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'proxy-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
+    }
+```
+
+---------------------------------------------------------------------------
+
+by axiac at 2015-08-03T16:56:39Z
+
+@xabbuh The tests you suggested look like they belong there. Thank you for your support.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-03T17:12:02Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-03T17:16:07Z
+
+:+1:

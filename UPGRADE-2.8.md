@@ -399,3 +399,23 @@ FrameworkBundle
        session:
            cookie_httponly: false
    ```
+
+Config
+------
+
+The edge case of defining just one value for nodes of type Enum is now allowed:
+
+```php
+$rootNode
+    ->children()
+        ->enumNode('variable')
+            ->values(array('value'))
+        ->end()
+    ->end()
+;
+```
+
+Before: `InvalidArgumentException` (variable must contain at least two
+distinct elements).
+After: the code will work as expected and it will restrict the values of the
+`variable` option to just `value`.

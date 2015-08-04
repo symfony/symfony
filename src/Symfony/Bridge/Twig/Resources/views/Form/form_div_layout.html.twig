@@ -304,7 +304,7 @@
 
 {%- block widget_container_attributes -%}
     {% if id is not empty %}id="{{ id }}" {% endif %}
-    {%- for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {%- endfor -%}
+    {%- for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor -%}
 {%- endblock widget_container_attributes -%}
 
 {%- block button_attributes -%}

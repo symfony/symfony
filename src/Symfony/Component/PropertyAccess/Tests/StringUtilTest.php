@@ -21,7 +21,9 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
         // see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
         return array(
             array('accesses', 'access'),
+            array('access', 'access'),
             array('addresses', 'address'),
+            array('address', 'address'),
             array('agendas', 'agenda'),
             array('alumnae', 'alumna'),
             array('alumni', 'alumnus'),
@@ -89,6 +91,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('ions', 'ion'),
             array('irises', array('iris', 'irise', 'irisis')),
             array('kisses', 'kiss'),
+            array('kiss', 'kiss'),
             array('knives', 'knife'),
             array('lamps', 'lamp'),
             array('leaves', array('leaf', 'leave', 'leaff')),

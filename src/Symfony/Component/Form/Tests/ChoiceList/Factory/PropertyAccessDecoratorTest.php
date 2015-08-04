@@ -365,4 +365,48 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
             new PropertyPath('property')
         ));
     }
+
+    public function testCreateViewLabelAttrAsPropertyPath()
+    {
+        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createView')
+            ->with($list, null, null, null, null, null, $this->isInstanceOf('\Closure'))
+            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $labelAttr) {
+                return $labelAttr((object) array('property' => 'labelAttr'));
+            }));
+
+        $this->assertSame('labelAttr', $this->factory->createView(
+            $list,
+            null, // preferred choices
+            null, // label
+            null, // index
+            null, // groups
+            null, // attr
+            'property'
+        ));
+    }
+
+    public function testCreateViewLabelAttrAsPropertyPathInstance()
+    {
+        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createView')
+            ->with($list, null, null, null, null, null, $this->isInstanceOf('\Closure'))
+            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $labelAttr) {
+                return $labelAttr((object) array('property' => 'labelAttr'));
+            }));
+
+        $this->assertSame('labelAttr', $this->factory->createView(
+            $list,
+            null, // preferred choices
+            null, // label
+            null, // index
+            null, // groups
+            null, // attr
+            new PropertyPath('property')
+        ));
+    }
 }

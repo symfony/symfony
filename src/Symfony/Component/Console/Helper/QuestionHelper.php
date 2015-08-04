@@ -434,10 +434,10 @@ class QuestionHelper extends Helper
             $ret = readline();
         } else {
             $ret = fgets($stream, 4096);
+        }
 
-            if (false === $ret) {
-                throw new \RuntimeException('Aborted');
-            }
+        if (false === $ret) {
+            throw new \RuntimeException('Aborted');
         }
 
         return trim($ret);

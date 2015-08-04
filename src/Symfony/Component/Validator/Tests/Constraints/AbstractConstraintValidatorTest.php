@@ -51,10 +51,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        if (Validation::API_VERSION_2_5 !== $this->getApiVersion()) {
-            $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-        }
-
         $this->group = 'MyGroup';
         $this->metadata = null;
         $this->object = null;
@@ -227,7 +223,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
             ->will($this->returnValue($validator));
         $validator->expects($this->at(2 * $i + 1))
             ->method('validate')
-            ->with($value, $this->logicalOr(null, array()), $group);
+            ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
@@ -260,7 +256,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
      */
     protected function assertViolation($message, array $parameters = array(), $propertyPath = 'property.path', $invalidValue = 'InvalidValue', $plural = null, $code = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
 
         $this->buildViolation($message)
             ->setParameters($parameters)
@@ -279,7 +275,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
      */
     protected function assertViolations(array $expected)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
 
         $violations = $this->context->getViolations();
 

@@ -25,6 +25,7 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
+            <argument>false</argument>
         </service>
 
         <service id="request_stack" class="%request_stack.class%" />

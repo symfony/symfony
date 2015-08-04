@@ -81,7 +81,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 1
                         )
@@ -96,7 +96,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 2
                         )
@@ -107,7 +107,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => stdClass
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 3
                         )
@@ -139,12 +139,12 @@ EOTXT;
     {
         $cloner = new VarCloner(array(
             '*' => function ($obj, $array) {
-                $array['foo'] = 123;
-
-                return $array;
+                return array('foo' => 123);
             },
             __CLASS__ => function ($obj, $array) {
-                return array();
+                ++$array['foo'];
+
+                return $array;
             },
         ));
         $clone = $cloner->cloneVar($this);
@@ -162,7 +162,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
                             [class] => %s
                             [value] => 
                             [cut] => 0
-                            [handle] => %d
+                            [handle] => %i
                             [refCount] => 0
                             [position] => 1
                         )
@@ -171,7 +171,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
             [1] => Array
                 (
-                    [foo] => 123
+                    [foo] => 124
                 )
 
         )

@@ -72,15 +72,14 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyDescribeSynchronizedServiceDefinition(Definition $definition, $expectedDescription)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertDescription($expectedDescription, $definition);
     }
 
+    /**
+     * @group legacy
+     */
     public function provideLegacySynchronizedServiceDefinitionTestData()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         return $this->getDescriptionTestData(ObjectsProvider::getLegacyContainerDefinitions());
     }
 
@@ -116,7 +115,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->getDescriptionTestData(ObjectsProvider::getContainerParameter());
 
-        array_push($data[0], array('parameter' => 'database_name'));
+        $data[0][] = array('parameter' => 'database_name');
 
         return $data;
     }

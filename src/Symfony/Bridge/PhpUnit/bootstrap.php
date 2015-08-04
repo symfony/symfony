@@ -4,7 +4,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 // Detect if we're loaded by an actual run of phpunit
-if (!class_exists('PHPUnit_TextUI_Command', false)) {
+if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Command', false)) {
     return;
 }
 
@@ -13,6 +13,9 @@ if (PHP_VERSION_ID >= 50400 && gc_enabled()) {
     // https://bugs.php.net/bug.php?id=53976
     gc_disable();
 }
+
+// Enforce a consistent locale
+setlocale(LC_ALL, 'C');
 
 if (class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
     AnnotationRegistry::registerLoader('class_exists');

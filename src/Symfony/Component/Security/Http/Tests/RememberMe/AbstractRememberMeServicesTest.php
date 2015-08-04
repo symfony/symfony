@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Http\Tests\RememberMe;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 
 class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,10 +25,10 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $service->getRememberMeParameter());
     }
 
-    public function testGetKey()
+    public function testGetSecret()
     {
         $service = $this->getService();
-        $this->assertEquals('fookey', $service->getKey());
+        $this->assertEquals('foosecret', $service->getSecret());
     }
 
     public function testAutoLoginReturnsNullWhenNoCookie()
@@ -77,7 +78,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $returnedToken = $service->autoLogin($request);
 
         $this->assertSame($user, $returnedToken->getUser());
-        $this->assertSame('fookey', $returnedToken->getKey());
+        $this->assertSame('foosecret', $returnedToken->getSecret());
         $this->assertSame('fookey', $returnedToken->getProviderKey());
     }
 
@@ -236,6 +237,30 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testEncodeCookieAndDecodeCookieAreInvertible()
+    {
+        $cookieParts = array('aa', 'bb', 'cc');
+        $service = $this->getService();
+
+        $encoded = $this->callProtected($service, 'encodeCookie', array($cookieParts));
+        $this->assertInternalType('string', $encoded);
+
+        $decoded = $this->callProtected($service, 'decodeCookie', array($encoded));
+        $this->assertSame($cookieParts, $decoded);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage cookie delimiter
+     */
+    public function testThereShouldBeNoCookieDelimiterInCookieParts()
+    {
+        $cookieParts = array('aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc');
+        $service = $this->getService();
+
+        $this->callProtected($service, 'encodeCookie', array($cookieParts));
+    }
+
     protected function getService($userProvider = null, $options = array(), $logger = null)
     {
         if (null === $userProvider) {
@@ -243,7 +268,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         }
 
         return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
-            array($userProvider), 'fookey', 'fookey', $options, $logger,
+            array($userProvider), 'foosecret', 'fookey', $options, $logger,
         ));
     }
 
@@ -257,5 +282,14 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         ;
 
         return $provider;
+    }
+
+    private function callProtected($object, $method, array $args)
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $reflectionMethod = $reflection->getMethod($method);
+        $reflectionMethod->setAccessible(true);
+
+        return $reflectionMethod->invokeArgs($object, $args);
     }
 }

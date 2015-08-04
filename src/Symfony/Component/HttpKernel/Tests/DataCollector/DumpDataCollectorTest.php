@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
- * DumpDataCollectorTest
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
@@ -58,6 +58,68 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('a:0:{}', $collector->serialize());
     }
 
+    public function testCollectDefault()
+    {
+        $data = new Data(array(array(123)));
+
+        $collector = new DumpDataCollector();
+
+        $collector->dump($data);
+        $line = __LINE__ - 1;
+
+        ob_start();
+        $collector->collect(new Request(), new Response());
+        $output = ob_get_clean();
+
+        if (PHP_VERSION_ID >= 50400) {
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
+        } else {
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n123\n", $output);
+        }
+        $this->assertSame(1, $collector->getDumpsCount());
+        $collector->serialize();
+    }
+
+    public function testCollectHtml()
+    {
+        $data = new Data(array(array(123)));
+
+        $collector = new DumpDataCollector(null, 'test://%f:%l');
+
+        $collector->dump($data);
+        $line = __LINE__ - 1;
+        $file = __FILE__;
+        if (PHP_VERSION_ID >= 50400) {
+            $xOutput = <<<EOTXT
+ <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
+<span class=sf-dump-num>123</span>
+</pre>
+
+EOTXT;
+        } else {
+            $len = strlen("DumpDataCollectorTest.php on line {$line}:");
+            $xOutput = <<<EOTXT
+ <pre class=sf-dump id=sf-dump data-indent-pad="  ">"<span class=sf-dump-str title="{$len} characters">DumpDataCollectorTest.php on line {$line}:</span>"
+</pre>
+<pre class=sf-dump id=sf-dump data-indent-pad="  "><span class=sf-dump-num>123</span>
+</pre>
+
+EOTXT;
+        }
+
+        ob_start();
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/html');
+        $collector->collect(new Request(), $response);
+        $output = ob_get_clean();
+        $output = preg_replace('#<(script|style).*?</\1>#s', '', $output);
+        $output = preg_replace('/sf-dump-\d+/', 'sf-dump', $output);
+
+        $this->assertSame($xOutput, $output);
+        $this->assertSame(1, $collector->getDumpsCount());
+        $collector->serialize();
+    }
+
     public function testFlush()
     {
         $data = new Data(array(array(456)));
@@ -67,6 +129,10 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         ob_start();
         $collector = null;
-        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+        if (PHP_VERSION_ID >= 50400) {
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+        } else {
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", ob_get_clean());
+        }
     }
 }

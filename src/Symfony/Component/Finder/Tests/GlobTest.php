@@ -15,12 +15,10 @@ use Symfony\Component\Finder\Glob;
 
 class GlobTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGlobToRegexDelimiters()
     {
-        $this->assertEquals(Glob::toRegex('.*'), '#^\.[^/]*$#');
-        $this->assertEquals(Glob::toRegex('.*', true, true, ''), '^\.[^/]*$');
-        $this->assertEquals(Glob::toRegex('.*', true, true, '/'), '/^\.[^/]*$/');
+        $this->assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
+        $this->assertEquals('^\.[^/]*$', Glob::toRegex('.*', true, true, ''));
+        $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
     }
-
 }

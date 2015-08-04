@@ -25,6 +25,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * Recursive implementation of {@link ValidatorInterface}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
@@ -124,7 +125,7 @@ class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
             $constraints = $groups;
             $groups = $traverse;
         } else {
-            trigger_error('The Symfony\Component\Validator\ValidatorInterface::validate method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+            @trigger_error('The Symfony\Component\Validator\ValidatorInterface::validate method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
 
             $constraints = new Valid(array('traverse' => $traverse, 'deep' => $deep));
         }
@@ -160,7 +161,7 @@ class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
      */
     public function validateValue($value, $constraints, $groups = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
 
         return $this->validate($value, $constraints, $groups);
     }
@@ -170,18 +171,18 @@ class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
      */
     public function getMetadataFactory()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
 
         return $this->metadataFactory;
     }
 
     private static function testConstraints($constraints)
     {
-        return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && current($constraints) instanceof Constraint);
+        return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && (0 === count($constraints) || current($constraints) instanceof Constraint));
     }
 
     private static function testGroups($groups)
     {
-        return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (is_string(current($groups)) || current($groups) instanceof GroupSequence));
+        return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (0 === count($groups) || is_string(current($groups)) || current($groups) instanceof GroupSequence));
     }
 }

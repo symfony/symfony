@@ -23,8 +23,6 @@ class FragmentRendererPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyFragmentRedererWithoutAlias()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // no alias
         $services = array(
             'my_content_renderer' => array(array()),

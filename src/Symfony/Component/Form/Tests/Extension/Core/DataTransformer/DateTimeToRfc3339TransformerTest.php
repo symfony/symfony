@@ -80,6 +80,20 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     }
 
     /**
+     * @dataProvider transformProvider
+     */
+    public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to)
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
+        }
+
+        $transformer = new DateTimeToRfc3339Transformer($fromTz, $toTz);
+
+        $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTimeImmutable($from) : null));
+    }
+
+    /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testTransformRequiresValidDateTime()

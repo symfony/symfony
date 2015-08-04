@@ -59,7 +59,7 @@ class PropertyNormalizer extends AbstractNormalizer
             }
 
             // Override visibility
-            if (! $property->isPublic()) {
+            if (!$property->isPublic()) {
                 $property->setAccessible(true);
             }
 
@@ -111,7 +111,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $property = $reflectionClass->getProperty($propertyName);
 
                 // Override visibility
-                if (! $property->isPublic()) {
+                if (!$property->isPublic()) {
                     $property->setAccessible(true);
                 }
 
@@ -127,7 +127,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
     }
 
     /**
@@ -135,7 +135,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->supports($type);
+        return class_exists($type) && $this->supports($type);
     }
 
     /**
@@ -151,7 +151,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
         // We look for at least one non-static property
         foreach ($class->getProperties() as $property) {
-            if (! $property->isStatic()) {
+            if (!$property->isStatic()) {
                 return true;
             }
         }

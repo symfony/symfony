@@ -134,7 +134,7 @@ class EntityTypeTest extends TypeTestCase
             'choice_label' => 'name',
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredToString()
@@ -150,7 +150,7 @@ class EntityTypeTest extends TypeTestCase
             'required' => false,
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
@@ -169,7 +169,7 @@ class EntityTypeTest extends TypeTestCase
             'query_builder' => $qb,
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     /**
@@ -495,6 +495,31 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame('3', $field['3']->getViewData());
     }
 
+    public function testSubmitMultipleExpandedWithNegativeIntegerId()
+    {
+        $entity1 = new SingleIntIdEntity(-1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $field->submit(array('-1'));
+
+        $expected = new ArrayCollection(array($entity1));
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertEquals($expected, $field->getData());
+        $this->assertTrue($field['_1']->getData());
+        $this->assertFalse($field['2']->getData());
+    }
+
     public function testOverrideChoices()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -513,7 +538,7 @@ class EntityTypeTest extends TypeTestCase
 
         $field->submit('2');
 
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
         $this->assertSame('2', $field->getViewData());
@@ -541,13 +566,13 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame('2', $field->getViewData());
         $this->assertEquals(array(
             'Group1' => new ChoiceGroupView('Group1', array(
-                1 => new ChoiceView('Foo', '1', $item1),
-                2 => new ChoiceView('Bar', '2', $item2),
+                1 => new ChoiceView($item1, '1', 'Foo'),
+                2 => new ChoiceView($item2, '2', 'Bar'),
             )),
             'Group2' => new ChoiceGroupView('Group2', array(
-                3 => new ChoiceView('Baz', '3', $item3),
+                3 => new ChoiceView($item3, '3', 'Baz'),
             )),
-            4 => new ChoiceView('Boo!', '4', $item4),
+            4 => new ChoiceView($item4, '4', 'Boo!'),
         ), $field->createView()->vars['choices']);
     }
 
@@ -566,8 +591,8 @@ class EntityTypeTest extends TypeTestCase
             'choice_label' => 'name',
         ));
 
-        $this->assertEquals(array(3 => new ChoiceView('Baz', '3', $entity3), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['preferred_choices']);
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(3 => new ChoiceView($entity3, '3', 'Baz'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['preferred_choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo')), $field->createView()->vars['choices']);
     }
 
     public function testOverrideChoicesWithPreferredChoices()
@@ -586,8 +611,8 @@ class EntityTypeTest extends TypeTestCase
             'choice_label' => 'name',
         ));
 
-        $this->assertEquals(array(3 => new ChoiceView('Baz', '3', $entity3)), $field->createView()->vars['preferred_choices']);
-        $this->assertEquals(array(2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(3 => new ChoiceView($entity3, '3', 'Baz')), $field->createView()->vars['preferred_choices']);
+        $this->assertEquals(array(2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier()
@@ -883,7 +908,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     protected function createRegistryMock($name, $em)

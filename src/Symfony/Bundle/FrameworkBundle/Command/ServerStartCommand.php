@@ -33,9 +33,11 @@ class ServerStartCommand extends ServerCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force web server startup'),
             ))
             ->setName('server:start')
             ->setDescription('Starts PHP built-in web server in the background')
@@ -106,13 +108,12 @@ EOF
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
-
-            return 1;
+            $address = $address.':'.$input->getOption('port');
         }
 
-        if ($this->isOtherServerProcessRunning($address)) {
+        if (!$input->getOption('force') && $this->isOtherServerProcessRunning($address)) {
             $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+            $output->writeln(sprintf('<error>Use the --force option if the server process terminated unexpectedly to start a new web server process.</error>'));
 
             return 1;
         }
@@ -165,27 +166,6 @@ EOF
 
             sleep(1);
         }
-    }
-
-    private function isOtherServerProcessRunning($address)
-    {
-        $lockFile = $this->getLockFile($address);
-
-        if (file_exists($lockFile)) {
-            return true;
-        }
-
-        list($hostname, $port) = explode(':', $address);
-
-        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
-
-        if (false !== $fp) {
-            fclose($fp);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

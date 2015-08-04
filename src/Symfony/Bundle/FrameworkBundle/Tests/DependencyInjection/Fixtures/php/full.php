@@ -50,6 +50,7 @@ $container->loadFromExtension('framework', array(
     'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
+        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
     ),
     'validation' => array(
         'enabled' => true,

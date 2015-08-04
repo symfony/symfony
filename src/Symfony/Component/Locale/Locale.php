@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale;
 
-trigger_error('The '.__NAMESPACE__.'\Locale class is deprecated since version 2.7, to be removed in Symfony 3.0. Use the methods provided by the \Symfony\Component\Intl\Intl class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\Locale class is deprecated since version 2.7, to be removed in Symfony 3.0. Use the methods provided by the \Symfony\Component\Intl\Intl class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Intl\Intl;
 

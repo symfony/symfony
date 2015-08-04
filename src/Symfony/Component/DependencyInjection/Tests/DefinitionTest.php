@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -128,8 +129,33 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setShared
+     * @covers Symfony\Component\DependencyInjection\Definition::isShared
+     */
+    public function testSetIsShared()
+    {
+        $def = new Definition('stdClass');
+        $this->assertTrue($def->isShared(), '->isShared() returns true by default');
+        $this->assertSame($def, $def->setShared(false), '->setShared() implements a fluent interface');
+        $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testPrototypeScopedDefinitionAreNotShared()
+    {
+        $def = new Definition('stdClass');
+        $def->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+
+        $this->assertFalse($def->isShared());
+        $this->assertEquals(ContainerInterface::SCOPE_PROTOTYPE, $def->getScope());
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setScope
      * @covers Symfony\Component\DependencyInjection\Definition::getScope
+     * @group legacy
      */
     public function testSetGetScope()
     {
@@ -170,8 +196,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacySetIsSynchronized()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $def = new Definition('stdClass');
         $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');
         $this->assertSame($def, $def->setSynchronized(true), '->setSynchronized() implements a fluent interface');

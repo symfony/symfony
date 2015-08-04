@@ -124,13 +124,15 @@ class FormFieldRegistry
     public function set($name, $value)
     {
         $target = &$this->get($name);
-        if (!is_array($value) || $target instanceof Field\ChoiceFormField) {
+        if ((!is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
-        } else {
+        } elseif (is_array($value)) {
             $fields = self::create($name, $value);
             foreach ($fields->all() as $k => $v) {
                 $this->set($k, $v);
             }
+        } else {
+            throw new \InvalidArgumentException(sprintf('Cannot set value on a compound field "%s".', $name));
         }
     }
 

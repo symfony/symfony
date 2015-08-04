@@ -27,6 +27,11 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 class ProxyDumper implements DumperInterface
 {
     /**
+     * @var string
+     */
+    private $salt;
+
+    /**
      * @var LazyLoadingValueHolderGenerator
      */
     private $proxyGenerator;
@@ -38,9 +43,12 @@ class ProxyDumper implements DumperInterface
 
     /**
      * Constructor.
+     *
+     * @param string $salt
      */
-    public function __construct()
+    public function __construct($salt = '')
     {
+        $this->salt = $salt;
         $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
         $this->classGenerator = new BaseGeneratorStrategy();
     }
@@ -60,9 +68,9 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if ($definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
             $instantiation .= " \$this->services['$id'] =";
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
             $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 
@@ -109,6 +117,6 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition);
+        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition).$this->salt;
     }
 }

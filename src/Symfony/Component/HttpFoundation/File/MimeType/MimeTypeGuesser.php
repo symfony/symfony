@@ -68,6 +68,14 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
+     * Resets the singleton instance.
+     */
+    public static function reset()
+    {
+        self::$instance = null;
+    }
+
+    /**
      * Registers all natively provided mime type guessers.
      */
     private function __construct()

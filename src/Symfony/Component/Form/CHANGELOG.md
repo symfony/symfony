@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
+
 2.7.0
 -----
 

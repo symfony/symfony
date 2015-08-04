@@ -113,7 +113,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
         $value = $this->parameters[$root];
         $currentKey = null;
-        for ($i = $pos, $c = strlen($path); $i < $c; $i++) {
+        for ($i = $pos, $c = strlen($path); $i < $c; ++$i) {
             $char = $path[$i];
 
             if ('[' === $char) {

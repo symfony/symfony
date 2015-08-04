@@ -25,10 +25,17 @@
                                     <em>The token already exists in the database.</em>
                                 </p>
                             {% elseif about == 'no_token' %}
-                                <h2>Token not found</h2>
-                                <p>
-                                    <em>Token "{{ token }}" was not found in the database.</em>
-                                </p>
+                                {% if token == 'latest' %}
+                                    <h2>No profiles</h2>
+                                    <p>
+                                        <em>No profiles found in the database.</em>
+                                    </p>
+                                {% else %}
+                                    <h2>Token not found</h2>
+                                    <p>
+                                        <em>Token "{{ token }}" was not found in the database.</em>
+                                    </p>
+                                {% endif %}
                             {% endif %}
                         {% endblock %}
                     </div>

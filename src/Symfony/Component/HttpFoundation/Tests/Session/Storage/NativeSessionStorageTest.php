@@ -119,6 +119,17 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(11, $storage->getBag('attributes')->get('legs'));
     }
 
+    public function testSessionGlobalIsUpToDateAfterIdRegeneration()
+    {
+        $storage = $this->getStorage();
+        $storage->start();
+        $storage->getBag('attributes')->set('lucky', 7);
+        $storage->regenerate();
+        $storage->getBag('attributes')->set('lucky', 42);
+
+        $this->assertEquals(42, $_SESSION['_sf2_attributes']['lucky']);
+    }
+
     public function testDefaultSessionCacheLimiter()
     {
         $this->iniSet('session.cache_limiter', 'nocache');
@@ -216,7 +227,6 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         $storage = $this->getStorage();
 
-        $this->assertFalse(isset($_SESSION));
         $this->assertFalse($storage->getSaveHandler()->isActive());
         $this->assertFalse($storage->isStarted());
 

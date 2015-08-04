@@ -11,39 +11,13 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+@trigger_error('The '.__NAMESPACE__.'\FalseValidator class is deprecated since version 2.7 and will be removed in 3.0. Use the IsFalseValidator class in the same namespace instead.', E_USER_DEPRECATED);
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @api
+ * @deprecated since version 2.7, to be removed in 3.0. Use IsFalseValidator instead.
  */
-class FalseValidator extends ConstraintValidator
+class FalseValidator extends IsFalseValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (!$constraint instanceof False) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\False');
-        }
-
-        if (null === $value || false === $value || 0 === $value || '0' === $value) {
-            return;
-        }
-
-        if ($this->context instanceof ExecutionContextInterface) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
-        } else {
-            $this->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
-        }
-    }
 }

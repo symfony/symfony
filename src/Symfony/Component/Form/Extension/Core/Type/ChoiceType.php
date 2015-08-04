@@ -13,6 +13,10 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+<<<<<<< HEAD
+=======
+use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
+>>>>>>> my-2.8
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -27,6 +31,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as LegacyChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
@@ -70,7 +75,7 @@ class ChoiceType extends AbstractType
             // Check if the choices already contain the empty value
             // Only add the placeholder option if this is not the case
             if (null !== $options['placeholder'] && 0 === count($options['choice_list']->getChoicesForValues(array('')))) {
-                $placeholderView = new ChoiceView($options['placeholder'], '', null);
+                $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved name
                 $this->addSubForm($builder, 'placeholder', $placeholderView, $options);
@@ -257,7 +262,11 @@ class ChoiceType extends AbstractType
 
         $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
             if ($choiceList) {
-                trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+
+                if ($choiceList instanceof LegacyChoiceListInterface) {
+                    return new LegacyChoiceListAdapter($choiceList);
+                }
 
                 return $choiceList;
             }
@@ -339,7 +348,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choices_as_values', 'bool');
@@ -438,7 +447,7 @@ class ChoiceType extends AbstractType
         // information from the "choices" option for creating groups
         if (!$options['group_by'] && $options['choices']) {
             $options['group_by'] = !$options['choices_as_values']
-                ? ChoiceType::flipRecursive($options['choices'])
+                ? self::flipRecursive($options['choices'])
                 : $options['choices'];
         }
 

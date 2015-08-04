@@ -1,9 +1,7 @@
 services:
     foo: { class: FooClass }
     baz: { class: BazClass }
-    scope.container: { class: FooClass, scope: container }
-    scope.custom: { class: FooClass, scope: custom }
-    scope.prototype: { class: FooClass, scope: prototype }
+    not_shared: { class: FooClass, shared: false }
     file: { class: FooClass, file: %path%/foo.php }
     arguments: { class: FooClass, arguments: [foo, @foo, [true, false]] }
     configurator1: { class: FooClass, configurator: sc_configure }
@@ -23,11 +21,6 @@ services:
     another_alias_for_foo:
         alias: foo
         public: false
-    request:
-        class: Request
-        synthetic: true
-        synchronized: true
-        lazy: true
     decorator_service:
         decorates: decorated
     decorator_service_with_name:

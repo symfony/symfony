@@ -179,7 +179,7 @@ pre, code {
     width: 250px;
     margin-left: -100%;
 }
-#collector-content table td {
+table td {
     background-color: white;
 }
 h1 {
@@ -217,7 +217,7 @@ li {
     border-top-right-radius: 16px;
     line-height: 18px;
 }
-a#resume-view-all {
+a#resume-view-all, a#resume-view-latest {
     display: inline-block;
     padding: 0.2em 0.7em;
     margin-right: 0.5em;
@@ -273,15 +273,15 @@ ul.alt li {
 ul.alt li.even {
     background: #f1f7e2;
 }
-ul.alt li.error {
+ul.alt li.error, tr.error td {
     background-color: #f66;
     margin-bottom: 1px;
 }
-ul.alt li.warning {
+ul.alt li.warning, tr.warning td {
     background-color: #ffcc00;
     margin-bottom: 1px;
 }
-ul.alt li.scream, ul.alt li.scream strong {
+ul.alt li.scream, ul.alt li.scream strong, tr.scream td, tr.scream strong {
     color: gray;
 }
 ul.sf-call-stack li {

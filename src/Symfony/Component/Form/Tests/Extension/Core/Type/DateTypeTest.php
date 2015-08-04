@@ -440,8 +440,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('06', '6', '6'),
-            new ChoiceView('07', '7', '7'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['month']->vars['choices']);
     }
 
@@ -455,8 +455,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('Jän', '1', '1'),
-            new ChoiceView('Apr.', '4', '4'),
+            new ChoiceView('1', '1', 'Jän'),
+            new ChoiceView('4', '4', 'Apr.'),
         ), $view['month']->vars['choices']);
     }
 
@@ -470,8 +470,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('Jänner', '1', '1'),
-            new ChoiceView('April', '4', '4'),
+            new ChoiceView('1', '1', 'Jänner'),
+            new ChoiceView('4', '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
@@ -485,8 +485,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('Jänner', '1', '1'),
-            new ChoiceView('April', '4', '4'),
+            new ChoiceView('1', '1', 'Jänner'),
+            new ChoiceView('4', '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
@@ -499,8 +499,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('06', '6', '6'),
-            new ChoiceView('07', '7', '7'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['day']->vars['choices']);
     }
 
@@ -625,6 +625,20 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertFalse(isset($view->vars['date_pattern']));
+    }
+
+    public function testDatePatternFormatWithQuotedStrings()
+    {
+        \Locale::setDefault('es_ES');
+
+        $form = $this->factory->create('date', null, array(
+            // EEEE, d 'de' MMMM 'de' y
+            'format' => \IntlDateFormatter::FULL,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassWidgetToView()

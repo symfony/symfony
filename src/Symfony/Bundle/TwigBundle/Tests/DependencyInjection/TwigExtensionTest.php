@@ -29,8 +29,6 @@ class TwigExtensionTest extends TestCase
      */
     public function testLegacyFormResourcesConfigurationKey($format)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'legacy-form-resources-only', $format);
@@ -49,8 +47,6 @@ class TwigExtensionTest extends TestCase
      */
     public function testLegacyMergeFormResourcesConfigurationKeyWithFormThemesConfigurationKey($format)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'legacy-merge-form-resources-with-form-themes', $format);
@@ -194,10 +190,8 @@ class TwigExtensionTest extends TestCase
         $def = $container->getDefinition('twig.loader.filesystem');
         $paths = array();
         foreach ($def->getMethodCalls() as $call) {
-            if ('addPath' === $call[0]) {
-                if (false === strpos($call[1][0], 'Form')) {
-                    $paths[] = $call[1];
-                }
+            if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
+                $paths[] = $call[1];
             }
         }
 

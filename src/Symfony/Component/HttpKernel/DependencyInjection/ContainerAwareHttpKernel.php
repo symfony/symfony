@@ -39,10 +39,15 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
      * @param RequestStack                $requestStack       A stack for master/sub requests
+     * @param bool                        $triggerDeprecation Whether or not to trigger the deprecation warning for the ContainerAwareHttpKernel
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null, $triggerDeprecation = true)
     {
         parent::__construct($dispatcher, $controllerResolver, $requestStack);
+
+        if ($triggerDeprecation) {
+            @trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Component\HttpKernel\HttpKernel class instead.', E_USER_DEPRECATED);
+        }
 
         $this->container = $container;
 

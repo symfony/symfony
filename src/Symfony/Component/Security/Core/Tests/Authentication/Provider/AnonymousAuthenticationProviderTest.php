@@ -37,7 +37,7 @@ class AnonymousAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider('foo');
 
-        $this->assertNull($provider->authenticate($this->getSupportedToken('bar')));
+        $provider->authenticate($this->getSupportedToken('bar'));
     }
 
     public function testAuthenticate()
@@ -50,9 +50,9 @@ class AnonymousAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getSupportedToken($key)
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', array('getKey'), array(), '', false);
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', array('getSecret'), array(), '', false);
         $token->expects($this->any())
-              ->method('getKey')
+              ->method('getSecret')
               ->will($this->returnValue($key))
         ;
 

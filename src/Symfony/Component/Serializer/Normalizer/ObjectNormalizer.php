@@ -43,7 +43,7 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data);
+        return is_object($data) && !$data instanceof \Traversable;
     }
 
     /**
@@ -141,14 +141,14 @@ class ObjectNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($normalizedData as $attribute => $value) {
+            if ($this->nameConverter) {
+                $attribute = $this->nameConverter->denormalize($attribute);
+            }
+
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
-                if ($this->nameConverter) {
-                    $attribute = $this->nameConverter->normalize($attribute);
-                }
-
                 try {
                     $this->propertyAccessor->setValue($object, $attribute, $value);
                 } catch (NoSuchPropertyException $exception) {

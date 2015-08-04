@@ -1,3 +1,11 @@
 services:
     constructor: { class: FooClass, factory_method: getInstance }
     factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }
+    scope.container: { class: FooClass, scope: container }
+    scope.custom: { class: FooClass, scope: custom }
+    scope.prototype: { class: FooClass, scope: prototype }
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true
+        lazy: true

@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Symfony WebProfilerBundle",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,21 +12,21 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/http-kernel": "~2.4",
-        "symfony/routing": "~2.2",
-        "symfony/twig-bridge": "~2.7"
+        "symfony/http-kernel": "~2.4|~3.0.0",
+        "symfony/routing": "~2.2|~3.0.0",
+        "symfony/twig-bridge": "~2.7|~3.0.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/config": "~2.2",
-        "symfony/console": "~2.3",
-        "symfony/dependency-injection": "~2.2",
-        "symfony/stopwatch": "~2.2"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/config": "~2.2|~3.0.0",
+        "symfony/console": "~2.3|~3.0.0",
+        "symfony/dependency-injection": "~2.2|~3.0.0",
+        "symfony/stopwatch": "~2.2|~3.0.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }
@@ -34,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

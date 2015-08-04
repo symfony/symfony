@@ -1,6 +1,20 @@
 UPGRADE FROM 2.6 to 2.7
 =======================
 
+Global
+------
+
+ * Deprecation notices -
+   `@trigger_error('... is deprecated ...', E_USER_DEPRECATED)` -
+   are now triggered when using any deprecated functionality.
+
+   By default these notices are silenced, so they won't appear in the PHP logs of
+   your production server. However, these notices are still visible in the web
+   debug toolbar, so you can know where your code needs an upgrade.
+
+   In addition, it's strongly recommended to enable the [phpunit-bridge](https://github.com/symfony/phpunit-bridge)
+   so that you can deal with deprecation notices in your test suite.
+
 Router
 ------
 
@@ -120,6 +134,11 @@ Form
            'Ignored' => Status::IGNORED,
        ),
        'choices_as_values' => true,
+       // important if you rely on your option value attribute (e.g. for JavaScript)
+       // this will keep the same functionality as before
+       'choice_value' => function ($choice) {
+           return $choice;
+       },
    ));
    ```
 
@@ -152,24 +171,8 @@ Form
  * `Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\View\ChoiceView` instead.
-
-   Note that the order of the arguments passed to the constructor was inverted.
-
-   Before:
-
-   ```php
-   use Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView;
-
-   $view = new ChoiceView($data, 'value', 'Label');
-   ```
-
-   After:
-
-   ```php
-   use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-
-   $view = new ChoiceView('Label', 'value', $data);
-   ```
+   The constructor arguments of the new class are in the same order than in the
+   deprecated one (this was not true in 2.7.0 but has been fixed in 2.7.1).
 
  * `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
@@ -528,3 +531,191 @@ Config
  * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as 
    deprecated in favor of the new `getPath()` method.
    
+Validator
+---------
+
+ * The PHP7-incompatible constraints (Null, True, False) and related validators
+   (NullValidator, TrueValidator, FalseValidator) are marked as deprecated
+   in favor of their `Is`-prefixed equivalent.
+
+Console
+-------
+
+ * The `Symfony\Component\Console\Input\InputDefinition::getSynopsis()` method
+   now has an optional argument (it previously had no arguments). If you override
+   this method, you'll need to add this argument so that your signature matches:
+
+   Before:
+
+   ```php
+   public function getSynopsis()
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   public function getSynopsis($short = false)
+   {
+       // ...
+   }
+   ```
+
+TwigBundle
+----------
+
+ * The `Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy` is deprecated and no longer
+   used in favor of `Twig_FileExtensionEscapingStrategy`. This means that CSS files automatically
+   use the CSS escape strategy. This can cause different behaviour when outputting reserved
+   characters.
+
+   Before:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_color: '#123456' #}
+   body {
+       background: {{ brand_color }};
+   }
+   ```
+
+   After:
+
+   ```css
+   {# styles.css.twig #}
+
+   {# with brand_color: '#123456' #}
+   body {
+       background: {{ brand_color|raw }};
+   }
+   ```
+
+FrameworkBundle
+---------------
+
+ * The `templating.helper.assets` was refactored and returns now an object of the type
+   `Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper` instead of
+   `Symfony\Component\Templating\Helper\CoreAssetsHelper`. You can update your class definition
+   or use the `assets.packages` service instead. Using the `assets.packages` service is the recommended 
+   way. The `templating.helper.assets` service will be removed in Symfony 3.0.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+
+   class DemoService
+   {
+       private $assetsHelper;
+
+       public function __construct(CoreAssetsHelper $assetsHelper)
+       {
+           $this->assetsHelper = $assetsHelper;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetsHelper->getUrl('thumbnail.png', null, $this->assetsHelper->getVersion());
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Asset\Packages;
+
+   class DemoService
+   {
+       private $assetPackages;
+
+       public function __construct(Packages $assetPackages)
+       {
+           $this->assetPackages = $assetPackages;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetPackages->getUrl('thumbnail.png').$this->assetPackages->getVersion();
+       }
+   }
+   ```
+
+Security
+---------------
+
+ * Injection of the `security.context` service has been reduced to a bare minimum. This means
+   that arguments that once hinted `SecurityContext` or `SecurityContextInterface` will have
+   to be updated accordingly to either the `TokenStorageInterface` or `AuthorizationCheckerInterface`.
+   The following classes now require the `security.token_storage` service instead of the `security.context`,
+   please update your extending implementations accordingly.
+
+    * `AbstractAuthenticationListener`
+    * `AnonymousAuthenticationListener`
+    * `ContextListener`
+    * `SimplePreAuthenticationListener`
+    * `X509AuthenticationListener`
+    * `RemoteUserAuthenticationListener`
+    * `BasicAuthenticationListener`
+    * `DigestAuthenticationListener`
+    * `ExceptionListener`
+    * `SwitchUserListener`
+    * `AccessListener`
+    * `RememberMeListener`
+
+UPGRADE FROM 2.7.1 to 2.7.2
+===========================
+
+Form
+----
+
+ * In order to fix a few regressions in the new `ChoiceList` implementation,
+   a few details had to be changed compared to 2.7.
+   
+   The legacy `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface` 
+   now does not extend the new `Symfony\Component\Form\ChoiceList\ChoiceListInterface`
+   anymore. If you pass an implementation of the old interface in a context
+   where the new interface is required, wrap the list into a
+   `LegacyChoiceListAdapter`:
+   
+   Before:
+   
+   ```php
+   use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+   
+   function doSomething(ChoiceListInterface $choiceList)
+   {
+       // ...
+   }
+   
+   doSomething($legacyList);
+   ```
+   
+   After:
+   
+   ```php
+   use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+   use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
+   
+   function doSomething(ChoiceListInterface $choiceList)
+   {
+       // ...
+   }
+   
+   doSomething(new LegacyChoiceListAdapter($legacyList));
+   ```
+   
+   The new `ChoiceListInterface` now has two additional methods
+   `getStructuredValues()` and `getOriginalKeys()`. You should add these methods
+   if you implement this interface. See their doc blocks and the implementation
+   of the core choice lists for inspiration.
+   
+   The method `ArrayKeyChoiceList::toArrayKey()` was marked as internal. This
+   method was never supposed to be used outside the class.
+   
+   The method `ChoiceListFactoryInterface::createView()` does not accept arrays
+   and `Traversable` instances anymore for the `$groupBy` parameter. Pass a
+   callable instead.

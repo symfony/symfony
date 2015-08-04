@@ -98,8 +98,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                 if (is_object($choice) || is_array($choice)) {
                     return $accessor->getValue($choice, $value);
                 }
-
-                return;
             };
         }
 
@@ -128,9 +126,9 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceLoaderInterface             $loader  The choice loader
-     * @param null|callable|string|PropertyPath $value   The callable or path for
-     *                                                   generating the choice values
+     * @param ChoiceLoaderInterface             $loader The choice loader
+     * @param null|callable|string|PropertyPath $value  The callable or path for
+     *                                                  generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */

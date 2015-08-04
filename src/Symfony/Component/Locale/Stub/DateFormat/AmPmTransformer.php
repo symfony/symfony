@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-trigger_error('The '.__NAMESPACE__.'\AmPmTransformer class is deprecated since version 2.3 and will be removed in Symfony 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\AmPmTransformer class is deprecated since version 2.3 and will be removed in Symfony 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer as BaseAmPmTransformer;
 

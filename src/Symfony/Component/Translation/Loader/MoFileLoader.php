@@ -12,13 +12,11 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Exception\InvalidResourceException;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  */
-class MoFileLoader extends ArrayLoader
+class MoFileLoader extends FileLoader
 {
     /**
      * Magic used for validating the format of a MO file as well as
@@ -43,45 +41,13 @@ class MoFileLoader extends ArrayLoader
      */
     const MO_HEADER_SIZE = 28;
 
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
-
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
-
-        $messages = $this->parse($resource);
-
-        // empty file
-        if (null === $messages) {
-            $messages = array();
-        }
-
-        // not an array
-        if (!is_array($messages)) {
-            throw new InvalidResourceException(sprintf('The file "%s" must contain a valid mo file.', $resource));
-        }
-
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
-
-        return $catalogue;
-    }
-
     /**
      * Parses machine object (MO) format, independent of the machine's endian it
      * was created on. Both 32bit and 64bit systems are supported.
      *
-     * @param resource $resource
-     *
-     * @return array
-     *
-     * @throws InvalidResourceException If stream content has an invalid format.
+     * {@inheritdoc}
      */
-    private function parse($resource)
+    protected function loadResource($resource)
     {
         $stream = fopen($resource, 'r');
 
@@ -113,7 +79,7 @@ class MoFileLoader extends ArrayLoader
 
         $messages = array();
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $singularId = $pluralId = null;
             $translated = null;
 

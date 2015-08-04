@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Cache;
 
-trigger_error('The '.__NAMESPACE__.'\ApcCache class is deprecated since version 2.5 and will be removed in 3.0. Use DoctrineCache with the Doctrine\Common\Cache\ApcCache class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\ApcCache class is deprecated since version 2.5 and will be removed in 3.0. Use DoctrineCache with the Doctrine\Common\Cache\ApcCache class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 

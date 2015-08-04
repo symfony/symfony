@@ -55,6 +55,7 @@ class PluralizationRules
          * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
          */
         switch ($locale) {
+            case 'az':
             case 'bo':
             case 'dz':
             case 'id':
@@ -73,7 +74,6 @@ class PluralizationRules
                 break;
 
             case 'af':
-            case 'az':
             case 'bn':
             case 'bg':
             case 'ca':

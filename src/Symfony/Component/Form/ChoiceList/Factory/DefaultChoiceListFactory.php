@@ -15,11 +15,12 @@ use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
+use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as LegacyChoiceListInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -29,71 +30,11 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as Lega
 class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 {
     /**
-     * Flattens an array into the given output variable.
-     *
-     * @param array $array  The array to flatten
-     * @param array $output The flattened output
-     *
-     * @internal Should not be used by user-land code
-     */
-    public static function flatten(array $array, &$output)
-    {
-        if (null === $output) {
-            $output = array();
-        }
-
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                self::flatten($value, $output);
-                continue;
-            }
-
-            $output[$key] = $value;
-        }
-    }
-
-    /**
-     * Flattens and flips an array into the given output variable.
-     *
-     * During the flattening, the keys and values of the input array are
-     * flipped.
-     *
-     * @param array $array  The array to flatten
-     * @param array $output The flattened output
-     *
-     * @internal Should not be used by user-land code
-     */
-    public static function flattenFlipped(array $array, &$output)
-    {
-        if (null === $output) {
-            $output = array();
-        }
-
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                self::flattenFlipped($value, $output);
-                continue;
-            }
-
-            $output[$value] = $key;
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function createListFromChoices($choices, $value = null)
     {
-        if ($choices instanceof \Traversable) {
-            $choices = iterator_to_array($choices);
-        }
-
-        // If the choices are given as recursive array (i.e. with explicit
-        // choice groups), flatten the array. The grouping information is needed
-        // in the view only.
-        self::flatten($choices, $flatChoices);
-
-        return new ArrayChoiceList($flatChoices, $value);
+        return new ArrayChoiceList($choices, $value);
     }
 
     /**
@@ -104,26 +45,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromFlippedChoices($choices, $value = null)
     {
-        if ($choices instanceof \Traversable) {
-            $choices = iterator_to_array($choices);
-        }
-
-        // If the choices are given as recursive array (i.e. with explicit
-        // choice groups), flatten the array. The grouping information is needed
-        // in the view only.
-        self::flattenFlipped($choices, $flatChoices);
-
-        // If no values are given, use the choices as values
-        // Since the choices are stored in the collection keys, i.e. they are
-        // strings or integers, we are guaranteed to be able to convert them
-        // to strings
-        if (null === $value) {
-            $value = function ($choice) {
-                return (string) $choice;
-            };
-        }
-
-        return new ArrayKeyChoiceList($flatChoices, $value);
+        return new ArrayKeyChoiceList($choices, $value);
     }
 
     /**
@@ -140,15 +62,30 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         // Backwards compatibility
+<<<<<<< HEAD
         if ($list instanceof LegacyChoiceListInterface && null === $preferredChoices
             && null === $label && null === $index && null === $groupBy && null === $attr && null === $labelAttr) {
             return new ChoiceListView($list->getRemainingViews(), $list->getPreferredViews());
+=======
+        if ($list instanceof LegacyChoiceListAdapter && empty($preferredChoices)
+            && null === $label && null === $index && null === $groupBy && null === $attr) {
+            $mapToNonLegacyChoiceView = function (LegacyChoiceView $choiceView) {
+                return new ChoiceView($choiceView->data, $choiceView->value, $choiceView->label);
+            };
+
+            $adaptedList = $list->getAdaptedList();
+
+            return new ChoiceListView(
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getRemainingViews()),
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getPreferredViews())
+            );
+>>>>>>> my-2.8
         }
 
         $preferredViews = array();
         $otherViews = array();
         $choices = $list->getChoices();
-        $values = $list->getValues();
+        $keys = $list->getOriginalKeys();
 
         if (!is_callable($preferredChoices) && !empty($preferredChoices)) {
             $preferredChoices = function ($choice) use ($preferredChoices) {
@@ -161,6 +98,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $index = 0;
         }
 
+<<<<<<< HEAD
         // If $groupBy is not given, no grouping is done
         if (empty($groupBy)) {
             foreach ($choices as $key => $choice) {
@@ -181,17 +119,19 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             return new ChoiceListView($otherViews, $preferredViews);
         }
 
+=======
+>>>>>>> my-2.8
         // If $groupBy is a callable, choices are added to the group with the
         // name returned by the callable. If the callable returns null, the
         // choice is not added to any group
         if (is_callable($groupBy)) {
-            foreach ($choices as $key => $choice) {
+            foreach ($choices as $value => $choice) {
                 self::addChoiceViewGroupedBy(
                     $groupBy,
                     $choice,
-                    $key,
+                    (string) $value,
                     $label,
-                    $values,
+                    $keys,
                     $index,
                     $attr,
                     $labelAttr,
@@ -201,13 +141,12 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 );
             }
         } else {
-            // If $groupBy is passed as array, use that array as template for
-            // constructing the groups
+            // Otherwise use the original structure of the choices
             self::addChoiceViewsGroupedBy(
-                $groupBy,
+                $list->getStructuredValues(),
                 $label,
                 $choices,
-                $values,
+                $keys,
                 $index,
                 $attr,
                 $labelAttr,
@@ -234,17 +173,27 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
+<<<<<<< HEAD
     private static function addChoiceView($choice, $key, $label, $values, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
+=======
+    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+>>>>>>> my-2.8
     {
-        $value = $values[$key];
+        // $value may be an integer or a string, since it's stored in the array
+        // keys. We want to guarantee it's a string though.
+        $key = $keys[$value];
         $nextIndex = is_int($index) ? $index++ : call_user_func($index, $choice, $key, $value);
 
         $view = new ChoiceView(
-            // If the labels are null, use the choice key by default
-            null === $label ? (string) $key : (string) call_user_func($label, $choice, $key, $value),
-            $value,
             $choice,
+<<<<<<< HEAD
             // The attributes and labels attributes may be a callable or a mapping from choice indices
+=======
+            $value,
+            // If the labels are null, use the original choice key by default
+            null === $label ? (string) $key : (string) call_user_func($label, $choice, $key, $value),
+            // The attributes may be a callable or a mapping from choice indices
+>>>>>>> my-2.8
             // to nested arrays
             is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array()),
             is_callable($labelAttr) ? call_user_func($labelAttr, $choice, $key, $value) : (isset($labelAttr[$key]) ? $labelAttr[$key] : array())
@@ -258,19 +207,23 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
+<<<<<<< HEAD
     private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $values, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
+=======
+    private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+>>>>>>> my-2.8
     {
-        foreach ($groupBy as $key => $content) {
+        foreach ($groupBy as $key => $value) {
             // Add the contents of groups to new ChoiceGroupView instances
-            if (is_array($content)) {
+            if (is_array($value)) {
                 $preferredViewsForGroup = array();
                 $otherViewsForGroup = array();
 
                 self::addChoiceViewsGroupedBy(
-                    $content,
+                    $value,
                     $label,
                     $choices,
-                    $values,
+                    $keys,
                     $index,
                     $attr,
                     $labelAttr,
@@ -292,10 +245,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add ungrouped items directly
             self::addChoiceView(
-                $choices[$key],
-                $key,
+                $choices[$value],
+                $value,
                 $label,
-                $values,
+                $keys,
                 $index,
                 $attr,
                 $labelAttr,
@@ -306,17 +259,21 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
+<<<<<<< HEAD
     private static function addChoiceViewGroupedBy($groupBy, $choice, $key, $label, $values, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
+=======
+    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+>>>>>>> my-2.8
     {
-        $groupLabel = call_user_func($groupBy, $choice, $key, $values[$key]);
+        $groupLabel = call_user_func($groupBy, $choice, $keys[$value], $value);
 
         if (null === $groupLabel) {
             // If the callable returns null, don't group the choice
             self::addChoiceView(
                 $choice,
-                $key,
+                $value,
                 $label,
-                $values,
+                $keys,
                 $index,
                 $attr,
                 $labelAttr,
@@ -328,6 +285,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             return;
         }
 
+        $groupLabel = (string) $groupLabel;
+
         // Initialize the group views if necessary. Unnnecessarily built group
         // views will be cleaned up at the end of createView()
         if (!isset($preferredViews[$groupLabel])) {
@@ -337,9 +296,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
         self::addChoiceView(
             $choice,
-            $key,
+            $value,
             $label,
-            $values,
+            $keys,
             $index,
             $attr,
             $labelAttr,

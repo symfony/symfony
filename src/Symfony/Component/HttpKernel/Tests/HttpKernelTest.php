@@ -66,13 +66,13 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             // should set a response, but does not
         });
 
-        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use($exception) { throw $exception; }));
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use ($exception) { throw $exception; }));
 
         try {
             $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
             $this->fail('LogicException expected');
-        } catch (\LogicException $e) {
-            $this->assertSame($exception, $e->getPrevious());
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
         }
     }
 
@@ -151,7 +151,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(false));
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle(new Request());
     }
 
     /**

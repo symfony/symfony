@@ -29,8 +29,6 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyGetSetDebugger()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $loader = new ProjectTemplateLoader4();
         $debugger = $this->getMock('Symfony\Component\Templating\DebuggerInterface');
         $loader->setDebugger($debugger);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definition class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" synchronized="false" abstract="false" file="/path/to/file">
+<definition class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" shared="true" synchronized="false" abstract="false" file="/path/to/file">
   <factory service="factory.service" method="get"/>
   <tags>
     <tag name="tag1">

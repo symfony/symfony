@@ -391,7 +391,7 @@ class InputDefinition
     /**
      * Gets the synopsis.
      *
-     * @param bool $short Whether to return the short version (with options foloded) or not
+     * @param bool $short Whether to return the short version (with options folded) or not
      *
      * @return string The synopsis
      */
@@ -449,7 +449,7 @@ class InputDefinition
      */
     public function asText()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
@@ -469,7 +469,7 @@ class InputDefinition
      */
     public function asXml($asDom = false)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $descriptor = new XmlDescriptor();
 

@@ -498,7 +498,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
-        throw new BadMethodCallException('Buttons do not support form processors.');
+        throw new BadMethodCallException('Buttons do not support request handlers.');
     }
 
     /**
@@ -597,7 +597,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getVirtual()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
 
         return false;
     }

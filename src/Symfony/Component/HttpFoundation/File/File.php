@@ -88,20 +88,6 @@ class File extends \SplFileInfo
     }
 
     /**
-     * Returns the extension of the file.
-     *
-     * \SplFileInfo::getExtension() is not available before PHP 5.3.6
-     *
-     * @return string The extension
-     *
-     * @api
-     */
-    public function getExtension()
-    {
-        return pathinfo($this->getBasename(), PATHINFO_EXTENSION);
-    }
-
-    /**
      * Moves the file to a new location.
      *
      * @param string $directory The destination folder

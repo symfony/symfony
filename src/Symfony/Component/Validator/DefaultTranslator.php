@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The class '.__NAMESPACE__.'\DefaultTranslator is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.', E_USER_DEPRECATED);
+@trigger_error('The class '.__NAMESPACE__.'\DefaultTranslator is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\BadMethodCallException;

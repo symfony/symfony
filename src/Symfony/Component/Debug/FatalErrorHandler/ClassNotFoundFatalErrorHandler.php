@@ -139,13 +139,13 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     private function findClassInPath($path, $class, $prefix)
     {
-        if (!$path = realpath($path)) {
+        if (!$path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path)) {
             return array();
         }
 
         $classes = array();
         $filename = $class.'.php';
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if ($filename == $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName(), $prefix)) {
                 $classes[] = $class;
             }
@@ -167,12 +167,20 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             // namespaced class
             $namespacedClass = str_replace(array($path.DIRECTORY_SEPARATOR, '.php', '/'), array('', '', '\\'), $file),
             // namespaced class (with target dir)
-            $namespacedClassTargetDir = $prefix.str_replace(array($path.DIRECTORY_SEPARATOR, '.php', '/'), array('', '', '\\'), $file),
+            $prefix.$namespacedClass,
+            // namespaced class (with target dir and separator)
+            $prefix.'\\'.$namespacedClass,
             // PEAR class
             str_replace('\\', '_', $namespacedClass),
             // PEAR class (with target dir)
-            str_replace('\\', '_', $namespacedClassTargetDir),
+            str_replace('\\', '_', $prefix.$namespacedClass),
+            // PEAR class (with target dir and separator)
+            str_replace('\\', '_', $prefix.'\\'.$namespacedClass),
         );
+
+        if ($prefix) {
+            $candidates = array_filter($candidates, function ($candidate) use ($prefix) {return 0 === strpos($candidate, $prefix);});
+        }
 
         // We cannot use the autoloader here as most of them use require; but if the class
         // is not found, the new autoloader call will require the file again leading to a

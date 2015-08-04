@@ -57,6 +57,14 @@
 {% endblock %}
 
 {% block panelContent %}
+    {% set filter = request.query.get('state', '-1') %}
+    {% set filterOptions = {
+        '-1': '',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_DEFINED')): 'Defined messages',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_MISSING')): 'Missing messages',
+        (constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK')): 'Fallback messages',
+    } %}
+
     <h2>Translation Stats</h2>
     <table>
         <tbody>
@@ -72,6 +80,22 @@
                 <th>Missing messages</th>
                 <td><pre>{{ collector.countMissings }}</pre></td>
             </tr>
+            <tr>
+                <th>Filter</th>
+                <td>
+                    <form id="filter-form" action="" method="get" style="display: inline">
+                        <input type="hidden" name="panel" value="translation">
+                        <select id="filter" name="state" onchange="document.getElementById('filter-form').submit(); ">
+                            {% for key,option in filterOptions %}
+                                <option value="{{ key }}"{{ filter == key ? ' selected' : '' }}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                        <noscript>
+                            <input type="submit" value="refresh">
+                        </noscript>
+                    </form>
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -83,19 +107,50 @@
             <th>Id</th>
             <th>Message Preview</th>
         </tr>
-        {% for message in collector.messages %}
+        {% for message in collector.messages if message.state == filter or filter == '-1' %}
             <tr>
                 <td><code>{{ translator.state(message) }}</code></td>
                 <td><code>{{ message.locale }}</code></td>
                 <td><code>{{ message.domain }}</code></td>
                 <td>
                     <code>{{ message.id }}</code>
+
                     {% if message.count > 1 %}<br><small style="color: gray;">(used {{ message.count }} times)</small>{% endif %}
+                    {% if message.transChoiceNumber is not null %}<br><small style="color: gray;">(use pluralization)</small>{% endif %}
+
+                    {% if message.parameters|length > 0 %}
+                        <div>
+                            [<a href="#" onclick="return openParameters(this);" style="text-decoration: none;"
+                                title="Toggle parameters display" data-target-id="parameters-{{ loop.index }}" >
+                                <img alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: inline; width: 12px; height: 12px;" />
+                                <img alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: none; width: 12px; height: 12px;" />
+                                <span style="vertical-align:top">Parameters</span>
+                            </a>]
+
+                            <div id="parameters-{{ loop.index }}" style="display: none;">
+                                {% for parameters in message.parameters %}
+                                    {{ profiler_dump(parameters) }}
+                                    {% if not loop.last %}<br />{% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </td>
                 <td><code>{{ message.translation }}</code></td>
             </tr>
         {% endfor %}
     </table>
+
+    <script type="text/javascript">
+        function openParameters(link) {
+            "use strict";
+
+            var imgs = link.children,
+                target = link.getAttribute('data-target-id');
+
+            Sfjs.toggle(target, imgs[0], imgs[1]);
+        }
+    </script>
 {% endblock %}
 
 {% macro state(translation) %}

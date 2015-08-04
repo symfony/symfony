@@ -69,7 +69,12 @@ interface ChoiceListFactoryInterface
      * argument.
      *
      * @param ChoiceLoaderInterface $loader The choice loader
+<<<<<<< HEAD
      * @param null|callable         $value  The callable generating the choice values
+=======
+     * @param null|callable         $value  The callable generating the choice
+     *                                      values
+>>>>>>> my-2.8
      *
      * @return ChoiceListInterface The choice list
      */
@@ -97,15 +102,11 @@ interface ChoiceListFactoryInterface
      * The preferred choices can also be passed as array. Each choice that is
      * contained in that array will be marked as preferred.
      *
-     * The groups can be passed as a multi-dimensional array. In that case, a
-     * group will be created for each array entry containing a nested array.
-     * For all other entries, the choice for the corresponding key will be
-     * inserted at that position.
-     *
      * The attributes can be passed as multi-dimensional array. The keys should
      * match the keys of the choices. The values should be arrays of HTML
      * attributes that should be added to the respective choice.
      *
+<<<<<<< HEAD
      * @param ChoiceListInterface              $list             The choice list
      * @param null|array|callable              $preferredChoices The preferred choices
      * @param null|callable                    $label            The callable generating
@@ -118,6 +119,18 @@ interface ChoiceListFactoryInterface
      *                                                           the HTML attributes
      * @param null|array|callable              $labelAttr        The callable generating
      *                                                           the HTML label attributes
+=======
+     * @param ChoiceListInterface $list             The choice list
+     * @param null|array|callable $preferredChoices The preferred choices
+     * @param null|callable       $label            The callable generating the
+     *                                              choice labels
+     * @param null|callable       $index            The callable generating the
+     *                                              view indices
+     * @param null|callable       $groupBy          The callable generating the
+     *                                              group names
+     * @param null|array|callable $attr             The callable generating the
+     *                                              HTML attributes
+>>>>>>> my-2.8
      *
      * @return ChoiceListView The choice list view
      */

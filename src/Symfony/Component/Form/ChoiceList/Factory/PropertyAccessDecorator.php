@@ -160,7 +160,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -223,6 +223,16 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        if (is_string($labelAttr)) {
+            $labelAttr = new PropertyPath($labelAttr);
+        }
+
+        if ($labelAttr instanceof PropertyPath) {
+            $labelAttr = function ($choice) use ($accessor, $labelAttr) {
+                return $accessor->getValue($choice, $labelAttr);
+            };
+        }
+
+        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
     }
 }

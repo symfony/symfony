@@ -69,8 +69,7 @@ interface ChoiceListFactoryInterface
      * argument.
      *
      * @param ChoiceLoaderInterface $loader The choice loader
-     * @param null|callable $value          The callable generating the choice
-     *                                      values
+     * @param null|callable         $value  The callable generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */
@@ -117,7 +116,7 @@ interface ChoiceListFactoryInterface
      *                                                           the group names
      * @param null|array|callable              $attr             The callable generating
      *                                                           the HTML attributes
-     * @param null|array|callable              $labelAttr       The callable generating
+     * @param null|array|callable              $labelAttr        The callable generating
      *                                                           the HTML label attributes
      *
      * @return ChoiceListView The choice list view

@@ -54,8 +54,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * Decorates the given factory.
      *
-     * @param ChoiceListFactoryInterface      $decoratedFactory The decorated factory
-     * @param null|PropertyAccessorInterface  $propertyAccessor The used property accessor
+     * @param ChoiceListFactoryInterface     $decoratedFactory The decorated factory
+     * @param null|PropertyAccessorInterface $propertyAccessor The used property accessor
      */
     public function __construct(ChoiceListFactoryInterface $decoratedFactory, PropertyAccessorInterface $propertyAccessor = null)
     {

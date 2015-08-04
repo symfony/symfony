@@ -157,12 +157,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $label_attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
 
-        $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr, $label_attr));
+        $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr));
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(
@@ -172,7 +172,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
                 $index,
                 $groupBy,
                 $attr,
-                $label_attr
+                $labelAttr
             );
         }
 

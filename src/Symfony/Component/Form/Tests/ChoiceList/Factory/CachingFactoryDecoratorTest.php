@@ -529,77 +529,79 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
     public function testCreateViewSameAttributes()
     {
         $attr = array('class' => 'foobar');
+        $labelAttr = array('class' => 'foobarbaz');
         $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
         $view = new \stdClass();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $attr, $label_attr)
+            ->with($list, null, null, null, null, $attr, $labelAttr)
             ->will($this->returnValue($view));
 
-        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));
-        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));
+        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $labelAttr));
+        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $labelAttr));
     }
 
     public function testCreateViewDifferentAttributes()
     {
         $attr1 = array('class' => 'foobar1');
         $attr2 = array('class' => 'foobar2');
-        $label_attr1 = array('class' => 'label_foobar1');
-        $label_attr2 = array('class' => 'label_foobar2');
+        $labelAttr1 = array('class' => 'label_foobar1');
+        $labelAttr2 = array('class' => 'label_foobar2');
         $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
         $view1 = new \stdClass();
         $view2 = new \stdClass();
 
         $this->decoratedFactory->expects($this->at(0))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr1, $label_attr1)
+            ->with($list, null, null, null, null, $attr1, $labelAttr1)
             ->will($this->returnValue($view1));
         $this->decoratedFactory->expects($this->at(1))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr2, $label_attr2)
+            ->with($list, null, null, null, null, $attr2, $labelAttr2)
             ->will($this->returnValue($view2));
 
-        $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1, $label_attr1));
-        $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2, $label_attr2));
+        $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1, $labelAttr1));
+        $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2, $labelAttr2));
     }
 
     public function testCreateViewSameAttributesClosure()
     {
         $attr = function () {};
+        $labelAttr = function () {};
         $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
         $view = new \stdClass();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $attr, $label_attr)
+            ->with($list, null, null, null, null, $attr, $labelAttr)
             ->will($this->returnValue($view));
 
-        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));
-        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));
+        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $labelAttr));
+        $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $labelAttr));
     }
 
     public function testCreateViewDifferentAttributesClosure()
     {
         $attr1 = function () {};
         $attr2 = function () {};
-        $label_attr1 = function () {};
-        $label_attr2 = function () {};
+        $labelAttr1 = function () {};
+        $labelAttr2 = function () {};
         $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
         $view1 = new \stdClass();
         $view2 = new \stdClass();
 
         $this->decoratedFactory->expects($this->at(0))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr1, $label_attr1)
+            ->with($list, null, null, null, null, $attr1, $labelAttr1)
             ->will($this->returnValue($view1));
         $this->decoratedFactory->expects($this->at(1))
             ->method('createView')
-            ->with($list, null, null, null, null, $attr2, $label_attr2)
+            ->with($list, null, null, null, null, $attr2, $labelAttr2)
             ->will($this->returnValue($view2));
 
-        $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1, $label_attr1));
-        $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2, $label_attr2));
+        $this->assertSame($view1, $this->factory->createView($list, null, null, null, null, $attr1, $labelAttr1));
+        $this->assertSame($view2, $this->factory->createView($list, null, null, null, null, $attr2, $labelAttr2));
     }
 
     public function provideSameChoices()

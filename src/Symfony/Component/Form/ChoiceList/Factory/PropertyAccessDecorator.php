@@ -159,11 +159,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @param null|callable|string|PropertyPath                    $index            The callable or path generating the view indices
      * @param null|array|\Traversable|callable|string|PropertyPath $groupBy          The callable or path generating the group names
      * @param null|array|callable|string|PropertyPath              $attr             The callable or path generating the HTML attributes
-     * @param null|array|callable|string|PropertyPath              $label_attr       The callable or path generating the HTML label attributes
+     * @param null|array|callable|string|PropertyPath              $labelAttr       The callable or path generating the HTML label attributes
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $label_attr = null)
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -220,8 +220,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             $attr = new PropertyPath($attr);
         }
 
-        if (is_string($label_attr)) {
-            $label_attr = new PropertyPath($label_attr);
+        if (is_string($labelAttr)) {
+            $labelAttr = new PropertyPath($labelAttr);
         }
 
         if ($attr instanceof PropertyPath) {
@@ -230,12 +230,12 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        if ($label_attr instanceof PropertyPath) {
-            $label_attr = function ($choice) use ($accessor, $label_attr) {
-                return $accessor->getValue($choice, $label_attr);
+        if ($labelAttr instanceof PropertyPath) {
+            $labelAttr = function ($choice) use ($accessor, $labelAttr) {
+                return $accessor->getValue($choice, $labelAttr);
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $label_attr);
+        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
     }
 }

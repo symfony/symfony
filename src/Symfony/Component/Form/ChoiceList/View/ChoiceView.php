@@ -79,7 +79,7 @@ class ChoiceView extends LegacyChoiceView
      *
      * @var array
      */
-    public $label_attr;
+    public $labelAttr;
 
     /**
      * Creates a new choice view.
@@ -88,13 +88,13 @@ class ChoiceView extends LegacyChoiceView
      * @param string $value The view representation of the choice
      * @param mixed  $data  The original choice
      * @param array  $attr  Additional attributes for the HTML tag
-     * @param array  $label_attr  Additional attributes for the HTML tag
+     * @param array  $labelAttr  Additional attributes for the HTML tag
      */
-    public function __construct($label, $value, $data, array $attr = array(), array $label_attr = array())
+    public function __construct($label, $value, $data, array $attr = array(), array $labelAttr = array())
     {
         parent::__construct($data, $value, $label);
 
         $this->attr = $attr;
-        $this->label_attr = $label_attr;
+        $this->labelAttr = $labelAttr;
     }
 }

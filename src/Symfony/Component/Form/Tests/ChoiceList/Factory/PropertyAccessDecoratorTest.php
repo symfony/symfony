@@ -322,8 +322,8 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $label_attr) {
-                return $label_attr((object) array('property' => 'label_attr'));
+            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $labelAttr) {
+                return $labelAttr((object) array('property' => 'label_attr'));
             }));
 
         $this->assertSame('label_attr', $this->factory->createView(
@@ -365,8 +365,8 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $label_attr) {
-                return $label_attr((object) array('property' => 'label_attr'));
+            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $labelAttr) {
+                return $labelAttr((object) array('property' => 'label_attr'));
             }));
 
         $this->assertSame('label_attr', $this->factory->createView(

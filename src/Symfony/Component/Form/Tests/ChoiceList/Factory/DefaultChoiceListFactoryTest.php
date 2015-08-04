@@ -952,7 +952,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             1 => 'c',
             2 => 'd',
             '0.1' => 'e',
-            '0.2' => 'f'
+            '0.2' => 'f',
         ), $list->getChoices());
 
         $this->assertSame(array(
@@ -984,7 +984,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             1 => 'C',
             2 => 'D',
             '0.1' => 'E',
-            '0.2' => 'F'
+            '0.2' => 'F',
         ), $list->getOriginalKeys());
     }
 
@@ -1076,7 +1076,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                         'F',
                         array(),
                         array('labelAttr2' => 'labelValue2')
-                    )
+                    ),
                 )
         ), $view);
     }

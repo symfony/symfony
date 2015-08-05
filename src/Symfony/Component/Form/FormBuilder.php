@@ -58,9 +58,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function add($child, $type = null, array $options = array())
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         if ($child instanceof FormBuilderInterface) {
             $this->children[$child->getName()] = $child;
@@ -94,9 +92,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function create($name, $type = null, array $options = array())
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         if (null === $type && null === $this->getDataClass()) {
             $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
@@ -114,9 +110,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function get($name)
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         if (isset($this->unresolvedChildren[$name])) {
             return $this->resolveChild($name);
@@ -134,9 +128,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function remove($name)
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         unset($this->unresolvedChildren[$name], $this->children[$name]);
 
@@ -148,9 +140,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function has($name)
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         if (isset($this->unresolvedChildren[$name])) {
             return true;
@@ -168,9 +158,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function all()
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         $this->resolveChildren();
 
@@ -182,9 +170,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function count()
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         return count($this->children);
     }
@@ -208,9 +194,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function getForm()
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         $this->resolveChildren();
 
@@ -234,9 +218,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function getIterator()
     {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
+        $this->ensureFormIsNotLocked();
 
         return new \ArrayIterator($this->all());
     }
@@ -268,5 +250,15 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         $this->unresolvedChildren = array();
+    }
+
+    /**
+     * @throws BadMethodCallException If form is locked
+     */
+    private function ensureFormIsNotLocked()
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
     }
 }

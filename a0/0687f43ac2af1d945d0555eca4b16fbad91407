@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-07-31T07:55:16Z
+
+@dosten can you give a use case for prioritizing service's decorator ? I fail to understand :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T09:47:06Z
+
+@dupuchba controlling the order in which multiple decorators for the same service are applied. ``new Bar(new Foobar(new Foo)))`` and ``new Foobar(new Bar(new Foo)))`` can lead to a totally different behavior at runtime. And without that, the order in which decorators are applied is undetermined (deterministic but not controllable)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-31T09:47:24Z
+
+btw, the issue requesting the change explains it already
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-04T17:31:59Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-04T21:00:46Z
+
+:+1: looks good to me
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-05T00:12:46Z
+
+:+1:
+
+Please submit a PR to the documentation repo to document this new feature for the 2.8 branch
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-05T01:48:15Z
+
+IMO this can be labeled as reviewed, right?
+
+@stof :+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-05T02:42:49Z
+
+The docs PR can be found [here](https://github.com/symfony/symfony-docs/pull/5600).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-05T08:24:35Z
+
+@dosten indeed. note that anyone can trigger the status change thanks to @carsonbot (the update of the doc to describe our goals with it is not yet ready unfortunately)
+
+status: reviewed
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-05T12:54:13Z
+
+@stof Yes, I know, but I feel unconfortable changing the status by myself.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2015-08-05T12:55:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-05T13:18:15Z
+
+@dosten ah yeah, being the PR author, this seems fair to let someone else change. We have plans to implement a restriction about that in the bot itself in the future. I missed the fact you are the author when I commented

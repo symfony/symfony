@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-30T19:48:04Z
+
+:-1: nightly is not stable yet. why would we depend on it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-30T20:17:04Z
+
+Now, that we are at a point where our tests are passing on PHP 7, I think it's a good idea (especially because it isn't stable yet) for two reasons:
+
+1. We notice very early when our code breaks in case that some PHP behaviour changes intentionally. Hence, we can react fast and adapt the Symfony code to be compatible again (we can decide to allow failures again if we notice that it will take us some time to make the needed changes).
+
+1. If the code breaks because of a regression in PHP itself, we will be able to report them as soon as possible to the PHP devs (and again, we could revert this change again if fixing PHP would take some time).
+
+I believe that we wouldn't notice failures (regardless of the reason for it) really soon if we were suppose to check the build log of passed Travis builds.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-30T23:47:09Z
+
+If it does fail too often because of temporarily broken php I'm ok with it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-31T08:40:09Z
+
+I also think it's too early to enforce this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-03T15:50:37Z
+
+Hum, we're now 3 days after, the time has come :)
+Rethinking about it, I'd be :+1: for this reason: ZF 2.4 already communicates on being PHP7 compatible. That means the guy from Zend will ensure that they do not break anything anymore.
+We need to be able to communicate on 2.7 being PHP7 ready.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T15:56:03Z
+
+Actually, I was thinking about closing this as we are actually not yet where I thought when opening this PR (see #14086). :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-03T16:10:37Z
+
+@nicolas-grekas you could start debugging the Debug and VarDumper tests on PHP7 then :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-03T16:11:18Z
+
+I was just looking at them :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-28T12:48:15Z
+
+@xabbuh can you please rebase? We're almost ready to merge this one!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-07-28T17:56:26Z
+
+Ready to go.

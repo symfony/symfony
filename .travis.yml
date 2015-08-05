@@ -49,7 +49,7 @@ install:
     - PHPUNIT="$(readlink -f ./vendor/bin/phpunit) --colors=always"
 
 script:
-    - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; '$PHPUNIT' --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; '"$PHPUNIT"' --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; '$PHPUNIT' --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; '$PHPUNIT' --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; '"$PHPUNIT"' --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; '"$PHPUNIT"' --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

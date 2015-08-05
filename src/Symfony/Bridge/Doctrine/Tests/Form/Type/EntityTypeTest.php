@@ -212,7 +212,7 @@ class EntityTypeTest extends TypeTestCase
 
         $field->submit('2');
     }
-    
+
     public function testConfigureQueryBuilderWithClosureReturningNull()
     {
         $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(

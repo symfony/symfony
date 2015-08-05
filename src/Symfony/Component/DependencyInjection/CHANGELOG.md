@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated the concept of scopes
  * added `Definition::setShared()` and `Definition::isShared()`
  * added ResettableContainerInterface to be able to reset the container to release memory on shutdown
+ * added a way to define the priority of service decoration
 
 2.7.0
 -----

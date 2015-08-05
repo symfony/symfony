@@ -150,12 +150,13 @@ class Definition
      *
      * @param null|string $id        The decorated service id, use null to remove decoration
      * @param null|string $renamedId The new decorated service id
+     * @param int         $priority  The priority of decoration
      *
      * @return Definition The current instance
      *
      * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
      */
-    public function setDecoratedService($id, $renamedId = null)
+    public function setDecoratedService($id, $renamedId = null, $priority = 0)
     {
         if ($renamedId && $id == $renamedId) {
             throw new \InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -164,7 +165,7 @@ class Definition
         if (null === $id) {
             $this->decoratedService = null;
         } else {
-            $this->decoratedService = array($id, $renamedId);
+            $this->decoratedService = array($id, $renamedId, (int) $priority);
         }
 
         return $this;
@@ -173,7 +174,7 @@ class Definition
     /**
      * Gets the service that decorates this service.
      *
-     * @return null|array An array composed of the decorated service id and the new id for it, null if no service is decorated
+     * @return null|array An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
      */
     public function getDecoratedService()
     {

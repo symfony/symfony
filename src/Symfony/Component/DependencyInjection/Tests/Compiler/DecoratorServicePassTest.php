@@ -73,6 +73,48 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($fooExtendedDefinition->getDecoratedService());
     }
 
+    public function testProcessWithPriority()
+    {
+        $container = new ContainerBuilder();
+        $fooDefinition = $container
+            ->register('foo')
+            ->setPublic(false)
+        ;
+        $barDefinition = $container
+            ->register('bar')
+            ->setPublic(true)
+            ->setDecoratedService('foo')
+        ;
+        $bazDefinition = $container
+            ->register('baz')
+            ->setPublic(true)
+            ->setDecoratedService('foo', null, 5)
+        ;
+        $quxDefinition = $container
+            ->register('qux')
+            ->setPublic(true)
+            ->setDecoratedService('foo', null, 3)
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals('bar', $container->getAlias('foo'));
+        $this->assertFalse($container->getAlias('foo')->isPublic());
+
+        $this->assertSame($fooDefinition, $container->getDefinition('baz.inner'));
+        $this->assertFalse($container->getDefinition('baz.inner')->isPublic());
+
+        $this->assertEquals('qux', $container->getAlias('bar.inner'));
+        $this->assertFalse($container->getAlias('bar.inner')->isPublic());
+
+        $this->assertEquals('baz', $container->getAlias('qux.inner'));
+        $this->assertFalse($container->getAlias('qux.inner')->isPublic());
+
+        $this->assertNull($barDefinition->getDecoratedService());
+        $this->assertNull($bazDefinition->getDecoratedService());
+        $this->assertNull($quxDefinition->getDecoratedService());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new DecoratorServicePass();

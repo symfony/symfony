@@ -97,6 +97,7 @@
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="decorates" type="xsd:string" />
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
+    <xsd:attribute name="decoration-priority" type="xsd:integer" />
   </xsd:complexType>
 
   <xsd:complexType name="tag">

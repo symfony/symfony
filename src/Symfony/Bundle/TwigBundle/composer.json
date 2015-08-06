@@ -30,6 +30,7 @@
         "symfony/config": "~2.8|~3.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
         "symfony/framework-bundle": "~2.8|~3.0"
     },
     "autoload": {

@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;
+    private $reader;
 
     protected function setUp()
     {

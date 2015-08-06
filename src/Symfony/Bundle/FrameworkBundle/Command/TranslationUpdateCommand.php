@@ -69,7 +69,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output = new SymfonyStyle($input, $output);
-        $kernel = $this->getContainer()->get('kernel');
 
         // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {

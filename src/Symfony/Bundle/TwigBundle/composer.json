@@ -25,6 +25,7 @@
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
         "symfony/config": "~2.2",
+        "symfony/yaml": "~2.3",
         "symfony/framework-bundle": "~2.1"
     },
     "autoload": {

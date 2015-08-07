@@ -20,7 +20,9 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Parser
 {
-    const FOLDED_SCALAR_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+    const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+    // BC - wrongly named
+    const FOLDED_SCALAR_PATTERN = self::BLOCK_SCALAR_HEADER_PATTERN;
 
     private $offset = 0;
     private $lines = array();
@@ -332,8 +334,8 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
 
-        // Comments must not be removed inside a string block (ie. after a line ending with "|")
-        $removeCommentsPattern = '~'.self::FOLDED_SCALAR_PATTERN.'$~';
+        // Comments must not be removed inside a block scalar
+        $removeCommentsPattern = '~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~';
         $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
 
         while ($this->moveToNextLine()) {
@@ -422,10 +424,10 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (preg_match('/^'.self::FOLDED_SCALAR_PATTERN.'$/', $value, $matches)) {
+        if (preg_match('/^'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
-            return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+            return $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
         }
 
         try {
@@ -439,15 +441,15 @@ class Parser
     }
 
     /**
-     * Parses a folded scalar.
+     * Parses a block scalar.
      *
-     * @param string $separator   The separator that was used to begin this folded scalar (| or >)
-     * @param string $indicator   The indicator that was used to begin this folded scalar (+ or -)
-     * @param int    $indentation The indentation that was used to begin this folded scalar
+     * @param string $style       The style indicator that was used to begin this block scalar (| or >)
+     * @param string $chomping    The chomping indicator that was used to begin this block scalar (+ or -)
+     * @param int    $indentation The indentation indicator that was used to begin this block scalar
      *
      * @return string The text value
      */
-    private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
+    private function parseBlockScalar($style, $chomping = '', $indentation = 0)
     {
         $notEOF = $this->moveToNextLine();
         if (!$notEOF) {
@@ -502,17 +504,23 @@ class Parser
             $this->moveToPreviousLine();
         }
 
-        // replace all non-trailing single newlines with spaces in folded blocks
-        if ('>' === $separator) {
+        // folded style
+        if ('>' === $style) {
+            // folded lines
+            // replace all non-leading/non-trailing single newlines with spaces
             preg_match('/(\n*)$/', $text, $matches);
-            $text = preg_replace('/(?<!\n)\n(?!\n)/', ' ', rtrim($text, "\n"));
+            $text = preg_replace('/(?<!\n|^)\n(?!\n)/', ' ', rtrim($text, "\n"));
             $text .= $matches[1];
+
+            // empty separation lines
+            // remove one newline from each group of non-leading/non-trailing newlines
+            $text = preg_replace('/[^\n]\n+\K\n(?=[^\n])/', '', $text);
         }
 
-        // deal with trailing newlines as indicated
-        if ('' === $indicator) {
+        // deal with trailing newlines
+        if ('' === $chomping) {
             $text = preg_replace('/\n+$/', "\n", $text);
-        } elseif ('-' === $indicator) {
+        } elseif ('-' === $chomping) {
             $text = preg_replace('/\n+$/', '', $text);
         }
 

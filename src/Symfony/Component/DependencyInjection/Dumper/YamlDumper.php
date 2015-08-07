@@ -104,6 +104,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synchronized: true\n");
         }
 
+        if ($definition->isDeprecated()) {
+            $code .= "        deprecated: true\n";
+        }
+
         if ($definition->getFactoryClass(false)) {
             $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass(false));
         }

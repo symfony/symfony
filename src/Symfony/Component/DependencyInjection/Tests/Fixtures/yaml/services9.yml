@@ -76,6 +76,9 @@ services:
         class: stdClass
         decorates: decorated
         decoration_inner_name: decorated.pif-pouf
+    deprecated_service:
+        class: stdClass
+        deprecated: true
     new_factory:
         class: FactoryClass
         public: false

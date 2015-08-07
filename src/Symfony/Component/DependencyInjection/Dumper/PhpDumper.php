@@ -592,7 +592,15 @@ class PhpDumper extends Dumper
             $return[] = sprintf("@throws InactiveScopeException when the '%s' service is requested while the '%s' scope is not active", $id, $scope);
         }
 
-        $return = implode("\n     * ", $return);
+        if ($definition->isDeprecated()) {
+            if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
+                $return[] = '';
+            }
+
+            $return[] = '@deprecated';
+        }
+
+        $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
 
         $doc = '';
         if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
@@ -652,6 +660,10 @@ EOF;
         if ($definition->isSynthetic()) {
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
         } else {
+            if ($definition->isDeprecated()) {
+                $code .= sprintf("        @trigger_error('The service %s has been marked as deprecated. You should stop using it.', E_USER_DEPRECATED);\n\n", $id);
+            }
+
             $code .=
                 $this->addServiceInclude($id, $definition).
                 $this->addServiceLocalTempVariables($id, $definition).

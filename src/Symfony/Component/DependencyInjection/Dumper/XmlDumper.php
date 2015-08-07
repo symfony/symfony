@@ -148,6 +148,9 @@ class XmlDumper extends Dumper
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
+        if ($definition->isDeprecated()) {
+            $service->setAttribute('deprecated', 'true');
+        }
         if (null !== $decorated = $definition->getDecoratedService()) {
             list($decorated, $renamedId, $priority) = $decorated;
             $service->setAttribute('decorates', $decorated);

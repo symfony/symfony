@@ -87,6 +87,7 @@
     <service id="decorated" class="stdClass"/>
     <service id="decorator_service" class="stdClass" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="deprecated_service" class="stdClass" deprecated="true"/>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
     </service>

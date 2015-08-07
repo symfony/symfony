@@ -201,7 +201,7 @@ class TimeType extends AbstractType
             if (is_array($choiceTranslationDomain)) {
                 $default = false;
 
-                return array_merge(
+                return array_replace(
                     array('hour' => $default, 'minute' => $default, 'second' => $default),
                     $choiceTranslationDomain
                 );

@@ -4,6 +4,7 @@ CHANGELOG
 2.8.0
 -----
 
+ * added option "choice_translation_domain" to DateType, TimeType and DateTimeType.
  * deprecated option "read_only" in favor of "attr['readonly']"
  * added the html5 "range" FormType
  * deprecated the "cascade_validation" option in favor of setting "constraints"

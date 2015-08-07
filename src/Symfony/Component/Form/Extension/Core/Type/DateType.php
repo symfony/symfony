@@ -212,7 +212,7 @@ class DateType extends AbstractType
             if (is_array($choiceTranslationDomain)) {
                 $default = false;
 
-                return array_merge(
+                return array_replace(
                     array('year' => $default, 'month' => $default, 'day' => $default),
                     $choiceTranslationDomain
                 );

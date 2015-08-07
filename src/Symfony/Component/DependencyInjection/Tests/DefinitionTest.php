@@ -234,6 +234,18 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
+     * @covers Symfony\Component\DependencyInjection\Definition::isDeprecated
+     */
+    public function testSetIsDeprecated()
+    {
+        $def = new Definition('stdClass');
+        $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
+        $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
+        $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setConfigurator
      * @covers Symfony\Component\DependencyInjection\Definition::getConfigurator
      */

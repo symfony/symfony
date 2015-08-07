@@ -38,6 +38,7 @@ class Definition
     private $public = true;
     private $synthetic = false;
     private $abstract = false;
+    private $deprecated = false;
     private $synchronized = false;
     private $lazy = false;
     private $decoratedService;
@@ -827,6 +828,36 @@ class Definition
     public function isAbstract()
     {
         return $this->abstract;
+    }
+
+    /**
+     * Whether this definition is deprecated, that means it should not be called
+     * anymore.
+     *
+     * @param bool $status
+     *
+     * @return Definition the current instance
+     *
+     * @api
+     */
+    public function setDeprecated($status = true)
+    {
+        $this->deprecated = (bool) $status;
+
+        return $this;
+    }
+
+    /**
+     * Whether this definition is deprecated, that means it should not be called
+     * anymore.
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isDeprecated()
+    {
+        return $this->deprecated;
     }
 
     /**

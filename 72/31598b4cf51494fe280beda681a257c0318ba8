@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-04T10:00:14Z
+
+I've compared the latest version of this patch with the initial situation and the results are great: 9% performance increase:
+
+![path_10](https://cloud.githubusercontent.com/assets/73419/9058288/56b85fac-3aa0-11e5-856a-9ab986e286e9.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-04T10:53:47Z
+
+The latest change increases performance even more. This is really nice!! Thanks @stof and @nicolas-grekas
+
+![patch_11](https://cloud.githubusercontent.com/assets/73419/9059147/d1590f02-3aa7-11e5-9077-738c66c21df5.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-04T11:33:14Z
+
+Test failures on HHVM don't seem to be related to these tests AFAICT.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-04T11:34:20Z
+
+@javiereguiluz can you run the DebugClassLoader tests on MacOS again to be sure that the regex change works fine (and see what the perf impact is) ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-04T11:38:50Z
+
+Tests pass correctly and the performance improvement is the same as shown above, which is really great!
+
+![test_pass](https://cloud.githubusercontent.com/assets/73419/9059844/1c565e50-3aae-11e5-8e1e-fc27c46b3c12.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-04T11:41:41Z
+
+:+1: for this patch then
+
+@nicolas-grekas do you think there is a chance to convince @jpauli to fix this PHP bug in a future release of PHP so that we would not need this costly implementation on newer PHP versions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-04T12:27:53Z
+
+@stof I sent a message to php-internals, wait & see... http://marc.info/?l=php-internals&m=143869103826753&w=2
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-07T02:09:53Z
+
+:+1:

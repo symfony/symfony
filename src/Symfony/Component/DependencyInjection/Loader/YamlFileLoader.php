@@ -196,6 +196,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (isset($service['deprecated'])) {
+            $definition->setDeprecated($service['deprecated']);
+        }
+
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
                 if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {

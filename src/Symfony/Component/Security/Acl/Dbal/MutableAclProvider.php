@@ -701,12 +701,14 @@ QUERY;
      */
     protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
     {
-        if ($usid->getUsername() == $oldUsername) {
+        $userName = $usid->getUsername();
+        if ($userName == $oldUsername) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
-        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
-        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+        $securityIdentityClass = $usid->getClass();
+        $oldIdentifier = $securityIdentityClass.'-'.$oldUsername;
+        $newIdentifier = $securityIdentityClass.'-'.$userName;
 
         return sprintf(
             'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',

@@ -104,6 +104,7 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
+        $oidsCount = count($oids);
         foreach ($oids as $i => $oid) {
             $oidIdentifier = $oid->getIdentifier();
             $oidType = $oid->getType();
@@ -176,7 +177,7 @@ class AclProvider implements AclProviderInterface
 
             // Is it time to load the current batch?
             $currentBatchesCount = count($currentBatch);
-            if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $c)) {
+            if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $oidsCount)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $e) {

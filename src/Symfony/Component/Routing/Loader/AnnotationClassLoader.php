@@ -220,11 +220,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            // for BC reasons
             if (null !== $annot->getPath()) {
                 $globals['path'] = $annot->getPath();
-            } elseif (null !== $annot->getPattern()) {
-                $globals['path'] = $annot->getPattern();
             }
 
             if (null !== $annot->getRequirements()) {

@@ -178,11 +178,6 @@ class YamlFileLoader extends FileLoader
             $definition->setSynthetic($service['synthetic']);
         }
 
-        if (isset($service['synchronized'])) {
-            @trigger_error(sprintf('The "synchronized" key of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
-            $definition->setSynchronized($service['synchronized'], 'request' !== $id);
-        }
-
         if (isset($service['lazy'])) {
             $definition->setLazy($service['lazy']);
         }
@@ -206,21 +201,6 @@ class YamlFileLoader extends FileLoader
             } else {
                 $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
             }
-        }
-
-        if (isset($service['factory_class'])) {
-            @trigger_error(sprintf('The "factory_class" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            @trigger_error(sprintf('The "factory_method" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            @trigger_error(sprintf('The "factory_service" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {

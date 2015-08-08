@@ -9,7 +9,6 @@
 <comment>Synthetic</comment>        yes
 <comment>Lazy</comment>             no
 <comment>Shared</comment>           yes
-<comment>Synchronized</comment>     no
 <comment>Abstract</comment>         no
 <comment>Required File</comment>    /path/to/file
 <comment>Factory Service</comment>  factory.service

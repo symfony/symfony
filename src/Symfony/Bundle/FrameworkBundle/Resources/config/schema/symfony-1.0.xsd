@@ -154,13 +154,9 @@
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
-            <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="package" type="old-package" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
-        <xsd:attribute name="assets-version" type="xsd:string" />
-        <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="hinclude-default-template" type="xsd:string" />
     </xsd:complexType>
@@ -169,16 +165,6 @@
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="resource" type="xsd:string" />
         </xsd:choice>
-    </xsd:complexType>
-
-    <xsd:complexType name="old-package">
-        <xsd:sequence>
-            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="version" type="xsd:string" />
-        <xsd:attribute name="version-format" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

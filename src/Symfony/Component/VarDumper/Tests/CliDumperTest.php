@@ -42,17 +42,8 @@ class CliDumperTest extends VarDumperTestCase
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
-        $closure54 = '';
+
         $r = defined('HHVM_VERSION') ? '' : '#%d';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
-EOTXT;
-        }
-
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -83,7 +74,9 @@ array:24 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {{$r}{$closure54}
+  "closure" => Closure {{$r}
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
     parameters: array:2 [
       "\$a" => []
       "&\$b" => array:2 [

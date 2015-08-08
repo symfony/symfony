@@ -287,10 +287,6 @@
     </form>
 {%- endblock form_end -%}
 
-{%- block form_enctype -%}
-    {% if multipart %}enctype="multipart/form-data"{% endif %}
-{%- endblock form_enctype -%}
-
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
     <ul>

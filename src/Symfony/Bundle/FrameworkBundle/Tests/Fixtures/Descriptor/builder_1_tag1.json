@@ -7,7 +7,6 @@
             "synthetic": true,
             "lazy": false,
             "shared": true,
-            "synchronized": false,
             "abstract": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",

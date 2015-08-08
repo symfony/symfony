@@ -5,23 +5,16 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="validator.class">Symfony\Component\Validator\Validator\ValidatorInterface</parameter>
-        <parameter key="validator.builder.class">Symfony\Component\Validator\ValidatorBuilderInterface</parameter>
-        <parameter key="validator.builder.factory.class">Symfony\Component\Validator\Validation</parameter>
-        <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
         <parameter key="validator.mapping.cache.prefix" />
-        <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.expression.class">Symfony\Component\Validator\Constraints\ExpressionValidator</parameter>
-        <parameter key="validator.email.class">Symfony\Component\Validator\Constraints\EmailValidator</parameter>
     </parameters>
 
     <services>
-        <service id="validator" class="%validator.class%">
+        <service id="validator" class="Symfony\Component\Validator\Validator\ValidatorInterface">
             <factory service="validator.builder" method="getValidator" />
         </service>
 
-        <service id="validator.builder" class="%validator.builder.class%">
-            <factory class="%validator.builder.factory.class%" method="createValidatorBuilder" />
+        <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilderInterface">
+            <factory class="Symfony\Component\Validator\Validation" method="createValidatorBuilder" />
             <call method="setConstraintValidatorFactory">
                 <argument type="service" id="validator.validator_factory" />
             </call>
@@ -35,7 +28,7 @@
 
         <service id="validator.mapping.class_metadata_factory" alias="validator" public="false" />
 
-        <service id="validator.mapping.cache.apc" class="%validator.mapping.cache.apc.class%" public="false">
+        <service id="validator.mapping.cache.apc" class="Symfony\Component\Validator\Mapping\Cache\ApcCache" public="false">
             <argument>%validator.mapping.cache.prefix%</argument>
         </service>
 
@@ -49,17 +42,17 @@
             </argument>
         </service>
 
-        <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
+        <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />
         </service>
 
-        <service id="validator.expression" class="%validator.expression.class%">
+        <service id="validator.expression" class="Symfony\Component\Validator\Constraints\ExpressionValidator">
             <argument type="service" id="property_accessor" />
             <tag name="validator.constraint_validator" alias="validator.expression" />
         </service>
 
-        <service id="validator.email" class="%validator.email.class%">
+        <service id="validator.email" class="Symfony\Component\Validator\Constraints\EmailValidator">
             <argument></argument>
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
         </service>

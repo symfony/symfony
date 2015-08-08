@@ -196,11 +196,9 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-        if (count($requirements)) {
+        if (count($route->getRequirements())) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
-            foreach ($requirements as $attribute => $pattern) {
+            foreach ($route->getRequirements() as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
@@ -331,20 +329,6 @@ class XmlDescriptor extends Descriptor
 
         $serviceXML->setAttribute('class', $definition->getClass());
 
-        if (method_exists($definition, 'getFactoryMethod')) {
-            if ($definition->getFactoryClass(false)) {
-                $serviceXML->setAttribute('factory-class', $definition->getFactoryClass(false));
-            }
-
-            if ($definition->getFactoryService(false)) {
-                $serviceXML->setAttribute('factory-service', $definition->getFactoryService(false));
-            }
-
-            if ($definition->getFactoryMethod(false)) {
-                $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod(false));
-            }
-        }
-
         if ($factory = $definition->getFactory()) {
             $serviceXML->appendChild($factoryXML = $dom->createElement('factory'));
 
@@ -368,9 +352,6 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
         if (method_exists($definition, 'isShared')) {
             $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
-        }
-        if (method_exists($definition, 'isSynchronized')) {
-            $serviceXML->setAttribute('synchronized', $definition->isSynchronized(false) ? 'true' : 'false');
         }
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());

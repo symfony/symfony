@@ -119,23 +119,10 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        $node->fixXmlConfig('user_provider');
         $builder = $node
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['key']); })
-                ->then(function ($v) {
-                    if (isset($v['secret'])) {
-                        throw new \LogicException('Cannot set both key and secret options for remember_me, use only secret instead.');
-                    }
-
-                    @trigger_error('remember_me.key is deprecated since version 2.8 and will be removed in 3.0. Use remember_me.secret instead.', E_USER_DEPRECATED);
-
-                    $v['secret'] = $v['key'];
-
-                    unset($v['key']);
-                })
-                ->end()
-            ->children();
+            ->fixXmlConfig('user_provider')
+            ->children()
+        ;
 
         $builder
             ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()

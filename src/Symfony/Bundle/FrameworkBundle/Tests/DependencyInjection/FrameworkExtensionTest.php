@@ -204,17 +204,30 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyTemplatingAssets()
-    {
-        $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
-    }
-
     public function testAssets()
     {
-        $this->checkAssetsPackages($this->createContainerFromFile('assets'));
+        $container = $this->createContainerFromFile('assets');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+
+        // packages
+        $packages = $packages->getArgument(1);
+        $this->assertCount(4, $packages);
+
+        $package = $container->getDefinition($packages['images_path']);
+        $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
+
+        $package = $container->getDefinition($packages['images']);
+        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', '%%s?version=%%s');
+
+        $package = $container->getDefinition($packages['foo']);
+        $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
+
+        $package = $container->getDefinition($packages['bar']);
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
     }
 
     public function testTranslator()
@@ -467,9 +480,8 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testAssetHelperWhenTemplatesAreEnabledAndAssetsAreDisabled()
     {
         $container = $this->createContainerFromFile('assets_disabled');
-        $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
 
-        $this->assertSame('assets.packages', (string) $packages);
+        $this->assertFalse($container->hasDefinition('templating.helper.assets'));
     }
 
     public function testSerializerServiceIsRegisteredWhenEnabled()
@@ -523,33 +535,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         return $container;
-    }
-
-    private function checkAssetsPackages(ContainerBuilder $container, $legacy = false)
-    {
-        $packages = $container->getDefinition('assets.packages');
-
-        // default package
-        $defaultPackage = $container->getDefinition($packages->getArgument(0));
-        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
-
-        // packages
-        $packages = $packages->getArgument(1);
-        $this->assertCount($legacy ? 3 : 4, $packages);
-
-        if (!$legacy) {
-            $package = $container->getDefinition($packages['images_path']);
-            $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
-        }
-
-        $package = $container->getDefinition($packages['images']);
-        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', $legacy ? '%%s?%%s' : '%%s?version=%%s');
-
-        $package = $container->getDefinition($packages['foo']);
-        $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
-
-        $package = $container->getDefinition($packages['bar']);
-        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
     }
 
     private function assertPathPackage(ContainerBuilder $container, DefinitionDecorator $package, $basePath, $version, $format)

@@ -43,10 +43,7 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
-        $declared = array_merge(get_declared_classes(), get_declared_interfaces());
-        if (function_exists('get_declared_traits')) {
-            $declared = array_merge($declared, get_declared_traits());
-        }
+        $declared = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
 
         if ($adaptive) {
             // don't include already declared classes
@@ -283,12 +280,10 @@ class ClassCollectionLoader
 
         $traits = array();
 
-        if (function_exists('get_declared_traits')) {
-            foreach ($classes as $c) {
-                foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
-                    if ($trait !== $c) {
-                        $traits[] = $trait;
-                    }
+        foreach ($classes as $c) {
+            foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
+                if ($trait !== $c) {
+                    $traits[] = $trait;
                 }
             }
         }

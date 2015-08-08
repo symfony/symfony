@@ -23,7 +23,7 @@ abstract class ServerCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (version_compare(phpversion(), '5.4.0', '<') || defined('HHVM_VERSION')) {
+        if (defined('HHVM_VERSION')) {
             return false;
         }
 

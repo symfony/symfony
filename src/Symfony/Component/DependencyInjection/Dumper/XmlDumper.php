@@ -121,15 +121,6 @@ class XmlDumper extends Dumper
 
             $service->setAttribute('class', $class);
         }
-        if ($definition->getFactoryMethod(false)) {
-            $service->setAttribute('factory-method', $definition->getFactoryMethod(false));
-        }
-        if ($definition->getFactoryClass(false)) {
-            $service->setAttribute('factory-class', $definition->getFactoryClass(false));
-        }
-        if ($definition->getFactoryService(false)) {
-            $service->setAttribute('factory-service', $definition->getFactoryService(false));
-        }
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');
         }
@@ -141,9 +132,6 @@ class XmlDumper extends Dumper
         }
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
-        }
-        if ($definition->isSynchronized(false)) {
-            $service->setAttribute('synchronized', 'true');
         }
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');

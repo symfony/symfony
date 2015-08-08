@@ -490,30 +490,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsText()
-    {
-        $application = new Application();
-        $application->add(new \FooCommand());
-        $this->ensureStaticCommandHelp($application);
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $this->normalizeLineBreaks($application->asText()), '->asText() returns a text representation of the application');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsXml()
-    {
-        $application = new Application();
-        $application->add(new \FooCommand());
-        $this->ensureStaticCommandHelp($application);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
-    }
-
     public function testRenderException()
     {
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
@@ -765,8 +741,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $helperSet = $application->getHelperSet();
 
         $this->assertTrue($helperSet->has('formatter'));
-        $this->assertTrue($helperSet->has('dialog'));
-        $this->assertTrue($helperSet->has('progress'));
     }
 
     public function testAddingSingleHelperSetOverwritesDefaultValues()

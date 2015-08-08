@@ -108,11 +108,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     abstract protected function renderForm(FormView $view, array $vars = array());
 
-    protected function renderEnctype(FormView $view)
-    {
-        $this->markTestSkipped(sprintf('Legacy %s::renderEnctype() is not implemented.', get_class($this)));
-    }
-
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
     abstract protected function renderErrors(FormView $view);
@@ -128,30 +123,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     abstract protected function renderEnd(FormView $view, array $vars = array());
 
     abstract protected function setTheme(FormView $view, array $themes);
-
-    /**
-     * @group legacy
-     */
-    public function testEnctype()
-    {
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
-            ->getForm();
-
-        $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form->createView()));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testNoEnctype()
-    {
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('text', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->getForm();
-
-        $this->assertEquals('', $this->renderEnctype($form->createView()));
-    }
 
     public function testLabel()
     {
@@ -558,15 +529,13 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
-
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
     [not(@required)]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="&b"]'.$classPart.'[not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -843,8 +812,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'expanded' => false,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
-
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name[]"]
@@ -852,7 +819,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@multiple="multiple"]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="&b"]'.$classPart.'[not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -957,14 +924,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'expanded' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
-
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
         ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"]'.$classPart.'[not(@checked)]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][@class="foo&bar"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
@@ -1081,14 +1046,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'required' => true,
         ));
 
-        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
-
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"]'.$classPart.'[not(@checked)][not(@required)]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@class="foo&bar"][not(@checked)][not(@required)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]

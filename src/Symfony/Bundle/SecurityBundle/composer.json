@@ -16,31 +16,30 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/security": "~2.8|~3.0.0",
-        "symfony/security-acl": "~2.8|~3.0.0",
-        "symfony/http-kernel": "~2.2|~3.0.0"
+        "php": ">=5.5.9",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/browser-kit": "~2.4|~3.0.0",
-        "symfony/config": "~2.8|~3.0.0",
-        "symfony/console": "~2.7|~3.0.0",
-        "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/dependency-injection": "~2.6,>=2.6.6|~3.0.0",
-        "symfony/dom-crawler": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/form": "~2.8",
-        "symfony/framework-bundle": "~2.8",
-        "symfony/http-foundation": "~2.4|~3.0.0",
-        "symfony/twig-bundle": "~2.7|~3.0.0",
-        "symfony/twig-bridge": "~2.7|~3.0.0",
-        "symfony/process": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/validator": "~2.5|~3.0.0",
-        "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/expression-language": "~2.6|~3.0.0",
-        "doctrine/doctrine-bundle": "~1.2",
-        "twig/twig": "~1.12",
-        "ircmaxell/password-compat": "~1.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/console": "~2.8|~3.0",
+        "symfony/css-selector": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
+        "symfony/framework-bundle": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/twig-bundle": "~2.8|~3.0",
+        "symfony/twig-bridge": "~2.8|~3.0",
+        "symfony/process": "~2.8|~3.0",
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "doctrine/doctrine-bundle": "~1.4",
+        "twig/twig": "~1.12"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" }
@@ -48,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

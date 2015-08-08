@@ -38,59 +38,12 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addFormSection($rootNode);
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
 
         return $treeBuilder;
-    }
-
-    private function addFormSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            // Check deprecation before the config is processed to ensure
-            // the setting has been explicitly defined in a configuration file.
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['form']['resources']); })
-                ->then(function ($v) {
-                    @trigger_error('The twig.form.resources configuration key is deprecated since version 2.6 and will be removed in 3.0. Use the twig.form_themes configuration key instead.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return count($v['form']['resources']) > 0;
-                })
-                ->then(function ($v) {
-                    $v['form_themes'] = array_values(array_unique(array_merge($v['form']['resources'], $v['form_themes'])));
-
-                    return $v;
-                })
-            ->end()
-            ->children()
-                ->arrayNode('form')
-                    ->info('Deprecated since version 2.6, to be removed in 3.0. Use twig.form_themes instead')
-                    ->addDefaultsIfNotSet()
-                    ->fixXmlConfig('resource')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                            ->example(array('MyBundle::form.html.twig'))
-                            ->validate()
-                                ->ifNotInArray(array('form_div_layout.html.twig'))
-                                ->then(function ($v) {
-                                    return array_merge(array('form_div_layout.html.twig'), $v);
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addFormThemesSection(ArrayNodeDefinition $rootNode)

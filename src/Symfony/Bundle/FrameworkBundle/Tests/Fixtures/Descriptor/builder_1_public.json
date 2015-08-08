@@ -7,7 +7,6 @@
             "synthetic": false,
             "lazy": true,
             "shared": true,
-            "synchronized": false,
             "abstract": true,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",

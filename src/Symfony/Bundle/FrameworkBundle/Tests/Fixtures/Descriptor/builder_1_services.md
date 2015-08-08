@@ -13,7 +13,6 @@ definition_1
 - Synthetic: no
 - Lazy: yes
 - Shared: yes
-- Synchronized: no
 - Abstract: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
@@ -27,7 +26,6 @@ definition_2
 - Synthetic: yes
 - Lazy: no
 - Shared: yes
-- Synchronized: no
 - Abstract: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`

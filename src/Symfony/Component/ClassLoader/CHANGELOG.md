@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * The DebugClassLoader class has been removed
+ * The DebugUniversalClassLoader class has been removed
+ * The UniversalClassLoader class has been removed
+ * The ApcUniversalClassLoader class has been removed
+
 2.4.0
 -----
 

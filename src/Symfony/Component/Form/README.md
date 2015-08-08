@@ -14,7 +14,7 @@ https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/FormServiceProvid
 
 Documentation:
 
-https://symfony.com/doc/2.8/book/forms.html
+https://symfony.com/doc/3.0/book/forms.html
 
 Resources
 ---------

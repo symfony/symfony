@@ -115,20 +115,36 @@ class ExceptionHandler
     public function handle(\Exception $exception)
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
-            $this->failSafeHandle($exception);
+            $this->sendPhpResponse($exception);
 
             return;
         }
 
         $caughtLength = $this->caughtLength = 0;
 
-        ob_start(array($this, 'catchOutput'));
-        $this->failSafeHandle($exception);
+        ob_start(function($buffer) {
+            $this->caughtBuffer = $buffer;
+
+            return '';
+        });
+
+        $this->sendPhpResponse($exception);
         while (null === $this->caughtBuffer && ob_end_flush()) {
             // Empty loop, everything is in the condition
         }
         if (isset($this->caughtBuffer[0])) {
-            ob_start(array($this, 'cleanOutput'));
+            ob_start(function($buffer) {
+                if ($this->caughtLength) {
+                    // use substr_replace() instead of substr() for mbstring overloading resistance
+                    $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
+                    if (isset($cleanBuffer[0])) {
+                        $buffer = $cleanBuffer;
+                    }
+                }
+
+                return $buffer;
+            });
+
             echo $this->caughtBuffer;
             $caughtLength = ob_get_length();
         }
@@ -143,33 +159,6 @@ class ExceptionHandler
                 throw $exception;
             }
         }
-    }
-
-    /**
-     * Sends a response for the given Exception.
-     *
-     * If you have the Symfony HttpFoundation component installed,
-     * this method will use it to create and send the response. If not,
-     * it will fallback to plain PHP functions.
-     *
-     * @param \Exception $exception An \Exception instance
-     */
-    private function failSafeHandle(\Exception $exception)
-    {
-        if (class_exists('Symfony\Component\HttpFoundation\Response', false)
-            && __CLASS__ !== get_class($this)
-            && ($reflector = new \ReflectionMethod($this, 'createResponse'))
-            && __CLASS__ !== $reflector->class
-        ) {
-            $response = $this->createResponse($exception);
-            $response->sendHeaders();
-            $response->sendContent();
-            @trigger_error(sprintf("The %s::createResponse method is deprecated since 2.8 and won't be called anymore when handling an exception in 3.0.", $reflector->class), E_USER_DEPRECATED);
-
-            return;
-        }
-
-        $this->sendPhpResponse($exception);
     }
 
     /**
@@ -195,26 +184,6 @@ class ExceptionHandler
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
-    }
-
-    /**
-     * Creates the error Response associated with the given Exception.
-     *
-     * @param \Exception|FlattenException $exception An \Exception instance
-     *
-     * @return Response A Response instance
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function createResponse($exception)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
-        }
-
-        return Response::create($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);
     }
 
     /**
@@ -430,48 +399,10 @@ EOF;
     }
 
     /**
-     * Returns an UTF-8 and HTML encoded string.
-     *
-     * @deprecated since version 2.7, to be removed in 3.0.
-     */
-    protected static function utf8Htmlize($str)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
-    }
-
-    /**
      * HTML-encodes a string.
      */
     private function escapeHtml($str)
     {
-        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), $this->charset);
-    }
-
-    /**
-     * @internal
-     */
-    public function catchOutput($buffer)
-    {
-        $this->caughtBuffer = $buffer;
-
-        return '';
-    }
-
-    /**
-     * @internal
-     */
-    public function cleanOutput($buffer)
-    {
-        if ($this->caughtLength) {
-            // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
-            if (isset($cleanBuffer[0])) {
-                $buffer = $cleanBuffer;
-            }
-        }
-
-        return $buffer;
+        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset);
     }
 }

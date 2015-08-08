@@ -30,6 +30,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('H:i:00', '16:05:00', '1970-01-01 16:05:00 UTC'),
             array('H:i', '16:05', '1970-01-01 16:05:00 UTC'),
             array('H', '16', '1970-01-01 16:00:00 UTC'),
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
 
             // different day representations
             array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),
@@ -96,10 +97,6 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testTransformDateTimeImmutable()
     {
-        if (PHP_VERSION_ID < 50500) {
-            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
-        }
-
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
 
         $input = new \DateTimeImmutable('2010-02-03 12:05:06 America/New_York');

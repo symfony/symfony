@@ -20,7 +20,7 @@ class ExceptionControllerTest extends TestCase
 {
     public function testOnlyClearOwnOutputBuffers()
     {
-        $flatten = $this->getMock('Symfony\Component\Debug\Exception\FlattenException');
+        $flatten = $this->getMock(FlattenException::class);
         $flatten
             ->expects($this->once())
             ->method('getStatusCode')

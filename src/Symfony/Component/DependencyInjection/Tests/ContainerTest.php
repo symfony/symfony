@@ -146,7 +146,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('scoped', 'scoped_foo', 'scoped_synchronized_foo', 'inactive', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('scoped', 'scoped_foo', 'inactive', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     /**
@@ -203,18 +203,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $scoped = $this->getField($c, 'scopedServices');
         $this->assertTrue(isset($scoped['foo']['foo']), '->set() sets a scoped service');
         $this->assertSame($foo, $scoped['foo']['foo'], '->set() sets a scoped service');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetAlsoCallsSynchronizeService()
-    {
-        $c = new ProjectServiceContainer();
-        $c->addScope(new Scope('foo'));
-        $c->enterScope('foo');
-        $c->set('scoped_synchronized_foo', $bar = new \stdClass(), 'foo');
-        $this->assertTrue($c->synchronized, '->set() calls synchronize*Service() if it is defined for the service');
     }
 
     /**
@@ -710,9 +698,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $class = new \ReflectionClass('Symfony\Component\DependencyInjection\Container');
         $clone = $class->getMethod('__clone');
-        if (PHP_VERSION_ID >= 50400) {
-            $this->assertFalse($class->isCloneable());
-        }
+        $this->assertFalse($class->isCloneable());
         $this->assertTrue($clone->isPrivate());
     }
 }
@@ -720,7 +706,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 class ProjectServiceContainer extends Container
 {
     public $__bar, $__foo_bar, $__foo_baz;
-    public $synchronized;
 
     public function __construct()
     {
@@ -729,7 +714,6 @@ class ProjectServiceContainer extends Container
         $this->__bar = new \stdClass();
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
-        $this->synchronized = false;
         $this->aliases = array('alias' => 'bar');
     }
 
@@ -749,20 +733,6 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->services['scoped_foo'] = $this->scopedServices['foo']['scoped_foo'] = new \stdClass();
-    }
-
-    protected function getScopedSynchronizedFooService()
-    {
-        if (!$this->isScopeActive('foo')) {
-            throw new \RuntimeException('invalid call');
-        }
-
-        return $this->services['scoped_bar'] = $this->scopedServices['foo']['scoped_bar'] = new \stdClass();
-    }
-
-    protected function synchronizeScopedSynchronizedFooService()
-    {
-        $this->synchronized = true;
     }
 
     protected function getInactiveService()

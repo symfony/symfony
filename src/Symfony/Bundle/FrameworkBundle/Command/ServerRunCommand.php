@@ -30,7 +30,7 @@ class ServerRunCommand extends ServerCommand
      */
     public function isEnabled()
     {
-        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
+        if (defined('HHVM_VERSION')) {
             return false;
         }
 

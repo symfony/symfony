@@ -295,10 +295,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     /** @dataProvider getSetCodeBindToClosureTests */
     public function testSetCodeBindToClosure($previouslyBound, $expected)
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
-        }
-
         $code = createClosure();
         if ($previouslyBound) {
             $code = $code->bindTo($this);
@@ -334,30 +330,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function callableMethodCommand(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('from the code...');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsText()
-    {
-        $command = new \TestCommand();
-        $command->setApplication(new Application());
-        $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getName()));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/command_astext.txt', $command->asText(), '->asText() returns a text representation of the command');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyAsXml()
-    {
-        $command = new \TestCommand();
-        $command->setApplication(new Application());
-        $tester = new CommandTester($command);
-        $tester->execute(array('command' => $command->getName()));
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
 }
 

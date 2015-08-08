@@ -88,7 +88,13 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+* Parameters of `renderException()` method of the
+  `Symfony\Component\Console\Application` are type hinted.
+  You must add the type hint to your implementations.
+
 ### DependencyInjection
+
+ * The method `remove` was added to `Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface`.
 
  * The methods `Definition::setFactoryClass()`,
    `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
@@ -453,6 +459,8 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+ * The `createEsi` method of `Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache` was removed. Use `createSurrogate` instead.
+
  * The `templating.helper.router` service was moved to `templating_php.xml`. You
    have to ensure that the PHP templating engine is enabled to be able to use it:
 
@@ -684,6 +692,41 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
    `Translator::setFallbackLocales()`.
+
+ * The visibility of the `locale` property has been changed from protected to private. Rely on `getLocale` and `setLocale`
+   instead.
+
+   Before:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->locale;
+
+           // update locale
+           $this->locale = $locale;
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->getLocale();
+
+           // update locale
+           $this->setLocale($locale);
+       }
+    }
+   ```
 
 ### Twig Bridge
 
@@ -1201,3 +1244,18 @@ UPGRADE FROM 2.x to 3.0
  * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
    `Process::setInput()` and `Process::getInput()` that works the same way.
  * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+
+### Monolog Bridge
+
+ * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.
+
+### Swiftmailer Bridge
+
+ * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
+
+### HttpFoundation
+
+* `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.

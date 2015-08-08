@@ -34,10 +34,6 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('This test requires at least PHP 5.4.0.');
-        }
-
         $this->writer = new JsonBundleWriter();
         $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
@@ -47,10 +43,6 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if (PHP_VERSION_ID < 50400) {
-            return;
-        }
-
         $this->filesystem->remove($this->directory);
     }
 

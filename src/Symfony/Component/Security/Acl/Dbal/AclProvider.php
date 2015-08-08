@@ -104,9 +104,11 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
-        for ($i = 0, $c = count($oids); $i < $c; ++$i) {
-            $oid = $oids[$i];
-            $oidLookupKey = $oid->getIdentifier().$oid->getType();
+        foreach ($oids as $i => $oid) {
+            $oidIdentifier = $oid->getIdentifier();
+            $oidType = $oid->getType();
+
+            $oidLookupKey = $oidIdentifier.$oidType;
             $oidLookup[$oidLookupKey] = $oid;
             $aclFound = false;
 
@@ -116,8 +118,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // check if this ACL has already been hydrated
-            if (!$aclFound && isset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()])) {
-                $acl = $this->loadedAcls[$oid->getType()][$oid->getIdentifier()];
+            if (!$aclFound && isset($this->loadedAcls[$oidType][$oidIdentifier])) {
+                $acl = $this->loadedAcls[$oidType][$oidIdentifier];
 
                 if (!$acl->isSidLoaded($sids)) {
                     // FIXME: we need to load ACEs for the missing SIDs. This is never
@@ -153,7 +155,7 @@ class AclProvider implements AclProviderInterface
                             $parentAcl = $parentAcl->getParentAcl();
                         }
 
-                        $this->loadedAcls[$oid->getType()][$oid->getIdentifier()] = $acl;
+                        $this->loadedAcls[$oidType][$oidIdentifier] = $acl;
                         $this->updateAceIdentityMap($acl);
                         $result->attach($oid, $acl);
                         $aclFound = true;
@@ -280,10 +282,10 @@ SELECTCLAUSE;
 SELECTCLAUSE;
 
         $types = array();
-        $count = count($batch);
-        for ($i = 0; $i < $count; ++$i) {
-            if (!isset($types[$batch[$i]->getType()])) {
-                $types[$batch[$i]->getType()] = true;
+        foreach ($batch as $batchItem) {
+            $batchItemType = $batchItem->getType();
+            if (!isset($types[$batchItemType])) {
+                $types[$batchItemType] = true;
 
                 // if there is more than one type we can safely break out of the
                 // loop, because it is the differentiator factor on whether to
@@ -296,8 +298,8 @@ SELECTCLAUSE;
 
         if (1 === count($types)) {
             $ids = array();
-            for ($i = 0; $i < $count; ++$i) {
-                $identifier = (string) $batch[$i]->getIdentifier();
+            foreach ($batch as $batchItem) {
+                $identifier = (string) $batchItem->getIdentifier();
                 $ids[] = $this->connection->quote($identifier);
             }
 
@@ -307,12 +309,14 @@ SELECTCLAUSE;
                 $this->connection->quote($batch[0]->getType())
             );
         } else {
+            $count = count($batch);
+
             $where = '(o.object_identifier = %s AND c.class_type = %s)';
-            for ($i = 0; $i < $count; ++$i) {
+            foreach ($batch as $i => $batchItem) {
                 $sql .= sprintf(
                     $where,
-                    $this->connection->quote($batch[$i]->getIdentifier()),
-                    $this->connection->quote($batch[$i]->getType())
+                    $this->connection->quote($batchItem->getIdentifier()),
+                    $this->connection->quote($batchItem->getType())
                 );
 
                 if ($i + 1 < $count) {

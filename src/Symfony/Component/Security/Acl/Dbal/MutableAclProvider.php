@@ -854,14 +854,14 @@ QUERY;
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
-                $ace = $new[$i];
-
+            foreach ($new as $i => $ace) {
                 if (null === $ace->getId()) {
-                    if ($sids->contains($ace->getSecurityIdentity())) {
-                        $sid = $sids->offsetGet($ace->getSecurityIdentity());
+                    $aceSecurityIdentity = $ace->getSecurityIdentity();
+
+                    if ($sids->contains($aceSecurityIdentity)) {
+                        $sid = $sids->offsetGet($aceSecurityIdentity);
                     } else {
-                        $sid = $this->createOrRetrieveSecurityIdentityId($ace->getSecurityIdentity());
+                        $sid = $this->createOrRetrieveSecurityIdentityId($aceSecurityIdentity);
                     }
 
                     $oid = $ace->getAcl()->getObjectIdentity();
@@ -895,22 +895,22 @@ QUERY;
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
-                $ace = $new[$i];
+            foreach ($new as $ace) {
+                $aceId = $ace->getId();
 
-                if (null !== $ace->getId()) {
-                    $currentIds[$ace->getId()] = true;
+                if (null !== $aceId) {
+                    $currentIds[$aceId] = true;
                 }
             }
         }
 
         foreach ($changes[0] as $old) {
-            for ($i = 0, $c = count($old); $i < $c; ++$i) {
-                $ace = $old[$i];
+            foreach ($old as $ace) {
+                $aceId = $ace->getId();
 
-                if (!isset($currentIds[$ace->getId()])) {
-                    $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
-                    unset($this->loadedAces[$ace->getId()]);
+                if (!isset($currentIds[$aceId])) {
+                    $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($aceId));
+                    unset($this->loadedAces[$aceId]);
                 }
             }
         }
@@ -928,14 +928,14 @@ QUERY;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
-            $ace = $new[$i];
-
+        foreach ($new as $i => $ace) {
             if (null === $ace->getId()) {
-                if ($sids->contains($ace->getSecurityIdentity())) {
-                    $sid = $sids->offsetGet($ace->getSecurityIdentity());
+                $aceSecurityIdentity = $ace->getSecurityIdentity();
+
+                if ($sids->contains($aceSecurityIdentity)) {
+                    $sid = $sids->offsetGet($aceSecurityIdentity);
                 } else {
-                    $sid = $this->createOrRetrieveSecurityIdentityId($ace->getSecurityIdentity());
+                    $sid = $this->createOrRetrieveSecurityIdentityId($aceSecurityIdentity);
                 }
 
                 $oid = $ace->getAcl()->getObjectIdentity();
@@ -969,20 +969,20 @@ QUERY;
         list($old, $new) = $changes;
         $currentIds = array();
 
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
-            $ace = $new[$i];
+        foreach ($new as $ace) {
+            $aceId = $ace->getId();
 
-            if (null !== $ace->getId()) {
-                $currentIds[$ace->getId()] = true;
+            if (null !== $aceId) {
+                $currentIds[$aceId] = true;
             }
         }
 
-        for ($i = 0, $c = count($old); $i < $c; ++$i) {
-            $ace = $old[$i];
+        foreach ($old as $ace) {
+            $aceId = $ace->getId();
 
-            if (!isset($currentIds[$ace->getId()])) {
-                $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
-                unset($this->loadedAces[$ace->getId()]);
+            if (!isset($currentIds[$aceId])) {
+                $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($aceId));
+                unset($this->loadedAces[$aceId]);
             }
         }
     }

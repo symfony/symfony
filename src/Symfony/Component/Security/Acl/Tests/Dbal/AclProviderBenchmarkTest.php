@@ -101,13 +101,13 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     {
         $rootId = $this->generateAcl($this->chooseClassId(), null, array());
 
-        $this->generateAclLevel(rand(1, 15), $rootId, array($rootId));
+        $this->generateAclLevel(mt_rand(1, 15), $rootId, array($rootId));
     }
 
     protected function generateAclLevel($depth, $parentId, $ancestors)
     {
         $level = count($ancestors);
-        for ($i = 0, $t = rand(1, 10); $i < $t; ++$i) {
+        for ($i = 0, $t = mt_rand(1, 10); $i < $t; ++$i) {
             $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
 
             if ($level < $depth) {
@@ -120,13 +120,13 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     {
         static $id = 1000;
 
-        if ($id === 1000 || ($id < 1500 && rand(0, 1))) {
-            $this->insertClassStmt->execute(array($id, $this->getRandomString(rand(20, 100), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\_')));
+        if ($id === 1000 || ($id < 1500 && mt_rand(0, 1))) {
+            $this->insertClassStmt->execute(array($id, $this->getRandomString(mt_rand(20, 100), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\_')));
             ++$id;
 
             return $id - 1;
         } else {
-            return rand(1000, $id - 1);
+            return mt_rand(1000, $id - 1);
         }
     }
 
@@ -137,9 +137,9 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $this->insertOidStmt->execute(array(
             $id,
             $classId,
-            $this->getRandomString(rand(20, 50)),
+            $this->getRandomString(mt_rand(20, 50)),
             $parentId,
-            rand(0, 1),
+            mt_rand(0, 1),
         ));
 
         $this->insertOidAncestorStmt->execute(array($id, $id));
@@ -157,17 +157,17 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     {
         static $id = 1000;
 
-        if ($id === 1000 || ($id < 11000 && rand(0, 1))) {
+        if ($id === 1000 || ($id < 11000 && mt_rand(0, 1))) {
             $this->insertSidStmt->execute(array(
                 $id,
-                $this->getRandomString(rand(5, 30)),
-                rand(0, 1),
+                $this->getRandomString(mt_rand(5, 30)),
+                mt_rand(0, 1),
             ));
             ++$id;
 
             return $id - 1;
         } else {
-            return rand(1000, $id - 1);
+            return mt_rand(1000, $id - 1);
         }
     }
 
@@ -179,7 +179,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $fieldOrder = array();
 
         for ($i = 0; $i <= 30; ++$i) {
-            $fieldName = rand(0, 1) ? null : $this->getRandomString(rand(10, 20));
+            $fieldName = mt_rand(0, 1) ? null : $this->getRandomString(mt_rand(10, 20));
 
             do {
                 $sid = $this->chooseSid();
@@ -191,7 +191,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             }
             $sids[$sid][] = $fieldName;
 
-            $strategy = rand(0, 2);
+            $strategy = mt_rand(0, 2);
             if ($strategy === 0) {
                 $strategy = PermissionGrantingStrategy::ALL;
             } elseif ($strategy === 1) {
@@ -204,15 +204,15 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             $this->insertEntryStmt->execute(array(
                 $id,
                 $classId,
-                rand(0, 5) ? $objectId : null,
+                mt_rand(0, 5) ? $objectId : null,
                 $fieldName,
                 $fieldOrder[$fieldName],
                 $sid,
                 $this->generateMask(),
-                rand(0, 1),
+                mt_rand(0, 1),
                 $strategy,
-                rand(0, 1),
-                rand(0, 1),
+                mt_rand(0, 1),
+                mt_rand(0, 1),
             ));
 
             ++$id;
@@ -221,11 +221,11 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
     protected function generateMask()
     {
-        $i = rand(1, 30);
+        $i = mt_rand(1, 30);
         $mask = 0;
 
         while ($i <= 30) {
-            $mask |= 1 << rand(0, 30);
+            $mask |= 1 << mt_rand(0, 30);
             ++$i;
         }
 

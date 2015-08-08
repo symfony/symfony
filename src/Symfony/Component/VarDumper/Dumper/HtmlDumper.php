@@ -129,7 +129,7 @@ var refStyle = doc.createElement('style'),
         e.addEventListener(n, cb, false);
     };
 
-doc.documentElement.firstChild.appendChild(refStyle);
+(doc.documentElement.firstElementChild || doc.documentElement.children[0]).appendChild(refStyle);
 
 if (!doc.addEventListener) {
     addEventListener = function (element, eventName, callback) {

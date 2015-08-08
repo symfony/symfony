@@ -22,7 +22,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function prepare_workspace()
     {
-        $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
+        $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().mt_rand(0, 1000);
         mkdir($this->workspace, 0777, true);
         $this->workspace = realpath($this->workspace);
     }
@@ -47,7 +47,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTestCreateMapTests
      */
-    public function testDump($directory, $expected)
+    public function testDump($directory)
     {
         $this->prepare_workspace();
 
@@ -112,6 +112,12 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
                 'Foo\\IBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\TFooBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\CBar' => __DIR__.'/Fixtures/php5.4/traits.php',
+            ));
+        }
+
+        if (PHP_VERSION_ID >= 50500) {
+            $data[] = array(__DIR__.'/Fixtures/php5.5', array(
+                'ClassCons\\Foo' => __DIR__.'/Fixtures/php5.5/class_cons.php',
             ));
         }
 

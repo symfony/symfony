@@ -18,13 +18,6 @@ use Symfony\Component\Validator\Validation;
 
 class CurrencyValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function setUp()
-    {
-        IntlTestHelper::requireFullIntl($this);
-
-        parent::setUp();
-    }
-
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_5;
@@ -72,6 +65,8 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
      **/
     public function testValidCurrenciesWithCountrySpecificLocale($currency)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('en_GB');
 
         $this->validator->validate($currency, new Currency());

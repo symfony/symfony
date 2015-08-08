@@ -9,19 +9,15 @@ addons:
 
 matrix:
     include:
+        - php: hhvm
         - php: 5.3
         - php: 5.4
         - php: 5.5
         - php: 5.6
-        - php: 5.3
           env: deps=low
         - php: 5.6
           env: deps=high
         - php: nightly
-        - php: hhvm
-    allow_failures:
-        - php: nightly
-        - php: hhvm
     fast_finish: true
 
 services: mongodb
@@ -33,12 +29,16 @@ env:
 
 before_install:
     - composer self-update
+    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "memory_limit = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (pecl install -f memcached-2.1.0 && echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without memcache extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini); fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
+    # Build a standalone phpunit without symfony/yaml and that works around https://github.com/sebastianbergmann/phpunit-mock-objects/issues/223
+    - (mkdir phpunit && cd phpunit && wget https://github.com/sebastianbergmann/phpunit/archive/4.7.zip && unzip 4.7.zip && cd phpunit-4.7 && composer remove --no-update symfony/yaml && composer require --prefer-source phpunit/phpunit-mock-objects '2.3.0')
+    - export PHPUNIT="$(readlink -f ./phpunit/phpunit-4.7/phpunit) --colors=always"
     # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built
     - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
@@ -46,10 +46,10 @@ install:
     - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
     - components=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
-    - if [ "$deps" != "no" ]; then sh .travis.sh $TRAVIS_BRANCH $components; fi;
+    - if [ "$deps" != "no" ]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $components; fi;
 
 script:
-    - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; $PHPUNIT --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
+    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

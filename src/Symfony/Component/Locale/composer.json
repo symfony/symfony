@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/intl": "~2.3"
+        "symfony/intl": "~2.7"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7"

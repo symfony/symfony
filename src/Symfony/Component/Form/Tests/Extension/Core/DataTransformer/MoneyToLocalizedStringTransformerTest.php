@@ -16,18 +16,13 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
+    public function testTransform()
     {
-        parent::setUp();
-
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
         \Locale::setDefault('de_AT');
-    }
 
-    public function testTransform()
-    {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals('1,23', $transformer->transform(123));
@@ -51,6 +46,11 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testReverseTransform()
     {
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
         $this->assertEquals(123, $transformer->reverseTransform('1,23'));

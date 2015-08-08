@@ -203,7 +203,13 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->metadataBag->stampNew();
         }
 
-        return session_regenerate_id($destroy);
+        $isRegenerated = session_regenerate_id($destroy);
+
+        // The reference to $_SESSION in session bags is lost in PHP7 and we need to re-create it.
+        // @see https://bugs.php.net/bug.php?id=70013
+        $this->loadSession();
+
+        return $isRegenerated;
     }
 
     /**

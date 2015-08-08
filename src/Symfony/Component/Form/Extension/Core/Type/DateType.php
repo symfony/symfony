@@ -146,6 +146,10 @@ class DateType extends AbstractType
 
             // remove special characters unless the format was explicitly specified
             if (!is_string($options['format'])) {
+                // remove quoted strings first
+                $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
+
+                // remove remaining special chars
                 $pattern = preg_replace('/[^yMd]+/', '', $pattern);
             }
 

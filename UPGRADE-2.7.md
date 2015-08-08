@@ -599,7 +599,7 @@ FrameworkBundle
  * The `templating.helper.assets` was refactored and returns now an object of the type
    `Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper` instead of
    `Symfony\Component\Templating\Helper\CoreAssetsHelper`. You can update your class definition
-   or use the `assets.package` service instead. Using the `assets.package` service is the recommended 
+   or use the `assets.packages` service instead. Using the `assets.packages` service is the recommended 
    way. The `templating.helper.assets` service will be removed in Symfony 3.0.
 
    Before:
@@ -665,3 +665,57 @@ Security
     * `SwitchUserListener`
     * `AccessListener`
     * `RememberMeListener`
+
+UPGRADE FROM 2.7.1 to 2.7.2
+===========================
+
+Form
+----
+
+ * In order to fix a few regressions in the new `ChoiceList` implementation,
+   a few details had to be changed compared to 2.7.
+   
+   The legacy `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface` 
+   now does not extend the new `Symfony\Component\Form\ChoiceList\ChoiceListInterface`
+   anymore. If you pass an implementation of the old interface in a context
+   where the new interface is required, wrap the list into a
+   `LegacyChoiceListAdapter`:
+   
+   Before:
+   
+   ```php
+   use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+   
+   function doSomething(ChoiceListInterface $choiceList)
+   {
+       // ...
+   }
+   
+   doSomething($legacyList);
+   ```
+   
+   After:
+   
+   ```php
+   use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+   use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
+   
+   function doSomething(ChoiceListInterface $choiceList)
+   {
+       // ...
+   }
+   
+   doSomething(new LegacyChoiceListAdapter($legacyList));
+   ```
+   
+   The new `ChoiceListInterface` now has two additional methods
+   `getStructuredValues()` and `getOriginalKeys()`. You should add these methods
+   if you implement this interface. See their doc blocks and the implementation
+   of the core choice lists for inspiration.
+   
+   The method `ArrayKeyChoiceList::toArrayKey()` was marked as internal. This
+   method was never supposed to be used outside the class.
+   
+   The method `ChoiceListFactoryInterface::createView()` does not accept arrays
+   and `Traversable` instances anymore for the `$groupBy` parameter. Pass a
+   callable instead.

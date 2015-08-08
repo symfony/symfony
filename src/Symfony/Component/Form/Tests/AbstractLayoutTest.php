@@ -168,6 +168,20 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testLabelWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'translation_domain' => false,
+        ));
+
+        $this->assertMatchesXpath($this->renderLabel($form->createView()),
+'/label
+    [@for="name"]
+    [.="Name"]
+'
+        );
+    }
+
     public function testLabelOnForm()
     {
         $form = $this->factory->createNamed('name', 'date');
@@ -513,6 +527,28 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testSingleChoiceWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'multiple' => false,
+            'expanded' => false,
+            'choice_translation_domain' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/select
+    [@name="name"]
+    [not(@required)]
+    [
+        ./option[@value="&a"][@selected="selected"][.="Choice&A"]
+        /following-sibling::option[@value="&b"][not(@selected)][.="Choice&B"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
     public function testSingleChoiceAttributes()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
@@ -635,7 +671,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@name="name"]
     [not(@required)]
     [
-        ./option[@value=""][.="[trans][/trans]"]
+        ./option[@value=""][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -658,7 +694,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@name="name"]
     [not(@required)]
     [
-        ./option[@value=""][.="[trans][/trans]"]
+        ./option[@value=""][.=""]
         /following-sibling::option[@value="&a"][not(@selected)][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -735,7 +771,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -889,6 +925,29 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testSingleChoiceExpandedWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'multiple' => false,
+            'expanded' => true,
+            'choice_translation_domain' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::label[@for="name_0"][.="Choice&A"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::label[@for="name_1"][.="Choice&B"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+'
+        );
+    }
+
     public function testSingleChoiceExpandedAttributes()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
@@ -979,6 +1038,32 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=4]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', 'choice', array('&a', '&c'), array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
+            'multiple' => true,
+            'expanded' => true,
+            'required' => true,
+            'choice_translation_domain' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
+        /following-sibling::label[@for="name_0"][.="Choice&A"]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
+        /following-sibling::label[@for="name_1"][.="Choice&B"]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
+        /following-sibling::label[@for="name_2"][.="Choice&C"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
@@ -1442,15 +1527,15 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [
         ./select
             [@id="name_month"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
             [./option[@value="1"][@selected="selected"]]
         /following-sibling::select
             [@id="name_year"]
-            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]]
+            [./option[@value=""][not(@selected)][not(@disabled)][.=""]]
             [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]

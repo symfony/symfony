@@ -14,17 +14,9 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
-use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class TimeTypeTest extends TestCase
 {
-    protected function setUp()
-    {
-        IntlTestHelper::requireIntl($this);
-
-        parent::setUp();
-    }
-
     public function testSubmitDateTime()
     {
         $form = $this->factory->create('time', null, array(

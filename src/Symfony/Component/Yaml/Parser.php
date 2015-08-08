@@ -234,7 +234,7 @@ class Parser
                 }
 
                 // 1-liner optionally followed by newline(s)
-                if ($this->lines[0] === trim($value)) {
+                if (is_string($value) && $this->lines[0] === trim($value)) {
                     try {
                         $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
                     } catch (ParseException $e) {
@@ -356,7 +356,7 @@ class Parser
             return;
         }
 
-        if ($inSequence && $oldLineIndentation === $newIndent && '-' === $data[0][0]) {
+        if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
             // the previous line contained a dash but no item content, this line is a sequence item with the same indentation
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();

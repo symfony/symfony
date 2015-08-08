@@ -204,8 +204,8 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFromFlippedChoicesSameChoices($choice1, $choice2)
     {
-        $choices1 = array($choice1);
-        $choices2 = array($choice2);
+        $choices1 = array($choice1 => 'A');
+        $choices2 = array($choice2 => 'A');
         $list = new \stdClass();
 
         $this->decoratedFactory->expects($this->once())
@@ -222,8 +222,8 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFromFlippedChoicesDifferentChoices($choice1, $choice2)
     {
-        $choices1 = array($choice1);
-        $choices2 = array($choice2);
+        $choices1 = array($choice1 => 'A');
+        $choices2 = array($choice2 => 'A');
         $list1 = new \stdClass();
         $list2 = new \stdClass();
 

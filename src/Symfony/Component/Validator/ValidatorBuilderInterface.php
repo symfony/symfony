@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 /**
  * A configurable builder for ValidatorInterface objects.
@@ -94,6 +95,15 @@ interface ValidatorBuilderInterface
      * @return ValidatorBuilderInterface The builder object
      */
     public function addMethodMappings(array $methodNames);
+
+    /**
+     * Adds a constraints loader to the validator.
+     *
+     * @param LoaderInterface $loader the loader instance
+     *
+     * @return ValidatorBuilderInterface The builder object
+     */
+    public function addLoader(LoaderInterface $loader);
 
     /**
      * Enables annotation based constraint mapping.

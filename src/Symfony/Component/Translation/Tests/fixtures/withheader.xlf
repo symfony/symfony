@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext" tool-id="foo">
+    <header>
+        <tool tool-id="foo" tool-name="Foo Tool" tool-version="0" />
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source>foo</source>
+        <target>bar</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

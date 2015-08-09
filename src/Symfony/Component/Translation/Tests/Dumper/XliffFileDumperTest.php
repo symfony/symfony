@@ -38,4 +38,33 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
 
         unlink($tempDir.'/messages.en_US.xlf');
     }
+
+    public function testExtendedDumperCanSetCustomToolInfo()
+    {
+        $dumper = new XliffExtendedFileDumper();
+
+        $this->assertContains(
+            '<tool tool-id="symfony" tool-name="Test" tool-version="0.0"/>',
+            $dumper->formatTestMessages( array() )
+        );
+    }
+
+}
+
+/**
+ * Test subclass for configuring dumper via protected functions.
+ */
+class XliffExtendedFileDumper extends XliffFileDumper {
+    public function formatTestMessages( array $messages ){
+
+        $this->setToolMetadata(array(
+            'tool-name' => 'Test',
+            'tool-version' => '0.0',
+        ));
+
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add( $messages, 'foo' );
+
+        return $this->format( $catalogue, 'foo' );
+    }
 }

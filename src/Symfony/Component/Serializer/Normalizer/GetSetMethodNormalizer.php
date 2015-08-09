@@ -136,11 +136,19 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
 
-                if (isset($normalizedData[$paramName])) {
+                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
+                    if (isset($normalizedData[$paramName])) {
+                        if (!is_array($normalizedData[$paramName])) {
+                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
+                        }
+
+                        $params = array_merge($params, $normalizedData[$paramName]);
+                    }
+                } elseif (isset($normalizedData[$paramName])) {
                     $params[] = $normalizedData[$paramName];
                     // don't run set for a parameter passed to the constructor
                     unset($normalizedData[$paramName]);
-                } elseif ($constructorParameter->isOptional()) {
+                } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
                     throw new RuntimeException(

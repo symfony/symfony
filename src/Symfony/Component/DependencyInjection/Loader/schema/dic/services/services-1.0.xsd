@@ -81,6 +81,7 @@
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
@@ -94,7 +95,6 @@
     <xsd:attribute name="synchronized" type="boolean" />
     <xsd:attribute name="lazy" type="boolean" />
     <xsd:attribute name="abstract" type="boolean" />
-    <xsd:attribute name="deprecated" type="boolean" />
     <xsd:attribute name="factory-class" type="xsd:string" />
     <xsd:attribute name="factory-method" type="xsd:string" />
     <xsd:attribute name="factory-service" type="xsd:string" />

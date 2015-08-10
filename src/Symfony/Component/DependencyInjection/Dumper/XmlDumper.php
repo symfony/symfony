@@ -148,9 +148,6 @@ class XmlDumper extends Dumper
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
-        if ($definition->isDeprecated()) {
-            $service->setAttribute('deprecated', 'true');
-        }
         if (null !== $decorated = $definition->getDecoratedService()) {
             list($decorated, $renamedId, $priority) = $decorated;
             $service->setAttribute('decorates', $decorated);
@@ -202,6 +199,13 @@ class XmlDumper extends Dumper
                 $factory->setAttribute('function', $callable);
             }
             $service->appendChild($factory);
+        }
+
+        if ($definition->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+
+            $service->appendChild($deprecated);
         }
 
         if ($callable = $definition->getConfigurator()) {

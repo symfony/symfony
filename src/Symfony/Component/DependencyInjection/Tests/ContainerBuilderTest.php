@@ -73,7 +73,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         set_error_handler(function ($errno, $errstr) use ($that, &$wasTriggered) {
             $that->assertSame(E_USER_DEPRECATED, $errno);
-            $that->assertSame('The service deprecated_foo relies on a deprecated definition. You should avoid using it.', $errstr);
+            $that->assertSame('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $errstr);
             $wasTriggered = true;
         });
 

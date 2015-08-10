@@ -597,7 +597,7 @@ class PhpDumper extends Dumper
                 $return[] = '';
             }
 
-            $return[] = '@deprecated';
+            $return[] = sprintf('@deprecated %s', $definition->getDeprecationMessage($id));
         }
 
         $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
@@ -661,7 +661,7 @@ EOF;
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
         } else {
             if ($definition->isDeprecated()) {
-                $code .= sprintf("        @trigger_error('The service %s has been marked as deprecated. You should stop using it.', E_USER_DEPRECATED);\n\n", $id);
+                $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", var_export($definition->getDeprecationMessage($id), true));
             }
 
             $code .=

@@ -236,6 +236,8 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
      * @covers Symfony\Component\DependencyInjection\Definition::isDeprecated
+     * @covers Symfony\Component\DependencyInjection\Definition::hasCustomDeprecationTemplate
+     * @covers Symfony\Component\DependencyInjection\Definition::getDeprecationMessage
      */
     public function testSetIsDeprecated()
     {
@@ -243,6 +245,28 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
         $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
+        $this->assertSame('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return a formatted message template');
+    }
+
+    /**
+     * @dataProvider invalidDeprecationMessageProvider
+     * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
+     * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
+    public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
+    {
+        $def = new Definition('stdClass');
+        $def->setDeprecated(false, $message);
+    }
+
+    public function invalidDeprecationMessageProvider()
+    {
+        return array(
+            "With \rs" => array("invalid \r message %service_id%"),
+            "With \ns" => array("invalid \n message %service_id%"),
+            'With */s' => array('invalid */ message %service_id%'),
+            'message not containing require %service_id% variable' => array('this is deprecated'),
+        );
     }
 
     /**

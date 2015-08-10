@@ -932,7 +932,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($definition->isDeprecated()) {
-            @trigger_error(sprintf('The service %s relies on a deprecated definition. You should avoid using it.', $id), E_USER_DEPRECATED);
+            @trigger_error($definition->getDeprecationMessage($id), E_USER_DEPRECATED);
         }
 
         if ($tryProxy && $definition->isLazy()) {

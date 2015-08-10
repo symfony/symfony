@@ -152,11 +152,11 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass A stdClass instance.
      *
-     * @deprecated
+     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
      */
     protected function getDeprecatedServiceService()
     {
-        @trigger_error('The service deprecated_service has been marked as deprecated. You should stop using it.', E_USER_DEPRECATED);
+        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
         return $this->services['deprecated_service'] = new \stdClass();
     }

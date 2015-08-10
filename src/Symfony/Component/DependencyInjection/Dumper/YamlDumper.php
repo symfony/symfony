@@ -105,7 +105,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isDeprecated()) {
-            $code .= "        deprecated: true\n";
+            $code .= sprintf("        deprecated: %s\n", $definition->getDeprecationMessage('%service_id%'));
         }
 
         if ($definition->getFactoryClass(false)) {

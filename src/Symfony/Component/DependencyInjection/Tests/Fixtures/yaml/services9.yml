@@ -78,7 +78,7 @@ services:
         decoration_inner_name: decorated.pif-pouf
     deprecated_service:
         class: stdClass
-        deprecated: true
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
     new_factory:
         class: FactoryClass
         public: false

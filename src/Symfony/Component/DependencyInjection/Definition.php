@@ -30,6 +30,8 @@ class Definition
     private $factoryMethod;
     private $factoryService;
     private $shared = true;
+    private $deprecated = false;
+    private $deprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
     private $scope = ContainerInterface::SCOPE_CONTAINER;
     private $properties = array();
     private $calls = array();
@@ -38,7 +40,6 @@ class Definition
     private $public = true;
     private $synthetic = false;
     private $abstract = false;
-    private $deprecated = false;
     private $synchronized = false;
     private $lazy = false;
     private $decoratedService;
@@ -834,14 +835,29 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param bool $status
+     * @param bool   $status
+     * @param string $template Template message to use if the definition is deprecated
      *
      * @return Definition the current instance
      *
+     * @throws InvalidArgumentException When the message template is invalid.
+     *
      * @api
      */
-    public function setDeprecated($status = true)
+    public function setDeprecated($status = true, $template = null)
     {
+        if (null !== $template) {
+            if (preg_match('#[\r\n]|\*/#', $template)) {
+                throw new InvalidArgumentException('Invalid characters found in deprecation template.');
+            }
+
+            if (false === strpos($template, '%service_id%')) {
+                throw new InvalidArgumentException('The deprecation template must contain the "%service_id%" placeholder.');
+            }
+
+            $this->deprecationTemplate = $template;
+        }
+
         $this->deprecated = (bool) $status;
 
         return $this;
@@ -858,6 +874,20 @@ class Definition
     public function isDeprecated()
     {
         return $this->deprecated;
+    }
+
+    /**
+     * Message to use if this definition is deprecated.
+     *
+     * @param string $id Service id relying on this definition
+     *
+     * @return string
+     *
+     * @api
+     */
+    public function getDeprecationMessage($id)
+    {
+        return str_replace('%service_id%', $id, $this->deprecationTemplate);
     }
 
     /**

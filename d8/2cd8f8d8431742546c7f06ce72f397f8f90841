@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-09T15:18:20Z
+
+:+1: @vlajos thanks for fixing these issues.
+
+There is no need to change your pull request, but I'd like to tell you that bug fixes should be sent to "the oldest Symfon branch which is still maintained". Until May 2016 that means "Symfony 2.3" (if the error is present in that version). But don't worry, our doc managers will change the branch for you. My comment is only useful for your next contribution. Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-09T15:21:59Z
+
+@vlajos another minor comment: when the changes are small (like the three typos fixed in this pull request) there is no need to add anything special in the description of the pull request. However, when the change is large or complex, we ask contributors to add the following table with information for the doc managers:
+
+```
+| Q             | A
+| ------------- | ---
+| Doc fix?      | yes
+| New docs?     | no
+| Applies to    | all
+| Fixed tickets | -
+```
+
+Since your pull request doesn't include this table, our review robot called "fabbot" says that there is an error. In any case, don't worry because the proposed changes are minor and our doc managers will understand it right.
+
+If you want to read more about the contribution process, here it is a bried and straight to the point article: http://symfony.com/doc/current/contributing/documentation/overview.html
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-08-11T07:06:44Z
+
+:+1:
+
+Status: Reviewed

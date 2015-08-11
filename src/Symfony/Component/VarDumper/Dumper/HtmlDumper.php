@@ -125,7 +125,7 @@ var refStyle = doc.createElement('style'),
     rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
     idRx = /\bsf-dump-\d+-ref[012]\w+\b/;
 
-doc.documentElement.firstElementChild.appendChild(refStyle);
+(doc.documentElement.firstElementChild || doc.documentElement.children[0]).appendChild(refStyle);
 
 function toggle(a) {
     var s = a.nextSibling || {};

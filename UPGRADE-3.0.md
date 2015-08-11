@@ -364,7 +364,7 @@ UPGRADE FROM 2.x to 3.0
 
  * The `templating.helper.assets` was removed in Symfony 3.0. You should
    use the `assets.package` service instead.
-
+   
    Before:
 
    ```php

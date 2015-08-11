@@ -134,8 +134,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         }
 
         $matcherIds = array();
-        foreach ($rules as $rule) {
-            list($matcherId, $attributes, $channel) = $rule;
+        foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));

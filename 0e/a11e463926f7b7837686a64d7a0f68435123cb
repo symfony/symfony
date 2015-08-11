@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-10T09:14:47Z
+
+The test failure on HHVM is because of an incompatibility between PHP and HHVM, which has been reported in https://github.com/facebook/hhvm/issues/5875
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T08:29:59Z
+
+Even if hhvm behaves differently, it would be great to have tests be green there also before merging.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T08:58:47Z
+
+@nicolas-grekas what do you suggest ? Just skipping the test on HHVM until the fix the bug ? I don't think we can update the test to work on HHVM (it would not catch all cases anymore, as I specifically chose a case where the DateTimeZone name does not match the ICU id)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T09:18:53Z
+
+@stof I don't have a better idea...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T09:25:49Z
+
+here we go. The test is now skipped on HHVM
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T09:37:41Z
+
+Looks like you need to skip the other test also
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T09:39:42Z
+
+no, I just need to skip the right one :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T09:55:32Z
+
+:+1:

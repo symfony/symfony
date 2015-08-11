@@ -434,7 +434,7 @@
         {% if data.children is not empty %}
             <ul id="{{ data.id }}-children"{% if not expanded %} class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
-                    {{ _self.form_tree_entry(childName, childData, false) }}
+                    {{ form_tree_entry(childName, childData, false) }}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -673,6 +673,6 @@
     </div>
 
     {% for childName, childData in data.children %}
-        {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
+        {{ form_tree_details(childName, childData, forms_by_hash) }}
     {% endfor %}
 {% endmacro %}

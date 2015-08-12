@@ -132,7 +132,7 @@ class IntlDateFormatter
      * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en").
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
-     * @param string $timezone Timezone identifier
+     * @param mixed  $timezone Timezone identifier
      * @param int    $calendar Calendar to use for formatting or parsing. The only currently
      *                         supported value is IntlDateFormatter::GREGORIAN.
      * @param string $pattern  Optional pattern to use when formatting
@@ -157,7 +157,7 @@ class IntlDateFormatter
         $this->timetype = $timetype;
 
         $this->setPattern($pattern);
-        $this->setTimeZoneId($timezone);
+        $this->setTimeZone($timezone);
     }
 
     /**
@@ -583,6 +583,19 @@ class IntlDateFormatter
      */
     public function setTimeZone($timeZone)
     {
+        if ($timeZone instanceof \IntlTimeZone) {
+            $timeZone = $timeZone->getID();
+        }
+
+        if ($timeZone instanceof \DateTimeZone) {
+            $timeZone = $timeZone->getName();
+
+            // DateTimeZone returns the GMT offset timezones without the leading GMT, while our parsing requires it.
+            if (!empty($timeZone) && ('+' === $timeZone[0] || '-' === $timeZone[0])) {
+                $timeZone = 'GMT'.$timeZone;
+            }
+        }
+
         return $this->setTimeZoneId($timeZone);
     }
 

@@ -28,5 +28,5 @@ class Bic extends Constraint
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
     );
 
-    public $message = 'This is not a valid Business Identifier Codes (BIC).';
+    public $message = 'This is not a valid Business Identifier Code (BIC).';
 }

@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Constraints\BicValidator;
 use Symfony\Component\Validator\Constraints\Bic;
 

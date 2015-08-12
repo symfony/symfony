@@ -256,6 +256,8 @@ table, .metric {
     min-width: 960px;
     max-width: 1200px;
     padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
 }
 #header {
     background-color: #222;
@@ -501,10 +503,6 @@ body#search h3 {
     border: solid #555;
     border-width: 2px 0;
 }
-#menu-profiler:hover li.selected a {
-    background: transparent;
-    border-color: transparent;
-}
 
 #menu-profiler li a .count {
     float: right;
@@ -681,7 +679,7 @@ td.main, td.menu {
 }
 #tabs input[type=radio]:checked + label {
     background: #666;
-bbox-shadow: inset 1px 1px 2px #CCC;
+    border-color: #666;
     color: #FAFAFA;
     z-index: 1100;
 }
@@ -724,7 +722,7 @@ table.logs .metadata {
     background: rgba(94, 151, 110, 0.2);
 }
 .status-warning {
-    background: rgba(240, 181, 24, 0.1);
+    background: rgba(240, 181, 24, 0.2);
 }
 .status-error {
     background: rgba(204, 0, 0, 0.15);

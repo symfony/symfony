@@ -25,7 +25,7 @@ class BicValidator extends ConstraintValidator
 
         $canonicalize = str_replace(' ', '', $value);
 
-        // the bic must have either 8 or 11 characters
+        // the bic must be either 8 or 11 characters long
         if (8 !== strlen($canonicalize) && 11 !== strlen($canonicalize)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))

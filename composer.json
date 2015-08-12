@@ -85,7 +85,10 @@
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
-        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "files": [
+            "src/Symfony/Component/Intl/Resources/stubs/functions.php",
+            "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

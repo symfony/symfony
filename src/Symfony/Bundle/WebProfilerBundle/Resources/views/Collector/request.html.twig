@@ -1,8 +1,6 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-
-
     {% set request_handler %}
         {% if collector.controller.class is defined %}
             {% set link = collector.controller.file|file_link(collector.controller.line) %}
@@ -61,118 +59,153 @@
 {% endblock %}
 
 {% block menu %}
-<span class="label">
-    <span class="icon"><svg width="38" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 38 28" enable-background="new 0 0 38 28" xml:space="preserve"><path fill="#3F3F3F" d="M26.7 20.5c0 0.3 0 0.7 0.1 1c-1.1 1-1.6 1.6-1.8 1.8c0 0 0 0.1 0 0.1c1 1.3 1.5 2 1.5 2 c0.1 0 0.4-0.1 1.1-0.4c0.6-0.3 1-0.6 1.3-0.7c0.2 0.1 0.4 0.2 0.5 0.2c0.1 0 0.3 0.1 0.5 0.2c0.1 0.3 0.2 0.8 0.4 1.4 s0.3 1 0.4 1.1c0 0 0.8-0.1 2.5-0.3c0.1 0 0.1 0 0.1-0.1c0.1-0.3 0.2-1.1 0.1-2.5c0.3-0.2 0.6-0.4 0.8-0.6c1.6 0.5 2.5 0.7 2.6 0.5 l1-2.2l0 0c0.1-0.2-0.6-0.7-2.2-1.5c0-0.4 0-0.7-0.1-1c1.1-1 1.6-1.6 1.8-1.8c0 0 0-0.1 0-0.1c-1-1.3-1.4-1.9-1.5-2l-0.1 0 c-0.6 0.2-1.4 0.6-2.2 1.2c-0.2-0.1-0.4-0.2-0.5-0.2c-0.1 0-0.3-0.1-0.5-0.2c-0.1-0.3-0.2-0.8-0.4-1.4c-0.2-0.7-0.3-1-0.4-1.1 c0 0-0.2 0-0.6 0c-0.4 0-0.8 0.1-1.2 0.1C29.4 14 29.2 14 29.2 14c-0.1 0-0.1 0-0.1 0.1c-0.1 0.3-0.2 1.1-0.1 2.5 c-0.3 0.2-0.6 0.4-0.8 0.6c-1.6-0.5-2.5-0.7-2.6-0.5l-1 2.2C24.5 19.1 25.2 19.6 26.7 20.5z M30.3 18.4c0.6-0.2 1.1-0.2 1.7 0 c0.6 0.2 0.9 0.6 1.2 1.2c0.2 0.6 0.2 1.1 0 1.7c-0.2 0.6-0.6 1-1.2 1.2c-0.6 0.2-1.1 0.2-1.7 0c-0.6-0.2-1-0.6-1.2-1.2 c-0.2-0.6-0.2-1.1 0-1.7C29.3 19.1 29.7 18.7 30.3 18.4z"/><path fill="#3F3F3F" d="M25.9 11.1c0-0.1 0-0.3-0.1-0.4c-0.1-0.1-0.2-0.2-0.3-0.2L22.3 10c-0.1-0.5-0.4-1-0.7-1.7 c0.2-0.3 0.5-0.7 0.9-1.2c0.4-0.5 0.7-0.9 0.8-1.1c0.1-0.1 0.1-0.3 0.1-0.4c0-0.4-1-1.4-2.9-3.2c-0.1-0.1-0.3-0.2-0.4-0.2 c-0.2 0-0.3 0-0.4 0.1l-2.4 1.8c-0.6-0.3-1.1-0.5-1.5-0.6l-0.5-3.1c0-0.1-0.1-0.3-0.2-0.4C15.1 0.1 15 0 14.8 0h-3.8 c-0.3 0-0.5 0.2-0.6 0.5c-0.2 0.6-0.3 1.7-0.5 3.1C9.4 3.8 8.9 4 8.4 4.2L6.1 2.4C6 2.3 5.8 2.3 5.7 2.3c-0.3 0-0.8 0.4-1.6 1.2 C3.3 4.3 2.7 4.9 2.4 5.3C2.3 5.4 2.3 5.5 2.3 5.7c0 0.1 0 0.3 0.1 0.4C3.2 7 3.8 7.8 4.2 8.4C4 9 3.7 9.5 3.6 10l-3.1 0.5 c-0.1 0-0.2 0.1-0.3 0.2C0 10.8 0 10.9 0 11.1v3.7c0 0.1 0 0.3 0.1 0.4c0.1 0.1 0.2 0.2 0.3 0.2l3.1 0.5c0.2 0.5 0.4 1.1 0.7 1.7 c-0.2 0.3-0.5 0.7-1 1.2c-0.4 0.5-0.7 0.9-0.8 1.1c-0.1 0.1-0.1 0.3-0.1 0.4c0 0.4 1 1.4 2.9 3.2c0.1 0.1 0.3 0.2 0.4 0.2 c0.2 0 0.3 0 0.4-0.1l2.4-1.8C9 22 9.5 22.2 10 22.3l0.5 3.1c0 0.1 0.1 0.3 0.2 0.4c0.1 0.1 0.3 0.2 0.4 0.2h3.8 c0.3 0 0.5-0.2 0.6-0.5c0.2-0.6 0.3-1.7 0.5-3.1c0.5-0.2 1.1-0.4 1.6-0.6l2.3 1.8c0.1 0.1 0.3 0.1 0.4 0.1c0.3 0 0.8-0.4 1.6-1.2 c0.8-0.8 1.4-1.4 1.7-1.8c0.1-0.1 0.1-0.2 0.1-0.4c0-0.1 0-0.3-0.1-0.4c-0.8-0.9-1.4-1.7-1.8-2.3c0.3-0.6 0.5-1.1 0.6-1.5l3.1-0.5 c0.1 0 0.2-0.1 0.3-0.2c0.1-0.1 0.1-0.3 0.1-0.4L25.9 11.1L25.9 11.1z M16.6 16.6c-1 1-2.2 1.5-3.7 1.5s-2.7-0.5-3.7-1.5 c-1-1-1.5-2.2-1.5-3.7s0.5-2.7 1.5-3.7c1-1 2.2-1.5 3.7-1.5s2.7 0.5 3.7 1.5c1 1 1.5 2.2 1.5 3.7S17.6 15.6 16.6 16.6z"/><circle fill="#3F3F3F" cx="12.9" cy="12.9" r="2.8"/></svg></span>
-    <strong>Request</strong>
-</span>
+    <span class="label">
+        <span class="icon">{{ include('@WebProfiler/Icon/request.svg') }}</span>
+        <strong>Request / Response</strong>
+    </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Request GET Parameters</h2>
+<div id="tabs">
+    <input id="tab-request" type="radio" name="tabs" checked="checked"/>
+    <label for="tab-request">Request</label>
+    <div>
+        <h3>GET Parameters</h3>
 
-    {% if collector.requestquery.all|length %}
-        {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
-    {% else %}
-        <p>
-            <em>No GET parameters</em>
-        </p>
-    {% endif %}
+        {% if collector.requestquery.all|length %}
+            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
+        {% else %}
+            <div class="empty">
+                <p>No GET parameters</p>
+            </div>
+        {% endif %}
 
-    <h2>Request POST Parameters</h2>
+        <h3>POST Parameters</h3>
 
-    {% if collector.requestrequest.all|length %}
-        {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
-    {% else %}
-        <p>
-            <em>No POST parameters</em>
-        </p>
-    {% endif %}
+        {% if collector.requestrequest.all|length %}
+            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
+        {% else %}
+            <div class="empty">
+                <p>No POST parameters</p>
+            </div>
+        {% endif %}
 
-    <h2>Request Attributes</h2>
+        <h3>Request Attributes</h3>
 
-    {% if collector.requestattributes.all|length %}
-        {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
-    {% else %}
-        <p>
-            <em>No attributes</em>
-        </p>
-    {% endif %}
+        {% if collector.requestattributes.all|length %}
+            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
+        {% else %}
+            <div class="empty">
+                <p>No attributes</p>
+            </div>
+        {% endif %}
 
-    <h2>Request Cookies</h2>
+        <h3>Cookies</h3>
 
-    {% if collector.requestcookies.all|length %}
-        {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestcookies } only %}
-    {% else %}
-        <p>
-            <em>No cookies</em>
-        </p>
-    {% endif %}
+        {% if collector.requestcookies.all|length %}
+            {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
+        {% else %}
+            <div class="empty">
+                <p>No cookies</p>
+            </div>
+        {% endif %}
 
-    <h2>Request Headers</h2>
+        <h3>Request Headers</h3>
+        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders }, with_context = false) }}
 
-    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestheaders } only %}
+        <h3>Request Content</h3>
 
-    <h2>Request Content</h2>
+        {% if collector.content == false %}
+            <div class="empty">
+                <p>Request content not available (it was retrieved as a resource).</p>
+            </div>
+        {% elseif collector.content %}
+            <pre>{{ collector.content }}</pre>
+        {% else %}
+            <div class="empty">
+                <p>No content</p>
+            </div>
+        {% endif %}
 
-    {% if collector.content == false %}
-        <p><em>Request content not available (it was retrieved as a resource).</em></p>
-    {% elseif collector.content %}
-        <pre>{{ collector.content }}</pre>
-    {% else %}
-        <p><em>No content</em></p>
-    {% endif %}
+        <h3>Server Parameters</h3>
+        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, 'class': 'auto-layout' }, with_context = false) }}
+    </div>
 
-    <h2>Request Server Parameters</h2>
+    <input id="tab-response" type="radio" name="tabs" />
+    <label for="tab-response">Response</label>
+    <div>
+        <h3>Response Headers</h3>
 
-    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestserver } only %}
+        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+    </div>
 
-    <h2>Response Headers</h2>
+    <input id="tab-session" type="radio" name="tabs" />
+    <label for="tab-session">Session</label>
+    <div>
+        <h3>Session Metadata</h3>
 
-    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.responseheaders } only %}
+        {% if collector.sessionmetadata|length %}
+            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionmetadata }, with_context = false) }}
+        {% else %}
+            <div class="empty">
+                <p>No session metadata</p>
+            </div>
+        {% endif %}
 
-    <h2>Session Metadata</h2>
+        <h3>Session Attributes</h3>
 
-    {% if collector.sessionmetadata|length %}
-    {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.sessionmetadata } only %}
-    {% else %}
-    <p>
-        <em>No session metadata</em>
-    </p>
-    {% endif %}
+        {% if collector.sessionattributes|length %}
+            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
+        {% else %}
+            <div class="empty">
+                <p>No session attributes</p>
+            </div>
+        {% endif %}
+    </div>
 
-    <h2>Session Attributes</h2>
+    <input id="tab-flashes" type="radio" name="tabs" />
+    <label for="tab-flashes">Flashes</label>
+    <div>
+        <h3>Flashes</h3>
 
-    {% if collector.sessionattributes|length %}
-        {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.sessionattributes } only %}
-    {% else %}
-        <p>
-            <em>No session attributes</em>
-        </p>
-    {% endif %}
-
-    <h2>Flashes</h2>
-
-    {% if collector.flashes|length %}
-        {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.flashes } only %}
-    {% else %}
-        <p>
-            <em>No flashes</em>
-        </p>
-    {% endif %}
+        {% if collector.flashes|length %}
+            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
+        {% else %}
+            <div class="empty">
+                <p>No flash messages were created.</p>
+            </div>
+        {% endif %}
+    </div>
 
     {% if profile.parent %}
-        <h2><a href="{{ path('_profiler', { 'token': profile.parent.token }) }}">Parent request: {{ profile.parent.token }}</a></h2>
+        <input id="tab-parent" type="radio" name="tabs" />
+        <label for="tab-parent">Parent Request</label>
+        <div>
+            <h3>
+                <a href="{{ path('_profiler', { token: profile.parent.token }) }}">Return to parent request</a>
+                <small>(token = {{ profile.parent.token }})</small>
+            </h3>
 
-        {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': profile.parent.getcollector('request').requestattributes } only %}
+            {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: profile.parent.getcollector('request').requestattributes }, with_context = false) }}
+        </div>
     {% endif %}
+
 
     {% if profile.children|length %}
-        <h2>Sub requests</h2>
+        <input id="tab-children" type="radio" name="tabs" />
+        <label for="tab-children">Sub Requests</label>
+        <div>
+            {% for child in profile.children %}
+                <h3>
+                    <a href="{{ path('_profiler', { token: child.token }) }}">
+                        {{- child.getcollector('request').requestattributes.get('_controller') -}}
+                    </a>
+                    <small>(token = {{ child.token }})</small>
+                </h3>
 
-        {% for child in profile.children %}
-            <h3><a href="{{ path('_profiler', { 'token': child.token }) }}">{{ child.token }}</a></h3>
-            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': child.getcollector('request').requestattributes } only %}
-        {% endfor %}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.getcollector('request').requestattributes }, with_context = false) }}
+            {% endfor %}
+        </div>
     {% endif %}
-
+</div>
 {% endblock %}

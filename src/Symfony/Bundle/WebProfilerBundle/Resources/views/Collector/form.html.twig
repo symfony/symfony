@@ -32,8 +32,8 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label">
-        <span class="icon"><svg width="20" height="27" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 20 27" enable-background="new 0 0 20 27" xml:space="preserve"><g><polygon fill="#3F3F3F" points="16,2 13,2 13,0 7,0 7,2 4,2 4,6 16,6"/><path fill="#3F3F3F" d="M17 3v4H3V3H0v24h20V3H17z M3 13h10v1H3V13z M8 24H3v-1h5V24z M17 22H3v-1h14V22z M17 20H3v-1h14V20z M17 18H3v-1h14V18z M17 16H4v-1h13V16z M17 12H3v-1h14V12z M17 10H4V9h13V10z"/></g></svg></span>
+    <span class="label {{ collector.data.forms is empty ? 'disabled' : '' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
         {% if collector.data.forms|length %}
             <span class="count"><span>{{ collector.data.forms|length }}</span></span>
@@ -196,11 +196,11 @@
     }
     </style>
 
+    <h2>Forms</h2>
+
     {% if collector.data.forms|length %}
         <div class="window">
             <div class="tree">
-                <h2>Forms</h2>
-
                 <ul>
                 {% for formName, formData in collector.data.forms %}
                     {{ form_tree_entry(formName, formData, true) }}
@@ -213,7 +213,9 @@
             {% endfor %}
         </div>
     {% else %}
-        <p><em>No forms were submitted for this request.</em></p>
+        <div class="empty">
+            <p>No forms were submitted for this request.</p>
+        </div>
     {% endif %}
 
     <script>

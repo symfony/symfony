@@ -1,6 +1,6 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% import _self as logger %}
+{% import _self as helper %}
 
 {% block toolbar %}
     {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
@@ -33,92 +33,117 @@
 {% endblock %}
 
 {% block menu %}
-<span class="label">
-    <span class="icon"><svg width="26" height="32" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 32" enable-background="new 0 0 26 32" xml:space="preserve"><path fill="#3F3F3F" d="M23.6 3.4h-1.7V1.7c0-0.9-0.8-1.7-1.7-1.7H1.7C0.8 0 0 0.8 0 1.7v3.4v21.9C0 29.7 2.3 32 5.1 32h18.5 c0.9 0 1.7-0.8 1.7-1.7V5.1C25.3 4.1 24.5 3.4 23.6 3.4z M8.4 18.5h5.1v5.1H8.4V18.5z M8.4 15.2V5.1h5.1v10.1H8.4z M23.6 28.6 c0 0.9-0.8 1.7-1.7 1.7H6.7c-1.5 0-2.8-0.7-3.7-1.7h17.2c0.9 0 1.7-0.8 1.7-1.7V5.1c0.9 0 1.7 0.8 1.7 1.7V28.6z"/></svg></span>
-    <strong>Logs</strong>
-    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
-        {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
-        <span class="count">
-            <span>{{ error_count }}</span>
-        </span>
-    {% endif %}
-</span>
+    <span class="label label-status-{{ collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' }} {{ collector.logs|length > 0 ? '' : 'disabled' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
+        <strong>Logs</strong>
+        {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
+            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            <span class="count">
+                <span>{{ error_count }}</span>
+            </span>
+        {% endif %}
+    </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Logs</h2>
-
-    {% set priority = request.query.get('priority', 0) %}
-
-    <table>
-        <tr>
-            <th>Filter</th>
-            <td>
-                <form id="priority-form" action="" method="get" style="display: inline">
-                    <input type="hidden" name="panel" value="logger">
-                    <label for="priority">Min. Priority</label>
-                    <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
-                        {# values < 0 are custom levels #}
-                        {% for value, level in collector.priorities %}
-                            {% if not priority and value > 100 %}
-                                {% set priority = value %}
-                            {% endif %}
-                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ level.name }} ({{ level.count }})</option>
-                        {% endfor %}
-                        {% if collector.countdeprecations %}
-                            {% if not priority %}
-                                {% set priority = "-100" %}
-                            {% endif %}
-                            <option value="-100"{{ "-100" == priority ? ' selected' : '' }}>DEPRECATION only ({{ collector.countdeprecations }})</option>
-                        {% endif %}
-                    </select>
-                    <noscript>
-                        <input type="submit" value="refresh">
-                    </noscript>
-                </form>
-            </td>
-        </tr>
-    </table>
+    <h2>Log Messages</h2>
 
     {% if collector.logs %}
-        <table>
-            <tr>
-                <th>#</th>
-                <th>Priority</th>
-                <th>Channel</th>
-                <th>Message and context</th>
-            </tr>
 
-            {% set log_loop_index = 0 %}
-            {% for log in collector.logs %}
-                {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
-                {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
-                    {% set log_loop_index = log_loop_index + 1 %}
-                    <tr class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
-                        <td>{{ log_loop_index }}</td>
-                        <td>{{ is_deprecation ? 'DEPRECATION' : log.priorityName }}</td>
-                        <td>{{ log.channel is defined ? log.channel }}</td>
-                        <td>{{ logger.display_message(loop.index, log, is_deprecation) }}</td>
-                    </tr>
-                {% endif %}
+        {# sort collected logs in groups #}
+        {% set deprecation_logs, debug_logs, info_and_error_logs = [], [], [] %}
+        {% for log in collector.logs %}
+            {% if log.context.level is defined and log.context.type is defined and log.context.type in [constant('E_DEPRECATED'), constant('E_USER_DEPRECATED')] %}
+                {% set deprecation_logs = deprecation_logs|merge([log]) %}
+            {% elseif log.priorityName == 'DEBUG' %}
+                {% set debug_logs = debug_logs|merge([log]) %}
             {% else %}
-                <tr><td colspan="4"><em>No logs available for {{ priority }} priority.</em></td></tr>
-            {% endfor %}
-        </table>
+                {% set info_and_error_logs = info_and_error_logs|merge([log]) %}
+            {% endif %}
+        {% endfor %}
+
+        <div id="tabs">
+            <input id="tab-info-error" type="radio" name="tabs" checked="checked"/>
+            <label for="tab-info-error">Info. & Errors <span class="badge">{{ info_and_error_logs|length }}</span></label>
+            <div>
+                {% if info_and_error_logs|length > 0 %}
+                    {{ helper.render_table(info_and_error_logs, true) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no log messages of this level.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <input id="tab-deprecations" type="radio" name="tabs"/>
+            <label for="tab-deprecations">Deprecations <span class="badge">{{ deprecation_logs|length }}</span></label>
+            <div>
+                {% if deprecation_logs|length > 0 %}
+                    {{ helper.render_table(deprecation_logs, false, true) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no log messages about deprecated features.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <input id="tab-debug" type="radio" name="tabs"/>
+            <label for="tab-debug">Debug <span class="badge">{{ debug_logs|length }}</span></label>
+            <div>
+                {% if debug_logs|length > 0 %}
+                    {{ helper.render_table(debug_logs) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no log messages of this level.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
     {% else %}
-        <p>
-            <em>No logs available.</em>
-        </p>
+        <div class="empty">
+            <p>No log messages available.</p>
+        </div>
     {% endif %}
 {% endblock %}
 
+{% macro render_table(logs, show_priority = false, is_deprecation = false) %}
+    {% import _self as helper %}
 
-{% macro display_message(log_index, log, is_deprecation) %}
-    {{ is_deprecation ? 'DEPRECATED' : log.priorityName }} - {{ log.message }}
+    <table class="auto-layout logs">
+        <thead>
+            <tr>
+                <th>Time</th>
+                {% if show_priority %}<th>Priority</th>{% endif %}
+                <th>Channel</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for log in logs %}
+                {% set css_class =
+                    is_deprecation ? '' :
+                    log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error' :
+                    log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning' : ''
+                %}
+                <tr class="{{ css_class }}">
+                    <td class="small-text muted">{{ log.timestamp|date('H:i:s') }}</td>
+                    {% if show_priority %}<td class="small-text bold">{{ log.priorityName }}</td>{% endif %}
+                    <td class="small-text bold text-right">{{ log.channel }}</td>
+                    <td>{{ helper.render_log_message(log, is_deprecation) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_log_message(log, is_deprecation = false) %}
+    {{ log.message }}
 
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
-        {% set id = 'sf-call-stack-' ~ log_index %}
+        {% set id = 'sf-call-stack-' ~ random(999) %}
 
         {% if log.context.errorCount is defined %}
         ({{ log.context.errorCount }}x)
@@ -153,10 +178,11 @@
         {% endfor %}
     {% else %}
         {% if log.context is defined and log.context is not empty %}
-            <br />
-            <small>
-                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256) }}
-            </small>
+            <span class="metadata">
+                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256)|replace({
+                    '{"' : '{ "', '"}' : '" }', '":{' : '": {', '":"' : '": "', '","' : '", "'
+                }) }}
+            </span>
         {% endif %}
     {% endif %}
 {% endmacro %}

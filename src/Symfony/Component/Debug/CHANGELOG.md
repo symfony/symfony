@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+* added BufferingLogger for errors that happen before a proper logger is configured
+* allow throwing from `__toString()` with `return trigger_error($e, E_USER_ERROR);`
+* deprecate ExceptionHandler::createResponse
+
 2.7.0
 -----
 

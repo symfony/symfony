@@ -96,6 +96,7 @@ class ErrorHandler
     private $loggedTraces = array();
     private $isRecursive = 0;
     private $exceptionHandler;
+    private $bootstrappingLogger;
 
     private static $reservedMemory;
     private static $stackedErrors = array();
@@ -152,6 +153,14 @@ class ErrorHandler
         return $handler;
     }
 
+    public function __construct(BufferingLogger $bootstrappingLogger = null)
+    {
+        if ($bootstrappingLogger) {
+            $this->bootstrappingLogger = $bootstrappingLogger;
+            $this->setDefaultLogger($bootstrappingLogger);
+        }
+    }
+
     /**
      * Sets a logger to non assigned errors levels.
      *
@@ -165,7 +174,7 @@ class ErrorHandler
 
         if (is_array($levels)) {
             foreach ($levels as $type => $logLevel) {
-                if (empty($this->loggers[$type][0]) || $replace) {
+                if (empty($this->loggers[$type][0]) || $replace || $this->loggers[$type][0] === $this->bootstrappingLogger) {
                     $loggers[$type] = array($logger, $logLevel);
                 }
             }
@@ -174,7 +183,7 @@ class ErrorHandler
                 $levels = E_ALL | E_STRICT;
             }
             foreach ($this->loggers as $type => $log) {
-                if (($type & $levels) && (empty($log[0]) || $replace)) {
+                if (($type & $levels) && (empty($log[0]) || $replace || $log[0] === $this->bootstrappingLogger)) {
                     $log[0] = $logger;
                     $loggers[$type] = $log;
                 }
@@ -197,6 +206,7 @@ class ErrorHandler
     {
         $prevLogged = $this->loggedErrors;
         $prev = $this->loggers;
+        $flush = array();
 
         foreach ($loggers as $type => $log) {
             if (!isset($prev[$type])) {
@@ -215,8 +225,23 @@ class ErrorHandler
                 throw new \InvalidArgumentException('Invalid logger provided');
             }
             $this->loggers[$type] = $log + $prev[$type];
+
+            if ($this->bootstrappingLogger && $prev[$type][0] === $this->bootstrappingLogger) {
+                $flush[$type] = $type;
+            }
         }
         $this->reRegister($prevLogged | $this->thrownErrors);
+
+        if ($flush) {
+            foreach ($this->bootstrappingLogger->cleanLogs() as $log) {
+                $type = $log[2]['type'];
+                if (!isset($flush[$type])) {
+                    $this->bootstrappingLogger->log($log[0], $log[1], $log[2]);
+                } elseif ($this->loggers[$type][0]) {
+                    $this->loggers[$type][0]->log($this->loggers[$type][1], $log[1], $log[2]);
+                }
+            }
+        }
 
         return $prev;
     }

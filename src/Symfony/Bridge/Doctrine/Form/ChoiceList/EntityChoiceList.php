@@ -41,6 +41,13 @@ class EntityChoiceList extends ObjectChoiceList
     private $classMetadata;
 
     /**
+     * Metadata for target class of primary key association.
+     *
+     * @var ClassMetadata
+     */
+    private $idClassMetadata;
+
+    /**
      * Contains the query builder that builds the query for fetching the
      * entities.
      *
@@ -107,16 +114,21 @@ class EntityChoiceList extends ObjectChoiceList
         $this->class = $this->classMetadata->getName();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
         $this->preferredEntities = $preferredEntities;
+        list(
+            $this->idAsIndex,
+            $this->idAsValue,
+            $this->idField
+        ) = $this->getIdentifierInfoForClass($this->classMetadata);
 
-        $identifier = $this->classMetadata->getIdentifierFieldNames();
+        if (null !== $this->idField && $this->classMetadata->hasAssociation($this->idField)) {
+            $this->idClassMetadata = $this->em->getClassMetadata(
+                $this->classMetadata->getAssociationTargetClass($this->idField)
+            );
 
-        if (1 === count($identifier)) {
-            $this->idField = $identifier[0];
-            $this->idAsValue = true;
-
-            if (in_array($this->classMetadata->getTypeOfField($this->idField), array('integer', 'smallint', 'bigint'))) {
-                $this->idAsIndex = true;
-            }
+            list(
+                $this->idAsIndex,
+                $this->idAsValue
+            ) = $this->getIdentifierInfoForClass($this->idClassMetadata);
         }
 
         if (!$this->loaded) {
@@ -228,7 +240,7 @@ class EntityChoiceList extends ObjectChoiceList
                 // "INDEX BY" clause to the Doctrine query in the loader,
                 // but I'm not sure whether that's doable in a generic fashion.
                 foreach ($unorderedEntities as $entity) {
-                    $value = $this->fixValue(current($this->getIdentifierValues($entity)));
+                    $value = $this->fixValue($this->getSingleIdentifierValue($entity));
                     $entitiesByValue[$value] = $entity;
                 }
 
@@ -274,7 +286,7 @@ class EntityChoiceList extends ObjectChoiceList
                 foreach ($entities as $i => $entity) {
                     if ($entity instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $values[$i] = $this->fixValue(current($this->getIdentifierValues($entity)));
+                        $values[$i] = $this->fixValue($this->getSingleIdentifierValue($entity));
                     }
                 }
 
@@ -314,7 +326,7 @@ class EntityChoiceList extends ObjectChoiceList
                 foreach ($entities as $i => $entity) {
                     if ($entity instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $indices[$i] = $this->fixIndex(current($this->getIdentifierValues($entity)));
+                        $indices[$i] = $this->fixIndex($this->getSingleIdentifierValue($entity));
                     }
                 }
 
@@ -372,7 +384,7 @@ class EntityChoiceList extends ObjectChoiceList
     protected function createIndex($entity)
     {
         if ($this->idAsIndex) {
-            return $this->fixIndex(current($this->getIdentifierValues($entity)));
+            return $this->fixIndex($this->getSingleIdentifierValue($entity));
         }
 
         return parent::createIndex($entity);
@@ -392,7 +404,7 @@ class EntityChoiceList extends ObjectChoiceList
     protected function createValue($entity)
     {
         if ($this->idAsValue) {
-            return (string) current($this->getIdentifierValues($entity));
+            return (string) $this->getSingleIdentifierValue($entity);
         }
 
         return parent::createValue($entity);
@@ -416,6 +428,36 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
+     * Get identifier information for a class.
+     *
+     * @param ClassMetadata $classMetadata The entity metadata
+     *
+     * @return array Return an array with idAsIndex, idAsValue and identifier
+     */
+    private function getIdentifierInfoForClass(ClassMetadata $classMetadata)
+    {
+        $identifier = null;
+        $idAsIndex = false;
+        $idAsValue = false;
+
+        $identifiers = $classMetadata->getIdentifierFieldNames();
+
+        if (1 === count($identifiers)) {
+            $identifier = $identifiers[0];
+
+            if (!$classMetadata->hasAssociation($identifier)) {
+                $idAsValue = true;
+
+                if (in_array($classMetadata->getTypeOfField($identifier), array('integer', 'smallint', 'bigint'))) {
+                    $idAsIndex = true;
+                }
+            }
+        }
+
+        return array($idAsIndex, $idAsValue, $identifier);
+    }
+
+    /**
      * Loads the list with entities.
      *
      * @throws StringCastException
@@ -436,6 +478,33 @@ class EntityChoiceList extends ObjectChoiceList
         }
 
         $this->loaded = true;
+    }
+
+    /**
+     * Returns the first (and only) value of the identifier fields of an entity.
+     *
+     * Doctrine must know about this entity, that is, the entity must already
+     * be persisted or added to the identity map before. Otherwise an
+     * exception is thrown.
+     *
+     * @param object $entity The entity for which to get the identifier
+     *
+     * @return array The identifier values
+     *
+     * @throws RuntimeException If the entity does not exist in Doctrine's identity map
+     */
+    private function getSingleIdentifierValue($entity)
+    {
+        $value = current($this->getIdentifierValues($entity));
+
+        if ($this->idClassMetadata) {
+            $class = $this->idClassMetadata->getName();
+            if ($value instanceof $class) {
+                $value = current($this->idClassMetadata->getIdentifierValues($value));
+            }
+        }
+
+        return $value;
     }
 
     /**

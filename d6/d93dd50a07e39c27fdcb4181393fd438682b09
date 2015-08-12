@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-05T09:36:07Z
+
+Thank you for the great PR! This looks good.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-05-05T12:58:46Z
+
+Thank you for your feedback! I've fixed everything you've have spotted.
+
+I agree with you that mixing variable initialization and return value was not clean, but I fixed the `initIdentifierAs` in another way. I've renamed it to `getIdentifierInfoForClass`, and simply return an array of `[idField, idAsValue, idAsIndex]`; I think it's clearer this way what the method does (and can be reused, if ever), and the `list` operator make it clear when and how the state is updated.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-05-06T09:38:28Z
+
+Ok, I've applied all your suggestions. In addition there is a small comment to the new unit test class (if it's ok to have it, and is clear).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-19T10:27:57Z
+
+Thanks! As you may have seen, the EntityChoiceList was replaced by a DoctrineChoiceLoader in Symfony 2.7. The appropriate class to fix it there is probably `IdReader`. Could you open a second PR for the 2.7 branch that fixes the same issue for the new implementation?
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-06-19T10:46:49Z
+
+I still have to dig into 2.7 sources, but I could give it try (since I have some spare time in the following days).
+
+Anyway, should I fix this commit or throw it away since it will never be merged?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-19T10:59:58Z
+
+@giosh94mhz No, this will be merged too, but into the 2.3 branch. The other one goes into the 2.7 branch so that we don't have a regression with the new functionality.
+
+Check the IdReader class, it should be pretty familiar to you.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-06-19T11:05:02Z
+
+@webmozart That's good news! So I'll fix the 2.3 ASAP. For the 2.7 branch I'll check it in the next days (`IdReader` is familiar indeed).
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-06-19T13:17:59Z
+
+Ok, I've swapped the returned array and removed the `array_slice` call. No notice or other is triggered so it may be good as is.
+
+This was the quickest solution, but I'm open to rename it as `initIdentifierInfoForClass` if you think is still foggy.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-06-19T13:50:30Z
+
+No, it's good now. Once the 2.7 PR is ready, I'll merge both in one go. Thanks! :)
+
+---------------------------------------------------------------------------
+
+by cursedcoder at 2015-08-11T15:17:17Z
+
+:+1: @giosh94mhz I have the same issue using your bundle :)
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-08-11T15:31:21Z
+
+@cursedcoder Thank you for the feedback. First, make sure you checked out the branch  `entity_choice_list_with_primary_key_association` (not master), then check if your code have a chain of foreign key defined in Doctrine. If this is the case, you may remove the chained entities (e.g. A[id], B[a_id==A.id], C[**b_id==A.id==B.id**]) with direct association (e.g. A[id], B[a_id==A.id], C[**a_id==A.id**]).
+Otherwise, can you add a failing test?
+
+---------------------------------------------------------------------------
+
+by cursedcoder at 2015-08-11T15:35:37Z
+
+@giosh94mhz I'm not sure I understand you.
+
+Just saying when using geonames bundle `country` entity I found the same bug.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-08-11T15:43:56Z
+
+@cursedcoder aaah sorry. I though you found a case in which this fix didn't work by using my branch. GeonamesBundle didn't cross my mind (and definitely that bundle deserves some more love from me :)

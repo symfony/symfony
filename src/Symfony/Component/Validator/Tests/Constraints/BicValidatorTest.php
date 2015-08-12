@@ -40,7 +40,6 @@ class BicValidatorTest extends AbstractConstraintValidatorTest
     {
         // http://formvalidation.io/validators/bic/
         return array(
-          //array('12345678901')
             array('ASPKAT2LXXX'),
             array('ASPKAT2L'),
             array('DSBACNBXSHA'),

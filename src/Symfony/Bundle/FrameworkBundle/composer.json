@@ -54,6 +54,7 @@
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
+        "symfony/serializer": "For using the serializer service",
         "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {

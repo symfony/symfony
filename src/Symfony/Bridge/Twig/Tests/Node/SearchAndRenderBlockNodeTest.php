@@ -24,7 +24,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(
@@ -47,7 +47,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(
@@ -67,7 +67,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(
@@ -87,7 +87,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -109,7 +109,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -130,7 +130,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(
@@ -154,7 +154,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -183,7 +183,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(
@@ -211,7 +211,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -248,7 +248,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.

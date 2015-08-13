@@ -84,7 +84,13 @@ class ExpressionLanguage
             return $expression;
         }
 
-        $key = $expression.'//'.implode('-', $names);
+        $keys = array_map(function($key, $value) {
+            return '{'."$key:$value".'}';
+        }, array_keys($names), $names);
+
+        asort($keys);
+
+        $key = $expression.'//'.implode('-', $keys);
 
         if (null === $parsedExpression = $this->cache->fetch($key)) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);

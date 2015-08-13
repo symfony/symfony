@@ -96,4 +96,17 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array('true or foo', array('foo' => 'foo'), true),
         );
     }
+
+    public function testExpressionLanguageCacheForOverriddenVariableNames()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = 'a + b';
+        $values = array('a' => 1, 'b' => 1);
+        $names = array('a', 'B' => 'b');
+        $expressionLanguage->evaluate($expression, $values);
+        $result = $expressionLanguage->compile($expression, $names);
+        $expected = '($a + $B)';
+        $this->assertSame($expected, $result);
+    }
+
 }

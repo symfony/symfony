@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.enabled ? '' : 'disabled' }}">
+    <span class="label {{ not collector.enabled ? 'disabled' }}">
         <span class="icon">{{ include('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>

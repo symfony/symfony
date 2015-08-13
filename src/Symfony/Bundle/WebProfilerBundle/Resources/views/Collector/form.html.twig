@@ -35,9 +35,6 @@
     <span class="label {{ collector.data.forms is empty ? 'disabled' : '' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
-        {% if collector.data.forms|length %}
-            <span class="count"><span>{{ collector.data.forms|length }}</span></span>
-        {% endif %}
     </span>
 {% endblock %}
 

@@ -68,7 +68,7 @@
         <tbody>
         {% for listener in events %}
             <tr>
-                {% if show_order %}<td class="small-text">{{ loop.index }}</td>{% endif %}
+                {% if show_order %}<td class="text-small muted font-normal">{{ loop.index }}</td>{% endif %}
                 <td>{{ listener.event }}</td>
                 <td>
                     {% if listener.type == 'Closure' %}
@@ -91,10 +91,10 @@
 
                         {% set link = listener.file|file_link(listener.line) %}
                         {% if link %}
-                            <a href="{{ link }}">{{ listener.class|abbr_class|striptags }} :: {{ listener.method }}()</a>
+                            <a href="{{ link }}">{{ listener.class|abbr_class|striptags }}::{{ listener.method }}()</a>
                             <small class="newline muted">{{ listener.class }}</small>
                         {% else %}
-                            {{ listener.class }} :: <strong>{{ listener.method }}()</strong>
+                            {{ listener.class }}::<strong>{{ listener.method }}()</strong>
                             <small class="newline muted">{{ listener.file }} (line {{ listener.line }})</small>
                         {% endif %}
 

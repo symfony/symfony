@@ -20,11 +20,11 @@
                     {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : '' %}
 
                     <tr class="{{ css_class }}">
-                        <td class="bold">{{ result.status_code|default('n/a') }}</td>
+                        <td class="text-bold text-centered">{{ result.status_code|default('n/a') }}</td>
                         <td class="nowrap">{{ result.ip }}</td>
                         <td>{{ result.method }}</td>
                         <td class="break-long-words">{{ result.url }}</td>
-                        <td class="small-text">
+                        <td class="text-small">
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
                             <span class="nowrap">{{ result.time|date('H:i:s') }}</span>
                         </td>

@@ -45,10 +45,11 @@
         "symfony/yaml": "~2.0,>=2.0.5"
     },
     "suggest": {
-        "symfony/console": "",
-        "symfony/finder": "",
-        "symfony/form": "",
-        "symfony/validator": ""
+        "symfony/console": "For using the console commands",
+        "symfony/finder": "For using the translation loader and cache warmer",
+        "symfony/form": "For using forms",
+        "symfony/validator": "For using validation",
+        "symfony/serializer": "For using the serializer service",
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

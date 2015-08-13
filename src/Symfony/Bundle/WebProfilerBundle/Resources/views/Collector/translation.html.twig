@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.messages|length > 0 ? '' : 'disabled' }}">
+    <span class="label {{ collector.messages is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
         <strong>Translation</strong>
     </span>
@@ -156,9 +156,9 @@
         <tbody>
         {% for message in messages %}
             <tr>
-                <td class="text-small">{{ message.locale }}</td>
-                <td class="text-small text-bold">{{ message.domain }}</td>
-                <td class="text-small">{{ message.count }}</td>
+                <td class="font-normal text-small">{{ message.locale }}</td>
+                <td class="font-normal text-small text-bold">{{ message.domain }}</td>
+                <td class="font-normal text-small">{{ message.count }}</td>
                 <td>
                     {{ message.id }}
 

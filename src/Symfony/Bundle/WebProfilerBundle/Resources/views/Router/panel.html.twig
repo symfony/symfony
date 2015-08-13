@@ -17,7 +17,7 @@
 <h3>Route parameters</h3>
 
 {% if request.routeParams|length %}
-    {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams }, with_context = false) }}
+    {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
 {% else %}
     <div class="empty">
         <p>No parameters.</p>
@@ -44,17 +44,17 @@
         <tr>
             <th>#</th>
             <th>Route name</th>
-            <th>Pattern</th>
+            <th>Path</th>
             <th>Log</th>
         </tr>
     </thead>
     <tbody>
     {% for trace in traces %}
         <tr class="{{ 1 == trace.level ? 'status-warning' : 2 == trace.level ? 'status-ok' : '' }}">
-            <td>{{ loop.index }}</td>
+            <td class="font-normal muted">{{ loop.index }}</td>
             <td>{{ trace.name }}</td>
             <td>{{ trace.path }}</td>
-            <td>{{ trace.level in [1, 2] ? trace.log : 'Path does not match' }}</td>
+            <td class="font-normal">{{ trace.level in [1, 2] ? trace.log : 'Path does not match' }}</td>
         </tr>
     {% endfor %}
     </tbody>

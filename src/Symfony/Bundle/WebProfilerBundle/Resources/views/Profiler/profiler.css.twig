@@ -739,15 +739,63 @@ table.logs .metadata strong {
     padding: 1em;
 }
 
-.sql-keyword   { color: #AA2063; font-weight: bold; }
+.sql-keyword   { color: #8959A8; font-weight: bold; }
 .sql-word      { color: #222222; }
 .sql-variable  { color: #916319; }
 .sql-symbol    { color: #222222; }
 .sql-comment   { color: #999999; }
-.sql-backtick  { color: #21AB23; }
-.sql-string    { color: #21AB23; }
-.sql-number    { color: #0F20F6; }
-.sql-error     { color: #CC0000; }
+.sql-backtick  { color: #718C00; }
+.sql-string    { color: #718C00; }
+.sql-number    { color: #F5871F; font-weight: bold; }
+.sql-error     { color: #C82829; }
+
+{# Dump panel
+   ========================================================================= #}
+#collector-content pre.sf-dump {
+    background: #222;
+    font-family: Inconsolata, monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 1em;
+}
+#collector-content .sf-dump h3 {
+    font-size: 18px;
+    margin-top: .5em;
+}
+#collector-content .sf-dump h3 a {
+    cursor: pointer;
+}
+
+#collector-content pre.sf-dump { color: #CC7832; }
+#collector-content .sf-dump-str { color: #629755; }
+#collector-content .sf-dump-private,
+#collector-content .sf-dump-protected,
+#collector-content .sf-dump-public { color: #E0E0E0; }
+#collector-content .sf-dump-note { color: #6897BB; }
+#collector-content .sf-dump-key { color: #A5C261; }
+
+#collector-content .sf-dump-compact {
+    display: none;
+}
+#collector-content .sf-dump .trace {
+    border: 1px solid #DDD;
+    background: #FFF;
+    padding: 10px;
+    margin: 1em 0;
+}
+#collector-content .sf-dump .trace {
+    font-size: 12px;
+}
+#collector-content .sf-dump .trace code {
+    font-size: 14px;
+}
+#collector-content .sf-dump .trace li {
+    margin-bottom: 0;
+    padding: 5px 0;
+}
+#collector-content .sf-dump .trace li.selected {
+    background: rgba(255, 255, 153, 0.5);
+}
 
 {# Search Results page
    ========================================================================= #}

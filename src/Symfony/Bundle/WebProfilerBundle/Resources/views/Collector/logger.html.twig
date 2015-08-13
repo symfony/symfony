@@ -128,9 +128,9 @@
                     log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning' : ''
                 %}
                 <tr class="{{ css_class }}">
-                    <td class="text-small muted">{{ log.timestamp|date('H:i:s') }}</td>
-                    {% if show_priority %}<td class="text-small text-bold">{{ log.priorityName }}</td>{% endif %}
-                    <td class="text-small text-bold text-right">{{ log.channel }}</td>
+                    <td class="font-normal text-small muted">{{ log.timestamp|date('H:i:s') }}</td>
+                    {% if show_priority %}<td class="font-normal text-small text-bold">{{ log.priorityName }}</td>{% endif %}
+                    <td class="font-normal text-small text-bold text-right">{{ log.channel }}</td>
                     <td>{{ helper.render_log_message(log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}

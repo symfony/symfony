@@ -45,26 +45,10 @@
 {% block panel %}
     <h2>Dumped contents</h2>
 
-    <style>
-        li.sf-dump {
-            list-style-type: disc;
-        }
-        .sf-dump ol>li {
-            padding: 0;
-        }
-        .sf-dump a {
-            cursor: pointer;
-        }
-        .sf-dump-compact {
-            display: none;
-        }
-    </style>
-
     {% if collector.dumpsCount %}
-        <ul class="alt">
-            {% for dump in collector.getDumps('html') %}
-            <li class="sf-dump sf-reset">
-                in
+        {% for dump in collector.getDumps('html') %}
+        <div class="sf-dump sf-reset">
+            <h3>In
                 {% if dump.line %}
                     {% set link = dump.file|file_link(dump.line) %}
                     {% if link %}
@@ -75,16 +59,20 @@
                 {% else %}
                     {{ dump.name }}
                 {% endif %}
-                line {{ dump.line }}:
-                <a onclick="var s = this.nextElementSibling; if ('sf-dump-compact' == s.className) {this.innerHTML = '&#9660;'; s.className = 'sf-dump-expanded';} else {this.innerHTML = '&#9654;'; s.className = 'sf-dump-compact';}">&#9654;</a>
-                <span class="sf-dump-compact">
-                {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
-                </span>
+                <small>line {{ dump.line }}</small>
 
-                {{ dump.data|raw }}
-            </li>
-            {% endfor %}
-        </ul>
+                <a class="text-small" onclick="var s = this.parentElement.nextElementSibling; if ('sf-dump-compact' == s.className) {this.innerHTML = 'Hide code'; s.className = 'sf-dump-expanded';} else {this.innerHTML = 'Show code'; s.className = 'sf-dump-compact';}">Show code</a>
+            </h3>
+
+            <div class="sf-dump-compact">
+                <div class="trace">
+                    {{ dump.fileExcerpt ? dump.fileExcerpt|raw : dump.file|file_excerpt(dump.line) }}
+                </div>
+            </div>
+
+            {{ dump.data|raw }}
+        </div>
+        {% endfor %}
     {% else %}
         <div class="empty">
             <p>No variable or content was dumped.</p>

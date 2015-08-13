@@ -43,7 +43,7 @@ Array
         (
             [file] => %s
             [line] => %d
-            [function] => foo
+            [function bug] => foo
             [args] => Array
                 (
                 )

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Security\User\FilesystemUserProvider;
+
 class FormLoginTest extends WebTestCase
 {
     /**
@@ -74,6 +76,37 @@ class FormLoginTest extends WebTestCase
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);
         $this->assertContains('You\'re browsing to path "/protected_resource".', $text);
+    }
+
+    public function testFormLoginRedirectsToEntryPointWithAuthenticationExceptionMessage()
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'custom_provider.yml'));
+        $client->insulate();
+
+        // An user is added to the FilesystemUserProvider
+        file_put_contents(FilesystemUserProvider::getFilename('StandardFormLogin'), json_encode(
+            array('johannes' => array('password' => 'test', 'roles' => array('ROLE_USER')))
+        ));
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $client->followRedirect();
+
+        // The username is modified between two requests
+        file_put_contents(FilesystemUserProvider::getFilename('StandardFormLogin'), json_encode(
+            array('johannes_' => array('password' => 'test', 'roles' => array('ROLE_USER')))
+        ));
+
+        $client->request('GET', '/profile');
+
+        $crawler = $client->followRedirect();
+
+        // The message from the authentication exception thrown during the refreshUser is displayed
+        $this->assertContains('Username "johannes" does not exist.', $crawler->text());
     }
 
     public function getConfigs()

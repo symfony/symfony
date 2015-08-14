@@ -65,7 +65,7 @@ class ChoiceQuestion extends Question
     }
 
     /**
-     * Returns whether the choices must be hidden
+     * Returns whether the choices must be hidden.
      *
      * @return bool
      */

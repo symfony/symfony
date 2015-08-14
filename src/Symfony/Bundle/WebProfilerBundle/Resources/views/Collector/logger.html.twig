@@ -62,41 +62,47 @@
             {% endif %}
         {% endfor %}
 
-        <div id="tabs">
-            <input id="tab-info-error" type="radio" name="tabs" checked="checked"/>
-            <label for="tab-info-error">Info. & Errors <span class="badge">{{ info_and_error_logs|length }}</span></label>
-            <div>
-                {% if info_and_error_logs|length > 0 %}
-                    {{ helper.render_table(info_and_error_logs, true) }}
-                {% else %}
-                    <div class="empty">
-                        <p>There are no log messages of this level.</p>
-                    </div>
-                {% endif %}
+        <div class="tabs">
+            <div class="tab">
+                <h3 class="tab-title">Info. & Errors <span class="badge">{{ info_and_error_logs|length }}</span></h3>
+
+                <div class="tab-content">
+                    {% if info_and_error_logs|length > 0 %}
+                        {{ helper.render_table(info_and_error_logs, true) }}
+                    {% else %}
+                        <div class="empty">
+                            <p>There are no log messages of this level.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <input id="tab-deprecations" type="radio" name="tabs"/>
-            <label for="tab-deprecations">Deprecations <span class="badge">{{ deprecation_logs|length }}</span></label>
-            <div>
-                {% if deprecation_logs|length > 0 %}
-                    {{ helper.render_table(deprecation_logs, false, true) }}
-                {% else %}
-                    <div class="empty">
-                        <p>There are no log messages about deprecated features.</p>
-                    </div>
-                {% endif %}
+            <div class="tab">
+                <h3 class="tab-title">Deprecations <span class="badge">{{ deprecation_logs|length }}</span></h3>
+
+                <div class="tab-content">
+                    {% if deprecation_logs|length > 0 %}
+                        {{ helper.render_table(deprecation_logs, false, true) }}
+                    {% else %}
+                        <div class="empty">
+                            <p>There are no log messages about deprecated features.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <input id="tab-debug" type="radio" name="tabs"/>
-            <label for="tab-debug">Debug <span class="badge">{{ debug_logs|length }}</span></label>
-            <div>
-                {% if debug_logs|length > 0 %}
-                    {{ helper.render_table(debug_logs) }}
-                {% else %}
-                    <div class="empty">
-                        <p>There are no log messages of this level.</p>
-                    </div>
-                {% endif %}
+            <div class="tab">
+                <h3 class="tab-title">Debug <span class="badge">{{ debug_logs|length }}</span></h3>
+
+                <div class="tab-content">
+                    {% if debug_logs|length > 0 %}
+                        {{ helper.render_table(debug_logs) }}
+                    {% else %}
+                        <div class="empty">
+                            <p>There are no log messages of this level.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 

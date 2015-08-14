@@ -88,56 +88,62 @@
         {% endif %}
     {% endfor %}
 
-    <div id="tabs">
-        <input id="tab-defined" type="radio" name="tabs" checked="checked"/>
-        <label for="tab-defined">Defined <span class="badge">{{ collector.countdefines }}</span></label>
-        <div>
-            <p>
-                These messages are correctly translated into the given locale.
-            </p>
+    <div class="tabs">
+        <div class="tab">
+            <h3 class="tab-title">Defined <span class="badge">{{ collector.countdefines }}</span></h3>
 
-            {% if collector.countdefines > 0 %}
-                {{ helper.render_table(defined) }}
-            {% else %}
-                <div class="empty">
-                    <p>There are no messages of this category.</p>
-                </div>
-            {% endif %}
+            <div class="tab-content">
+                <p>
+                    These messages are correctly translated into the given locale.
+                </p>
+
+                {% if collector.countdefines > 0 %}
+                    {{ helper.render_table(defined) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no messages of this category.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <input id="tab-missing" type="radio" name="tabs" />
-        <label for="tab-missing">Fallback <span class="badge">{{ collector.countFallbacks }}</span></label>
-        <div>
-            <p>
-                These messages are not available for the application locale but
-                Symfony found them in the fallback locale catalog.
-            </p>
+        <div class="tab">
+            <h3 class="tab-title">Fallback <span class="badge">{{ collector.countFallbacks }}</span></h3>
 
-            {% if collector.countFallbacks > 0 %}
-                {{ helper.render_table(fallback) }}
-            {% else %}
-                <div class="empty">
-                    <p>There are no messages of this category.</p>
-                </div>
-            {% endif %}
+            <div class="tab-content">
+                <p>
+                    These messages are not available for the application locale but
+                    Symfony found them in the fallback locale catalog.
+                </p>
+
+                {% if collector.countFallbacks > 0 %}
+                    {{ helper.render_table(fallback) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no messages of this category.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
-        <input id="tab-fallback" type="radio" name="tabs" />
-        <label for="tab-fallback">Missing <span class="badge">{{ collector.countMissings }}</span></label>
-        <div>
-            <p>
-                These messages are not available for the given locale and cannot
-                be found in the fallback locales. Add them to the translation
-                catalogue to avoid Symfony outputting untranslated contents.
-            </p>
+        <div class="tab">
+            <h3 class="tab-title">Missing <span class="badge">{{ collector.countMissings }}</span></h3>
 
-            {% if collector.countMissings > 0 %}
-                {{ helper.render_table(missing) }}
-            {% else %}
-                <div class="empty">
-                    <p>There are no messages of this category.</p>
-                </div>
-            {% endif %}
+            <div class="tab-content">
+                <p>
+                    These messages are not available for the given locale and cannot
+                    be found in the fallback locales. Add them to the translation
+                    catalogue to avoid Symfony outputting untranslated contents.
+                </p>
+
+                {% if collector.countMissings > 0 %}
+                    {{ helper.render_table(missing) }}
+                {% else %}
+                    <div class="empty">
+                        <p>There are no messages of this category.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock %}

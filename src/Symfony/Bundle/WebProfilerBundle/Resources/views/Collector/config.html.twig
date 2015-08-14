@@ -222,8 +222,8 @@
             <tbody>
                 {% for name in collector.bundles|keys|sort %}
                 <tr>
-                    <th>{{ name }}</th>
-                    <td>{{ collector.bundles[name] }}</td>
+                    <th scope="row" class="font-normal">{{ name }}</th>
+                    <td class="font-normal">{{ collector.bundles[name] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

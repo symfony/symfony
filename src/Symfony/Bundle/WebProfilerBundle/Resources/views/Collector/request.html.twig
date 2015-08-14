@@ -66,146 +66,157 @@
 {% endblock %}
 
 {% block panel %}
-<div id="tabs">
-    <input id="tab-request" type="radio" name="tabs" checked="checked"/>
-    <label for="tab-request">Request</label>
-    <div>
-        <h3>GET Parameters</h3>
+    <div class="tabs">
+        <div class="tab">
+            <h3 class="tab-title">Request</h3>
 
-        {% if collector.requestquery.all|length %}
-            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
-        {% else %}
-            <div class="empty">
-                <p>No GET parameters</p>
+            <div class="tab-content">
+                <h3>GET Parameters</h3>
+
+                {% if collector.requestquery.all|length %}
+                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
+                {% else %}
+                    <div class="empty">
+                        <p>No GET parameters</p>
+                    </div>
+                {% endif %}
+
+                <h3>POST Parameters</h3>
+
+                {% if collector.requestrequest.all|length %}
+                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
+                {% else %}
+                    <div class="empty">
+                        <p>No POST parameters</p>
+                    </div>
+                {% endif %}
+
+                <h3>Request Attributes</h3>
+
+                {% if collector.requestattributes.all|length %}
+                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
+                {% else %}
+                    <div class="empty">
+                        <p>No attributes</p>
+                    </div>
+                {% endif %}
+
+                <h3>Cookies</h3>
+
+                {% if collector.requestcookies.all|length %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
+                {% else %}
+                    <div class="empty">
+                        <p>No cookies</p>
+                    </div>
+                {% endif %}
+
+                <h3>Request Headers</h3>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders }, with_context = false) }}
+
+                <h3>Request Content</h3>
+
+                {% if collector.content == false %}
+                    <div class="empty">
+                        <p>Request content not available (it was retrieved as a resource).</p>
+                    </div>
+                {% elseif collector.content %}
+                    <pre>{{ collector.content }}</pre>
+                {% else %}
+                    <div class="empty">
+                        <p>No content</p>
+                    </div>
+                {% endif %}
+
+                <h3>Server Parameters</h3>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, 'class': 'auto-layout' }, with_context = false) }}
             </div>
-        {% endif %}
-
-        <h3>POST Parameters</h3>
-
-        {% if collector.requestrequest.all|length %}
-            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
-        {% else %}
-            <div class="empty">
-                <p>No POST parameters</p>
-            </div>
-        {% endif %}
-
-        <h3>Request Attributes</h3>
-
-        {% if collector.requestattributes.all|length %}
-            {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
-        {% else %}
-            <div class="empty">
-                <p>No attributes</p>
-            </div>
-        {% endif %}
-
-        <h3>Cookies</h3>
-
-        {% if collector.requestcookies.all|length %}
-            {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
-        {% else %}
-            <div class="empty">
-                <p>No cookies</p>
-            </div>
-        {% endif %}
-
-        <h3>Request Headers</h3>
-        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders }, with_context = false) }}
-
-        <h3>Request Content</h3>
-
-        {% if collector.content == false %}
-            <div class="empty">
-                <p>Request content not available (it was retrieved as a resource).</p>
-            </div>
-        {% elseif collector.content %}
-            <pre>{{ collector.content }}</pre>
-        {% else %}
-            <div class="empty">
-                <p>No content</p>
-            </div>
-        {% endif %}
-
-        <h3>Server Parameters</h3>
-        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, 'class': 'auto-layout' }, with_context = false) }}
-    </div>
-
-    <input id="tab-response" type="radio" name="tabs" />
-    <label for="tab-response">Response</label>
-    <div>
-        <h3>Response Headers</h3>
-
-        {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'] }, with_context = false) }}
-    </div>
-
-    <input id="tab-session" type="radio" name="tabs" />
-    <label for="tab-session">Session</label>
-    <div>
-        <h3>Session Metadata</h3>
-
-        {% if collector.sessionmetadata|length %}
-            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionmetadata }, with_context = false) }}
-        {% else %}
-            <div class="empty">
-                <p>No session metadata</p>
-            </div>
-        {% endif %}
-
-        <h3>Session Attributes</h3>
-
-        {% if collector.sessionattributes|length %}
-            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
-        {% else %}
-            <div class="empty">
-                <p>No session attributes</p>
-            </div>
-        {% endif %}
-    </div>
-
-    <input id="tab-flashes" type="radio" name="tabs" />
-    <label for="tab-flashes">Flashes</label>
-    <div>
-        <h3>Flashes</h3>
-
-        {% if collector.flashes|length %}
-            {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
-        {% else %}
-            <div class="empty">
-                <p>No flash messages were created.</p>
-            </div>
-        {% endif %}
-    </div>
-
-    {% if profile.parent %}
-        <input id="tab-parent" type="radio" name="tabs" />
-        <label for="tab-parent">Parent Request</label>
-        <div>
-            <h3>
-                <a href="{{ path('_profiler', { token: profile.parent.token }) }}">Return to parent request</a>
-                <small>(token = {{ profile.parent.token }})</small>
-            </h3>
-
-            {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: profile.parent.getcollector('request').requestattributes }, with_context = false) }}
         </div>
-    {% endif %}
 
+        <div class="tab">
+            <h3 class="tab-title">Response</h3>
 
-    {% if profile.children|length %}
-        <input id="tab-children" type="radio" name="tabs" />
-        <label for="tab-children">Sub Requests</label>
-        <div>
-            {% for child in profile.children %}
+            <div class="tab-content">
+                <h3>Response Headers</h3>
+
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Session</h3>
+
+            <div class="tab-content">
+                <h3>Session Metadata</h3>
+
+                {% if collector.sessionmetadata|length %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionmetadata }, with_context = false) }}
+                {% else %}
+                    <div class="empty">
+                        <p>No session metadata</p>
+                    </div>
+                {% endif %}
+
+                <h3>Session Attributes</h3>
+
+                {% if collector.sessionattributes|length %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
+                {% else %}
+                    <div class="empty">
+                        <p>No session attributes</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">Flashes</h3>
+
+            <div class="tab-content">
+                <h3>Flashes</h3>
+
+                {% if collector.flashes|length %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
+                {% else %}
+                    <div class="empty">
+                        <p>No flash messages were created.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if profile.parent %}
+        <div class="tab">
+            <h3 class="tab-title">Parent Request</h3>
+
+            <div class="tab-content">
                 <h3>
-                    <a href="{{ path('_profiler', { token: child.token }) }}">
-                        {{- child.getcollector('request').requestattributes.get('_controller') -}}
-                    </a>
-                    <small>(token = {{ child.token }})</small>
+                    <a href="{{ path('_profiler', { token: profile.parent.token }) }}">Return to parent request</a>
+                    <small>(token = {{ profile.parent.token }})</small>
                 </h3>
 
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.getcollector('request').requestattributes }, with_context = false) }}
-            {% endfor %}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: profile.parent.getcollector('request').requestattributes }, with_context = false) }}
+            </div>
         </div>
-    {% endif %}
-</div>
+        {% endif %}
+
+        {% if profile.children|length %}
+        <div class="tab">
+            <h3 class="tab-title">Sub Requests</h3>
+
+            <div class="tab-content">
+                {% for child in profile.children %}
+                    <h3>
+                        <a href="{{ path('_profiler', { token: child.token }) }}">
+                            {{- child.getcollector('request').requestattributes.get('_controller') -}}
+                        </a>
+                        <small>(token = {{ child.token }})</small>
+                    </h3>
+
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.getcollector('request').requestattributes }, with_context = false) }}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
 {% endblock %}

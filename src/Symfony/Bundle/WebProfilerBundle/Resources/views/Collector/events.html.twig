@@ -22,36 +22,39 @@
 {% endblock %}
 
 {% block panelContent %}
-    <div id="tabs">
-        <input id="tab-called" type="radio" name="tabs" checked="checked"/>
-        <label for="tab-called">Called listeners <span class="badge">{{ collector.calledlisteners|length }}</span></label>
-        <div>
-            {{ helper.render_table(collector.calledlisteners, true) }}
+    <div class="tabs">
+        <div class="tab">
+            <h3 class="tab-title">Called listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
+
+            <div class="tab-content">
+                {{ helper.render_table(collector.calledlisteners, true) }}
+            </div>
         </div>
 
-        <input id="tab-not-called" type="radio" name="tabs" />
-        <label for="tab-not-called">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></label>
-        <div>
-            {% if collector.notcalledlisteners|length > 0 %}
-                {# sort collector.notcalledlisteners alphabetically #}
-                {% set notcalledlisteners = [] %}
-                {% for key in collector.notcalledlisteners|keys|sort %}
-                    {% set notcalledlisteners = notcalledlisteners|merge([ collector.notcalledlisteners[key] ]) %}
-                {% endfor %}
+        <div class="tab">
+            <h3 class="tab-title">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></h3>
+            <div class="tab-content">
+                {% if collector.notcalledlisteners|length > 0 %}
+                    {# sort collector.notcalledlisteners alphabetically #}
+                    {% set notcalledlisteners = [] %}
+                    {% for key in collector.notcalledlisteners|keys|sort %}
+                        {% set notcalledlisteners = notcalledlisteners|merge([ collector.notcalledlisteners[key] ]) %}
+                    {% endfor %}
 
-                {{ helper.render_table(collector.notcalledlisteners) }}
-            {% else %}
-                <div class="empty">
-                    <p>
-                        <strong>There are no uncalled listeners</strong>.
-                    </p>
-                    <p>
-                        All listeners were called for this request or an error occurred
-                        when trying to collect uncalled listeners (in which case check the
-                        logs to get more information).
-                    </p>
-                </div>
-            {% endif %}
+                    {{ helper.render_table(collector.notcalledlisteners) }}
+                {% else %}
+                    <div class="empty">
+                        <p>
+                            <strong>There are no uncalled listeners</strong>.
+                        </p>
+                        <p>
+                            All listeners were called for this request or an error occurred
+                            when trying to collect uncalled listeners (in which case check the
+                            logs to get more information).
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock %}

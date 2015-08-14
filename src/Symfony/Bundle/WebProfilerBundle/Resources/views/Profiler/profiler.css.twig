@@ -617,39 +617,28 @@ body#search h3 {
 
 {# Navigation
    ========================================================================= #}
-#tabs {
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-  flex-wrap: wrap;
+.tabs .tab {
+    display: none;
 }
-#tabs > div {
-    -webkit-order: 1;
-    margin-top: -1px;
-    order: 1;
-    padding: 1em 0;
-    width: 100%;
-    z-index: 1000;
+.tab-navigation {
+    margin: 0;
+    padding: 0;
 }
-#tabs label {
+.tab-navigation li {
     background: #FFF;
-    border-bottom: 0;
     border: 1px solid #DDD;
     color: #444;
     cursor: pointer;
+    display: inline-block;
     font-size: 16px;
     margin-left: -1px;
     padding: .5em .75em;
     z-index: 1;
 }
-#tabs label:hover {
+.tab-navigation li:hover {
     background: #EEE;
 }
-#tabs label:hover .badge {
-    background: #FAFAFA;
-    color: #777;
-}
-#tabs label .badge {
+.tab-navigation li .badge {
     background-color: #F5F5F5;
     color: #777;
     display: inline-block;
@@ -661,25 +650,19 @@ body#search h3 {
     text-align: center;
     white-space: nowrap;
 }
-#tabs input[type=radio], #tabs > div {
-    display: none;
+.tab-navigation li:hover .badge {
+    background: #FAFAFA;
+    color: #777;
 }
-#tabs > div h2:first-of-type,
-#tabs > div h3:first-of-type {
-    margin-top: .5em;
-}
-#tabs input[type=radio]:checked + label {
+.tab-navigation li.active {
     background: #666;
     border-color: #666;
     color: #FAFAFA;
     z-index: 1100;
 }
-#tabs input[type=radio]:checked + label .badge {
+.tab-navigation li.active .badge {
     background-color: #444;
     color: #FFF;
-}
-#tabs input[type=radio]:checked + label + div {
-    display: block;
 }
 
 {# Twig panel
@@ -751,16 +734,24 @@ table.logs .metadata strong {
 
 {# Dump panel
    ========================================================================= #}
-#collector-content pre.sf-dump {
-    background: #222;
+#collector-content .sf-dump {
+    margin-bottom: 2em;
+}
+#collector-content pre.sf-dump,
+#collector-content .sf-dump code,
+#collector-content .sf-dump samp {
     font-family: Inconsolata, monospace;
     font-size: 14px;
+}
+#collector-content pre.sf-dump {
+    background: #222;
     line-height: 1.4;
+    margin-top: .5em;
     padding: 1em;
 }
 #collector-content .sf-dump h3 {
     font-size: 18px;
-    margin-top: .5em;
+    margin: .5em 0 0;
 }
 #collector-content .sf-dump h3 a {
     cursor: pointer;

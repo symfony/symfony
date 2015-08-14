@@ -153,11 +153,14 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $width = max(array_map('strlen', array_keys($question->getChoices())));
-
             $messages = (array) $question->getQuestion();
-            foreach ($question->getChoices() as $key => $value) {
-                $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+
+            if (!$question->isChoicesHidden()) {
+                $width = max(array_map('strlen', array_keys($question->getChoices())));
+
+                foreach ($question->getChoices() as $key => $value) {
+                    $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+                }
             }
 
             $output->writeln($messages);

@@ -104,4 +104,38 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array('true or foo', array('foo' => 'foo'), true),
         );
     }
+
+    public function testCachingForOverriddenVariableNames()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = 'a + b';
+        $expressionLanguage->evaluate($expression, array('a' => 1, 'b' => 1));
+        $result = $expressionLanguage->compile($expression, array('a', 'B' => 'b'));
+        $this->assertSame('($a + $B)', $result);
+    }
+
+    public function testCachingWithDifferentNamesOrder()
+    {
+        $cacheMock = $this->getMock('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface');
+        $expressionLanguage = new ExpressionLanguage($cacheMock);
+        $savedParsedExpressions = array();
+        $cacheMock
+            ->expects($this->exactly(2))
+            ->method('fetch')
+            ->will($this->returnCallback(function ($key) use (&$savedParsedExpressions) {
+                return isset($savedParsedExpressions[$key]) ? $savedParsedExpressions[$key] : null;
+            }))
+        ;
+        $cacheMock
+            ->expects($this->exactly(1))
+            ->method('save')
+            ->will($this->returnCallback(function ($key, $expression) use (&$savedParsedExpressions) {
+                $savedParsedExpressions[$key] = $expression;
+            }))
+        ;
+
+        $expression = 'a + b';
+        $expressionLanguage->compile($expression, array('a', 'B' => 'b'));
+        $expressionLanguage->compile($expression, array('B' => 'b', 'a'));
+    }
 }

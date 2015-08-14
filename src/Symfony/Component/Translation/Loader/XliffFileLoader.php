@@ -59,24 +59,15 @@ class XliffFileLoader implements LoaderInterface
 
             $catalogue->set((string) $source, $target, $domain);
 
-            if (isset($translation->note)) {
-                $notes = array();
-                foreach ($translation->note as $xmlNote) {
-                    $noteAttributes = $xmlNote->attributes();
-                    $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));
-                    if (isset($noteAttributes['priority'])) {
-                        $note['priority'] = (int) $noteAttributes['priority'];
-                    }
-
-                    if (isset($noteAttributes['from'])) {
-                        $note['from'] = (string) $noteAttributes['from'];
-                    }
-
-                    $notes[] = $note;
-                }
-
-                $catalogue->setMetadata((string) $source, array('notes' => $notes), $domain);
+            $metadata = array();
+            if ($notes = $this->parseNotesMetadata($translation->note, $encoding)) {
+                $metadata['notes'] = $notes;
             }
+            if ($translation->target->attributes()) {
+                $metadata['target-attributes'] = $translation->target->attributes();
+            }
+
+            $catalogue->setMetadata((string) $source, $metadata, $domain);
         }
 
         if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
@@ -184,5 +175,36 @@ class XliffFileLoader implements LoaderInterface
         libxml_use_internal_errors($internalErrors);
 
         return $errors;
+    }
+
+    /**
+     * @param \SimpleXMLElement|null $noteElement
+     * @param string|null            $encoding
+     *
+     * @return array
+     */
+    private function parseNotesMetadata(\SimpleXMLElement $noteElement = null, $encoding = null)
+    {
+        $notes = array();
+
+        if (null === $noteElement) {
+            return $notes;
+        }
+
+        foreach ($noteElement as $xmlNote) {
+            $noteAttributes = $xmlNote->attributes();
+            $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));
+            if (isset($noteAttributes['priority'])) {
+                $note['priority'] = (int) $noteAttributes['priority'];
+            }
+
+            if (isset($noteAttributes['from'])) {
+                $note['from'] = (string) $noteAttributes['from'];
+            }
+
+            $notes[] = $note;
+        }
+
+        return $notes;
     }
 }

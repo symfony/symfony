@@ -6,6 +6,11 @@ CHANGELOG
 
  * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
  * added options 'as_tree', 'inline' to YamlFileDumper
+ * [DEPRECATION] The `DiffOperation` class has been deprecated and
+   will be removed in Symfony 3.0, since its operation has nothing to do with 'diff',
+   so the class name is misleading. The `TargetOperation` class should be used for
+   this use-case instead.
+
 
 2.7.0
 -----

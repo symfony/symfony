@@ -87,7 +87,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
             if ($error instanceof FormError) {
                 $string .= $error->getMessage().PHP_EOL;
             } else {
-                /** @var $error FormErrorIterator */
+                /* @var $error FormErrorIterator */
                 $string .= $error->form->getName().':'.PHP_EOL;
                 $string .= self::indent((string) $error);
             }

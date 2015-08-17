@@ -124,4 +124,20 @@ class StreamedResponse extends Response
     {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Response
+     *
+     * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
+     *
+     * @api
+     */
+    public function setNotModified()
+    {
+        $this->streamed = true;
+
+        return parent::setNotModified();
+    }
 }

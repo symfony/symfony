@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\NaturalOrderPostNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
@@ -267,6 +268,19 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             $expectedData,
             $serializer->deserialize($jsonData, __NAMESPACE__.'\Model[]', 'json')
         );
+    }
+
+    public function testPostNormalization()
+    {
+        $this->serializer = new Serializer(
+            array(new GetSetMethodNormalizer()),
+            array('json' => new JsonEncoder()),
+            array(new NaturalOrderPostNormalizer())
+        );
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $result = $this->serializer->normalize(Model::fromArray($data), 'json');
+        uksort($data, 'strnatcasecmp');
+        $this->assertSame($data, $result);
     }
 }
 

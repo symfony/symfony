@@ -85,10 +85,10 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 
         foreach ($this->errors as $error) {
             if ($error instanceof FormError) {
-                $string .= 'ERROR: '.$error->getMessage()."\n";
+                $string .= $error->getMessage().PHP_EOL;
             } else {
                 /** @var $error FormErrorIterator */
-                $string .= $error->form->getName().":\n";
+                $string .= $error->form->getName().':' . PHP_EOL;
                 $string .= self::indent((string) $error);
             }
         }
@@ -276,6 +276,6 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      */
     private static function indent($string)
     {
-        return rtrim(self::INDENTATION.str_replace("\n", "\n".self::INDENTATION, $string), ' ');
+        return rtrim(self::INDENTATION.str_replace(PHP_EOL, PHP_EOL.self::INDENTATION, $string), ' ');
     }
 }

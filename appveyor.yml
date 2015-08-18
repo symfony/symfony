@@ -1,0 +1,53 @@
+build: false
+shallow_clone: true
+platform: x86
+clone_folder: c:\projects\symfony
+
+environment:
+    matrix:
+        - PHP_EXT: 1
+        - PHP_EXT: 0
+
+cache:
+    - c:\php -> appveyor.yml
+    - .phpunit -> phpunit
+    - vendor -> composer.json
+
+init:
+    - SET PATH=c:\php;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET SYMFONY_DEPRECATIONS_HELPER=weak
+    - SET PHP=1
+
+install:
+    - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+    - cd c:\php
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.4.43-nts-Win32-VC9-x86.zip
+    - IF %PHP%==1 7z x php-5.4.43-nts-Win32-VC9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/ICU-51.2-dlls.zip
+    - IF %PHP%==1 7z x ICU-51.2-dlls.zip -y > 7z.log
+    - IF %PHP%==1 cd ext
+    - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/php_intl-3.0.0-5.4-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_intl-3.0.0-5.4-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apc/3.1.13/php_apc-3.1.13-5.4-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_apc-3.1.13-5.4-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 cd ..
+    - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    - appveyor DownloadFile https://getcomposer.org/composer.phar
+    - copy php.ini-production php.ini /Y
+    - echo date.timezone="UTC" >> php.ini
+    - echo extension_dir=ext >> php.ini
+    - echo extension=php_openssl.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_apc.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_intl.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_mbstring.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_fileinfo.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_pdo_sqlite.dll >> php.ini
+    - cd c:\projects\symfony
+    - php phpunit install
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - composer update --prefer-dist --no-progress --ansi
+
+test_script:
+    - cd c:\projects\symfony
+    - php phpunit symfony --exclude-group benchmark,intl-data

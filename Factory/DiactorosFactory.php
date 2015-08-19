@@ -86,6 +86,10 @@ class DiactorosFactory implements HttpMessageFactoryInterface
         $files = array();
 
         foreach ($uploadedFiles as $key => $value) {
+            if ($value === null) {
+                $files[$key] = new DiactorosUploadedFile(null, 0, UPLOAD_ERR_NO_FILE, null, null);
+                continue;
+            }
             if ($value instanceof UploadedFile) {
                 $files[$key] = $this->createUploadedFile($value);
             } else {
@@ -107,7 +111,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
     {
         return new DiactorosUploadedFile(
             $symfonyUploadedFile->getRealPath(),
-            $symfonyUploadedFile->getSize(),
+            $symfonyUploadedFile->getClientSize(),
             $symfonyUploadedFile->getError(),
             $symfonyUploadedFile->getClientOriginalName(),
             $symfonyUploadedFile->getClientMimeType()

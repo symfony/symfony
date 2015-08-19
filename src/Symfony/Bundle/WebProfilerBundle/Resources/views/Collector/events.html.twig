@@ -77,28 +77,28 @@
                     {% if listener.type == 'Closure' %}
 
                         Closure
-                        <small class="newline muted">(there is no class or file information)</small>
+                        <span class="newline muted text-small">(there is no class or file information)</span>
 
                     {% elseif listener.type == 'Function' %}
 
                         {% set link = listener.file|file_link(listener.line) %}
                         {% if link %}
                             <a href="{{ link }}">{{ listener.function }}()</a>
-                            <small class="newline muted">{{ listener.file }}</small>
+                            <span class="newline muted text-small">{{ listener.file }}</span>
                         {% else %}
                             {{ listener.function }}()
-                            <small class="newline muted">{{ listener.file }} (line {{ listener.line }})</small>
+                            <span class="newline muted text-small">{{ listener.file }} (line {{ listener.line }})</span>
                         {% endif %}
 
                     {% elseif listener.type == "Method" %}
 
                         {% set link = listener.file|file_link(listener.line) %}
                         {% if link %}
-                            <a href="{{ link }}">{{ listener.class|abbr_class|striptags }}::{{ listener.method }}()</a>
-                            <small class="newline muted">{{ listener.class }}</small>
+                            <a href="{{ link }}"><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()</a>
+                            <span class="newline muted text-small">{{ listener.class }}</span>
                         {% else %}
-                            {{ listener.class }}::<strong>{{ listener.method }}()</strong>
-                            <small class="newline muted">{{ listener.file }} (line {{ listener.line }})</small>
+                            <strong>{{ listener.class }}</strong>::{{ listener.method }}()
+                            <span class="newline muted text-small">{{ listener.file }} (line {{ listener.line }})</span>
                         {% endif %}
 
                     {% endif %}

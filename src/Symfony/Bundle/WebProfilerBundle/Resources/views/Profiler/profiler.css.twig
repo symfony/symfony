@@ -306,7 +306,7 @@ p.help {
     width: 100%;
 }
 #collector-content {
-    margin: 0 0 30px 240px;
+    margin: 0 0 30px 220px;
     padding: 14px 0 14px 20px;
 }
 
@@ -321,19 +321,27 @@ p.help {
     overflow: hidden;
 }
 #header h1 {
+    color: #FFF;
+    font-weight: normal;
+    font-size: 21px;
     float: left;
     margin: 0;
-    padding: 10px;
+    padding: 10px 10px 8px;
+}
+#header h1 span {
+    color: #CCC;
 }
 #header h1 svg {
     height: 40px;
+    margin-top: -4px;
+    vertical-align: middle;
 }
 #header h1 svg path {
     fill: #FFF;
 }
 #header .search {
     float: right;
-    padding-top: 15px;
+    padding-top: 11px;
 }
 #header .search input {
     border: 1px solid #DDD;
@@ -399,7 +407,7 @@ p.help {
     margin-bottom: -99999px; {# needed for 'same-height columns' trick #}
     margin-left: -100%;
     padding-bottom: 99999px; {# needed for 'same-height columns' trick #}
-    width: 240px;
+    width: 220px;
 }
 #sidebar a {
     color: #99CDD8;
@@ -479,7 +487,7 @@ body#search h3 {
     background: #CCC;
     border: 1px solid #999;
     color: #222;
-    width: 140px;
+    width: 120px;
 }
 #sidebar-search .form-group select {
     color: #222;
@@ -515,7 +523,7 @@ body#search h3 {
 #menu-profiler li a .label {
     color: #EEE;
     display: block;
-    padding: 8px 10px 8px 60px;
+    padding: 8px 10px 8px 50px;
     overflow: hidden;
     white-space: nowrap;
 }
@@ -524,7 +532,7 @@ body#search h3 {
     position: absolute;
     left: 0;
     top: 8px;
-    width: 60px;
+    width: 50px;
     text-align: center;
 }
 #menu-profiler li a .label .icon svg path {
@@ -542,15 +550,6 @@ body#search h3 {
     opacity: 1;
 }
 
-/* TODO: remove when all the icons are reviewed */
-#menu-profiler li a .icon svg {
-    height: 24px;
-}
-#header h1 svg { width: 40px; height: 40px !important; position: relative; top: 10px; margin-right: 0px; }
-#header h1 { color: #FFF; font-weight: normal; font-size: 25px; line-height: 40px; margin-top: -10px;}
-#header h1 span { color: #CCC; }
-/* END of TODO */
-
 #menu-profiler li.selected a,
 #menu-profiler:hover li.selected a:hover,
 #menu-profiler li a:hover {
@@ -563,6 +562,7 @@ body#search h3 {
     background-color: #666;
     color: #FFF;
     display: inline-block;
+    font-weight: bold;
     float: right;
     line-height: 1;
     min-width: 10px;
@@ -578,6 +578,13 @@ body#search h3 {
 #menu-profiler li a span.count span + span::before {
     content: " / ";
     color: #AAA;
+}
+
+#menu-profiler .label-status-warning .count {
+    background: #BC8034;
+}
+#menu-profiler .label-status-error .count {
+    background: #B0413E;
 }
 
 {# Timeline panel
@@ -690,6 +697,12 @@ table.logs .metadata {
 table.logs .metadata strong {
     color: #222;
 }
+table.logs .status-warning td.text-bold  {
+    color: #BC8034;
+}
+table.logs .status-error td.text-bold  {
+    color: #B0413E;
+}
 
 {# Doctrine panel
    ========================================================================= #}
@@ -722,15 +735,15 @@ table.logs .metadata strong {
     padding: 1em;
 }
 
-.sql-keyword   { color: #8959A8; font-weight: bold; }
-.sql-word      { color: #222222; }
-.sql-variable  { color: #916319; }
-.sql-symbol    { color: #222222; }
-.sql-comment   { color: #999999; }
-.sql-backtick  { color: #718C00; }
-.sql-string    { color: #718C00; }
-.sql-number    { color: #F5871F; font-weight: bold; }
-.sql-error     { color: #C82829; }
+.highlight .keyword   { color: #8959A8; font-weight: bold; }
+.highlight .word      { color: #222222; }
+.highlight .variable  { color: #916319; }
+.highlight .symbol    { color: #222222; }
+.highlight .comment   { color: #999999; }
+.highlight .backtick  { color: #718C00; }
+.highlight .string    { color: #718C00; }
+.highlight .number    { color: #F5871F; font-weight: bold; }
+.highlight .error     { color: #C82829; }
 
 {# Dump panel
    ========================================================================= #}

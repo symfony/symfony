@@ -37,9 +37,15 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.messages is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' : '' }} {{ collector.messages is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
         <strong>Translation</strong>
+        {% if collector.countMissings or collector.countFallbacks %}
+            {% set error_count = collector.countMissings + collector.countFallbacks %}
+            <span class="count">
+                <span>{{ error_count }}</span>
+            </span>
+        {% endif %}
     </span>
 {% endblock %}
 

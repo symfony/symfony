@@ -86,7 +86,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $cmd = Command::create()->add('--force');
 
         $cmd->arg('--run');
-        $this->assertSame('--force \'--run\'', $cmd->join());
+        $this->assertSame('--force '.escapeshellarg('--run'), $cmd->join());
     }
 
     public function testCmd()

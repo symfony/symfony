@@ -60,9 +60,6 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         $i->seek(1);
         $actual[] = $i->getPathname();
 
-        $i->seek(2);
-        $actual[] = $i->getPathname();
-
         $this->assertEquals($contains, $actual);
     }
 
@@ -73,7 +70,6 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         // ftp
         $contains = array(
             'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'README',
-            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'index.html',
             'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'pub',
         );
         $data[] = array('ftp://ftp.mozilla.org/', false, $contains);

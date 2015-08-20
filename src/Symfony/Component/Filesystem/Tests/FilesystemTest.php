@@ -34,16 +34,13 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            self::$symlinkOnWindows = true;
-            $originDir = tempnam(sys_get_temp_dir(), 'sl');
-            $targetDir = tempnam(sys_get_temp_dir(), 'sl');
-            if (true !== @symlink($originDir, $targetDir)) {
-                $report = error_get_last();
-                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
-                    self::$symlinkOnWindows = false;
-                }
+        if ('\\' === DIRECTORY_SEPARATOR && null === self::$symlinkOnWindows) {
+            $target = tempnam(sys_get_temp_dir(), 'sl');
+            $link = sys_get_temp_dir().'/sl'.microtime(true).mt_rand();
+            if (self::$symlinkOnWindows = @symlink($target, $link)) {
+                unlink($link);
             }
+            unlink($target);
         }
     }
 
@@ -58,25 +55,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $this->clean($this->workspace);
+        $this->filesystem->remove($this->workspace);
         umask($this->umask);
-    }
-
-    /**
-     * @param string $file
-     */
-    private function clean($file)
-    {
-        if (is_dir($file) && !is_link($file)) {
-            $dir = new \FilesystemIterator($file);
-            foreach ($dir as $childFile) {
-                $this->clean($childFile);
-            }
-
-            rmdir($file);
-        } else {
-            unlink($file);
-        }
     }
 
     public function testCopyCreatesNewFile()
@@ -1035,7 +1015,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('symlink is not supported');
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
+        if (false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }
     }

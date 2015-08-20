@@ -27,6 +27,10 @@ class JsonResponse extends Response
     protected $data;
     protected $callback;
 
+    // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+    // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+    private $encodingOptions = 15;
+
     /**
      * Constructor.
      *
@@ -41,6 +45,7 @@ class JsonResponse extends Response
         if (null === $data) {
             $data = new \ArrayObject();
         }
+
         $this->setData($data);
     }
 
@@ -55,11 +60,11 @@ class JsonResponse extends Response
     /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
      * @return JsonResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {
@@ -80,7 +85,7 @@ class JsonResponse extends Response
     }
 
     /**
-     * Sets the data to be sent as json.
+     * Sets the data to be sent as JSON.
      *
      * @param mixed $data
      *
@@ -90,18 +95,63 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->data = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        if (defined('HHVM_VERSION')) {
+            // HHVM does not trigger any warnings and let exceptions
+            // thrown from a JsonSerializable object pass through.
+            // If only PHP did the same...
+            $data = json_encode($data, $this->encodingOptions);
+        } else {
+            try {
+                if (PHP_VERSION_ID < 50400) {
+                    // PHP 5.3 triggers annoying warnings for some
+                    // types that can't be serialized as JSON (INF, resources, etc.)
+                    // but doesn't provide the JsonSerializable interface.
+                    set_error_handler('var_dump', 0);
+                    $data = @json_encode($data, $this->encodingOptions);
+                } else {
+                    // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
+                    // objects in a new exception that needs to be removed.
+                    // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
+                    if (PHP_VERSION_ID < 50500) {
+                        // Clear json_last_error()
+                        json_encode(null);
+                        $errorHandler = set_error_handler('var_dump');
+                        restore_error_handler();
+                        set_error_handler(function () use ($errorHandler) {
+                            if (JSON_ERROR_NONE === json_last_error()) {
+                                return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
+                            }
+                        });
+                    }
+
+                    $data = json_encode($data, $this->encodingOptions);
+                }
+
+                if (PHP_VERSION_ID < 50500) {
+                    restore_error_handler();
+                }
+            } catch (\Exception $e) {
+                if (PHP_VERSION_ID < 50500) {
+                    restore_error_handler();
+                }
+                if (PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                    throw $e->getPrevious() ?: $e;
+                }
+                throw $e;
+            }
+        }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException($this->transformJsonError());
         }
 
+        $this->data = $data;
+
         return $this->update();
     }
 
     /**
-     * Updates the content and headers according to the json data and callback.
+     * Updates the content and headers according to the JSON data and callback.
      *
      * @return JsonResponse
      */

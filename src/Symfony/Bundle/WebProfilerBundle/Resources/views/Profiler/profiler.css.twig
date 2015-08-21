@@ -167,6 +167,9 @@ p.help {
     padding: .5em 2em;
 }
 
+.hidden {
+    display: none;
+}
 .nowrap {
     white-space: pre;
 }
@@ -433,20 +436,6 @@ p.help {
 
 {# Sidebar Search
    ------------------------------------------------------------------------- #}
-#sidebar #sidebar-shortcuts #reveal-search-form {
-    display: none;
-}
-#sidebar #sidebar-shortcuts #sidebar-search {
-    height: 0;
-    overflow: hidden;
-    -moz-transition: height .25s ease;
-    -webkit-transition: height .25s ease;
-    transition: height .25s ease;
-}
-body#search #sidebar #sidebar-shortcuts #sidebar-search,
-#sidebar #sidebar-shortcuts #reveal-search-form:checked + #sidebar-search {
-    height: 290px;
-}
 body#search h3 {
     margin-top: 0;
 }
@@ -618,7 +607,7 @@ body#search h3 {
     margin: .5em 0;
 }
 
-{# Navigation
+{# Tabbed navigation
    ========================================================================= #}
 .tab-navigation {
     margin: 0;
@@ -663,6 +652,20 @@ body#search h3 {
 .tab-navigation li.active .badge {
     background-color: #444;
     color: #FFF;
+}
+
+{# Toggles
+   ========================================================================= #}
+.sf-toggle-content {
+    -moz-transition: display .25s ease;
+    -webkit-transition: display .25s ease;
+    transition: display .25s ease;
+}
+.sf-toggle-content.sf-toggle-hidden {
+    display: none;
+}
+.sf-toggle-content.sf-toggle-visible {
+    display: block;
 }
 
 {# Twig panel
@@ -723,7 +726,6 @@ table.logs .status-error .text-bold  {
 }
 .sql-runnable {
     background: #F5F5F5;
-    display: none; /* initially they are hidden */
     margin: .5em 0;
     padding: 1em;
 }

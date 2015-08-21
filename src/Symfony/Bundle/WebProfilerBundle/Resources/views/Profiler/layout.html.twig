@@ -56,10 +56,10 @@
                 <div id="sidebar-shortcuts">
                     <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Latest profiles</a>
 
-                    <label for="reveal-search-form" class="btn btn-sm">
+                    <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search">
                         {{ include('@WebProfiler/Icon/search.svg') }} Search
-                    </label>
-                    <input id="reveal-search-form" type="checkbox">
+                    </a>
+
                     {{ render(path('_profiler_search_bar')) }}
                 </div>
 

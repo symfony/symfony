@@ -46,20 +46,36 @@
                 xhr.send(payload || '');
             },
 
-            hasClass = function(el, klass) {
-                return el.className && el.className.match(new RegExp('\\b' + klass + '\\b'));
-            },
-
-            removeClass = function(el, klass) {
-                if (el.className) {
-                    el.className = el.className.replace(new RegExp('\\b' + klass + '\\b'), ' ');
+            hasClass = function(el, cssClass) {
+                if (el.classList) {
+                    return el.classList.contains(cssClass);
+                } else if (el.className) {
+                    return el.className.match(new RegExp('\\b' + cssClass + '\\b'));
                 }
             },
 
-            addClass = function(el, klass) {
-                if (!hasClass(el, klass)) {
-                    el.className += " " + klass;
+            removeClass = function(el, cssClass) {
+                if (el.classList) {
+                    el.classList.remove(cssClass);
+                } else if (el.className) {
+                    el.className = el.className.replace(new RegExp('\\b' + cssClass + '\\b', 'g'), ' ');
                 }
+            },
+
+            addClass = function(el, cssClass) {
+                if (el.classList) {
+                    if (!el.classList.contains(cssClass)) {
+                        el.classList.add(cssClass);
+                    }
+                } else if (el.className) {
+                    if (!hasClass(el, cssClass)) {
+                        el.className += " " + cssClass;
+                    }
+                }
+            },
+
+            toggleClass = function(el, cssClass) {
+                hasClass(el, cssClass) ? removeClass(el, cssClass) : addClass(el, cssClass);
             },
 
             getPreference = function(name) {
@@ -140,6 +156,39 @@
                             document.getElementById(activeTabId).style.display = 'block';
                         });
                     }
+                }
+            },
+
+            createToggles = function () {
+                var toggles = document.querySelectorAll('.sf-toggle');
+
+                for (var i = 0; i < toggles.length; i++) {
+                    var elementSelector = toggles[i].getAttribute('data-toggle-selector');
+                    var element = document.querySelector(elementSelector);
+                    Sfjs.addClass(element, 'sf-toggle-content');
+                    Sfjs.addClass(element, 'sf-toggle-hidden');
+
+                    Sfjs.addEventListener(toggles[i], 'click', function(e) {
+                        var toggle = e.target || e.srcElement;
+                        var element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
+
+                        Sfjs.toggleClass(element, 'sf-toggle-hidden');
+                        Sfjs.toggleClass(element, 'sf-toggle-visible');
+
+                        // the toggle doesn't change its contents when clickin on it
+                        if (!toggle.hasAttribute('data-toggle-alt-content')) {
+                            return false;
+                        }
+
+                        if (!toggle.hasAttribute('data-toggle-original-content')) {
+                            toggle.setAttribute('data-toggle-original-content', toggle.innerHTML);
+                        }
+
+                        var currentContent = toggle.innerHTML;
+                        var originalContent = toggle.getAttribute('data-toggle-original-content');
+                        var altContent = toggle.getAttribute('data-toggle-alt-content');
+                        toggle.innerHTML = currentContent != altContent ? altContent : originalContent;
+                    });
                 }
             },
 
@@ -318,6 +367,8 @@
 
             addClass: addClass,
 
+            toggleClass : toggleClass,
+
             getPreference: getPreference,
 
             setPreference: setPreference,
@@ -327,6 +378,8 @@
             request: request,
 
             createTabs: createTabs,
+
+            createToggles: createToggles,
 
             renderAjaxRequests: renderAjaxRequests,
 
@@ -369,5 +422,6 @@
 
     window.addEventListener("load", function() {
         Sfjs.createTabs();
+        Sfjs.createToggles();
     });
 /*]]>*/</script>

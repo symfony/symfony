@@ -80,6 +80,69 @@
 
             requestStack = [],
 
+            createTabs = function () {
+                var tabGroups = document.querySelectorAll('.sf-tabs');
+
+                // create the tab navigation for each group of tabs
+                for (var i = 0; i < tabGroups.length; i++) {
+                    var tabs = tabGroups[i].querySelectorAll('.tab');
+                    var tabNavigation = document.createElement('ul');
+                    tabNavigation.setAttribute('class', 'tab-navigation');
+
+                    for (var j = 0; j < tabs.length; j++) {
+                        var tabId = 'tab-' + i + '-' + j;
+                        var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
+
+                        var tabNavigationItem = document.createElement('li');
+                        tabNavigationItem.setAttribute('data-tab-id', tabId);
+                        tabNavigationItem.setAttribute('class', j == 0 ? 'active' : '');
+                        tabNavigationItem.innerHTML = tabTitle;
+                        tabNavigation.appendChild(tabNavigationItem);
+
+                        var tabContent = tabs[j].querySelector('.tab-content');
+                        tabContent.parentElement.setAttribute('id', tabId);
+                    }
+
+                    tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
+                }
+
+                // display the active tab and add the 'click' event listeners
+                for (var i = 0; i < tabGroups.length; i++) {
+                    var tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
+
+                    for (var j = 0; j < tabNavigation.length; j++) {
+                        var tabId = tabNavigation[j].getAttribute('data-tab-id');
+                        document.getElementById(tabId).querySelector('.tab-title').style.display = 'none';
+
+                        if (tabNavigation[j].classList.contains('active')) {
+                            document.getElementById(tabId).style.display = 'block';
+                        } else {
+                            document.getElementById(tabId).style.display = 'none';
+                        }
+
+                        tabNavigation[j].addEventListener('click', function(e) {
+                            var activeTab = e.target || e.srcElement;
+
+                            // needed because when the tab contains HTML contents, user can click
+                            // on any of those elements instead of their parent '<li>' element
+                            while (activeTab.tagName.toLowerCase() != 'li') {
+                                activeTab = activeTab.parentNode;
+                            }
+
+                            for (var k = 0; k < tabNavigation.length; k++) {
+                                var tabId = tabNavigation[k].getAttribute('data-tab-id');
+                                document.getElementById(tabId).style.display = 'none';
+                                tabNavigation[k].classList.remove('active');
+                            }
+
+                            activeTab.classList.add('active');
+                            var activeTabId = activeTab.getAttribute('data-tab-id');
+                            document.getElementById(activeTabId).style.display = 'block';
+                        });
+                    }
+                }
+            },
+
             renderAjaxRequests = function() {
                 var requestCounter = document.querySelectorAll('.sf-toolbar-ajax-requests');
                 if (!requestCounter.length) {
@@ -263,6 +326,8 @@
 
             request: request,
 
+            createTabs: createTabs,
+
             renderAjaxRequests: renderAjaxRequests,
 
             load: function(selector, url, onSuccess, onError, options) {
@@ -302,65 +367,7 @@
         }
     })();
 
-    // create the tabs
     window.addEventListener("load", function() {
-        var tabGroups = document.querySelectorAll('.tabs');
-
-        // create the tab navigation for each group of tabs
-        for (var i = 0; i < tabGroups.length; i++) {
-            var tabs = tabGroups[i].querySelectorAll('.tab');
-            var tabNavigation = document.createElement('ul');
-            tabNavigation.setAttribute('class', 'tab-navigation');
-
-            for (var j = 0; j < tabs.length; j++) {
-                var tabId = 'tab-' + i + '-' + j;
-                var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
-
-                var tabNavigationItem = document.createElement('li');
-                tabNavigationItem.setAttribute('data-tab-id', tabId);
-                tabNavigationItem.setAttribute('class', j == 0 ? 'active' : '');
-                tabNavigationItem.innerHTML = tabTitle;
-                tabNavigation.appendChild(tabNavigationItem);
-
-                var tabContent = tabs[j].querySelector('.tab-content');
-                tabContent.parentElement.setAttribute('id', tabId);
-            }
-
-            tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
-        }
-
-        // display the active tab and add the 'click' event listeners
-        for (var i = 0; i < tabGroups.length; i++) {
-            var tabNavigation = tabGroups[i].querySelectorAll('.tab-navigation li');
-
-            for (var j = 0; j < tabNavigation.length; j++) {
-                var tabId = tabNavigation[j].getAttribute('data-tab-id');
-                document.getElementById(tabId).querySelector('.tab-title').style.display = 'none';
-
-                if (tabNavigation[j].classList.contains('active')) {
-                    document.getElementById(tabId).style.display = 'block';
-                }
-
-                tabNavigation[j].addEventListener('click', function(e) {
-                    var activeTab = e.target || e.srcElement;
-
-                    // needed because when the tab contains HTML contents, user can click
-                    // on any of those elements instead of their parent '<li>' element
-                    while (activeTab.tagName.toLowerCase() != 'li') {
-                        activeTab = activeTab.parentNode;
-                    }
-
-                    for (k = 0; k < tabNavigation.length; k++) {
-                        var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                        document.getElementById(tabId).style.display = 'none';
-                        tabNavigation[k].classList.remove('active');
-                    }
-
-                    activeTab.classList.add('active');
-                    var activeTabId = activeTab.getAttribute('data-tab-id');
-                    document.getElementById(activeTabId).style.display = 'block';
-                });
-            }
-        }
+        Sfjs.createTabs();
     });
 /*]]>*/</script>

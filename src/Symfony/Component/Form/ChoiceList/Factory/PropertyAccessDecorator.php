@@ -151,12 +151,12 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceListInterface                                  $list             The choice list
-     * @param null|array|callable|string|PropertyPath              $preferredChoices The preferred choices
-     * @param null|callable|string|PropertyPath                    $label            The callable or path generating the choice labels
-     * @param null|callable|string|PropertyPath                    $index            The callable or path generating the view indices
-     * @param null|array|\Traversable|callable|string|PropertyPath $groupBy          The callable or path generating the group names
-     * @param null|array|callable|string|PropertyPath              $attr             The callable or path generating the HTML attributes
+     * @param ChoiceListInterface                     $list             The choice list
+     * @param null|array|callable|string|PropertyPath $preferredChoices The preferred choices
+     * @param null|callable|string|PropertyPath       $label            The callable or path generating the choice labels
+     * @param null|callable|string|PropertyPath       $index            The callable or path generating the view indices
+     * @param null|callable|string|PropertyPath       $groupBy          The callable or path generating the group names
+     * @param null|array|callable|string|PropertyPath $attr             The callable or path generating the HTML attributes
      *
      * @return ChoiceListView The choice list view
      */

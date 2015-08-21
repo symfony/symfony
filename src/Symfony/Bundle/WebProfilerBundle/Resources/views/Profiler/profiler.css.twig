@@ -260,7 +260,7 @@ p.help {
 
 {# Status
    ------------------------------------------------------------------------- #}
-.status-ok {
+.status-success {
     background: rgba(94, 151, 110, 0.3);
 }
 .status-warning {
@@ -269,7 +269,7 @@ p.help {
 .status-error {
     background: rgba(176, 65, 62, 0.1);
 }
-.status-ok td,
+.status-success td,
 .status-warning td,
 .status-error td {
     background: transparent;
@@ -339,29 +339,32 @@ p.help {
    ========================================================================= #}
 #summary .status {
     background: #E0E0E0;
-    border: solid rgba(0, 0, 0, 0.2);
+    border: solid rgba(0, 0, 0, 0.1);
     border-width: 2px 0;
     padding: 10px;
 }
-#summary .status-undefined {
-    border-color: rgba(0, 0, 0, 0.1);
-}
-#summary .status-undefined h2 {
-    margin: 8px 0;
-}
-#summary .status-ok      { background: #5E976E; }
-#summary .status-warning { background: #BC8034; }
-#summary .status-error   { background: #B0413E; }
-
-#summary #summary-url,
-#summary #summary-url a {
-    color: #FFF;
+#summary h2,
+#summary h2 a {
+    color: #222;
     font-size: 21px;
     margin: 0;
     text-decoration: none;
 }
-#summary #summary-url a:hover {
+#summary h2 a:hover {
     text-decoration: underline;
+}
+
+#summary .status-success { background: #5E976E; }
+#summary .status-warning { background: #BC8034; }
+#summary .status-error   { background: #B0413E; }
+
+#summary .status-success h2,
+#summary .status-success h2 a,
+#summary .status-warning h2,
+#summary .status-warning h2 a,
+#summary .status-error h2,
+#summary .status-error h2 a {
+    color: #FFF;
 }
 
 #summary dl.metadata {
@@ -677,7 +680,7 @@ body#search h3 {
 }
 #twig-dump .status-error   { background: transparent; color: #B0413E; }
 #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3);     }
-#twig-dump .status-ok      { background: rgba(100, 189, 99, 0.2);     }
+#twig-dump .status-success { background: rgba(100, 189, 99, 0.2);     }
 
 {# Logger panel
    ========================================================================= #}

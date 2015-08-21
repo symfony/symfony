@@ -50,7 +50,7 @@
     </thead>
     <tbody>
     {% for trace in traces %}
-        <tr class="{{ 1 == trace.level ? 'status-warning' : 2 == trace.level ? 'status-ok' : '' }}">
+        <tr class="{{ 1 == trace.level ? 'status-warning' : 2 == trace.level ? 'status-success' : '' }}">
             <td class="font-normal muted">{{ loop.index }}</td>
             <td>{{ trace.name }}</td>
             <td>{{ trace.path }}</td>

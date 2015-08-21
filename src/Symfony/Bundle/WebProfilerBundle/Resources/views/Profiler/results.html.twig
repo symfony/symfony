@@ -1,5 +1,13 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block summary %}
+    <div class="status">
+        <div class="container">
+            <h2>Profile Search</h2>
+        </div>
+    </div>
+{% endblock %}
+
 {% block panel %}
     <h3>{{ tokens ? tokens|length : 'No' }} results found</h3>
 
@@ -20,7 +28,7 @@
                     {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : '' %}
 
                     <tr class="{{ css_class }}">
-                        <td class="text-bold text-centered">{{ result.status_code|default('n/a') }}</td>
+                        <td class="text-bold">{{ result.status_code|default('n/a') }}</td>
                         <td class="nowrap">{{ result.ip }}</td>
                         <td>{{ result.method }}</td>
                         <td class="break-long-words">{{ result.url }}</td>

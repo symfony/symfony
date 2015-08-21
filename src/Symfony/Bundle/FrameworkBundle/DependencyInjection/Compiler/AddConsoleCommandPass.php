@@ -42,6 +42,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 throw new \InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must be a subclass of "Symfony\\Component\\Console\\Command\\Command".', $id));
             }
             $container->setAlias('console.command.'.strtolower(str_replace('\\', '_', $class)), $id);
+
+            if (isset($tags[0]['command'])) {
+                $definition->addMethodCall('setName', array($tags[0]['command']));
+            }
         }
 
         $container->setParameter('console.command.ids', array_keys($commandServices));

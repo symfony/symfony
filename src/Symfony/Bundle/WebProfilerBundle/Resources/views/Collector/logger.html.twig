@@ -113,14 +113,13 @@
     {% endif %}
 {% endblock %}
 
-{% macro render_table(logs, show_priority = false, is_deprecation = false) %}
+{% macro render_table(logs, show_level = false, is_deprecation = false) %}
     {% import _self as helper %}
 
     <table class="auto-layout logs">
         <thead>
             <tr>
-                <th>Time</th>
-                {% if show_priority %}<th>Priority</th>{% endif %}
+                <th>{{ show_level ? 'Level' : 'Time' }}</th>
                 <th>Channel</th>
                 <th>Message</th>
             </tr>
@@ -134,10 +133,15 @@
                     log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning' : ''
                 %}
                 <tr class="{{ css_class }}">
-                    <td class="font-normal text-small muted">{{ log.timestamp|date('H:i:s') }}</td>
-                    {% if show_priority %}<td class="font-normal text-small text-bold">{{ log.priorityName }}</td>{% endif %}
-                    <td class="font-normal text-small text-bold text-right">{{ log.channel }}</td>
-                    <td>{{ helper.render_log_message(log, is_deprecation) }}</td>
+                    <td class="font-normal text-small">
+                        {% if show_level %}
+                            <span class="text-bold nowrap">{{ log.priorityName }}</span>
+                        {% endif %}
+                        <span class="muted nowrap newline">{{ log.timestamp|date('H:i:s') }}</span>
+                    </td>
+
+                    <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+                    <td class="font-normal">{{ helper.render_log_message(log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}
         </tbody>

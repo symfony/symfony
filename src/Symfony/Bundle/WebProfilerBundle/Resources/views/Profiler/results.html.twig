@@ -26,7 +26,7 @@
                         <td class="break-long-words">{{ result.url }}</td>
                         <td class="text-small">
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
-                            <span class="nowrap">{{ result.time|date('H:i:s') }}</span>
+                            <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>
                         </td>
                         <td class="nowrap"><a href="{{ path('_profiler', { token: result.token }) }}">{{ result.token }}</a></td>
                     </tr>

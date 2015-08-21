@@ -761,7 +761,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @group legacy
      */
-    public function testCreateViewForLegacyChoiceList()
+    public function testCreateViewForNestedLegacyChoiceList()
     {
         // legacy ChoiceList instances provide legacy ChoiceView objects
         $preferred = array('Section 1' => array(new LegacyChoiceView('x', 'x', 'Preferred')));

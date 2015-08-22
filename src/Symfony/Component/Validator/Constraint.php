@@ -236,6 +236,8 @@ abstract class Constraint
     {
         if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
+        } else if (in_array($group, $this->groups) && !in_array(self::DEFAULT_GROUP, $this->groups)) {
+            $this->groups[] = self::DEFAULT_GROUP;
         }
     }
 

@@ -245,12 +245,16 @@ class TextDescriptor extends Descriptor
      */
     private function getColumnWidth(array $commands)
     {
-        $width = 0;
+        $widths = array();
+
         foreach ($commands as $command) {
-            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
+            $widths[] = strlen($command->getName());
+            foreach ($command->getAliases() as $alias) {
+                $widths[] = strlen($alias);
+            }
         }
 
-        return $width + 2;
+        return max($widths) + 2;
     }
 
     /**

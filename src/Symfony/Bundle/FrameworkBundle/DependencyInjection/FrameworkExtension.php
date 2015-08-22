@@ -971,7 +971,7 @@ class FrameworkExtension extends Extension
             );
         }
 
-        if ($config['name_converter']) {
+        if (isset($config['name_converter']) && $config['name_converter']) {
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
         }
     }

@@ -70,11 +70,17 @@ class XliffFileDumper extends FileDumper
             // Does the target contain characters requiring a CDATA section?
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
 
-            $t = $translation->appendChild($dom->createElement('target'));
+            $targetElement = $dom->createElement('target');
+            $metadata = $messages->getMetadata($source, $domain);
+            if ($this->hasMetadataArrayInfo('target-attributes', $metadata)) {
+                foreach ($metadata['target-attributes'] as $name => $value) {
+                    $targetElement->setAttribute($name, $value);
+                }
+            }
+            $t = $translation->appendChild($targetElement);
             $t->appendChild($text);
 
-            $metadata = $messages->getMetadata($source, $domain);
-            if (null !== $metadata && array_key_exists('notes', $metadata) && is_array($metadata['notes'])) {
+            if ($this->hasMetadataArrayInfo('notes', $metadata)) {
                 foreach ($metadata['notes'] as $note) {
                     if (!isset($note['content'])) {
                         continue;
@@ -105,5 +111,16 @@ class XliffFileDumper extends FileDumper
     protected function getExtension()
     {
         return 'xlf';
+    }
+
+    /**
+     * @param string     $key
+     * @param array|null $metadata
+     *
+     * @return bool
+     */
+    private function hasMetadataArrayInfo($key, $metadata = null)
+    {
+        return null !== $metadata && array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || is_array($metadata[$key]));
     }
 }

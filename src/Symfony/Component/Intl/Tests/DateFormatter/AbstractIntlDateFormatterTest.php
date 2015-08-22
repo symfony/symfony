@@ -348,6 +348,47 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFormatWithDateTimeZone()
+    {
+        if (defined('HHVM_VERSION_ID')) {
+            $this->markTestSkipped('This test cannot work on HHVM. See https://github.com/facebook/hhvm/issues/5875 for the issue.');
+        }
+
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithIntlTimeZone()
+    {
+        if (!class_exists('IntlTimeZone')) {
+            $this->markTestSkipped('This test requires the IntlTimeZone class from the Intl extension.');
+        }
+
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithTimezoneFromEnvironmentVariable()
+    {
+        $tz = getenv('TZ');
+        putenv('TZ=Europe/London');
+
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->getDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+
+        $this->assertEquals('Europe/London', getenv('TZ'));
+
+        // Restores TZ.
+        putenv('TZ='.$tz);
+    }
+
     public function testFormatWithTimezoneFromPhp()
     {
         $tz = date_default_timezone_get();

@@ -22,7 +22,7 @@ class TranslationDefaultDomainNodeVisitorTest extends \PHPUnit_Framework_TestCas
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testDefaultDomainAssignment(\Twig_Node $node)
     {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
@@ -48,7 +48,7 @@ class TranslationDefaultDomainNodeVisitorTest extends \PHPUnit_Framework_TestCas
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testNewModuleWithoutDefaultDomainTag(\Twig_Node $node)
     {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag

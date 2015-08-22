@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-14T15:04:48Z
+
+Ping @chanmix51
+
+---------------------------------------------------------------------------
+
+by chanmix51 at 2015-08-15T09:50:51Z
+
+Nice work :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-15T16:22:51Z
+
+Cool, thank you! Do you have any suggestions to make it better?
+
+---------------------------------------------------------------------------
+
+by chanmix51 at 2015-08-15T18:55:03Z
+
+@nicolas-grekas maybe yes. I have tested the result cast and afaicr I couldn't tell the index of the last fetched result. Postgres' cursors are scrollable, you can iterate several times on them and fetch directly the nth row of a result. I could not see that in the stub (maybe this data is not available but I think it is).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-15T20:47:17Z
+
+I found pg_result_seek() for seeking, but nothing for getting the current cursor position. Can you find a way to get it?
+
+---------------------------------------------------------------------------
+
+by chanmix51 at 2015-08-16T07:14:27Z
+
+Don't mind, there are no PHP functions for that, this is why it is kept in Pomm's iterators.
+
+All good !

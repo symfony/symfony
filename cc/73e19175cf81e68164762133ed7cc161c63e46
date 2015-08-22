@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-18T13:53:35Z
+
+@fabpot please check the test which is failing on 3 different jobs in the tests of the special Twig filesystem loader
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-18T14:05:30Z
+
+@stof I'm aware of that failing test and I see why it fails. Patch coming soon.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-22T07:38:24Z
+
+Now that all builds fail because of the deprecation notices and because fixing the remaining issue is not easy, I'm going to merge this one to reduce the noise.

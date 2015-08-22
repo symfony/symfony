@@ -380,6 +380,36 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFormatWithDateTimeZone()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
+        }
+
+        if (defined('HHVM_VERSION_ID')) {
+            $this->markTestSkipped('This test cannot work on HHVM. See https://github.com/facebook/hhvm/issues/5875 for the issue.');
+        }
+
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithIntlTimeZone()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
+        }
+
+        if (!class_exists('IntlTimeZone')) {
+            $this->markTestSkipped('This test requires the IntlTimeZone class from the Intl extension.');
+        }
+
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
     public function testFormatWithTimezoneFromEnvironmentVariable()
     {
         if (PHP_VERSION_ID >= 50500) {

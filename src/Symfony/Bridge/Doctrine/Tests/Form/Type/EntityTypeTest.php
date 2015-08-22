@@ -30,12 +30,16 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 
 class EntityTypeTest extends TypeTestCase
 {
     const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';
     const SINGLE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
+    const SINGLE_IDENT_NO_TO_STRING_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity';
     const SINGLE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity';
+    const SINGLE_ASSOC_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity';
     const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity';
     const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdEntity';
 
@@ -60,7 +64,9 @@ class EntityTypeTest extends TypeTestCase
         $classes = array(
             $this->em->getClassMetadata(self::ITEM_GROUP_CLASS),
             $this->em->getClassMetadata(self::SINGLE_IDENT_CLASS),
+            $this->em->getClassMetadata(self::SINGLE_IDENT_NO_TO_STRING_CLASS),
             $this->em->getClassMetadata(self::SINGLE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(self::SINGLE_ASSOC_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
         );
@@ -330,6 +336,31 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame('2', $field->getViewData());
     }
 
+    public function testSubmitSingleNonExpandedSingleAssocIdentifier()
+    {
+        $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
+        $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
+
+        $entity1 = new SingleAssociationToIntIdEntity($innerEntity1, 'Foo');
+        $entity2 = new SingleAssociationToIntIdEntity($innerEntity2, 'Bar');
+
+        $this->persist(array($innerEntity1, $innerEntity2, $entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'em' => 'default',
+            'class' => self::SINGLE_ASSOC_IDENT_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $field->submit('2');
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertSame($entity2, $field->getData());
+        $this->assertSame('2', $field->getViewData());
+    }
+
     public function testSubmitSingleNonExpandedCompositeIdentifier()
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
@@ -366,6 +397,35 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $field->submit(array('1', '3'));
+
+        $expected = new ArrayCollection(array($entity1, $entity3));
+
+        $this->assertTrue($field->isSynchronized());
+        $this->assertEquals($expected, $field->getData());
+        $this->assertSame(array('1', '3'), $field->getViewData());
+    }
+
+    public function testSubmitMultipleNonExpandedSingleAssocIdentifier()
+    {
+        $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
+        $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
+        $innerEntity3 = new SingleIntIdNoToStringEntity(3, 'InBaz');
+
+        $entity1 = new SingleAssociationToIntIdEntity($innerEntity1, 'Foo');
+        $entity2 = new SingleAssociationToIntIdEntity($innerEntity2, 'Bar');
+        $entity3 = new SingleAssociationToIntIdEntity($innerEntity3, 'Baz');
+
+        $this->persist(array($innerEntity1, $innerEntity2, $innerEntity3, $entity1, $entity2, $entity3));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'multiple' => true,
+            'expanded' => false,
+            'em' => 'default',
+            'class' => self::SINGLE_ASSOC_IDENT_CLASS,
             'choice_label' => 'name',
         ));
 
@@ -662,6 +722,29 @@ class EntityTypeTest extends TypeTestCase
         $this->assertNull($field->getData());
     }
 
+    public function testDisallowChoicesThatAreNotIncludedChoicesSingleAssocIdentifier()
+    {
+        $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
+        $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
+
+        $entity1 = new SingleAssociationToIntIdEntity($innerEntity1, 'Foo');
+        $entity2 = new SingleAssociationToIntIdEntity($innerEntity2, 'Bar');
+
+        $this->persist(array($innerEntity1, $innerEntity2, $entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_ASSOC_IDENT_CLASS,
+            'choices' => array($entity1, $entity2),
+            'choice_label' => 'name',
+        ));
+
+        $field->submit('3');
+
+        $this->assertFalse($field->isSynchronized());
+        $this->assertNull($field->getData());
+    }
+
     public function testDisallowChoicesThatAreNotIncludedChoicesCompositeIdentifier()
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
@@ -698,6 +781,34 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
                 ->where('e.id IN (1, 2)'),
+            'choice_label' => 'name',
+        ));
+
+        $field->submit('3');
+
+        $this->assertFalse($field->isSynchronized());
+        $this->assertNull($field->getData());
+    }
+
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier()
+    {
+        $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
+        $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
+        $innerEntity3 = new SingleIntIdNoToStringEntity(3, 'InBaz');
+
+        $entity1 = new SingleAssociationToIntIdEntity($innerEntity1, 'Foo');
+        $entity2 = new SingleAssociationToIntIdEntity($innerEntity2, 'Bar');
+        $entity3 = new SingleAssociationToIntIdEntity($innerEntity3, 'Baz');
+
+        $this->persist(array($innerEntity1, $innerEntity2, $innerEntity3, $entity1, $entity2, $entity3));
+
+        $repository = $this->em->getRepository(self::SINGLE_ASSOC_IDENT_CLASS);
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_ASSOC_IDENT_CLASS,
+            'query_builder' => $repository->createQueryBuilder('e')
+                ->where('e.entity IN (1, 2)'),
             'choice_label' => 'name',
         ));
 

@@ -18,7 +18,7 @@ use Symfony\Bridge\Twig\Node\TransNode;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
+class TranslationNodeVisitor extends \Twig_BaseNodeVisitor
 {
     const UNDEFINED_DOMAIN = '_undefined';
 
@@ -45,7 +45,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    protected function doEnterNode(\Twig_Node $node, \Twig_Environment $env)
     {
         if (!$this->enabled) {
             return $node;
@@ -85,7 +85,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
+    protected function doLeaveNode(\Twig_Node $node, \Twig_Environment $env)
     {
         return $node;
     }

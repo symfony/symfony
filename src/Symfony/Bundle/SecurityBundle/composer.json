@@ -38,7 +38,7 @@
         "symfony/yaml": "~2.0,>=2.0.5",
         "symfony/expression-language": "~2.6",
         "doctrine/doctrine-bundle": "~1.2",
-        "twig/twig": "~1.12",
+        "twig/twig": "~1.20|~2.0",
         "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {

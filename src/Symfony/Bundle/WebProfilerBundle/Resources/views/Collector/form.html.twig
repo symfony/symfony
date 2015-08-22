@@ -418,6 +418,7 @@
 {% endblock %}
 
 {% macro form_tree_entry(name, data, expanded) %}
+    {% import _self as tree %}
     <li>
         <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
             {% if data.children is not empty %}
@@ -434,7 +435,7 @@
         {% if data.children is not empty %}
             <ul id="{{ data.id }}-children"{% if not expanded %} class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
-                    {{ form_tree_entry(childName, childData, false) }}
+                    {{ tree.form_tree_entry(childName, childData, false) }}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -442,6 +443,7 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data, forms_by_hash) %}
+    {% import _self as tree %}
     <div class="tree-details" {% if data.id is defined %} id="{{ data.id }}-details"{% endif %}>
         <h2>
             {{ name|default('(no name)') }}
@@ -673,6 +675,6 @@
     </div>
 
     {% for childName, childData in data.children %}
-        {{ form_tree_details(childName, childData, forms_by_hash) }}
+        {{ tree.form_tree_details(childName, childData, forms_by_hash) }}
     {% endfor %}
 {% endmacro %}

@@ -195,7 +195,7 @@
 {# Labels #}
 
 {%- block form_label -%}
-    {% if label is not sameas(false) %}
+    {% if label is not same as(false) %}
         {%- if not compound -%}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {%- endif -%}

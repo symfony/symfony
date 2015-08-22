@@ -42,7 +42,7 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $compiler = new \Twig_Compiler(new \Twig_Environment());
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
 
         $this->assertEquals(
             sprintf(

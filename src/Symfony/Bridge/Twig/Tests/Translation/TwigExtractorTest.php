@@ -23,7 +23,7 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = new \Twig_Loader_Array(array());
+        $loader = $this->getMock('Twig_LoaderInterface');
         $twig = new \Twig_Environment($loader, array(
             'strict_variables' => true,
             'debug' => true,
@@ -78,7 +78,7 @@ class TwigExtractorTest extends TestCase
      */
     public function testExtractSyntaxError()
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Array(array()));
+        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
         $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
 
         $extractor = new TwigExtractor($twig);

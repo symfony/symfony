@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "twig/twig": "~1.12,>=1.12.3"
+        "twig/twig": "~1.20|~2.0"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",

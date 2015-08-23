@@ -135,6 +135,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
                 '"foo" matches "/foo/"',
             ),
+            array(
+                new Node\BetweenNode(new Node\ConstantNode(10), new Node\ConstantNode(20), new Node\ConstantNode(30)),
+                '10 between 20 and 30',
+            ),
 
             // chained calls
             array(

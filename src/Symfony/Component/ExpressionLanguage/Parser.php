@@ -42,6 +42,7 @@ class Parser
             '-' => array('precedence' => 500),
             '+' => array('precedence' => 500),
         );
+
         $this->binaryOperators = array(
             'or' => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
             '||' => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
@@ -61,6 +62,7 @@ class Parser
             'not in' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
             'in' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
             'matches' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            'between' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
             '..' => array('precedence' => 25,  'associativity' => Parser::OPERATOR_LEFT),
             '+' => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
             '-' => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
@@ -113,8 +115,17 @@ class Parser
             $op = $this->binaryOperators[$token->value];
             $this->stream->next();
 
-            $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
-            $expr = new Node\BinaryNode($token->value, $expr, $expr1);
+            if ('between' === $token->value) {
+                $expr1 = $this->parsePrimaryExpression();
+                $this->stream->expect(Token::OPERATOR_TYPE, 'and');
+                $expr2 = $this->parsePrimaryExpression();
+
+                $expr = new Node\BetweenNode($expr, $expr1, $expr2);
+            } else {
+                $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
+
+                $expr = new Node\BinaryNode($token->value, $expr, $expr1);
+            }
 
             $token = $this->stream->current;
         }

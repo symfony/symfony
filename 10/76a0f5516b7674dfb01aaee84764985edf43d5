@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-14T10:25:12Z
+
+:+1:
+
+Should we also simplify the constructor of the Twig's Code extension? See https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bridge/Twig/Extension/CodeExtension.php#L34
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-14T10:30:10Z
+
+@javiereguiluz the bridge could be used without the FrameworkBundle

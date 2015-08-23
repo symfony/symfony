@@ -628,7 +628,7 @@
                     <th>{{ option }}</th>
                     <td><pre>{{ value }}</pre></td>
                     <td>
-                        {% if data.resolved_options[option] is sameas(value) %}
+                        {% if data.resolved_options[option] is same as(value) %}
                             <em>same as passed value</em>
                         {% else %}
                             <pre>{{ data.resolved_options[option] }}</pre>

@@ -23,7 +23,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDumpTag($template, $debug, $expectedOutput, $expectedDumped)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new \Twig_Environment(new \Twig_Loader_String(), array(
+        $twig = new \Twig_Environment(new \Twig_Loader_Array(array('template' => $template)), array(
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
@@ -35,7 +35,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
         $prevDumper = VarDumper::setHandler(function ($var) use (&$dumped) {$dumped = $var;});
 
         try {
-            $this->assertEquals($expectedOutput, $twig->render($template));
+            $this->assertEquals($expectedOutput, $twig->render('template'));
         } catch (\Exception $exception) {
         }
 
@@ -63,7 +63,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new \Twig_Environment(new \Twig_Loader_String(), array(
+        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array(
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,

@@ -1,5 +1,5 @@
 <div id="sfwdt{{ token }}" class="sf-toolbar" style="display: none"></div>
-{% include '@WebProfiler/Profiler/base_js.html.twig' %}
+{{ include('@WebProfiler/Profiler/base_js.html.twig') }}
 <script>/*<![CDATA[*/
     (function () {
         {% if 'top' == position %}

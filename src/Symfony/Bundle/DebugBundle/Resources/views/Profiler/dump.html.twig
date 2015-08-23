@@ -61,10 +61,10 @@
                 {% endif %}
                 <small>line {{ dump.line }}</small>
 
-                <a class="text-small" onclick="var s = this.parentElement.nextElementSibling; if ('sf-dump-compact' == s.className) {this.innerHTML = 'Hide code'; s.className = 'sf-dump-expanded';} else {this.innerHTML = 'Show code'; s.className = 'sf-dump-compact';}">Show code</a>
+                <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}" data-toggle-alt-content="Hide code">Show code</a>
             </h3>
 
-            <div class="sf-dump-compact">
+            <div class="sf-dump-compact" id="sf-trace-{{ loop.index0 }}">
                 <div class="trace">
                     {{ dump.fileExcerpt ? dump.fileExcerpt|raw : dump.file|file_excerpt(dump.line) }}
                 </div>

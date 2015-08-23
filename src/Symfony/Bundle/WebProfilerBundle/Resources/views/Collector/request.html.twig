@@ -121,7 +121,9 @@
                         <p>Request content not available (it was retrieved as a resource).</p>
                     </div>
                 {% elseif collector.content %}
-                    <pre>{{ collector.content }}</pre>
+                    <div class="card">
+                        <pre class="break-long-words">{{ collector.content }}</pre>
+                    </div>
                 {% else %}
                     <div class="empty">
                         <p>No content</p>

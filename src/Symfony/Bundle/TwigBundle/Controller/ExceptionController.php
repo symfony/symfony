@@ -63,7 +63,7 @@ class ExceptionController
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
-            $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
+            (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
             array(
                 'status_code' => $code,
                 'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
@@ -125,9 +125,11 @@ class ExceptionController
         return new TemplateReference('TwigBundle', 'Exception', $showException ? 'exception_full' : $name, 'html', 'twig');
     }
 
-    // to be removed when the minimum required version of Twig is >= 2.0
+    // to be removed when the minimum required version of Twig is >= 3.0
     protected function templateExists($template)
     {
+        $template = (string) $template;
+
         $loader = $this->twig->getLoader();
         if ($loader instanceof \Twig_ExistsLoaderInterface) {
             return $loader->exists($template);

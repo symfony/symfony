@@ -303,9 +303,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             if (isset($this->children[$name])) {
                 $normalized[$name] = $this->children[$name]->normalize($val);
                 unset($value[$name]);
-            } elseif (false === $this->removeExtraKeys) {
+            } elseif (!$this->removeExtraKeys) {
                 $normalized[$name] = $val;
-                unset($value[$name]);
             }
         }
 

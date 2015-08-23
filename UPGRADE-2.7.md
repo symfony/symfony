@@ -473,7 +473,7 @@ Form
    After:
 
    ```jinja
-   {{ choice_translation_domain is sameas(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}
+   {{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}
    ```
 
 Serializer

@@ -12,12 +12,12 @@
 namespace Symfony\Component\Security\Acl\Permission;
 
 /**
- * Retrieves the MaskBuilder
+ * Retrieves the MaskBuilder.
  */
 interface MaskBuilderRetrievalInterface
 {
     /**
-     * Returns a new instance of the MaskBuilder used in the permissionMap
+     * Returns a new instance of the MaskBuilder used in the permissionMap.
      *
      * @return MaskBuilderInterface
      */

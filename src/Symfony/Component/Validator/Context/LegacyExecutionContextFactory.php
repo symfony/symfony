@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Implemented for backward compatibility with Symfony < 2.5.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated since version 2.5, to be removed in 3.0.

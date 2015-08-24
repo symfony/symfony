@@ -315,7 +315,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
         $bar->start();
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 200; ++$i) {
             $bar->advance();
         }
 
@@ -384,7 +384,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $output->write("\n");
         $bar3->start();
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             // up two lines
             $output->write("\033[2A");
             if ($i <= 2) {

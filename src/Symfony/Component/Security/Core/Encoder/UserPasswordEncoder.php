@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Encoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * A generic password encoder
+ * A generic password encoder.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
  */

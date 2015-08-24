@@ -177,7 +177,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a Mongo instance
+     * Return a Mongo instance.
      *
      * @return \Mongo
      */

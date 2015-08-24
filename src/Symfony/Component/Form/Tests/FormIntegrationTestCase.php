@@ -20,8 +20,8 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseFormIntegrationTe
 abstract class FormIntegrationTestCase extends BaseFormIntegrationTestCase
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         @trigger_error('The '.__CLASS__.' class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Test\FormIntegrationTestCase class instead.', E_USER_DEPRECATED);

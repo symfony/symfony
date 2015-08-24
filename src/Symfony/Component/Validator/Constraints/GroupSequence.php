@@ -102,7 +102,6 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      * @return \Traversable The iterator
      *
      * @see \IteratorAggregate::getIterator()
-     *
      * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function getIterator()

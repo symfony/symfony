@@ -45,12 +45,14 @@ class Isbn extends Constraint
 
     /**
      * @deprecated since version 2.5, to be removed in 3.0. Use option "type" instead.
+     *
      * @var bool
      */
     public $isbn10 = false;
 
     /**
      * @deprecated since version 2.5, to be removed in 3.0. Use option "type" instead.
+     *
      * @var bool
      */
     public $isbn13 = false;

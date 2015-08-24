@@ -41,21 +41,21 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 {
     /**
-     * The loader for loading the class metadata
+     * The loader for loading the class metadata.
      *
      * @var LoaderInterface|null
      */
     protected $loader;
 
     /**
-     * The cache for caching class metadata
+     * The cache for caching class metadata.
      *
      * @var CacheInterface|null
      */
     protected $cache;
 
     /**
-     * The loaded metadata, indexed by class name
+     * The loaded metadata, indexed by class name.
      *
      * @var ClassMetadata[]
      */

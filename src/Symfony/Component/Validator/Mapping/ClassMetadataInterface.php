@@ -25,6 +25,7 @@ use Symfony\Component\Validator\PropertyMetadataContainerInterface as LegacyProp
  * should be traversed or not.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see MetadataInterface

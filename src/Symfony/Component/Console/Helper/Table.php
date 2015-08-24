@@ -247,7 +247,7 @@ class Table
         }
 
         $markup = $this->style->getCrossingChar();
-        for ($column = 0; $column < $count; $column++) {
+        for ($column = 0; $column < $count; ++$column) {
             $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->columnWidths[$column]).$this->style->getCrossingChar();
         }
 
@@ -340,7 +340,7 @@ class Table
     private function buildTableRows($rows)
     {
         $unmergedRows = array();
-        for ($rowKey = 0; $rowKey < count($rows); $rowKey++) {
+        for ($rowKey = 0; $rowKey < count($rows); ++$rowKey) {
             $rows = $this->fillNextRows($rows, $rowKey);
 
             // Remove any new line breaks and replace it with a new line

@@ -20,6 +20,7 @@ final class Validation
 {
     /**
      * The Validator API provided by Symfony 2.4 and older.
+     *
      * @deprecated use API_VERSION_2_5_BC instead.
      */
     const API_VERSION_2_4 = 1;

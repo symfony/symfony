@@ -116,7 +116,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
                 if (!isset($templates[$p->getTemplate()])) {
                     $templates[$p->getTemplate()] = 1;
                 } else {
-                    $templates[$p->getTemplate()]++;
+                    ++$templates[$p->getTemplate()];
                 }
             }
 

@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Kernel;
 class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Test to ensure BC without RequestStack
+     * Test to ensure BC without RequestStack.
      *
      * @group legacy
      */
@@ -79,7 +79,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subRequest =  $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+        $subRequest = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();
 

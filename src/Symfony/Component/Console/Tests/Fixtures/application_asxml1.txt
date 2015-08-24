@@ -97,7 +97,7 @@
     <command id="foo:bar" name="foo:bar">
   <usage>foo:bar</usage>
   <description>The foo:bar command</description>
-  <help/>
+  <help>The foo:bar command</help>
   <aliases>
     <alias>afoobar</alias>
   </aliases>

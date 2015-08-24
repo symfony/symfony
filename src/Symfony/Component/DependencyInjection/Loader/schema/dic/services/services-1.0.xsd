@@ -85,6 +85,7 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="autowiring-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
@@ -103,6 +104,7 @@
     <xsd:attribute name="decorates" type="xsd:string" />
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
+    <xsd:attribute name="autowire" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="tag">

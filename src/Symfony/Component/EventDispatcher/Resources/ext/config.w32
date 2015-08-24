@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("symfony_eventdispatcher", "for symfony_eventdispatcher support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("symfony_eventdispatcher", "enable symfony_eventdispatcher support", "no");
+
+if (PHP_SYMFONY_EVENTDISPATCHER != "no") {
+	EXTENSION("symfony_eventdispatcher", "symfony_eventdispatcher.c");
+}
+

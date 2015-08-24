@@ -34,6 +34,8 @@ before_install:
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (pecl install -f memcached-2.1.0 && echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without memcache extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini); fi;
+    - if [ "$C_EXT" == "yes" ]; then sh -c "cd src/Symfony/Component/EventDispatcher/Resources/ext && phpize && ./configure && make && sudo make install"; fi
+    - if [ "$C_EXT" == "yes" ]; then echo "extension=symfony_eventdispatcher.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`; fi
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
     # Build a standalone phpunit without symfony/yaml and that works around https://github.com/sebastianbergmann/phpunit-mock-objects/issues/223
     - (mkdir phpunit && cd phpunit && wget https://github.com/sebastianbergmann/phpunit/archive/4.7.zip && unzip 4.7.zip && cd phpunit-4.7 && composer remove --no-update symfony/yaml && composer require --prefer-source phpunit/phpunit-mock-objects '2.3.0')

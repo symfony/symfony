@@ -18,7 +18,7 @@
         {% endif %}
     {% endset %}
 
-    {% set request_status_code_color = (400 > collector.statuscode) ? ((200 == collector.statuscode) ? 'green' : 'yellow') : 'red' %}
+    {% set request_status_code_color = (collector.statuscode >= 400) ? 'red' : (collector.statuscode >= 300) ? 'yellow' : 'green' %}
 
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
@@ -29,30 +29,32 @@
     {% endset %}
 
     {% set text %}
-        {% spaceless %}
+        <div class="sf-toolbar-info-piece">
+            <b>HTTP status</b>
+            <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Controller</b>
+            <span>{{ request_handler }}</span>
+        </div>
+
+        {% if collector.controller.class is defined %}
             <div class="sf-toolbar-info-piece">
-                <b>HTTP status</b>
-                <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
+                <b>Controller class</b>
+                <span>{{ collector.controller.class }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Controller</b>
-                <span>{{ request_handler }}</span>
-            </div>
-            {% if collector.controller.class is defined %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Controller class</b>
-                    <span>{{ collector.controller.class }}</span>
-                </div>
-            {% endif %}
-            <div class="sf-toolbar-info-piece">
-                <b>Route name</b>
-                <span>{{ collector.route|default('NONE') }}</span>
-            </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Has session</b>
-                <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
-            </div>
-        {% endspaceless %}
+        {% endif %}
+
+        <div class="sf-toolbar-info-piece">
+            <b>Route name</b>
+            <span>{{ collector.route|default('NONE') }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Has session</b>
+            <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
+        </div>
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
@@ -73,42 +75,42 @@
             <div class="tab-content">
                 <h3>GET Parameters</h3>
 
-                {% if collector.requestquery.all|length %}
-                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
-                {% else %}
+                {% if collector.requestquery.all is empty %}
                     <div class="empty">
                         <p>No GET parameters</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestquery }, with_context = false) }}
                 {% endif %}
 
                 <h3>POST Parameters</h3>
 
-                {% if collector.requestrequest.all|length %}
-                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
-                {% else %}
+                {% if collector.requestrequest.all is empty %}
                     <div class="empty">
                         <p>No POST parameters</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest }, with_context = false) }}
                 {% endif %}
 
                 <h3>Request Attributes</h3>
 
-                {% if collector.requestattributes.all|length %}
-                    {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
-                {% else %}
+                {% if collector.requestattributes.all is empty %}
                     <div class="empty">
                         <p>No attributes</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestattributes }, with_context = false) }}
                 {% endif %}
 
                 <h3>Cookies</h3>
 
-                {% if collector.requestcookies.all|length %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
-                {% else %}
+                {% if collector.requestcookies.all is empty %}
                     <div class="empty">
                         <p>No cookies</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestcookies }, with_context = false) }}
                 {% endif %}
 
                 <h3>Request Headers</h3>
@@ -131,7 +133,7 @@
                 {% endif %}
 
                 <h3>Server Parameters</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, 'class': 'auto-layout' }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, class: 'auto-layout' }, with_context = false) }}
             </div>
         </div>
 
@@ -151,22 +153,22 @@
             <div class="tab-content">
                 <h3>Session Metadata</h3>
 
-                {% if collector.sessionmetadata|length %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionmetadata }, with_context = false) }}
-                {% else %}
+                {% if collector.sessionmetadata is empty %}
                     <div class="empty">
                         <p>No session metadata</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionmetadata }, with_context = false) }}
                 {% endif %}
 
                 <h3>Session Attributes</h3>
 
-                {% if collector.sessionattributes|length %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
-                {% else %}
+                {% if collector.sessionattributes is empty %}
                     <div class="empty">
                         <p>No session attributes</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.sessionattributes, labels: ['Attribute', 'Value'] }, with_context = false) }}
                 {% endif %}
             </div>
         </div>
@@ -177,12 +179,12 @@
             <div class="tab-content">
                 <h3>Flashes</h3>
 
-                {% if collector.flashes|length %}
-                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
-                {% else %}
+                {% if collector.flashes is empty %}
                     <div class="empty">
                         <p>No flash messages were created.</p>
                     </div>
+                {% else %}
+                    {{ include('@WebProfiler/Profiler/table.html.twig', { data: collector.flashes }, with_context = false) }}
                 {% endif %}
             </div>
         </div>

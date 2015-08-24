@@ -16,7 +16,7 @@
 
         <div class="sf-toolbar-info-piece">
             <b>PHP memory limit</b>
-            <span>{{ collector.memoryLimit == -1 ? '&infin;' : '%.0f'|format(collector.memoryLimit / 1024 / 1024)|escape }} MB</span>
+            <span>{{ collector.memoryLimit == -1 ? 'Unlimited' : '%.0f MB'|format(collector.memoryLimit / 1024 / 1024)|escape }}</span>
         </div>
     {% endset %}
 

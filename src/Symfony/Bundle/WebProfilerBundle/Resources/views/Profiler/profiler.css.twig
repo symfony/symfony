@@ -22,11 +22,12 @@ body {
     line-height: 1.4;
 }
 
-h2, h3 {
+h2, h3, h4 {
     font-weight: 500;
     margin: 1.5em 0 .5em;
 }
-h2 + h3 {
+h2 + h3,
+h3 + h4 {
     margin-top: 1em;
 }
 h2 {
@@ -35,8 +36,11 @@ h2 {
 h3 {
     font-size: 21px;
 }
-h2 span, h3 span,
-h2 small, h3 small {
+h4 {
+    font-size: 18px;
+}
+h2 span, h3 span, h4 span,
+h2 small, h3 small, h4 small {
     color: #999;
 }
 
@@ -55,6 +59,12 @@ a {
 }
 a:hover {
     text-decoration: underline;
+}
+a.link-inverse {
+    text-decoration: underline;
+}
+a.link-inverse:hover {
+    text-decoration: none;
 }
 a:active,
 a:hover {
@@ -149,24 +159,12 @@ table tbody td {
     {{ mixins.break_long_words|raw }}
 }
 
+table tbody div {
+    margin: .25em 0;
+}
+
 {# Utility classes
    ========================================================================= #}
-.muted,
-.help {
-    color: #999;
-}
-p.help {
-    font-size: 14px;
-    margin-bottom: .5em;
-}
-
-.empty {
-    border: 4px dashed #E0E0E0;
-    color: #999;
-    margin: 1em 0;
-    padding: .5em 2em;
-}
-
 .hidden {
     display: none;
 }
@@ -182,18 +180,40 @@ p.help {
 .text-small {
     font-size: 12px !important;
 }
+.text-muted {
+    color: #999;
+}
 .text-bold {
     font-weight: bold;
 }
 .text-right {
     text-align: right;
 }
-.text-centered {
+.text-center {
     text-align: center;
 }
 .font-normal {
     {{ mixins.sans_serif_font|raw }}
     font-size: 14px;
+}
+.help {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: .5em;
+}
+.empty {
+    border: 4px dashed #E0E0E0;
+    color: #999;
+    margin: 1em 0;
+    padding: .5em 2em;
+}
+.label {
+    background-color: #666;
+    color: #FAFAFA;
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 7px;
+    white-space: nowrap;
 }
 
 {# Metrics
@@ -228,6 +248,7 @@ p.help {
 }
 .metric .label {
     background: #E0E0E0;
+    color: #222;
     display: block;
     font-size: 12px;
     font-weight: bold;
@@ -265,6 +286,14 @@ p.help {
     {{ mixins.subtle_border_and_shadow|raw }};
     margin: 1em 0;
     padding: 10px;
+}
+.card-block + .card-block {
+    border-top: 1px solid #E0E0E0;
+    padding-top: 10px;
+}
+.card *:first-child,
+.card-block *:first-child {
+    margin-top: 0;
 }
 
 {# Status
@@ -511,6 +540,7 @@ body#search h3 {
     text-decoration: none;
 }
 #menu-profiler li a .label {
+    background: transparent;
     color: #EEE;
     display: block;
     padding: 8px 10px 8px 50px;
@@ -709,28 +739,6 @@ table.logs .metadata strong {
 
 {# Doctrine panel
    ========================================================================= #}
-.sql-queries th span {
-    color: #999;
-}
-.sql-section
-.sql-actions {
-    margin-top: 4px;
-}
-.sql-actions a {
-    {{ mixins.sans_serif_font|raw }}
-    font-size: 12px;
-    margin-right: 1em;
-    text-decoration: underline;
-}
-.sql-actions a:hover {
-    text-decoration: none;
-}
-.sql-parameters {
-    margin: 4px 0;
-}
-.sql-parameters strong {
-    {{ mixins.sans_serif_font|raw }}
-}
 .sql-runnable {
     background: #F5F5F5;
     margin: .5em 0;

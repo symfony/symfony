@@ -8,11 +8,7 @@
         {% set icon %}
             {{ include('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">
-                {% if collector.data.nb_errors %}
-                    {{ collector.data.nb_errors }}
-                {% else %}
-                    {{ collector.data.forms|length }}
-                {% endif %}
+                {{ collector.data.nb_errors ?: collector.data.forms|length }}
             </span>
         {% endset %}
 
@@ -32,158 +28,159 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.data.forms is empty ? 'disabled' : '' }}">
+    <span class="label {{ collector.data.forms is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
     </span>
 {% endblock %}
 
-{% block panel %}
-    <style type="text/css">
-    #tree-menu {
-        float: left;
-        padding-right: 10px;
-        width: 230px;
-    }
-    #tree-menu ul {
-        list-style: none;
-        margin: 0;
-        padding-left: 0;
-    }
-    #tree-menu li {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-    }
-    #tree-menu .empty {
-        border: 0;
-        mmargin: 0;
-        padding: 0;
-    }
-    #tree-details-container {
-        border-left: 1px solid #DDD;
-        margin-left: 250px;
-        padding-left: 20px;
-    }
-    .tree-details {
-        padding-bottom: 40px;
-    }
-    .tree-details h3 {
-        font-size: 18px;
-        position: relative;
-    }
+{% block head %}
+    {{ parent() }}
 
-    .toggle-icon {
-        display: inline-block;
-        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDgwx4LcKwAAAABVQTFRFAAAA////////////////ZmZm////bvjBwAAAAAV0Uk5TABZwsuCVEUjgAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgTQgQGWgA7h2uIFwK+CWwp1BpHvYEqDuATEYkBlY3IOmBq6dCPcAAIT5Eg2IksjQAAAAAElFTkSuQmCC") no-repeat top left #5eb5e0;
-    }
-    .closed .toggle-icon, .closed.toggle-icon {
-        background-position: bottom left;
-    }
-    .toggle-icon.empty {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QAZgBmAGYHukptAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhIf6CA40AAAAFRJREFUOMvtk7ENACEMA61vfx767MROWfO+AdGBHlNyTZrYUZRYDBII4NWE1pNdpFarfgLUbpDaBEgBYRiEVjsvDLa1l6O4Z3wkFWN+OfLKdpisOH/TlICzukmUJwAAAABJRU5ErkJggg==");
-    }
+    <style>
+        #tree-menu {
+            float: left;
+            padding-right: 10px;
+            width: 230px;
+        }
+        #tree-menu ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 0;
+        }
+        #tree-menu li {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #tree-menu .empty {
+            border: 0;
+            mmargin: 0;
+            padding: 0;
+        }
+        #tree-details-container {
+            border-left: 1px solid #DDD;
+            margin-left: 250px;
+            padding-left: 20px;
+        }
+        .tree-details {
+            padding-bottom: 40px;
+        }
+        .tree-details h3 {
+            font-size: 18px;
+            position: relative;
+        }
 
-    .tree .tree-inner {
-        cursor: pointer;
-        padding: 5px 7px 5px 22px;
-        position: relative;
+        .toggle-icon {
+            display: inline-block;
+            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDgwx4LcKwAAAABVQTFRFAAAA////////////////ZmZm////bvjBwAAAAAV0Uk5TABZwsuCVEUjgAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgTQgQGWgA7h2uIFwK+CWwp1BpHvYEqDuATEYkBlY3IOmBq6dCPcAAIT5Eg2IksjQAAAAAElFTkSuQmCC") no-repeat top left #5eb5e0;
+        }
+        .closed .toggle-icon, .closed.toggle-icon {
+            background-position: bottom left;
+        }
+        .toggle-icon.empty {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QAZgBmAGYHukptAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhIf6CA40AAAAFRJREFUOMvtk7ENACEMA61vfx767MROWfO+AdGBHlNyTZrYUZRYDBII4NWE1pNdpFarfgLUbpDaBEgBYRiEVjsvDLa1l6O4Z3wkFWN+OfLKdpisOH/TlICzukmUJwAAAABJRU5ErkJggg==");
+        }
 
-    }
-    .tree .toggle-button {
-        /* provide a bigger clickable area than just 10x10px */
-        width: 16px;
-        height: 16px;
-        /* vertically center the button */
-        position: absolute;
-        top: 50%;
-        margin-top: -8px;
-        margin-left: -18px;
-    }
-    .tree .toggle-icon {
-        width: 10px;
-        height: 10px;
-        /* position the icon in the center of the clickable area */
-        margin-left: 3px;
-        margin-top: 3px;
-        background-size: 10px 20px;
-        background-color: #ccc;
-    }
-    .tree .toggle-icon.empty {
-        width: 10px;
-        height: 10px;
-        position: absolute;
-        top: 50%;
-        margin-top: -5px;
-        margin-left: -15px;
-        background-size: 10px 10px;
-    }
-    .tree ul ul .tree-inner {
-        padding-left: 37px;
-    }
-    .tree ul ul ul .tree-inner {
-        padding-left: 52px;
-    }
-    .tree ul ul ul ul .tree-inner {
-        padding-left: 67px;
-    }
-    .tree ul ul ul ul ul .tree-inner {
-        padding-left: 82px;
-    }
-    .tree .tree-inner:hover {
-        background: #dfdfdf;
-    }
-    .tree .tree-inner.active, .tree .tree-inner.active:hover {
-        background: #E0E0E0;
-        font-weight: bold;
-    }
-    .tree .tree-inner.active .toggle-icon, .tree .tree-inner:hover .toggle-icon, .tree .tree-inner.active:hover .toggle-icon {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhEYXWn+sAAAABhQTFRFAAAA39/f39/f39/f39/fZmZm39/f////gc3YPwAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgXIgQGWgA7h2uIFwK+CWwp1BpHvYC6DuATEYkBlY3IOmBq6dCPcAADqLE4MnBi/fAAAAAElFTkSuQmCC");
-        background-color: #999;
-    }
-    .tree .tree-inner.active .toggle-icon.empty, .tree .tree-inner:hover .toggle-icon.empty, .tree .tree-inner.active:hover .toggle-icon.empty {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhoucSey4gAAABVQTFRFAAAA39/f39/f39/f39/fZmZm39/fD5Dx2AAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAADJJREFUCNdjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBnIA3DtcAPhVsAthTkDAFOfBKW9C1iqAAAAAElFTkSuQmCC");
-    }
-    .tree-details .toggle-icon {
-        width: 16px;
-        height: 16px;
-        /* vertically center the button */
-        position: absolute;
-        top: 50%;
-        margin-top: -9px;
-        margin-left: 6px;
-    }
-    .form-type {
-        color: #999999;
-    }
-    .hidden {
-        display: none;
-    }
-    .badge-error {
-        float: right;
-        background: #B0413E;
-        color: #FFF;
-        padding: 1px 4px;
-        font-size: 10px;
-        font-weight: bold;
-        vertical-align: middle;
-    }
-    .errors h3 {
-        color: #B0413E;
-    }
-    .errors th {
-        background: #B0413E;
-        color: #FFF;
-    }
-    .errors .toggle-icon {
-        background-color: #B0413E;
-    }
-    h3 a, h3 a:hover, h3 a:focus {
-        color: inherit;
-        text-decoration: inherit;
-    }
+        .tree .tree-inner {
+            cursor: pointer;
+            padding: 5px 7px 5px 22px;
+            position: relative;
+
+        }
+        .tree .toggle-button {
+            /* provide a bigger clickable area than just 10x10px */
+            width: 16px;
+            height: 16px;
+            /* vertically center the button */
+            position: absolute;
+            top: 50%;
+            margin-top: -8px;
+            margin-left: -18px;
+        }
+        .tree .toggle-icon {
+            width: 10px;
+            height: 10px;
+            /* position the icon in the center of the clickable area */
+            margin-left: 3px;
+            margin-top: 3px;
+            background-size: 10px 20px;
+            background-color: #ccc;
+        }
+        .tree .toggle-icon.empty {
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            top: 50%;
+            margin-top: -5px;
+            margin-left: -15px;
+            background-size: 10px 10px;
+        }
+        .tree ul ul .tree-inner {
+            padding-left: 37px;
+        }
+        .tree ul ul ul .tree-inner {
+            padding-left: 52px;
+        }
+        .tree ul ul ul ul .tree-inner {
+            padding-left: 67px;
+        }
+        .tree ul ul ul ul ul .tree-inner {
+            padding-left: 82px;
+        }
+        .tree .tree-inner:hover {
+            background: #dfdfdf;
+        }
+        .tree .tree-inner.active, .tree .tree-inner.active:hover {
+            background: #E0E0E0;
+            font-weight: bold;
+        }
+        .tree .tree-inner.active .toggle-icon, .tree .tree-inner:hover .toggle-icon, .tree .tree-inner.active:hover .toggle-icon {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhEYXWn+sAAAABhQTFRFAAAA39/f39/f39/f39/fZmZm39/f////gc3YPwAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAAE1JREFUGNNjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBmwgXIgQGWgA7h2uIFwK+CWwp1BpHvYC6DuATEYkBlY3IOmBq6dCPcAADqLE4MnBi/fAAAAAElFTkSuQmCC");
+            background-color: #999;
+        }
+        .tree .tree-inner.active .toggle-icon.empty, .tree .tree-inner:hover .toggle-icon.empty, .tree .tree-inner.active:hover .toggle-icon.empty {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QweDhoucSey4gAAABVQTFRFAAAA39/f39/f39/f39/fZmZm39/fD5Dx2AAAAAV0Uk5TAAtAc6ZeVyCYAAAAAWJLR0QF+G/pxwAAADJJREFUCNdjSHMSYGBgUEljSGYAAzMGBwiDhUEBwmBiEIAwGBnIA3DtcAPhVsAthTkDAFOfBKW9C1iqAAAAAElFTkSuQmCC");
+        }
+        .tree-details .toggle-icon {
+            width: 16px;
+            height: 16px;
+            /* vertically center the button */
+            position: absolute;
+            top: 50%;
+            margin-top: -9px;
+            margin-left: 6px;
+        }
+        .form-type {
+            color: #999;
+        }
+        .badge-error {
+            float: right;
+            background: #B0413E;
+            color: #FFF;
+            padding: 1px 4px;
+            font-size: 10px;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+        .errors h3 {
+            color: #B0413E;
+        }
+        .errors th {
+            background: #B0413E;
+            color: #FFF;
+        }
+        .errors .toggle-icon {
+            background-color: #B0413E;
+        }
+        h3 a, h3 a:hover, h3 a:focus {
+            color: inherit;
+            text-decoration: inherit;
+        }
     </style>
+{% endblock %}
 
+{% block panel %}
     <h2>Forms</h2>
 
     {% if collector.data.forms|length %}
@@ -466,8 +463,7 @@
         <div class="errors">
             <h3>
                 <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#">
-                    Errors
-                    <span class="toggle-icon"></span>
+                    Errors <span class="toggle-icon"></span>
                 </a>
             </h3>
 
@@ -527,8 +523,7 @@
         {% if data.default_data is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#">
-                Default Data
-                <span class="toggle-icon"></span>
+                Default Data <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -547,7 +542,7 @@
                             {% if data.default_data.model is defined %}
                                 {{ data.default_data.model }}
                             {% else %}
-                                <em class="font-normal muted">same as normalized format</em>
+                                <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
                         </td>
                     </tr>
@@ -561,7 +556,7 @@
                             {% if data.default_data.view is defined %}
                                 {{ data.default_data.view }}
                             {% else %}
-                                <em class="font-normal muted">same as normalized format</em>
+                                <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
                         </td>
                     </tr>
@@ -573,8 +568,7 @@
         {% if data.submitted_data is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
-                Submitted Data
-                <span class="toggle-icon"></span>
+                Submitted Data <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -594,7 +588,7 @@
                             {% if data.submitted_data.view is defined %}
                                 {{ data.submitted_data.view }}
                             {% else %}
-                                <em class="font-normal muted">same as normalized format</em>
+                                <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
                         </td>
                     </tr>
@@ -608,7 +602,7 @@
                             {% if data.submitted_data.model is defined %}
                                 {{ data.submitted_data.model }}
                             {% else %}
-                                <em class="font-normal muted">same as normalized format</em>
+                                <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
                         </td>
                     </tr>
@@ -625,8 +619,7 @@
         {% if data.passed_options is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#">
-                Passed Options
-                <span class="toggle-icon"></span>
+                Passed Options <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -647,7 +640,7 @@
                     <td>{{ value }}</td>
                     <td>
                         {% if data.resolved_options[option] is same as(value) %}
-                            <em class="font-normal muted">same as passed value</em>
+                            <em class="font-normal text-muted">same as passed value</em>
                         {% else %}
                             {{ data.resolved_options[option] }}
                         {% endif %}
@@ -667,8 +660,7 @@
         {% if data.resolved_options is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#">
-                Resolved Options
-                <span class="toggle-icon"></span>
+                Resolved Options <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -695,8 +687,7 @@
         {% if data.view_vars is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#">
-                View Variables
-                <span class="toggle-icon"></span>
+                View Variables <span class="toggle-icon"></span>
             </a>
         </h3>
 

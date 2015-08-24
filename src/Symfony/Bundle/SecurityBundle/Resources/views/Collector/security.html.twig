@@ -19,10 +19,12 @@
                 <b>Logged in as</b>
                 <span>{{ collector.user }}</span>
             </div>
+
             <div class="sf-toolbar-info-piece">
                 <b>Authenticated</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
             </div>
+
             {% if collector.tokenClass != null %}
             <div class="sf-toolbar-info-piece">
                 <b>Token class</b>
@@ -51,10 +53,9 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Security token</h2>
+    <h2>Security Token</h2>
 
     {% if collector.tokenClass %}
-
         <div class="metrics">
             <div class="metric">
                 <span class="value">{{ collector.user == 'anon.' ? 'Anonymous' : collector.user }}</span>
@@ -93,7 +94,7 @@
                 </tr>
                 {% endif %}
 
-                {% if collector.tokenClass != null %}
+                {% if collector.tokenClass %}
                 <tr>
                     <th>Token class</th>
                     <td>{{ collector.tokenClass }}</td>

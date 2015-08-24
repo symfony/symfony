@@ -12,51 +12,41 @@
 {% block panel %}
     <h2>Event Dispatcher</h2>
 
-    {% if collector.calledlisteners|length > 0 %}
-        {{ block('panelContent') }}
-    {% else %}
+    {% if collector.calledlisteners is empty %}
         <div class="empty">
             <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
         </div>
+    {% else %}
+        <div class="sf-tabs">
+            <div class="tab">
+                <h3 class="tab-title">Called Listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
+
+                <div class="tab-content">
+                    {{ helper.render_table(collector.calledlisteners, true) }}
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></h3>
+                <div class="tab-content">
+                    {% if collector.notcalledlisteners is empty %}
+                        <div class="empty">
+                            <p>
+                                <strong>There are no uncalled listeners</strong>.
+                            </p>
+                            <p>
+                                All listeners were called for this request or an error occurred
+                                when trying to collect uncalled listeners (in which case check the
+                                logs to get more information).
+                            </p>
+                        </div>
+                    {% else %}
+                        {{ helper.render_table(collector.notcalledlisteners) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     {% endif %}
-{% endblock %}
-
-{% block panelContent %}
-    <div class="sf-tabs">
-        <div class="tab">
-            <h3 class="tab-title">Called listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
-
-            <div class="tab-content">
-                {{ helper.render_table(collector.calledlisteners, true) }}
-            </div>
-        </div>
-
-        <div class="tab">
-            <h3 class="tab-title">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></h3>
-            <div class="tab-content">
-                {% if collector.notcalledlisteners|length > 0 %}
-                    {# sort collector.notcalledlisteners alphabetically #}
-                    {% set notcalledlisteners = [] %}
-                    {% for key in collector.notcalledlisteners|keys|sort %}
-                        {% set notcalledlisteners = notcalledlisteners|merge([ collector.notcalledlisteners[key] ]) %}
-                    {% endfor %}
-
-                    {{ helper.render_table(collector.notcalledlisteners) }}
-                {% else %}
-                    <div class="empty">
-                        <p>
-                            <strong>There are no uncalled listeners</strong>.
-                        </p>
-                        <p>
-                            All listeners were called for this request or an error occurred
-                            when trying to collect uncalled listeners (in which case check the
-                            logs to get more information).
-                        </p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 {% macro render_table(events, show_order = false) %}
@@ -71,23 +61,23 @@
         <tbody>
         {% for listener in events %}
             <tr>
-                {% if show_order %}<td class="text-small muted font-normal">{{ loop.index }}</td>{% endif %}
+                {% if show_order %}<td class="text-small text-muted font-normal">{{ loop.index }}</td>{% endif %}
                 <td class="font-normal text-small text-bold">{{ listener.event }}</td>
                 <td class="font-normal">
                     {% if listener.type == 'Closure' %}
 
                         Closure
-                        <span class="muted text-small">(there is no class or file information)</span>
+                        <span class="text-muted text-small">(there is no class or file information)</span>
 
                     {% elseif listener.type == 'Function' %}
 
                         {% set link = listener.file|file_link(listener.line) %}
                         {% if link %}
                             <a href="{{ link }}">{{ listener.function }}()</a>
-                            <span class="muted text-small">({{ listener.file }})</span>
+                            <span class="text-muted text-small">({{ listener.file }})</span>
                         {% else %}
                             {{ listener.function }}()
-                            <span class="muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
+                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
                         {% endif %}
 
                     {% elseif listener.type == "Method" %}
@@ -97,10 +87,10 @@
 
                         {% if link %}
                             <a href="{{ link }}"><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()</a>
-                            <span class="text-small muted">({{ listener.class }})</span>
+                            <span class="text-muted text-small">({{ listener.class }})</span>
                         {% else %}
                             <span>{{ class_namespace }}\</span><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()
-                            <span class="muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
+                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
                         {% endif %}
 
                     {% endif %}

@@ -1,12 +1,10 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% set dumps_count = collector.dumpsCount %}
-
-    {% if dumps_count %}
+    {% if collector.dumpsCount %}
         {% set icon %}
             {{ include('@Debug/Profiler/icon.svg') }}
-            <span class="sf-toolbar-value">{{ dumps_count }}</span>
+            <span class="sf-toolbar-value">{{ collector.dumpsCount }}</span>
         {% endset %}
 
         {% set text %}
@@ -25,6 +23,7 @@
                     {% endif %}
                     </span>
                     <span class="sf-toolbar-file-line">line {{ dump.line }}</span>
+
                     {{ dump.data|raw }}
                 </div>
             {% endfor %}
@@ -36,16 +35,20 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ not collector.dumpsCount ? 'disabled' }}">
+    <span class="label {{ collector.dumpsCount == 0 ? 'disabled' }}">
         <span class="icon">{{ include('@Debug/Profiler/icon.svg') }}</span>
         <strong>Debug</strong>
     </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Dumped contents</h2>
+    <h2>Dumped Contents</h2>
 
-    {% if collector.dumpsCount %}
+    {% if collector.dumpsCount == 0 %}
+        <div class="empty">
+            <p>No content was dumped.</p>
+        </div>
+    {% else %}
         {% for dump in collector.getDumps('html') %}
         <div class="sf-dump sf-reset">
             <h3>In
@@ -64,7 +67,7 @@
                 <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}" data-toggle-alt-content="Hide code">Show code</a>
             </h3>
 
-            <div class="sf-dump-compact" id="sf-trace-{{ loop.index0 }}">
+            <div class="sf-dump-compact hidden" id="sf-trace-{{ loop.index0 }}">
                 <div class="trace">
                     {{ dump.fileExcerpt ? dump.fileExcerpt|raw : dump.file|file_excerpt(dump.line) }}
                 </div>
@@ -73,9 +76,5 @@
             {{ dump.data|raw }}
         </div>
         {% endfor %}
-    {% else %}
-        <div class="empty">
-            <p>No variable or content was dumped.</p>
-        </div>
     {% endif %}
 {% endblock %}

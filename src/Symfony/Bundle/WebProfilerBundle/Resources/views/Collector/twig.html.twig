@@ -38,8 +38,14 @@
 {% endblock %}
 
 {% block panel %}
-    {% if collector.templatecount %}
-        <h2>Twig metrics</h2>
+    {% if collector.templatecount == 0 %}
+        <h2>Twig</h2>
+
+        <div class="empty">
+            <p>No Twig templates were rendered for this request.</p>
+        </div>
+    {% else %}
+        <h2>Twig Metrics</h2>
 
         <div class="metrics">
             <div class="metric">
@@ -90,10 +96,6 @@
 
         <div id="twig-dump">
             {{ collector.htmlcallgraph }}
-        </div>
-    {% else %}
-        <div class="empty">
-            <p>No Twig templates were rendered for this request.</p>
         </div>
     {% endif %}
 {% endblock %}

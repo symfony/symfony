@@ -1,4 +1,4 @@
-<h2>Routing information</h2>
+<h2>Routing</h2>
 
 <div class="metrics">
     <div class="metric">
@@ -14,30 +14,31 @@
     {% endif %}
 </div>
 
-<h3>Route parameters</h3>
+<h3>Route Parameters</h3>
 
-{% if request.routeParams|length %}
-    {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
-{% else %}
+{% if request.routeParams is empty %}
     <div class="empty">
         <p>No parameters.</p>
     </div>
+{% else %}
+    {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
 {% endif %}
 
 {% if router.redirect %}
-    <h3>Route redirection</h3>
-    <p>
-        <strong>This page redirects to:</strong> "{{ router.targetUrl }}"
-        {% if router.targetRoute %}<span class="muted">(route: "{{ router.targetRoute }}")</span>{% endif %}
-    </p>
+    <h3>Route Redirection</h3>
+
+    <p>This page redirects to:</p>
+    <div class="card" style="break-long-words">
+        {{ router.targetUrl }}
+        {% if router.targetRoute %}<span class="text-muted">(route: "{{ router.targetRoute }}")</span>{% endif %}
+    </div>
 {% endif %}
 
-<h3>Route matching logs</h3>
+<h3>Route Matching Logs</h3>
 
-<table class="auto-layout">
-    <thead><tr><th>Path to match</th></tr></thead>
-    <tbody><tr><td>{{ request.pathinfo }}</td></tr></tbody>
-</table>
+<div class="card">
+    <strong>Path to match:</strong> <code>{{ request.pathinfo }}</code>
+</div>
 
 <table id="router-logs" class="auto-layout">
     <thead>
@@ -50,11 +51,20 @@
     </thead>
     <tbody>
     {% for trace in traces %}
-        <tr class="{{ 1 == trace.level ? 'status-warning' : 2 == trace.level ? 'status-success' : '' }}">
-            <td class="font-normal muted">{{ loop.index }}</td>
+        <tr class="{{ trace.level == 1 ? 'status-warning' : trace.level == 2 ? 'status-success' }}">
+            <td class="font-normal text-muted">{{ loop.index }}</td>
             <td>{{ trace.name }}</td>
             <td>{{ trace.path }}</td>
-            <td class="font-normal">{{ trace.level in [1, 2] ? trace.log : 'Path does not match' }}</td>
+            <td class="font-normal">
+                {% if trace.level == 1 %}
+                    Path almost matches, but
+                    <span class="newline">{{ trace.log }}</span>
+                {% elseif trace.level == 2 %}
+                    {{ trace.log }}
+                {% else %}
+                    Path does not match
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </tbody>

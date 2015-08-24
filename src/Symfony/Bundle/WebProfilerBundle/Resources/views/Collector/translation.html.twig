@@ -6,7 +6,7 @@
     {% if collector.messages|length %}
         {% set icon %}
             {{ include('@WebProfiler/Icon/translation.svg') }}
-            {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' : '' %}
+            {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
             <span class="sf-toolbar-value">{{ error_count ?: collector.countdefines }}</span>
         {% endset %}
@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' : '' }} {{ collector.messages is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.countMissings ? 'error' : collector.countFallbacks ? 'warning' }} {{ collector.messages is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/translation.svg') }}</span>
         <strong>Translation</strong>
         {% if collector.countMissings or collector.countFallbacks %}
@@ -61,7 +61,7 @@
 {% endblock %}
 
 {% block panelContent %}
-    <h2>Translation metrics</h2>
+    <h2>Translation Metrics</h2>
 
     <div class="metrics">
         <div class="metric">
@@ -80,74 +80,74 @@
         </div>
     </div>
 
-    <h2>Translation messages</h2>
+    <h2>Translation Messages</h2>
 
     {# sort translation messages in groups #}
-    {% set defined, missing, fallback = [], [], [] %}
+    {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
     {% for message in collector.messages %}
         {% if message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_DEFINED') %}
-            {% set defined = defined|merge([message]) %}
+            {% set messages_defined = messages_defined|merge([message]) %}
         {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_MISSING') %}
-            {% set missing = missing|merge([message]) %}
+            {% set messages_missing = messages_missing|merge([message]) %}
         {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK') %}
-            {% set fallback = fallback|merge([message]) %}
+            {% set messages_fallback = messages_fallback|merge([message]) %}
         {% endif %}
     {% endfor %}
 
     <div class="sf-tabs">
         <div class="tab">
-            <h3 class="tab-title">Defined <span class="badge">{{ collector.countdefines }}</span></h3>
+            <h3 class="tab-title">Defined <span class="badge">{{ messages_defined|length }}</span></h3>
 
             <div class="tab-content">
-                <p>
+                <p class="help">
                     These messages are correctly translated into the given locale.
                 </p>
 
-                {% if collector.countdefines > 0 %}
-                    {{ helper.render_table(defined) }}
-                {% else %}
+                {% if messages_defined is empty %}
                     <div class="empty">
-                        <p>There are no messages of this category.</p>
+                        <p>None of the used translation messages are defined for the given locale.</p>
                     </div>
+                {% else %}
+                    {{ helper.render_table(messages_defined) }}
                 {% endif %}
             </div>
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Fallback <span class="badge">{{ collector.countFallbacks }}</span></h3>
+            <h3 class="tab-title">Fallback <span class="badge">{{ messages_fallback|length }}</span></h3>
 
             <div class="tab-content">
-                <p>
-                    These messages are not available for the application locale but
-                    Symfony found them in the fallback locale catalog.
+                <p class="help">
+                    These messages are not available for the given locale
+                    but Symfony found them in the fallback locale catalog.
                 </p>
 
-                {% if collector.countFallbacks > 0 %}
-                    {{ helper.render_table(fallback) }}
-                {% else %}
+                {% if messages_fallback is empty %}
                     <div class="empty">
-                        <p>There are no messages of this category.</p>
+                        <p>No fallback translation messages were used.</p>
                     </div>
+                {% else %}
+                    {{ helper.render_table(messages_fallback) }}
                 {% endif %}
             </div>
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Missing <span class="badge">{{ collector.countMissings }}</span></h3>
+            <h3 class="tab-title">Missing <span class="badge">{{ messages_missing|length }}</span></h3>
 
             <div class="tab-content">
-                <p>
+                <p class="help">
                     These messages are not available for the given locale and cannot
                     be found in the fallback locales. Add them to the translation
                     catalogue to avoid Symfony outputting untranslated contents.
                 </p>
 
-                {% if collector.countMissings > 0 %}
-                    {{ helper.render_table(missing) }}
-                {% else %}
+                {% if messages_missing is empty %}
                     <div class="empty">
                         <p>There are no messages of this category.</p>
                     </div>
+                {% else %}
+                    {{ helper.render_table(messages_missing) }}
                 {% endif %}
             </div>
         </div>
@@ -179,20 +179,13 @@
                     {% endif %}
 
                     {% if message.parameters|length > 0 %}
-                        <div>
-                            [<a href="#" onclick="return openParameters(this);" style="text-decoration: none;"
-                                title="Toggle parameters display" data-target-id="parameters-{{ loop.index }}" >
-                                <img alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: inline; width: 12px; height: 12px;" />
-                                <img alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: none; width: 12px; height: 12px;" />
-                                <span style="vertical-align:top">Parameters</span>
-                            </a>]
+                        <a class="newline text-small sf-toggle" data-toggle-selector="#parameters-{{ loop.index }}" data-toggle-alt-content="Hide parameters">Show parameters</a>
 
-                            <div id="parameters-{{ loop.index }}" style="display: none;">
-                                {% for parameters in message.parameters %}
-                                    {{ profiler_dump(parameters) }}
-                                    {% if not loop.last %}<br />{% endif %}
-                                {% endfor %}
-                            </div>
+                        <div id="parameters-{{ loop.index }}" class="hidden">
+                            {% for parameters in message.parameters %}
+                                {{ profiler_dump(parameters) }}
+                                {% if not loop.last %}<br />{% endif %}
+                            {% endfor %}
                         </div>
                     {% endif %}
                 </td>

@@ -1,0 +1,4 @@
+services:
+    foo_service:
+        class:    FooClass
+        types:    [ Foo, Bar ]

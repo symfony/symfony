@@ -299,6 +299,20 @@ class YamlFileLoader extends FileLoader
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
+        if (isset($service['types'])) {
+            if (!is_array($service['types'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "types" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            }
+
+            foreach ($service['types'] as $type) {
+                if (!is_string($type)) {
+                    throw new InvalidArgumentException(sprintf('A "types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+
+                $definition->addType($type);
+            }
+        }
+
         $this->container->setDefinition($id, $definition);
     }
 

@@ -494,4 +494,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Baz', $barConfigurator[0]->getClass());
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
+
+    public function testType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services22.xml');
+
+        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getTypes());
+    }
 }

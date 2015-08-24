@@ -41,6 +41,7 @@ class Definition
     private $synchronized = false;
     private $lazy = false;
     private $decoratedService;
+    private $types = array();
 
     protected $arguments;
 
@@ -817,5 +818,72 @@ class Definition
     public function getConfigurator()
     {
         return $this->configurator;
+    }
+
+    /**
+     * Sets types that will default to this definition.
+     *
+     * @param string[] $types
+     *
+     * @return Definition The current instance
+     */
+    public function setTypes(array $types)
+    {
+        $this->types = array();
+
+        foreach ($types as $type) {
+            $this->types[$type] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets types that will default to this definition.
+     *
+     * @return string[]
+     */
+    public function getTypes()
+    {
+        return array_keys($this->types);
+    }
+
+    /**
+     * Adds a type that will default to this definition.
+     *
+     * @param string $type
+     *
+     * @return Definition The current instance
+     */
+    public function addType($type)
+    {
+        $this->types[$type] = true;
+
+        return $this;
+    }
+
+    /**
+     * Removes a type.
+     *
+     * @param string $type
+     *
+     * @return Definition The current instance
+     */
+    public function removeType($type)
+    {
+        unset($this->types[$type]);
+
+        return $this;
+    }
+
+    /**
+     * Will this definition default for the given type?
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function hasType($type) {
+        return isset($this->types[$type]);
     }
 }

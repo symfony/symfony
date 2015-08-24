@@ -149,6 +149,33 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
+    public function testAskWithChoicesHidden()
+    {
+        $questionHelper = new QuestionHelper();
+        $questionHelper->setInputStream($this->getInputStream("Banana\n"));
+
+        $fruits = array('Apple', 'Banana', 'Orange');
+
+        $question = new ChoiceQuestion('What is your favourite fruit?', $fruits, 1);
+
+        $this->assertFalse($question->isChoicesHidden());
+
+        $question->setChoicesHidden(true);
+
+        $this->assertTrue($question->isChoicesHidden());
+
+        $this->assertEquals('Banana', $questionHelper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question));
+
+        rewind($output->getStream());
+        $stream = stream_get_contents($output->getStream());
+
+        $this->assertContains('What is your favourite fruit?', $stream);
+
+        $this->assertNotContains('[0] Apple', $stream);
+        $this->assertNotContains('[1] Banana', $stream);
+        $this->assertNotContains('[2] Orange', $stream);
+    }
+
     /**
      * @dataProvider getAskConfirmationData
      */

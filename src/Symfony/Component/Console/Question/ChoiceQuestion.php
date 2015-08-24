@@ -19,6 +19,7 @@ namespace Symfony\Component\Console\Question;
 class ChoiceQuestion extends Question
 {
     private $choices;
+    private $choicesHidden = false;
     private $multiselect = false;
     private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
@@ -47,6 +48,30 @@ class ChoiceQuestion extends Question
     public function getChoices()
     {
         return $this->choices;
+    }
+
+    /**
+     * Sets whether the choices are hidden or not.
+     *
+     * @param bool $choicesHidden True to hide the choices, otherwise false
+     *
+     * @return $this
+     */
+    public function setChoicesHidden($choicesHidden)
+    {
+        $this->choicesHidden = (bool) $choicesHidden;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether the choices must be hidden.
+     *
+     * @return bool
+     */
+    public function isChoicesHidden()
+    {
+        return $this->choicesHidden;
     }
 
     /**

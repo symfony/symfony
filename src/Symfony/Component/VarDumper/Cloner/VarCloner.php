@@ -77,7 +77,7 @@ class VarCloner extends AbstractCloner
                     $zval['type'] = gettype($v);
                 }
                 if ($zval['zval_isref']) {
-                    $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
+                    $queue[$i][$k] = &$stub;    // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
                     if (isset($hardRefs[$zval['zval_hash']])) {
                         $queue[$i][$k] = $useExt ? ($v = $hardRefs[$zval['zval_hash']]) : ($step[$k] = $v);
@@ -130,7 +130,7 @@ class VarCloner extends AbstractCloner
                                 unset($v[$gid]);
                                 $a = array();
                                 foreach ($v as $gk => &$gv) {
-                                    $a[$gk] =& $gv;
+                                    $a[$gk] = &$gv;
                                 }
                             } else {
                                 $a = $v;
@@ -210,7 +210,7 @@ class VarCloner extends AbstractCloner
                             $step[$k] = new Stub();
                             $step[$k]->value = $stub;
                             $h = spl_object_hash($step[$k]);
-                            $queue[$i][$k] = $hardRefs[$h] =& $step[$k];
+                            $queue[$i][$k] = $hardRefs[$h] = &$step[$k];
                             $values[$h] = $v;
                         }
                         $queue[$i][$k]->handle = ++$refs;
@@ -249,7 +249,7 @@ class VarCloner extends AbstractCloner
                         $step[$k] = $queue[$i][$k] = new Stub();
                         $step[$k]->value = $v;
                         $h = spl_object_hash($step[$k]);
-                        $hardRefs[$h] =& $step[$k];
+                        $hardRefs[$h] = &$step[$k];
                         $values[$h] = $v;
                     }
                     $queue[$i][$k]->handle = ++$refs;

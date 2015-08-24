@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Asset\Context;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-
 /**
  * A context that does nothing.
  *

@@ -506,7 +506,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('echo foo');
 
         $this->assertSame($process, $process->mustRun());
-        $this->assertEquals("foo".PHP_EOL, $process->getOutput());
+        $this->assertEquals('foo'.PHP_EOL, $process->getOutput());
     }
 
     public function testSuccessfulMustRunHasCorrectExitCode()
@@ -541,7 +541,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(0.2, $end-$start);
+        $this->assertLessThan(0.2, $end - $start);
         $process->wait();
     }
 

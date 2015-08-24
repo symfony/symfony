@@ -159,7 +159,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 return true;
             }
 
-            $context['circular_reference_limit'][$objectHash]++;
+            ++$context['circular_reference_limit'][$objectHash];
         } else {
             $context['circular_reference_limit'][$objectHash] = 1;
         }

@@ -229,7 +229,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // the final value of the path must not be validated
             if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i+1);
+                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i + 1);
             }
 
             $propertyValues[] = &$propertyValue;

@@ -26,7 +26,7 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * An array of YAML class descriptions
+     * An array of YAML class descriptions.
      *
      * @var array
      */

@@ -109,7 +109,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
                     $result[$messageId]['parameters'][] = $message['parameters'];
                 }
 
-                $result[$messageId]['count']++;
+                ++$result[$messageId]['count'];
             }
 
             unset($messages[$key]);

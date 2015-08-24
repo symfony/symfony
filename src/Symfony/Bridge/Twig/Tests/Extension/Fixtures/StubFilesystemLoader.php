@@ -18,6 +18,6 @@ class StubFilesystemLoader extends \Twig_Loader_Filesystem
         // strip away bundle name
         $parts = explode(':', $name);
 
-        return parent::findTemplate(end($parts));
+        return parent::findTemplate(end($parts), $throw);
     }
 }

@@ -98,6 +98,7 @@ class ControllerTest extends TestCase
 
     /**
      * @param $token
+     *
      * @return ContainerInterface
      */
     private function getContainerWithTokenStorage($token = null)

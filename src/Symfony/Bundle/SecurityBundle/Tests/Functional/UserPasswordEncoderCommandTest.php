@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
 /**
- * Tests UserPasswordEncoderCommand
+ * Tests UserPasswordEncoderCommand.
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
  */

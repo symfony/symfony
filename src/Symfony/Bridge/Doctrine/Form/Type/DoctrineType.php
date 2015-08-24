@@ -129,7 +129,6 @@ abstract class DoctrineType extends AbstractType
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-
                 $hash = null;
                 $qbParts = null;
 
@@ -137,7 +136,6 @@ abstract class DoctrineType extends AbstractType
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
                 if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
-
                     $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
                         $options['class'],

@@ -114,7 +114,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a Memcached instance
+     * Return a Memcached instance.
      *
      * @return \Memcached
      */

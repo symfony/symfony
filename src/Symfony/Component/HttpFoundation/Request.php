@@ -1577,7 +1577,7 @@ class Request
 
             // Content passed in parameter (test)
             if (is_string($this->content)) {
-                $resource = fopen('php://temp','r+');
+                $resource = fopen('php://temp', 'r+');
                 fwrite($resource, $this->content);
                 rewind($resource);
 
@@ -2001,7 +2001,7 @@ class Request
         if (self::$requestFactory) {
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
-            if (!$request instanceof Request) {
+            if (!$request instanceof self) {
                 throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
             }
 

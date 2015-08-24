@@ -980,7 +980,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testContentAsResource()
     {
-        $resource = fopen('php://memory','r+');
+        $resource = fopen('php://memory', 'r+');
         fwrite($resource, 'My other content');
         rewind($resource);
 

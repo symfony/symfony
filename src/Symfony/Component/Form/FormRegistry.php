@@ -101,7 +101,7 @@ class FormRegistry implements FormRegistryInterface
         }
 
         if (isset($this->legacyNames[$name])) {
-            @trigger_error('Accessing types by their string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
         }
 
         return $this->types[$name];
@@ -171,7 +171,7 @@ class FormRegistry implements FormRegistryInterface
     public function hasType($name)
     {
         if (isset($this->legacyNames[$name])) {
-            @trigger_error('Accessing types by their string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
         }
 
         if (isset($this->types[$name])) {

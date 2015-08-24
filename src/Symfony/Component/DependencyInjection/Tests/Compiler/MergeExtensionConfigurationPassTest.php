@@ -44,7 +44,7 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getMock('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface');
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
-        $container->prependExtensionConfig('foo', array('bar' => true ));
+        $container->prependExtensionConfig('foo', array('bar' => true));
         $container->addExpressionLanguageProvider($provider);
 
         $pass = new MergeExtensionConfigurationPass();

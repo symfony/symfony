@@ -471,14 +471,17 @@ class FrameworkExtension extends Extension
     {
         $loader->load('templating.xml');
 
-        $links = array(
-            'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-            'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-            'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-            'sublime' => 'subl://open?url=file://%%f&line=%%l',
-        );
+        if (!$container->hasParameter('templating.helper.code.file_link_format')) {
+            $links = array(
+                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                'sublime' => 'subl://open?url=file://%%f&line=%%l',
+            );
 
-        $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
+            $container->setParameter('templating.helper.code.file_link_format', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+        }
+
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
         if ($container->getParameter('kernel.debug')) {

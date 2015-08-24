@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Tests\Fixtures\AlternatingRowType;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
 abstract class AbstractDivLayoutTest extends AbstractLayoutTest

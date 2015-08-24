@@ -1,4 +1,5 @@
 <?php
+
 $container->loadFromExtension('security', array(
     'providers' => array(
         'default' => array('id' => 'foo'),

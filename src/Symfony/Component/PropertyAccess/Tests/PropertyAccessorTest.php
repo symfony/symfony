@@ -458,7 +458,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(new TestClassSetValue(array('a' => array('b' => 'old-value'))), 'value[a][b]', 'new-value'),
             array(new \ArrayIterator(array('a' => array('b' => array('c' => 'old-value')))), '[a][b][c]', 'new-value'),
         );
-
     }
 
     /**
@@ -478,7 +477,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(new TestClassIsWritable(new \ArrayIterator(array('a' => array('b' => 'old-value')))), 'value[a][b]', true),
             array(new TestClassIsWritable(array('a' => array('b' => array('c' => new TestClassSetValue('old-value'))))), 'value[a][b][c].value', true),
         );
-
     }
 
     /**
@@ -488,5 +486,4 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
     }
-
 }

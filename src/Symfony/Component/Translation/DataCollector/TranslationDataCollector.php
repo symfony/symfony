@@ -104,7 +104,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
                 $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
                 $result[$messageId] = $message;
             } else {
-                $result[$messageId]['count']++;
+                ++$result[$messageId]['count'];
             }
 
             unset($messages[$key]);

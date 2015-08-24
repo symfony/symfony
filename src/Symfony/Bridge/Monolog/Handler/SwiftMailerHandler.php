@@ -45,7 +45,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     }
 
     /**
-     * After the CLI application has been terminated we will always flush messages
+     * After the CLI application has been terminated we will always flush messages.
      *
      * @param ConsoleTerminateEvent $event
      */

@@ -22,6 +22,7 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  * Proxy that invokes a data collector when creating a form and its view.
  *
  * @since  2.4
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface

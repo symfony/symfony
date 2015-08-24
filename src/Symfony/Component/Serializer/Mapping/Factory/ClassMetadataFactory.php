@@ -38,7 +38,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
     /**
      * @param LoaderInterface $loader
-     * @param Cache|null $cache
+     * @param Cache|null      $cache
      */
     public function __construct(LoaderInterface $loader, Cache $cache = null)
     {

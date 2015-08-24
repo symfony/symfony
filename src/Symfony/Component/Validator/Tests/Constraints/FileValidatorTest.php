@@ -247,17 +247,17 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             array(11, 10, false, '11', '10', 'bytes'),
 
             // round(size) == 1.01kB, limit == 1kB
-            array(ceil(1000*1.01), 1000, null, '1.01', '1', 'kB'),
-            array(ceil(1000*1.01), '1k', null, '1.01', '1', 'kB'),
-            array(ceil(1024*1.01), '1Ki', null, '1.01', '1', 'KiB'),
+            array(ceil(1000 * 1.01), 1000, null, '1.01', '1', 'kB'),
+            array(ceil(1000 * 1.01), '1k', null, '1.01', '1', 'kB'),
+            array(ceil(1024 * 1.01), '1Ki', null, '1.01', '1', 'KiB'),
 
-            array(ceil(1024*1.01), 1024, true, '1.01', '1', 'KiB'),
-            array(ceil(1024*1.01*1000), '1024k', true, '1010', '1000', 'KiB'),
-            array(ceil(1024*1.01), '1Ki', true, '1.01', '1', 'KiB'),
+            array(ceil(1024 * 1.01), 1024, true, '1.01', '1', 'KiB'),
+            array(ceil(1024 * 1.01 * 1000), '1024k', true, '1010', '1000', 'KiB'),
+            array(ceil(1024 * 1.01), '1Ki', true, '1.01', '1', 'KiB'),
 
-            array(ceil(1000*1.01), 1000, false, '1.01', '1', 'kB'),
-            array(ceil(1000*1.01), '1k', false, '1.01', '1', 'kB'),
-            array(ceil(1024*1.01*10), '10Ki', false, '10.34', '10.24', 'kB'),
+            array(ceil(1000 * 1.01), 1000, false, '1.01', '1', 'kB'),
+            array(ceil(1000 * 1.01), '1k', false, '1.01', '1', 'kB'),
+            array(ceil(1024 * 1.01 * 10), '10Ki', false, '10.34', '10.24', 'kB'),
         );
     }
 
@@ -266,7 +266,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testBinaryFormat($bytesWritten, $limit, $binaryFormat, $sizeAsString, $limitAsString, $suffix)
     {
-        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fseek($this->file, $bytesWritten - 1, SEEK_SET);
         fwrite($this->file, '0');
         fclose($this->file);
 

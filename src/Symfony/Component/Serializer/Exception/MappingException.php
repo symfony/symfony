@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * MappingException
+ * MappingException.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

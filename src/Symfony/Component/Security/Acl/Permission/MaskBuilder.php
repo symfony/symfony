@@ -124,7 +124,7 @@ class MaskBuilder extends AbstractMaskBuilder
     }
 
     /**
-     * Returns the mask for the passed code
+     * Returns the mask for the passed code.
      *
      * @param mixed $code
      *

@@ -134,7 +134,7 @@ class Stopwatch
     }
 
     /**
-     * Returns a specific event by name
+     * Returns a specific event by name.
      *
      * @param string $name The event name
      *

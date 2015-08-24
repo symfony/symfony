@@ -94,6 +94,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryClass($factoryClass)
@@ -111,6 +112,7 @@ class Definition
      * @return string|null The factory class name
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryClass($triggerDeprecationError = true)
@@ -130,6 +132,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryMethod($factoryMethod)
@@ -182,6 +185,7 @@ class Definition
      * @return string|null The factory method name
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryMethod($triggerDeprecationError = true)
@@ -201,6 +205,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryService($factoryService)
@@ -218,6 +223,7 @@ class Definition
      * @return string|null The factory service id
      *
      * @api
+     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryService($triggerDeprecationError = true)

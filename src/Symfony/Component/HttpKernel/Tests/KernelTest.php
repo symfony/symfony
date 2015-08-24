@@ -765,7 +765,7 @@ EOF;
     }
 
     /**
-     * Returns a mock for the BundleInterface
+     * Returns a mock for the BundleInterface.
      *
      * @return BundleInterface
      */

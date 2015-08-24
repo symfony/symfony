@@ -133,7 +133,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testErrorHandler()
     {
         $cmd = Command::create();
-        $handler = function() { return 'error-handler'; };
+        $handler = function () { return 'error-handler'; };
         $cmd->setErrorHandler($handler);
 
         $this->assertSame($handler, $cmd->getErrorHandler());

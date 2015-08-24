@@ -1479,7 +1479,7 @@ class Request
 
             // Content passed in parameter (test)
             if (is_string($this->content)) {
-                $resource = fopen('php://temp','r+');
+                $resource = fopen('php://temp', 'r+');
                 fwrite($resource, $this->content);
                 rewind($resource);
 

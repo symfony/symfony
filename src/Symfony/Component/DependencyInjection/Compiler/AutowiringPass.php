@@ -45,7 +45,7 @@ class AutowiringPass implements CompilerPassInterface
     /**
      * Wires the given definition.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @throws RuntimeException
@@ -171,8 +171,8 @@ class AutowiringPass implements CompilerPassInterface
             }
 
             unset($this->typesToId[$type]);
-
             $this->notGuessableTypesToId[$type] = true;
+
             return;
         }
 
@@ -209,7 +209,7 @@ class AutowiringPass implements CompilerPassInterface
     /**
      * Retrieves the reflection class associated with the given service.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return \ReflectionClass|null

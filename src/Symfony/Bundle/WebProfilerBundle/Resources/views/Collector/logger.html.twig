@@ -142,19 +142,19 @@
                     </td>
 
                     <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
-                    <td class="font-normal">{{ helper.render_log_message(log, is_deprecation) }}</td>
+                    <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
 
-{% macro render_log_message(log, is_deprecation = false) %}
+{% macro render_log_message(log_index, log, is_deprecation = false) %}
     {{ log.message }}
 
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
-        {% set id = 'sf-call-stack-' ~ random(999) %}
+        {% set id = 'sf-call-stack-' ~ log_index %}
 
         {% if log.context.errorCount is defined %}
         ({{ log.context.errorCount }}x)

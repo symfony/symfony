@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-08T18:26:46Z
+
+Would using firstElementChild work instead of firstChild ?
+
+---------------------------------------------------------------------------
+
+by SaschaDens at 2015-08-08T19:39:20Z
+
+`firstElementChild` will do the trick as this doesn't take text and comment nodes into account, but isn't supported on all browsers ([quirksmode](http://www.quirksmode.org/dom/w3c_traversal.html)).
+
+VarDumper is most likely used in a development environment so is the support for the older browsers still needed?
+
+---------------------------------------------------------------------------
+
+by SaschaDens at 2015-08-21T08:47:56Z
+
+Status: Needs Review

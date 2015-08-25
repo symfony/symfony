@@ -38,7 +38,7 @@ class AutowiringPass implements CompilerPassInterface
         $this->container = $container;
         $this->definitions = $container->getDefinitions();
         foreach ($this->definitions as $id => $definition) {
-            $this->completeDefinition($id, $definition, $container);
+            $this->completeDefinition($id, $definition);
         }
     }
 

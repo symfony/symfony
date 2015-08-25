@@ -48,34 +48,34 @@
 {% endblock %}
 
 {% block panel %}
+    <h2>Performance metrics</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ '%.0f'|format(collector.duration) }} <span class="unit">ms</span></span>
+            <span class="label">Total execution time</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ '%.0f'|format(collector.inittime) }} <span class="unit">ms</span></span>
+            <span class="label">Symfony initialization</span>
+        </div>
+
+        {% if profile.collectors.memory %}
+            <div class="metric">
+                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
+                <span class="label">Peak memory usage</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2>Execution timeline</h2>
+
     {% if collector.events is empty %}
         <div class="empty">
             <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
         </div>
     {% else %}
-        <h2>Performance metrics</h2>
-
-        <div class="metrics">
-            <div class="metric">
-                <span class="value">{{ '%.0f'|format(collector.duration) }} <span class="unit">ms</span></span>
-                <span class="label">Total execution time</span>
-            </div>
-
-            <div class="metric">
-                <span class="value">{{ '%.0f'|format(collector.inittime) }} <span class="unit">ms</span></span>
-                <span class="label">Symfony initialization</span>
-            </div>
-
-            {% if profile.collectors.memory %}
-                <div class="metric">
-                    <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
-                    <span class="label">Peak memory usage</span>
-                </div>
-            {% endif %}
-        </div>
-
-        <h2>Execution timeline</h2>
-
         {{ block('panelContent') }}
     {% endif %}
 {% endblock %}
@@ -84,8 +84,8 @@
     <form id="timeline-control" action="" method="get">
         <input type="hidden" name="panel" value="time">
         <label for="threshold">Threshold</label>
-        <input type="number" size="3" name="threshold" value="3" min="0"> ms
-        <span class="help">(timeline only displays events slower than this threshold)</span>
+        <input type="number" size="3" name="threshold" id="threshold" value="3" min="0"> ms
+        <span class="help">(timeline only displays events with a duration longer than this threshold)</span>
     </form>
 
     {% if profile.parent %}

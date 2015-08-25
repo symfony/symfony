@@ -114,7 +114,7 @@
                 {% endif %}
 
                 <h3>Request Headers</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'] }, with_context = false) }}
 
                 <h3>Request Content</h3>
 

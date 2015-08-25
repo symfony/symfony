@@ -117,12 +117,13 @@
 
 {% macro render_table(logs, show_level = false, is_deprecation = false) %}
     {% import _self as helper %}
+    {% set channel_is_defined = (logs|first).channel is defined %}
 
     <table class="auto-layout logs">
         <thead>
             <tr>
                 <th>{{ show_level ? 'Level' : 'Time' }}</th>
-                <th>Channel</th>
+                {% if channel_is_defined %}<th>Channel</th>{% endif %}
                 <th>Message</th>
             </tr>
         </thead>
@@ -141,7 +142,10 @@
                         <span class="text-muted nowrap newline">{{ log.timestamp|date('H:i:s') }}</span>
                     </td>
 
-                    <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+                    {% if channel_is_defined %}
+                        <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+                    {% endif %}
+
                     <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}

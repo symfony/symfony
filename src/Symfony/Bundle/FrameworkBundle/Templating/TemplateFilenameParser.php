@@ -26,7 +26,7 @@ class TemplateFilenameParser implements TemplateNameParserInterface
      */
     public function parse($file)
     {
-        $parts = explode('/', strtr($file, '\\', '/'));
+        $parts = explode('/', str_replace('\\', '/', $file));
 
         $elements = explode('.', array_pop($parts));
         if (3 > count($elements)) {

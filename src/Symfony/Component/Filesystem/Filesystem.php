@@ -313,8 +313,8 @@ class Filesystem
     {
         // Normalize separators on Windows
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $endPath = strtr($endPath, '\\', '/');
-            $startPath = strtr($startPath, '\\', '/');
+            $endPath = str_replace('\\', '/', $endPath);
+            $startPath = str_replace('\\', '/', $startPath);
         }
 
         // Split the paths into arrays

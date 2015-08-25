@@ -24,11 +24,10 @@ use Symfony\Component\DependencyInjection\Reference;
 class AutowiringPass implements CompilerPassInterface
 {
     private $container;
-    private $definitions;
-    private $reflectionClassesToId = array();
+    private $reflectionClasses = array();
     private $definedTypes = array();
-    private $typesToId;
-    private $notGuessableTypesToId = array();
+    private $types;
+    private $notGuessableTypes = array();
 
     /**
      * {@inheritdoc}
@@ -36,10 +35,16 @@ class AutowiringPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
-        $this->definitions = $container->getDefinitions();
-        foreach ($this->definitions as $id => $definition) {
+        foreach ($container->getDefinitions() as $id => $definition) {
             $this->completeDefinition($id, $definition);
         }
+
+        // Free memory and remove circular reference to container
+        $this->container = null;
+        $this->reflectionClasses = array();
+        $this->definedTypes = array();
+        $this->types = null;
+        $this->notGuessableTypes = array();
     }
 
     /**
@@ -62,7 +67,7 @@ class AutowiringPass implements CompilerPassInterface
 
         $arguments = $definition->getArguments();
         foreach ($constructor->getParameters() as $index => $parameter) {
-            if (!($typeHint = $parameter->getClass()) || $parameter->isOptional()) {
+            if (!($typeHint = $parameter->getClass())) {
                 continue;
             }
 
@@ -71,20 +76,28 @@ class AutowiringPass implements CompilerPassInterface
                 continue;
             }
 
-            if (null === $this->typesToId) {
+            if (null === $this->types) {
                 $this->populateAvailableTypes();
             }
 
-            if (isset($this->typesToId[$typeHint->name])) {
-                $reference = new Reference($this->typesToId[$typeHint->name]);
+            if (isset($this->types[$typeHint->name])) {
+                $value = new Reference($this->types[$typeHint->name]);
             } else {
-                $reference = $this->createAutowiredDefinition($typeHint);
+                try {
+                    $value = $this->createAutowiredDefinition($typeHint);
+                } catch (RuntimeException $e) {
+                    if (!$parameter->isDefaultValueAvailable()) {
+                        throw $e;
+                    }
+
+                    $value = $parameter->getDefaultValue();
+                }
             }
 
             if ($argumentExist) {
-                $definition->replaceArgument($index, $reference);
+                $definition->replaceArgument($index, $value);
             } else {
-                $definition->addArgument($reference);
+                $definition->addArgument($value);
             }
         }
     }
@@ -94,9 +107,9 @@ class AutowiringPass implements CompilerPassInterface
      */
     private function populateAvailableTypes()
     {
-        $this->typesToId = array();
+        $this->types = array();
 
-        foreach ($this->definitions as $id => $definition) {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
         }
     }
@@ -115,7 +128,7 @@ class AutowiringPass implements CompilerPassInterface
 
         foreach ($definition->getTypes() as $type) {
             $this->definedTypes[$type] = true;
-            $this->typesToId[$type] = $id;
+            $this->types[$type] = $id;
         }
 
         if ($reflectionClass = $this->getReflectionClass($id, $definition)) {
@@ -162,22 +175,22 @@ class AutowiringPass implements CompilerPassInterface
      */
     private function set($type, $value)
     {
-        if (isset($this->definedTypes[$type]) || isset($this->notGuessableTypesToId[$type])) {
+        if (isset($this->definedTypes[$type]) || isset($this->notGuessableTypes[$type])) {
             return;
         }
 
-        if (isset($this->typesToId[$type])) {
-            if ($this->typesToId[$type] === $value) {
+        if (isset($this->types[$type])) {
+            if ($this->types[$type] === $value) {
                 return;
             }
 
-            unset($this->typesToId[$type]);
-            $this->notGuessableTypesToId[$type] = true;
+            unset($this->types[$type]);
+            $this->notGuessableTypes[$type] = true;
 
             return;
         }
 
-        $this->typesToId[$type] = $value;
+        $this->types[$type] = $value;
     }
 
     /**
@@ -200,7 +213,6 @@ class AutowiringPass implements CompilerPassInterface
         $argumentDefinition = $this->container->register($argumentId, $typeHint->name);
         $argumentDefinition->setPublic(false);
 
-        $this->definitions = $this->container->getDefinitions();
         $this->populateAvailableType($argumentId, $argumentDefinition);
         $this->completeDefinition($argumentId, $argumentDefinition);
 
@@ -217,16 +229,18 @@ class AutowiringPass implements CompilerPassInterface
      */
     private function getReflectionClass($id, Definition $definition)
     {
-        if (isset($this->reflectionClassesToId[$id])) {
-            return $this->reflectionClassesToId[$id];
+        if (isset($this->reflectionClasses[$id])) {
+            return $this->reflectionClasses[$id];
         }
 
         if (!$class = $definition->getClass()) {
             return;
         }
 
+        $class = $this->container->getParameterBag()->resolveValue($class);
+
         try {
-            return $this->reflectionClassesToId[$id] = new \ReflectionClass($class);
+            return $this->reflectionClasses[$id] = new \ReflectionClass($class);
         } catch (\ReflectionException $e) {
             // Skip invalid classes definitions to keep BC
         }

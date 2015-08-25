@@ -147,6 +147,37 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $lilleDefinition = $container->getDefinition('autowired.symfony\component\dependencyinjection\tests\compiler\lille');
         $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
     }
+
+    public function testResolveParameter()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('class_name', __NAMESPACE__.'\Foo');
+        $container->register('foo', '%class_name%');
+        $container->register('bar', __NAMESPACE__.'\Bar');
+
+        $pass = new AutowiringPass();
+        $pass->process($container);
+
+        $this->assertEquals('foo', $container->getDefinition('bar')->getArgument(0));
+    }
+
+    public function testOptionalParameter()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('opt', __NAMESPACE__.'\OptionalParameter');
+
+        $pass = new AutowiringPass();
+        $pass->process($container);
+
+        $definition = $container->getDefinition('opt');
+        $this->assertNull($definition->getArgument(0));
+        $this->assertEquals('a', $definition->getArgument(1));
+        $this->assertEquals('foo', $definition->getArgument(2));
+    }
 }
 
 class Foo
@@ -234,6 +265,13 @@ class Dunglas
 class LesTilleuls
 {
     public function __construct(Dunglas $k)
+    {
+    }
+}
+
+class OptionalParameter
+{
+    public function __construct(CollisionInterface $c = null, A $a, Foo $f = null)
     {
     }
 }

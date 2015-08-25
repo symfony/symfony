@@ -44,12 +44,7 @@
 {% block panel %}
     <h2>Dumped Contents</h2>
 
-    {% if collector.dumpsCount == 0 %}
-        <div class="empty">
-            <p>No content was dumped.</p>
-        </div>
-    {% else %}
-        {% for dump in collector.getDumps('html') %}
+    {% for dump in collector.getDumps('html') %}
         <div class="sf-dump sf-reset">
             <h3>In
                 {% if dump.line %}
@@ -75,6 +70,9 @@
 
             {{ dump.data|raw }}
         </div>
-        {% endfor %}
-    {% endif %}
+    {% else %}
+        <div class="empty">
+            <p>No content was dumped.</p>
+        </div>
+    {% endfor %}
 {% endblock %}

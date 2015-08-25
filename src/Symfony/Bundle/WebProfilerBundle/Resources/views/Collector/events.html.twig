@@ -49,7 +49,7 @@
     {% endif %}
 {% endblock %}
 
-{% macro render_table(events, show_order = false) %}
+{% macro render_table(listeners, show_order = false) %}
     <table class="auto-layout">
         <thead>
             <tr>
@@ -59,7 +59,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for listener in events %}
+        {% for listener in listeners %}
             <tr>
                 {% if show_order %}<td class="text-small text-muted font-normal">{{ loop.index }}</td>{% endif %}
                 <td class="font-normal text-small text-bold">{{ listener.event }}</td>

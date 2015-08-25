@@ -82,7 +82,7 @@
                         {{ collector.roles is empty ? 'none' : collector.roles|yaml_encode }}
 
                         {% if not collector.authenticated and collector.roles is empty %}
-                            <p class="help">User is not authenticated probably because he/she has no roles.</p>
+                            <p class="help">User is not authenticated probably because they have no roles.</p>
                         {% endif %}
                     </td>
                 </tr>

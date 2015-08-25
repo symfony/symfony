@@ -1,7 +1,8 @@
 <script>/*<![CDATA[*/
-    /* Caution: the contents of this file are processed by Twig before loading
-                them as JavaScript source code. Always use /* comments instead
-                of one-line comments to avoid impossible-to-debug side-effects */
+    {# Caution: the contents of this file are processed by Twig before loading
+                them as JavaScript source code. Always use '/*' comments instead
+                of '//' comments to avoid impossible-to-debug side-effects #}
+
     Sfjs = (function() {
         "use strict";
 
@@ -334,7 +335,7 @@
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        tabNavigationItem.setAttribute('class', j == 0 ? 'active' : '');
+                        tabNavigationItem.className = (j == 0) ? 'active' : '';
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);
 
@@ -353,7 +354,7 @@
                         tabId = tabNavigation[j].getAttribute('data-tab-id');
                         document.getElementById(tabId).querySelector('.tab-title').style.display = 'none';
 
-                        if (tabNavigation[j].classList.contains('active')) {
+                        if (Sfjs.hasClass(tabNavigation[j], 'active')) {
                             document.getElementById(tabId).style.display = 'block';
                         } else {
                             document.getElementById(tabId).style.display = 'none';

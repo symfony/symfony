@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-25T10:07:22Z
+
+Travis failures are reviewed:
+
+- HHVM failed because of a volatile test
+- PHP 7 failed because of segfaults in the session-related tests (IIRC, @nicolas-grekas already reported them to the PHP team)
+
+AppVeyor failure is because the config file is not yet available in the 2.7 branch

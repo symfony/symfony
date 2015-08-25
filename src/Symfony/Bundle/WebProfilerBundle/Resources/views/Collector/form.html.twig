@@ -28,9 +28,14 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.data.forms is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
+        {% if collector.data.nb_errors > 0 %}
+            <span class="count">
+                <span>{{ collector.data.nb_errors }}</span>
+            </span>
+        {% endif %}
     </span>
 {% endblock %}
 
@@ -537,7 +542,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <th class="font-normal">Model Format</th>
+                        <th class="font-normal" scope="row">Model Format</th>
                         <td>
                             {% if data.default_data.model is defined %}
                                 {{ data.default_data.model }}
@@ -547,11 +552,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="font-normal">Normalized Format</th>
+                        <th class="font-normal" scope="row">Normalized Format</th>
                         <td>{{ data.default_data.norm }}</td>
                     </tr>
                     <tr>
-                        <th class="font-normal">View Format</th>
+                        <th class="font-normal" scope="row">View Format</th>
                         <td>
                             {% if data.default_data.view is defined %}
                                 {{ data.default_data.view }}
@@ -583,7 +588,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <th class="font-normal">View Format</th>
+                        <th class="font-normal" scope="row">View Format</th>
                         <td>
                             {% if data.submitted_data.view is defined %}
                                 {{ data.submitted_data.view }}
@@ -593,11 +598,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="font-normal">Normalized Format</th>
+                        <th class="font-normal" scope="row">Normalized Format</th>
                         <td>{{ data.submitted_data.norm }}</td>
                     </tr>
                     <tr>
-                        <th class="font-normal">Model Format</th>
+                        <th class="font-normal" scope="row">Model Format</th>
                         <td>
                             {% if data.submitted_data.model is defined %}
                                 {{ data.submitted_data.model }}
@@ -639,7 +644,7 @@
                     <th>{{ option }}</th>
                     <td>{{ value }}</td>
                     <td>
-                        {% if data.resolved_options[option] is same as(value) %}
+                        {% if data.resolved_options[option] is sameas(value) %}
                             <em class="font-normal text-muted">same as passed value</em>
                         {% else %}
                             {{ data.resolved_options[option] }}
@@ -675,7 +680,7 @@
                 <tbody>
                 {% for option, value in data.resolved_options %}
                 <tr>
-                    <th>{{ option }}</th>
+                    <th scope="row">{{ option }}</th>
                     <td>{{ value }}</td>
                 </tr>
                 {% endfor %}
@@ -702,7 +707,7 @@
                 <tbody>
                 {% for variable, value in data.view_vars %}
                 <tr>
-                    <th>{{ variable }}</th>
+                    <th scope="row">{{ variable }}</th>
                     <td>{{ value }}</td>
                 </tr>
                 {% endfor %}

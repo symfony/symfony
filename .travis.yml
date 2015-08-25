@@ -32,7 +32,7 @@ before_install:
     - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "memory_limit = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "version_compare(PHP_VERSION, '5.3.9999')") -eq -1 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (pecl install -f memcached-2.1.0 && echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without memcache extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini); fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;

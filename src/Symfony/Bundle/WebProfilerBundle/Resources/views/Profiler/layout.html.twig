@@ -56,7 +56,7 @@
                 <div id="sidebar-shortcuts">
                     <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Latest profiles</a>
 
-                    <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search">
+                    <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
                         {{ include('@WebProfiler/Icon/search.svg') }} Search
                     </a>
 

@@ -390,7 +390,12 @@
                     var element = document.querySelector(elementSelector);
 
                     Sfjs.addClass(element, 'sf-toggle-content');
-                    Sfjs.addClass(element, 'sf-toggle-hidden');
+
+                    if (toggles[i].hasAttribute('data-toggle-initial') && toggles[i].getAttribute('data-toggle-initial') == 'display') {
+                        Sfjs.addClass(element, 'sf-toggle-visible');
+                    } else {
+                        Sfjs.addClass(element, 'sf-toggle-hidden');
+                    }
 
                     Sfjs.addEventListener(toggles[i], 'click', function(e) {
                         var toggle = e.target || e.srcElement;

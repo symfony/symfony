@@ -107,7 +107,8 @@ class AutowiringPass implements CompilerPassInterface
      * @param string     $id
      * @param Definition $definition
      */
-    private function populateAvailableType($id, Definition $definition) {
+    private function populateAvailableType($id, Definition $definition)
+    {
         if (!($class = $definition->getClass())) {
             return;
         }

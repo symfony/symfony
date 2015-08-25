@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-24T07:43:54Z
+
+There are more occurrences of "nightly" in the travis file.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-24T09:44:29Z
+
+looks good to me. We want to test against 7.0 releases once they are available on Travis
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-24T09:45:11Z
+
+@nicolas-grekas can you check the issue with the AppVeyor build ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-24T09:46:14Z
+
+@stof the issue is that #15575 is not merged

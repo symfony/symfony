@@ -6,6 +6,20 @@
     Sfjs = (function() {
         "use strict";
 
+        var classListIsSupported = 'classList' in document.createElement('_');
+
+        if (classListIsSupported) {
+            var hasClass = function (el, cssClass) { return el.classList.contains(cssClass); };
+            var removeClass = function(el, cssClass) { el.classList.remove(cssClass); };
+            var addClass = function(el, cssClass) { el.classList.add(cssClass); };
+            var toggleClass = function(el, cssClass) { el.classList.toggle(cssClass); };
+        } else {
+            var hasClass = function (el, cssClass) { return el.className.match(new RegExp('\\b' + cssClass + '\\b')); };
+            var removeClass = function(el, cssClass) { el.className = el.className.replace(new RegExp('\\b' + cssClass + '\\b'), ' '); };
+            var addClass = function(el, cssClass) { if (!hasClass(el, cssClass)) { el.className += " " + cssClass; } };
+            var toggleClass = function(el, cssClass) { hasClass(el, cssClass) ? removeClass(el, cssClass) : addClass(el, cssClass); };
+        }
+
         var noop = function() {},
 
             collectionToArray = function (collection) {
@@ -48,36 +62,6 @@
                     }
                 };
                 xhr.send(payload || '');
-            },
-
-            hasClass = function(el, cssClass) {
-                if (el.classList) {
-                    return el.classList.contains(cssClass);
-                } else if (el.className) {
-                    return el.className.match(new RegExp('\\b' + cssClass + '\\b'));
-                }
-            },
-
-            removeClass = function(el, cssClass) {
-                if (el.classList) {
-                    el.classList.remove(cssClass);
-                } else if (el.className) {
-                    el.className = el.className.replace(new RegExp('\\b' + cssClass + '\\b'), ' ');
-                }
-            },
-
-            addClass = function(el, cssClass) {
-                if (!hasClass(el, cssClass)) {
-                    if (el.classList) {
-                        el.classList.add(cssClass);
-                    } else if (el.className) {
-                        el.className += " " + cssClass;
-                    }
-                }
-            },
-
-            toggleClass = function(el, cssClass) {
-                hasClass(el, cssClass) ? removeClass(el, cssClass) : addClass(el, cssClass);
             },
 
             getPreference = function(name) {
@@ -327,7 +311,7 @@
                 for (var i = 0; i < tabGroups.length; i++) {
                     var tabs = tabGroups[i].querySelectorAll('.tab');
                     var tabNavigation = document.createElement('ul');
-                    tabNavigation.setAttribute('class', 'tab-navigation');
+                    tabNavigation.className = 'tab-navigation';
 
                     for (var j = 0; j < tabs.length; j++) {
                         var tabId = 'tab-' + i + '-' + j;
@@ -352,12 +336,12 @@
 
                     for (j = 0; j < tabNavigation.length; j++) {
                         tabId = tabNavigation[j].getAttribute('data-tab-id');
-                        document.getElementById(tabId).querySelector('.tab-title').style.display = 'none';
+                        document.getElementById(tabId).querySelector('.tab-title').className = 'hidden';
 
                         if (Sfjs.hasClass(tabNavigation[j], 'active')) {
-                            document.getElementById(tabId).style.display = 'block';
+                            document.getElementById(tabId).className = 'block';
                         } else {
-                            document.getElementById(tabId).style.display = 'none';
+                            document.getElementById(tabId).className = 'hidden';
                         }
 
                         tabNavigation[j].addEventListener('click', function(e) {
@@ -371,13 +355,13 @@
 
                             for (var k = 0; k < tabNavigation.length; k++) {
                                 var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                                document.getElementById(tabId).style.display = 'none';
-                                tabNavigation[k].classList.remove('active');
+                                document.getElementById(tabId).className = 'hidden';
+                                Sfjs.removeClass(tabNavigation[k], 'active');
                             }
 
-                            activeTab.classList.add('active');
+                            Sfjs.addClass(activeTab, 'active');
                             var activeTabId = activeTab.getAttribute('data-tab-id');
-                            document.getElementById(activeTabId).style.display = 'block';
+                            document.getElementById(activeTabId).className = 'block';
                         });
                     }
                 }

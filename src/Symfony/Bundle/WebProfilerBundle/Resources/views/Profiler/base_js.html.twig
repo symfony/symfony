@@ -365,7 +365,7 @@
 
                             /* needed because when the tab contains HTML contents, user can click */
                             /* on any of those elements instead of their parent '<li>' element */
-                            while (activeTab.tagName.toLowerCase() != 'li') {
+                            while (activeTab.tagName.toLowerCase() !== 'li') {
                                 activeTab = activeTab.parentNode;
                             }
 
@@ -417,7 +417,7 @@
                         var currentContent = toggle.innerHTML;
                         var originalContent = toggle.getAttribute('data-toggle-original-content');
                         var altContent = toggle.getAttribute('data-toggle-alt-content');
-                        toggle.innerHTML = currentContent != altContent ? altContent : originalContent;
+                        toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
 
                         e.preventDefault();
                     });

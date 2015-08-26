@@ -11,7 +11,6 @@ environment:
 cache:
     - c:\php -> appveyor.yml
     - .phpunit -> phpunit
-    - vendor -> composer.json
 
 init:
     - SET PATH=c:\php;%PATH%
@@ -46,7 +45,7 @@ install:
     - cd c:\projects\symfony
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - composer update --prefer-dist --no-progress --ansi
+    - composer update --prefer-source --no-progress --ansi
 
 test_script:
     - cd c:\projects\symfony

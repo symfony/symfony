@@ -89,7 +89,7 @@ class SetAclCommandTest extends WebTestCase
         $setAclCommandTester = new CommandTester($setAclCommand);
         $setAclCommandTester->execute(array(
             'command' => 'acl:set',
-            'arguments' => array($grantedPermission, sprintf('%s:%s', strtr(self::OBJECT_CLASS, '\\', '/'), $objectId)),
+            'arguments' => array($grantedPermission, sprintf('%s:%s', str_replace('\\', '/', self::OBJECT_CLASS), $objectId)),
             '--role' => array($role),
         ));
 

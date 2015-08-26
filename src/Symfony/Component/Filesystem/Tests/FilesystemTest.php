@@ -11,24 +11,11 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 /**
  * Test class for Filesystem.
  */
 class FilesystemTest extends FilesystemTestCase
 {
-    /**
-     * @var \Symfony\Component\Filesystem\Filesystem
-     */
-    private $filesystem = null;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->filesystem = new Filesystem();
-    }
-
     public function testCopyCreatesNewFile()
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';

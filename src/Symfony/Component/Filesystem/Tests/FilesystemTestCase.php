@@ -11,29 +11,33 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 {
     private $umask;
+
+    /**
+     * @var \Symfony\Component\Filesystem\Filesystem
+     */
+    protected $filesystem = null;
 
     /**
      * @var string
      */
     protected $workspace = null;
 
-    protected static $symlinkOnWindows = null;
+    private static $symlinkOnWindows = null;
 
     public static function setUpBeforeClass()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            static::$symlinkOnWindows = true;
-            $originDir = tempnam(sys_get_temp_dir(), 'sl');
-            $targetDir = tempnam(sys_get_temp_dir(), 'sl');
-            if (true !== @symlink($originDir, $targetDir)) {
-                $report = error_get_last();
-                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
-                    static::$symlinkOnWindows = false;
-                }
+        if ('\\' === DIRECTORY_SEPARATOR && null === self::$symlinkOnWindows) {
+            $target = tempnam(sys_get_temp_dir(), 'sl');
+            $link = sys_get_temp_dir().'/sl'.microtime(true).mt_rand();
+            if (self::$symlinkOnWindows = @symlink($target, $link)) {
+                unlink($link);
             }
+            unlink($target);
         }
     }
 
@@ -43,29 +47,13 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
         $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().mt_rand(0, 1000);
         mkdir($this->workspace, 0777, true);
         $this->workspace = realpath($this->workspace);
+        $this->filesystem = new Filesystem();
     }
 
     protected function tearDown()
     {
-        $this->clean($this->workspace);
+        $this->filesystem->remove($this->workspace);
         umask($this->umask);
-    }
-
-    /**
-     * @param string $file
-     */
-    protected function clean($file)
-    {
-        if (is_dir($file) && !is_link($file)) {
-            $dir = new \FilesystemIterator($file);
-            foreach ($dir as $childFile) {
-                $this->clean($childFile);
-            }
-
-            rmdir($file);
-        } else {
-            unlink($file);
-        }
     }
 
     /**

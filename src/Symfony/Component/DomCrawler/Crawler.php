@@ -166,19 +166,42 @@ class Crawler extends \SplObjectStorage
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
-        if (function_exists('mb_convert_encoding')) {
-            $hasError = false;
-            set_error_handler(function () use (&$hasError) {
-                $hasError = true;
-            });
-            $tmpContent = @mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
+        set_error_handler(function () {throw new \Exception();});
 
-            restore_error_handler();
+        try {
+            // Convert charset to HTML-entities to work around bugs in DOMDocument::loadHTML()
 
-            if (!$hasError) {
-                $content = $tmpContent;
+            if (function_exists('mb_convert_encoding')) {
+                $content = mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
+            } elseif (function_exists('iconv')) {
+                $content = preg_replace_callback(
+                    '/[\x80-\xFF]+/',
+                    function ($m) {
+                        $m = unpack('C*', $m[0]);
+                        $i = 1;
+                        $entities = '';
+
+                        while (isset($m[$i])) {
+                            if (0xF0 <= $m[$i]) {
+                                $c = (($m[$i++] - 0xF0) << 18) + (($m[$i++] - 0x80) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++] - 0x80;
+                            } elseif (0xE0 <= $m[$i]) {
+                                $c = (($m[$i++] - 0xE0) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++]  - 0x80;
+                            } else {
+                                $c = (($m[$i++] - 0xC0) << 6) + $m[$i++] - 0x80;
+                            }
+
+                            $entities .= '&#'.$c.';';
+                        }
+
+                        return $entities;
+                    },
+                    iconv($charset, 'UTF-8', $content)
+                );
             }
+        } catch (\Exception $e) {
         }
+
+        restore_error_handler();
 
         if ('' !== trim($content)) {
             @$dom->loadHTML($content);

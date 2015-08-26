@@ -637,8 +637,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
         $process->start();
+
+        $this->assertFalse($process->isSuccessful());
+
         while ($process->isRunning()) {
-            $this->assertFalse($process->isSuccessful());
             usleep(300000);
         }
 

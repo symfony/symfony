@@ -491,6 +491,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderExceptionWithDoubleWidthCharacters()
     {
+        if (!function_exists('mb_strwidth')) {
+            $this->markTestSkipped('The "mb_strwidth" function is not available');
+        }
+
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
         $application->setAutoExit(false);
         $application->expects($this->any())

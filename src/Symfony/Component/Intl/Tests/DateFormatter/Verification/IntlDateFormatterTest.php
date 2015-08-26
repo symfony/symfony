@@ -45,7 +45,11 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
-        return new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
+        if (!$formatter = new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern)) {
+            throw new \InvalidArgumentException(intl_get_error_message());
+        }
+
+        return $formatter;
     }
 
     protected function getIntlErrorMessage()

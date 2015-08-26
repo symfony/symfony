@@ -5,3 +5,4 @@ phpunit.xml
 composer.phar
 package.tar
 /packages.json
+/.phpunit

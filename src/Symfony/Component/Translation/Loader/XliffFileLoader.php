@@ -53,7 +53,7 @@ class XliffFileLoader implements LoaderInterface
             }
 
             $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
-            $target = (string) isset($translation->target) ? $translation->target : $source;
+            $target = (string) (isset($translation->target) ? $translation->target : $source);
 
             // If the xlf file has another encoding specified, try to convert it because
             // simple_xml will always return utf-8 encoded values

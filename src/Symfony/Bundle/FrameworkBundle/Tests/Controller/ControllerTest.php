@@ -96,6 +96,52 @@ class ControllerTest extends TestCase
         $controller->getUser();
     }
 
+//    public function testRenderWithTwig()
+//    {
+//
+//    }
+//
+//    public function testRenderWithTemplating()
+//    {
+//
+//    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You can not use the render method if the Templating Component or the Twig Bundle are not available.
+     */
+    public function testRenderWithEmptyContainer()
+    {
+        $container = $this->getContainerWithoutTwigAndTemplating();
+        $controller = new TestController();
+        $controller->setContainer($container);
+        $controller->render('dummy.html.twig');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You can not use the renderView method if the Templating Component or the Twig Bundle are not available.
+     */
+    public function testRenderViewWithEmptyContainer()
+    {
+        $container = $this->getContainerWithoutTwigAndTemplating();
+        $controller = new TestController();
+        $controller->setContainer($container);
+        $controller->renderView('dummy.html.twig');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You can not use the stream method if the Templating Component or the Twig Bundle are not available.
+     */
+    public function testStreamWithEmptyContainer()
+    {
+        $container = $this->getContainerWithoutTwigAndTemplating();
+        $controller = new TestController();
+        $controller->setContainer($container);
+        $controller->stream('dummy.html.twig');
+    }
+
     /**
      * @param $token
      *
@@ -121,6 +167,71 @@ class ControllerTest extends TestCase
             ->method('get')
             ->with('security.token_storage')
             ->will($this->returnValue($tokenStorage));
+
+        return $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function getContainerWithTwig()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('twig')
+            ->will($this->returnValue(true));
+
+        $twig = $this->getMock('Twig_Environment');
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('twig')
+            ->will($this->returnValue($twig));
+
+        return $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    private function getContainerWithTemplating()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('templating')
+            ->will($this->returnValue(true));
+
+        $templating = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('templating')
+            ->will($this->returnValue($templating));
+
+        return $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainerWithoutTwigAndTemplating()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('twig')
+            ->will($this->returnValue(false));
+
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('templating')
+            ->will($this->returnValue(false));
 
         return $container;
     }

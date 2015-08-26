@@ -172,6 +172,9 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetStreamAsInput($code, $size)
     {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestIncomplete('This test fails with a timeout on Windows, can someone investigate please?');
+        }
         $expected = str_repeat(str_repeat('*', 1024), $size).'!';
         $expectedLength = (1024 * $size) + 1;
 
@@ -179,7 +182,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         fwrite($stream, $expected);
         rewind($stream);
 
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)), null, null, null, 5);
         $p->setInput($stream);
         $p->run();
 

@@ -7,7 +7,7 @@ $PHPUNIT_VERSION = 4.8;
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
-    # Build a standalone phpunit without symfony/yaml
+    // Build a standalone phpunit without symfony/yaml
 
     $oldPwd = getcwd();
     mkdir($PHPUNIT_DIR);
@@ -31,7 +31,7 @@ $cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
 
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
-    # Find Symfony components in plain php for Windows portability
+    // Find Symfony components in plain php for Windows portability
 
     $finder = new RecursiveDirectoryIterator('src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
     $finder = new RecursiveIteratorIterator($finder);
@@ -45,7 +45,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
         if ('phpunit.xml.dist' === $file) {
             $component = dirname($fileInfo->getPathname());
 
-            # Run phpunit tests in parallel
+            // Run phpunit tests in parallel
 
             $c = escapeshellarg($component);
 
@@ -58,20 +58,34 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
         }
     }
 
+    // Fixes for colors support on appveyor
+    // See http://help.appveyor.com/discussions/suggestions/197-support-ansi-color-codes
+    $colorFixes = array(
+        array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
+        array("SS", "EE", "II", "FF"),
+    );
+    $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
+    $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
+
     foreach ($procs as $component => $proc) {
         $procStatus = proc_close($proc);
 
         foreach (array('out', 'err') as $file) {
             $file = "$component/phpunit.std$file";
-            $h = fopen($file, 'rb');
-            while (false !== $line = fgets($h)) {
-                echo preg_replace_callback(
-                    '/\033\[[0-9]++(?:;[0-9]++)++m/',
-                    function ($m) {return str_replace(';', "m\033[", $m[0]);},
-                    $line
-                );
+
+            if ('\\' === DIRECTORY_SEPARATOR) {
+                $h = fopen($file, 'rb');
+                while (false !== $line = fgets($h)) {
+                    echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
+                        '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
+                        "$1m\033[$2$3$4$4",
+                        $line
+                    ));
+                }
+                fclose($h);
+            } else {
+                readfile($file);
             }
-            fclose($h);
             unlink($file);
         }
 
@@ -84,32 +98,28 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     }
 
 } elseif (!isset($argv[1]) || 'install' !== $argv[1]) {
-    # Run regular phpunit in a subprocess
+    // Run regular phpunit in a subprocess
 
     $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
 
     $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
     if ($proc = proc_open(implode(' ', $cmd).' 2> '.escapeshellarg($errFile), array(1 => array('pipe', 'w')), $pipes)) {
-        while (false !== $line = fgets($pipes[1])) {
-            echo $line;
-        }
+        stream_copy_to_stream($pipes[1], STDOUT);
         fclose($pipes[1]);
         $exit = proc_close($proc);
 
-        $h = fopen($errFile, 'rb');
-        while (false !== $line = fgets($h)) {
-            echo $line;
-        }
-        fclose($h);
+        readfile($errFile);
         unlink($errFile);
     }
 
-    if (file_exists($component = array_pop($argv))) {
-        if ($exit) {
-            echo "\033[41mKO\033[0m $component\n\n";
-        } else {
-            echo "\033[32mOK\033[0m $component\n\n";
-        }
+    if (!file_exists($component = array_pop($argv))) {
+        $component = basename(getcwd());
+    }
+
+    if ($exit) {
+        echo "\033[41mKO\033[0m $component\n\n";
+    } else {
+        echo "\033[32mOK\033[0m $component\n\n";
     }
 }
 

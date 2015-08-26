@@ -71,8 +71,8 @@ class AutowiringPass implements CompilerPassInterface
                 continue;
             }
 
-            $argumentExist = array_key_exists($index, $arguments);
-            if ($argumentExist && '' !== $arguments[$index]) {
+            $argumentExists = array_key_exists($index, $arguments);
+            if ($argumentExists && '' !== $arguments[$index]) {
                 continue;
             }
 
@@ -94,7 +94,7 @@ class AutowiringPass implements CompilerPassInterface
                 }
             }
 
-            if ($argumentExist) {
+            if ($argumentExists) {
                 $definition->replaceArgument($index, $value);
             } else {
                 $definition->addArgument($value);
@@ -198,6 +198,7 @@ class AutowiringPass implements CompilerPassInterface
      *
      * @param \ReflectionClass $typeHint
      * @param string           $id
+     *
      * @return Reference A reference to the registered definition
      *
      * @throws RuntimeException

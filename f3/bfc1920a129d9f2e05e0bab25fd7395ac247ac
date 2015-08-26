@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-25T19:34:03Z
+
+Do we still need this (given the changes done in 1270e725601e08a228d35c6c91cea61aea958b03)?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-25T19:37:26Z
+
+@xabbuh yes, when installing `symfony/symfony`, only the root composer.json is what matters and it does not require the not included Security ACL package.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-25T20:02:30Z
+
+indeed :+1:
+
+Status: Reviewed

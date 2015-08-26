@@ -6,7 +6,7 @@
     Sfjs = (function() {
         "use strict";
 
-        var classListIsSupported = 'classList' in document.createElement('_');
+        var classListIsSupported = 'classList' in document.documentElement;
 
         if (classListIsSupported) {
             var hasClass = function (el, cssClass) { return el.classList.contains(cssClass); };

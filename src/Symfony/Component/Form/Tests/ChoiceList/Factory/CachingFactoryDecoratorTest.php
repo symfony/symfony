@@ -642,7 +642,7 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $labelAttr)
+            ->with($list, null, null, null, null, null, $labelAttr)
             ->will($this->returnValue($view));
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, null, null, $labelAttr));

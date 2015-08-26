@@ -365,7 +365,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $labelAttr) {
+            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr, $labelAttr) {
                 return $labelAttr((object) array('property' => 'labelAttr'));
             }));
 

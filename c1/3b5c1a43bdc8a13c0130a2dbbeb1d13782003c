@@ -1,0 +1,176 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-18T14:49:53Z
+
+should we also try compiling the debug extension on Windows ? Or should we wait until we decide whether we move it to a separate repo ?
+In any case, it is irrelevant for 2.3 as it does not have the C extension
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T15:18:26Z
+
+That would be great to have the debug ext compiled also, but let's first make this one work.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-18T15:22:18Z
+
+Account has been created now. Try to push here to trigger a new build as I don't seem to have any way to do that from the interface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T15:57:34Z
+
+@fabpot thanks, did you setup the webhook?
+Here is a helper screenshot for PR support:
+
+![11](https://cloud.githubusercontent.com/assets/243674/9335131/9909bdbe-45d2-11e5-9974-a73ae06ec286.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T17:04:34Z
+
+The build is now working! But phpunit crashes before going to the end of the test suite :(
+Any Windows expert here?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-18T17:16:08Z
+
+@nicolas-grekas can you try running the testsuite in smaller chunks (component by component) to see whether it helps ? We are not running the full testsuite in 1 go on Travis (even though the main goal was to parallelize runs to be faster)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T17:19:23Z
+
+If you give me the command to do so, yes :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T21:00:42Z
+
+Any PowerShell scripter here? We would need a ps script to run phpunit tests in parallel, the same as we do on unixes with `find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n' | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; php --exclude-group tty,benchmark,intl-data {} || (echo  "KO {}" && $(exit 1));'`
+
+[Invole-Parallel](https://github.com/RamblingCookieMonster/Invoke-Parallel) could maybe help, but I must admit I'm a total noob here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-18T21:08:28Z
+
+An other idea could be to run bash from cygwin, it's maybe even already somewhere on the vm.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-18T21:18:00Z
+
+@nicolas-grekas I have both powershell and cygwin on my PC, what do you want me to do/try?
+
+---------------------------------------------------------------------------
+
+by loostro at 2015-08-19T04:56:05Z
+
+@nicolas-grekas @WouterJ cygwin is not needed to run bash scripts, just get the `bash.exe` (and any others you need, like `grep`) from [bmatzelle/gow](https://github.com/bmatzelle/gow) project
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-19T20:22:05Z
+
+PR is almost ready, at least tests run on Windows. I wrote a phpunit wrapper that will please those who wanted to have symfony come with its own phpunit. At first I tried to write the wrapper using bash, but I didn't manage to have bash + all the needed utilities working on Windows. Instead, I just wrote it in plain php.
+This wrapper is able to:
+- install automatically a custom phpunit,
+- run phpunit transparently
+- or run all components tests in parallel when invoked as `phpunit symfony ...` (... standing for regular phpunit arguments that will be used when runing component by component tests)
+
+I voluntarily did not enable mbstring because Symfony should work without it.
+I enabled intl, fileinfo and openssl (for composer at least).
+
+Pipes on Windows are not binary safe. As such, many tests fail because of this. I see no other way than skipping them.
+
+Additional comments welcomed.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-20T08:51:51Z
+
+OK, looks like Appveyor does not support colors when our process writes the output to files and then output it in the main process...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-20T08:55:46Z
+
+It's not appveyor, it's PHP+Windows that is broken for binary pipes...
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-20T09:14:13Z
+
+ > It's not appveyor, it's PHP+Windows that is broken for binary pipes...
+
+<s>Are you sure? Doing `composer validate > out.txt 2>&1; cat out.txt` on Windows gives me nice colors.</s>
+
+Hmm, skip this comment. I'm not using PHP in that example...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-20T10:00:46Z
+
+In fact you're right: redirections on the command line are binary safe, the issue is on appveyor: they do not currently handle multiple-codes ansi sequences. I reported the issue and made the wrapper split these sequences. Enjoy color full output now (with some display bug that are likely on appveyor's side).
+PR is ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-20T13:32:36Z
+
+Except for transient tests, tests are green both on Linux and on Windows!
+Please review also the embedded fixes for bugs discovered on appveyor.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-20T13:58:15Z
+
+Looks like we need to skip a bunch of tests when we don't have fileinfo
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-21T09:01:39Z
+
+Nice to see that this PR fixes so many bugs found in the skipped tests on Travis :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-21T09:18:26Z
+
+It looks like we should be able to install intl 51.2 on Windows, which would allow to tests Intl without skipping anything (on travis, we skip a bunch of tests so that our Intl component can't be considered as tested).
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-23T15:16:53Z
+
+There are still some failing tests on Windows. Not sure if you are working on them though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-23T15:19:11Z
+
+I've been afk this weekend. Of course I'd like to fix remaining issues. This PR is mergeable thought.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-25T13:26:00Z
+
+Status: needs review
+Except for a transient test on the Process component, tests are green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-25T16:59:16Z
+
+ping @symfony/deciders , especially @webmozart
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-26T08:48:44Z
+
+Not mergeable yet as there is still a failing test on Windows.

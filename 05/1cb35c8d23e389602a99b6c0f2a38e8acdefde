@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-02T04:18:49Z
+
+:+1: but a test would help to prevent further regressions
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-02T06:49:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-02T08:00:56Z
+
+@stof thanks for fixing this error. However, I agree with @Tobion: we should provide a test to avoid more regressions.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-03T09:34:15Z
+
+@javiereguiluz will do this evening
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-26T16:52:58Z
+
+Updated with tests

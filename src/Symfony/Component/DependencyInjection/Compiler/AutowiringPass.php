@@ -84,7 +84,7 @@ class AutowiringPass implements CompilerPassInterface
                 $value = new Reference($this->types[$typeHint->name]);
             } else {
                 try {
-                    $value = $this->createAutowiredDefinition($typeHint);
+                    $value = $this->createAutowiredDefinition($typeHint, $id);
                 } catch (RuntimeException $e) {
                     if (!$parameter->isDefaultValueAvailable()) {
                         throw $e;
@@ -197,15 +197,15 @@ class AutowiringPass implements CompilerPassInterface
      * Registers a definition for the type if possible or throws an exception.
      *
      * @param \ReflectionClass $typeHint
-     *
+     * @param string           $id
      * @return Reference A reference to the registered definition
      *
      * @throws RuntimeException
      */
-    private function createAutowiredDefinition(\ReflectionClass $typeHint)
+    private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
         if (!$typeHint->isInstantiable()) {
-            throw new RuntimeException(sprintf('Unable to autowire type "%s".', $typeHint->name));
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s".', $typeHint->name, $id));
         }
 
         $argumentId = sprintf('autowired.%s', $typeHint->name);

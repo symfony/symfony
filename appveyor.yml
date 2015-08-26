@@ -11,13 +11,13 @@ environment:
 cache:
     - c:\php -> appveyor.yml
     - .phpunit -> phpunit
-    - vendor -> composer.json
 
 init:
     - SET PATH=c:\php;%PATH%
     - SET COMPOSER_NO_INTERACTION=1
-    - SET SYMFONY_DEPRECATIONS_HELPER=weak
+    - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET PHP=1
+    - SET ANSICON=121x90 (121x90)
 
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
@@ -46,7 +46,7 @@ install:
     - cd c:\projects\symfony
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - composer update --prefer-dist --no-progress --ansi
+    - composer update --prefer-source --no-progress --ansi
 
 test_script:
     - cd c:\projects\symfony

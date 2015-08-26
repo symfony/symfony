@@ -33,8 +33,8 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'password' => 'password',
             'user-class' => 'Symfony\Component\Security\Core\User\User',
             '--empty-salt' => true,
-        ));
-        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/emptysalt.txt');
+        ), array('decorated' => false));
+        $expected = str_replace("\n", PHP_EOL, file_get_contents(__DIR__.'/app/PasswordEncode/emptysalt.txt'));
 
         $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
     }

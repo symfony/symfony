@@ -257,7 +257,7 @@ class XmlReferenceDumper
         $indent = strlen($text) + $indent;
         $format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text)."\n";
+        $this->reference .= sprintf($format, $text).PHP_EOL;
     }
 
     /**

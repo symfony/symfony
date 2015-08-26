@@ -62,7 +62,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
             });
         }
 
-        return hash('sha256', $namespace.':'.json_encode($value));
+        return hash('sha256', $namespace.':'.serialize($value));
     }
 
     /**

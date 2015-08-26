@@ -12,6 +12,9 @@ class LockHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructWhenRepositoryDoesNotExist()
     {
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
+        }
         new LockHandler('lock', '/a/b/c/d/e');
     }
 
@@ -21,6 +24,9 @@ class LockHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructWhenRepositoryIsNotWriteable()
     {
+        if (!getenv('USER') || 'root' === getenv('USER')) {
+            $this->markTestSkipped('This test will fail if run under superuser');
+        }
         new LockHandler('lock', '/');
     }
 

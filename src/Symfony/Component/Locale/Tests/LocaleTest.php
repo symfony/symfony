@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Tests;
 
 use Symfony\Component\Locale\Locale;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Test case for the {@link Locale} class.
@@ -35,6 +36,8 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDisplayCountriesForSwitzerland()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         $countries = Locale::getDisplayCountries('de_CH');
         $this->assertEquals('Schweiz', $countries['CH']);
     }

@@ -98,7 +98,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('symlink is not supported');
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR && false === static::$symlinkOnWindows) {
+        if ('\\' === DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on windows');
         }
     }

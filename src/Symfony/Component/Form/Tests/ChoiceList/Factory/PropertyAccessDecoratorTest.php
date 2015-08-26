@@ -93,6 +93,36 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('value', $this->factory->createListFromLoader($loader, 'property'));
     }
 
+    // https://github.com/symfony/symfony/issues/5494
+    public function testCreateFromChoicesAssumeNullIfValuePropertyPathUnreadable()
+    {
+        $choices = array(null);
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromChoices')
+            ->with($choices, $this->isInstanceOf('\Closure'))
+            ->will($this->returnCallback(function ($choices, $callback) {
+                return array_map($callback, $choices);
+            }));
+
+        $this->assertSame(array(null), $this->factory->createListFromChoices($choices, 'property'));
+    }
+
+    // https://github.com/symfony/symfony/issues/5494
+    public function testCreateFromChoiceLoaderAssumeNullIfValuePropertyPathUnreadable()
+    {
+        $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromLoader')
+            ->with($loader, $this->isInstanceOf('\Closure'))
+            ->will($this->returnCallback(function ($loader, $callback) {
+                return $callback(null);
+            }));
+
+        $this->assertNull($this->factory->createListFromLoader($loader, 'property'));
+    }
+
     public function testCreateFromLoaderPropertyPathInstance()
     {
         $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');

@@ -673,7 +673,7 @@ body#search h3 {
 {# Tabbed navigation
    ========================================================================= #}
 .tab-navigation {
-    margin: 0;
+    margin: 0 0 1em 0;
     padding: 0;
 }
 .tab-navigation li {
@@ -683,7 +683,7 @@ body#search h3 {
     cursor: pointer;
     display: inline-block;
     font-size: 16px;
-    margin-left: -1px;
+    margin: 0 0 0 -1px;
     padding: .5em .75em;
     z-index: 1;
 }
@@ -715,6 +715,9 @@ body#search h3 {
 .tab-navigation li.active .badge {
     background-color: #444;
     color: #FFF;
+}
+.tab-content > *:first-child {
+    margin-top: 0;
 }
 
 {# Toggles

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T11:21:02Z
+
+Why ? We want to test our high deps on stable PHP versions IMO, not only on nightly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T11:26:53Z
+
+Now that we enforce php7 tests to pass, this is the same (for the use case).
+
+Removing one test line makes tests faster, which means faster feedback for PR-authors, and more merges per day (we quite often saturate our travis slots when we merge several PRs a day while other PRs are also submitted/updated.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T11:48:47Z
+
+Btw, indirectly related: the php7 tests fail from time to time with a segfault.
+I reported this here: https://bugs.php.net/70202

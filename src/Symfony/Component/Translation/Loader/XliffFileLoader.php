@@ -63,7 +63,7 @@ class XliffFileLoader implements LoaderInterface
             if ($notes = $this->parseNotesMetadata($translation->note, $encoding)) {
                 $metadata['notes'] = $notes;
             }
-            if ($translation->target->attributes()) {
+            if (isset($translation->target) && $translation->target->attributes()) {
                 $metadata['target-attributes'] = $translation->target->attributes();
             }
 

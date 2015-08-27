@@ -1,5 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block page_title 'Performance' %}
+
 {% import _self as helper %}
 
 {% if colors is not defined %}
@@ -11,7 +13,6 @@
         'template':               '#66CC00',
         'doctrine':               '#FF6633',
         'propel':                 '#FF6633',
-        'sub_requests':           '#F0F0F0',
     } %}
 {% endif %}
 
@@ -93,22 +94,20 @@
             Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
             <small>
                 {{ collector.events.__section__.duration }} ms
-                <br/>
-                <a href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
+                <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
             </small>
         </h3>
     {% elseif profile.children|length > 0 %}
         <h3>
-            Main Request
-            <small>
-                {{ collector.events.__section__.duration }} ms
-            </small>
+            Main Request <small>{{ collector.events.__section__.duration }} ms</small>
         </h3>
     {% endif %}
 
     {{ helper.display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}
+        <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
+
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h3>
@@ -255,7 +254,12 @@
                         var timelineHeadPosition = x + period.start * ratio;
 
                         if (isChildEvent(event)) {
-                            ctx.fillStyle = colors.sub_requests;
+                            /* create a striped background dynamically */
+                            var img = new Image();
+                            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKBAMAAAB/HNKOAAAAIVBMVEX////w8PDd7h7d7h7d7h7d7h7w8PDw8PDw8PDw8PDw8PAOi84XAAAAKUlEQVQImWNI71zAwMBQMYuBgY0BxExnADErGEDMTgYQE8hnAKtCZwIAlcMNSR9a1OEAAAAASUVORK5CYII=';
+                            var pattern = ctx.createPattern(img, 'repeat');
+
+                            ctx.fillStyle = pattern;
                             ctx.fillRect(timelineHeadPosition, 0, (period.end - period.start) * ratio, canvasHeight);
                         } else if (isSectionEvent(event)) {
                             var timelineTailPosition = x + period.end * ratio;
@@ -300,7 +304,7 @@
                         var timelineHeadPosition = x + period.start * ratio;
 
                         if (!isSectionEvent(event)) {
-                            ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
+                            ctx.fillRect(timelineHeadPosition, h + 3, 2, 8);
                             ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {
                             var timelineTailPosition = x + period.end * ratio;

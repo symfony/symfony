@@ -1,5 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block page_title 'Security' %}
+
 {% block toolbar %}
     {% if collector.tokenClass %}
         {% set is_authenticated = collector.enabled and collector.authenticated  %}
@@ -46,7 +48,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ not collector.enabled ? 'disabled' }}">
+    <span class="label {{ not collector.enabled or not collector.tokenClass ? 'disabled' }}">
         <span class="icon">{{ include('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>

@@ -1,5 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block page_title 'Configuration' %}
+
 {% block toolbar %}
     {% if 'unknown' == collector.symfonyState %}
         {% set block_status = '' %}
@@ -106,7 +108,7 @@
 {% block menu %}
     <span class="label label-status-{{ collector.symfonyState == 'eol' ? 'red' : collector.symfonyState in ['eom', 'dev'] ? 'yellow' : '' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/config.svg') }}</span>
-        <strong>Config</strong>
+        <strong>Configuration</strong>
     </span>
 {% endblock %}
 

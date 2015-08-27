@@ -1,5 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% block page_title 'Request/Response' %}
+
 {% block toolbar %}
     {% set request_handler %}
         {% if collector.controller.class is defined %}

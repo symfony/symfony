@@ -14,14 +14,16 @@
     {% endif %}
 </div>
 
-<h3>Route Parameters</h3>
+{% if request.route %}
+    <h3>Route Parameters</h3>
 
-{% if request.routeParams is empty %}
-    <div class="empty">
-        <p>No parameters.</p>
-    </div>
-{% else %}
-    {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
+    {% if request.routeParams is empty %}
+        <div class="empty">
+            <p>No parameters.</p>
+        </div>
+    {% else %}
+        {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
+    {% endif %}
 {% endif %}
 
 {% if router.redirect %}

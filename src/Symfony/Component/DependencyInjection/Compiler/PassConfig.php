@@ -40,7 +40,7 @@ class PassConfig
      *
      * @param bool $autowiring Enable the autowiring
      */
-    public function __construct($autowiring = false)
+    public function __construct($autowiring = true)
     {
         $this->mergePass = new MergeExtensionConfigurationPass();
 

@@ -30,7 +30,7 @@ class Compiler
      *
      * @param bool $autowiring Enable the autowiring
      */
-    public function __construct($autowiring = false)
+    public function __construct($autowiring = true)
     {
         $this->passConfig = new PassConfig($autowiring);
         $this->serviceReferenceGraph = new ServiceReferenceGraph();

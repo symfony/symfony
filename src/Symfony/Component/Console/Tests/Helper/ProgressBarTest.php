@@ -492,6 +492,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testAnsiColorsAndEmojis()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);

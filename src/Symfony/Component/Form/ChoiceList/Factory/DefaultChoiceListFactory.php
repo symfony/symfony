@@ -70,12 +70,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             $adaptedList = $list->getAdaptedList();
 
-            $remainingViews = $adaptedList->getRemainingViews();
-            $preferredViews = $adaptedList->getPreferredViews();
-            array_walk_recursive($remainingViews, $mapToNonLegacyChoiceView);
-            array_walk_recursive($preferredViews, $mapToNonLegacyChoiceView);
-
-            return new ChoiceListView($remainingViews, $preferredViews);
+            return new ChoiceListView(
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getRemainingViews()),
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getPreferredViews())
+            );
         }
 
         $preferredViews = array();

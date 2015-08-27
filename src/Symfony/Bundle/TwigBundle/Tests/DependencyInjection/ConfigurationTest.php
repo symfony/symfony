@@ -19,12 +19,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testDoNoDuplicateDefaultFormResources()
     {
         $input = array(
-            'form' => array('resources' => array('form_div_layout.html.twig')),
+            'form_themes' => array('form_div_layout.html.twig'),
         );
 
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(), array($input));
 
-        $this->assertEquals(array('form_div_layout.html.twig'), $config['form']['resources']);
+        $this->assertEquals(array('form_div_layout.html.twig'), $config['form_themes']);
     }
 }

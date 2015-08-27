@@ -35,7 +35,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array($input));
+        $config = $processor->processConfiguration(new Configuration(true), array($input));
 
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }

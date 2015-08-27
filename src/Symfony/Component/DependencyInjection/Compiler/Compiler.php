@@ -27,10 +27,12 @@ class Compiler
 
     /**
      * Constructor.
+     *
+     * @param bool $autowiring Enable the autowiring
      */
-    public function __construct()
+    public function __construct($autowiring = false)
     {
-        $this->passConfig = new PassConfig();
+        $this->passConfig = new PassConfig($autowiring);
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
         $this->loggingFormatter = new LoggingFormatter();
     }

@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AutowiringPass implements CompilerPassInterface
 {
+    const NO_AUTOWIRING = 'no_autowiring';
+
     private $container;
     private $reflectionClasses = array();
     private $definedTypes = array();
@@ -36,7 +38,9 @@ class AutowiringPass implements CompilerPassInterface
     {
         $this->container = $container;
         foreach ($container->getDefinitions() as $id => $definition) {
-            $this->completeDefinition($id, $definition);
+            if (!$definition->hasTag(self::NO_AUTOWIRING)) {
+                $this->completeDefinition($id, $definition);
+            }
         }
 
         // Free memory and remove circular reference to container

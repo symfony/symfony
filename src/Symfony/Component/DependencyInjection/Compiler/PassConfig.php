@@ -37,8 +37,10 @@ class PassConfig
 
     /**
      * Constructor.
+     *
+     * @param bool $autowiring Enable the autowiring
      */
-    public function __construct()
+    public function __construct($autowiring = false)
     {
         $this->mergePass = new MergeExtensionConfigurationPass();
 
@@ -50,11 +52,17 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
-            new AutowiringPass(),
+        );
+
+        if ($autowiring) {
+            $this->optimizationPasses[] = new AutowiringPass();
+        }
+
+        $this->optimizationPasses = array_merge($this->optimizationPasses, array(
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
-        );
+        ));
 
         $this->removingPasses = array(
             new RemovePrivateAliasesPass(),

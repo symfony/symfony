@@ -325,7 +325,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getCompiler()
     {
         if (null === $this->compiler) {
-            $this->compiler = new Compiler();
+            $this->compiler = new Compiler($this->hasParameter('container.autowiring') ? $this->getParameter('container.autowiring') : false);
         }
 
         return $this->compiler;

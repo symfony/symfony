@@ -97,7 +97,7 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a".
      */
     public function testTypeCollision()
     {
@@ -177,6 +177,20 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($definition->getArgument(0));
         $this->assertEquals('a', $definition->getArgument(1));
         $this->assertEquals('foo', $definition->getArgument(2));
+    }
+
+    public function testNoAutowiringTag()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $barDefintion = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefintion->addTag(AutowiringPass::NO_AUTOWIRING);
+
+        $pass = new AutowiringPass();
+        $pass->process($container);
+
+        $this->assertCount(0, $container->getDefinition('bar')->getArguments());
     }
 }
 

@@ -59,6 +59,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $loadClassCache;
+    protected $containerAutowiring = true;
 
     const VERSION = '2.8.0-DEV';
     const VERSION_ID = 20800;
@@ -552,6 +553,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.bundles' => $bundles,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
+                'container.autowiring' => $this->containerAutowiring,
             ),
             $this->getEnvParameters()
         );

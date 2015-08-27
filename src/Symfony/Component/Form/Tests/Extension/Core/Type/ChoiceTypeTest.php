@@ -1337,6 +1337,42 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
+    public function testSingleSelectedObjectChoices()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', $this->objectChoices[3], array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->objectChoices,
+            'choices_as_values' => true,
+            'choice_label' => 'name',
+            'choice_value' => 'id',
+        ));
+
+        $view = $form->createView();
+        $selectedChecker = $view->vars['is_selected'];
+
+        $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
+        $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
+    }
+
+    public function testMultipleSelectedObjectChoices()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', array($this->objectChoices[3]), array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->objectChoices,
+            'choices_as_values' => true,
+            'choice_label' => 'name',
+            'choice_value' => 'id',
+        ));
+
+        $view = $form->createView();
+        $selectedChecker = $view->vars['is_selected'];
+
+        $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
+        $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
+    }
+
     /*
      * We need this functionality to create choice fields for Boolean types,
      * e.g. false => 'No', true => 'Yes'

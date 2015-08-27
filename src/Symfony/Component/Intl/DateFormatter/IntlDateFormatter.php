@@ -550,8 +550,12 @@ class IntlDateFormatter
 
         try {
             $this->dateTimeZone = new \DateTimeZone($timeZoneId);
+            if ('GMT' !== $timeZoneId && $this->dateTimeZone->getName() !== $timeZoneId) {
+                $timeZoneId = $timeZone = $this->getTimeZoneId();
+            }
         } catch (\Exception $e) {
-            $this->dateTimeZone = new \DateTimeZone('UTC');
+            $timeZoneId = $timeZone = $this->getTimeZoneId();
+            $this->dateTimeZone = new \DateTimeZone($timeZoneId);
         }
 
         $this->timeZoneId = $timeZone;
@@ -617,7 +621,7 @@ class IntlDateFormatter
         if (self::NONE !== $this->timetype) {
             $patternParts[] = $this->defaultTimeFormats[$this->timetype];
         }
-        $pattern = implode(' ', $patternParts);
+        $pattern = implode(', ', $patternParts);
 
         return $pattern;
     }

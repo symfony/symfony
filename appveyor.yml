@@ -1,0 +1,44 @@
+build: false
+shallow_clone: true
+platform: x86
+clone_folder: c:\projects\symfony
+
+environment:
+    matrix:
+        - PHP_EXT: 1
+        - PHP_EXT: 0
+
+cache:
+    - c:\php -> appveyor.yml
+    - .phpunit -> phpunit
+
+init:
+    - SET PATH=c:\php;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET SYMFONY_DEPRECATIONS_HELPER=strict
+    - SET PHP=1
+    - SET ANSICON=121x90 (121x90)
+
+install:
+    - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+    - cd c:\php
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.6.11-nts-Win32-VC11-x86.zip
+    - IF %PHP%==1 7z x php-5.6.11-nts-Win32-VC11-x86.zip -y > 7z.log
+    - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    - appveyor DownloadFile https://getcomposer.org/composer.phar
+    - copy php.ini-production php.ini /Y
+    - echo date.timezone="UTC" >> php.ini
+    - echo extension_dir=ext >> php.ini
+    - echo extension=php_openssl.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_intl.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_mbstring.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_fileinfo.dll >> php.ini
+    - IF %PHP_EXT%==1 echo extension=php_pdo_sqlite.dll >> php.ini
+    - cd c:\projects\symfony
+    - php phpunit install
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - composer update --prefer-source --no-progress --ansi
+
+test_script:
+    - cd c:\projects\symfony
+    - php phpunit symfony --exclude-group benchmark,intl-data

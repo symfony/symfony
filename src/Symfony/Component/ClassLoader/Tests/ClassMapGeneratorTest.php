@@ -137,10 +137,10 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     protected function assertEqualsNormalized($expected, $actual, $message = null)
     {
         foreach ($expected as $ns => $path) {
-            $expected[$ns] = strtr($path, '\\', '/');
+            $expected[$ns] = str_replace('\\', '/', $path);
         }
         foreach ($actual as $ns => $path) {
-            $actual[$ns] = strtr($path, '\\', '/');
+            $actual[$ns] = str_replace('\\', '/', $path);
         }
         $this->assertEquals($expected, $actual, $message);
     }

@@ -38,6 +38,11 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
 
         $this->assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
+
+        $this->assertEquals(
+            $this->getDateTime(0, $formatter->getTimeZoneId())->format('M j, Y, g:i A'),
+            $formatter->format(0)
+        );
     }
 
     /**
@@ -830,10 +835,10 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('GMT', 'GMT'),
             array('GMT-03:00', 'GMT-03:00'),
             array('Europe/Zurich', 'Europe/Zurich'),
-            array('GMT-0300', 'GMT-0300'),
-            array('Foo/Bar', 'Foo/Bar'),
-            array('GMT+00:AA', 'GMT+00:AA'),
-            array('GMT+00AA', 'GMT+00AA'),
+            array(null, date_default_timezone_get()),
+            array('Foo/Bar', 'UTC'),
+            array('GMT+00:AA', 'UTC'),
+            array('GMT+00AA', 'UTC'),
         );
     }
 
@@ -846,7 +851,9 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
-        $dateTime->setTimezone(new \DateTimeZone($timeZone));
+        if (null !== $timeZone) {
+            $dateTime->setTimezone(new \DateTimeZone($timeZone));
+        }
 
         return $dateTime;
     }

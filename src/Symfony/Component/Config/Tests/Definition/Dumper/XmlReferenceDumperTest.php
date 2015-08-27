@@ -34,7 +34,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
     private function getConfigurationAsString()
     {
-        return <<<EOL
+        return str_replace("\n", PHP_EOL, <<<EOL
 <!-- Namespace: http://example.org/schema/dic/acme_root -->
 <!-- scalar-required: Required -->
 <!-- enum: One of "this"; "that" -->
@@ -75,6 +75,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
 </config>
 
-EOL;
+EOL
+        );
     }
 }

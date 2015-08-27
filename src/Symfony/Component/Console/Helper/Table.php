@@ -513,7 +513,7 @@ class Table
      */
     private function calculateColumnsWidth($rows)
     {
-        for ($column = 0; $column < $this->numberOfColumns; $column++) {
+        for ($column = 0; $column < $this->numberOfColumns; ++$column) {
             $lengths = array();
             foreach ($rows as $row) {
                 if ($row instanceof TableSeparator) {

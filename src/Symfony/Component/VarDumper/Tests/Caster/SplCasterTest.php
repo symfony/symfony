@@ -44,7 +44,7 @@ SplFileInfo {
   file: true
   dir: false
   link: false
-}
+%A}
 EOTXT
             ),
             array('https://google.com/about', <<<'EOTXT'
@@ -61,7 +61,7 @@ SplFileInfo {
   file: false
   dir: false
   link: false
-}
+%A}
 EOTXT
             ),
         );
@@ -111,8 +111,8 @@ SplFileObject {
     "ino" => %d
     "nlink" => %d
     "rdev" => 0
-    "blksize" => %d
-    "blocks" => %d
+    "blksize" => %i
+    "blocks" => %i
      …20
   ]
   eof: false

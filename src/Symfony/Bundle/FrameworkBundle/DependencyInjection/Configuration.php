@@ -336,7 +336,7 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultChildrenIfNoneSet()
                                     ->prototype('scalar')->defaultValue('FrameworkBundle:Form')->end()
                                     ->validate()
-                                        ->ifNotInArray(array('FrameworkBundle:Form'))
+                                        ->ifTrue(function ($v) {return !in_array('FrameworkBundle:Form', $v); })
                                         ->then(function ($v) {
                                             return array_merge(array('FrameworkBundle:Form'), $v);
                                         })

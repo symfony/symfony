@@ -225,7 +225,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {
-                return null;
+                return;
             },
         ));
 
@@ -346,7 +346,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($innerEntity1, $innerEntity2, $entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -421,7 +421,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($innerEntity1, $innerEntity2, $innerEntity3, $entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -732,7 +732,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($innerEntity1, $innerEntity2, $entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::SINGLE_ASSOC_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -804,7 +804,7 @@ class EntityTypeTest extends TypeTestCase
 
         $repository = $this->em->getRepository(self::SINGLE_ASSOC_IDENT_CLASS);
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::SINGLE_ASSOC_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')

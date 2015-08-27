@@ -337,8 +337,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 // scope.
 function createClosure()
 {
-    return function(InputInterface $input, OutputInterface $output)
-    {
+    return function (InputInterface $input, OutputInterface $output) {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
     };
 }

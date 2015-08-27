@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
-use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {

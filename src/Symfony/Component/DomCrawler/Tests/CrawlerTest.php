@@ -81,6 +81,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharset()
     {
@@ -115,6 +116,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharsetGbk()
     {
@@ -235,7 +237,7 @@ EOF
         $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
 
         $crawler = new Crawler();
-        $crawler->addContent(mb_convert_encoding('<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>', 'SJIS', 'UTF-8'));
+        $crawler->addContent(iconv('UTF-8', 'SJIS', '<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
     }
 

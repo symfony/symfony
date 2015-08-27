@@ -25,6 +25,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
         $this->assertSame(array(), libxml_get_errors());
+        $this->assertContainsOnly('string', $catalogue->all('domain1'));
     }
 
     public function testLoadWithInternalErrorsEnabled()
@@ -55,8 +56,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/resources.xlf', 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar', 'key' => '', 'test' => 'with'), $catalogue->all('domain1'));
-        $this->assertFalse($catalogue->has('extra', 'domain1'));
+        $this->assertEquals(array('foo' => 'bar', 'extra' => 'extra', 'key' => '', 'test' => 'with'), $catalogue->all('domain1'));
     }
 
     public function testEncoding()
@@ -145,7 +145,8 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('notes' => array(array('priority' => 1, 'content' => 'foo'))), $catalogue->getMetadata('foo', 'domain1'));
         // message without target
-        $this->assertNull($catalogue->getMetadata('extra', 'domain1'));
+        $this->assertEquals(array('notes' => array(array('content' => 'bar', 'from' => 'foo'))), $catalogue->getMetadata('extra', 'domain1'));
+        // message with empty target
         $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux'))), $catalogue->getMetadata('key', 'domain1'));
     }
 }

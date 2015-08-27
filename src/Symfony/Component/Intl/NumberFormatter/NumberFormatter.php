@@ -538,22 +538,30 @@ class NumberFormatter
             return false;
         }
 
-        preg_match('/^([^0-9\-\.]{0,})(.*)/', $value, $matches);
+        $groupSep = $this->getAttribute(self::GROUPING_USED) ? ',' : '';
 
         // Any string before the numeric value causes error in the parsing
-        if (isset($matches[1]) && !empty($matches[1])) {
+        if (preg_match("/^-?(?:\.\d++|([\d{$groupSep}]++)(?:\.\d++)?)/", $value, $matches)) {
+            $value = $matches[0];
+            $position = strlen($value);
+            if ($error = $groupSep && isset($matches[1]) && !preg_match('/^\d{1,3}+(?:(?:,\d{3})++|\d*+)$/', $matches[1])) {
+                $position -= strlen(preg_replace('/^\d{1,3}+(?:(?:,\d++)++|\d*+)/', '', $matches[1]));
+            }
+        } else {
+            $error = 1;
+            $position = 0;
+        }
+
+        if ($error) {
             IntlGlobals::setError(IntlGlobals::U_PARSE_ERROR, 'Number parsing failed');
             $this->errorCode = IntlGlobals::getErrorCode();
             $this->errorMessage = IntlGlobals::getErrorMessage();
-            $position = 0;
 
             return false;
         }
 
-        preg_match('/^[0-9\-\.\,]*/', $value, $matches);
-        $value = preg_replace('/[^0-9\.\-]/', '', $matches[0]);
+        $value = str_replace(',', '', $value);
         $value = $this->convertValueDataType($value, $type);
-        $position = strlen($matches[0]);
 
         // behave like the intl extension
         $this->resetError();

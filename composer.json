@@ -73,7 +73,7 @@
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2",
-        "symfony/security-acl": "self.version"
+        "symfony/security-acl": "~2.8|~3.0"
     },
     "autoload": {
         "psr-4": {

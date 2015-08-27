@@ -1,0 +1,126 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(-1);
+
+$PHPUNIT_VERSION = 4.8;
+$PHPUNIT_DIR = __DIR__.'/.phpunit';
+
+if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
+    // Build a standalone phpunit without symfony/yaml
+
+    $oldPwd = getcwd();
+    mkdir($PHPUNIT_DIR);
+    chdir($PHPUNIT_DIR);
+    if (extension_loaded('openssl') && ini_get('allow_url_fopen')) {
+        stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
+    } else {
+        passthru("wget https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
+    }
+    $zip = new ZipArchive();
+    $zip->open("$PHPUNIT_VERSION.zip");
+    $zip->extractTo(getcwd());
+    $zip->close();
+    chdir("phpunit-$PHPUNIT_VERSION");
+    passthru("composer remove --no-update symfony/yaml");
+    passthru("composer install --prefer-source --no-progress --ansi");
+    chdir($oldPwd);
+}
+
+$cmd = array_map('escapeshellarg', $argv);
+$exit = 0;
+
+if (isset($argv[1]) && 'symfony' === $argv[1]) {
+    // Find Symfony components in plain php for Windows portability
+
+    $finder = new RecursiveDirectoryIterator('src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+    $finder = new RecursiveIteratorIterator($finder);
+    $finder->setMaxDepth(3);
+
+    array_shift($cmd);
+    $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
+    $procs = array();
+
+    foreach ($finder as $file => $fileInfo) {
+        if ('phpunit.xml.dist' === $file) {
+            $component = dirname($fileInfo->getPathname());
+
+            // Run phpunit tests in parallel
+
+            $c = escapeshellarg($component);
+
+            if ($proc = proc_open(implode(' ', $cmd)." $c > $c/phpunit.stdout 2> $c/phpunit.stderr", array(), $pipes)) {
+                $procs[$component] = $proc;
+            } else {
+                $exit = 1;
+                echo "\033[41mKO\033[0m $component\n\n";
+            }
+        }
+    }
+
+    // Fixes for colors support on appveyor
+    // See http://help.appveyor.com/discussions/suggestions/197-support-ansi-color-codes
+    $colorFixes = array(
+        array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
+        array("SS", "EE", "II", "FF"),
+    );
+    $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
+    $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
+
+    foreach ($procs as $component => $proc) {
+        $procStatus = proc_close($proc);
+
+        foreach (array('out', 'err') as $file) {
+            $file = "$component/phpunit.std$file";
+
+            if ('\\' === DIRECTORY_SEPARATOR) {
+                $h = fopen($file, 'rb');
+                while (false !== $line = fgets($h)) {
+                    echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
+                        '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
+                        "$1m\033[$2$3$4$4",
+                        $line
+                    ));
+                }
+                fclose($h);
+            } else {
+                readfile($file);
+            }
+            unlink($file);
+        }
+
+        if ($procStatus) {
+            $exit = 1;
+            echo "\033[41mKO\033[0m $component\n\n";
+        } else {
+            echo "\033[32mOK\033[0m $component\n\n";
+        }
+    }
+
+} elseif (!isset($argv[1]) || 'install' !== $argv[1]) {
+    // Run regular phpunit in a subprocess
+
+    $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
+
+    $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
+    if ($proc = proc_open(implode(' ', $cmd).' 2> '.escapeshellarg($errFile), array(1 => array('pipe', 'w')), $pipes)) {
+        stream_copy_to_stream($pipes[1], STDOUT);
+        fclose($pipes[1]);
+        $exit = proc_close($proc);
+
+        readfile($errFile);
+        unlink($errFile);
+    }
+
+    if (!file_exists($component = array_pop($argv))) {
+        $component = basename(getcwd());
+    }
+
+    if ($exit) {
+        echo "\033[41mKO\033[0m $component\n\n";
+    } else {
+        echo "\033[32mOK\033[0m $component\n\n";
+    }
+}
+
+exit($exit);

@@ -69,7 +69,12 @@ class YamlReferenceDumper
                 if ($key = $node->getKeyAttribute()) {
                     $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
                     $keyNode = new $keyNodeClass($key, $node);
-                    $keyNode->setInfo('Prototype');
+
+                    $info = 'Prototype';
+                    if (null !== $prototype->getInfo()) {
+                        $info .= ': '.$prototype->getInfo();
+                    }
+                    $keyNode->setInfo($info);
 
                     // add children
                     foreach ($children as $childNode) {

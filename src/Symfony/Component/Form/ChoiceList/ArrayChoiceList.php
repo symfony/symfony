@@ -155,7 +155,7 @@ class ArrayChoiceList implements ChoiceListInterface
             $givenValues = array();
 
             foreach ($choices as $i => $givenChoice) {
-                $givenValues[$i] = call_user_func($this->valueCallback, $givenChoice);
+                $givenValues[$i] = (string) call_user_func($this->valueCallback, $givenChoice);
             }
 
             return array_intersect($givenValues, array_keys($this->choices));

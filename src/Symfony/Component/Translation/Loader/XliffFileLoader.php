@@ -48,14 +48,14 @@ class XliffFileLoader implements LoaderInterface
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
             $attributes = $translation->attributes();
 
-            if (!(isset($attributes['resname']) || isset($translation->source)) || !isset($translation->target)) {
+            if (!(isset($attributes['resname']) || isset($translation->source))) {
                 continue;
             }
 
             $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
             // If the xlf file has another encoding specified, try to convert it because
             // simple_xml will always return utf-8 encoded values
-            $target = $this->utf8ToCharset((string) $translation->target, $encoding);
+            $target = $this->utf8ToCharset((string) (isset($translation->target) ? $translation->target : $source), $encoding);
 
             $catalogue->set((string) $source, $target, $domain);
 

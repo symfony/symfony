@@ -23,12 +23,12 @@ class SplCasterTest extends VarDumperTestCase
         return array(
             array(__FILE__, <<<'EOTXT'
 SplFileInfo {
-%Apath: "%s/Tests/Caster"
+%Apath: "%sCaster"
   filename: "SplCasterTest.php"
   basename: "SplCasterTest.php"
-  pathname: "%s/Tests/Caster/SplCasterTest.php"
+  pathname: "%sSplCasterTest.php"
   extension: "php"
-  realPath: "%s/Tests/Caster/SplCasterTest.php"
+  realPath: "%sSplCasterTest.php"
   aTime: %s-%s-%d %d:%d:%d
   mTime: %s-%s-%d %d:%d:%d
   cTime: %s-%s-%d %d:%d:%d
@@ -79,12 +79,12 @@ EOTXT
         $var->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
         $dump = <<<'EOTXT'
 SplFileObject {
-%Apath: "%s/Tests/Caster"
+%Apath: "%sCaster"
   filename: "SplCasterTest.php"
   basename: "SplCasterTest.php"
-  pathname: "%s/Tests/Caster/SplCasterTest.php"
+  pathname: "%sSplCasterTest.php"
   extension: "php"
-  realPath: "%s/Tests/Caster/SplCasterTest.php"
+  realPath: "%sSplCasterTest.php"
   aTime: %s-%s-%d %d:%d:%d
   mTime: %s-%s-%d %d:%d:%d
   cTime: %s-%s-%d %d:%d:%d
@@ -100,7 +100,7 @@ SplFileObject {
   file: true
   dir: false
   link: false
-  csvControl: array:2 [
+%AcsvControl: array:2 [
     0 => ","
     1 => """
   ]

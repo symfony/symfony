@@ -65,17 +65,15 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         if ($list instanceof LegacyChoiceListAdapter && empty($preferredChoices)
             && null === $label && null === $index && null === $groupBy && null === $attr && null === $labelAttr) {
             $mapToNonLegacyChoiceView = function (LegacyChoiceView $choiceView) {
-                $choiceView = new ChoiceView($choiceView->data, $choiceView->value, $choiceView->label);
+                return new ChoiceView($choiceView->data, $choiceView->value, $choiceView->label);
             };
 
             $adaptedList = $list->getAdaptedList();
 
-            $remainingViews = $adaptedList->getRemainingViews();
-            $preferredViews = $adaptedList->getPreferredViews();
-            array_walk_recursive($remainingViews, $mapToNonLegacyChoiceView);
-            array_walk_recursive($preferredViews, $mapToNonLegacyChoiceView);
-
-            return new ChoiceListView($remainingViews, $preferredViews);
+            return new ChoiceListView(
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getRemainingViews()),
+                array_map($mapToNonLegacyChoiceView, $adaptedList->getPreferredViews())
+            );
         }
 
         $preferredViews = array();

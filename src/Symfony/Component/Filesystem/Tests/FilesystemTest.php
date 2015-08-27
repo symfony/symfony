@@ -669,7 +669,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testSymlink()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markAsSkipped('Windows does not support creating "broken" symlinks');
+            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
         }
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';

@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Formatter;
 /**
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  */
-class IntlMessageFormatter implements MessageFormatterInterface
+class LegacyIntlMessageFormatter implements MessageFormatterInterface
 {
     /**
      * {@inheritdoc}
@@ -27,20 +27,23 @@ class IntlMessageFormatter implements MessageFormatterInterface
 
         $formatter = new \MessageFormatter($locale, $id);
         if (null === $formatter) {
-            throw new \InvalidArgumentException(sprintf('Invalid message format. Reason: %s (error #%d)', intl_get_error_message(), intl_get_error_code()));
+            return $this->fallbackToLegacyFormatter($id, $parameters);
         }
 
         $message = $formatter->format($parameters);
         if ($formatter->getErrorCode() !== U_ZERO_ERROR) {
-            throw new \InvalidArgumentException(sprintf('Unable to format message. Reason: %s (error #%s)', $formatter->getErrorMessage(), $formatter->getErrorCode()));
+            return $this->fallbackToLegacyFormatter($message, $parameters);
         }
 
         if (!$formatter->parse($message) && $formatter->getErrorCode() === U_ZERO_ERROR) {
-            @trigger_error('Passing a MessageSelector instance into the '.__METHOD__.' as a second argument is deprecated since version 2.8 and will be removed in 3.0. Inject a MessageFormatterInterface instance instead.', E_USER_DEPRECATED);
-
-            return strtr($message, $parameters);
+            return $this->fallbackToLegacyFormatter($message, $parameters);
         }
 
         return $message;
+    }
+
+    private function fallbackToLegacyFormatter($message, $parameters)
+    {
+        return strtr($message, $parameters);
     }
 }

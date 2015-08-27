@@ -29,7 +29,7 @@ class IntlMessageFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormat($expected, $message, $arguments)
     {
-        $formatter = new IntlMessageFormatter();
+        $formatter = $this->getMessageFormatter();
 
         $this->assertEquals($expected, trim($formatter->format('en', $message, $arguments)));
     }
@@ -59,7 +59,7 @@ class IntlMessageFormatterTest extends \PHPUnit_Framework_TestCase
      other {{host} invites {guest} as one of the # people invited to their party.}}}}
 _MSG_;
 
-        $formatter = new IntlMessageFormatter();
+        $formatter = $this->getMessageFormatter();
         $message = $formatter->format('en', $chooseMessage, array(
             'gender_of_host' => 'male',
             'num_guests' => 10,
@@ -84,5 +84,10 @@ _MSG_;
                 array(4560, 123, 4560 / 123),
             ),
         );
+    }
+
+    protected function getMessageFormatter()
+    {
+        return new IntlMessageFormatter();
     }
 }

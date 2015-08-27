@@ -43,6 +43,15 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getTranschoiceTests
+     * @group legacy
+     */
+    public function testTranschoice($template, $expected, array $variables = array())
+    {
+        $this->testTrans($template, $expected, $variables);
+    }
+
+    /**
      * @expectedException        \Twig_Error_Syntax
      * @expectedExceptionMessage Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.
      */
@@ -84,6 +93,18 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 
             array('{% trans into "fr"%}Hello{% endtrans %}', 'Hello'),
 
+            // trans filter
+            array('{{ "Hello"|trans }}', 'Hello'),
+            array('{{ name|trans }}', 'Symfony', array('name' => 'Symfony')),
+            array('{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
+            array('{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
+            array('{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'),
+        );
+    }
+
+    public function getTranschoiceTests()
+    {
+        return array(
             // transchoice
             array('{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
                 'There is no apples', array('count' => 0),),
@@ -98,13 +119,6 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             array('{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
                 'There is 5 apples',),
 
-            // trans filter
-            array('{{ "Hello"|trans }}', 'Hello'),
-            array('{{ name|trans }}', 'Symfony', array('name' => 'Symfony')),
-            array('{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'),
-
             // transchoice filter
             array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|transchoice(count) }}', 'There is 5 apples', array('count' => 5)),
             array('{{ text|transchoice(5, {\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', array('text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)')),
@@ -112,7 +126,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDefaultTranslationDomain()
+    public function testTransDefaultTranslationDomain()
     {
         $templates = array(
             'index' => '
@@ -125,6 +139,31 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
                     {%- trans from "custom" %}foo{% endtrans %}
                     {{- "foo"|trans }}
                     {{- "foo"|trans({}, "custom") }}
+                {% endblock %}
+            ',
+
+            'base' => '
+                {%- block content "" %}
+            ',
+        );
+
+        $template = $this->getTemplate($templates, $this->getTranslator());
+
+        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceDefaultTranslationDomain()
+    {
+        $templates = array(
+            'index' => '
+                {%- extends "base" %}
+
+                {%- trans_default_domain "foo" %}
+
+                {%- block content %}
                     {{- "foo"|transchoice(1) }}
                     {{- "foo"|transchoice(1, {}, "custom") }}
                 {% endblock %}
@@ -135,15 +174,9 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ',
         );
 
-        $translator = new Translator('en');
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
-        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
-        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
+        $template = $this->getTemplate($templates, $this->getTranslator());
 
-        $template = $this->getTemplate($templates, $translator);
-
-        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+        $this->assertEquals('foo (foo)foo (custom)', trim($template->render(array())));
     }
 
     public function testDefaultTranslationDomainWithNamedArguments()
@@ -154,10 +187,33 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 
                 {%- block content %}
                     {{- "foo"|trans(arguments = {}, domain = "custom") }}
-                    {{- "foo"|transchoice(count = 1) }}
-                    {{- "foo"|transchoice(count = 1, arguments = {}, domain = "custom") }}
                     {{- "foo"|trans({}, domain = "custom") }}
                     {{- "foo"|trans({}, "custom", locale = "fr") }}
+                {% endblock %}
+            ',
+
+            'base' => '
+                {%- block content "" %}
+            ',
+        );
+
+        $template = $this->getTemplate($templates, $this->getTranslator());
+
+        $this->assertEquals('foo (custom)foo (custom)foo (fr)', trim($template->render(array())));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testTransChoiceDefaultTranslationDomainWithNamedArguments()
+    {
+        $templates = array(
+            'index' => '
+                {%- trans_default_domain "foo" %}
+
+                {%- block content %}
+                    {{- "foo"|transchoice(count = 1) }}
+                    {{- "foo"|transchoice(count = 1, arguments = {}, domain = "custom") }}
                     {{- "foo"|transchoice(1, arguments = {}, domain = "custom") }}
                     {{- "foo"|transchoice(1, {}, "custom", locale = "fr") }}
                 {% endblock %}
@@ -168,6 +224,13 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ',
         );
 
+        $template = $this->getTemplate($templates, $this->getTranslator());
+
+        $this->assertEquals('foo (foo)foo (custom)foo (custom)foo (fr)', trim($template->render(array())));
+    }
+
+    protected function getTranslator()
+    {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
@@ -175,9 +238,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
         $translator->addResource('array', array('foo' => 'foo (fr)'), 'fr', 'custom');
 
-        $template = $this->getTemplate($templates, $translator);
-
-        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render(array())));
+        return $translator;
     }
 
     protected function getTemplate($template, $translator = null)

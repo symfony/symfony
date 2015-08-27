@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
-use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
+use Symfony\Component\Translation\Formatter\LegacyIntlMessageFormatter;
 
 /**
  * IdentityTranslator does not translate anything.
@@ -37,12 +37,12 @@ class IdentityTranslator implements TranslatorInterface
         if ($formatter instanceof MessageSelector) {
             @trigger_error('Passing a MessageSelector instance into the '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Inject a MessageFormatterInterface instance instead.', E_USER_DEPRECATED);
             $this->selector = $formatter;
-            $formatter = new DefaultMessageFormatter();
+            $formatter = new LegacyIntlMessageFormatter();
         } else {
             $this->selector = new MessageSelector();
         }
 
-        $this->formatter = $formatter ?: new DefaultMessageFormatter();
+        $this->formatter = $formatter ?: new LegacyIntlMessageFormatter();
         if (!$this->formatter instanceof MessageFormatterInterface) {
             throw new \InvalidArgumentException(sprintf('The message formatter "%s" must implement MessageFormatterInterface.', get_class($this->formatter)));
         }
@@ -89,6 +89,7 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Rely on the MessageFormatterInterface and TranslatorInterface::trans() method instead.', E_USER_DEPRECATED);
         if (!$locale) {
             $locale = $this->getLocale();
         }

@@ -57,10 +57,10 @@
             <argument type="service" id="translator.formatter" />
         </service>
 
-        <service id="translator.formatter" alias="translator.formatter.default" />
+        <service id="translator.formatter" alias="translator.formatter.legacy_intl" />
         <service id="translator.formatter.intl" class="Symfony\Component\Translation\Formatter\IntlMessageFormatter" public="false" />
 
-        <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\DefaultMessageFormatter" public="false">
+        <service id="translator.formatter.legacy_intl" class="Symfony\Component\Translation\Formatter\LegacyIntlMessageFormatter" public="false">
             <argument type="service" id="translator.selector" />
         </service>
 

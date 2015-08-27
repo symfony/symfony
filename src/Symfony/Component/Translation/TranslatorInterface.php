@@ -39,6 +39,9 @@ interface TranslatorInterface
     /**
      * Translates the given choice message by choosing a translation according to a number.
      *
+     * @deprecated since version 2.8, to be removed in 3.0.
+     *             Use the {@link trans} method instead.
+     *
      * @param string      $id         The message id (may also be an object that can be cast to string)
      * @param int         $number     The number to use to find the indice of the message
      * @param array       $parameters An array of parameters for the message

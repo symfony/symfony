@@ -21,13 +21,13 @@ interface MessageFormatterInterface
     /**
      * Formats a lozalized message pattern with given arguments.
      *
-     * @param string $locale    The message locale
-     * @param string $id        The message id (may also be an object that can be cast to string)
-     * @param array  $arguments An array of parameters for the message
+     * @param string $locale     The message locale
+     * @param string $id         The message id (may also be an object that can be cast to string)
+     * @param array  $parameters An array of parameters for the message
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function format($locale, $id, array $arguments = array());
+    public function format($locale, $id, array $parameters = array());
 }

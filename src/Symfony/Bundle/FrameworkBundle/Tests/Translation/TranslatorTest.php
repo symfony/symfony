@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
+use Symfony\Component\Translation\Formatter\IntlMessageFormatter;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,10 +50,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array(0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array(1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
@@ -68,10 +68,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array(0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array(1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
@@ -86,10 +86,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array(0)));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array(1)));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
@@ -157,7 +157,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('en'))
         ;
 
-        $translator = new Translator($container, new DefaultMessageFormatter());
+        $translator = new Translator($container, new IntlMessageFormatter());
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -191,7 +191,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getCatalogue('en', array(
                 'foo' => 'foo (EN)',
                 'bar' => 'bar (EN)',
-                'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
+                'choice' => '{0, plural, =0 {choice 0 (EN)} =1 {choice 1 (EN)} other {# choice inf (EN)}}',
             ))))
         ;
         $loader
@@ -212,7 +212,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(4))
             ->method('load')
             ->will($this->returnValue($this->getCatalogue('pt_BR', array(
-                'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
+                'other choice' => '{0, plural, =0 {other choice 0 (PT-BR)} =1 {other choice 1 (PT-BR)} other {# other choice inf (PT-BR)}}',
             ))))
         ;
         $loader
@@ -290,7 +290,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         return new $translatorClass(
             $this->getContainer($loader),
-            new DefaultMessageFormatter(),
+            new IntlMessageFormatter(),
             array($loaderFomat => array($loaderFomat)),
             $options
         );

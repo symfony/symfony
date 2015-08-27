@@ -58,6 +58,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Rely on the MessageFormatterInterface and TranslatorInterface::trans() method instead.', E_USER_DEPRECATED);
         $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters, $number);
 

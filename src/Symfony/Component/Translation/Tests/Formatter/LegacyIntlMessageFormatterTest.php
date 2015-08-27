@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\Translation\Tests\Formatter;
 
-use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
+use Symfony\Component\Translation\Formatter\LegacyIntlMessageFormatter;
 
-class DefaultMessageFormatterTest extends \PHPUnit_Framework_TestCase
+class LegacyIntlMessageFormatterTest extends IntlMessageFormatterTest
 {
     /**
-     * @dataProvider provideDataForFormat
+     * @dataProvider legacyMessages
      */
-    public function testFormat($expected, $message, $arguments)
+    public function testFormatLegacyMessages($expected, $message, $arguments)
     {
-        $formatter = new DefaultMessageFormatter();
+        $formatter = $this->getMessageFormatter();
 
         $this->assertEquals($expected, $formatter->format('en', $message, $arguments));
     }
 
-    public function provideDataForFormat()
+    public function legacyMessages()
     {
         return array(
             array(
@@ -38,17 +38,16 @@ class DefaultMessageFormatterTest extends \PHPUnit_Framework_TestCase
                 'There are %count% apples',
                 array('%count%' => 5),
             ),
+            array(
+                'There are 5 apples',
+                'There are {{count}} apples',
+                array('{{count}}' => 5),
+            ),
         );
     }
 
-    private function mockMessageSelector($willCallChoose)
+    protected function getMessageFormatter()
     {
-        $mock = $this->getMock('Symfony\Component\Translation\MessageSelector');
-
-        $mock->expects($willCallChoose ? $this->once() : $this->never())
-             ->method('choose')
-             ->will($this->returnValue('Message'));
-
-        return $mock;
+        return new LegacyIntlMessageFormatter();
     }
 }

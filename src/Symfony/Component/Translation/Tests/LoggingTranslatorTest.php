@@ -27,17 +27,19 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithNoTranslationIsLogged()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');
-        $logger->expects($this->exactly(2))
+        $logger->expects($this->any())
             ->method('warning')
             ->with('Translation not found.')
         ;
 
         $translator = new Translator('ar');
         $loggableTranslator = new LoggingTranslator($translator, $logger);
-        $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
         $loggableTranslator->trans('bar');
     }
 
+    /**
+     * @group legacy
+     */
     public function testTransChoiceFallbackIsLogged()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');

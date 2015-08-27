@@ -15,7 +15,7 @@
         <table id="search-results" class="auto-layout">
             <thead>
                 <tr>
-                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Status</th>
                     <th scope="col">IP</th>
                     <th scope="col">Method</th>
                     <th scope="col">URL</th>
@@ -25,10 +25,12 @@
             </thead>
             <tbody>
                 {% for result in tokens %}
-                    {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : '' %}
+                    {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
 
-                    <tr class="{{ css_class }}">
-                        <td class="text-bold colored">{{ result.status_code|default('n/a') }}</td>
+                    <tr>
+                        <td class="text-center">
+                            <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                        </td>
                         <td class="nowrap">{{ result.ip }}</td>
                         <td>{{ result.method }}</td>
                         <td class="break-long-words">{{ result.url }}</td>

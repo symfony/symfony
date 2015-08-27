@@ -210,14 +210,19 @@ table tbody div {
     margin: 1em 0;
     padding: .5em 2em;
 }
+
 .label {
     background-color: #666;
     color: #FAFAFA;
     display: inline-block;
     font-size: 12px;
+    font-weight: bold;
     padding: 3px 7px;
     white-space: nowrap;
 }
+.label.status-success { background: #5E976E; color: #FFF; }
+.label.status-warning { background: #BC8034; color: #FFF; }
+.label.status-error   { background: #B0413E; color: #FFF; }
 
 {# Metrics
    ------------------------------------------------------------------------- #}
@@ -254,7 +259,6 @@ table tbody div {
     color: #222;
     display: block;
     font-size: 12px;
-    font-weight: bold;
     padding: 5px;
     text-align: center;
 }
@@ -301,7 +305,6 @@ table tbody div {
 .card .label {
     background-color: #EEE;
     color: #222;
-    font-weight: bold;
 }
 
 {# Status

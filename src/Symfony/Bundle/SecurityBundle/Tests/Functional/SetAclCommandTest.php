@@ -30,6 +30,13 @@ class SetAclCommandTest extends WebTestCase
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
 
+    protected function setUp()
+    {
+        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
+            self::markTestSkipped('This test requires SQLite support in your environment');
+        }
+    }
+
     public function testSetAclUser()
     {
         $objectId = 1;

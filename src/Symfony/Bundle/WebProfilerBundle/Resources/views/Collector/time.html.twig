@@ -60,6 +60,23 @@
             <span class="label">Symfony initialization</span>
         </div>
 
+        {% if profile.children|length > 0 %}
+            <div class="metric">
+                <span class="value">{{ profile.children|length }}</span>
+                <span class="label">Sub-Requests</span>
+            </div>
+
+            {% set subrequests_time = 0 %}
+            {% for child in profile.children %}
+                {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
+            {% endfor %}
+
+            <div class="metric">
+                <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
+                <span class="label">Sub-Requests time</span>
+            </div>
+        {% endif %}
+
         {% if profile.collectors.memory %}
             <div class="metric">
                 <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
@@ -106,12 +123,14 @@
     {% if profile.children|length %}
         <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
 
+        <h3>Sub-requests <small>({{ profile.children|length }})</small></h3>
+
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
-            <h3>
-                Sub-request <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
+            <h4>
+                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
-            </h3>
+            </h4>
 
             {{ helper.display_timeline('timeline_' ~ child.token, events, colors) }}
         {% endfor %}

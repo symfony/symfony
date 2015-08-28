@@ -139,6 +139,8 @@
         <service id="security.authentication.custom_failure_handler" class="Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler" abstract="true" public="false">
             <argument /> <!-- The custom failure handler service id -->
             <argument type="collection" /> <!-- Options -->
+
+            <tag name="no_autowiring" />
         </service>
 
         <service id="security.authentication.failure_handler" class="%security.authentication.failure_handler.class%" abstract="true" public="false">

@@ -17,8 +17,6 @@
             <argument type="service" id="annotations.reader" />
             <argument /><!-- Cache Implementation -->
             <argument /><!-- Debug-Flag -->
-
-            <tag name="no_autowiring" />
         </service>
 
         <service id="annotations.file_cache_reader" class="%annotations.file_cache_reader.class%" public="false">

@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AutowiringPass implements CompilerPassInterface
 {
-    const NO_AUTOWIRING = 'no_autowiring';
+    const AUTOWIRING = 'autowiring';
 
     private $container;
     private $reflectionClasses = array();
@@ -38,7 +38,7 @@ class AutowiringPass implements CompilerPassInterface
     {
         $this->container = $container;
         foreach ($container->getDefinitions() as $id => $definition) {
-            if (!$definition->hasTag(self::NO_AUTOWIRING)) {
+            if ($definition->hasTag(self::AUTOWIRING)) {
                 $this->completeDefinition($id, $definition);
             }
         }
@@ -244,10 +244,6 @@ class AutowiringPass implements CompilerPassInterface
 
         $class = $this->container->getParameterBag()->resolveValue($class);
 
-        try {
-            return $this->reflectionClasses[$id] = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
-            // Skip invalid classes definitions to keep BC
-        }
+        return $this->reflectionClasses[$id] = new \ReflectionClass($class);
     }
 }

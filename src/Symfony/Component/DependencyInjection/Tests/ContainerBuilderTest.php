@@ -893,10 +893,11 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAutowiring()
     {
-        $container = new ContainerBuilder(new ParameterBag(array('container.autowiring' => true)));
+        $container = new ContainerBuilder();
 
         $container->register('a', __NAMESPACE__.'\A');
-        $container->register('b', __NAMESPACE__.'\B');
+        $bDefinition = $container->register('b', __NAMESPACE__.'\B');
+        $bDefinition->addTag('autowiring');
 
         $container->compile();
 

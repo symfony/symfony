@@ -59,7 +59,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $loadClassCache;
-    protected $containerAutowiring = true;
 
     const VERSION = '2.8.0-DEV';
     const VERSION_ID = 20800;
@@ -644,9 +643,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function getContainerBuilder()
     {
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
-        if (!$this->containerAutowiring) {
-            $container->setAutowiring(false);
-        }
 
         if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
             $container->setProxyInstantiator(new RuntimeInstantiator());

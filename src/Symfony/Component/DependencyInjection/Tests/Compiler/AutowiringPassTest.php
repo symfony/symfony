@@ -25,7 +25,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', __NAMESPACE__.'\Foo');
-        $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -39,7 +40,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('b', __NAMESPACE__.'\B');
-        $container->register('c', __NAMESPACE__.'\C');
+        $cDefinition = $container->register('c', __NAMESPACE__.'\C');
+        $cDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -53,7 +55,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('f', __NAMESPACE__.'\F');
-        $container->register('g', __NAMESPACE__.'\G');
+        $gDefinition = $container->register('g', __NAMESPACE__.'\G');
+        $gDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -69,7 +72,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('b', __NAMESPACE__.'\B');
         $container->register('f', __NAMESPACE__.'\F');
-        $container->register('h', __NAMESPACE__.'\H')->addArgument(new Reference('b'));
+        $hDefinition = $container->register('h', __NAMESPACE__.'\H')->addArgument(new Reference('b'));
+        $hDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -85,7 +89,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('b', __NAMESPACE__.'\B');
         $container->register('f', __NAMESPACE__.'\F');
-        $container->register('h', __NAMESPACE__.'\H')->addArgument('')->addArgument('');
+        $hDefinition = $container->register('h', __NAMESPACE__.'\H')->addArgument('')->addArgument('');
+        $hDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -105,7 +110,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('c1', __NAMESPACE__.'\CollisionA');
         $container->register('c2', __NAMESPACE__.'\CollisionB');
-        $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -117,7 +123,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('c1', __NAMESPACE__.'\CollisionA');
         $container->register('c2', __NAMESPACE__.'\CollisionB')->addType(__NAMESPACE__.'\CollisionInterface');
-        $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -130,7 +137,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('coop_tilleuls', __NAMESPACE__.'\LesTilleuls');
+        $coopTilleulsDefinition = $container->register('coop_tilleuls', __NAMESPACE__.'\LesTilleuls');
+        $coopTilleulsDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -154,7 +162,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->setParameter('class_name', __NAMESPACE__.'\Foo');
         $container->register('foo', '%class_name%');
-        $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -168,7 +177,8 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('a', __NAMESPACE__.'\A');
         $container->register('foo', __NAMESPACE__.'\Foo');
-        $container->register('opt', __NAMESPACE__.'\OptionalParameter');
+        $optDefinition = $container->register('opt', __NAMESPACE__.'\OptionalParameter');
+        $optDefinition->addTag(AutowiringPass::AUTOWIRING);
 
         $pass = new AutowiringPass();
         $pass->process($container);
@@ -179,13 +189,12 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $definition->getArgument(2));
     }
 
-    public function testNoAutowiringTag()
+    public function testDontTriggeruAutowiring()
     {
         $container = new ContainerBuilder();
 
         $container->register('foo', __NAMESPACE__.'\Foo');
-        $barDefintion = $container->register('bar', __NAMESPACE__.'\Bar');
-        $barDefintion->addTag(AutowiringPass::NO_AUTOWIRING);
+        $container->register('bar', __NAMESPACE__.'\Bar');
 
         $pass = new AutowiringPass();
         $pass->process($container);

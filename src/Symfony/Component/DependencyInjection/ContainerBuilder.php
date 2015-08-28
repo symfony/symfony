@@ -88,6 +88,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $expressionLanguageProviders = array();
 
+    private $autowiring = true;
+
     /**
      * @var string[] with tag names used by findTaggedServiceIds
      */
@@ -124,6 +126,26 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
     {
         $this->proxyInstantiator = $proxyInstantiator;
+    }
+
+    /**
+     * Sets if the autowiring must be enabled or not.
+     *
+     * @param bool $autowiring
+     */
+    public function setAutowiring($autowiring)
+    {
+        $this->autowiring = (bool) $autowiring;
+    }
+
+    /**
+     * Checks if the autowiring is enabled.
+     *
+     * @return bool
+     */
+    public function isAutowiring()
+    {
+        return $this->autowiring;
     }
 
     /**
@@ -325,7 +347,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getCompiler()
     {
         if (null === $this->compiler) {
-            $this->compiler = new Compiler($this->hasParameter('container.autowiring') ? $this->getParameter('container.autowiring') : true);
+            $this->compiler = new Compiler($this->autowiring);
         }
 
         return $this->compiler;

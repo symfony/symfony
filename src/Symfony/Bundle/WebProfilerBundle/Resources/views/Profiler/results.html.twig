@@ -1,7 +1,5 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% block page_title 'Search results' %}
-
 {% block summary %}
     <div class="status">
         <div class="container">
@@ -11,7 +9,7 @@
 {% endblock %}
 
 {% block panel %}
-    <h3>{{ tokens ? tokens|length : 'No' }} results found</h3>
+    <h2>{{ tokens ? tokens|length : 'No' }} results found</h2>
 
     {% if tokens %}
         <table id="search-results" class="auto-layout">

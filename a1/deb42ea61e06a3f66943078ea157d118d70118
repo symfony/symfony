@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-25T11:59:56Z
+
+@stof I've added back the original code as fallback. This will make it pass through to the doctrine class utils when possible.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T08:51:29Z
+
+Status: needs work
+
+Left 2 minor comments
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-27T10:13:27Z
+
+@WouterJ I've processed your feedback and also added it to the changelog.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T10:18:13Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T06:34:38Z
+
+:+1:

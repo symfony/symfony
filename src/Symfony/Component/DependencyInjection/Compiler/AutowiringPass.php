@@ -119,14 +119,14 @@ class AutowiringPass implements CompilerPassInterface
     }
 
     /**
-     * Populates the of available types for a given definition.
+     * Populates the list of available types for a given definition.
      *
      * @param string     $id
      * @param Definition $definition
      */
     private function populateAvailableType($id, Definition $definition)
     {
-        if (!($class = $definition->getClass())) {
+        if (!$definition->getClass()) {
             return;
         }
 
@@ -172,19 +172,19 @@ class AutowiringPass implements CompilerPassInterface
     }
 
     /**
-     * Associates if applicable a type and a service id or a class.
+     * Associates a type and a service id if applicable.
      *
      * @param string $type
-     * @param string $value A service id or a class name depending of the value of $class
+     * @param string $id
      */
-    private function set($type, $value)
+    private function set($type, $id)
     {
         if (isset($this->definedTypes[$type]) || isset($this->notGuessableTypes[$type])) {
             return;
         }
 
         if (isset($this->types[$type])) {
-            if ($this->types[$type] === $value) {
+            if ($this->types[$type] === $id) {
                 return;
             }
 
@@ -194,7 +194,7 @@ class AutowiringPass implements CompilerPassInterface
             return;
         }
 
-        $this->types[$type] = $value;
+        $this->types[$type] = $id;
     }
 
     /**

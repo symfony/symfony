@@ -120,7 +120,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
 
         if (false === $name) {
-            $name = strtr($file, '\\', '/');
+            $name = str_replace('\\', '/', $file);
             $name = substr($name, strrpos($name, '/') + 1);
         }
 

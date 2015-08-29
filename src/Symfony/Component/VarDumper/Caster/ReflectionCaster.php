@@ -109,6 +109,7 @@ class ReflectionCaster
 
         self::addMap($a, $c, array(
             'returnsReference' => 'returnsReference',
+            'returnType' => 'getReturnType',
             'class' => 'getClosureScopeClass',
             'this' => 'getClosureThis',
         ));

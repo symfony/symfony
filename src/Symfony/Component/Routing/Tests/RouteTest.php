@@ -229,4 +229,16 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }
+
+    public function testSerializeHasCompiledField()
+    {
+        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
+        $route->compile();
+
+        $serialized = serialize($route);
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals($route, $unSerialized);
+        $this->assertNotSame($route, $unSerialized);
+    }
 }

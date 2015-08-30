@@ -20,7 +20,7 @@
         "doctrine/common": "~2.3",
         "twig/twig": "~1.20|~2.0",
         "psr/log": "~1.0",
-        "symfony/security-acl": "self.version"
+        "symfony/security-acl": "~2.7"
     },
     "replace": {
         "symfony/asset": "self.version",

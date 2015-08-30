@@ -94,7 +94,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
             }
 
             foreach ($groups as $group) {
-                $this->accept($visitor, $value, $group, $propertyPath, Constraint::DEFAULT_GROUP);
+                $this->accept($visitor, $value, $group, $propertyPath, ($this->defaultGroup === $group) ? Constraint::DEFAULT_GROUP : null);
 
                 if (count($visitor->getViolations()) > 0) {
                     break;

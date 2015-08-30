@@ -203,6 +203,38 @@ class ValidationVisitorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->visitor->getViolations());
     }
 
+    public function testValidateInGroupSequenceCascadeWithExplicitGroup()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->setGroupSequence(array($this->metadata->getDefaultGroup(), 'Reference'));
+
+        $referenceMetadata = new ClassMetadata(get_class($entity->reference));
+        $referenceMetadata->addConstraint(new FailingConstraint(array(
+            'groups' => 'Reference',
+        )));
+        $this->metadataFactory->addMetadata($referenceMetadata);
+
+        $this->visitor->validate($entity, 'Default', '');
+
+        // The validation of the reference's FailingConstraint in group
+        // "Reference" was launched
+        $violations = new ConstraintViolationList(array(
+            new ConstraintViolation(
+                'Failed',
+                'Failed',
+                array(),
+                'Root',
+                'reference',
+                $entity->reference
+            ),
+        ));
+
+        $this->assertEquals($violations, $this->visitor->getViolations());
+    }
+
     public function testValidateInOtherGroupTraversesNoGroupSequence()
     {
         $entity = new Entity();
@@ -217,7 +249,7 @@ class ValidationVisitorTest extends \PHPUnit_Framework_TestCase
 
         $this->visitor->validate($entity, $this->metadata->getDefaultGroup(), '');
 
-        // Only group "Second" was validated
+        // Only group "Entity" was validated
         $violations = new ConstraintViolationList(array(
             new ConstraintViolation(
                 'Failed',

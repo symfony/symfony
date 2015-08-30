@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core;
 
-@trigger_error('The '.__NAMESPACE__.'\SecurityContextInterface interface is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
-
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 

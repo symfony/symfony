@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-24T19:32:09Z
+
+:+1: What about doing that on 2.3 as this is a bug fix? (no need to create another PR, as we can easily switch the branch when merging)
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2015-08-24T21:19:50Z
+
+Sure. I have just realized that version 2.3 has not yet reached its end of life. My bad.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-25T06:35:30Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-25T10:29:13Z
+
+:+1: I think the normalization should only be done internally when really necesssary to work with it (e.g. in https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Filesystem/Filesystem.php#L332 ) which does not seem to be the case here.

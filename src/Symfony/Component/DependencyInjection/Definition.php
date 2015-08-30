@@ -883,7 +883,8 @@ class Definition
      *
      * @return bool
      */
-    public function hasType($type) {
+    public function hasType($type)
+    {
         return isset($this->types[$type]);
     }
 }

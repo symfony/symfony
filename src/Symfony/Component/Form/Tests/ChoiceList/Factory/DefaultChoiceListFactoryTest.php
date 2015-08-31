@@ -536,6 +536,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $list = new ArrayChoiceList(array(
             'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
             'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
+            'Group empty' => array(),
         ));
 
         $view = $this->factory->createView(

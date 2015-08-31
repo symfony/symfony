@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-24T13:26:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-24T15:06:45Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-24T16:03:37Z
+
+:-1: Help and description are not the same. If help is empty for some command, they should be added instead.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-08-24T16:23:08Z
+
+They may not be the same but in fact the help is often the description rephrased and with two example to illustrate the usage of one or two options. And people could prefer to not duplicate the information and save time for the translators. It can be done manually for each command or automatically with a fallback. Personally I truly believe it should be done automatically (especially because we don't want to display the description when there is an help block).
+
+Have a look to `help help`, `help debug.twig`, `help swiftmailer:email:send` or `cache:clear` per example
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-24T17:08:36Z
+
+@fabpot help is the extended version of description. While description only *describes* what a command does, help *also* describes how to use the command. If there is no docs on how to use something, it's still usefull to know what it does.
+
+Currently, `app/console custom:command --help` doesn't give you any information about what custom:command does. With this PR, it at least gives you some information about what it does. Partial documentation is better to no docs at all :)

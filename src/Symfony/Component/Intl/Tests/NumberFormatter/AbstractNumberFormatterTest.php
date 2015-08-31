@@ -686,7 +686,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // The negative PHP_INT_MAX was being converted to float
-        if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404) {
+        if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->assertInternalType('int', $parsedValue);
         } else {
             $this->assertInternalType('float', $parsedValue);

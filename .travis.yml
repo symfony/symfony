@@ -10,7 +10,6 @@ addons:
 matrix:
     include:
         - php: hhvm
-        - php: 5.3.3
         - php: 5.3
         - php: 5.4
         - php: 5.5

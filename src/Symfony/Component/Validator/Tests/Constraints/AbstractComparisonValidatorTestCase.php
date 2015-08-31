@@ -79,6 +79,10 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
         // Make sure we have the correct version loaded
         if ($dirtyValue instanceof \DateTime) {
             IntlTestHelper::requireIntl($this);
+
+            if (PHP_VERSION_ID < 50304 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+                $this->markTestSkipped('Intl supports formatting DateTime objects since 5.3.4');
+            }
         }
 
         $constraint = $this->createConstraint(array('value' => $comparedValue));

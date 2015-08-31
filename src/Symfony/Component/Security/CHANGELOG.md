@@ -10,6 +10,8 @@ CHANGELOG
    `Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface` instead
  * deprecated `Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface`, use
    `Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface` instead
+ * deprecated `Symfony\Component\Security\Core\Util\ClassUtils`, use
+   `Symfony\Component\Security\Acl\Util\ClassUtils` instead
 
 2.7.0
 -----

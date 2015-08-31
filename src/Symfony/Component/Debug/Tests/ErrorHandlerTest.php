@@ -293,6 +293,28 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHandleDeprecation()
+    {
+        $that = $this;
+        $logArgCheck = function ($level, $message, $context) use ($that) {
+            $that->assertEquals(LogLevel::INFO, $level);
+            $that->assertArrayHasKey('level', $context);
+            $that->assertEquals(E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED, $context['level']);
+            $that->assertArrayHasKey('stack', $context);
+        };
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger
+            ->expects($this->once())
+            ->method('log')
+            ->will($this->returnCallback($logArgCheck))
+        ;
+
+        $handler = new ErrorHandler();
+        $handler->setDefaultLogger($logger);
+        @$handler->handleError(E_USER_DEPRECATED, 'Foo deprecation', __FILE__, __LINE__, array());
+    }
+
     public function testHandleException()
     {
         try {

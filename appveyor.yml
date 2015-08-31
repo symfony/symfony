@@ -22,8 +22,8 @@ init:
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.6.11-nts-Win32-VC11-x86.zip
-    - IF %PHP%==1 7z x php-5.6.11-nts-Win32-VC11-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.5.9-nts-Win32-VC11-x86.zip
+    - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y > 7z.log
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor DownloadFile https://getcomposer.org/composer.phar
     - copy php.ini-production php.ini /Y

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-30T19:04:39Z
+
+If it's a bug fix, it should probably be merged into an older version, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-30T19:50:09Z
+
+Right, it's for 2.7!

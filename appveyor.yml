@@ -22,15 +22,17 @@ init:
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.4.43-nts-Win32-VC9-x86.zip
-    - IF %PHP%==1 7z x php-5.4.43-nts-Win32-VC9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.3.3-nts-Win32-VC9-x86.zip
+    - IF %PHP%==1 7z x php-5.3.3-nts-Win32-VC9-x86.zip -y > 7z.log
     - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/ICU-51.2-dlls.zip
     - IF %PHP%==1 7z x ICU-51.2-dlls.zip -y > 7z.log
     - IF %PHP%==1 cd ext
-    - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/php_intl-3.0.0-5.4-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_intl-3.0.0-5.4-nts-vc9-x86.zip -y > 7z.log
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apc/3.1.13/php_apc-3.1.13-5.4-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_apc-3.1.13-5.4-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/php_intl-3.0.0-5.3-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_intl-3.0.0-5.3-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apc/3.1.13/php_apc-3.1.13-5.3-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_apc-3.1.13-5.3-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.3-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_memcache-3.0.8-5.3-nts-vc9-x86.zip -y > 7z.log
     - IF %PHP%==1 cd ..
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor DownloadFile https://getcomposer.org/composer.phar

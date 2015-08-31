@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-30T21:26:23Z
+
+Could you also please remove the acl-related suggestions?
+See https://github.com/symfony/symfony/pull/15658/files#diff-303420d112ba190b0f9edb9c9806d7b2R43 and below.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2015-08-30T21:29:50Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-30T21:35:28Z
+
+Thanks @scaytrase.
+
+@iltar is there a plan to release security-acl 3.0? If yes, shouldn't we change these ~2.7 to ~2.7|~3.0.0 in this composer.json and in the root one ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-30T21:37:27Z
+
+Hum, looking at the branch alias on security-acl, I'd say yes. @scaytrase can you please do this (use ~2.7|~3.0.0 in the two composer.json files)?
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2015-08-30T21:47:48Z
+
+The first is `Security` component's. The second is global `symfony\symfony` composer.json? Correct?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-30T21:48:19Z
+
+@nicolas-grekas Since security-acl will have it's own release cycle, as you said yourself, why would you assume 3.0 version is going to be compatible? 3.0 would mean the acl part has a BC break which would not make it compatible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-30T21:50:25Z
+
+these two files yes. I don't assume 3.0 will stay compatible with 2.8. But right now, it is compatible. And tests will tell when and if this becomes false. Which may or may not happen (this is how we did for all components btw).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-30T22:25:32Z
+
+@nicolas-grekas no tests will not tell us because there is no test in the security core or csrf that uses the acl component of course. Adding 3.0 as allowed dependency is totally random. You could just as well allow 4.0 as well, or anything since we don't know yet what exactly the BC break will be in >=3.0 as it does not exist yet.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2015-08-31T04:05:45Z
+
+ i hope we could use travis to check 3.0.0 compatibility. And to agree  with @tobion - with desync release process 3.0.0 is no really have to be compatible. It could be not released at all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-31T05:17:59Z
+
+That's true, OK for me, let's remove the 3.0
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-31T05:23:54Z
+
+I think that for the sake of simplicity, it would be easier to have it follow the same major/minor versions as `symfony/symfony`.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2015-08-31T05:48:56Z
+
+@nicolas-grekas @iltar So what is the correct version reference? `~2.7` or `~2.7|~3.0.0`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-31T05:57:30Z
+
+~2.7 for me after this discussion :-)
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-31T06:01:17Z
+
+I agree with `~2.7`, when 2.8 is released, it can become `~2.8` and should support `~3.0` with forward compatibility: `~2.8|~3.0`.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2015-08-31T06:11:35Z
+
+I've rolled-back addition of 3.0.0, please re-check.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-31T06:44:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-31T09:24:28Z
+
+:+1:

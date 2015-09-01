@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-31T15:53:20Z
+
+Not sure why, but PHP 5.3.9 and 5.3.10 crash badly on Windows for almost all components. I tried with the PHP provided by windows.php.net and the one by easyphp. 5.3.11 is the lowest testable version on Windows after 5.3.9.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-31T16:57:13Z
+
+Tests are green after a few minor fixes.

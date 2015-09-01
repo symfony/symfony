@@ -53,7 +53,7 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('parameters')
                     ->useAttributeAsKey('name')
-                    ->prototype('scalar')->end()
+                    ->prototype('scalar')->info('Parameter name')->end()
                 ->end()
                 ->arrayNode('connections')
                     ->prototype('array')

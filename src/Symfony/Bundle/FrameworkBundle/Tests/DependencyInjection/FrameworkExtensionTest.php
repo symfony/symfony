@@ -498,20 +498,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer'));
     }
 
-    public function testSerializerServiceIsRegisteredWhenEnabled()
-    {
-        $container = $this->createContainerFromFile('serializer_enabled');
-
-        $this->assertTrue($container->hasDefinition('serializer'));
-    }
-
-    public function testSerializerServiceIsNotRegisteredWhenDisabled()
-    {
-        $container = $this->createContainerFromFile('serializer_disabled');
-
-        $this->assertFalse($container->hasDefinition('serializer'));
-    }
-
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

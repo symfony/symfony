@@ -6,5 +6,3 @@ composer.phar
 package.tar
 /packages.json
 /.phpunit
-
-src/Symfony/Component/Security/Acl/Exception/Exception.php

@@ -47,6 +47,6 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
             return sprintf('(isset($context["%s"]) || array_key_exists("%s", $context) ? $context["%s"] : $this->notFound("%s", 0))', $name, $name, $name, $name);
         }
 
-        return sprintf('$this->getContext($context, "%s")', $name);
+        return sprintf('(isset($context["%1$s"]) ? $context["%1$s"] : $this->getContext($context, "%1$s"))', $name);
     }
 }

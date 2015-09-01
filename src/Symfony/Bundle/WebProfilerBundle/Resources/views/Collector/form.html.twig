@@ -472,7 +472,7 @@
                 </a>
             </h3>
 
-            <table class="auto-layout" id="{{ data.id }}-errors">
+            <table id="{{ data.id }}-errors">
                 <thead>
                     <tr>
                         <th>Message</th>
@@ -533,7 +533,7 @@
         </h3>
 
         <div id="{{ data.id }}-default_data">
-            <table class="auto-layout">
+            <table>
                 <thead>
                     <tr>
                         <th width="180">Property</th>
@@ -579,7 +579,7 @@
 
         <div id="{{ data.id }}-submitted_data">
         {% if data.submitted_data.norm is defined %}
-            <table class="auto-layout">
+            <table>
                 <thead>
                     <tr>
                         <th width="180">Property</th>
@@ -630,7 +630,7 @@
 
         <div id="{{ data.id }}-passed_options">
             {% if data.passed_options|length %}
-            <table class="auto-layout">
+            <table>
                 <thead>
                     <tr>
                         <th width="180">Option</th>
@@ -670,7 +670,7 @@
         </h3>
 
         <div id="{{ data.id }}-resolved_options" class="hidden">
-            <table class="auto-layout">
+            <table>
                 <thead>
                     <tr>
                         <th width="180">Option</th>
@@ -697,7 +697,7 @@
         </h3>
 
         <div id="{{ data.id }}-view_vars" class="hidden">
-            <table class="auto-layout">
+            <table>
                 <thead>
                     <tr>
                         <th width="180">Variable</th>

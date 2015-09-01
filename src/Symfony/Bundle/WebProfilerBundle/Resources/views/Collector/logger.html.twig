@@ -36,10 +36,9 @@
     <span class="label label-status-{{ collector.counterrors ? 'error' : collector.countdeprecations ? 'warning' }} {{ collector.logs is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/logger.svg') }}</span>
         <strong>Logs</strong>
-        {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
-            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+        {% if collector.counterrors or collector.countdeprecations %}
             <span class="count">
-                <span>{{ error_count }}</span>
+                <span>{{ collector.counterrors ?: collector.countdeprecations }}</span>
             </span>
         {% endif %}
     </span>
@@ -49,13 +48,10 @@
     <h2>Log Messages</h2>
 
     {% if collector.logs is empty %}
-
         <div class="empty">
             <p>No log messages available.</p>
         </div>
-
     {% else %}
-
         {# sort collected logs in groups #}
         {% set deprecation_logs, debug_logs, info_and_error_logs = [], [], [] %}
         {% for log in collector.logs %}
@@ -111,7 +107,6 @@
                 </div>
             </div>
         </div>
-
     {% endif %}
 {% endblock %}
 
@@ -119,7 +114,7 @@
     {% import _self as helper %}
     {% set channel_is_defined = (logs|first).channel is defined %}
 
-    <table class="auto-layout logs">
+    <table class="logs">
         <thead>
             <tr>
                 <th>{{ show_level ? 'Level' : 'Time' }}</th>

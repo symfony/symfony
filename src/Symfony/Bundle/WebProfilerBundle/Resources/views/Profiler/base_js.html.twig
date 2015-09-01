@@ -319,7 +319,8 @@
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        tabNavigationItem.className = (j == 0) ? 'active' : '';
+                        if (j == 0) { Sfjs.addClass(tabNavigationItem, 'active'); }
+                        if (Sfjs.hasClass(tabs[j], 'disabled')) { Sfjs.addClass(tabNavigationItem, 'disabled'); }
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);
 

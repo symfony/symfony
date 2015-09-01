@@ -133,7 +133,7 @@
                 {% endif %}
 
                 <h3>Server Parameters</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver, class: 'auto-layout' }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver }, with_context = false) }}
             </div>
         </div>
 
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <div class="tab">
+        <div class="tab {{ collector.sessionmetadata is empty ? 'disabled' }}">
             <h3 class="tab-title">Session</h3>
 
             <div class="tab-content">
@@ -173,7 +173,7 @@
             </div>
         </div>
 
-        <div class="tab">
+        <div class="tab {{ collector.flashes is empty ? 'disabled' }}">
             <h3 class="tab-title">Flashes</h3>
 
             <div class="tab-content">
@@ -206,7 +206,7 @@
 
         {% if profile.children|length %}
         <div class="tab">
-            <h3 class="tab-title">Sub Requests</h3>
+            <h3 class="tab-title">Sub Requests <span class="badge">{{ profile.children|length }}</span></h3>
 
             <div class="tab-content">
                 {% for child in profile.children %}

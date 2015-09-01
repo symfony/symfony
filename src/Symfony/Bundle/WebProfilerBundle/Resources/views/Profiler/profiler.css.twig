@@ -121,19 +121,13 @@ button {
 table, tr, th, td {
     background: #FFF;
     border-collapse: collapse;
-    border: 1px solid #E0E0E0;
-    border-width: 1px 0;
     line-height: 1.5;
     vertical-align: top;
 }
 table {
     {{ mixins.subtle_border_and_shadow|raw }};
     margin: 1em 0;
-    table-layout: fixed;
     width: 100%;
-}
-table.auto-layout {
-    table-layout: auto;
 }
 
 table th, table td {
@@ -146,7 +140,6 @@ table th {
 }
 table thead th {
     background-color: #E0E0E0;
-    border-bottom: 1px solid #FCFCFC;
 }
 table thead th.key {
     width: 19%;
@@ -155,6 +148,8 @@ table thead th.key {
 table tbody th,
 table tbody td {
     {{ mixins.monospace_font|raw }}
+    border: 1px solid #E0E0E0;
+    border-width: 1px 0;
 }
 
 table tbody td {
@@ -328,6 +323,11 @@ table tbody ul {
 .status-warning td,
 .status-error td {
     background: transparent;
+}
+tr.status-error td,
+tr.status-warning td {
+    border-bottom: 1px solid #FAFAFA;
+    border-top: 1px solid #FAFAFA;
 }
 
 .status-warning .colored  {
@@ -711,13 +711,17 @@ table tbody ul {
     font-weight: bold;
     margin-left: 8px;
     min-width: 10px;
-    padding: 2px 6px;
+    padding: 1px 6px;
     text-align: center;
     white-space: nowrap;
 }
 .tab-navigation li:hover .badge {
     background: #FAFAFA;
     color: #777;
+}
+.tab-navigation li.disabled {
+    background: #F5F5F5;
+    color: #999;
 }
 .tab-navigation li.active {
     background: #666;

@@ -42,7 +42,7 @@ class AssetExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
             new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
-            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
+            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion'), array('deprecated' => true, 'alternative' => 'asset_version')),
         );
     }
 

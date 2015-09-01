@@ -75,8 +75,18 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 1,
-                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0), 'priority' => 100, 'priorityName' => 'DEBUG')),
-                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                0,
+                1,
+            ),
+            array(
+                1,
+                array(
+                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => -1, 'file' => __FILE__, 'line' => 123), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                ),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => -1, 'file' => __FILE__, 'line' => 123, 'errorCount' => 2), 'priority' => 100, 'priorityName' => 'DEBUG')),
                 0,
                 1,
             ),

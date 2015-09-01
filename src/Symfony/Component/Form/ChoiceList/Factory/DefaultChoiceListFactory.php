@@ -172,6 +172,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
         foreach ($groupBy as $key => $value) {
+            if (null === $value) {
+                continue;
+            }
+
             // Add the contents of groups to new ChoiceGroupView instances
             if (is_array($value)) {
                 $preferredViewsForGroup = array();

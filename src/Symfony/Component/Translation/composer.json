@@ -21,7 +21,7 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.7",
-        "symfony/intl": "~2.3",
+        "symfony/intl": "~2.4",
         "symfony/yaml": "~2.2",
         "psr/log": "~1.0"
     },

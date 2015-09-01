@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T17:42:22Z
+
+I like this feature!
+
+I've left 2 minor things to do. <s>It would be great if you can fix them in this PR.</s> (you are quick! thanks for fixing them) This will probably also fix the failures on Travis & Appveyor, fabbot failures are unrelated to changes in this PR.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-31T12:51:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-01T10:49:36Z
+
+:+1:

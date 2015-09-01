@@ -31,7 +31,7 @@ class TestExtension implements FormExtensionInterface
 
     public function addType(FormTypeInterface $type)
     {
-        $this->types[$type->getName()] = $type;
+        $this->types[$type->getName() ?: get_class($type)] = $type;
     }
 
     public function getType($name)

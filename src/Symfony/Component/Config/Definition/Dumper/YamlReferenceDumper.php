@@ -125,7 +125,7 @@ class YamlReferenceDumper
         if ($info = $node->getInfo()) {
             $this->writeLine('');
             // indenting multi-line info
-            $info = str_replace("\n", sprintf("\n%".($depth * 4)."s# ", ' '), $info);
+            $info = str_replace("\n", sprintf("\n%".($depth * 4).'s# ', ' '), $info);
             $this->writeLine('# '.$info, $depth * 4);
         }
 
@@ -160,7 +160,7 @@ class YamlReferenceDumper
     }
 
     /**
-     * Outputs a single config reference line
+     * Outputs a single config reference line.
      *
      * @param string $text
      * @param int    $indent

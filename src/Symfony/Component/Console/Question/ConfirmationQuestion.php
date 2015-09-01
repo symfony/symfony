@@ -23,8 +23,8 @@ class ConfirmationQuestion extends Question
     /**
      * Constructor.
      *
-     * @param string $question   The question to ask to the user
-     * @param bool   $default    The default answer to return, true or false
+     * @param string $question        The question to ask to the user
+     * @param bool   $default         The default answer to return, true or false
      * @param string $trueAnswerRegex A regex to match the "yes" answer
      */
     public function __construct($question, $default = true, $trueAnswerRegex = '/^y/i')

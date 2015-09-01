@@ -9,7 +9,7 @@
 
 {% block form_label -%}
 {% spaceless %}
-    {% if label is sameas(false) %}
+    {% if label is same as(false) %}
         <div class="{{ block('form_label_class') }}"></div>
     {% else %}
         {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ block('form_label_class'))|trim}) %}

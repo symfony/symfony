@@ -50,7 +50,7 @@ class ValidatorExtension extends AbstractExtension
         // the DIC, where the XML file is loaded automatically. Thus the following
         // code must be kept synchronized with validation.xml
 
-        /** @var $metadata ClassMetadata */
+        /* @var $metadata ClassMetadata */
         $metadata->addConstraint(new Form());
         $metadata->addPropertyConstraint('children', new Valid());
 

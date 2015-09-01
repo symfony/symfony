@@ -63,7 +63,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      *
      * @throws \Twig_Error_Loader if the template could not be found
      */
-    protected function findTemplate($template)
+    protected function findTemplate($template, $throw = true)
     {
         $logicalName = (string) $template;
 

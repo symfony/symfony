@@ -58,14 +58,21 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $def = new Definition('stdClass');
         $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed', 5);
+        $this->assertEquals(array('foo', 'foo.renamed', 5), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
         $def->setDecoratedService('foo', 'foo.renamed');
-        $this->assertEquals(array('foo', 'foo.renamed'), $def->getDecoratedService());
+        $this->assertEquals(array('foo', 'foo.renamed', 0), $def->getDecoratedService());
         $def->setDecoratedService(null);
         $this->assertNull($def->getDecoratedService());
 
         $def = new Definition('stdClass');
         $def->setDecoratedService('foo');
-        $this->assertEquals(array('foo', null), $def->getDecoratedService());
+        $this->assertEquals(array('foo', null, 0), $def->getDecoratedService());
         $def->setDecoratedService(null);
         $this->assertNull($def->getDecoratedService());
 

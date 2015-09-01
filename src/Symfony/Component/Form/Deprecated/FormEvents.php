@@ -15,6 +15,7 @@ namespace Symfony\Component\Form\Deprecated;
 
 /**
  * @deprecated since version 2.7, to be removed in 3.0.
+ *
  * @internal
  */
 final class FormEvents

@@ -1063,7 +1063,7 @@ class SimpleFormTest extends AbstractFormTest
      */
     public function testCustomOptionsResolver()
     {
-        $fooType = new Fixtures\FooType();
+        $fooType = new Fixtures\LegacyFooType();
         $resolver = new Fixtures\CustomOptionsResolver();
         $fooType->setDefaultOptions($resolver);
     }

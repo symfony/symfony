@@ -7,6 +7,27 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.3 (2015-07-31)
+
+ * bug #15413 Fix the return value on error for intl methods returning arrays (stof)
+ * bug #15392 Fix missing _route parameter notice in RouterListener logging case (Haehnchen)
+ * bug #15390 [php7] Fix for substr() always returning a string (nicolas-grekas)
+ * bug #15386 [php7] Fix for substr() always returning a string (nicolas-grekas)
+ * bug #15355 [Security] Do not save the target path in the session for a stateless firewall (lyrixx)
+ * bug #15306 [HttpKernel] [HttpCache] Fix deprecated error in HttpCache#getSurrogate (m14t)
+ * bug #15369 [TwigBridge] type-dependent path discovery (marcosdsanchez, xabbuh)
+ * bug #15361 [Yaml] throw a ParseException on invalid data type (xabbuh)
+ * bug #15345 [Twig+FrameworkBundle] Fix forward compat with Form 2.8 (nicolas-grekas)
+ * bug #15330 [Console] Fix console output with closed stdout (jakzal)
+ * bug #15339 [Serializer] Fix 2 bugs regarding private setters (dunglas)
+ * bug #15326 [Security] fix check for empty usernames (xabbuh)
+ * bug #15291 [HttpFoundation] Fix Response::closeOutputBuffers() for HHVM 3.3 (nicolas-grekas)
+ * bug #15249 [HttpFoundation] [PSR-7] Allow to use resources as content body and to return resources from string content (dunglas)
+ * bug #15282 [HttpFoundation] Behaviour change in PHP7 for substr (Nicofuma)
+ * bug #15277 [Form] Fix a BC break in the entity (jakzal)
+ * bug #15271 fix broken ChoiceQuestion (sstok)
+ * bug #15250 [PropertyAccess] BC Break since 2.6.5 (Nicolas Macherey)
+
 * 2.7.2 (2015-07-13)
 
  * bug #15248 Added 'default' color (jaytaph)

@@ -38,7 +38,7 @@ class ExceptionHandler
 
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
-        if (false !== strpos($charset, '%') xor false === strpos($fileLinkFormat, '%')) {
+        if (false !== strpos($charset, '%')) {
             // Swap $charset and $fileLinkFormat for BC reasons
             $pivot = $fileLinkFormat;
             $fileLinkFormat = $charset;
@@ -153,19 +153,23 @@ class ExceptionHandler
      * it will fallback to plain PHP functions.
      *
      * @param \Exception $exception An \Exception instance
-     *
-     * @see sendPhpResponse()
-     * @see createResponse()
      */
     private function failSafeHandle(\Exception $exception)
     {
-        if (class_exists('Symfony\Component\HttpFoundation\Response', false)) {
+        if (class_exists('Symfony\Component\HttpFoundation\Response', false)
+            && __CLASS__ !== get_class($this)
+            && ($reflector = new \ReflectionMethod($this, 'createResponse'))
+            && __CLASS__ !== $reflector->class
+        ) {
             $response = $this->createResponse($exception);
             $response->sendHeaders();
             $response->sendContent();
-        } else {
-            $this->sendPhpResponse($exception);
+            @trigger_error(sprintf("The %s::createResponse method is deprecated since 2.8 and won't be called anymore when handling an exception in 3.0.", $reflector->class), E_USER_DEPRECATED);
+
+            return;
         }
+
+        $this->sendPhpResponse($exception);
     }
 
     /**
@@ -199,9 +203,13 @@ class ExceptionHandler
      * @param \Exception|FlattenException $exception An \Exception instance
      *
      * @return Response A Response instance
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function createResponse($exception)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }

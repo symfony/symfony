@@ -73,6 +73,15 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('notes' => array(array('content' => utf8_decode('bäz')))), $catalogue->getMetadata('foo', 'domain1'));
     }
 
+    public function testTargetAttributesAreStoredCorrectly()
+    {
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/with-attributes.xlf', 'en', 'domain1');
+
+        $metadata = $catalogue->getMetadata('foo', 'domain1');
+        $this->assertEquals('translated', $metadata['target-attributes']['state']);
+    }
+
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */

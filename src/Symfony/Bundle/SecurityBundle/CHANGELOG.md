@@ -20,7 +20,7 @@ CHANGELOG
 
  * Added 'host' option to firewall configuration
  * Added 'csrf_token_generator' and 'csrf_token_id' options to firewall logout
-   listener configuration to supercede/alias 'csrf_provider' and 'intention'
+   listener configuration to supersede/alias 'csrf_provider' and 'intention'
    respectively
  * Moved 'security.secure_random' service configuration to FrameworkBundle
 

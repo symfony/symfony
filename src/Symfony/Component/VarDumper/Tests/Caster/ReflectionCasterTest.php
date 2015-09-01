@@ -32,7 +32,7 @@ ReflectionClass {
   constants: array:3 [
     "IS_IMPLICIT_ABSTRACT" => 16
     "IS_EXPLICIT_ABSTRACT" => 32
-    "IS_FINAL" => 64
+    "IS_FINAL" => %d
   ]
   properties: array:%d [
     "name" => ReflectionProperty {

@@ -168,7 +168,7 @@ Form
    }
    ```
 
- * `Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView` was
+ * `Symfony\Component\Form\Extension\Core\View\ChoiceView` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\View\ChoiceView` instead.
    The constructor arguments of the new class are in the same order than in the
@@ -473,7 +473,7 @@ Form
    After:
 
    ```jinja
-   {{ choice_translation_domain is sameas(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}
+   {{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}
    ```
 
 Serializer

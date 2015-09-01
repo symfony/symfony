@@ -215,8 +215,8 @@ class ArgvInput extends Input
 
         $option = $this->definition->getOption($name);
 
-        // Convert false values (from a previous call to substr()) to null
-        if (false === $value) {
+        // Convert empty values to null
+        if (!isset($value[0])) {
             $value = null;
         }
 

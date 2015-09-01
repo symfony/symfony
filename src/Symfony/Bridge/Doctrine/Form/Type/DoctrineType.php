@@ -94,12 +94,12 @@ abstract class DoctrineType extends AbstractType
      * Gets important parts from QueryBuilder that will allow to cache its results.
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
-     * 
+     *
      * @param object $queryBuilder
-     * 
+     *
      * @return array|false Array with important QueryBuilder parts or false if
      *                     they can't be determined
-     * 
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
@@ -136,7 +136,6 @@ abstract class DoctrineType extends AbstractType
 
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-
                 $hash = null;
                 $qbParts = null;
 
@@ -144,7 +143,6 @@ abstract class DoctrineType extends AbstractType
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
                 if (!$options['query_builder'] || false !== ($qbParts = $type->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
-
                     $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
                         $options['class'],
@@ -335,6 +333,6 @@ abstract class DoctrineType extends AbstractType
 
     public function getParent()
     {
-        return 'choice';
+        return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
 }

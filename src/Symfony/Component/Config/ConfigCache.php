@@ -42,6 +42,7 @@ class ConfigCache implements ConfigCacheInterface
      * Gets the cache file path.
      *
      * @return string The cache file path
+     *
      * @deprecated since 2.7, to be removed in 3.0. Use getPath() instead.
      */
     public function __toString()

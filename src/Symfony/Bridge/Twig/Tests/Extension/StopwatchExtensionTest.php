@@ -28,11 +28,11 @@ class StopwatchExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testTiming($template, $events)
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_String(), array('debug' => true, 'cache' => false, 'autoescape' => true, 'optimizations' => 0));
+        $twig = new \Twig_Environment(new \Twig_Loader_Array(array('template' => $template)), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));
         $twig->addExtension(new StopwatchExtension($this->getStopwatch($events)));
 
         try {
-            $nodes = $twig->render($template);
+            $nodes = $twig->render('template');
         } catch (\Twig_Error_Runtime $e) {
             throw $e->getPrevious();
         }

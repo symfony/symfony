@@ -26,8 +26,8 @@ class DebugExtensionTest extends \PHPUnit_Framework_TestCase
 
         $expectedTags = array(
             array(
-                "id" => "dump",
-                "template" => "@Debug/Profiler/dump.html.twig",
+                'id' => 'dump',
+                'template' => '@Debug/Profiler/dump.html.twig',
             ),
         );
 

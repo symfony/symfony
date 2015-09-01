@@ -24,6 +24,19 @@ class IntegerNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    /**
+     * @dataProvider getValidValues
+     *
+     * @param int $value
+     */
+    public function testValidNonEmptyValues($value)
+    {
+        $node = new IntegerNode('test');
+        $node->setAllowEmptyValue(false);
+
+        $this->assertSame($value, $node->finalize($value));
+    }
+
     public function getValidValues()
     {
         return array(

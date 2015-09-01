@@ -42,7 +42,7 @@ class ExceptionCaster
 
     public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
-        return $e instanceof \Exception ? $a : self::filterExceptionArray($a, "\0Error\0", $filter);
+        return self::filterExceptionArray($a, "\0Error\0", $filter);
     }
 
     public static function castException(\Exception $e, array $a, Stub $stub, $isNested, $filter = 0)

@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * The SecurityContextInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
  * @deprecated since version 2.6, to be removed in 3.0.
  */
 interface SecurityContextInterface extends TokenStorageInterface, AuthorizationCheckerInterface

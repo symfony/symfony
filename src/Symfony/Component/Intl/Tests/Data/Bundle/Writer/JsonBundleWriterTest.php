@@ -13,7 +13,7 @@ namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
-use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -74,7 +74,10 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteResourceBundle()
     {
-        IntlTestHelper::requireFullIntl($this);
+        // We only run tests if the intl extension is loaded...
+        if (!Intl::isExtensionLoaded()) {
+            $this->markTestSkipped('The intl extension is not available.');
+        }
 
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 

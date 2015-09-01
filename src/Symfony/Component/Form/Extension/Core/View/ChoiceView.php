@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\View;
 
 @trigger_error('The '.__NAMESPACE__.'\ChoiceView class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\View\ChoiceView instead.', E_USER_DEPRECATED);
 
-/**
+/*
  * Represents a choice in templates.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

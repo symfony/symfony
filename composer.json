@@ -18,8 +18,9 @@
     "require": {
         "php": ">=5.3.9",
         "doctrine/common": "~2.3",
-        "twig/twig": "~1.18",
-        "psr/log": "~1.0"
+        "twig/twig": "~1.20|~2.0",
+        "psr/log": "~1.0",
+        "symfony/security-acl": "~2.8"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -50,7 +51,6 @@
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
-        "symfony/security-acl": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
         "symfony/security-http": "self.version",

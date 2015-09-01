@@ -396,7 +396,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -471,14 +471,17 @@ class FrameworkExtension extends Extension
     {
         $loader->load('templating.xml');
 
-        $links = array(
-            'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-            'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-            'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-            'sublime' => 'subl://open?url=file://%%f&line=%%l',
-        );
+        if (!$container->hasParameter('templating.helper.code.file_link_format')) {
+            $links = array(
+                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                'sublime' => 'subl://open?url=file://%%f&line=%%l',
+            );
 
-        $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
+            $container->setParameter('templating.helper.code.file_link_format', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+        }
+
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
         if ($container->getParameter('kernel.debug')) {
@@ -969,6 +972,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        }
+
+        if (isset($config['name_converter']) && $config['name_converter']) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
         }
     }
 

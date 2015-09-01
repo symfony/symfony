@@ -115,6 +115,9 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
                     }
                 }
+                if ($isRef) {
+                    $this->refs[$isRef] = end($data);
+                }
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
@@ -227,6 +230,9 @@ class Parser
                         $data[$key] = $value;
                     }
                 }
+                if ($isRef) {
+                    $this->refs[$isRef] = $data[$key];
+                }
             } else {
                 // multiple documents are not supported
                 if ('---' === $this->currentLine) {
@@ -283,10 +289,6 @@ class Parser
                 }
 
                 throw new ParseException($error, $this->getRealCurrentLineNb() + 1, $this->currentLine);
-            }
-
-            if ($isRef) {
-                $this->refs[$isRef] = end($data);
             }
         }
 
@@ -356,7 +358,7 @@ class Parser
             return;
         }
 
-        if ($inSequence && $oldLineIndentation === $newIndent && '-' === $data[0][0]) {
+        if ($inSequence && $oldLineIndentation === $newIndent && isset($data[0][0]) && '-' === $data[0][0]) {
             // the previous line contained a dash but no item content, this line is a sequence item with the same indentation
             // and therefore no nested list or mapping
             $this->moveToPreviousLine();

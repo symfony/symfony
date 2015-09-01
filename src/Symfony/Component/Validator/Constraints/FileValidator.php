@@ -294,7 +294,7 @@ class FileValidator extends ConstraintValidator
 
     /**
      * Convert the limit to the smallest possible number
-     * (i.e. try "MB", then "kB", then "bytes")
+     * (i.e. try "MB", then "kB", then "bytes").
      */
     private function factorizeSizes($size, $limit, $binaryFormat)
     {

@@ -71,7 +71,7 @@ class SecurityDataCollector extends DataCollector
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
                 foreach ($allRoles as $role) {
-                    if (!in_array($role, $assignedRoles)) {
+                    if (!in_array($role, $assignedRoles, true)) {
                         $inheritedRoles[] = $role;
                     }
                 }

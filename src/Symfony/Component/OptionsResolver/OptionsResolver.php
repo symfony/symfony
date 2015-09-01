@@ -434,7 +434,6 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @throws AccessException           If called from a lazy option or normalizer
      *
      * @see setNormalizer()
-     *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setNormalizers(array $normalizers)

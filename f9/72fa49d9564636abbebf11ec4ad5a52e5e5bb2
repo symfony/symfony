@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-31T20:22:12Z
+
+IMO you should update the dependency in the twig bridge to `~1.21` (https://github.com/twigphp/Twig/commit/56c73827750e6e0f5d94a290e8f00a9a8f48e459) since deprecation functionality was introduced there. Strictly it isn't required, since it shouldn't throw an error if the option is unknown at the moment, but it's more obvious this way.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-31T20:24:13Z
+
+@Tobion not necessary IMO (you would just not get the deprecation warning in this case, which is exactly what happens currently).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-31T20:28:38Z
+
+Yeah that's what I said. But again, what's the disadvantage and more explicit. That invalid options are ignored is an implementation detail to me.

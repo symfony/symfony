@@ -807,7 +807,7 @@ class OptionsResolver implements Options
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value, $offendingType)
+                    $this->formatTypeOf($value)
                 ));
             }
         }

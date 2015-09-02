@@ -562,6 +562,35 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->resolver->resolve());
     }
 
+    public function testResolveSucceedsIfTypedArray()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedTypes('foo', array('null', '\DateTime[]'));
+
+        $data = array(
+            'foo'   => array(
+                new \DateTime(),
+                new \DateTime(),
+            )
+        );
+        $result = $this->resolver->resolve($data);
+        $this->assertEquals($data, $result);
+    }
+
+    public function testResolveSucceedsNestedTypedArray()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $expect = array(
+            'foo' => array(
+                range(1, 10),
+            ),
+        );
+        $result = $this->resolver->resolve($expect);
+        $this->assertEquals($expect, $result);
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */

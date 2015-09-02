@@ -866,19 +866,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
             $valid = false;
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
-
-                if (function_exists($isFunction = 'is_'.$type)) {
-                    if ($isFunction($value)) {
-                        $valid = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if ($value instanceof $type) {
-                    $valid = true;
+                $valid = $this->verifyAllowedType($type, $value);
+                if ($valid) {
                     break;
                 }
             }
@@ -890,7 +879,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value)
+                    $this->formatTypeOf($value, $offendingType)
                 ));
             }
         }
@@ -962,6 +951,44 @@ class OptionsResolver implements Options, OptionsResolverInterface
         $this->resolved[$option] = $value;
 
         return $value;
+    }
+
+    /**
+     * Verify value is of the allowed type. Recursive method to support
+     * typed array notation like ClassName[], or scalar arrays (int[])
+     *
+     * @param string $type the required allowedType string
+     *
+     * @param mixed $value the value
+     *
+     * @return bool Whether or not $value if of the allowed type
+     *
+     */
+    private function verifyAllowedType($type, $value)
+    {
+        $valid = false;
+
+        $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+
+        if (substr($type, -2) === '[]') {
+            if (is_array($value)) {
+                $subType = substr($type, 0, -2);
+                foreach ($value as $v) {
+                    $valid = $this->validateType($subType, $v);
+                    if (!$valid) {
+                        break;
+                    }
+                }
+            }
+        } else if (function_exists($isFunction = 'is_'.$type)) {
+            if ($isFunction($value)) {
+                $valid = true;
+            }
+        } else if ($value instanceof $type) {
+            $valid = true;
+        }
+
+        return $valid;
     }
 
     /**

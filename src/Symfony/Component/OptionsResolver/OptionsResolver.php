@@ -916,6 +916,7 @@ class OptionsResolver implements Options
         if (function_exists($isFunction = 'is_'.$type)) {
             return $isFunction($value);
         }
+
         return ($value instanceof $type);
     }
 

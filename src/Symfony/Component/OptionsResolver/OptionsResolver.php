@@ -964,29 +964,28 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     private function verifyAllowedType($type, $value)
     {
-        $valid = false;
+        if (substr($type, -2) === '[]') {
+            //allowed type is typed array
+            if (!is_array($value)) {
+                return false;
+            }
+            $subType = substr($type, 0, -2);
+            foreach ($value as $v) {
+                //recursive call -> check subtype
+                if (!$this->verifyAllowedType($subType, $v)) {
+                    return false;
+                }
+            }
+            //value was array, subtypes all matched -> allowed type OK
+            return true;
+        }
 
         $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
 
-        if (substr($type, -2) === '[]') {
-            if (is_array($value)) {
-                $subType = substr($type, 0, -2);
-                foreach ($value as $v) {
-                    $valid = $this->verifyAllowedType($subType, $v);
-                    if (!$valid) {
-                        break;
-                    }
-                }
-            }
-        } elseif (function_exists($isFunction = 'is_'.$type)) {
-            if ($isFunction($value)) {
-                $valid = true;
-            }
-        } elseif ($value instanceof $type) {
-            $valid = true;
+        if (function_exists($isFunction = 'is_'.$type)) {
+            return $isFunction($value);
         }
-
-        return $valid;
+        return ($value instanceof $type);
     }
 
     /**

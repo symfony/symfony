@@ -507,7 +507,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
 
-        $this->resolver->resolve(array('foo' => array(new \DateTime)));
+        $this->resolver->resolve(array('foo' => array(new \DateTime())));
     }
 
     /**

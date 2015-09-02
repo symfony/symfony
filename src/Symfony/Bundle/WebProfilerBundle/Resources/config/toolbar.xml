@@ -15,6 +15,7 @@
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>
             <argument>%web_profiler.debug_toolbar.mode%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
+            <argument key="maxTries">%web_profiler.debug_toolbar.max_tries%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
             <argument /> <!-- paths that should be excluded from the AJAX requests shown in the toolbar -->
         </service>

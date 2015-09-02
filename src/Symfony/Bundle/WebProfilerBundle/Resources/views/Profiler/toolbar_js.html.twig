@@ -64,7 +64,7 @@
                     confirm('An error occurred while loading the web debug toolbar (' + xhr.status + ': ' + xhr.statusText + ').\n\nDo you want to open the profiler?') && (window.location = '{{ path("_profiler", { "token": token }) }}');
                 }
             },
-            {'maxTries': 5}
+            {'maxTries': {{ maxTries }} }
         );
     })();
 /*]]>*/</script>

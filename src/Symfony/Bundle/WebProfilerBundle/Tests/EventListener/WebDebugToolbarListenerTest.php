@@ -201,7 +201,8 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
-        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $urlGenerator);
+        $maxTries = 5;
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $maxTries, $urlGenerator);
         $listener->onKernelResponse($event);
 
         $this->assertEquals('/_profiler/xxxxxxxx', $response->headers->get('X-Debug-Token-Link'));
@@ -222,7 +223,8 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
-        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $urlGenerator);
+        $maxTries = 5;
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $maxTries, $urlGenerator);
         $listener->onKernelResponse($event);
 
         $this->assertEquals('Exception: foo', $response->headers->get('X-Debug-Error'));

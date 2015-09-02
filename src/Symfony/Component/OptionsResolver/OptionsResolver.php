@@ -972,7 +972,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             if (is_array($value)) {
                 $subType = substr($type, 0, -2);
                 foreach ($value as $v) {
-                    $valid = $this->validateType($subType, $v);
+                    $valid = $this->verifyAllowedType($subType, $v);
                     if (!$valid) {
                         break;
                     }

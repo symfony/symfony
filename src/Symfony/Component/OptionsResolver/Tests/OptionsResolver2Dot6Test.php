@@ -500,6 +500,18 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "array".
+     */
+    public function testResolveFailsIfInvalidTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+
+        $this->resolver->resolve(array('foo' => array(new \DateTime)));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string", but is of type "integer".
      */
     public function testResolveFailsIfInvalidType()

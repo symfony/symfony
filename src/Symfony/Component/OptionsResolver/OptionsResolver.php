@@ -985,6 +985,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
         if (function_exists($isFunction = 'is_'.$type)) {
             return $isFunction($value);
         }
+
         return ($value instanceof $type);
     }
 

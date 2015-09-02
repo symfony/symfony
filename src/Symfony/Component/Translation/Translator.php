@@ -276,8 +276,9 @@ class Translator implements TranslatorInterface
                 $this->doLoadCatalogue($fallback);
             }
 
-            $current->addFallbackCatalogue($this->catalogues[$fallback]);
-            $current = $this->catalogues[$fallback];
+            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            $current->addFallbackCatalogue($fallbackCatalogue);
+            $current = $fallbackCatalogue;
         }
     }
 

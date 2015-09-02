@@ -955,14 +955,12 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
     /**
      * Verify value is of the allowed type. Recursive method to support
-     * typed array notation like ClassName[], or scalar arrays (int[])
+     * typed array notation like ClassName[], or scalar arrays (int[]).
      *
-     * @param string $type the required allowedType string
-     *
-     * @param mixed $value the value
+     * @param string $type  the required allowedType string
+     * @param mixed  $value the value
      *
      * @return bool Whether or not $value if of the allowed type
-     *
      */
     private function verifyAllowedType($type, $value)
     {

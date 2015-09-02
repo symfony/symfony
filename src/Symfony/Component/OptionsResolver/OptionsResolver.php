@@ -978,11 +978,11 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     }
                 }
             }
-        } else if (function_exists($isFunction = 'is_'.$type)) {
+        } elseif (function_exists($isFunction = 'is_'.$type)) {
             if ($isFunction($value)) {
                 $valid = true;
             }
-        } else if ($value instanceof $type) {
+        } elseif ($value instanceof $type) {
             $valid = true;
         }
 

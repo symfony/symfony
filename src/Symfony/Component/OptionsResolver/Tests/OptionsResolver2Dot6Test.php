@@ -568,10 +568,10 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setAllowedTypes('foo', array('null', '\DateTime[]'));
 
         $data = array(
-            'foo'   => array(
+            'foo' => array(
                 new \DateTime(),
                 new \DateTime(),
-            )
+            ),
         );
         $result = $this->resolver->resolve($data);
         $this->assertEquals($data, $result);

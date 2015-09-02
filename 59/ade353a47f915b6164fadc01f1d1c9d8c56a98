@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by kimausloos at 2015-08-14T19:24:22Z
+
+This fixes issue #15522
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-02T10:08:33Z
+
+@symfony/deciders can someone review please :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-02T10:46:11Z
+
+what happens if you defined ``array('fr', 'en')`` as fallback locales and you load either fr or en as fallback locales. what would be the fallbacks for each of them ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-02T10:48:50Z
+
+@stof
+fr -> en as fallback
+en -> fr as fallback
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-02T10:56:52Z
+
+well, this looks weird to me though, as the fr fallback of en will be different from the fr catalogue used anywhere else. But it is indeed one of the possible implementations. the other one could be to consider that ``en`` does not fallback to anything here, as it is itself the last fallback locale.
+
+Anyway it is a different topic (and a behavior change, so not for 2.3), so it should be discussed separately.
+
+:+1: for this
+status: reviewed

@@ -26,6 +26,7 @@
 
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
+        {% autoescape false %}
         {{ template.renderblock('toolbar', {
             'collector': profile.getcollector(name),
             'profiler_url': profiler_url,
@@ -34,6 +35,7 @@
             'profiler_markup_version': profiler_markup_version
           })
         }}
+        {% endautoescape %}
     {% endfor %}
 
     {% if 'normal' != position %}

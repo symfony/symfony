@@ -12,12 +12,12 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -294,7 +294,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getClassName()
     {
-        return $this->metadata instanceof ClassBasedInterface ? $this->metadata->getClassName() : null;
+        return $this->metadata instanceof ClassMetadataInterface ? $this->metadata->getClassName() : null;
     }
 
     /**

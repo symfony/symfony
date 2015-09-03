@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface as BaseSimplePreAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface as LegacySimplePreAuthenticatorInterface;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface SimplePreAuthenticatorInterface extends BaseSimplePreAuthenticatorInterface
+interface SimplePreAuthenticatorInterface extends LegacySimplePreAuthenticatorInterface
 {
 }

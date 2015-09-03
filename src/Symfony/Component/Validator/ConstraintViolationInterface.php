@@ -68,6 +68,8 @@ interface ConstraintViolationInterface
      * @see getMessageTemplate()
      *
      * @api
+     *
+     * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
      */
     public function getMessageParameters();
 
@@ -86,6 +88,8 @@ interface ConstraintViolationInterface
      * pluralization form (in this case "choices").
      *
      * @return int|null The number to use to pluralize of the message.
+     *
+     * @deprecated since version 2.7, to be replaced by getPlural() in 3.0.
      */
     public function getMessagePluralization();
 

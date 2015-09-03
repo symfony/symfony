@@ -12,7 +12,6 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Test class for Event.

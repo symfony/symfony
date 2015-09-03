@@ -122,7 +122,7 @@ class ExceptionHandler
 
         $caughtLength = $this->caughtLength = 0;
 
-        ob_start(function($buffer) {
+        ob_start(function ($buffer) {
             $this->caughtBuffer = $buffer;
 
             return '';
@@ -133,7 +133,7 @@ class ExceptionHandler
             // Empty loop, everything is in the condition
         }
         if (isset($this->caughtBuffer[0])) {
-            ob_start(function($buffer) {
+            ob_start(function ($buffer) {
                 if ($this->caughtLength) {
                     // use substr_replace() instead of substr() for mbstring overloading resistance
                     $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);

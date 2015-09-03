@@ -91,7 +91,6 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsActive()
     {
-
         $this->assertFalse($this->proxy->isActive());
         session_start();
         $this->assertTrue($this->proxy->isActive());

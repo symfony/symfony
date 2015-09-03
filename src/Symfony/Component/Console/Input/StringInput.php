@@ -30,7 +30,7 @@ class StringInput extends ArgvInput
     /**
      * Constructor.
      *
-     * @param string          $input      An array of parameters from the CLI (in the argv format)
+     * @param string $input An array of parameters from the CLI (in the argv format)
      *
      * @api
      */

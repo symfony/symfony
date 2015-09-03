@@ -110,13 +110,10 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
                 'Foo\\TFooBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\CBar' => __DIR__.'/Fixtures/php5.4/traits.php',
             )),
-        );
-
-        if (PHP_VERSION_ID >= 50500) {
-            $data[] = array(__DIR__.'/Fixtures/php5.5', array(
+            array(__DIR__.'/Fixtures/php5.5', array(
                 'ClassCons\\Foo' => __DIR__.'/Fixtures/php5.5/class_cons.php',
-            ));
-        }
+            )),
+        );
 
         return $data;
     }

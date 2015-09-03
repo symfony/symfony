@@ -57,7 +57,7 @@
                 <th>Listener</th>
             </tr>
         </thead>
-        <tbody>
+
         {% set previous_event = (listeners|first).event %}
         {% for listener in listeners %}
             {% if loop.first or listener.event != previous_event %}
@@ -108,7 +108,10 @@
                     {% endif %}
                 </td>
             </tr>
+
+            {% if loop.last %}
+                </tbody>
+            {% endif %}
         {% endfor %}
-        </tbody>
     </table>
 {% endmacro %}

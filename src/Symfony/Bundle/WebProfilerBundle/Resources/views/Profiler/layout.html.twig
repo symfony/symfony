@@ -37,7 +37,11 @@
                     {% if templates is defined %}
                         <ul id="menu-profiler">
                             {% for name, template in templates %}
-                                {% set menu %}{{ template.renderBlock('menu', { 'collector': profile.getcollector(name)}) }}{% endset %}
+                                {% set menu %}
+                                {% autoescape false %}
+                                {{ template.renderBlock('menu', { 'collector': profile.getcollector(name)}) }}
+                                {% endautoescape %}
+                                {% endset %}
                                 {% if menu != '' %}
                                     <li class="{{ name }}{% if name == panel %} selected{% endif %}">
                                         <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>

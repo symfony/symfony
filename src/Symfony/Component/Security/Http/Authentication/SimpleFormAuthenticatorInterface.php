@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface as BaseSimpleFormAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface as LegacySimpleFormAuthenticatorInterface;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface SimpleFormAuthenticatorInterface extends BaseSimpleFormAuthenticatorInterface
+interface SimpleFormAuthenticatorInterface extends LegacySimpleFormAuthenticatorInterface
 {
 }

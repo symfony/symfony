@@ -26,6 +26,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * @since  2.5
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 {

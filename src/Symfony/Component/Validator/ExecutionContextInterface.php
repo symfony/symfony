@@ -274,7 +274,7 @@ interface ExecutionContextInterface
      * Returns the class name of the current node.
      *
      * If the metadata of the current node does not implement
-     * {@link ClassBasedInterface} or if no metadata is available for the
+     * {@link Mapping\ClassMetadataInterface} or if no metadata is available for the
      * current node, this method returns null.
      *
      * @return string|null The class name or null, if no class name could be found.

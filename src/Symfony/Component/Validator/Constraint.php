@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
+use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
 /**
  * Contains the properties of a constraint definition.
@@ -55,13 +56,15 @@ abstract class Constraint
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
-     * Maps error codes to the names of their constants
+     * Maps error codes to the names of their constants.
+     *
      * @var array
      */
     protected static $errorNames = array();
 
     /**
-     * Domain-specific data attached to a constraint
+     * Domain-specific data attached to a constraint.
+     *
      * @var mixed
      */
     public $payload;
@@ -229,10 +232,16 @@ abstract class Constraint
      * @param string $group
      *
      * @api
+     *
+     * @throws GroupDefinitionException If the implicit group has been explicitly configured in current constraint.
      */
     public function addImplicitGroupName($group)
     {
-        if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
+        if (in_array($group, $this->groups)) {
+            throw new GroupDefinitionException(sprintf('The implicit group "%s" has already been explicitly configured in constraint %s', $group, get_class($this)));
+        }
+
+        if (in_array(self::DEFAULT_GROUP, $this->groups)) {
             $this->groups[] = $group;
         }
     }

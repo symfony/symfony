@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class LegacyChoiceListAdapterTest extends \PHPUnit_Framework_TestCase
 {

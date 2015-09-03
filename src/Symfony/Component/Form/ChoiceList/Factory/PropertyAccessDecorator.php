@@ -116,11 +116,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @deprecated Added for backwards compatibility in Symfony 2.7, to be
      *             removed in Symfony 3.0.
      */
-    public function createListFromFlippedChoices($choices, $value = null)
+    public function createListFromFlippedChoices($choices, $value = null, $triggerDeprecationNotice = true)
     {
         // Property paths are not supported here, because array keys can never
         // be objects
-        return $this->decoratedFactory->createListFromFlippedChoices($choices, $value);
+        return $this->decoratedFactory->createListFromFlippedChoices($choices, $value, $triggerDeprecationNotice);
     }
 
     /**

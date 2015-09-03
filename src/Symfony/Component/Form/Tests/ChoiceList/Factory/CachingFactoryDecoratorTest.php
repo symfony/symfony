@@ -155,6 +155,9 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure2));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesEmpty()
     {
         $list = new \stdClass();
@@ -168,6 +171,9 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($list, $this->factory->createListFromFlippedChoices(array()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesComparesTraversableChoicesAsArray()
     {
         // The top-most traversable is converted to an array
@@ -184,6 +190,9 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($list, $this->factory->createListFromFlippedChoices($choices2));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesFlattensChoices()
     {
         $choices1 = array('key' => array('a' => 'A'));
@@ -201,6 +210,7 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideSameKeyChoices
+     * @group legacy
      */
     public function testCreateFromFlippedChoicesSameChoices($choice1, $choice2)
     {
@@ -219,6 +229,7 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideDistinguishedKeyChoices
+     * @group legacy
      */
     public function testCreateFromFlippedChoicesDifferentChoices($choice1, $choice2)
     {
@@ -240,6 +251,9 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($list2, $this->factory->createListFromFlippedChoices($choices2));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesSameValueClosure()
     {
         $choices = array(1);
@@ -255,6 +269,9 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($list, $this->factory->createListFromFlippedChoices($choices, $closure));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesDifferentValueClosure()
     {
         $choices = array(1);

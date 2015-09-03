@@ -382,10 +382,8 @@ class PhpDumper extends Dumper
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
-        if (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
+        if (!$isProxyCandidate && $definition->isShared()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
-            $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
         }
@@ -574,18 +572,10 @@ class PhpDumper extends Dumper
             }
         }
 
-        $scope = $definition->getScope(false);
-        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
-            if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
-                $return[] = '';
-            }
-            $return[] = sprintf("@throws InactiveScopeException when the '%s' service is requested while the '%s' scope is not active", $id, $scope);
-        }
-
         $return = implode("\n     * ", $return);
 
         $doc = '';
-        if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
+        if ($definition->isShared()) {
             $doc .= <<<EOF
 
      *
@@ -628,16 +618,6 @@ EOF;
 EOF;
 
         $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id) : '';
-
-        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
-            $code .= <<<EOF
-        if (!isset(\$this->scopedServices['$scope'])) {
-            throw new InactiveScopeException('$id', '$scope');
-        }
-
-
-EOF;
-        }
 
         if ($definition->isSynthetic()) {
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
@@ -737,7 +717,6 @@ EOF;
 $namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -778,12 +757,6 @@ EOF;
 
 EOF;
 
-        if (count($scopes = $this->container->getScopes(false)) > 0) {
-            $code .= "\n";
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
-        }
-
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 
@@ -817,22 +790,7 @@ EOF;
             $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
         }
 
-        $code .= <<<EOF
-
-        \$this->services =
-        \$this->scopedServices =
-        \$this->scopeStacks = array();
-EOF;
-
-        $code .= "\n";
-        if (count($scopes = $this->container->getScopes(false)) > 0) {
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
-        } else {
-            $code .= "        \$this->scopes = array();\n";
-            $code .= "        \$this->scopeChildren = array();\n";
-        }
-
+        $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 

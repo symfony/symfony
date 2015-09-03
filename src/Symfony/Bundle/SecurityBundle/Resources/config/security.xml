@@ -10,11 +10,6 @@
     </parameters>
 
     <services>
-        <service id="security.context" class="Symfony\Component\Security\Core\SecurityContext">
-            <argument type="service" id="security.token_storage" />
-            <argument type="service" id="security.authorization_checker" />
-        </service>
-
         <service id="security.authorization_checker" class="Symfony\Component\Security\Core\Authorization\AuthorizationChecker">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.manager" />

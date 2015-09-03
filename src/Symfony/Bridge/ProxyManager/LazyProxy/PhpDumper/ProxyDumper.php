@@ -15,7 +15,6 @@ use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -68,10 +67,8 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if ($definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
+        if ($definition->isShared()) {
             $instantiation .= " \$this->services['$id'] =";
-        } elseif ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
-            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 
         $methodName = 'get'.Container::camelize($id).'Service';

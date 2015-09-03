@@ -5,14 +5,12 @@ $container->loadFromExtension('framework', array(
     'default_locale' => 'fr',
     'form' => array(
         'csrf_protection' => array(
+            'enabled' => true,
             'field_name' => '_csrf',
         ),
     ),
     'http_method_override' => false,
     'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
-    'csrf_protection' => array(
-        'enabled' => true,
-    ),
     'esi' => array(
         'enabled' => true,
     ),

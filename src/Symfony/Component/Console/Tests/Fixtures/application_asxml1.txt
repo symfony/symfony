@@ -100,7 +100,7 @@
       <usage>afoobar</usage>
     </usages>
   <description>The foo:bar command</description>
-  <help/>
+  <help>The foo:bar command</help>
   <arguments/>
     <options>
       <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">

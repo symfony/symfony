@@ -353,10 +353,17 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFormatWithDateTimeZone()
+    public function testFormatWithDateTimeZoneGmt()
     {
-        if (defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped('This test cannot work on HHVM. See https://github.com/facebook/hhvm/issues/5875 for the issue.');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT', $formatter->format(0));
+    }
+
+    public function testFormatWithDateTimeZoneGmtOffset()
+    {
+        if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) {
+            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');

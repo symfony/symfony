@@ -479,7 +479,7 @@ class FrameworkExtension extends Extension
                 'sublime' => 'subl://open?url=file://%%f&line=%%l',
             );
 
-            $container->setParameter('templating.helper.code.file_link_format', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+            $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
         }
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);

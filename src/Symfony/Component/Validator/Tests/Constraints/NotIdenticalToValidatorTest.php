@@ -87,9 +87,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array($object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'),
         );
 
-        $immutableDate = new \DateTimeImmutable('2000-01-01');
-        $comparisons[] = array($immutableDate, 'Jan 1, 2000, 12:00 AM', $immutableDate, 'Jan 1, 2000, 12:00 AM', 'DateTime');
-
         return $comparisons;
     }
 }

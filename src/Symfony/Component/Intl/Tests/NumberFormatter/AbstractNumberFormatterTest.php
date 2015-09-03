@@ -683,9 +683,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2147483647, $parsedValue);
 
         $parsedValue = $formatter->parse('-2,147,483,648', NumberFormatter::TYPE_INT64);
-
         $this->assertInternalType('int', $parsedValue);
-
         $this->assertEquals(-2147483648, $parsedValue);
     }
 

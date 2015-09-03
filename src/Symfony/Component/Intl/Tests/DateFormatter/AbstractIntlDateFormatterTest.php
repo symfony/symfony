@@ -306,10 +306,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
             array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
-            array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
-            array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
-            array(0, 'UTC+04:30', '1970-01-01 00:00:00'),
-            array(0, 'UTC+04:AA', '1970-01-01 00:00:00'),
         );
 
         return $data;
@@ -380,25 +376,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
 
         $this->assertEquals('GMT+03:00', $formatter->format(0));
-    }
-
-    public function testFormatWithTimezoneFromEnvironmentVariable()
-    {
-        $tz = getenv('TZ');
-        putenv('TZ=Europe/London');
-
-        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
-        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
-
-        $this->assertEquals(
-            $this->getDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'),
-            $formatter->format(0)
-        );
-
-        $this->assertEquals('Europe/London', getenv('TZ'));
-
-        // Restores TZ.
-        putenv('TZ='.$tz);
     }
 
     public function testFormatWithTimezoneFromPhp()

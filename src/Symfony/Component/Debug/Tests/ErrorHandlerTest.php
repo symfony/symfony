@@ -295,12 +295,11 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleDeprecation()
     {
-        $that = $this;
-        $logArgCheck = function ($level, $message, $context) use ($that) {
-            $that->assertEquals(LogLevel::INFO, $level);
-            $that->assertArrayHasKey('level', $context);
-            $that->assertEquals(E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED, $context['level']);
-            $that->assertArrayHasKey('stack', $context);
+        $logArgCheck = function ($level, $message, $context) {
+            $this->assertEquals(LogLevel::INFO, $level);
+            $this->assertArrayHasKey('level', $context);
+            $this->assertEquals(E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED, $context['level']);
+            $this->assertArrayHasKey('stack', $context);
         };
 
         $logger = $this->getMock('Psr\Log\LoggerInterface');

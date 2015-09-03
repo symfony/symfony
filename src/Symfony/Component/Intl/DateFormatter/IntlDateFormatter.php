@@ -207,10 +207,7 @@ class IntlDateFormatter
         // behave like the intl extension
         $argumentError = null;
         if (!is_int($timestamp) && !$timestamp instanceof \DateTime) {
-            $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
-            if (!is_int($timestamp)) {
-                $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
-            }
+            $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
         }
 
         if (null !== $argumentError) {

@@ -352,7 +352,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $listenerWrapper = $listenerConfig->getWrappedListener();
         foreach ($allListeners[$eventName] as $priority => $listeners) {
             foreach ($listeners as $listener) {
-                if ($listenerWrapper[0] === $listener[0]) {
+                if (is_array($listenerWrapper) && $listenerWrapper[0] === $listener[0]) {
                     return $priority;
                 }
             }

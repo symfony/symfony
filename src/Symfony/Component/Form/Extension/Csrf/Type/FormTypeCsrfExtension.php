@@ -121,30 +121,12 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        // BC clause for the "intention" option
-        $csrfTokenId = function (Options $options) {
-            return $options['intention'];
-        };
-
-        // BC clause for the "csrf_provider" option
-        $csrfTokenManager = function (Options $options) {
-            if ($options['csrf_provider'] instanceof CsrfTokenManagerInterface) {
-                return $options['csrf_provider'];
-            }
-
-            return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
-                ? $options['csrf_provider']->getTokenManager(false)
-                : new CsrfProviderAdapter($options['csrf_provider']);
-        };
-
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'csrf_token_manager' => $csrfTokenManager,
-            'csrf_token_id' => $csrfTokenId,
-            'csrf_provider' => $this->defaultTokenManager,
-            'intention' => null,
+            'csrf_token_manager' => $this->defaultTokenManager,
+            'csrf_token_id' => null,
         ));
     }
 

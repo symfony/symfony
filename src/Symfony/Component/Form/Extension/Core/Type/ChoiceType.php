@@ -199,9 +199,6 @@ class ChoiceType extends AbstractType
             $view->vars['placeholder'] = $options['placeholder'];
         }
 
-        // BC
-        $view->vars['empty_value_in_choices'] = $view->vars['placeholder_in_choices'];
-
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
@@ -249,25 +246,6 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $choiceListNormalizer = function (Options $options) use ($choiceListFactory) {
-            if (null !== $options['choice_loader']) {
-                return $choiceListFactory->createListFromLoader(
-                    $options['choice_loader'],
-                    $options['choice_value']
-                );
-            }
-
-            // Harden against NULL values (like in EntityType and ModelType)
-            $choices = null !== $options['choices'] ? $options['choices'] : array();
-
-            // BC when choices are in the keys, not in the values
-            if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value'], false);
-            }
-
-            return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
-        };
-
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
@@ -299,7 +277,6 @@ class ChoiceType extends AbstractType
         $resolver->setDefaults(array(
             'multiple' => false,
             'expanded' => false,
-            'choice_list' => null, // deprecated
             'choices' => array(),
             'choices_as_values' => false,
             'choice_loader' => null,
@@ -320,11 +297,9 @@ class ChoiceType extends AbstractType
             'choice_translation_domain' => true,
         ));
 
-        $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choices_as_values', 'bool');

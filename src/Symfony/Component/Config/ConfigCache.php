@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\ResourceValidator;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -68,9 +69,10 @@ class ConfigCache implements ConfigCacheInterface
      * This method always returns true when debug is off and the
      * cache file exists.
      *
+     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against.
      * @return bool true if the cache is fresh, false otherwise
      */
-    public function isFresh()
+    public function isFresh(array $validators = null)
     {
         if (!is_file($this->file)) {
             return false;
@@ -87,9 +89,18 @@ class ConfigCache implements ConfigCacheInterface
 
         $time = filemtime($this->file);
         $meta = unserialize(file_get_contents($metadata));
-        foreach ($meta as $resource) {
-            if (!$resource->isFresh($time)) {
-                return false;
+
+        if (null === $validators) {
+            $validators = array(new ResourceValidator());
+        }
+        foreach ($validators as $validator) {
+            foreach ($meta as $resource) {
+                if (!$validator->supports($resource)) {
+                    continue;
+                }
+                if (!$validator->isFresh($resource, $time)) {
+                    return false;
+                }
             }
         }
 

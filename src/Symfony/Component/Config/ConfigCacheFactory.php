@@ -25,11 +25,24 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
     private $debug;
 
     /**
+     * @var MetadataValidatorInterface[] List of validators used by the ConfigCache
+     */
+    private $validators = array();
+
+    /**
      * @param bool $debug The debug flag to pass to ConfigCache
      */
     public function __construct($debug)
     {
         $this->debug = $debug;
+    }
+
+    /**
+     * @param MetadataValidatorInterface $validator
+     */
+    public function addValidator(MetadataValidatorInterface $validator)
+    {
+        $validator[] = $validator;
     }
 
     /**
@@ -42,7 +55,7 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
         }
 
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isFresh()) {
+        if (!$cache->isFresh($this->validators)) {
             call_user_func($callback, $cache);
         }
 

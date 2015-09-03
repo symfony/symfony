@@ -13,6 +13,8 @@
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
         <parameter key="request_stack.class">Symfony\Component\HttpFoundation\RequestStack</parameter>
+        <parameter key="config_cache_factory.class">Symfony\Component\Config\ConfigCacheFactory</parameter>
+        <parameter key="config_cache_resource_validator.class">Symfony\Component\Config\Resource\ResourceValidator</parameter>
     </parameters>
 
     <services>
@@ -62,6 +64,14 @@
 
         <service id="uri_signer" class="%uri_signer.class%">
             <argument>%kernel.secret%</argument>
+        </service>
+
+        <service id="config_cache_factory" class="%config_cache_factory.class%">
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="config_cache_resource_validator" class="%config_cache_resource_validator.class%">
+            <tag name="config_cache.metadata_validator" />
         </service>
     </services>
 </container>

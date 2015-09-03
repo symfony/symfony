@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-03T11:02:41Z
+
+@nicolas-grekas given that our testsuite segfaults on PHP 7, I'm not sure it is a good idea to add more jobs running on PHP 7 now. We should really fix the issue with our testsuite, or move it back to allow_failure for now.
+
+Getting used to see red builds because of the segfault and to ignore them is a bad idea, as it is the best way to ignore other failures making the build red instead (and this is by experience: it happened multiple times in the past when our CI setup was not reliable in its failure status)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-03T11:25:09Z
+
+@stof OK, PR updated

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -267,7 +267,7 @@ interface ExecutionContextInterface
      * Returns the metadata for the currently validated value.
      *
      * With the core implementation, this method returns a
-     * {@link Mapping\ClassMetadata} instance if the current value is an object,
+     * {@link Mapping\ClassMetadataInterface} instance if the current value is an object,
      * a {@link Mapping\PropertyMetadata} instance if the current value is
      * the value of a property and a {@link Mapping\GetterMetadata} instance if
      * the validated value is the result of a getter method.
@@ -292,7 +292,7 @@ interface ExecutionContextInterface
      * Returns the class name of the current node.
      *
      * If the metadata of the current node does not implement
-     * {@link ClassMetadataInterface} or if no metadata is available for the
+     * {@link Mapping\ClassMetadataInterface} or if no metadata is available for the
      * current node, this method returns null.
      *
      * @return string|null The class name or null, if no class name could be found.

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;

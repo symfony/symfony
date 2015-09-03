@@ -7,6 +7,38 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.32 (2015-09-01)
+
+ * bug #15601 [console] Use the description when no help is available (Nicofuma)
+ * bug #15603 [HttpKernel] Do not normalize the kernel root directory path #15567 (leofeyer)
+ * bug #15428 Fix the validation of form resources to register the default theme (stof)
+ * bug #15619 [Translation] Fix the string casting in the XliffFileLoader (stof)
+ * bug #15575 Add appveyor.yml for C.I. on Windows (nicolas-grekas)
+ * bug #15611 [Translation][Xliff Loader] Support omitting the <target> node in an .xlf file. (leofeyer)
+ * bug #15549 [FrameworkBundle] Fix precedence of xdebug.file_link_format (nicolas-grekas)
+ * bug #15589 made Symfony compatible with both Twig 1.x and 2.x (fabpot)
+ * bug #15535 made Symfony compatible with both Twig 1.x and 2.x (fabpot)
+ * bug #14372 [DoctrineBridge][Form] fix EntityChoiceList when indexing by primary foreign key (giosh94mhz)
+ * bug #15489 Implement the support of timezone objects in the stub IntlDateFormatter (stof)
+ * bug #15426 [Serializer] Add support for variadic arguments in the GetSetNormalizer (stof)
+ * bug #15480 [Yaml] Nested merge keys (mathroc)
+ * bug #15445 do not remove space between attributes (greg0ire)
+ * bug #15263 [HttpFoundation] fixed the check of 'proxy-revalidate' in Response::mustRevalidate() (axiac)
+ * bug #15425 [Routing] Fix the retrieval of the default value for variadic arguments in the annotation loader (wdalmut, stof)
+ * bug #15074 Fixing DbalSessionHandler to work with a Oracle "limitation" or bug? (nuncanada)
+ * bug #15380 do not dump leading backslashes in class names (xabbuh)
+ * bug #15376 [ClassMapGenerator] Skip ::class constant (WouterJ)
+ * bug #15170 [Config] type specific check for emptiness (xabbuh)
+ * bug #15411 Fix the handling of null as locale in the stub intl classes (stof)
+ * bug #15413 Fix the return value on error for intl methods returning arrays (stof)
+ * bug #15392 Fix missing _route parameter notice in RouterListener logging case (Haehnchen)
+ * bug #15386 [php7] Fix for substr() always returning a string (nicolas-grekas)
+ * bug #15355 [Security] Do not save the target path in the session for a stateless firewall (lyrixx)
+ * bug #15330 [Console] Fix console output with closed stdout (jakzal)
+ * bug #15326 [Security] fix check for empty usernames (xabbuh)
+ * bug #15249 [HttpFoundation] [PSR-7] Allow to use resources as content body and to return resources from string content (dunglas)
+ * bug #15282 [HttpFoundation] Behaviour change in PHP7 for substr (Nicofuma)
+
 * 2.3.31 (2015-07-13)
 
  * bug #15248 Added 'default' color (jaytaph)

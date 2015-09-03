@@ -131,6 +131,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $ret = $command->setHelp('help1');
         $this->assertEquals($command, $ret, '->setHelp() implements a fluent interface');
         $this->assertEquals('help1', $command->getHelp(), '->setHelp() sets the help');
+        $command->setHelp('');
+        $this->assertEquals('description', $command->getHelp(), '->getHelp() fallback to the description');
     }
 
     public function testGetProcessedHelp()

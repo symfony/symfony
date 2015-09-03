@@ -217,7 +217,24 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Adds a class constraint.
+     *
+     * If the constraint {@link Traverse} is added, depending on the
+     * property $traverse of that constraint, the traversal strategy
+     * will be set to one of the following:
+     *
+     *  - {@link TraversalStrategy::TRAVERSE} if $traverse is enabled
+     *  - {@link TraversalStrategy::NONE} if $traverse is disabled
+     *
+     * @param Constraint $constraint The class constraint to add
+     *
+     * @return ClassMetadata This object
+     *
+     * @throws ConstraintDefinitionException When trying to add the
+     *                                       {@link Valid} constraint
+     * @throws GroupDefinitionException      When the "class name" group has
+     *                                       been explicity configured in
+     *                                       the given constraint
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -262,6 +279,10 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      * @param Constraint $constraint The constraint
      *
      * @return ClassMetadata This object
+     *
+     * @throws GroupDefinitionException When the "class name" group has
+     *                                  been explicity configured in
+     *                                  the given constraint
      */
     public function addPropertyConstraint($property, Constraint $constraint)
     {
@@ -303,6 +324,10 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      * @param Constraint $constraint The constraint
      *
      * @return ClassMetadata This object
+     *
+     * @throws GroupDefinitionException When the "class name" group has
+     *                                  been explicity configured in
+     *                                  the given constraint
      */
     public function addGetterConstraint($property, Constraint $constraint)
     {
@@ -338,6 +363,10 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      * Merges the constraints of the given metadata into this object.
      *
      * @param ClassMetadata $source The source metadata
+     *
+     * @throws GroupDefinitionException When the "class name" group has
+     *                                  been explicity configured in
+     *                                  the given constraint
      */
     public function mergeConstraints(ClassMetadata $source)
     {

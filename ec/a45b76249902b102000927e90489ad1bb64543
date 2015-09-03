@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-01T17:21:49Z
+
+PR is ready to merge. I can't reproduce the failures on the doctrine bridge with a fresh php7.
+If someone can, please tell me where is the issue, otherwise the php7 on travis is broken and may be fixed tomorrow.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-01T21:21:37Z
+
+Upgrading to doctrine/orm ^2.4.6 as lowest version fixes the remaining test failures.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-02T15:14:48Z
+
+Reverted the doctrine upgrade: that was a temporary bug in php7

@@ -23,13 +23,13 @@ class JsonFileDumperTest extends \PHPUnit_Framework_TestCase
         }
 
         $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
+        $catalogue->add(array('foo' => '"bar"'));
 
         $tempDir = sys_get_temp_dir();
         $dumper = new JsonFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir, 'json_encoding' => JSON_HEX_QUOT));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.json'), file_get_contents($tempDir.'/messages.en.json'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.dump.json'), file_get_contents($tempDir.'/messages.en.json'));
 
         unlink($tempDir.'/messages.en.json');
     }

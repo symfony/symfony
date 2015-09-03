@@ -189,6 +189,8 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             }
         }
 
+        uasort($notCalled, array($this, 'sortListenersByPriority'));
+
         return $notCalled;
     }
 
@@ -357,5 +359,26 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 }
             }
         }
+    }
+
+    private function sortListenersByPriority($a, $b)
+    {
+        if (is_int($a['priority']) && !is_int($b['priority'])) {
+            return 1;
+        }
+
+        if (!is_int($a['priority']) && is_int($b['priority'])) {
+            return -1;
+        }
+
+        if ($a['priority'] === $b['priority']) {
+            return 0;
+        }
+
+        if ($a['priority'] > $b['priority']) {
+            return -1;
+        }
+
+        return 1;
     }
 }

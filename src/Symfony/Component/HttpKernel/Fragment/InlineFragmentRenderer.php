@@ -59,8 +59,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             // want that as we want to preserve objects (so we manually set Request attributes
             // below instead)
             $attributes = $reference->attributes;
-            if (isset($options['is_fallback']) && $options['is_fallback'] )
-            {
+            if (isset($options['is_fallback']) && $options['is_fallback']) {
                 $this->checkNonScalar($attributes);
                 unset($options['is_fallback']);
             }

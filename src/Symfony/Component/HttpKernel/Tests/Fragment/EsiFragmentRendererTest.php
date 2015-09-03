@@ -95,12 +95,10 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $inline = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer')->disableOriginalConstructor()->getMock();
 
         if ($called) {
-            if ($options)
-            {
+            if ($options) {
                 $inline->expects($this->once())->method('render')->with($this->anything(), $this->anything(), $options);
             }
-            else
-            {
+            else {
                 $inline->expects($this->once())->method('render');
             }
         }

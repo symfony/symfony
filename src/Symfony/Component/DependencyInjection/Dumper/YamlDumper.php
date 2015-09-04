@@ -120,10 +120,6 @@ class YamlDumper extends Dumper
             $code .= "        shared: false\n";
         }
 
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
-            $code .= sprintf("        scope: %s\n", $scope);
-        }
-
         if (null !== $decorated = $definition->getDecoratedService()) {
             list($decorated, $renamedId, $priority) = $decorated;
             $code .= sprintf("        decorates: %s\n", $decorated);

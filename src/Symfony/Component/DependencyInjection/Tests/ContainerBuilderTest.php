@@ -20,11 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -150,29 +148,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         // we must also have the same RuntimeException here
         $builder->get('foo');
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
-     * @group legacy
-     */
-    public function testGetReturnsNullOnInactiveScope()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('foo', 'stdClass')->setScope('request');
-
-        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
-     * @group legacy
-     */
-    public function testGetReturnsNullOnInactiveScopeWhenServiceIsCreatedByAMethod()
-    {
-        $builder = new ProjectContainer();
-
-        $this->assertNull($builder->get('foobaz', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
     /**
@@ -776,12 +751,4 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
 class FooClass
 {
-}
-
-class ProjectContainer extends ContainerBuilder
-{
-    public function getFoobazService()
-    {
-        throw new InactiveScopeException('foo', 'request');
-    }
 }

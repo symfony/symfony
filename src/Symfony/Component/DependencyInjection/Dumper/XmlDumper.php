@@ -124,9 +124,6 @@ class XmlDumper extends Dumper
         if (!$definition->isShared()) {
             $service->setAttribute('shared', 'false');
         }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
-            $service->setAttribute('scope', $scope);
-        }
         if (!$definition->isPublic()) {
             $service->setAttribute('public', 'false');
         }
@@ -280,9 +277,6 @@ class XmlDumper extends Dumper
                     $element->setAttribute('on-invalid', 'null');
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
-                }
-                if (!$value->isStrict(false)) {
-                    $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');

@@ -167,13 +167,6 @@ class YamlFileLoader extends FileLoader
             $definition->setShared($service['shared']);
         }
 
-        if (isset($service['scope'])) {
-            if ('request' !== $id) {
-                @trigger_error(sprintf('The "scope" key of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
-            }
-            $definition->setScope($service['scope'], false);
-        }
-
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
         }

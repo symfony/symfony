@@ -28,21 +28,16 @@ interface ContainerInterface
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE = 2;
     const IGNORE_ON_INVALID_REFERENCE = 3;
-    const SCOPE_CONTAINER = 'container';
-    const SCOPE_PROTOTYPE = 'prototype';
 
     /**
      * Sets a service.
      *
-     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
-     *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope of the service
      *
      * @api
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER);
+    public function set($id, $service);
 
     /**
      * Gets a service.
@@ -114,65 +109,4 @@ interface ContainerInterface
      * @api
      */
     public function setParameter($name, $value);
-
-    /**
-     * Enters the given scope.
-     *
-     * @param string $name
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function enterScope($name);
-
-    /**
-     * Leaves the current scope, and re-enters the parent scope.
-     *
-     * @param string $name
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function leaveScope($name);
-
-    /**
-     * Adds a scope to the container.
-     *
-     * @param ScopeInterface $scope
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function addScope(ScopeInterface $scope);
-
-    /**
-     * Whether this container has the given scope.
-     *
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function hasScope($name);
-
-    /**
-     * Determines whether the given scope is currently active.
-     *
-     * It does however not check if the scope actually exists.
-     *
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function isScopeActive($name);
 }

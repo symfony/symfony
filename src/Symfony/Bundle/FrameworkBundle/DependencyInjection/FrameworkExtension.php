@@ -97,13 +97,9 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
-
-            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-                $config['csrf_protection']['enabled'] = true;
-            }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['form']['csrf_protection'], $container, $loader);
 
         if (isset($config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -200,20 +196,12 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (null === $config['form']['csrf_protection']['enabled']) {
-            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
-        }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-
-            if (null !== $config['form']['csrf_protection']['field_name']) {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
-            } else {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-            }
+            $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -789,12 +777,6 @@ class FrameworkExtension extends Extension
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
-
-        // You can use this parameter to check the API version in your own
-        // bundle extension classes
-        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
-        // @deprecated since version 2.7, to be removed in 3.0
-        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)

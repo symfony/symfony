@@ -2,7 +2,6 @@
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -23,11 +22,7 @@ class LazyServiceProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
+        $this->services = array();
     }
 
     /**
@@ -43,7 +38,6 @@ class LazyServiceProjectServiceContainer extends Container
     public function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
-
             return $this->services['foo'] = new stdClass_c1d194250ee2e2b7d2eab8b8212368a8(
                 function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
                     $wrappedInstance = $this->getFooService(false);

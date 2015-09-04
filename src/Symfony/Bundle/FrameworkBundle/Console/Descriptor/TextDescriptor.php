@@ -256,7 +256,6 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Tags</comment>             -';
         }
 
-        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope(false));
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');

@@ -308,20 +308,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyFullyConfiguredValidationService()
-    {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('The apc extension is not available.');
-        }
-
-        $container = $this->createContainerFromFile('full');
-
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
-    }
-
     public function testValidationService()
     {
         $container = $this->createContainerFromFile('validation_annotations');
@@ -407,28 +393,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('form_no_csrf');
 
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFormCsrfFieldNameCanBeSetUnderCsrfSettings()
-    {
-        $container = $this->createContainerFromFile('form_csrf_sets_field_name');
-
-        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
-        $this->assertEquals('_custom', $container->getParameter('form.type_extension.csrf.field_name'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
-    {
-        $container = $this->createContainerFromFile('form_csrf_under_form_sets_field_name');
-
-        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
-        $this->assertEquals('_custom_form', $container->getParameter('form.type_extension.csrf.field_name'));
     }
 
     public function testStopwatchEnabledWithDebugModeEnabled()

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -353,55 +352,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns all Scopes.
-     *
-     * @return array An array of scopes
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function getScopes($triggerDeprecationError = true)
-    {
-        if ($triggerDeprecationError) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        return $this->scopes;
-    }
-
-    /**
-     * Returns all Scope children.
-     *
-     * @return array An array of scope children.
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function getScopeChildren($triggerDeprecationError = true)
-    {
-        if ($triggerDeprecationError) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        return $this->scopeChildren;
-    }
-
-    /**
      * Sets a service.
-     *
-     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
+    public function set($id, $service)
     {
         $id = strtolower($id);
 
@@ -424,7 +384,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         unset($this->definitions[$id], $this->aliasDefinitions[$id]);
 
-        parent::set($id, $service, $scope);
+        parent::set($id, $service);
     }
 
     /**
@@ -464,7 +424,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return object The associated service
      *
      * @throws InvalidArgumentException when no definitions are available
-     * @throws InactiveScopeException   when the current scope is not active
      * @throws LogicException           when a circular dependency is detected
      * @throws \Exception
      *
@@ -500,10 +459,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = $this->createService($definition, $id);
         } catch (\Exception $e) {
             unset($this->loading[$id]);
-
-            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return;
-            }
 
             throw $e;
         }
@@ -914,7 +869,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object The service described by the service definition
      *
-     * @throws RuntimeException         When the scope is inactive
      * @throws RuntimeException         When the factory definition is incomplete
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
@@ -1135,21 +1089,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param Definition $definition
      * @param mixed      $service
      * @param string     $id
-     *
-     * @throws InactiveScopeException
      */
     private function shareService(Definition $definition, $service, $id)
     {
-        if ($definition->isShared() && self::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
-            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new InactiveScopeException($id, $scope);
-            }
-
+        if ($definition->isShared()) {
             $this->services[$lowerId = strtolower($id)] = $service;
-
-            if (self::SCOPE_CONTAINER !== $scope) {
-                $this->scopedServices[$scope][$lowerId] = $service;
-            }
         }
     }
 

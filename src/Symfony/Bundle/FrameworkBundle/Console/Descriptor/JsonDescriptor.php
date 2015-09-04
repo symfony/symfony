@@ -205,7 +205,6 @@ class JsonDescriptor extends Descriptor
     {
         $data = array(
             'class' => (string) $definition->getClass(),
-            'scope' => $definition->getScope(false),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),

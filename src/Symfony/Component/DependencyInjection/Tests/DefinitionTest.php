@@ -148,31 +148,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testPrototypeScopedDefinitionAreNotShared()
-    {
-        $def = new Definition('stdClass');
-        $def->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-
-        $this->assertFalse($def->isShared());
-        $this->assertEquals(ContainerInterface::SCOPE_PROTOTYPE, $def->getScope());
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setScope
-     * @covers Symfony\Component\DependencyInjection\Definition::getScope
-     * @group legacy
-     */
-    public function testSetGetScope()
-    {
-        $def = new Definition('stdClass');
-        $this->assertEquals('container', $def->getScope());
-        $this->assertSame($def, $def->setScope('foo'));
-        $this->assertEquals('foo', $def->getScope());
-    }
-
-    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setPublic
      * @covers Symfony\Component\DependencyInjection\Definition::isPublic
      */

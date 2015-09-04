@@ -547,7 +547,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
-        if (!$cache->isFresh()) {
+        if (!$cache->isFresh(array(new ResourceInterfaceValidator()))) {
             $container = $this->buildContainer();
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());

@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Config\Resource\ResourceValidator;
+use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -69,11 +68,17 @@ class ConfigCache implements ConfigCacheInterface
      * This method always returns true when debug is off and the
      * cache file exists.
      *
-     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against.
+     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against. The first validator that supports a resource is considered authoritative.
+     *
      * @return bool true if the cache is fresh, false otherwise
      */
     public function isFresh(array $validators = null)
     {
+        if (null === $validators) {
+            @trigger_error('ConfigCache::isFresh requires the $validators parameter as of version 2.8.', E_USER_DEPRECATED);
+            $validators = array(new ResourceInterfaceValidator());
+        }
+
         if (!is_file($this->file)) {
             return false;
         }
@@ -90,18 +95,18 @@ class ConfigCache implements ConfigCacheInterface
         $time = filemtime($this->file);
         $meta = unserialize(file_get_contents($metadata));
 
-        if (null === $validators) {
-            $validators = array(new ResourceValidator());
-        }
-        foreach ($validators as $validator) {
-            foreach ($meta as $resource) {
+        foreach ($meta as $resource) {
+            foreach ($validators as $validator) {
                 if (!$validator->supports($resource)) {
-                    continue;
+                    continue; // next validator
                 }
-                if (!$validator->isFresh($resource, $time)) {
-                    return false;
+                if ($validator->isFresh($resource, $time)) {
+                    continue; // no need to further check this resource
+                } else {
+                    return false; // cache is stale
                 }
             }
+            // no suitable validator found, ignore this resource
         }
 
         return true;
@@ -111,7 +116,7 @@ class ConfigCache implements ConfigCacheInterface
      * Writes cache.
      *
      * @param string              $content  The content to write in the cache
-     * @param ResourceInterface[] $metadata An array of ResourceInterface instances
+     * @param array               $metadata An array of metadata
      *
      * @throws \RuntimeException When cache file can't be written
      */

@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,7 +57,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, false);
 
-        $this->assertFalse($cache->isFresh());
+        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
     }
 
     public function testCacheIsAlwaysFreshIfFileExistsWithDebugDisabled()
@@ -65,7 +66,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, false);
 
-        $this->assertTrue($cache->isFresh());
+        $this->assertTrue($this->callIsFreshWithResourceValidator($cache));
     }
 
     public function testCacheIsNotFreshWithoutMetaFile()
@@ -74,14 +75,14 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertFalse($cache->isFresh());
+        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
     }
 
     public function testCacheIsFreshIfResourceIsFresh()
     {
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertTrue($cache->isFresh());
+        $this->assertTrue($this->callIsFreshWithResourceValidator($cache));
     }
 
     public function testCacheIsNotFreshIfOneOfTheResourcesIsNotFresh()
@@ -90,7 +91,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertFalse($cache->isFresh());
+        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
     }
 
     public function testWriteDumpsFile()
@@ -119,6 +120,11 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($this->cacheFile, 'Cache file is created');
         $this->assertFileExists($this->metaFile, 'Meta file is created');
         $this->assertSame(serialize($metadata), file_get_contents($this->metaFile));
+    }
+
+    private function callIsFreshWithResourceValidator(ConfigCache $cache)
+    {
+        return $cache->isFresh(array(new ResourceInterfaceValidator()));
     }
 
     private function makeCacheFresh()

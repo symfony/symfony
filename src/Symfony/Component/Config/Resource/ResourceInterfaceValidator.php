@@ -14,11 +14,11 @@ namespace Symfony\Component\Config\Resource;
 use Symfony\Component\Config\MetadataValidatorInterface;
 
 /**
- * Validator for Resources.
+ * Validator for metadata implementing the ResourceInterface.
  *
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class ResourceValidator implements MetadataValidatorInterface
+class ResourceInterfaceValidator implements MetadataValidatorInterface
 {
     public function supports($metadata)
     {

@@ -33,16 +33,6 @@ class DateTypeTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('date');
-
-        $this->assertSame('date', $form->getConfig()->getType()->getName());
-    }
-
-    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidWidgetOption()

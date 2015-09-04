@@ -1560,24 +1560,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyReadOnly()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
-            'read_only' => true,
-        ));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
-'/input
-    [@type="text"]
-    [@name="name"]
-    [@readonly="readonly"]
-'
-        );
-    }
-
     public function testDisabled()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(

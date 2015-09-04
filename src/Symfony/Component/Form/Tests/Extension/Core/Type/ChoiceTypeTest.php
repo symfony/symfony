@@ -68,16 +68,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('choice');
-
-        $this->assertSame('choice', $form->getConfig()->getType()->getName());
-    }
-
-    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testChoicesOptionExpectsArrayOrTraversable()
@@ -432,33 +422,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacySubmitSingleNonExpandedObjectChoices()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'multiple' => false,
-            'expanded' => false,
-            'choice_list' => new ObjectChoiceList(
-                $this->objectChoices,
-                // label path
-                'name',
-                array(),
-                null,
-                // value path
-                'id'
-            ),
-        ));
-
-        // "id" value of the second entry
-        $form->submit('2');
-
-        $this->assertEquals($this->objectChoices[1], $form->getData());
-        $this->assertEquals('2', $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
-    }
-
     public function testSubmitMultipleNonExpanded()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
@@ -546,32 +509,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices_as_values' => true,
             'choice_label' => 'name',
             'choice_value' => 'id',
-        ));
-
-        $form->submit(array('2', '3'));
-
-        $this->assertEquals(array($this->objectChoices[1], $this->objectChoices[2]), $form->getData());
-        $this->assertEquals(array('2', '3'), $form->getViewData());
-        $this->assertTrue($form->isSynchronized());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySubmitMultipleNonExpandedObjectChoices()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'multiple' => true,
-            'expanded' => false,
-            'choice_list' => new ObjectChoiceList(
-                $this->objectChoices,
-                // label path
-                'name',
-                array(),
-                null,
-                // value path
-                'id'
-            ),
         ));
 
         $form->submit(array('2', '3'));
@@ -1039,42 +976,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacySubmitSingleExpandedObjectChoices()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'multiple' => false,
-            'expanded' => true,
-            'choice_list' => new ObjectChoiceList(
-                $this->objectChoices,
-                // label path
-                'name',
-                array(),
-                null,
-                // value path
-                'id'
-            ),
-        ));
-
-        $form->submit('2');
-
-        $this->assertSame($this->objectChoices[1], $form->getData());
-        $this->assertTrue($form->isSynchronized());
-
-        $this->assertFalse($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertNull($form[0]->getViewData());
-        $this->assertSame('2', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
-    }
-
     public function testSubmitSingleExpandedNumericChoices()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
@@ -1257,42 +1158,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices_as_values' => true,
             'choice_label' => 'name',
             'choice_value' => 'id',
-        ));
-
-        $form->submit(array('1', '2'));
-
-        $this->assertSame(array($this->objectChoices[0], $this->objectChoices[1]), $form->getData());
-        $this->assertTrue($form->isSynchronized());
-
-        $this->assertTrue($form[0]->getData());
-        $this->assertTrue($form[1]->getData());
-        $this->assertFalse($form[2]->getData());
-        $this->assertFalse($form[3]->getData());
-        $this->assertFalse($form[4]->getData());
-        $this->assertSame('1', $form[0]->getViewData());
-        $this->assertSame('2', $form[1]->getViewData());
-        $this->assertNull($form[2]->getViewData());
-        $this->assertNull($form[3]->getViewData());
-        $this->assertNull($form[4]->getViewData());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySubmitMultipleExpandedObjectChoices()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'multiple' => true,
-            'expanded' => true,
-            'choice_list' => new ObjectChoiceList(
-                $this->objectChoices,
-                // label path
-                'name',
-                array(),
-                null,
-                // value path
-                'id'
-            ),
         ));
 
         $form->submit(array('1', '2'));

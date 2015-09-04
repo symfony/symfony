@@ -380,23 +380,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testBlockPrefixDefaultsToNameIfSet()
-    {
-        // Type without getBlockPrefix() method
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-
-        $type->expects($this->once())
-            ->method('getName')
-            ->willReturn('my_prefix');
-
-        $resolvedType = new ResolvedFormType($type);
-
-        $this->assertSame('my_prefix', $resolvedType->getBlockPrefix());
-    }
-
-    /**
      * @dataProvider provideTypeClassBlockPrefixTuples
      */
     public function testBlockPrefixDefaultsToFQCNIfNoName($typeClass, $blockPrefix)

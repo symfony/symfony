@@ -572,24 +572,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->validator->validate($entity);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
-     * @group legacy
-     */
-    public function testLegacyPropertyMetadataMustImplementPropertyMetadataInterface()
-    {
-        $entity = new Entity();
-
-        // Legacy interface
-        $propertyMetadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
-        $metadata = new FakeClassMetadata(get_class($entity));
-        $metadata->addCustomPropertyMetadata('firstName', $propertyMetadata);
-
-        $this->metadataFactory->addMetadata($metadata);
-
-        $this->validator->validate($entity);
-    }
-
     public function testNoDuplicateValidationIfClassConstraintInMultipleGroups()
     {
         $entity = new Entity();

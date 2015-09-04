@@ -42,7 +42,7 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
      */
     public function addValidator(MetadataValidatorInterface $validator)
     {
-        $validator[] = $validator;
+        $this->validators[] = $validator;
     }
 
     /**

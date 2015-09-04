@@ -38,17 +38,26 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Constructor.
      *
-     * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
-     * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
-     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
+     * @param int                           $verbosity       The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param bool|null                     $decorated       Whether to decorate messages (null for auto-guessing)
+     * @param OutputFormatterInterface|null $stdoutFormatter Output formatter instance for stdout (null to use default OutputFormatter)
+     * @param OutputFormatterInterface|null $stderrFormatter Output formatter instance for stderr (null to use stdout OutputFormatter)
      *
      * @api
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
-    {
-        parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
+    public function __construct(
+        $verbosity = self::VERBOSITY_NORMAL,
+        $decorated = null,
+        OutputFormatterInterface $stdoutFormatter = null,
+        OutputFormatterInterface $stderrFormatter = null
+    ) {
+        parent::__construct($this->openOutputStream(), $verbosity, $decorated, $stdoutFormatter);
 
-        $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
+        if (null === $stderrFormatter) {
+            $stderrFormatter = clone $this->getFormatter();
+        }
+
+        $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $stderrFormatter);
     }
 
     /**
@@ -66,7 +75,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         parent::setFormatter($formatter);
-        $this->stderr->setFormatter($formatter);
+        $this->stderr->setFormatter(clone $formatter);
     }
 
     /**

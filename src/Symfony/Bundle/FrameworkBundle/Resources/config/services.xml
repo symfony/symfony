@@ -14,7 +14,7 @@
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
         <parameter key="request_stack.class">Symfony\Component\HttpFoundation\RequestStack</parameter>
         <parameter key="config_cache_factory.class">Symfony\Component\Config\ConfigCacheFactory</parameter>
-        <parameter key="config_cache_resource_validator.class">Symfony\Component\Config\Resource\ResourceValidator</parameter>
+        <parameter key="config_cache_resource_validator.class">Symfony\Component\Config\Resource\ResourceInterfaceValidator</parameter>
     </parameters>
 
     <services>

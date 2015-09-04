@@ -492,6 +492,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
+    public function testGetFollowRedirects()
+    {
+        $client = new TestClient();
+        $this->assertTrue($client->getFollowRedirects(), '->getFollowRedirects() returns default value');
+        $client->followRedirects(false);
+        $this->assertFalse($client->getFollowRedirects(), '->getFollowRedirects() returns assigned value');
+    }
+
+    public function testGetMaxRedirects()
+    {
+        $client = new TestClient();
+        $this->assertEquals(-1, $client->getMaxRedirects(), '->getMaxRedirects() returns default value');
+        $client->setMaxRedirects(3);
+        $this->assertEquals(3, $client->getMaxRedirects(), '->getMaxRedirects() returns assigned value');
+    }
+    
+    
+
     public function testBack()
     {
         $client = new TestClient();

@@ -115,8 +115,8 @@ class ConfigCache implements ConfigCacheInterface
     /**
      * Writes cache.
      *
-     * @param string              $content  The content to write in the cache
-     * @param array               $metadata An array of metadata
+     * @param string $content  The content to write in the cache
+     * @param array  $metadata An array of metadata
      *
      * @throws \RuntimeException When cache file can't be written
      */

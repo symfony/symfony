@@ -23,7 +23,6 @@ namespace Symfony\Component\Config;
  */
 interface MetadataValidatorInterface
 {
-
     /**
      * Queries the MetadataValidator whether it can validate a given
      * resource or not.

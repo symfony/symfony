@@ -29,7 +29,7 @@ class ResourceInterfaceValidatorTest extends \PHPUnit_Framework_TestCase
     public function testSupportsResourceInterface()
     {
         $this->assertTrue($this->validator->supports($this->metadataMock), '->supports($metadata) returns true if $metadata implements ResourceInterface');
-        $this->assertFalse($this->validator->supports(new \StdClass), '->supports($metadata) returns false if $metadata does not implement ResourceInterface');
+        $this->assertFalse($this->validator->supports(new \StdClass()), '->supports($metadata) returns false if $metadata does not implement ResourceInterface');
     }
 
     /**

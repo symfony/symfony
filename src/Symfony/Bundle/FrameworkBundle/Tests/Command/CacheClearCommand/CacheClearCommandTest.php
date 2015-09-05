@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestA
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;

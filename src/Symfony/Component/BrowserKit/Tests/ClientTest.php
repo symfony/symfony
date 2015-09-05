@@ -507,8 +507,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setMaxRedirects(3);
         $this->assertEquals(3, $client->getMaxRedirects(), '->getMaxRedirects() returns assigned value');
     }
-    
-    
 
     public function testBack()
     {

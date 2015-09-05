@@ -50,7 +50,7 @@ class CacheClearCommandTest extends TestCase
         foreach ($metaFiles as $file) {
             $configCache = new ConfigCache(substr($file, 0, -5), true);
             $this->assertTrue(
-                $configCache->isFresh(),
+                $configCache->isFresh(array(new ResourceInterfaceValidator()))),
                 sprintf(
                     'Meta file "%s" is not fresh',
                     (string) $file

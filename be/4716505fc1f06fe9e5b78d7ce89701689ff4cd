@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by zerustech at 2015-08-16T02:32:24Z
+
+@stof @aitboudad Please check, thanks.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-08-25T12:41:17Z
+
+could you update https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/Command/TranslationUpdateCommand.php#L142 too
+
+---------------------------------------------------------------------------
+
+by zerustech at 2015-08-25T12:48:40Z
+
+@aitboudad Shall I create a separate PR for it after this PR is merged or just include the change in this PR?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-08-25T12:50:20Z
+
+ just include the change
+
+---------------------------------------------------------------------------
+
+by zerustech at 2015-08-25T14:32:21Z
+
+@aitboudad Updated
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-08-25T16:17:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-08-25T16:17:43Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by zerustech at 2015-09-01T03:25:12Z
+
+@xabbuh @stof Updated
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-01T06:48:14Z
+
+Looks like you need to bump the required version of the Translation component in the FrameworkBundle.
+
+---------------------------------------------------------------------------
+
+by zerustech at 2015-09-01T07:07:10Z
+
+@xabbuh Updated
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-05T11:19:14Z
+
+:+1:

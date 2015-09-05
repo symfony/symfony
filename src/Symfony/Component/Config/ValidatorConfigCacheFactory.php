@@ -11,21 +11,23 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
-
 /**
- * Basic implementation of ConfigCacheFactoryInterface.
- * Creates a ConfigCache instance that will be validated with the
- * ResourceInterfaceValidator only.
+ * A ConfigCacheFactory implementation that validates the
+ * cache with an arbitrary set of metadata validators.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class ConfigCacheFactory implements ConfigCacheFactoryInterface
+class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
 {
     /**
-     * @var bool Debug flag passed to the ConfigCache
+     * @var bool
      */
     private $debug;
+
+    /**
+     * @var MetadataValidatorInterface[]
+     */
+    private $validators = array();
 
     /**
      * @param bool $debug The debug flag to pass to ConfigCache
@@ -33,6 +35,14 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
     public function __construct($debug)
     {
         $this->debug = $debug;
+    }
+
+    /**
+     * @param MetadataValidatorInterface $validator
+     */
+    public function addValidator(MetadataValidatorInterface $validator)
+    {
+        $this->validators[] = $validator;
     }
 
     /**
@@ -45,7 +55,7 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
         }
 
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isFresh(array(new ResourceInterfaceValidator()))) {
+        if (!$cache->isFresh($this->validators)) {
             call_user_func($callback, $cache);
         }
 

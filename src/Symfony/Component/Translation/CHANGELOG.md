@@ -4,8 +4,10 @@ CHANGELOG
 2.8.0
 -----
 
- * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
- * added options 'as_tree', 'inline' to YamlFileDumper
+ * deprecated Translator::getMessages(), rely on TranslatorBagInterface::getCatalogue() instead.
+ * added options `as_tree`, `inline` to YamlFileDumper
+ * added support for XLIFF target and tool attributes.
+ * added message parameters to DataCollectorTranslator.
  * [DEPRECATION] The `DiffOperation` class has been deprecated and
    will be removed in Symfony 3.0, since its operation has nothing to do with 'diff',
    so the class name is misleading. The `TargetOperation` class should be used for

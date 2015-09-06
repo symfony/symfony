@@ -55,7 +55,7 @@ class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
         }
 
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isFresh($this->validators)) {
+        if (!$cache->isValid($this->validators)) {
             call_user_func($callback, $cache);
         }
 

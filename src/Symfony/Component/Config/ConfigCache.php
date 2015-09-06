@@ -16,12 +16,13 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * ConfigCache manages PHP cache files.
+ * ConfigCache caches arbitrary content in files on disk.
  *
- * When debug is enabled, it knows when to flush the cache
- * thanks to an array of ResourceInterface instances.
+ * Metadata can be stored alongside the cache and can later be
+ * used by MetadataValidators to check if the cache is still fresh.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  */
 class ConfigCache implements ConfigCacheInterface
 {
@@ -68,23 +69,35 @@ class ConfigCache implements ConfigCacheInterface
      * This method always returns true when debug is off and the
      * cache file exists.
      *
+     * @return bool true if the cache is fresh, false otherwise
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
+     */
+    public function isFresh()
+    {
+        @trigger_error(__NAMESPACE__.'\ConfigCache::isFresh() is deprecated since version 2.8 and will be removed in 3.0. Use the isValid() method instead and pass the appropriate MetadataValidators, or even better use a \Symfony\Component\Config\ConfigCacheFactoryInterface implementation to create and validate the cache.', E_USER_DEPRECATED);
+
+        if (!$this->debug && is_file($this->file)) {
+            return true;
+        }
+
+        return $this->isValid(array(new ResourceInterfaceValidator()));
+    }
+
+    /**
+     * Use MetadataValidators to check if the cache is still valid.
+     *
+     * The first MetadataValidator that supports a given resource is considered authoritative.
+     * Resources with no matching MetadataValidators will silently be ignored.
+     *
      * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against. The first validator that supports a resource is considered authoritative.
      *
-     * @return bool true if the cache is fresh, false otherwise
+     * @return bool True if all supported resources and valid, false otherwise
      */
-    public function isFresh(array $validators = null)
+    public function isValid(array $validators = null)
     {
-        if (null === $validators) {
-            @trigger_error('ConfigCache::isFresh requires the $validators parameter as of version 2.8.', E_USER_DEPRECATED);
-            $validators = array(new ResourceInterfaceValidator());
-        }
-
         if (!is_file($this->file)) {
             return false;
-        }
-
-        if (!$this->debug) {
-            return true;
         }
 
         $metadata = $this->getMetaFile();

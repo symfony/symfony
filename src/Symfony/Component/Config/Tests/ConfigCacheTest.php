@@ -57,7 +57,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, false);
 
-        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
+        $this->assertFalse($this->isCacheValid($cache));
     }
 
     public function testCacheIsAlwaysFreshIfFileExistsWithDebugDisabled()
@@ -66,7 +66,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, false);
 
-        $this->assertTrue($this->callIsFreshWithResourceValidator($cache));
+        $this->assertTrue($this->isCacheValid($cache));
     }
 
     public function testCacheIsNotFreshWithoutMetaFile()
@@ -75,14 +75,14 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
+        $this->assertFalse($this->isCacheValid($cache));
     }
 
     public function testCacheIsFreshIfResourceIsFresh()
     {
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertTrue($this->callIsFreshWithResourceValidator($cache));
+        $this->assertTrue($this->isCacheValid($cache));
     }
 
     public function testCacheIsNotFreshIfOneOfTheResourcesIsNotFresh()
@@ -91,7 +91,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertFalse($this->callIsFreshWithResourceValidator($cache));
+        $this->assertFalse($this->isCacheValid($cache));
     }
 
     public function testWriteDumpsFile()
@@ -122,9 +122,9 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(serialize($metadata), file_get_contents($this->metaFile));
     }
 
-    private function callIsFreshWithResourceValidator(ConfigCache $cache)
+    private function isCacheValid(ConfigCache $cache)
     {
-        return $cache->isFresh(array(new ResourceInterfaceValidator()));
+        return $cache->isValid(array(new ResourceInterfaceValidator()));
     }
 
     private function makeCacheFresh()

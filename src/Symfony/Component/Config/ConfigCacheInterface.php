@@ -32,11 +32,9 @@ interface ConfigCacheInterface
      *
      * This check should take the metadata passed to the write() method into consideration.
      *
-     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against.
-     *
      * @return bool Whether the cache is still fresh.
      */
-    public function isFresh(array $validators = null);
+    public function isFresh();
 
     /**
      * Writes the given content into the cache file. Metadata will be stored

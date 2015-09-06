@@ -27,7 +27,7 @@ interface MetadataValidatorInterface
      * Queries the MetadataValidator whether it can validate a given
      * resource or not.
      *
-     * @param $metadata The resource to be checked for freshness
+     * @param object $metadata The resource to be checked for freshness
      *
      * @return bool True if the MetadataValidator can handle this resource type, false if not
      */
@@ -36,8 +36,8 @@ interface MetadataValidatorInterface
     /**
      * Validates the resource.
      *
-     * @param $metadata The resource to be validated.
-     * @param $timestamp The timestamp at which the cache associated with this resource was created.
+     * @param object $metadata  The resource to be validated.
+     * @param int    $timestamp The timestamp at which the cache associated with this resource was created.
      *
      * @return bool True if the resource has not changed since the given timestamp, false otherwise.
      */

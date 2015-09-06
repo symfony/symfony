@@ -45,7 +45,7 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
         }
 
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isFresh(array(new ResourceInterfaceValidator()))) {
+        if (!$cache->isValid(array(new ResourceInterfaceValidator()))) {
             call_user_func($callback, $cache);
         }
 

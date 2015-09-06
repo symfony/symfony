@@ -26,16 +26,6 @@ class NumberTypeTest extends TestCase
         \Locale::setDefault('de_DE');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('number');
-
-        $this->assertSame('number', $form->getConfig()->getType()->getName());
-    }
-
     public function testDefaultFormatting()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType');

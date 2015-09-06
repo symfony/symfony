@@ -803,50 +803,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetErrorsAsStringDeep()
-    {
-        $parent = $this->getBuilder()
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->getForm();
-
-        $this->form->addError(new FormError('Error!'));
-
-        $parent->add($this->form);
-        $parent->add($this->getBuilder('foo')->getForm());
-
-        $this->assertSame(
-             "name:\n".
-             "    ERROR: Error!\n",
-             $parent->getErrorsAsString()
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetErrorsAsStringDeepWithIndentation()
-    {
-        $parent = $this->getBuilder()
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->getForm();
-
-        $this->form->addError(new FormError('Error!'));
-
-        $parent->add($this->form);
-        $parent->add($this->getBuilder('foo')->getForm());
-
-        $this->assertSame(
-             "    name:\n".
-             "        ERROR: Error!\n",
-             $parent->getErrorsAsString(4)
-        );
-    }
-
     public function testGetErrors()
     {
         $this->form->addError($error1 = new FormError('Error 1'));

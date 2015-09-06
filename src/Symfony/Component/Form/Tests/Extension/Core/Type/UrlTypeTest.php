@@ -15,16 +15,6 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
 class UrlTypeTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('url');
-
-        $this->assertSame('url', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\UrlType', 'name');

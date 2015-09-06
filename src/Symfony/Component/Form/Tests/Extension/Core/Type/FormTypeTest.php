@@ -51,16 +51,6 @@ class FormTest_AuthorWithoutRefSetter
 
 class FormTypeTest extends BaseTypeTest
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('form');
-
-        $this->assertSame('form', $form->getConfig()->getType()->getName());
-    }
-
     public function testCreateFormInstances()
     {
         $this->assertInstanceOf('Symfony\Component\Form\Form', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType'));
@@ -109,19 +99,6 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyNonReadOnlyFormWithReadOnlyParentIsReadOnly()
-    {
-        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array('read_only' => true))
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->getForm()
-            ->createView();
-
-        $this->assertTrue($view['child']->vars['read_only']);
-    }
-
     public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array('attr' => array('readonly' => true)))
@@ -132,19 +109,6 @@ class FormTypeTest extends BaseTypeTest
         $this->assertTrue($view['child']->vars['attr']['readonly']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyReadOnlyFormWithNonReadOnlyParentIsReadOnly()
-    {
-        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', array('read_only' => true))
-            ->getForm()
-            ->createView();
-
-        $this->assertTrue($view['child']->vars['read_only']);
-    }
-
     public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
@@ -153,19 +117,6 @@ class FormTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertTrue($view['child']->vars['attr']['readonly']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
-    {
-        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->getForm()
-                ->createView();
-
-        $this->assertFalse($view['child']->vars['read_only']);
     }
 
     public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
@@ -684,23 +635,6 @@ class FormTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertSame('0', $view->vars['label']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCanGetErrorsWhenButtonInForm()
-    {
-        $builder = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
-            'required' => false,
-        ));
-        $builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $builder->add('submit', 'Symfony\Component\Form\Extension\Core\Type\SubmitType');
-        $form = $builder->getForm();
-
-        //This method should not throw a Fatal Error Exception.
-        $form->getErrorsAsString();
     }
 
     protected function getTestedType()

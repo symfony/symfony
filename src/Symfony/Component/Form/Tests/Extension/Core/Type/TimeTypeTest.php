@@ -17,16 +17,6 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
 class TimeTypeTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('time');
-
-        $this->assertSame('time', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitDateTime()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(

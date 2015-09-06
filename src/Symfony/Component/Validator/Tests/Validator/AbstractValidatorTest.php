@@ -821,22 +821,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Cannot be UnsupportedMetadataException for BC with Symfony < 2.5.
-     *
-     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     * @group legacy
-     */
-    public function testLegacyValidatePropertyFailsIfPropertiesNotSupported()
-    {
-        // $metadata does not implement PropertyMetadataContainerInterface
-        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
-
-        $this->metadataFactory->addMetadataForValue('VALUE', $metadata);
-
-        $this->validateProperty('VALUE', 'someProperty');
-    }
-
-    /**
      * https://github.com/symfony/symfony/issues/11604.
      */
     public function testValidatePropertyWithoutConstraints()
@@ -946,22 +930,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
         $this->assertNull($violations[0]->getPlural());
         $this->assertNull($violations[0]->getCode());
-    }
-
-    /**
-     * Cannot be UnsupportedMetadataException for BC with Symfony < 2.5.
-     *
-     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     * @group legacy
-     */
-    public function testLegacyValidatePropertyValueFailsIfPropertiesNotSupported()
-    {
-        // $metadata does not implement PropertyMetadataContainerInterface
-        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
-
-        $this->metadataFactory->addMetadataForValue('VALUE', $metadata);
-
-        $this->validatePropertyValue('VALUE', 'someProperty', 'someValue');
     }
 
     /**

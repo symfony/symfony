@@ -2,7 +2,6 @@
     "definitions": {
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
-            "scope": "container",
             "public": false,
             "synthetic": true,
             "lazy": false,

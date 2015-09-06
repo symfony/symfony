@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -71,10 +68,6 @@ class Container implements ResettableContainerInterface
     protected $services = array();
     protected $methodMap = array();
     protected $aliases = array();
-    protected $scopes = array();
-    protected $scopeChildren = array();
-    protected $scopedServices = array();
-    protected $scopeStacks = array();
     protected $loading = array();
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
@@ -181,48 +174,22 @@ class Container implements ResettableContainerInterface
      * Setting a service to null resets the service: has() returns false and get()
      * behaves in the same way as if the service was never created.
      *
-     * Note: The $scope parameter is deprecated since version 2.8 and will be removed in 3.0.
-     *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope of the service
-     *
-     * @throws RuntimeException         When trying to set a service in an inactive scope
-     * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
+    public function set($id, $service)
     {
-        if (!in_array($scope, array('container', 'request')) || ('request' === $scope && 'request' !== $id)) {
-            @trigger_error('The concept of container scopes is deprecated since version 2.8 and will be removed in 3.0. Omit the third parameter.', E_USER_DEPRECATED);
-        }
-
-        if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
-        }
-
         $id = strtolower($id);
 
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (self::SCOPE_CONTAINER !== $scope) {
-            if (!isset($this->scopedServices[$scope])) {
-                throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
-            }
-
-            $this->scopedServices[$scope][$id] = $service;
-        }
-
         $this->services[$id] = $service;
 
         if (null === $service) {
-            if (self::SCOPE_CONTAINER !== $scope) {
-                unset($this->scopedServices[$scope][$id]);
-            }
-
             unset($this->services[$id]);
         }
     }
@@ -333,10 +300,6 @@ class Container implements ResettableContainerInterface
                     unset($this->services[$id]);
                 }
 
-                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    return;
-                }
-
                 throw $e;
             }
 
@@ -373,10 +336,6 @@ class Container implements ResettableContainerInterface
      */
     public function reset()
     {
-        if (!empty($this->scopedServices)) {
-            throw new LogicException('Resetting the container is not allowed when a scope is active.');
-        }
-
         $this->services = array();
     }
 
@@ -397,193 +356,6 @@ class Container implements ResettableContainerInterface
         $ids[] = 'service_container';
 
         return array_unique(array_merge($ids, array_keys($this->services)));
-    }
-
-    /**
-     * This is called when you enter a scope.
-     *
-     * @param string $name
-     *
-     * @throws RuntimeException         When the parent scope is inactive
-     * @throws InvalidArgumentException When the scope does not exist
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function enterScope($name)
-    {
-        if ('request' !== $name) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        if (!isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
-        }
-
-        if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
-        }
-
-        // check if a scope of this name is already active, if so we need to
-        // remove all services of this scope, and those of any of its child
-        // scopes from the global services map
-        if (isset($this->scopedServices[$name])) {
-            $services = array($this->services, $name => $this->scopedServices[$name]);
-            unset($this->scopedServices[$name]);
-
-            foreach ($this->scopeChildren[$name] as $child) {
-                if (isset($this->scopedServices[$child])) {
-                    $services[$child] = $this->scopedServices[$child];
-                    unset($this->scopedServices[$child]);
-                }
-            }
-
-            // update global map
-            $this->services = call_user_func_array('array_diff_key', $services);
-            array_shift($services);
-
-            // add stack entry for this scope so we can restore the removed services later
-            if (!isset($this->scopeStacks[$name])) {
-                $this->scopeStacks[$name] = new \SplStack();
-            }
-            $this->scopeStacks[$name]->push($services);
-        }
-
-        $this->scopedServices[$name] = array();
-    }
-
-    /**
-     * This is called to leave the current scope, and move back to the parent
-     * scope.
-     *
-     * @param string $name The name of the scope to leave
-     *
-     * @throws InvalidArgumentException if the scope is not active
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function leaveScope($name)
-    {
-        if ('request' !== $name) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        if (!isset($this->scopedServices[$name])) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
-        }
-
-        // remove all services of this scope, or any of its child scopes from
-        // the global service map
-        $services = array($this->services, $this->scopedServices[$name]);
-        unset($this->scopedServices[$name]);
-
-        foreach ($this->scopeChildren[$name] as $child) {
-            if (isset($this->scopedServices[$child])) {
-                $services[] = $this->scopedServices[$child];
-                unset($this->scopedServices[$child]);
-            }
-        }
-
-        // update global map
-        $this->services = call_user_func_array('array_diff_key', $services);
-
-        // check if we need to restore services of a previous scope of this type
-        if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
-            $services = $this->scopeStacks[$name]->pop();
-            $this->scopedServices += $services;
-
-            if ($this->scopeStacks[$name]->isEmpty()) {
-                unset($this->scopeStacks[$name]);
-            }
-
-            foreach ($services as $array) {
-                foreach ($array as $id => $service) {
-                    $this->set($id, $service, $name);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds a scope to the container.
-     *
-     * @param ScopeInterface $scope
-     *
-     * @throws InvalidArgumentException
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function addScope(ScopeInterface $scope)
-    {
-        $name = $scope->getName();
-        $parentScope = $scope->getParentName();
-
-        if ('request' !== $name) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-        if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
-        }
-        if (isset($this->scopes[$name])) {
-            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
-        }
-        if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
-        }
-
-        $this->scopes[$name] = $parentScope;
-        $this->scopeChildren[$name] = array();
-
-        // normalize the child relations
-        while ($parentScope !== self::SCOPE_CONTAINER) {
-            $this->scopeChildren[$parentScope][] = $name;
-            $parentScope = $this->scopes[$parentScope];
-        }
-    }
-
-    /**
-     * Returns whether this container has a certain scope.
-     *
-     * @param string $name The name of the scope
-     *
-     * @return bool
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function hasScope($name)
-    {
-        if ('request' !== $name) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
-        return isset($this->scopes[$name]);
-    }
-
-    /**
-     * Returns whether this scope is currently active.
-     *
-     * This does not actually check if the passed scope actually exists.
-     *
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @api
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
-     */
-    public function isScopeActive($name)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return isset($this->scopedServices[$name]);
     }
 
     /**

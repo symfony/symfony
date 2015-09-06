@@ -113,7 +113,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def = new Definition();
 
         // merge in parent definition
-        // purposely ignored attributes: scope, abstract, tags
+        // purposely ignored attributes: abstract, tags
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
@@ -180,7 +180,6 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope(false), false);
         $def->setTags($definition->getTags());
 
         return $def;

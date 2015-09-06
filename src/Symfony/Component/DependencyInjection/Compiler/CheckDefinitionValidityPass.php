@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -24,8 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
- * - synthetic services are always of non-prototype scope
- * - shared services are always of non-prototype scope
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -44,16 +41,6 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
             // synthetic service is public
             if ($definition->isSynthetic() && !$definition->isPublic()) {
                 throw new RuntimeException(sprintf('A synthetic service ("%s") must be public.', $id));
-            }
-
-            // synthetic service has non-prototype scope
-            if ($definition->isSynthetic() && ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
-                throw new RuntimeException(sprintf('A synthetic service ("%s") cannot be of scope "prototype".', $id));
-            }
-
-            // shared service has non-prototype scope
-            if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope(false)) {
-                throw new RuntimeException(sprintf('A shared service ("%s") cannot be of scope "prototype".', $id));
             }
 
             // non-synthetic, non-abstract service has class

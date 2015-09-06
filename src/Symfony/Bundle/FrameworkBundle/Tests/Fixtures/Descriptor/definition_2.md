@@ -1,5 +1,4 @@
 - Class: `Full\Qualified\Class2`
-- Scope: `container`
 - Public: no
 - Synthetic: yes
 - Lazy: no

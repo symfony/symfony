@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-04T20:56:14Z
+
+`validator_api_version` still there
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-09-04T21:11:32Z
+
+You should fix the error in `Symfony/Bridge/ProxyManager/LazyProxy/PhpDumper/ProxyDumper`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-04T22:21:47Z
+
+@Tobion yes, to be removed in an other PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-04T22:24:07Z
+
+@dosten which error??
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-09-05T02:45:35Z
+
+@nicolas-grekas Hmm.. It's weird, a few hours ago the cause of the failing job on Travis was the use of the SCOPE_CONTAINER constant in the `Symfony/Bridge/ProxyManager/LazyProxy/PhpDumper/ProxyDumper` class, but now seems to be ok.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-05T13:43:33Z
+
+Status: needs work
+I need to figure out what's wrong with the test.
+It may be related to the per-component testing system.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-06T08:06:15Z
+
+Failure inspected, will be fixed once #15694 is merged.
+Status: needs review

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-04T21:05:34Z
+
+ref https://github.com/symfony/symfony/issues/15346#issuecomment-124201286
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-04T22:16:29Z
+
+Thanks for the link.
+Code wanting to be both 3.0 and 2.x compatible could rely on ContainerInterface + method_exists
+Can we consider this?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-04T22:54:09Z
+
+I agree
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-05T08:54:01Z
+
+I added 3.0 compat in Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-05T17:06:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-05T17:07:30Z
+
+Status: Reviewed

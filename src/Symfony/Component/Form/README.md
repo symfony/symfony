@@ -10,7 +10,7 @@ Resources
 
 Silex integration:
 
-https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/FormServiceProvider.php
+https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/FormServiceProvider.php
 
 Documentation:
 

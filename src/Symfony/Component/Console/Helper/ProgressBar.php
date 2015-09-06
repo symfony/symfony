@@ -181,7 +181,7 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
-     * @return int     The progress bar step width
+     * @return int The progress bar step width
      */
     private function getStepWidth()
     {

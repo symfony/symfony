@@ -76,28 +76,28 @@ interface OutputInterface
     public function getVerbosity();
 
     /**
-     * Returns whether verbosity is quiet (-q)
+     * Returns whether verbosity is quiet (-q).
      *
      * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
      */
     public function isQuiet();
 
     /**
-     * Returns whether verbosity is verbose (-v)
+     * Returns whether verbosity is verbose (-v).
      *
      * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
      */
     public function isVerbose();
 
     /**
-     * Returns whether verbosity is very verbose (-vv)
+     * Returns whether verbosity is very verbose (-vv).
      *
      * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
      */
     public function isVeryVerbose();
 
     /**
-     * Returns whether verbosity is debug (-vvv)
+     * Returns whether verbosity is debug (-vvv).
      *
      * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
      */

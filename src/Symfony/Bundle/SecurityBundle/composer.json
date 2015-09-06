@@ -28,6 +28,7 @@
         "symfony/console": "~2.8|~3.0",
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
         "symfony/framework-bundle": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/twig-bundle": "~2.8|~3.0",

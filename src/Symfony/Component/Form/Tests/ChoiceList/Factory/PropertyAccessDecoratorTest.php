@@ -63,6 +63,9 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('value'), $this->factory->createListFromChoices($choices, new PropertyPath('property')));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoices()
     {
         // Property paths are not supported here, because array keys can never

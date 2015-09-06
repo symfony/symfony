@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-06T06:43:16Z
+
+@iltar Can we do the same for the `symfony/security` package?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-06T07:12:24Z
+
+@xabbuh it shouldn't have any side effects as the code is BC. I have no idea how the Subtree split would react though.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-06T07:57:06Z
+
+:+1:

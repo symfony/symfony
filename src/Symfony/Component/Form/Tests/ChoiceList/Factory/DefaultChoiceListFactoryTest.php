@@ -193,6 +193,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertObjectListWithCustomValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesEmpty()
     {
         $list = $this->factory->createListFromFlippedChoices(array());
@@ -201,6 +204,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $list->getValues());
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesFlat()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -210,6 +216,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithChoiceValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesFlatTraversable()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -219,6 +228,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithChoiceValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesFlatValuesAsCallable()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -229,6 +241,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithCustomValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesFlatValuesAsClosure()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -246,6 +261,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithCustomValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesGrouped()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -258,6 +276,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithChoiceValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesGroupedTraversable()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -270,6 +291,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithChoiceValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesGroupedValuesAsCallable()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -283,6 +307,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithCustomValues($list);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateFromFlippedChoicesGroupedValuesAsClosure()
     {
         $list = $this->factory->createListFromFlippedChoices(

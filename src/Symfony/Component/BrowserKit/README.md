@@ -10,7 +10,7 @@ Resources
 ---------
 
 For a simple implementation of a browser based on an HTTP layer, have a look
-at [Goutte](https://github.com/fabpot/Goutte).
+at [Goutte](https://github.com/FriendsOfPHP/Goutte).
 
 For an implementation based on HttpKernelInterface, have a look at the
 [Client](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Client.php)

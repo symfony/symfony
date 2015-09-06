@@ -572,6 +572,9 @@ class TimeTypeTest extends TestCase
         $this->assertSame('Empty', $view['second']->vars['placeholder']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPassEmptyValueBC()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(

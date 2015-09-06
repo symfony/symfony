@@ -280,7 +280,7 @@ class ChoiceType extends AbstractType
 
             // BC when choices are in the keys, not in the values
             if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value']);
+                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value'], false);
             }
 
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);

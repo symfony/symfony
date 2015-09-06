@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-05T08:53:09Z
+
+The failure on 2.8 will be fixed once #15694 is merged

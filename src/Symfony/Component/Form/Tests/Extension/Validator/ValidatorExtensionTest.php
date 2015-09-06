@@ -48,6 +48,9 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser', $guesser);
     }
 
+    /**
+     * @group legacy
+     */
     public function test2Dot4ValidationApi()
     {
         $factory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
@@ -82,6 +85,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @group legacy
      */
     public function testInvalidValidatorInterface()
     {

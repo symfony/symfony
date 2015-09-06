@@ -1404,6 +1404,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     /**
      * @dataProvider getOptionsWithPlaceholder
+     * @group legacy
      */
     public function testPassEmptyValueBC($multiple, $expanded, $required, $placeholder, $viewValue)
     {

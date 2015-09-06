@@ -759,6 +759,9 @@ class DateTypeTest extends TestCase
         $this->assertSame('Empty', $view['day']->vars['placeholder']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPassEmptyValueBC()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(

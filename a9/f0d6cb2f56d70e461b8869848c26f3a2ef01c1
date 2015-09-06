@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-05T14:09:36Z
+
+Legacy Form types in the fixtures must be removed as well.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-05T20:44:33Z
+
+More fixtures and legacy tests removed.
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-06T01:56:25Z
+
+:+1:
+Status: Reviewed

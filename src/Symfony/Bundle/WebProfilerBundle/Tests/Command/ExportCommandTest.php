@@ -16,6 +16,9 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
+/**
+ * @group legacy
+ */
 class ExportCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**

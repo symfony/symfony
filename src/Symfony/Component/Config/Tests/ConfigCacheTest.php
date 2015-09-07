@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Config\Resource\ResourceValidator;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {

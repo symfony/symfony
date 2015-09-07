@@ -39,12 +39,8 @@ class ValidationListener implements EventSubscriberInterface
      * @param ValidatorInterface       $validator
      * @param ViolationMapperInterface $violationMapper
      */
-    public function __construct($validator, ViolationMapperInterface $violationMapper)
+    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
     {
-        if (!$validator instanceof ValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface');
-        }
-
         $this->validator = $validator;
         $this->violationMapper = $violationMapper;
     }

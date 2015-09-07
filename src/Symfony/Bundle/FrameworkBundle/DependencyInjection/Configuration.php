@@ -52,6 +52,10 @@ class Configuration implements ConfigurationInterface
                                 }
 
                                 if (false !== strpos($v, '/')) {
+                                    if ('0.0.0.0/0' === $v) {
+                                        return false;
+                                    }
+
                                     list($v, $mask) = explode('/', $v, 2);
 
                                     if (strcmp($mask, (int) $mask) || $mask < 1 || $mask > (false !== strpos($v, ':') ? 128 : 32)) {

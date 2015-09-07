@@ -12,30 +12,21 @@
 namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\ResourceValidator;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
-    private $resourceFile = null;
-
     private $cacheFile = null;
-
-    private $metaFile = null;
 
     protected function setUp()
     {
-        $this->resourceFile = tempnam(sys_get_temp_dir(), '_resource');
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
-        $this->metaFile = $this->cacheFile.'.meta';
-
-        $this->makeCacheFresh();
-        $this->generateMetaFile();
     }
 
     protected function tearDown()
     {
-        $files = array($this->cacheFile, $this->metaFile, $this->resourceFile);
+        $files = array($this->cacheFile, "{$this->cacheFile}.meta");
 
         foreach ($files as $file) {
             if (file_exists($file)) {
@@ -51,94 +42,136 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->cacheFile, $cache->getPath());
     }
 
-    public function testCacheIsNotFreshIfFileDoesNotExist()
+    public function testCacheIsNotValidIfNothingHasBeenCached()
     {
-        unlink($this->cacheFile);
-
+        unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ConfigCache($this->cacheFile, false);
 
         $this->assertFalse($this->isCacheValid($cache));
     }
 
-    public function testCacheIsAlwaysFreshIfFileExistsWithDebugDisabled()
+    /**
+     * @group legacy
+     */
+    public function testIsFreshAlwaysReturnsTrueInProduction()
     {
-        $this->makeCacheStale();
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
 
         $cache = new ConfigCache($this->cacheFile, false);
+        $cache->write('', array($staleResource));
+
+        $this->assertTrue($cache->isFresh());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIsFreshWithFreshResourceInDebug()
+    {
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array($freshResource));
+
+        $this->assertTrue($cache->isFresh());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testIsNotFreshWithStaleResourceInDebug()
+    {
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array($staleResource));
+
+        $this->assertFalse($cache->isFresh());
+    }
+
+    /**
+     * @dataProvider debugModes
+     */
+    public function testIsValidWithFreshResource($debug)
+    {
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
+        $cache = new ConfigCache($this->cacheFile, $debug);
+        $cache->write('', array($freshResource));
 
         $this->assertTrue($this->isCacheValid($cache));
     }
 
-    public function testCacheIsNotFreshWithoutMetaFile()
+    /**
+     * @dataProvider debugModes
+     */
+    public function testIsNotValidWithStaleResource($debug)
     {
-        unlink($this->metaFile);
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(true);
 
-        $cache = new ConfigCache($this->cacheFile, true);
-
-        $this->assertFalse($this->isCacheValid($cache));
-    }
-
-    public function testCacheIsFreshIfResourceIsFresh()
-    {
-        $cache = new ConfigCache($this->cacheFile, true);
+        $cache = new ConfigCache($this->cacheFile, $debug);
+        $cache->write('', array($staleResource));
 
         $this->assertTrue($this->isCacheValid($cache));
     }
 
-    public function testCacheIsNotFreshIfOneOfTheResourcesIsNotFresh()
+    public function testResourcesWithoutValidatorsAreIgnoredAndConsideredFresh()
     {
-        $this->makeCacheStale();
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
 
         $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array($staleResource));
 
-        $this->assertFalse($this->isCacheValid($cache));
+        $this->assertTrue($cache->isValid(array())); // no (matching) MetadataValidator passed
     }
 
-    public function testWriteDumpsFile()
+    public function testCacheKeepsContent()
     {
-        unlink($this->cacheFile);
-        unlink($this->metaFile);
-
         $cache = new ConfigCache($this->cacheFile, false);
         $cache->write('FOOBAR');
 
-        $this->assertFileExists($this->cacheFile, 'Cache file is created');
-        $this->assertSame('FOOBAR', file_get_contents($this->cacheFile));
-        $this->assertFileNotExists($this->metaFile, 'Meta file is not created');
+        $this->assertSame('FOOBAR', file_get_contents($cache->getPath()));
     }
 
-    public function testWriteDumpsMetaFileWithDebugEnabled()
+    public function debugModes()
     {
-        unlink($this->cacheFile);
-        unlink($this->metaFile);
-
-        $metadata = array(new FileResource($this->resourceFile));
-
-        $cache = new ConfigCache($this->cacheFile, true);
-        $cache->write('FOOBAR', $metadata);
-
-        $this->assertFileExists($this->cacheFile, 'Cache file is created');
-        $this->assertFileExists($this->metaFile, 'Meta file is created');
-        $this->assertSame(serialize($metadata), file_get_contents($this->metaFile));
+        return array(
+            array(true),
+            array(false)
+        );
     }
 
     private function isCacheValid(ConfigCache $cache)
     {
         return $cache->isValid(array(new ResourceValidator()));
     }
+}
 
-    private function makeCacheFresh()
+class ResourceStub implements ResourceInterface {
+    private $fresh = true;
+
+    public function setFresh($isFresh)
     {
-        touch($this->resourceFile, filemtime($this->cacheFile) - 3600);
+        $this->fresh = $isFresh;
     }
 
-    private function makeCacheStale()
-    {
-        touch($this->cacheFile, filemtime($this->resourceFile) - 3600);
+    public function __toString() {
+        return 'stub';
     }
 
-    private function generateMetaFile()
+    public function isFresh($timestamp)
     {
-        file_put_contents($this->metaFile, serialize(array(new FileResource($this->resourceFile))));
+        return $this->fresh;
+    }
+
+    public function getResource()
+    {
+        return 'stub';
     }
 }

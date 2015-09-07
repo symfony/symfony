@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
+use Symfony\Component\Config\Resource\ResourceValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -553,7 +553,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
          * some wrapper methods because we cannot call protected methods from closures
          * prior to PHP 5.4. Let's do this change later when we can require PHP 5.4.
          */
-        if (!$cache->isValid(array(new ResourceInterfaceValidator()))) {
+        if (!$cache->isValid(array(new ResourceValidator()))) {
             $container = $this->buildContainer();
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());

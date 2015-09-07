@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
+use Symfony\Component\Config\Resource\ResourceValidator;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -81,7 +81,7 @@ class ConfigCache implements ConfigCacheInterface
             return true;
         }
 
-        return $this->isValid(array(new ResourceInterfaceValidator()));
+        return $this->isValid(array(new ResourceValidator()));
     }
 
     /**

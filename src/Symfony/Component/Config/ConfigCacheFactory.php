@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
+use Symfony\Component\Config\Resource\ResourceValidator;
 
 /**
  * Basic implementation of ConfigCacheFactoryInterface.
  * Creates a ConfigCache instance that will be validated with the
- * ResourceInterfaceValidator only.
+ * ResourceValidator only.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
@@ -45,7 +45,7 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
         }
 
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isValid(array(new ResourceInterfaceValidator()))) {
+        if (!$cache->isValid(array(new ResourceValidator()))) {
             call_user_func($callback, $cache);
         }
 

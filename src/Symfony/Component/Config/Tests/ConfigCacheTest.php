@@ -13,7 +13,7 @@ namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
+use Symfony\Component\Config\Resource\ResourceValidator;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -124,7 +124,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     private function isCacheValid(ConfigCache $cache)
     {
-        return $cache->isValid(array(new ResourceInterfaceValidator()));
+        return $cache->isValid(array(new ResourceValidator()));
     }
 
     private function makeCacheFresh()

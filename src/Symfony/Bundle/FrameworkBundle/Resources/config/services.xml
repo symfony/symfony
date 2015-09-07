@@ -14,7 +14,7 @@
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
         <parameter key="request_stack.class">Symfony\Component\HttpFoundation\RequestStack</parameter>
         <parameter key="config_cache_factory.class">Symfony\Component\Config\ValidatorConfigCacheFactory</parameter>
-        <parameter key="default_resource_interface_validator.class">Symfony\Component\Config\Resource\ResourceInterfaceValidator</parameter>
+        <parameter key="config_cache_default_validator.class">Symfony\Component\Config\Resource\ResourceValidator</parameter>
     </parameters>
 
     <services>
@@ -70,7 +70,7 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="default_resource_interface_validator" class="%default_resource_interface_validator.class%">
+        <service id="config_cache_default_validator" class="%config_cache_default_validator.class%">
             <tag name="config_cache.metadata_validator" />
         </service>
     </services>

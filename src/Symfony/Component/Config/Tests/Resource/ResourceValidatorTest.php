@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
-use Symfony\Component\Config\Resource\ResourceInterfaceValidator;
+use Symfony\Component\Config\Resource\ResourceValidator;
 
-class ResourceInterfaceValidatorTest extends \PHPUnit_Framework_TestCase
+class ResourceValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
     protected $metadataMock;
@@ -22,7 +22,7 @@ class ResourceInterfaceValidatorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->timestamp = 10;
-        $this->validator = new ResourceInterfaceValidator();
+        $this->validator = new ResourceValidator();
         $this->metadataMock = $this->getMock('\Symfony\Component\Config\Resource\ResourceInterface');
     }
 

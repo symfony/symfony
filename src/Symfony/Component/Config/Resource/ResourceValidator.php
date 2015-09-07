@@ -18,7 +18,7 @@ use Symfony\Component\Config\MetadataValidatorInterface;
  *
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class ResourceInterfaceValidator implements MetadataValidatorInterface
+class ResourceValidator implements MetadataValidatorInterface
 {
     public function supports($metadata)
     {

@@ -33,6 +33,10 @@ interface ConfigCacheInterface
      * This check should take the metadata passed to the write() method into consideration.
      *
      * @return bool Whether the cache is still fresh.
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
+     *      Use Symfony\Component\Config\ConfigCacheFactory instead, it will take care of
+     *      validating the cache.
      */
     public function isFresh();
 

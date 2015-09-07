@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -60,7 +59,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ExecutionContextInterface extends LegacyExecutionContextInterface
+interface ExecutionContextInterface
 {
     /**
      * Returns a builder for adding a violation with extended information.

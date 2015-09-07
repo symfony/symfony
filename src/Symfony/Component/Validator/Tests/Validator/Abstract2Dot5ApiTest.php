@@ -19,10 +19,9 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
-use Symfony\Component\Validator\Tests\Fixtures\FakeClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

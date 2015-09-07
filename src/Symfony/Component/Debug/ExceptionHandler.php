@@ -167,7 +167,7 @@ class ExceptionHandler
      * This method uses plain PHP functions like header() and echo to output
      * the response.
      *
-     * @param \Exception|FlattenException $exception An \Exception instance
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      */
     public function sendPhpResponse($exception)
     {
@@ -184,6 +184,22 @@ class ExceptionHandler
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
+    }
+
+    /**
+     * Gets the full HTML content associated with the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The HTML content as a string
+     */
+    public function getHtml($exception)
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        return $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
     }
 
     /**

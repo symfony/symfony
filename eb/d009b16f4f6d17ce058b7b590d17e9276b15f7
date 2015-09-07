@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-07T14:35:16Z
+
+and now, we remember why ``ExceptionHandler::createResponse()`` was part of the public API. It was probably added for Silex already :smile:

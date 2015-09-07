@@ -60,7 +60,7 @@ class XliffFileLoader implements LoaderInterface
         }
 
         $xliffVersion = $this->getVersionNumber($dom);
-        $this->validateSchema($xliffVersion, $dom, $this->getSchema($xliffVersion, $dom));
+        $this->validateSchema($xliffVersion, $dom, $this->getSchema($xliffVersion));
 
         if ('1.2' === $xliffVersion) {
             $this->extractXliff1($dom, $catalogue, $domain);
@@ -159,6 +159,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
+     * @param string       $file
      * @param \DOMDocument $dom
      * @param string       $schema source of the schema
      *
@@ -178,10 +179,7 @@ class XliffFileLoader implements LoaderInterface
         libxml_use_internal_errors($internalErrors);
     }
 
-    /**
-     * @return string
-     */
-    private function getSchema($xliffVersion, $dom)
+    private function getSchema($xliffVersion)
     {
         if ('1.2' === $xliffVersion) {
             $schemaSource = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-1.2-strict.xsd');

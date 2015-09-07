@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Validator\Mapping\Factory;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 
 /**
  * Returns {@link \Symfony\Component\Validator\Mapping\MetadataInterface} instances for values.
@@ -20,4 +21,19 @@ namespace Symfony\Component\Validator\Mapping\Factory;
  */
 interface MetadataFactoryInterface
 {
+    /**
+     * @param string|object $value
+     *
+     * @return ClassMetadataInterface
+     */
+    public function getMetadataFor($value);
+
+    /**
+     * Checks if class has metadata.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function hasMetadataFor($value);
 }

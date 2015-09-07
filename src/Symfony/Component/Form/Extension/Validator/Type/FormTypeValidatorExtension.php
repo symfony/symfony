@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -35,14 +34,10 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     private $violationMapper;
 
     /**
-     * @param ValidatorInterface|LegacyValidatorInterface $validator
+     * @param ValidatorInterface $validator
      */
-    public function __construct($validator)
+    public function __construct(ValidatorInterface $validator)
     {
-        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
-        }
-
         $this->validator = $validator;
         $this->violationMapper = new ViolationMapper();
     }

@@ -179,7 +179,7 @@
                 {% set from = '-' %}
             {% endif %}
 
-            <li>Called from {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
+            <li><span class="text-small">Called from</span> {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
 
             {% if index == stack|length - 1 %}
                 </ul>

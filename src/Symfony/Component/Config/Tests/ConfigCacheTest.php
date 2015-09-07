@@ -42,12 +42,44 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->cacheFile, $cache->getPath());
     }
 
-    public function testCacheIsNotValidIfNothingHasBeenCached()
+    /**
+     * @dataProvider debugModes
+     */
+    public function testCacheIsValidIfNoValidatorProvided($debug)
     {
-        unlink($this->cacheFile); // remove tempnam() side effect
-        $cache = new ConfigCache($this->cacheFile, false);
+        /* For example in prod mode, you may choose not to run any validators
+           at all. In that case, the cache should always be considered fresh. */
+        $cache = new ConfigCache($this->cacheFile, $debug);
+        $this->assertTrue($cache->isValid(array()));
+    }
 
-        $this->assertFalse($this->isCacheValid($cache));
+    /**
+     * @dataProvider debugModes
+     */
+    public function testResourcesWithoutValidatorsAreIgnoredAndConsideredFresh($debug)
+    {
+        /* As in the previous test, but this time we have a resource. */
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array(new ResourceStub()));
+
+        $this->assertTrue($cache->isValid(array())); // no (matching) MetadataValidator passed
+    }
+
+    /**
+     * @dataProvider debugModes
+     */
+    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
+    {
+        $validator = $this->getMock('\Symfony\Component\Config\MetadataValidatorInterface')
+            ->expects($this->never())->method('supports');
+
+        /* If there is nothing in the cache, it needs to be filled (and thus it's not fresh).
+            It does not matter if you provide validators or not. */
+
+        unlink($this->cacheFile); // remove tempnam() side effect
+        $cache = new ConfigCache($this->cacheFile, $debug);
+
+        $this->assertFalse($cache->isValid(array($validator)));
     }
 
     /**
@@ -97,13 +129,20 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsValidWithFreshResource($debug)
     {
-        $freshResource = new ResourceStub();
-        $freshResource->setFresh(true);
+        $validator = $this->getMock('\Symfony\Component\Config\MetadataValidatorInterface');
+
+        $validator->expects($this->once())
+                  ->method('supports')
+                  ->willReturn(true);
+
+        $validator->expects($this->once())
+                  ->method('isFresh')
+                  ->willReturn(true);
 
         $cache = new ConfigCache($this->cacheFile, $debug);
-        $cache->write('', array($freshResource));
+        $cache->write('', array(new ResourceStub()));
 
-        $this->assertTrue($this->isCacheValid($cache));
+        $this->assertTrue($cache->isValid(array($validator)));
     }
 
     /**
@@ -111,24 +150,20 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNotValidWithStaleResource($debug)
     {
-        $staleResource = new ResourceStub();
-        $staleResource->setFresh(true);
+        $validator = $this->getMock('\Symfony\Component\Config\MetadataValidatorInterface');
+
+        $validator->expects($this->once())
+                  ->method('supports')
+                  ->willReturn(true);
+
+        $validator->expects($this->once())
+                  ->method('isFresh')
+                  ->willReturn(false);
 
         $cache = new ConfigCache($this->cacheFile, $debug);
-        $cache->write('', array($staleResource));
+        $cache->write('', array(new ResourceStub()));
 
-        $this->assertTrue($this->isCacheValid($cache));
-    }
-
-    public function testResourcesWithoutValidatorsAreIgnoredAndConsideredFresh()
-    {
-        $staleResource = new ResourceStub();
-        $staleResource->setFresh(false);
-
-        $cache = new ConfigCache($this->cacheFile, true);
-        $cache->write('', array($staleResource));
-
-        $this->assertTrue($cache->isValid(array())); // no (matching) MetadataValidator passed
+        $this->assertFalse($cache->isValid(array($validator)));
     }
 
     public function testCacheKeepsContent()
@@ -145,11 +180,6 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             array(true),
             array(false),
         );
-    }
-
-    private function isCacheValid(ConfigCache $cache)
-    {
-        return $cache->isValid(array(new ResourceValidator()));
     }
 }
 

@@ -150,7 +150,7 @@ class ConfigCache implements ConfigCacheInterface
             // discard chmod failure (some filesystem may not support it)
         }
 
-        if (null !== $metadata && true === $this->debug) {
+        if (null !== $metadata) {
             $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);

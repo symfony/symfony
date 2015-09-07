@@ -14,9 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * A generic container of {@link Constraint} objects.
@@ -224,22 +222,5 @@ class GenericMetadata implements MetadataInterface
     public function getTraversalStrategy()
     {
         return $this->traversalStrategy;
-    }
-
-    /**
-     * Exists for compatibility with the deprecated
-     * {@link Symfony\Component\Validator\MetadataInterface}.
-     *
-     * Should not be used.
-     *
-     * Implemented for backward compatibility with Symfony < 2.5.
-     *
-     * @throws BadMethodCallException
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath)
-    {
-        throw new BadMethodCallException('Not supported.');
     }
 }

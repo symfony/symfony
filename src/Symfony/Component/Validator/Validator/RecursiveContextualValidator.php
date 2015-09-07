@@ -181,17 +181,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
-        if (!$classMetadata instanceof ClassMetadataInterface) {
-            // Cannot be UnsupportedMetadataException because of BC with
-            // Symfony < 2.5
-            throw new ValidatorException(sprintf(
-                'The metadata factory should return instances of '.
-                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                'got: "%s".',
-                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
-            ));
-        }
-
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = spl_object_hash($object);

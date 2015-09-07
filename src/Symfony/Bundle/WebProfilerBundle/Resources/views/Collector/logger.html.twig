@@ -80,7 +80,9 @@
             </div>
 
             <div class="tab">
-                <h3 class="tab-title">Deprecations <span class="badge">{{ deprecation_logs|length }}</span></h3>
+                {# 'deprecation_logs|length' is not used because deprecations are
+                now grouped and the group count doesn't match the message count #}
+                <h3 class="tab-title">Deprecations <span class="badge">{{ collector.countdeprecations|default(0) }}</span></h3>
 
                 <div class="tab-content">
                     {% if deprecation_logs is empty %}
@@ -156,7 +158,7 @@
         {% set id = 'sf-call-stack-' ~ log_index %}
 
         {% if log.context.errorCount is defined %}
-        ({{ log.context.errorCount }}x)
+            <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>
         {% endif %}
 
         {% if stack %}

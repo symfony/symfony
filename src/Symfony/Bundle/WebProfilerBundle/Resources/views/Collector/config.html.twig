@@ -19,21 +19,22 @@
     {% endif %}
 
     {% set icon %}
-        {% if collector.symfonyState is defined %}
+        {% if collector.applicationname %}
+            <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
+            <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
+        {% elseif collector.symfonyState is defined %}
             <span class="sf-toolbar-label">
                 {{ include('@WebProfiler/Icon/symfony.svg') }}
             </span>
             <span class="sf-toolbar-value">{{ collector.symfonyversion }}</span>
-        {% elseif collector.applicationname %}
-            <span class="sf-toolbar-label">{{ collector.applicationname }}</span>
-            <span class="sf-toolbar-value">{{ collector.applicationversion }}</span>
         {% endif %}
     {% endset %}
 
     {% set text %}
         {% if collector.applicationname %}
             <div class="sf-toolbar-info-piece">
-                {{ collector.applicationname }} <b>{{ collector.applicationversion }}</b>
+                <b>{{ collector.applicationname }}</b>
+                <span>{{ collector.applicationversion }}</span>
             </div>
         {% endif %}
 
@@ -88,19 +89,26 @@
             <span>{{ collector.sapiName }}</span>
         </div>
 
+
         {% if collector.symfonyversion is defined %}
             <div class="sf-toolbar-info-piece">
                 <b>Resources</b>
                 <span>
-                    <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
-                        Read Symfony {{ collector.symfonyversion }} Docs
-                    </a>
+                    {% if 'Silex' == collector.applicationname %}
+                        <a href="http://silex.sensiolabs.org/documentation" rel="help">
+                            Read Silex Docs
+                        </a>
+                    {% else %}
+                        <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
+                            Read Symfony {{ collector.symfonyversion }} Docs
+                        </a>
+                    {% endif %}
                 </span>
             </div>
         {% endif %}
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, status: block_status }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status }) }}
 {% endblock %}
 
 {% block menu %}
@@ -115,24 +123,21 @@
         {# this application is not the Symfony framework #}
         <h2>Project Configuration</h2>
 
-        <table>
-            <tr>
-                <th>Key</th>
-                <th>Value</th>
-            </tr>
-            <tr>
-                <th>Application name</th>
-                <td>{{ collector.applicationname }}</td>
-            </tr>
-            <tr>
-                <th>Application version</th>
-                <td>{{ collector.applicationversion }}</td>
-            </tr>
-            <tr>
-                <th>Based on</th>
-                <td>Symfony {{ collector.symfonyversion }}</td>
-            </tr>
-        </table>
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.applicationname }}</span>
+                <span class="label">Application name</span>
+            </div>
+
+            <div class="metric">
+                <span class="value">{{ collector.applicationversion }}</span>
+                <span class="label">Application version</span>
+            </div>
+        </div>
+
+        <p>
+            Based on <a class="text-bold" href="https://symfony.com">Symfony {{ collector.symfonyversion }}</a>
+        </p>
     {% else %}
         <h2>Symfony Configuration</h2>
 

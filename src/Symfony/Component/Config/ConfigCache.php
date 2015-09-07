@@ -88,9 +88,14 @@ class ConfigCache implements ConfigCacheInterface
      * Use MetadataValidators to check if the cache is still valid.
      *
      * The first MetadataValidator that supports a given resource is considered authoritative.
-     * Resources with no matching MetadataValidators will silently be ignored.
+     * Resources with no matching MetadataValidators will silently be ignored and considered fresh.
      *
-     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against. The first validator that supports a resource is considered authoritative.
+     * This method <em>does not</em> take the debug flag into consideration: Whether or not a cache
+     * should be checked in production mode and/or which validators need to be applied is a decision
+     * left to the client of this method.
+     *
+     * @param MetadataValidatorInterface[] $validators List of validators the metadata is checked against.
+     *                                                 The first validator that supports a resource is considered authoritative.
      *
      * @return bool True if all supported resources and valid, false otherwise
      */
@@ -102,7 +107,7 @@ class ConfigCache implements ConfigCacheInterface
 
         $metadata = $this->getMetaFile();
         if (!is_file($metadata)) {
-            return false;
+            return true;
         }
 
         $time = filemtime($this->file);

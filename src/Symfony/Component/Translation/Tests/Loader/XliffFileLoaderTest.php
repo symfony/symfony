@@ -164,7 +164,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $domains['domain1']);
         $this->assertContainsOnly('string', $catalogue->all('domain1'));
 
-        // Notes aren't assigned to specific segments, but to whole units, so there's no way to do a mapping
-        $this->assertEmpty($catalogue->getMetadata());
+        // target attributes
+        $this->assertEquals(array('target-attributes' => array('order' => 1)), $catalogue->getMetadata('bar', 'domain1'));
     }
 }

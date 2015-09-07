@@ -325,8 +325,11 @@ DependencyInjection
    </services>
    ```
 
-Web Development Toolbar
------------------------
+WebProfiler
+-----------
+
+The `profiler:import` and `profiler:export` commands have been deprecated and
+will be removed in 3.0.
 
 The web development toolbar has been completely redesigned. This update has
 introduced some changes in the HTML markup of the toolbar items.

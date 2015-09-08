@@ -1162,9 +1162,9 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @return string The type of the value
      */
-    private function formatTypeOf($value, $option)
+    private function formatTypeOf($value, $option = null)
     {
-        if (is_array($value)) {
+        if (is_array($value) && $option) {
             foreach ($this->allowedTypes[$option] as $type) {
                 if (substr($type, -2) === '[]') {
                     return $this->formatComplexTypeOf($value, $type);
@@ -1200,12 +1200,21 @@ class OptionsResolver implements Options, OptionsResolverInterface
             $suffix .= '[]';
         }
         if (is_array($value)) {
-            $value = array_shift($value);//get first element
+            $subTypes = array();
+            foreach ($value as $v) {
+                $v = $this->formatTypeOf($v);
+                if (!isset($subTypes[$v])) {
+                    $subTypes[$v] = $v;//build unique map from the off
+                }
+            }
+            $vType = implode('|', $subTypes);
+        } else {
+            $vType = is_object($value) ? get_class($value) : gettype($value);
         }
 
         return sprintf(
             '%s%s',
-            is_object($value) ? get_class($value) : gettype($value),
+            $vType,
             $suffix
         );
     }

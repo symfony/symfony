@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
+use Symfony\Component\Config\Resource\FileResource;
 
 class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

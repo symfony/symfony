@@ -260,7 +260,7 @@ abstract class Controller extends ContainerAware
      */
     protected function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->container->get('form.factory')->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', $data, $options);
     }
 
     /**

@@ -105,6 +105,10 @@ class ConfigCache implements ConfigCacheInterface
             return false;
         }
 
+        if (!$validators) {
+            return true; // shortcut - if we don't have any validators we don't need to bother with the meta file at all
+        }
+
         $metadata = $this->getMetaFile();
         if (!is_file($metadata)) {
             return true;

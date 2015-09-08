@@ -513,6 +513,24 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInvalidTypes
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but is of type "double[][]".
+     */
+    public function testResolveFailsWithCorrectLevelsButWrongScalar()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $this->resolver->resolve(
+            array(
+                'foo'   => array(
+                    array(1.2),
+                ),
+            )
+        );
+    }
+ 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "integer|stdClass|array|DateTime[]".
      */
     public function testResolveFailsIfTypedArrayContainsInvalidTypes()

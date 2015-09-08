@@ -500,7 +500,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "array".
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "DateTime[]".
      */
     public function testResolveFailsIfInvalidTypedArray()
     {

@@ -86,9 +86,9 @@ class ValidatorConfigCache implements ConfigCacheInterface
                 }
                 if ($validator->isFresh($resource, $time)) {
                     break; // no need to further check this resource
-                } else {
-                    return false; // cache is stale
                 }
+
+                return false; // cache is stale
             }
             // no suitable validator found, ignore this resource
         }

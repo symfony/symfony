@@ -25,7 +25,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $files = array($this->cacheFile, "{$this->cacheFile}.meta");
+        $files = array($this->cacheFile, $this->cacheFile.'.meta');
 
         foreach ($files as $file) {
             if (file_exists($file)) {

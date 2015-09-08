@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\Config\Tests\Resource;
 
 use Symfony\Component\Config\Resource\ResourceInterface;

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
-use Symfony\Component\Config\Resource\ResourceValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;

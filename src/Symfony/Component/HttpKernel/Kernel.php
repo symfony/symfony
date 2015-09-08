@@ -547,11 +547,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
-
-        /* We probably should use the ConfigCacheFactory here, but that would require
-         * some wrapper methods because we cannot call protected methods from closures
-         * prior to PHP 5.4. Let's do this change later when we can require PHP 5.4.
-         */
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();

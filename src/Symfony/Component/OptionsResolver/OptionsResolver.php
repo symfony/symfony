@@ -1157,7 +1157,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed $value The value to return the type of
+     * @param mixed  $value  The value to return the type of
      * @param string $option The option that holds the value
      *
      * @return string The type of the value
@@ -1171,17 +1171,18 @@ class OptionsResolver implements Options, OptionsResolverInterface
                 }
             }
         }
+
         return is_object($value) ? get_class($value) : gettype($value);
     }
 
     /**
-     * Returns a string represnetation of the complex type of the value
+     * Returns a string represnetation of the complex type of the value.
      *
      * This method should be called in formatTypeOf, if there is a complex allowed type
      * for an array value defined to get a more explicit exception message
      *
-     * @param array $value The value to return the complex type of
-     * @param string $type the expected type
+     * @param array  $value The value to return the complex type of
+     * @param string $type  the expected type
      *
      * @return string the complex type of the value
      */
@@ -1201,6 +1202,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
         if (is_array($value)) {
             $value = array_shift($value);//get first element
         }
+
         return sprintf(
             '%s%s',
             is_object($value) ? get_class($value) : gettype($value),

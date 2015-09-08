@@ -1,17 +1,6 @@
 CHANGELOG
 =========
 
-2.8.0
------
-
- * deprecated the `ConfigCache::isFresh()` method. Use the new `isValid()` method instead and
-   pass the `MetadataValidator` instances that shall be used to validate the cache. A single
-   `ResourceValidator` will do and perform the same validations (using `ResourceInterface`)
-   as `isFresh()` previously did.
-
-   Note that an even better approach would be to use the `ConfigCacheFactory`; it will
-   perform the freshness check for you and runs a callback if the cache needs to be updated.
-
 2.7.0
 -----
 

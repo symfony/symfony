@@ -553,7 +553,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
          * some wrapper methods because we cannot call protected methods from closures
          * prior to PHP 5.4. Let's do this change later when we can require PHP 5.4.
          */
-        if (!$cache->isValid(array(new ResourceValidator()))) {
+        if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());

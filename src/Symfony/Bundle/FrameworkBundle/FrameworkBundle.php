@@ -72,7 +72,6 @@ class FrameworkBundle extends Bundle
 
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
-        $container->addCompilerPass(new ConfigCachePass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
         $container->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -94,6 +93,7 @@ class FrameworkBundle extends Bundle
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
+            $container->addCompilerPass(new ConfigCachePass());
         }
     }
 }

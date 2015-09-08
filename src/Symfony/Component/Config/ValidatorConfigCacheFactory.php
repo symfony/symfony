@@ -30,14 +30,6 @@ class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
     private $validators = array();
 
     /**
-     * @param bool $debug The debug flag to pass to ConfigCache
-     */
-    public function __construct($debug)
-    {
-        $this->debug = $debug;
-    }
-
-    /**
      * @param MetadataValidatorInterface $validator
      */
     public function addValidator(MetadataValidatorInterface $validator)
@@ -54,8 +46,8 @@ class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
             throw new \InvalidArgumentException(sprintf('Invalid type for callback argument. Expected callable, but got "%s".', gettype($callback)));
         }
 
-        $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isValid($this->validators)) {
+        $cache = new ValidatorConfigCache($file, $this->validators);
+        if (!$cache->isFresh()) {
             call_user_func($callback, $cache);
         }
 

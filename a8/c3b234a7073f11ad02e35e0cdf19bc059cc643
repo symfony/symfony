@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-09-07T15:44:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-07T16:57:23Z
+
+I've fixed some more thanks to Silex.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-07T17:00:17Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-07T17:09:51Z
+
+Some tests are failing though
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-07T17:22:49Z
+
+yeah, tests checking these methods explicitly. they should be updated for the new returned value.
+
+and we should probably write integration tests for these classes (using the FormIntegrationTestCase), to run the extension code from a form factory as this is where deprecations are triggered

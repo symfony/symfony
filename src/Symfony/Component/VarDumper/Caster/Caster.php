@@ -36,8 +36,8 @@ class Caster
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
-     * @param object          $obj       The object to cast.
-     * @param ReflectionClass $reflector The class reflector to use for inspecting the object definition.
+     * @param object           $obj       The object to cast.
+     * @param \ReflectionClass $reflector The class reflector to use for inspecting the object definition.
      *
      * @return array The array-cast of the object, with prefixed dynamic properties.
      */

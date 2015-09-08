@@ -55,7 +55,7 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @dataProvider      getGenerateFragmentUriDataWithNonScalar
      */
     public function testGenerateFragmentUriWithNonScalar($controller)

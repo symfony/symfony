@@ -376,7 +376,7 @@ class Table
      * fill rows that contains rowspan > 1.
      *
      * @param array $rows
-     * @param array $line
+     * @param int   $line
      *
      * @return array
      */
@@ -429,7 +429,7 @@ class Table
      * fill cells for a row that contains colspan > 1.
      *
      * @param array $row
-     * @param array $column
+     * @param int   $column
      *
      * @return array
      */

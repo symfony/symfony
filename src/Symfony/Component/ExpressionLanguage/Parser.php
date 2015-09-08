@@ -10,7 +10,6 @@
  */
 
 namespace Symfony\Component\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\Node\Node;
 
 /**
  * Parsers a token stream.
@@ -89,7 +88,7 @@ class Parser
      * @param TokenStream $stream A token stream instance
      * @param array       $names  An array of valid names
      *
-     * @return Node A node tree
+     * @return Node\Node A node tree
      *
      * @throws SyntaxError
      */

@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Validator\Mapping\Factory;
+
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 
 /**

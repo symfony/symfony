@@ -98,26 +98,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
 
-//        switch ($this->getApiVersion()) {
-//            case Validation::API_VERSION_2_5:
-//                $context = new ExecutionContext(
-//                    $validator,
-//                    $this->root,
-//                    $translator
-//                );
-//                break;
-//            case Validation::API_VERSION_2_5_BC:
-//                $context = new LegacyExecutionContext(
-//                    $validator,
-//                    $this->root,
-//                    $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface'),
-//                    $translator
-//                );
-//                break;
-//            default:
-//                throw new \RuntimeException('Invalid API version');
-//        }
-
         $context = new ExecutionContext(
             $validator,
             $this->root,

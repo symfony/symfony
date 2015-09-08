@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 
 /**
  * Parsers a token stream.

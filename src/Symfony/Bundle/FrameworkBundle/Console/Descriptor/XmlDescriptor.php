@@ -467,7 +467,7 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param DOMElement $element
+     * @param \DOMElement $element
      * @param array      $eventListeners
      */
     private function appendEventListenerDocument(\DOMElement $element, array $eventListeners)

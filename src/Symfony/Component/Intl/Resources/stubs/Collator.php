@@ -10,7 +10,6 @@
  */
 
 use Symfony\Component\Intl\Collator\Collator as IntlCollator;
-use Symfony\Component\Intl\Collator\StubCollator;
 
 /**
  * Stub implementation for the Collator class of the intl extension.

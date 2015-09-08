@@ -119,7 +119,7 @@ class ConfigCache implements ConfigCacheInterface
                     continue; // next validator
                 }
                 if ($validator->isFresh($resource, $time)) {
-                    continue; // no need to further check this resource
+                    break; // no need to further check this resource
                 } else {
                     return false; // cache is stale
                 }

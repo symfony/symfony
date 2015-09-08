@@ -1007,7 +1007,7 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Returns a string represnetation of the complex type of the value.
+     * Returns a string representation of the complex type of the value.
      *
      * This method should be called in formatTypeOf, if there is a complex allowed type
      * for an array value defined to get a more explicit exception message

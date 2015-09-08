@@ -519,7 +519,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[]');
         $values = range(1, 5);
-        $values[] = new \stdClass;
+        $values[] = new \stdClass();
         $values[] = array();
         $values[] = new \DateTime();
         $values[] = 123;

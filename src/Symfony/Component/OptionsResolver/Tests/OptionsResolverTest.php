@@ -522,13 +522,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver->resolve(
             array(
-                'foo'   => array(
+                'foo' => array(
                     array(1.2),
                 ),
             )
         );
     }
- 
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "integer|stdClass|array|DateTime[]".

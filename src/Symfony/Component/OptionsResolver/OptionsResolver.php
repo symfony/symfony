@@ -879,7 +879,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value)
+                    $this->formatTypeOf($value, $option)
                 ));
             }
         }
@@ -1158,12 +1158,54 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * non-technical people.
      *
      * @param mixed $value The value to return the type of
+     * @param string $option The option that holds the value
      *
      * @return string The type of the value
      */
-    private function formatTypeOf($value)
+    private function formatTypeOf($value, $option)
     {
+        if (is_array($value)) {
+            foreach ($this->allowedTypes[$option] as $type) {
+                if (substr($type, -2) === '[]') {
+                    return $this->formatComplexTypeOf($value, $type);
+                }
+            }
+        }
         return is_object($value) ? get_class($value) : gettype($value);
+    }
+
+    /**
+     * Returns a string represnetation of the complex type of the value
+     *
+     * This method should be called in formatTypeOf, if there is a complex allowed type
+     * for an array value defined to get a more explicit exception message
+     *
+     * @param array $value The value to return the complex type of
+     * @param string $type the expected type
+     *
+     * @return string the complex type of the value
+     */
+    private function formatComplexTypeOf(array $value, $type)
+    {
+        $suffix = '[]';
+        $type = substr($type, 0, -2);
+        while (substr($type, -2) === '[]') {
+            $value = array_shift($value);
+            if (!is_array($value)) {
+                //expected a nested array, but we've already hit a scalar
+                break;
+            }
+            $type = substr($type, 0, -2);
+            $suffix .= '[]';
+        }
+        if (is_array($value)) {
+            $value = array_shift($value);//get first element
+        }
+        return sprintf(
+            '%s%s',
+            is_object($value) ? get_class($value) : gettype($value),
+            $suffix
+        );
     }
 
     /**

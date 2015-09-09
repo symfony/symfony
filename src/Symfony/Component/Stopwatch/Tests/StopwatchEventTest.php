@@ -26,13 +26,13 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        \Symfony\Component\HttpFoundation\Tests\enable_clock_mock();
+        enable_clock_mock();
         parent::setUp();
     }
 
     public function tearDown()
     {
-        \Symfony\Component\HttpFoundation\Tests\disable_clock_mock();
+        disable_clock_mock();
         parent::tearDown();
     }
 

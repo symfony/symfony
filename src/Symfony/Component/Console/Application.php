@@ -379,6 +379,10 @@ class Application
     {
         $command->setApplication($this);
 
+        if (null !== $this->dispatcher) {
+            $command->setDispatcher($this->dispatcher);
+        }
+
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 

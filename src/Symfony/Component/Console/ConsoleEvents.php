@@ -33,6 +33,19 @@ final class ConsoleEvents
     const COMMAND = 'console.command';
 
     /**
+     * The COMMAND_INITIALIZE event allows you to attach listeners which can act upon the
+     * command before it has been executed but after its values have been bound.
+     *
+     * This is useful for validation for example.
+     *
+     * The event listener method receives a Symfony\Component\Console\Event\ConsoleCommandInitializeEvent
+     * instance.
+     *
+     * @var string
+     */
+    const COMMAND_INITIALIZE = 'console.command-initialize';
+
+    /**
      * The TERMINATE event allows you to attach listeners after a command is
      * executed by the console.
      *

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-09T15:44:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-09T15:46:27Z
+
+@nicolas-grekas it would be great to have green builds again when tests are passing. (the HHVM issue making the test fail is annoying for instance)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-09T15:49:29Z
+
+Yeah, see #15617, someone needs to work on it
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-09T15:53:52Z
+
+:+1:
+
+Status: Reviewed

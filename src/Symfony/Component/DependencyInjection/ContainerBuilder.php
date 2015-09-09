@@ -775,14 +775,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id    The service identifier
      * @param string $class The service class
+     * @param array  $arguments An array of arguments to pass to the service constructor
      *
      * @return Definition A Definition instance
      *
      * @api
      */
-    public function register($id, $class = null)
+    public function register($id, $class = null, array $arguments = array())
     {
-        return $this->setDefinition($id, new Definition($class));
+        return $this->setDefinition($id, new Definition($class, $arguments));
     }
 
     /**

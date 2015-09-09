@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Translator;
@@ -228,7 +228,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()
     {
-        $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $resource = $this->getMock('Symfony\Component\Config\Resource\SelfCheckingResourceInterface');
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $resource->method('isFresh')->will($this->returnValue(false));
         $loader
@@ -281,7 +281,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class StaleResource implements ResourceInterface
+class StaleResource implements SelfCheckingResourceInterface
 {
     public function isFresh($timestamp)
     {

@@ -75,6 +75,9 @@
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="config_cache_factory" />
+            </call>
         </service>
 
         <service id="router" alias="router.default" />

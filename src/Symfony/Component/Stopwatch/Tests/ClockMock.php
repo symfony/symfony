@@ -34,6 +34,7 @@ function usleep($us)
 
     if (!$GLOBALS['stopwatch_enable_clock_mock']) {
         \usleep($us);
+
         return;
     }
 

@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @deprecated since 2.8, to be removed in 3.0.
  */
-class BCResourceInterfaceChecker extends DefaultResourceChecker
+class BCResourceInterfaceChecker extends SelfCheckingResourceChecker
 {
     public function supports(ResourceInterface $metadata)
     {
@@ -27,10 +27,10 @@ class BCResourceInterfaceChecker extends DefaultResourceChecker
         return true;
     }
 
-    public function isFresh(ResourceInterface $metadata, $timestamp)
+    public function isFresh(ResourceInterface $resource, $timestamp)
     {
-        trigger_error('Resource checking through ResourceInterface::isFresh() is deprecated since 2.8 and will be removed in 3.0', E_USER_DEPRECATED);
+        @trigger_error('Resource checking through ResourceInterface::isFresh() is deprecated since 2.8 and will be removed in 3.0', E_USER_DEPRECATED);
 
-        return parent::isFresh($metadata, $timestamp); // For now, $metadata features the isFresh() method, so off we go (quack quack)
+        return parent::isFresh($resource, $timestamp); // For now, $metadata features the isFresh() method, so off we go (quack quack)
     }
 }

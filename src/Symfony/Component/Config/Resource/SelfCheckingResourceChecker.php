@@ -14,23 +14,23 @@ namespace Symfony\Component\Config\Resource;
 use Symfony\Component\Config\ResourceCheckerInterface;
 
 /**
- * Resource checker for instances of
- * SelfCheckingResourceInterface. As these resources can
- * perform the check themselves, we can support them in a generic
- * way.
+ * Resource checker for instances of SelfCheckingResourceInterface.
+ *
+ * As these resources perform the actual check themselves, we can provide
+ * this class as a standard way of validating them.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class DefaultResourceChecker implements ResourceCheckerInterface
+class SelfCheckingResourceChecker implements ResourceCheckerInterface
 {
     public function supports(ResourceInterface $metadata)
     {
         return $metadata instanceof SelfCheckingResourceInterface;
     }
 
-    public function isFresh(ResourceInterface $metadata, $timestamp)
+    public function isFresh(ResourceInterface $resource, $timestamp)
     {
-        /* @var SelfCheckingResourceInterface $metadata */
-        return $metadata->isFresh($timestamp);
+        /* @var SelfCheckingResourceInterface $resource */
+        return $resource->isFresh($timestamp);
     }
 }

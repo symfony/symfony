@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\BCResourceInterfaceChecker;
-use Symfony\Component\Config\Resource\DefaultResourceChecker;
+use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 
 /**
  * ConfigCache caches arbitrary content in files on disk.
@@ -40,7 +40,7 @@ class ConfigCache extends ResourceCheckerConfigCache
     public function __construct($file, $debug)
     {
         parent::__construct($file, array(
-            new DefaultResourceChecker(),
+            new SelfCheckingResourceChecker(),
             new BCResourceInterfaceChecker(),
         ));
         $this->debug = (bool) $debug;

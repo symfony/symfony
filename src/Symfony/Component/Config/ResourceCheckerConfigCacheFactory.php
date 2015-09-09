@@ -27,7 +27,7 @@ class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
     /**
      * @param ResourceCheckerInterface[] $resourceCheckers
      */
-    public function setResourceCheckers(array $resourceCheckers)
+    public function __construct(array $resourceCheckers = array())
     {
         $this->resourceCheckers = $resourceCheckers;
     }

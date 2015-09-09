@@ -39,14 +39,28 @@ class ConfigCachePassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($definition));
 
         $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('setResourceCheckers', array(
-                array(
+            ->method('replaceArgument')
+            ->with(0, array(
                     new Reference('checker_1'),
                     new Reference('checker_2'),
                     new Reference('checker_3'),
-                ),
-            ));
+                ));
+
+        $pass = new ConfigCachePass();
+        $pass->process($container);
+    }
+
+    public function testThatCheckersCanBeMissing()
+    {
+        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('findTaggedServiceIds')
+        );
+
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue(array()));
 
         $pass = new ConfigCachePass();
         $pass->process($container);

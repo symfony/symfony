@@ -26,15 +26,20 @@ class ConfigCachePass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $resourceCheckers = array();
-        foreach ($container->findTaggedServiceIds('config_cache.resource_checker') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+
+        foreach ($container->findTaggedServiceIds('config_cache.resource_checker') as $id => $tags) {
+            $priority = isset($tags[0]['priority']) ? $tags[0]['priority'] : 0;
             $resourceCheckers[$priority][] = new Reference($id);
+        }
+
+        if (empty($resourceCheckers)) {
+            return;
         }
 
         // sort by priority and flatten
         krsort($resourceCheckers);
         $resourceCheckers = call_user_func_array('array_merge', $resourceCheckers);
 
-        $container->getDefinition('config_cache_factory')->addMethodCall('setResourceCheckers', array($resourceCheckers));
+        $container->getDefinition('config_cache_factory')->replaceArgument(0, $resourceCheckers);
     }
 }

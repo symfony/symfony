@@ -15,8 +15,6 @@ use Symfony\Component\Intl\Collator\Collator as IntlCollator;
  * Stub implementation for the Collator class of the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @see StubCollator
  */
 class Collator extends IntlCollator
 {

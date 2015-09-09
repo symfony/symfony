@@ -40,7 +40,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my-command" tagged "console.command" must be public.
      */
     public function testProcessThrowAnExceptionIfTheServiceIsNotPublic()
@@ -57,7 +57,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my-command" tagged "console.command" must not be abstract.
      */
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
@@ -74,7 +74,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".
      */
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()

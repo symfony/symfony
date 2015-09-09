@@ -820,7 +820,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Unreachable field "0"
      */
     public function testFormRegistrySetArrayOnNotCompoundField()

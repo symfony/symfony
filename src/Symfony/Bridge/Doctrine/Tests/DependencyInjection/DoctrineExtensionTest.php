@@ -49,7 +49,7 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
@@ -239,7 +239,7 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "unrecognized_type" is an unrecognized Doctrine cache driver.
      */
     public function testUnrecognizedCacheDriverException()

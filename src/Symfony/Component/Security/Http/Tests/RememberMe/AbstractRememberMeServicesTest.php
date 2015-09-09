@@ -250,7 +250,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage cookie delimiter
      */
     public function testThereShouldBeNoCookieDelimiterInCookieParts()

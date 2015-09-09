@@ -589,9 +589,4 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
     }
-
-    private function getMockType()
-    {
-        return $this->getMock('Symfony\Component\Form\FormTypeInterface');
-    }
 }

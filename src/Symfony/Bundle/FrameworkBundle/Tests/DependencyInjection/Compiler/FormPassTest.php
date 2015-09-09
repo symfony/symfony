@@ -43,7 +43,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             array(),
             array(),
             array(),
-            array(),
         ));
 
         $definition1 = new Definition(__CLASS__.'_Type1');
@@ -80,7 +79,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             array(),
             array(),
             array(),
-            array(),
         ));
 
         $definition1 = new Definition(__CLASS__.'_Type1');
@@ -104,41 +102,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ), $extDefinition->getArgument(1));
     }
 
-    public function testPassLegacyNames()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new FormPass());
-
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
-        $extDefinition->setArguments(array(
-            new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-            array(),
-        ));
-
-        $definition1 = new Definition(__CLASS__.'_Type1');
-        $definition1->addTag('form.type');
-        $definition2 = new Definition(__CLASS__.'_Type2');
-        $definition2->addTag('form.type', array('alias' => 'mytype2'));
-
-        $container->setDefinition('form.extension', $extDefinition);
-        $container->setDefinition('my.type1', $definition1);
-        $container->setDefinition('my.type2', $definition2);
-
-        $container->compile();
-
-        $extDefinition = $container->getDefinition('form.extension');
-
-        $this->assertEquals(array(
-            // Service ID if no alias is set
-            'my.type1' => true,
-            // Alias if set
-            'mytype2' => true,
-        ), $extDefinition->getArgument(4));
-    }
-
     public function testAddTaggedTypeExtensions()
     {
         $container = new ContainerBuilder();
@@ -147,7 +110,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setArguments(array(
             new Reference('service_container'),
-            array(),
             array(),
             array(),
             array(),
@@ -188,7 +150,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setArguments(array(
             new Reference('service_container'),
-            array(),
             array(),
             array(),
             array(),

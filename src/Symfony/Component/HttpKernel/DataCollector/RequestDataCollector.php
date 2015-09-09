@@ -29,9 +29,16 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 {
     protected $controllers;
 
-    public function __construct()
+    protected $hiddenParametersList;
+
+    public function __construct($hiddenParametersList = array())
     {
         $this->controllers = new \SplObjectStorage();
+        $this->hiddenParametersList = array_merge_recursive(array(
+            'request_headers'=>array('php-auth-pw'),
+            'request_server'=>array('PHP_AUTH_PW'),
+            'request_request'=>array('_password'),
+        ),$hiddenParametersList);
     }
 
     /**
@@ -109,16 +116,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'locale' => $request->getLocale(),
         );
 
-        if (isset($this->data['request_headers']['php-auth-pw'])) {
-            $this->data['request_headers']['php-auth-pw'] = '******';
-        }
-
-        if (isset($this->data['request_server']['PHP_AUTH_PW'])) {
-            $this->data['request_server']['PHP_AUTH_PW'] = '******';
-        }
-
-        if (isset($this->data['request_request']['_password'])) {
-            $this->data['request_request']['_password'] = '******';
+        foreach ($this->hiddenParametersList as $type => $values) {
+            foreach ($values as $value) {
+                if (isset($this->data[$type][$value])) {
+                    $this->data[$type][$value] = '******';
+                }
+            }
         }
 
         if (isset($this->controllers[$request])) {

@@ -24,7 +24,11 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()
     {
-        $c = new RequestDataCollector();
+        $c = new RequestDataCollector(array(
+            'request_request'=>array(
+                'password'
+            )
+        ));
 
         $c->collect($this->createRequest(), $this->createResponse());
 
@@ -49,6 +53,8 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('OK', $c->getStatusText());
         $this->assertSame(200, $c->getStatusCode());
         $this->assertSame('application/json', $c->getContentType());
+        $this->assertSame('******', $c->getRequestRequest()->get('password'));
+        $this->assertSame('******', $c->getRequestRequest()->get('_password'));
     }
 
     /**
@@ -164,6 +170,8 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_route_params', array('name' => 'foo'));
         $request->attributes->set('resource', fopen(__FILE__, 'r'));
         $request->attributes->set('object', new \stdClass());
+        $request->request->set('password','12345');
+        $request->request->set('_password','12345');
 
         return $request;
     }

@@ -18,7 +18,25 @@ function time($asFloat = false)
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+function enable_clock_mock()
+{
+    global $clockMockEnabled;
+    $clockMockEnabled = true;
+}
+
+function disable_clock_mock()
+{
+    global $clockMockEnabled;
+    $clockMockEnabled = 0;
+}
+
 function time()
 {
-    return $_SERVER['REQUEST_TIME'];
+    global $clockMockEnabled;
+
+    if ($clockMockEnabled) {
+        return $_SERVER['REQUEST_TIME'];
+    } else {
+        return \time();
+    }
 }

@@ -23,6 +23,18 @@ require_once __DIR__.'/ClockMock.php';
  */
 class CookieTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        \Symfony\Component\HttpFoundation\Tests\enable_clock_mock();
+        parent::setUp();
+    }
+
+    public function tearDown()
+    {
+        \Symfony\Component\HttpFoundation\Tests\disable_clock_mock();
+        parent::tearDown();
+    }
+
     public function invalidNames()
     {
         return array(

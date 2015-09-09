@@ -20,23 +20,19 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 function enable_clock_mock()
 {
-    global $clockMockEnabled;
-    $clockMockEnabled = true;
+    $GLOBALS['http_foundation_enable_clock_mock'] = true;
 }
 
 function disable_clock_mock()
 {
-    global $clockMockEnabled;
-    $clockMockEnabled = 0;
+    $GLOBALS['http_foundation_enable_clock_mock'] = false;
 }
 
 function time()
 {
-    global $clockMockEnabled;
-
-    if ($clockMockEnabled) {
-        return $_SERVER['REQUEST_TIME'];
-    } else {
+    if (!$GLOBALS['http_foundation_enable_clock_mock']) {
         return \time();
     }
+
+    return $_SERVER['REQUEST_TIME'];
 }

@@ -33,20 +33,14 @@ class FormPass implements CompilerPassInterface
         // Builds an array with service IDs as keys and tag aliases as values
         $types = array();
 
-        // Remember which names will not be supported in Symfony 3.0 to trigger
-        // deprecation errors
-        $legacyNames = array();
-
         foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
             // The following if-else block is deprecated and will be removed
             // in Symfony 3.0
-            // Deprecation errors are triggered in DependencyInjectionExtension
+            // Deprecation errors are triggered in the form registry
             if (isset($tag[0]['alias'])) {
                 $types[$tag[0]['alias']] = $serviceId;
-                $legacyNames[$tag[0]['alias']] = true;
             } else {
                 $types[$serviceId] = $serviceId;
-                $legacyNames[$serviceId] = true;
             }
 
             // Support type access by FQCN
@@ -55,7 +49,6 @@ class FormPass implements CompilerPassInterface
         }
 
         $definition->replaceArgument(1, $types);
-        $definition->replaceArgument(4, $legacyNames);
 
         $typeExtensions = array();
 

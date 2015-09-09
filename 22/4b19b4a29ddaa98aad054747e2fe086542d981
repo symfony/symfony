@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-09T20:10:30Z
+
+:+1: I've just tested this code and it solves the mentioned issue. Thanks @oyepez003.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-09T20:47:00Z
+
+Shouldn't it be fixed in 2.7?
+
+---------------------------------------------------------------------------
+
+by oyepez003 at 2015-09-09T21:06:07Z
+
+This issue only happens in sf 2.8 (the new toolbar), for the current toolbar ( in sf 2.7.* ) the "highlight" animation works fine.

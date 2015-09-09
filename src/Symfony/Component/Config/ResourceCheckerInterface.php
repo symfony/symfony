@@ -11,27 +11,30 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
+
 /**
- * Interface for MetadataValidators.
+ * Interface for ResourceCheckers.
  *
- * When a ConfigCache instance is checked for freshness, all its associated
- * metadata resources are passed to MetadataValidators. The MetadataValidators
+ * When a ResourceCheckerConfigCache instance is checked for freshness, all its associated
+ * metadata resources are passed to ResourceCheckers. The ResourceCheckers
  * can then inspect the resources and decide whether the cache can be considered
  * fresh or not.
  *
+ * @author Matthias Pigulla <mp@webfactory.de>
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-interface MetadataValidatorInterface
+interface ResourceCheckerInterface
 {
     /**
-     * Queries the MetadataValidator whether it can validate a given
+     * Queries the ResourceChecker whether it can validate a given
      * resource or not.
      *
-     * @param object $metadata The resource to be checked for freshness
+     * @param ResourceInterface $metadata The resource to be checked for freshness
      *
-     * @return bool True if the MetadataValidator can handle this resource type, false if not
+     * @return bool True if the ResourceChecker can handle this resource type, false if not
      */
-    public function supports($metadata);
+    public function supports(ResourceInterface $metadata);
 
     /**
      * Validates the resource.
@@ -41,6 +44,6 @@ interface MetadataValidatorInterface
      *
      * @return bool True if the resource has not changed since the given timestamp, false otherwise.
      */
-    public function isFresh($metadata, $timestamp);
+    public function isFresh(ResourceInterface $metadata, $timestamp);
 
 }

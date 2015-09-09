@@ -13,28 +13,23 @@ namespace Symfony\Component\Config;
 
 /**
  * A ConfigCacheFactory implementation that validates the
- * cache with an arbitrary set of metadata validators.
+ * cache with an arbitrary set of ResourceCheckers.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
+class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
 {
     /**
-     * @var bool
+     * @var ResourceCheckerInterface[]
      */
-    private $debug;
+    private $resourceCheckers = array();
 
     /**
-     * @var MetadataValidatorInterface[]
+     * @param ResourceCheckerInterface[] $resourceCheckers
      */
-    private $validators = array();
-
-    /**
-     * @param MetadataValidatorInterface $validator
-     */
-    public function addValidator(MetadataValidatorInterface $validator)
+    public function setResourceCheckers(array $resourceCheckers)
     {
-        $this->validators[] = $validator;
+        $this->resourceCheckers = $resourceCheckers;
     }
 
     /**
@@ -46,7 +41,7 @@ class ValidatorConfigCacheFactory implements ConfigCacheFactoryInterface
             throw new \InvalidArgumentException(sprintf('Invalid type for callback argument. Expected callable, but got "%s".', gettype($callback)));
         }
 
-        $cache = new ValidatorConfigCache($file, $this->validators);
+        $cache = new ResourceCheckerConfigCache($file, $this->resourceCheckers);
         if (!$cache->isFresh()) {
             call_user_func($callback, $cache);
         }

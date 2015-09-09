@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceValidator;
-
 /**
- * Basic implementation of ConfigCacheFactoryInterface.
- * Creates a ConfigCache instance that will be validated with the
- * ResourceValidator only.
+ * Basic implementation of ConfigCacheFactoryInterface that
+ * creates an instance of the default ConfigCache.
+ *
+ * This factory and/or cache <em>do not</em> support cache validation
+ * by means of ResourceChecker instances (that is, service-based).
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */

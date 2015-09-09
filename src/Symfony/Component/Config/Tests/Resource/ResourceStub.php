@@ -2,9 +2,9 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
-class ResourceStub implements ResourceInterface
+class ResourceStub implements SelfCheckingResourceInterface
 {
     private $fresh = true;
 

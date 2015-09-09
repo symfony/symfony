@@ -11,16 +11,17 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * ValidatorConfigCache uses instances of MetadataValidatorInterface
+ * ResourceCheckerConfigCache uses instances of ResourceCheckerInterface
  * to check whether cached data is still fresh.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class ValidatorConfigCache implements ConfigCacheInterface
+class ResourceCheckerConfigCache implements ConfigCacheInterface
 {
     /**
      * @var string
@@ -28,18 +29,18 @@ class ValidatorConfigCache implements ConfigCacheInterface
     private $file;
 
     /**
-     * @var MetadataValidatorInterface[]
+     * @var ResourceCheckerInterface[]
      */
-    private $validators;
+    private $resourceCheckers;
 
     /**
-     * @param string                       $file       The absolute cache path
-     * @param MetadataValidatorInterface[] $validators The MetadataValidators to use for the freshness check
+     * @param string                     $file             The absolute cache path
+     * @param ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
      */
-    public function __construct($file, array $validators = array())
+    public function __construct($file, array $resourceCheckers = array())
     {
         $this->file = $file;
-        $this->validators = $validators;
+        $this->resourceCheckers = $resourceCheckers;
     }
 
     /**
@@ -53,11 +54,11 @@ class ValidatorConfigCache implements ConfigCacheInterface
     /**
      * Checks if the cache is still fresh.
      *
-     * This implementation will make a decision solely based on the MetadataValidators
+     * This implementation will make a decision solely based on the ResourceCheckers
      * passed in the constructor.
      *
-     * The first MetadataValidator that supports a given resource is considered authoritative.
-     * Resources with no matching MetadataValidators will silently be ignored and considered fresh.
+     * The first ResourceChecker that supports a given resource is considered authoritative.
+     * Resources with no matching ResourceChecker will silently be ignored and considered fresh.
      *
      * @return bool true if the cache is fresh, false otherwise
      */
@@ -67,8 +68,8 @@ class ValidatorConfigCache implements ConfigCacheInterface
             return false;
         }
 
-        if (!$this->validators) {
-            return true; // shortcut - if we don't have any validators we don't need to bother with the meta file at all
+        if (!$this->resourceCheckers) {
+            return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
         $metadata = $this->getMetaFile();
@@ -80,17 +81,18 @@ class ValidatorConfigCache implements ConfigCacheInterface
         $meta = unserialize(file_get_contents($metadata));
 
         foreach ($meta as $resource) {
-            foreach ($this->validators as $validator) {
-                if (!$validator->supports($resource)) {
-                    continue; // next validator
+            /** @var ResourceInterface $resource */
+            foreach ($this->resourceCheckers as $checker) {
+                if (!$checker->supports($resource)) {
+                    continue; // next checker
                 }
-                if ($validator->isFresh($resource, $time)) {
+                if ($checker->isFresh($resource, $time)) {
                     break; // no need to further check this resource
                 }
 
                 return false; // cache is stale
             }
-            // no suitable validator found, ignore this resource
+            // no suitable checker found, ignore this resource
         }
 
         return true;
@@ -99,8 +101,8 @@ class ValidatorConfigCache implements ConfigCacheInterface
     /**
      * Writes cache.
      *
-     * @param string $content  The content to write in the cache
-     * @param array  $metadata An array of metadata
+     * @param string              $content  The content to write in the cache
+     * @param ResourceInterface[] $metadata An array of metadata
      *
      * @throws \RuntimeException When cache file can't be written
      */
@@ -133,6 +135,6 @@ class ValidatorConfigCache implements ConfigCacheInterface
      */
     private function getMetaFile()
     {
-        return $this->file.'.meta';
+        return $this->file . '.meta';
     }
 }

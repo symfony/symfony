@@ -37,6 +37,9 @@ interface ResourceInterface
      * @param int $timestamp The last time the resource was loaded
      *
      * @return bool True if the resource has not been updated, false otherwise
+     *
+     * @deprecated since 2.8, to be removed in 3.0. If your resource can check itself for
+     *             freshness implement the SelfCheckingResourceInterface instead.
      */
     public function isFresh($timestamp);
 

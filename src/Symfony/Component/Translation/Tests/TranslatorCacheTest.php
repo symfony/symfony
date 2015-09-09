@@ -281,7 +281,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class StaleResource implements ResourceInterface
+class StaleResource implements SelfCheckingResourceInterface
 {
     public function isFresh($timestamp)
     {

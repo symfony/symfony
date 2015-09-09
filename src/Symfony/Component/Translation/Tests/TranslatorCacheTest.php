@@ -228,7 +228,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()
     {
-        $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $resource = $this->getMock('Symfony\Component\Config\Resource\SelfCheckingResourceInterface');
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $resource->method('isFresh')->will($this->returnValue(false));
         $loader

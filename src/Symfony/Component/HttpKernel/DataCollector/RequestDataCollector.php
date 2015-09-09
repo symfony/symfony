@@ -35,9 +35,9 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     {
         $this->controllers = new \SplObjectStorage();
         $this->hiddenParametersList = array_merge_recursive(array(
-            'request_headers'=>array('php-auth-pw'),
-            'request_server'=>array('PHP_AUTH_PW'),
-            'request_request'=>array('_password'),
+            'request_headers' => array('php-auth-pw'),
+            'request_server' => array('PHP_AUTH_PW'),
+            'request_request' => array('_password'),
         ),$hiddenParametersList);
     }
 

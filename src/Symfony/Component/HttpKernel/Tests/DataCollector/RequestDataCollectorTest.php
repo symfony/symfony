@@ -25,9 +25,9 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testCollect()
     {
         $c = new RequestDataCollector(array(
-            'request_request'=>array(
-                'password'
-            )
+            'request_request' => array(
+                'password',
+            ),
         ));
 
         $c->collect($this->createRequest(), $this->createResponse());

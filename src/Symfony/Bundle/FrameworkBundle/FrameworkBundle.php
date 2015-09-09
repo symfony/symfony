@@ -36,6 +36,7 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterArgumentResolversPass;
 
 /**
  * Bundle.
@@ -88,6 +89,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new RegisterArgumentResolversPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

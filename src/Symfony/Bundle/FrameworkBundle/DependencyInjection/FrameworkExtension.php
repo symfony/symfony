@@ -153,6 +153,10 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
         }
 
+        if (interface_exists('Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface')) {
+            $loader->load('psr-http-message.xml');
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\FileLocator',
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added argument resolvers
+ * deprecated `Symfony\Component\HttpKernel\Controller\ControllerResolver::getArguments()` and `doGetArguments()` in favor of argument resolvers
+
 2.7.0
 -----
 

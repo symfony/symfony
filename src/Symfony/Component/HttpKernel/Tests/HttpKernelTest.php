@@ -21,6 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * Tagged as legacy because of the usage of the deprecated ControllerResolver#getArguments().
+ *
+ * @group legacy
+ */
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
     /**

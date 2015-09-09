@@ -57,6 +57,8 @@ interface ControllerResolverInterface
      *
      * @throws \RuntimeException When value for argument given is not provided
      *
+     * @deprecated As of Symfony 2.8, to be removed in Symfony 3.0. Use the ArgumentResolverManager instead.
+     *
      * @api
      */
     public function getArguments(Request $request, $controller);

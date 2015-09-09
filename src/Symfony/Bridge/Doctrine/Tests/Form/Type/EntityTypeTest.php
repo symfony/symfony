@@ -130,7 +130,7 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testInvalidClassOption()
     {

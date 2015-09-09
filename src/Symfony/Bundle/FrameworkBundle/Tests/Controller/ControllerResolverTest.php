@@ -33,6 +33,18 @@ class ControllerResolverTest extends BaseControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
+    public function testGetControllerOnContainerAwareInvokable()
+    {
+        $resolver = $this->createControllerResolver();
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController');
+
+        $controller = $resolver->getController($request);
+
+        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
+    }
+
     public function testGetControllerWithBundleNotation()
     {
         $shortName = 'FooBundle:Default:test';
@@ -159,6 +171,10 @@ class ContainerAwareController implements ContainerAwareInterface
     }
 
     public function testAction()
+    {
+    }
+
+    public function __invoke()
     {
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Defines a class that is able to load and return a RouteCollection
+ * Defines a class that is able to load and return a RouteCollection.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
@@ -23,6 +23,7 @@ interface RouteLoaderInterface
 {
     /**
      * @param Loader $loader
+     *
      * @return RouteCollection
      */
     public function getRouteCollection(Loader $loader);

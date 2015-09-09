@@ -34,10 +34,10 @@ class ServiceRouterLoader extends Loader
     }
 
     /**
-     * Calls the service that will load the routes
+     * Calls the service that will load the routes.
      *
-     * @param string $resource  The name of the service to load
-     * @param string|null $type The resource type
+     * @param string      $resource The name of the service to load
+     * @param string|null $type     The resource type
      *
      * @return RouteCollection
      */

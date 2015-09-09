@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-07T15:48:48Z
+
+Shouldn't the import() and export() methods of the profiler be deprecated as well? https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/HttpKernel/Profiler/Profiler.php#L141
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-07T15:50:53Z
+
+I agree the import/export can be removed. I never used it myself. And if somebody needs similar functionality, he can implement it himself easily as he has access to all methods needed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-07T15:52:09Z
+
+We agreed on deprecated the commands, not the methods, but I think it makes sense. I will do that now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-07T15:53:59Z
+
+done
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-07T16:49:53Z
+
+Tests are failing.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-08T09:48:59Z
+
+:+1: for deprecating/removing this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-09T21:11:12Z
+
+tests fixed now

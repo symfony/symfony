@@ -26,13 +26,13 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        enable_clock_mock();
+        with_clock_mock(true);
         parent::setUp();
     }
 
     public function tearDown()
     {
-        disable_clock_mock();
+        with_clock_mock(false);
         parent::tearDown();
     }
 

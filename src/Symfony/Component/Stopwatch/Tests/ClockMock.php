@@ -18,21 +18,22 @@ function microtime($asFloat = false)
 
 namespace Symfony\Component\Stopwatch\Tests;
 
-function enable_clock_mock()
+function with_clock_mock($enable = null)
 {
-    $GLOBALS['stopwatch_clock_mock_enabled'] = true;
-}
+    static $enabled;
 
-function disable_clock_mock()
-{
-    $GLOBALS['stopwatch_clock_mock_enabled'] = false;
+    if (null === $enable) {
+        return $enabled;
+    }
+
+    $enabled = $enable;
 }
 
 function usleep($us)
 {
     static $now;
 
-    if (!$GLOBALS['stopwatch_clock_mock_enabled']) {
+    if (!with_clock_mock()) {
         \usleep($us);
 
         return;
@@ -47,7 +48,7 @@ function usleep($us)
 
 function microtime($asFloat = false)
 {
-    if (!isset($GLOBALS['stopwatch_clock_mock_enabled']) || !$GLOBALS['stopwatch_clock_mock_enabled']) {
+    if (!with_clock_mock()) {
         return \microtime($asFloat);
     }
 

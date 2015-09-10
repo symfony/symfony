@@ -18,19 +18,20 @@ function time($asFloat = false)
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-function enable_clock_mock()
+function with_clock_mock($enable = null)
 {
-    $GLOBALS['http_foundation_clock_mock_enabled'] = true;
-}
+    static $enabled;
 
-function disable_clock_mock()
-{
-    $GLOBALS['http_foundation_clock_mock_enabled'] = false;
+    if (null === $enable) {
+        return $enabled;
+    }
+
+    $enabled = $enable;
 }
 
 function time()
 {
-    if (!isset($GLOBALS['http_foundation_clock_mock_enabled']) || !$GLOBALS['http_foundation_clock_mock_enabled']) {
+    if (!with_clock_mock()) {
         return \time();
     }
 

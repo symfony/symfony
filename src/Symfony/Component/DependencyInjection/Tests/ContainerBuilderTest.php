@@ -75,6 +75,19 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::register
+     */
+    public function testRegisterWithArguments()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass', array('barArg'));
+        $this->assertTrue($builder->hasDefinition('foo'), '->register() registers a new service definition');
+        $definition = $builder->getDefinition('foo');
+        $this->assertEquals('Bar\FooClass', $definition->getClass());
+        $this->assertEquals(array('barArg'), $definition->getArguments());
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::has
      */
     public function testHas()

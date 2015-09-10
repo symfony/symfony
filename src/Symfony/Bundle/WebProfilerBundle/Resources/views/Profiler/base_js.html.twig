@@ -179,7 +179,10 @@
                 var className = 'sf-toolbar-ajax-requests sf-toolbar-value';
                 requestCounter[0].className = className;
 
-                if (state == 'error') {
+                if (state == 'ok') {
+                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
+                } else if (state == 'error') {
                     Sfjs.addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
                 } else {
                     Sfjs.addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');

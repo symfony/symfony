@@ -25,6 +25,11 @@ CHANGELOG
  * removed `Symfony\Component\HttpKernel\Log\LoggerInterface`
  * removed `Symfony\Component\HttpKernel\Log\NullLogger`
 
+2.8.0
+-----
+
+ * deprecated `Profiler::import` and `Profiler::export`
+
 2.7.0
 -----
 

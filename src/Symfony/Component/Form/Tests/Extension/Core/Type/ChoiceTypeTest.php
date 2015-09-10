@@ -1404,27 +1404,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     /**
      * @dataProvider getOptionsWithPlaceholder
-     * @group legacy
-     */
-    public function testPassEmptyValueBC($multiple, $expanded, $required, $placeholder, $viewValue)
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'multiple' => $multiple,
-            'expanded' => $expanded,
-            'required' => $required,
-            'empty_value' => $placeholder,
-            'choices' => $this->choices,
-        ));
-        $view = $form->createView();
-
-        $this->assertEquals($viewValue, $view->vars['placeholder']);
-        $this->assertFalse($view->vars['placeholder_in_choices']);
-        $this->assertEquals($viewValue, $view->vars['empty_value']);
-        $this->assertFalse($view->vars['empty_value_in_choices']);
-    }
-
-    /**
-     * @dataProvider getOptionsWithPlaceholder
      */
     public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $viewValue)
     {

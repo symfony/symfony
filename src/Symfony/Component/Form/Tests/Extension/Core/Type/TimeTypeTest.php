@@ -562,25 +562,6 @@ class TimeTypeTest extends TestCase
         $this->assertSame('Empty', $view['second']->vars['placeholder']);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPassEmptyValueBC()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
-            'empty_value' => 'Empty',
-            'with_seconds' => true,
-        ));
-
-        $view = $form->createView();
-        $this->assertSame('Empty', $view['hour']->vars['placeholder']);
-        $this->assertSame('Empty', $view['minute']->vars['placeholder']);
-        $this->assertSame('Empty', $view['second']->vars['placeholder']);
-        $this->assertSame('Empty', $view['hour']->vars['empty_value']);
-        $this->assertSame('Empty', $view['minute']->vars['empty_value']);
-        $this->assertSame('Empty', $view['second']->vars['empty_value']);
-    }
-
     public function testPassPlaceholderAsArray()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(

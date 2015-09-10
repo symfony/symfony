@@ -535,45 +535,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertSame(42, $violations[0]->getCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
-     * @group legacy
-     */
-    public function testMetadataMustImplementClassMetadataInterface()
-    {
-        $entity = new Entity();
-
-        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
-        $metadata->expects($this->any())
-            ->method('getClassName')
-            ->will($this->returnValue(get_class($entity)));
-
-        $this->metadataFactory->addMetadata($metadata);
-
-        $this->validator->validate($entity);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
-     * @group legacy
-     */
-    public function testReferenceMetadataMustImplementClassMetadataInterface()
-    {
-        $entity = new Entity();
-        $entity->reference = new Reference();
-
-        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
-        $metadata->expects($this->any())
-            ->method('getClassName')
-            ->will($this->returnValue(get_class($entity->reference)));
-
-        $this->metadataFactory->addMetadata($metadata);
-
-        $this->metadata->addPropertyConstraint('reference', new Valid());
-
-        $this->validator->validate($entity);
-    }
-
     public function testNoDuplicateValidationIfClassConstraintInMultipleGroups()
     {
         $entity = new Entity();

@@ -52,9 +52,9 @@ class FragmentHandler
     {
         if (is_array($requestStack)) {
             $tmp = $debug;
-            $debug = $renderers;
+            $debug = func_num_args() < 2 ? false : $renderers;
             $renderers = $requestStack;
-            $requestStack = $tmp;
+            $requestStack = func_num_args() < 3 ? null : $tmp;
 
             @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as first argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         } elseif (!$requestStack instanceof RequestStack) {

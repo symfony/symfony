@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Routing;
+namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\FileResource;
@@ -18,6 +18,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A route loader that executes a service to load the routes.
+ *
+ * The depends on the DependencyInjection component
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
@@ -46,7 +48,7 @@ class ServiceRouterLoader extends Loader
         $service = $this->container->get($resource);
 
         if (!$service instanceof RouteLoaderInterface) {
-            throw new \LogicException(sprintf('Service "%s" must implement RouteProviderInterface.', $resource));
+            throw new \LogicException(sprintf('Service "%s" must implement RouteLoaderInterface.', $resource));
         }
 
         $routeCollection = $service->getRouteCollection($this);

@@ -50,7 +50,7 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.service" class="Symfony\Bundle\FrameworkBundle\Routing\ServiceRouterLoader" public="false">
+        <service id="routing.loader.service" class="Symfony\Comopnent\Routing\Loader\ServiceRouterLoader" public="false">
             <tag name="routing.loader" />
             <argument type="service" id="service_container" />
         </service>

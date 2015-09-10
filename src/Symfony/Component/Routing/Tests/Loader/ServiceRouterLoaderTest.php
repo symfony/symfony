@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
+namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Bundle\FrameworkBundle\Routing\ServiceRouterLoader;
+use Symfony\Component\Routing\Loader\ServiceRouterLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -19,7 +19,7 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadCallsServiceAndReturnsCollection()
     {
-        $routeLoader = $this->getMock('Symfony\Bundle\FrameworkBundle\Routing\RouteLoaderInterface');
+        $routeLoader = $this->getMock('Symfony\Component\Routing\Loader\RouteLoaderInterface');
 
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\Container', array('get'));
 

@@ -209,8 +209,7 @@ class Inline
                 $i += strlen($output);
 
                 // remove comments
-                if ((false !== $strpos = strpos($output, '#')) && 
-                    ($output[$strpos-1] == ' ' || $output[$strpos-1] == "\t")) {
+                if ((false !== $strpos = strpos($output, '#')) && ($output[$strpos - 1] == ' ' || $output[$strpos - 1] == "\t")) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
             } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {

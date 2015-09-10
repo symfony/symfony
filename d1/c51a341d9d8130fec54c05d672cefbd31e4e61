@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-08T09:24:54Z
+
+deps=high failures will be fixed once this PR is merged into master
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-08T09:35:38Z
+
+See #15196
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-09T20:44:27Z
+
+I still don't get why we should make such changes. It would make impossible/very hard to support all Symfony versions in Silex for instance.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-09T20:51:15Z
+
+@fabpot because we have these comments that say: `RequestStack will become required in 3.0.`, which implies that it is moved as first arguments.
+For Silex, you could simply check the `Kernel::VERSION_ID` consts don't you think?

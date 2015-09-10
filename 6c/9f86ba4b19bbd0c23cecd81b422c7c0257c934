@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-06-09T11:09:02Z
+
+Sorry .. my first PR .. should be ok now (?) :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-15T16:35:37Z
+
+:+1: should be merged in 2.3 though.
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-06-15T16:36:40Z
+
+:+1:  thanks fabien :)  Had I to redo the PR ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-15T23:58:08Z
+
+I'm not sure about this one. If you don't want interference with the toolbar, just close it. With this change, how do you navigate to the toolbar menu without mouse?
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-06-16T05:40:09Z
+
+@Tobion OK got your point and I could agree .. but we have to implement access key to show/hide the toolbar then .. (and we still have a not-null probability to interfer with a site having the same AK :P)
+
+Debugging should be aside the normal behavior, not something changing it ... it's not quantum mechanic, I'd  like to study my application without interfere, not so much at least ;)
+
+> Il giorno 16/giu/2015, alle ore 01:58, Tobias Schultze <notifications@github.com> ha scritto:
+>
+> I'm not sure about this one. If you don't want interference with the toolbar, just close it. With this change, how do you navigate to the toolbar menu without mouse?
+>
+> —
+> Reply to this email directly or view it on GitHub.
+>
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-06-16T08:06:27Z
+
+It's about accessability. And there are also developers that need accessability.
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-06-16T09:23:03Z
+
+@Tobion I agree .. but having tab to jump here and there without much control is not so accessible too .. so I think the right approach should be to introduce an access key to show/hide the dev bar.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-06-16T15:04:20Z
+
+@drAlberT An access key looks like a good idea.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T07:00:40Z
+
+@drAlberT Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-08-03T08:25:44Z
+
+What about [D] ..  (Debug) ?  it's not in the already taken standard AC http://www.standardaccesskeys.com/SAK2014/
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-03T08:29:02Z
+
+Fine by me. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-08-03T08:31:36Z
+
+I leaved the tabindex -1 in order to not interfere and added accesskey="D" in order to keep TB accessible
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-31T19:20:57Z
+
+Just to make sure: Can I now navigate to the toolbar using the tab key or what am I supposed to use now when I don't want to use the mouse?
+
+---------------------------------------------------------------------------
+
+by drAlberT at 2015-09-09T15:55:09Z
+
+Access key "D" will toggle the bar, then tab should follow the natural order

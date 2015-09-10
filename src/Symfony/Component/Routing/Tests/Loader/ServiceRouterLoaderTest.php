@@ -24,7 +24,7 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\Container', array('get'));
 
         $container
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('get')
             ->with('my_route_provider_service')
             ->will($this->returnValue($routeLoader))
@@ -37,7 +37,7 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
         $routes->add('foo', new Route('/foo'));
 
         $routeLoader
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getRouteCollection')
             // the loader itself is passed
             ->with($serviceRouteLoader)

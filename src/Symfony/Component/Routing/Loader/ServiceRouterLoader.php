@@ -68,6 +68,6 @@ class ServiceRouterLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return $type == 'service';
+        return 'service' === $type;
     }
 }

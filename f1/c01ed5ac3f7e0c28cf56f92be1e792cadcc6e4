@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-16T08:19:39Z
+
+Since deprecations are silenced and the default config is not to "scream" them, this will not save them for later logging for now. I need to figure out something about this.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-16T14:43:02Z
+
+Fixed: deprecation notices are now screamed when $displayErrors is set to true
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-16T17:40:06Z
+
+Last iteration: I removed the code that stripped scope vars and trace args. We have no use case for it: deprecations are already cleanup from those, and we throw all the other error levels.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-17T08:48:00Z
+
+PR refactored, really the last round this time (although I can't ensure that @stof won't have any comments ;)):
+I replaced "configuration by interface" by proper constructor DI. This also fixes an ordering issue: having one bootstrapping logger per error level resulted in grouping of errors by level. Having only one now allows preserving the order of log lines.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-29T11:01:13Z
+
+@symfony/deciders should we merge this PR in 2.7? Even if this can be considered as a new feature, it fixes collecting early deprecation notices, that are currently completely silent on 2.7, and would stay so if we merge this one on 2.8. What do you think?

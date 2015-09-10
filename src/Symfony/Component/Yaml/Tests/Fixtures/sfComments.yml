@@ -7,8 +7,9 @@ yaml: |
     ex2: "foo # bar" # comment
     ex3: 'foo # bar' # comment
     ex4: foo # comment
+    ex5: foo	#	comment with tab before    
 php: |
-    array('ex1' => 'foo # bar', 'ex2' => 'foo # bar', 'ex3' => 'foo # bar', 'ex4' => 'foo')
+    array('ex1' => 'foo # bar', 'ex2' => 'foo # bar', 'ex3' => 'foo # bar', 'ex4' => 'foo', 'ex5' => 'foo')
 ---
 test: Comments in the middle
 brief: >

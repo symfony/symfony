@@ -60,7 +60,6 @@ class Store implements StoreInterface
             // send a 503
             header('HTTP/1.0 503 Service Unavailable');
             header('Retry-After: 10');
-            echo '503 Service Unavailable';
         }
     }
 

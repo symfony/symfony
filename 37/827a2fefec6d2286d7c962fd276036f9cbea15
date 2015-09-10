@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-08T09:58:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T13:08:25Z
+
+changing the order of events makes sense IMO (it makes event consistent with kernel ones). However, the PR is broken as is.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-09-08T13:59:24Z
+
+OK so I changed it so it uses the exception from ConsoleExceptionEvent, and uses the code there again in TERMINATE.
+
+One thing though (and that was broken already so I don't think it should block this PR) is that if you override the exit code of the TERMINATE event, it's kinda useless in the case where there was an exception because we then throw $e and it's caught again in run() and then the exit code is computed there from the exception code. I am not sure how to fix this without risking BC breaks to be honest. We'd have to move the TERMINATE dispatch out of doRunCommand and into run(), that's the only way I can imagine.

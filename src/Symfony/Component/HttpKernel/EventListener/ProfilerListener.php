@@ -49,7 +49,7 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function __construct(Profiler $profiler, $requestStack = null, $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {
-        if ($requestStack instanceof RequestMatcherInterface || $onlyMasterRequests instanceof RequestStack) {
+        if ($requestStack instanceof RequestMatcherInterface || (null !== $matcher && !$matcher instanceof RequestMatcherInterface) || $onlyMasterRequests instanceof RequestStack) {
             $tmp = $onlyMasterRequests;
             $onlyMasterRequests = $onlyException;
             $onlyException = $matcher;

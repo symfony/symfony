@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -22,9 +22,9 @@ use Symfony\Component\Routing\RouteCollection;
 interface RouteLoaderInterface
 {
     /**
-     * @param Loader $loader
+     * @param LoaderInterface $loader
      *
      * @return RouteCollection
      */
-    public function getRouteCollection(Loader $loader);
+    public function getRouteCollection(LoaderInterface $loader);
 }

@@ -53,7 +53,7 @@ class Debug
             ini_set('display_errors', 1);
         }
         if ($displayErrors) {
-            ErrorHandler::register(new ErrorHandler(new BufferingLogger()))->screamAt(E_DEPRECATED | E_USER_DEPRECATED);
+            ErrorHandler::register(new ErrorHandler(new BufferingLogger()));
         } else {
             ErrorHandler::register()->throwAt(0, true);
         }

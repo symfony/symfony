@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-10T08:52:34Z
+
+Thanks for the fix. I'd prefer we don't use any global variable. I suggest instead using a single function:
+```php
+function with_clock_mock($enable = null)
+{
+    static $enabled;
+
+    if (null === $enable) {
+        return $enabled;
+    }
+
+    $enabled = $enable;
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-10T09:12:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-10T11:34:28Z
+
+:+1:

@@ -48,11 +48,11 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function __construct($requestStack = null, $defaultLocale = 'en', $router = null)
     {
-        if (is_string($requestStack) || $defaultLocale instanceof RequestContextAwareInterface || $router instanceof RequestStack) {
+        if ((null !== $requestStack && !$requestStack instanceof RequestStack) || $defaultLocale instanceof RequestContextAwareInterface || $router instanceof RequestStack) {
             $tmp = $router;
-            $router = $defaultLocale;
+            $router = func_num_args() < 2 ? null : $defaultLocale;
             $defaultLocale = $requestStack;
-            $requestStack = $tmp;
+            $requestStack = func_num_args() < 3 ? null : $tmp;
 
             @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as first argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         } elseif (!$requestStack instanceof RequestStack) {

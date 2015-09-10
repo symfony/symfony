@@ -799,7 +799,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertEquals('before.foo.after.', $tester->getDisplay());
+        $this->assertEquals('before.foo.after.'.PHP_EOL, $tester->getDisplay());
     }
 
     /**
@@ -835,7 +835,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.foo.after.caught.', $tester->getDisplay());
+        $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
     }
 
     protected function getDispatcher()
@@ -845,12 +845,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $event->getOutput()->write('before.');
         });
         $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) {
-            $event->getOutput()->write('after.');
+            $event->getOutput()->writeln('after.');
 
             $event->setExitCode(128);
         });
         $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
-            $event->getOutput()->writeln('caught.');
+            $event->getOutput()->write('caught.');
 
             $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
         });

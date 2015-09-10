@@ -899,13 +899,15 @@ class Application
         try {
             $exitCode = $command->run($input, $output);
         } catch (\Exception $e) {
+            $event = new ConsoleExceptionEvent($command, $input, $output, $e, $e->getCode());
+            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
+
+            $e = $event->getException();
+
             $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
             $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
 
-            $event = new ConsoleExceptionEvent($command, $input, $output, $e, $event->getExitCode());
-            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
-
-            throw $event->getException();
+            throw $e;
         }
 
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);

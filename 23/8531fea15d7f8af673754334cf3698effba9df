@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-10T08:11:21Z
+
+fabbot complains on invalid yaml files, but these are fixtures.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-10T09:56:45Z
+
+> include the original's exception message in the newly thrown exception. Othwerwise the end user still won't be able to say what's wrong.
+
+Symfony displays linked exceptions, so it will be possible to see it
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-10T10:00:53Z
+
+What about using these classes standalone?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-11T07:59:25Z
+
+@stof I reverted this change since I didn't find many examples of including parent's exception message in a newly thrown exception in the code base.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-11T09:26:27Z
+
+:+1:
+
+status: reviewed

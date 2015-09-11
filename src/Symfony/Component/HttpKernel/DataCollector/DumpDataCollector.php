@@ -34,6 +34,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $clonesIndex = 0;
     private $rootRefs;
     private $charset;
+    private $requestStack;
     private $dumper;
     private $dumperIsInjected;
 

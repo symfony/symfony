@@ -87,6 +87,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             array('bad_services'),
             array('bad_service'),
             array('bad_calls'),
+            array('bad_format'),
         );
     }
 

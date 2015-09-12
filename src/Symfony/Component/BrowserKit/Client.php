@@ -80,11 +80,11 @@ abstract class Client
     }
 
     /**
-     * Returns whether client automatically follow redirects or not.
+     * Returns whether client automatically follows redirects or not.
      *
      * @return bool
      */
-    public function getFollowRedirects()
+    public function isFollowingRedirects()
     {
         return $this->followRedirects;
     }

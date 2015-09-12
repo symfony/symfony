@@ -53,14 +53,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidValidatorInterface()
-    {
-        new FormTypeValidatorExtension(null);
-    }
-
     protected function createForm(array $options = array())
     {
         return $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, $options);

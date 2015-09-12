@@ -31,13 +31,15 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('admin_routing.yml', 'yaml')
             ->will($this->returnValue($expectedCollection));
 
-        // import the file!
+        // import the file! (with a prefix)
         $collectionBuilder = new RouteCollectionBuilder($loader);
-        $addedCollection = $collectionBuilder->import('admin_routing.yml', '/admin', 'yaml');
+        $addedBuilder = $collectionBuilder->import('admin_routing.yml', '/admin', 'yaml');
 
-        // the exact collection is passed back
-        $this->assertSame($expectedCollection, $addedCollection);
+        // we should get back a RouteCollectionBuilder
+        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Routing\RouteCollectionBuilder', $addedBuilder);
 
+        // get the collection back so we can look at it
+        $addedCollection = $addedBuilder->flush();
         $route = $addedCollection->get('one_test_route');
         $this->assertNotNull($route);
         $this->assertEquals('/admin/foo/path', $route->getPath(), 'The prefix should be applied');
@@ -81,20 +83,20 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout')
             ->setName('checkout_route');
         // 2) Add a collection directly
-        $collectionBuilder->addCollection($loadedCollection1);
+        $collectionBuilder->addRouteCollection($loadedCollection1);
         // 3) Import from a file
         $collectionBuilder->import('admin_routing.yml');
         // 4) Add another route
         $collectionBuilder->add('/', 'AppBundle:Default:homepage')
             ->setName('homepage');
         // 5) Add another collection
-        $collectionBuilder->addCollection($loadedCollection2);
+        $collectionBuilder->addRouteCollection($loadedCollection2);
         // 6) Add another route
         $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard')
             ->setName('admin_dashboard');
 
         // set a default value
-        $collectionBuilder->addDefaults(array('_locale' => 'fr'));
+        $collectionBuilder->setDefault('_locale', 'fr');
         // set an extra resource
         $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
 
@@ -151,22 +153,39 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder = new RouteCollectionBuilder($loader);
 
         // add a "named" route
-        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard')
-            ->setName('admin_dashboard');
-        $collectionBuilder->addDefaults(array('_locale' => 'fr'));
+        $collectionBuilder->add('/post', 'AppBundle:Admin:dashboard')
+            ->setName('admin_post');
+        $collectionBuilder->setPrefix('/admin');
+        $collectionBuilder->setDefault('_locale', 'fr');
+        $collectionBuilder->setMethods('POST');
+        $collectionBuilder->setSchemes('https');
+        $collectionBuilder->setCondition('foo');
+        $collectionBuilder->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
+        $collectionBuilder->setHost('example.com');
+        $collectionBuilder->setOption('expose', true);
+        $collectionBuilder->setRequirement('id', '\d+');
         $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
 
         // flush once
         $collectionBuilder->flush();
 
         // flush again - should not contain previous stuff
-        $collectionBuilder->add('/blogs', 'AppBundle:Blog:list')
+        $collectionBuilder->add('/blogs', 'list')
             ->setName('blog_list');
         $secondCollection = $collectionBuilder->flush();
 
         $this->assertCount(1, $secondCollection);
         $this->assertCount(0, $secondCollection->getResources());
-        $this->assertArrayNotHasKey('_locale', $secondCollection->get('blog_list')->getDefaults());
+        $blogListRoute = $secondCollection->get('blog_list');
+        $this->assertArrayNotHasKey('_locale', $blogListRoute->getDefaults());
+        $this->assertEmpty($blogListRoute->getMethods());
+        $this->assertEmpty($blogListRoute->getSchemes());
+        $this->assertEmpty($blogListRoute->getCondition());
+        // controller class should not have been added
+        $this->assertEquals('list', $blogListRoute->getDefault('_controller'));
+        $this->assertEmpty($blogListRoute->getHost());
+        $this->assertNull($blogListRoute->getOption('expose'));
+        $this->assertNull($blogListRoute->getRequirement('id'));
     }
 
     private function getLoader()
@@ -177,6 +196,4 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         return $loader;
     }
-
-    // test that flush leaves everything cleared
 }

@@ -73,10 +73,10 @@ class RouteCollectionBuilder
     {
         /** @var RouteCollection $subCollection */
         $subCollection = $this->loader->import($resource, $type);
-        $subCollection->addPrefix($prefix);
 
         // turn this into a RouteCollectionBuilder
         $builder = new RouteCollectionBuilder($this->loader);
+        $builder->setPrefix($prefix);
         $builder->addRouteCollection($subCollection);
         $this->routes[] = $builder;
 

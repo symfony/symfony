@@ -287,7 +287,7 @@ class RouteCollectionBuilder
      */
     public function flush()
     {
-        $routes = new RouteCollection();
+        $routeCollection = new RouteCollection();
 
         foreach ($this->routes as $route) {
             if ($route instanceof Route) {
@@ -322,18 +322,20 @@ class RouteCollectionBuilder
                     $route->setMethods($this->methods);
                 }
 
-                $routes->add($name, $route);
+                $routeCollection->add($name, $route);
             } elseif ($route instanceof RouteCollectionBuilder) {
                 $subCollection = $route->flush();
-                $routes->addCollection($subCollection);
+
+                $routeCollection->addCollection($subCollection);
             } else {
                 /** @var RouteCollection $route */
-                $routes->addCollection($route);
+
+                $routeCollection->addCollection($route);
             }
         }
 
         foreach ($this->resources as $resource) {
-            $routes->addResource($resource);
+            $routeCollection->addResource($resource);
         }
 
         // reset all the values
@@ -349,7 +351,7 @@ class RouteCollectionBuilder
         $this->methods = null;
         $this->controllerClass = null;
 
-        return $routes;
+        return $routeCollection;
     }
 
     /**

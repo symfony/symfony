@@ -106,6 +106,8 @@ class RouteCollectionBuilder
     }
 
     /**
+     * Returns a RouteCollectionBuilder that can be configured and then added with mount()
+     *
      * @return RouteCollectionBuilder
      */
     public function createCollection()
@@ -135,6 +137,12 @@ class RouteCollectionBuilder
         $this->routes[] = $collection;
     }
 
+    /**
+     * Sets a prefix (e.g. /admin) to be used with all embedded routes.
+     *
+     * @param string $prefix
+     * @return $this
+     */
     public function setPrefix($prefix)
     {
         $this->prefix = trim(trim($prefix), '/');
@@ -142,6 +150,12 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets the host on all embedded routes (unless already set).
+     *
+     * @param string $pattern
+     * @return $this
+     */
     public function setHost($pattern)
     {
         $this->host = $pattern;
@@ -149,6 +163,12 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets a condition on all embedded routes (unless already set).
+     *
+     * @param string $condition
+     * @return $this
+     */
     public function setCondition($condition)
     {
         $this->condition = $condition;
@@ -156,6 +176,14 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets a default value that will be added to all embedded routes (unless that
+     * default value is already set.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     public function setDefault($key, $value)
     {
         $this->defaults[$key] = $value;
@@ -163,6 +191,14 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets a requirement that will be added to all embedded routes (unless that
+     * requirement is already set.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     public function setRequirement($key, $regex)
     {
         $this->requirements[$key] = $regex;
@@ -170,6 +206,14 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets an opiton that will be added to all embedded routes (unless that
+     * option is already set.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     public function setOption($key, $value)
     {
         $this->options[$key] = $value;
@@ -177,6 +221,12 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets the schemes on all embedded routes (unless already set).
+     *
+     * @param array|string $schemes
+     * @return $this
+     */
     public function setSchemes($schemes)
     {
         $this->schemes = $schemes;
@@ -184,6 +234,12 @@ class RouteCollectionBuilder
         return $this;
     }
 
+    /**
+     * Sets the methods on all embedded routes (unless already set).
+     *
+     * @param array|string $methods
+     * @return $this
+     */
     public function setMethods($methods)
     {
         $this->methods = $methods;
@@ -204,7 +260,11 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Set a controller class that all added routes should use.
+     * Set a controller class that all added embedded should use.
+     *
+     * With this, the controller for embedded routes can just be a method name.
+     * If an embedded route has a full controller (e.g. class::methodName), the
+     * controllerClass won't be applied to that route.
      *
      * @param string $controllerClass
      * @return $this

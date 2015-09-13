@@ -54,9 +54,7 @@ class ServiceRouterLoader extends Loader
         $routeCollection = $service->getRouteCollection($this);
 
         // make the service file tracked so that if it changes, the cache rebuilds
-        $obj = new \ReflectionObject($service);
-        $resource = new FileResource($obj->getFileName());
-        $routeCollection->addResource($resource);
+        $this->addClassResource(new \ReflectionClass($service), $routeCollection);
 
         return $routeCollection;
     }
@@ -69,5 +67,12 @@ class ServiceRouterLoader extends Loader
     public function supports($resource, $type = null)
     {
         return 'service' === $type;
+    }
+
+    private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
+    {
+        do {
+            $collection->addResource(new FileResource($class->getFileName()));
+        } while ($class = $class->getParentClass());
     }
 }

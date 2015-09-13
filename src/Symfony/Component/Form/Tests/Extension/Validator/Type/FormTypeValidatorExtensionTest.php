@@ -74,6 +74,9 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
     }
 
+    /**
+     * @group legacy
+     */
     public function testValidatorInterfaceUntilSymfony24()
     {
         // Mock of ValidatorInterface until apiVersion 2.4
@@ -84,6 +87,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     }
 
     /**
+     * @group legacy
      * @expectedException \InvalidArgumentException
      */
     public function testInvalidValidatorInterface()

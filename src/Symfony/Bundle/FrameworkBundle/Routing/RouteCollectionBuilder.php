@@ -106,24 +106,26 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Returns a RouteCollectionBuilder that can be configured and then added with mount()
+     * Returns a RouteCollectionBuilder that can be configured and then added with mount().
      *
+     * @param string $prefix A prefix to apply to all routes added to this collection
      * @return RouteCollectionBuilder
      */
-    public function createCollection()
+    public function createCollection($prefix = null)
     {
-        return new RouteCollectionBuilder($this->loader);
+        $builder = new RouteCollectionBuilder($this->loader);
+        $builder->setPrefix($prefix);
+
+        return $builder;
     }
 
     /**
      * Add a RouteCollectionBuilder.
      *
-     * @param $prefix
      * @param RouteCollectionBuilder $routes
      */
-    public function mount($prefix, RouteCollectionBuilder $routes)
+    public function mount(RouteCollectionBuilder $routes)
     {
-        $routes->setPrefix($prefix);
         $this->routes[] = $routes;
     }
 

@@ -123,9 +123,14 @@ class ControllerResolver implements ControllerResolverInterface
     {
         $attributes = $request->attributes->all();
         $arguments = array();
+        $variadicAvailable = method_exists('\ReflectionMethod', 'isVariadic');
         foreach ($parameters as $param) {
             if (array_key_exists($param->name, $attributes)) {
-                $arguments[] = $attributes[$param->name];
+                if ($variadicAvailable && $param->isVariadic() && is_array($attributes[$param->name])) {
+                    $arguments = array_merge($arguments, array_values($attributes[$param->name]));
+                } else {
+                    $arguments[] = $attributes[$param->name];
+                }
             } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {

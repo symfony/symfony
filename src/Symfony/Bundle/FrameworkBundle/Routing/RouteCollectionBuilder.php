@@ -272,7 +272,7 @@ class RouteCollectionBuilder
     public function setControllerClass($controllerClass)
     {
         if (!class_exists($controllerClass)) {
-            throw new \LogicException(sprintf('The controller class "%s" does not exist.', $controllerClass));
+            throw new \InvalidArgumentException(sprintf('The controller class "%s" does not exist.', $controllerClass));
         }
 
         $this->controllerClass = $controllerClass;

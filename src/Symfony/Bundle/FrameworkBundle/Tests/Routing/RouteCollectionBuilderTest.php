@@ -188,6 +188,193 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($blogListRoute->getRequirement('id'));
     }
 
+    public function testFlushSetsDetailsOnChildrenRoutes()
+    {
+        $loader = $this->getLoader();
+        $routes = new RouteCollectionBuilder($loader);
+
+        $routes->add('/blogs/{page}', 'listAction', 'blog_list')
+            // unique things for the route
+            ->setDefault('page', 1)
+            ->setRequirement('id', '\d+')
+            ->setOption('expose', true)
+            // things that the collection will try to override (but won't)
+            ->setDefault('_format', 'html')
+            ->setRequirement('_format', 'json|xml')
+            ->setOption('fooBar', true)
+            ->setHost('example.com')
+            ->setCondition('request.isSecure()')
+            ->setSchemes('https')
+            ->setMethods('POST');
+
+        // a simple route, nothing added to it
+        $routes->add('/blogs/{id}', 'editAction', 'blog_edit');
+
+        // configure the collection itself
+        $routes
+            // things that will not override the child route
+            ->setDefault('_format', 'json')
+            ->setRequirement('_format', 'xml')
+            ->setOption('fooBar', false)
+            ->setHost('symfony.com')
+            ->setCondition('request.query.get("page")==1')
+            // some unique things that should be set on the child
+            ->setDefault('_locale', 'fr')
+            ->setRequirement('_locale', 'fr|en')
+            ->setOption('niceRoute', true)
+            ->setSchemes('http')
+            ->setMethods(array('GET', 'POST'));
+
+        $collection = $routes->flush();
+        $actualListRoute = $collection->get('blog_list');
+
+        $this->assertEquals(1, $actualListRoute->getDefault('page'));
+        $this->assertEquals('\d+', $actualListRoute->getRequirement('id'));
+        $this->assertEquals(true, $actualListRoute->getOption('expose'));
+        // none of these should be overridden
+        $this->assertEquals('html', $actualListRoute->getDefault('_format'));
+        $this->assertEquals('json|xml', $actualListRoute->getRequirement('_format'));
+        $this->assertEquals(true, $actualListRoute->getOption('fooBar'));
+        $this->assertEquals('example.com', $actualListRoute->getHost());
+        $this->assertEquals('request.isSecure()', $actualListRoute->getCondition());
+        $this->assertEquals(array('https'), $actualListRoute->getSchemes());
+        $this->assertEquals(array('POST'), $actualListRoute->getMethods());
+        // inherited from the main collection
+        $this->assertEquals('fr', $actualListRoute->getDefault('_locale'));
+        $this->assertEquals('fr|en', $actualListRoute->getRequirement('_locale'));
+        $this->assertEquals(true, $actualListRoute->getOption('niceRoute'));
+
+        $actualEditRoute = $collection->get('blog_edit');
+        // inherited from the collection
+        $this->assertEquals('symfony.com', $actualEditRoute->getHost());
+        $this->assertEquals('request.query.get("page")==1', $actualEditRoute->getCondition());
+        $this->assertEquals(array('http'), $actualEditRoute->getSchemes());
+        $this->assertEquals(array('GET', 'POST'), $actualEditRoute->getMethods());
+    }
+
+    /**
+     * @dataProvider providePrefixTests
+     */
+    public function testFlushPrefixesPaths($collectionPrefix, $routePath, $expectedPath)
+    {
+        $loader = $this->getLoader();
+        $routes = new RouteCollectionBuilder($loader);
+        $routes->setPrefix($collectionPrefix);
+
+        $routes->add($routePath, 'someController', 'test_route');
+        $collection = $routes->flush();
+
+        $this->assertEquals($expectedPath, $collection->get('test_route')->getPath());
+    }
+
+    public function providePrefixTests()
+    {
+        $tests = array();
+        // empty prefix is of course ok
+        $tests[] = array('', '/foo', '/foo');
+        // normal prefix - does not matter if it's a wildcard
+        $tests[] = array('/{admin}', '/foo', '/{admin}/foo');
+        // shows that a prefix will always be given the starting slash
+        $tests = array();
+        $tests[] = array('0', '/foo', '/0/foo');
+
+        // spaces are ok, and double slahses at the end are cleaned
+        $tests[] = array('/ /', '/foo', '/ /foo');
+
+        return $tests;
+    }
+
+    public function testFlushSetsPrefixedWithMultipleLevels()
+    {
+        $loader = $this->getLoader();
+        $routes = new RouteCollectionBuilder($loader);
+
+        $routes->add('homepage', 'MainController::homepageAction', 'homepage');
+
+        $adminRoutes = $routes->createCollection();
+        $adminRoutes->add('/dashboard', 'AdminController::dashboardAction', 'admin_dashboard');
+
+        // embedded collection under /admin
+        $adminBlogRoutes = $routes->createCollection();
+        $adminBlogRoutes->add('/new', 'BlogController::newAction', 'admin_blog_new');
+        // mount into admin, but before the parent collection has been mounted
+        $adminRoutes->mount('/blog', $adminBlogRoutes);
+
+        // now mount the /admin routes, above should all still be /blog/admin
+        $routes->mount('/admin', $adminRoutes);
+        // add a route after mounting
+        $adminRoutes->add('/users', 'AdminController::userAction', 'admin_users');
+
+        // add another sub-collection after the mount
+        $otherAdminRoutes = $routes->createCollection();
+        $otherAdminRoutes->add('/sales', 'StatsController::indexAction', 'admin_stats_sales');
+        $adminRoutes->mount('/stats', $otherAdminRoutes);
+
+        // add a normal collection and see that it is also prefixed
+        $importedCollection = new RouteCollection();
+        $importedCollection->add('imported_route', new Route('/foo'));
+        $loader
+            ->expects($this->any())
+            ->method('import')
+            ->will($this->returnValue($importedCollection));
+        // import this from the /admin route builder
+        $routeBuilderFromImport = $adminRoutes->import('admin.yml', '/imported');
+        // setting the prefix via this method has no affect (i.e. no /imported/imported)
+        $routeBuilderFromImport->setPrefix('/imported');
+
+        $collection = $routes->flush();
+        $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');
+        $this->assertEquals('/admin/users', $collection->get('admin_users')->getPath(), 'Routes after mounting have the prefix');
+        $this->assertEquals('/admin/blog/new', $collection->get('admin_blog_new')->getPath(), 'Sub-collections receive prefix even if mounted before parent prefix');
+        $this->assertEquals('/admin/stats/sales', $collection->get('admin_stats_sales')->getPath(), 'Sub-collections receive prefix if mounted after parent prefix');
+        $this->assertEquals('/admin/imported/foo', $collection->get('imported_route')->getPath(), 'Normal RouteCollections are also prefixed properly');
+    }
+
+    /**
+     * @dataProvider provideControllerClassTests
+     */
+    public function testSetControllerClass($routeController, $controllerClass, $expectedFinalController)
+    {
+        $loader = $this->getLoader();
+        $routes = new RouteCollectionBuilder($loader);
+        $routes->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
+
+        $routes->add('/', $routeController, 'test_route');
+        $collection = $routes->flush();
+        $this->assertEquals($expectedFinalController, $collection->get('test_route')->getDefault('_controller'));
+    }
+
+    public function provideControllerClassTests()
+    {
+        $controllerClass = 'Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController';
+
+        $tests = array();
+        $tests[] = array('withControllerAction', $controllerClass, $controllerClass.'::'.'withControllerAction');
+
+        // the controllerClass should not be used in many cases
+        $tests[] = array('', $controllerClass, '');
+        $tests[] = array('Some\Class\FooController::fooAction', $controllerClass, 'Some\Class\FooController::fooAction');
+        $tests[] = array('AppBundle:Default:index', $controllerClass, 'AppBundle:Default:index');
+        $tests[] = array('foo_controller:fooAction', $controllerClass, 'foo_controller:fooAction');
+        $tests[] = array(array('Acme\FooController', 'fooAction'), $controllerClass, array('Acme\FooController', 'fooAction'));
+
+        $closure = function() {};
+        $tests[] = array($closure, $controllerClass, $closure);
+
+        return $tests;
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptiononBadControllerClass()
+    {
+        $loader = $this->getLoader();
+        $routes = new RouteCollectionBuilder($loader);
+
+        $routes->setControllerClass('Acme\FakeController');
+    }
+
     private function getLoader()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\Loader')

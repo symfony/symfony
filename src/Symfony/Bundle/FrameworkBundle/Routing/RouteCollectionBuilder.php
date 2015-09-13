@@ -302,7 +302,7 @@ class RouteCollectionBuilder
                 $route->setRequirements(array_merge($this->requirements, $route->getRequirements()));
                 $route->setOptions(array_merge($this->options, $route->getOptions()));
 
-                if ($this->prefix) {
+                if (null !== $this->prefix) {
                     $route->setPath('/'.$this->prefix.$route->getPath());
                 }
 
@@ -325,10 +325,12 @@ class RouteCollectionBuilder
                 $routeCollection->add($name, $route);
             } elseif ($route instanceof RouteCollectionBuilder) {
                 $subCollection = $route->flush();
+                $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);
             } else {
                 /** @var RouteCollection $route */
+                $route->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($route);
             }

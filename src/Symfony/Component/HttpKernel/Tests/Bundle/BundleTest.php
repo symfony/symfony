@@ -18,6 +18,16 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\F
 
 class BundleTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetContainerExtension()
+    {
+        $bundle = new ExtensionPresentBundle();
+
+        $this->assertInstanceOf(
+            'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension',
+            $bundle->getContainerExtension()
+        );
+    }
+
     public function testRegisterCommands()
     {
         $cmd = new FooCommand();

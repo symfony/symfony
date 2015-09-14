@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -42,6 +43,10 @@ class DialogHelper extends Helper
      */
     public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $width = max(array_map('strlen', array_keys($choices)));
 
         $messages = (array) $question;
@@ -98,6 +103,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;
@@ -255,6 +264,10 @@ class DialogHelper extends Helper
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         if ('\\' === DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 
@@ -452,6 +465,10 @@ class DialogHelper extends Helper
      */
     private function validateAttempts($interviewer, OutputInterface $output, $validator, $attempts)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $e = null;
         while (false === $attempts || $attempts--) {
             if (null !== $e) {

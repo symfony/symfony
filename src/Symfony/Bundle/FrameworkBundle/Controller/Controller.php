@@ -164,7 +164,7 @@ class Controller extends ContainerAware
         }
 
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the renderView method if the Templating Component or the Twig Bundle are not available.');
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
         }
 
         return $this->container->get('twig')->render($view, $parameters);
@@ -186,7 +186,7 @@ class Controller extends ContainerAware
         }
 
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the render method if the Templating Component or the Twig Bundle are not available.');
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
         }
 
         if (null === $response) {
@@ -222,7 +222,7 @@ class Controller extends ContainerAware
                 $twig->display($view, $parameters);
             };
         } else {
-            throw new \LogicException('You can not use the stream method if the Templating Component or the Twig Bundle are not available.');
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
         }
 
         if (null === $response) {

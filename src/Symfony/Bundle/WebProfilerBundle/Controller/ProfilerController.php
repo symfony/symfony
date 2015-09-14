@@ -112,6 +112,7 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
+            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
         )), 200, array('Content-Type' => 'text/html'));
     }
 

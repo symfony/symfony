@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by danez at 2015-02-25T23:46:05Z
+
+Okay, after digging into the RFCs I think i found a solution.
+
+For reference:
+*Given ```<base href="http://base.com/path/">``` and currentUri=http://current.com*
+**links ```<a>```**:
+* *absolute href with host*:  http://domain.com/link -> http://domain.com/link
+* *absolute href w/o host*:  /link -> http://base.com/link
+* *relative href*:  link/ -> http://base.com/path/link/
+* *empty href*:  -> http://base.com/path/
+
+**forms ```<form>```**:
+* *everything same as links, except:*
+* *empty action*:  -> http://current.com/
+
+So links and forms handle empty strings in a different way (see [w3.org 9.](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#form-submission-algorithm)):
+
+    ...
+    If action is the empty string, let action be the document's address of the form document.
+
+    This step is a willful violation of RFC 3986, which would require base URL processing here. This violation is motivated by a desire for compatibility with legacy content. [RFC3986]
+    ...
+
+That's why I put the code in the Form class and not into Link, as it is only related to forms.
+
+The solution is to let the Form class know about the baseHref and set it as currentUri if action not empty.
+
+---------------------------------------------------------------------------
+
+by danez at 2015-03-13T08:10:54Z
+
+Maybe @dkop or @WouterJ can say more on this as you did the referenced pr that changed a lot for base handling.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-24T08:20:04Z
+
+@jakzal is now in charge of this component :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T10:15:00Z
+
+:+1: I do not fully understand the code, but the test cases seem correct. Just run into the relative path issue on a project.
+
+@symfony/deciders can you please vote & merge this as a bug fix?
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-02T07:56:35Z
+
+@danez there's one more difference I think. Taking your examples, submitting a form to `/link` will redirect to `http://base.com/link` and not to `http://base.com/path/link`. At least that's how it works in chrome, safari and firefox.
+
+---------------------------------------------------------------------------
+
+by danez at 2015-09-02T08:24:27Z
+
+@jakzal You are right, my example in the comment was wrong. I added the same example to the tests and it works there correctly.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-14T13:44:33Z
+
+:+1:

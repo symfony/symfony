@@ -1,0 +1,224 @@
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-04-16T15:50:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-16T15:55:53Z
+
+I like this idea as well, especially as the implementation is so easy now :) Can you try to make the link more prominent? I did not see it at first and had to closely look to find it on the screenshot.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T15:57:02Z
+
+I like this idea too
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T15:57:52Z
+
+@fabpot should the 2.8 branch become the default branch of all Symfony repos now that 2.7 is feature-frozen so that people sending PR open them against 2.8 by default ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-16T15:59:23Z
+
+@stof I like to way for the stable release to switch the default branch (like for Silex by the way :)).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-16T16:09:19Z
+
+Here are some quick proposals to make the link stand out (without adding an icon):
+
+![proposal_1](https://cloud.githubusercontent.com/assets/73419/7185540/a05f0e64-e463-11e4-9c1c-ac3ca6a45e02.png)
+
+![proposal_2](https://cloud.githubusercontent.com/assets/73419/7185541/a1fea720-e463-11e4-830c-dd927d7048ab.png)
+
+![proposal_3](https://cloud.githubusercontent.com/assets/73419/7185544/a3cb8fb4-e463-11e4-9741-67d7ec4a72b6.png)
+
+![proposal_4](https://cloud.githubusercontent.com/assets/73419/7185545/a5b9520c-e463-11e4-8420-f964db30bb3f.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-16T16:14:09Z
+
+Option 1 or 2 would do for me.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T17:09:14Z
+
+@fabpot this would mean that people not being careful will send us all PRs to 2.7, while only bugfixes should go there. It would be better to have them based on the right version IMO (even though we can switch the target with gh, it is better if the Travis builds are running on the right version, and it also means less chance for conflicts when rebasing)
+
+@javiereguiluz I vote for the option 2 (with the button style)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-16T17:24:41Z
+
+:+1:  for the second option.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-04-16T17:30:04Z
+
+I'd prefer both 1 + 2 = the button with the cross.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-16T17:52:17Z
+
+I've combined the 1 and 2 options. Here it is in action:
+
+![logout_button](https://cloud.githubusercontent.com/assets/73419/7187606/f9142680-e471-11e4-8cc9-8f6a7ac51ef9.gif)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T18:59:24Z
+
+Do we have buttons anywhere else in the panel?
+
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-04-16T19:06:48Z
+
+Looks great :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-16T19:47:46Z
+
+@Tobion I'd say that we don't have any button in any other panel. And I agree that we should avoid this inconsistency.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T21:56:57Z
+
+I like option 1 and 2 as well as the combined one.
+
+> @Tobion I'd say that we don't have any button in any other panel. And I agree that we should avoid this inconsistency.
+
+We didn't have something that would justify for a button UI element before, did we? So introducing this now doesn't look wrong to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T22:46:42Z
+
+Don't care if its a button or a link but IMO it should be next to `authenticated: yes` as in example 4 as these belong together. Below the other data, it looks misplaced as it does not fit into the "key: value" pair.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-17T06:43:58Z
+
+IMO nice would be to have option if we detect role `ROLE_PREVIOUS_ADMIN` or something similar to be able to easily log back as "admin".
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2015-04-17T07:47:47Z
+
+:+1: awesome, i like the link next to the 'Authenticated'. if the user has the role `ROLE_PREVIOUS_ADMIN` we could replace the logout button with something like "logout(link) to [old_user](link)"
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2015-04-17T08:14:48Z
+
+I think the logout button should be next to `Authenticated: Yes`, and if the user has the role `ROLE_PREVIOUS_ADMIN` a new button `Exit` must appear next to `Logged in as: foobar`
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2015-04-17T21:21:23Z
+
+Here a proposal with button next to the ``Authenticated: Yes``:
+
+![sample_1](https://cloud.githubusercontent.com/assets/652505/7211156/69783128-e558-11e4-84b3-8d4d476e0555.png)
+
+And an other one with le link aligned with values:
+
+![sample_2](https://cloud.githubusercontent.com/assets/652505/7211338/31d7d79e-e55a-11e4-9908-c497fa05eb63.png)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-18T03:53:48Z
+
+I like @raziel057 proposal. :+1:
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-04-18T08:32:15Z
+
+Nice one @javiereguiluz !
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-18T08:36:49Z
+
+@raziel057 the problem I see with your first proposal is that the button looks like a badge (obviously my own button proposal also suffer this problem, but it's less problematic because it's not displayed next to the badge).
+
+Regarding your second proposal, I like that the link looks like a real link, but most people here don't want the link to stand out that much. Besides, I'm not sure about the result of aligning the link with the values.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-24T07:32:46Z
+
+I've committed a new proposal where a new **Actions** section is created in the security panel:
+
+![logout_button](https://cloud.githubusercontent.com/assets/73419/7314420/a47ec00a-ea64-11e4-937a-83d0d15b4b43.png)
+
+Considering that in #14458 we might add a new feature to switch the user, this **Actions** section could hold that button too:
+
+![actions_button](https://cloud.githubusercontent.com/assets/73419/7314445/d1ce1254-ea64-11e4-999e-2ff54a8cfcdc.png)
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-24T07:49:55Z
+
+:+1: great job :-)
+
+---------------------------------------------------------------------------
+
+by ajgarlag at 2015-04-24T08:09:35Z
+
+:+1: great!
+I think that the `Switch user` button should be renamed to something like `Exit` when the token has the `ROLE_PREVIOUS_ADMIN` role.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-24T18:38:53Z
+
+@javiereguiluz how can i select the user to impersonate?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-24T18:39:28Z
+
+btw, i like the buttons :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T14:32:50Z
+
+@javiereguiluz Can you finish this one? I'd like to merge it ASAP.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-01T15:17:32Z
+
+I've finished and rebased this PR. Thanks to the new toolbar style, there is no need to discuss about displaying this feature as a link or as a button. It "must" be a link to match the new style:
+
+![logout_link](https://cloud.githubusercontent.com/assets/73419/9022308/20c0b902-3871-11e5-88e6-9525bd27842c.png)
+
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-08-01T15:19:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-01T17:04:28Z
+
+:+1:

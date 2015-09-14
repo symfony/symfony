@@ -55,7 +55,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link http://www.iana.org/assignments/http-status-codes/ Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2012-02-13).
+     * (last updated 2015-05-19).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *

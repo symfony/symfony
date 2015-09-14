@@ -121,7 +121,7 @@ class YamlFileLoader extends FileLoader
         try {
             $classes = $this->yamlParser->parse(file_get_contents($path));
         } catch (ParseException $e) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid.', $path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
         }
 
         // empty file

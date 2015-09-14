@@ -38,7 +38,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return md5(serialize(array($this->resource, $this->pattern)));
     }
 
     /**

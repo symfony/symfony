@@ -274,7 +274,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // prime the cache
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
-        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $translator->warmup($this->tmpDir);
 
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
@@ -284,6 +284,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
         $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 

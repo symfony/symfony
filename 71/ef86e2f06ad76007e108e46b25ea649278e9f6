@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-12T22:36:53Z
+
+Nice fix! I left one comment (unsure if it's really wanted) and you have to fix CS as indicated by fabbot, but apart from that it looks 100% valid.
+
+---------------------------------------------------------------------------
+
+by jmgq at 2015-09-13T17:31:29Z
+
+Thank you very much for the feedback, @WouterJ. I've updated my patch as requested.

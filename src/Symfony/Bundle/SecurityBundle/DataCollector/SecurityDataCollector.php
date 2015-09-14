@@ -50,6 +50,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => false,
                 'authenticated' => false,
                 'token_class' => null,
+                'provider_key' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -60,6 +61,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => true,
                 'authenticated' => false,
                 'token_class' => null,
+                'provider_key' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -80,6 +82,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
+                'provider_key' => method_exists($token, 'getProviderKey') ? $token->getProviderKey() : null,
                 'user' => $token->getUsername(),
                 'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
                 'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
@@ -157,6 +160,16 @@ class SecurityDataCollector extends DataCollector
     public function getTokenClass()
     {
         return $this->data['token_class'];
+    }
+
+    /**
+     * Get the provider key (i.e. the name of the active firewall).
+     *
+     * @return string The provider key
+     */
+    public function getProviderKey()
+    {
+        return $this->data['provider_key'];
     }
 
     /**

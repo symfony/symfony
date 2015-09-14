@@ -64,9 +64,10 @@ class RouteCollectionBuilder
      *
      * Returns a RouteCollectionBuilder so you can continue to tweak options on the routes.
      *
-     * @param mixed $resource
+     * @param mixed  $resource
      * @param string $prefix
      * @param string $type
+     *
      * @return RouteCollectionBuilder
      */
     public function import($resource, $prefix = null, $type = null)
@@ -75,7 +76,7 @@ class RouteCollectionBuilder
         $subCollection = $this->loader->import($resource, $type);
 
         // turn this into a RouteCollectionBuilder
-        $builder = new RouteCollectionBuilder($this->loader);
+        $builder = new self($this->loader);
         $builder->setPrefix($prefix);
         $builder->addRouteCollection($subCollection);
         $this->routes[] = $builder;
@@ -86,9 +87,10 @@ class RouteCollectionBuilder
     /**
      * Adds a route and returns it for future modification.
      *
-     * @param string $path          The route path
-     * @param string $controller    The route controller string
-     * @param string $name          The name to give this route
+     * @param string $path       The route path
+     * @param string $controller The route controller string
+     * @param string $name       The name to give this route
+     *
      * @return Route
      */
     public function add($path, $controller, $name = null)
@@ -109,11 +111,12 @@ class RouteCollectionBuilder
      * Returns a RouteCollectionBuilder that can be configured and then added with mount().
      *
      * @param string $prefix A prefix to apply to all routes added to this collection
+     *
      * @return RouteCollectionBuilder
      */
     public function createCollection($prefix = null)
     {
-        $builder = new RouteCollectionBuilder($this->loader);
+        $builder = new self($this->loader);
         $builder->setPrefix($prefix);
 
         return $builder;
@@ -143,6 +146,7 @@ class RouteCollectionBuilder
      * Sets a prefix (e.g. /admin) to be used with all embedded routes.
      *
      * @param string $prefix
+     *
      * @return $this
      */
     public function setPrefix($prefix)
@@ -156,6 +160,7 @@ class RouteCollectionBuilder
      * Sets the host on all embedded routes (unless already set).
      *
      * @param string $pattern
+     *
      * @return $this
      */
     public function setHost($pattern)
@@ -169,6 +174,7 @@ class RouteCollectionBuilder
      * Sets a condition on all embedded routes (unless already set).
      *
      * @param string $condition
+     *
      * @return $this
      */
     public function setCondition($condition)
@@ -183,7 +189,8 @@ class RouteCollectionBuilder
      * default value is already set.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setDefault($key, $value)
@@ -198,7 +205,8 @@ class RouteCollectionBuilder
      * requirement is already set.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setRequirement($key, $regex)
@@ -213,7 +221,8 @@ class RouteCollectionBuilder
      * option is already set.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setOption($key, $value)
@@ -227,6 +236,7 @@ class RouteCollectionBuilder
      * Sets the schemes on all embedded routes (unless already set).
      *
      * @param array|string $schemes
+     *
      * @return $this
      */
     public function setSchemes($schemes)
@@ -240,6 +250,7 @@ class RouteCollectionBuilder
      * Sets the methods on all embedded routes (unless already set).
      *
      * @param array|string $methods
+     *
      * @return $this
      */
     public function setMethods($methods)
@@ -269,6 +280,7 @@ class RouteCollectionBuilder
      * controllerClass won't be applied to that route.
      *
      * @param string $controllerClass
+     *
      * @return $this
      */
     public function setControllerClass($controllerClass)
@@ -325,13 +337,13 @@ class RouteCollectionBuilder
                 }
 
                 $routeCollection->add($name, $route);
-            } elseif ($route instanceof RouteCollectionBuilder) {
+            } elseif ($route instanceof self) {
                 $subCollection = $route->flush();
                 $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);
             } else {
-                /** @var RouteCollection $route */
+                /* @var RouteCollection $route */
                 $route->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($route);

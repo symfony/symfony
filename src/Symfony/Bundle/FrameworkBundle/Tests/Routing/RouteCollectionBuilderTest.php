@@ -113,7 +113,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             'homepage',
             'second_collection_route1',
             'second_collection_route2',
-            'admin_dashboard'
+            'admin_dashboard',
         ), $actualRouteNames);
 
         // make sure the defaults were set
@@ -230,11 +230,11 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $actualListRoute->getDefault('page'));
         $this->assertEquals('\d+', $actualListRoute->getRequirement('id'));
-        $this->assertEquals(true, $actualListRoute->getOption('expose'));
+        $this->assertTrue($actualListRoute->getOption('expose'));
         // none of these should be overridden
         $this->assertEquals('html', $actualListRoute->getDefault('_format'));
         $this->assertEquals('json|xml', $actualListRoute->getRequirement('_format'));
-        $this->assertEquals(true, $actualListRoute->getOption('fooBar'));
+        $this->assertTrue($actualListRoute->getOption('fooBar'));
         $this->assertEquals('example.com', $actualListRoute->getHost());
         $this->assertEquals('request.isSecure()', $actualListRoute->getCondition());
         $this->assertEquals(array('https'), $actualListRoute->getSchemes());
@@ -242,7 +242,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         // inherited from the main collection
         $this->assertEquals('fr', $actualListRoute->getDefault('_locale'));
         $this->assertEquals('fr|en', $actualListRoute->getRequirement('_locale'));
-        $this->assertEquals(true, $actualListRoute->getOption('niceRoute'));
+        $this->assertTrue($actualListRoute->getOption('niceRoute'));
 
         $actualEditRoute = $collection->get('blog_edit');
         // inherited from the collection

@@ -26,6 +26,7 @@ class Route extends BaseRoute
      * Set the controller string on the route.
      *
      * @param string $controller
+     *
      * @return $this
      */
     public function setController($controller)
@@ -39,6 +40,7 @@ class Route extends BaseRoute
      * Set the request format for this route.
      *
      * @param string $format
+     *
      * @return $this
      */
     public function setRequestFormat($format)
@@ -52,6 +54,7 @@ class Route extends BaseRoute
      * Set the locale for this route.
      *
      * @param string $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
@@ -66,6 +69,7 @@ class Route extends BaseRoute
      * supports this, like RouteCollectionBuilder.
      *
      * @param string $name
+     *
      * @return $this
      */
     public function setName($name)

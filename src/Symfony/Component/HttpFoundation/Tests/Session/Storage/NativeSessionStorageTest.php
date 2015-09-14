@@ -130,6 +130,13 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(42, $_SESSION['_sf2_attributes']['lucky']);
     }
 
+    public function testRegenerationFailureDoesNotFlagStorageAsStarted()
+    {
+        $storage = $this->getStorage();
+        $this->assertFalse($storage->regenerate());
+        $this->assertFalse($storage->isStarted());
+    }
+
     public function testDefaultSessionCacheLimiter()
     {
         $this->iniSet('session.cache_limiter', 'nocache');

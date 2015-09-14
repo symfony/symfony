@@ -36,7 +36,7 @@
     </div>
 </div>
 
-{% for position, e in exception.toarray %}
+{% for position, e in [exception]|merge(exception.allprevious) %}
     {% include 'TwigBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
 {% endfor %}
 

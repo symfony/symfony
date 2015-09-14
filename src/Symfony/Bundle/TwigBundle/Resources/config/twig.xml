@@ -101,6 +101,7 @@
             <argument /> <!-- %templating.helper.code.file_link_format% -->
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
+            <argument type="service" id="debug.html_utils" on-invalid="ignore" />
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">

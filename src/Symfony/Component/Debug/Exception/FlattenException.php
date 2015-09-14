@@ -51,6 +51,7 @@ class FlattenException
 
 namespace Symfony\Component\Debug\Exception;
 
+use Symfony\Component\Debug\ArgumentsFlattenExceptionProcessor;
 use Symfony\Component\HttpKernel\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -95,9 +96,13 @@ class FlattenException extends LegacyFlattenException
         $e->setClass(get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
+
         if ($exception->getPrevious()) {
-            $e->setPrevious(static::create($exception->getPrevious()));
+            $e->setPrevious(static::create($exception->getPrevious(), -1));
         }
+
+        $processor = new ArgumentsFlattenExceptionProcessor(null, false);
+        $processor->process($exception, $e, -1 !== $statusCode);
 
         return $e;
     }
@@ -249,7 +254,7 @@ class FlattenException extends LegacyFlattenException
                 'function' => isset($entry['function']) ? $entry['function'] : null,
                 'file' => isset($entry['file']) ? $entry['file'] : null,
                 'line' => isset($entry['line']) ? $entry['line'] : null,
-                'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
+                'args' => array(),
             );
         }
     }
@@ -296,44 +301,5 @@ class FlattenException extends LegacyFlattenException
     public function setExtra($name, $value)
     {
         $this->extras[$name] = $value;
-    }
-
-    private function flattenArgs($args, $level = 0, &$count = 0)
-    {
-        $result = array();
-        foreach ($args as $key => $value) {
-            if (++$count > 1e4) {
-                return array('array', '*SKIPPED over 10000 entries*');
-            }
-            if (is_object($value)) {
-                $result[$key] = array('object', get_class($value));
-            } elseif (is_array($value)) {
-                if ($level > 10) {
-                    $result[$key] = array('array', '*DEEP NESTED ARRAY*');
-                } else {
-                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1, $count));
-                }
-            } elseif (null === $value) {
-                $result[$key] = array('null', null);
-            } elseif (is_bool($value)) {
-                $result[$key] = array('boolean', $value);
-            } elseif (is_resource($value)) {
-                $result[$key] = array('resource', get_resource_type($value));
-            } elseif ($value instanceof \__PHP_Incomplete_Class) {
-                // Special case of object, is_object will return false
-                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
-            } else {
-                $result[$key] = array('string', (string) $value);
-            }
-        }
-
-        return $result;
-    }
-
-    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
-    {
-        $array = new \ArrayObject($value);
-
-        return $array['__PHP_Incomplete_Class_Name'];
     }
 }

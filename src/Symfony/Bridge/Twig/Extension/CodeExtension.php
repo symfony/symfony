@@ -10,6 +10,8 @@
  */
 
 namespace Symfony\Bridge\Twig\Extension;
+use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Utils\HtmlUtils;
 
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
@@ -21,6 +23,7 @@ class CodeExtension extends \Twig_Extension
     private $fileLinkFormat;
     private $rootDir;
     private $charset;
+    private $htmlUtils;
 
     /**
      * Constructor.
@@ -29,11 +32,12 @@ class CodeExtension extends \Twig_Extension
      * @param string $rootDir        The project root directory
      * @param string $charset        The charset
      */
-    public function __construct($fileLinkFormat, $rootDir, $charset)
+    public function __construct($fileLinkFormat, $rootDir, $charset, HtmlUtils $htmlUtils = null)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
         $this->charset = $charset;
+        $this->htmlUtils = $htmlUtils;
     }
 
     /**
@@ -78,48 +82,27 @@ class CodeExtension extends \Twig_Extension
     /**
      * Formats an array as a string.
      *
-     * @param array $args The argument array
+     * @param array                 $args      The argument array
+     * @param FlattenException|null $exception The flatten exception
      *
      * @return string
      */
-    public function formatArgs($args)
+    public function formatArgs($args, $exception = null)
     {
-        $result = array();
-        foreach ($args as $key => $item) {
-            if ('object' === $item[0]) {
-                $parts = explode('\\', $item[1]);
-                $short = array_pop($parts);
-                $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
-            } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
-            } elseif ('string' === $item[0]) {
-                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->charset));
-            } elseif ('null' === $item[0]) {
-                $formattedValue = '<em>null</em>';
-            } elseif ('boolean' === $item[0]) {
-                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
-            } elseif ('resource' === $item[0]) {
-                $formattedValue = '<em>resource</em>';
-            } else {
-                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], ENT_QUOTES, $this->charset), true));
-            }
-
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
-        }
-
-        return implode(', ', $result);
+        return $this->htmlUtils->formatArgs($args, $exception);
     }
 
     /**
      * Formats an array as a string.
      *
-     * @param array $args The argument array
+     * @param array                 $args      The argument array
+     * @param FlattenException|null $exception The flatten exception
      *
      * @return string
      */
-    public function formatArgsAsText($args)
+    public function formatArgsAsText($args, $exception = null)
     {
-        return strip_tags($this->formatArgs($args));
+        return strip_tags($this->formatArgs($args, $exception));
     }
 
     /**

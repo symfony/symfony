@@ -1,5 +1,5 @@
 {% if trace.function %}
-    at {{ trace.class ~ trace.type ~ trace.function }}({{ trace.args|format_args_as_text }})
+    at {{ trace.class ~ trace.type ~ trace.function }}({{ trace.args|format_args_as_text(exception|default) }})
 {% else %}
     at n/a
 {% endif %}

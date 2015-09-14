@@ -49,7 +49,7 @@
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
-        "symfony/serializer": "For using the serializer service",
+        "symfony/serializer": "For using the serializer service"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

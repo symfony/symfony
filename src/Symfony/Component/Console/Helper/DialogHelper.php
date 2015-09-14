@@ -385,7 +385,7 @@ class DialogHelper extends Helper
     /**
      * Returns the helper's input stream.
      *
-     * @return string
+     * @return resource|null The input stream or null if the default STDIN is used
      */
     public function getInputStream()
     {

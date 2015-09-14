@@ -92,6 +92,28 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->headers->has('x-body-eval'));
     }
 
+    public function testMultilineEsiRemoveTagsAreRemoved()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('<esi:remove> <a href="http://www.example.com">www.example.com</a> </esi:remove> Keep this'."<esi:remove>\n <a>www.example.com</a> </esi:remove> And this");
+        $esi->process($request, $response);
+
+        $this->assertEquals(' Keep this And this', $response->getContent());
+    }
+
+    public function testCommentTagsAreRemoved()
+    {
+        $esi = new Esi();
+
+        $request = Request::create('/');
+        $response = new Response('<esi:comment text="some comment &gt;" /> Keep this');
+        $esi->process($request, $response);
+
+        $this->assertEquals(' Keep this', $response->getContent());
+    }
+
     public function testProcess()
     {
         $esi = new Esi();

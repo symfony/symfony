@@ -221,8 +221,22 @@ class DebugClassLoader
 
                 throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
             }
-            if (self::$caseCheck && preg_match('#(?:[/\\\\][a-zA-Z_\x7F-\xFF][a-zA-Z0-9_\x7F-\xFF]*+)++\.(?:php|hh)$#D', $file, $tail)) {
-                $tail = $tail[0];
+            if (self::$caseCheck) {
+                $real = explode('\\', $class.strrchr($file, '.'));
+                $tail = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $file));
+
+                $i = count($tail) - 1;
+                $j = count($real) - 1;
+
+                 while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
+                    --$i;
+                    --$j;
+                }
+
+                array_splice($tail, 0, $i + 1);
+            }
+            if (self::$caseCheck && $tail) {
+                $tail = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $tail);
                 $tailLen = strlen($tail);
                 $real = $refl->getFileName();
 
@@ -289,7 +303,7 @@ class DebugClassLoader
                 if (0 === substr_compare($real, $tail, -$tailLen, $tailLen, true)
                   && 0 !== substr_compare($real, $tail, -$tailLen, $tailLen, false)
                 ) {
-                    throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));
+                    throw new \RuntimeException(sprintf('Case mismatch between class and real file names: %s vs %s in %s', substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)));
                 }
             }
 

@@ -135,6 +135,11 @@ class Parser
                     throw $e;
                 }
 
+                // Convert float keys to strings, to avoid being converted to integers by PHP
+                if (is_float($key)) {
+                    $key = (string) $key;
+                }
+
                 if ('<<' === $key) {
                     $mergeNode = true;
                     $allowOverwrite = true;

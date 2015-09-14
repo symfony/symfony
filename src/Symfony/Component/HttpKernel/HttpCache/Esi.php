@@ -213,8 +213,8 @@ class Esi implements SurrogateInterface
 
         // we don't use a proper XML parser here as we can have ESI tags in a plain text response
         $content = $response->getContent();
-        $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#', '', $content);
-        $content = preg_replace('#<esi\:comment[^>]*(?:/|</esi\:comment)>#', '', $content);
+        $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#s', '', $content);
+        $content = preg_replace('#<esi\:comment[^>]+>#s', '', $content);
 
         $chunks = preg_split('#<esi\:include\s+(.*?)\s*(?:/|</esi\:include)>#', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
         $chunks[0] = str_replace($this->phpEscapeMap[0], $this->phpEscapeMap[1], $chunks[0]);

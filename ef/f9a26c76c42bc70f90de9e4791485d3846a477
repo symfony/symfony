@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-08T15:51:44Z
+
+This change broke some monolog bridge tests.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-09-08T16:06:57Z
+
+Sorry, fixed the tests.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-08T16:44:44Z
+
+Related #13730
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-09-08T17:03:04Z
+
+@Tobion in retrospect, I think that other one you linked was misguided, it should be given the right output by the user instead of doing automagic. But in this case there is no easy way for the user to do it right, so I think defaulting to the right behavior when setup with the listener is good, and if people want to do it wrong they can always reconfigure the hard way.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T05:58:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-14T12:37:27Z
+
+:+1:

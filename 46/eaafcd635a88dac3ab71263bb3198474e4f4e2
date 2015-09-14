@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-26T11:43:39Z
+
+You should add this change to the CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-26T12:22:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-26T13:25:35Z
+
+:+1: but some tiny tests to ensure these methods keep being called would be good.
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-08-26T14:45:54Z
+
+@Tobion can you give advice, maybe some piece of code how to do this? Bootstrap kernel without templating - where should I do it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-26T15:42:36Z
+
+I don't mean functional tests but unit tests. We already have unit tests for this class. Just mock the container and ensure the methods are called.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-27T17:11:06Z
+
+And if the `twig` service isn't available? IMO the code should be something like this:
+
+```php
+if ($this->container->has('templating')) {
+    // use the templating component
+} else if ($this->container->has('twig')) {
+    // use twig
+} else {
+    throw new \LogicException('You can not use the XXX method if the Templating Component or the Twig Bundle are not available.');
+}
+```

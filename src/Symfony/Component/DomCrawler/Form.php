@@ -34,19 +34,26 @@ class Form extends Link implements \ArrayAccess
     private $fields;
 
     /**
+     * @var string
+     */
+    private $baseHref;
+
+    /**
      * Constructor.
      *
      * @param \DOMNode $node       A \DOMNode instance
      * @param string   $currentUri The URI of the page where the form is embedded
      * @param string   $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param string   $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
      * @throws \LogicException if the node is not a button inside a form tag
      *
      * @api
      */
-    public function __construct(\DOMNode $node, $currentUri, $method = null)
+    public function __construct(\DOMNode $node, $currentUri, $method = null, $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
+        $this->baseHref = $baseHref;
 
         $this->initialize();
     }
@@ -441,6 +448,10 @@ class Form extends Link implements \ArrayAccess
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
+        }
+
+        if ($this->baseHref && '' !== $this->node->getAttribute('action')) {
+            $this->currentUri = $this->baseHref;
         }
     }
 

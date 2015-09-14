@@ -48,7 +48,12 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     {
         parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
 
+        $actualDecorated = $this->isDecorated();
         $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
+
+        if (null === $decorated) {
+            $this->setDecorated($actualDecorated && $this->stderr->isDecorated());
+        }
     }
 
     /**

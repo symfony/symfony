@@ -54,7 +54,6 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new DirectoryResource($this->directory);
         $this->assertSame($this->directory, $resource->getResource(), '->getResource() returns the path to the resource');
-        $this->assertSame($this->directory, (string) $resource, '->__toString() returns the path to the resource');
     }
 
     public function testGetPattern()
@@ -85,6 +84,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new DirectoryResource($this->directory);
         touch($this->directory.'/new.xml', time() + 20);
         $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if a new file is added');
+    }
+
+    public function testIsFreshNewFileWithDifferentPattern()
+    {
+        $resource = new DirectoryResource($this->directory, '/.xml$/');
+        touch($this->directory.'/new.yaml', time() + 20);
+        $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if a new file with a non-matching pattern is added');
     }
 
     public function testIsFreshDeleteFile()
@@ -148,5 +154,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($this->directory, $resource->getResource());
         $this->assertSame('/\.(foo|xml)$/', $resource->getPattern());
+    }
+
+    public function testResourcesWithDifferentPatternsAreDifferent()
+    {
+        $resourceA = new DirectoryResource($this->directory, '/.xml$/');
+        $resourceB = new DirectoryResource($this->directory, '/.yaml$/');
+
+        $this->assertEquals(2, count(array_unique(array($resourceA, $resourceB))));
     }
 }

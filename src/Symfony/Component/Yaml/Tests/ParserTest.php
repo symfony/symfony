@@ -747,6 +747,24 @@ bar: 2
 EOF;
         $this->assertEquals(array('foo' => 1, 'bar' => 2), $this->parser->parse($yaml));
     }
+
+    public function testFloatKeys()
+    {
+        $yaml = <<<EOF
+foo:
+    1.2: "bar"
+    1.3: "baz"
+EOF;
+
+        $expected = array(
+            'foo' => array(
+                '1.2' => 'bar',
+                '1.3' => 'baz',
+            ),
+        );
+
+        $this->assertEquals($expected, $this->parser->parse($yaml));
+    }
 }
 
 class B

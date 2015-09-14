@@ -1,0 +1,653 @@
+---------------------------------------------------------------------------
+
+by romqin at 2015-08-12T14:32:10Z
+
+:clap: :+1:
+
+---------------------------------------------------------------------------
+
+by DZunke at 2015-08-12T14:36:56Z
+
+it seems to be far more accessible then the old version. so ... vote :+1: for this.
+
+great work! :clap:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-08-12T14:47:08Z
+
+Big :+1: :clap: :clap: !
+Fantastic job !
+
+---------------------------------------------------------------------------
+
+by deguif at 2015-08-12T14:58:51Z
+
+I really like the new design.
+But from the screenshots, there's only one thing that appears confused to me with the new design.
+In the Exception panel, the line causing the exception seems to not being highlighted any more in the stack trace. Is there any reason ? ping @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by oyepez003 at 2015-08-12T15:22:19Z
+
++10000
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-12T15:38:20Z
+
+@romqin I've added the missing SVG icons. Thanks for reporting the error.
+
+@deguif very nice catch! I totally forgot about that. The line is now highlighted again:
+
+![exception_line_highlight](https://cloud.githubusercontent.com/assets/73419/9228394/9211b8ae-4118-11e5-9643-5f081ad232d7.png)
+
+@romainneutron the problem is that at some point, making the lines longer worsen readability instead of improving it. The classic limit in the print era was around 75 characters per line (including white spaces). The longest line in the current table has 96 chars (and the longest file path text contain up to 134 chars, but it's not an important element).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-12T15:50:03Z
+
+awesome!!!!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-12T15:58:25Z
+
+the height of the input and the button is different, isn't it?
+
+![bildschirmfoto 2015-08-12 um 17 57 42](https://cloud.githubusercontent.com/assets/995707/9229095/b9283f6e-411b-11e5-90d2-c7ef76182277.png)
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-12T16:28:26Z
+
+@javiereguiluz I love the redesign, it's more functional and just looks awesome! One question though, is it by design the code from the exception will remain light themed?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-12T16:38:00Z
+
+@javiereguiluz can you also open the DoctrineBundle PR so that I can see what it implies for a bundle supporting both versions of the profiler ?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-12T17:22:27Z
+
+In general: Perfect!
+
+In more detail: I would change some things :) Some thoughts after playing with it for some minutes:
+
+* The design now takes the full width, instead of the previous centered-fixed-width-box. However, the content still has this very small width. This looks very weird on a bigger screen. The most strange thing is the search box floating somewhere in the center of the page, while its look reveals it should be right aligned:
+
+   ![sf-profiler-fixed-width](https://cloud.githubusercontent.com/assets/749025/9230995/ebf08a0a-4125-11e5-8338-d83f2876911e.png)
+
+* I like the color of the summary bar. However, I find it too big. What about merging the 2 lines into one? (or moving most of the information in the, almost empty, top bar?)
+* I don't like the new yellow highlight color, it's almost invisible.
+* I don't like it that "Symfony" after the Symfony logo in the top bar doesn't use the Symfony logo font, but some Helvetica/Arial.
+* Due to how a human eye handles colors, selected tabs look less big (as the fill color is darker than the border color) than not selected tabs. This doesn't feel very natural. I propose to make the border darker (`#555`) when a tab is selected.
+* In the menu, when hovering over menu items, the current menu items looses its focus. I like it more if the current menu item is always highlighted.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-12T20:00:45Z
+
+@WouterJ thanks for your review. I've made some tweaks:
+
+  * The selected menu item remains selected when "hovering" the mouse.
+  * The selected navigation tab border color matches its background to aovid the 1px issue.
+  * The shade of the `.status-warning` yellow is slightly darker
+  * The "Symfony Profiler" title font will be tweaked once our designer returns from his summer holidays :)
+
+Regarding the "summary section", for now we prefer to maintain it as it is. first, because this colored block balances the "too gray / too dark" feeling of the rest of the page. Second because the green/yellow/red background is a very useful visual clue (assuming the user doesn't have problems perceiving colors). Third, the URL looks very short in your example ... but most of the times is way longer (and sometimes very long and it spans two lines!)
+
+Lastly, regarding the behavior with high resolution screens, here it is the comparison between maintaining it on the left or centering it. Let's do a quick poll to see what do people like:
+
+![wide-screen-left](https://cloud.githubusercontent.com/assets/73419/9235198/7e34ba50-413d-11e5-977f-b3b4b656daf3.png)
+
+![wide-screen-center](https://cloud.githubusercontent.com/assets/73419/9235200/8082a6b4-413d-11e5-9714-77d33654bc8d.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-12T20:08:18Z
+
+I prefer the second screenshot (centered page).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-08-12T20:17:52Z
+
+@javiereguiluz : I prefer the first screenshot, but it's right some of the tables/informations deserve more space (timeline for instance).
+
+Regarding the 2 heading bars, what do you think about merging them ? (note margins/paddings are not representative) :
+![7e34ba50-413d-11e5-977f-b3b4b656daf3 copie](https://cloud.githubusercontent.com/assets/2211145/9235589/e6db28ee-413f-11e5-939d-9a1d96ba4da0.png)
+ And eventually making it smaller ?
+
+<img width="1298" alt="screenshot 2015-08-13 a 22 49 53" src="https://cloud.githubusercontent.com/assets/2211145/9261471/533c06f6-420e-11e5-93be-0a5646b5918b.PNG">
+
+For smaller screens, the search input would be hidden.
+
+---------------------------------------------------------------------------
+
+by hugohenrique at 2015-08-13T04:08:40Z
+
+awesome! :+1:
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-13T06:41:06Z
+
+awesome, please add! :+1:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-13T07:29:11Z
+
+:+1:  for centered
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-13T07:30:52Z
+
+@WouterJ @OskarStark the problem is that the layout wasn't designed to be displayed centered and it looks really bad :cry:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-13T07:43:59Z
+
+hmm, ok then i would leave it as it is und maybe fix the whole problem to center the page later in a separate PR
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-08-13T07:46:01Z
+
+I really love the new design, just a few smaller remarks:
+
+*   How often is the Search on Symfony website” actually used?
+*   We have a lot of “code” content, so probably we should use a monotype font more often? Practically every key-value table (like in the request tab) or especially things like the paths in the Routing panel or the context of the log messages.
+*   I love the color coding of the header! It might be difficult for users with visual impairment, so we could imitate the HTTP Method head? So the line where currently just the URL is, could look like `POST 500 http://...`? Just a thought...
+*   I like the tabbed content.
+*   As @iltar already mentioned: I would probably choose a dark theme for the code lines in the exception panel.
+*   Maybe a pretty-JSON formatter for the log context? We could make it expandable, like the doctrine queries are in the current (2.7) version.
+*   The shade of green in the routing panel is very desaturized
+*   Maybe we should show the Roles in the security panel as a list instead of inline JSON.
+*   Search results: I love it
+*   Empty elements with the dashed border: I also like it, although it looks a little bit like a drag & drop upload field.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-13T07:49:48Z
+
+@apfelbox if it's the same search as the website, it will be "offline": http://symfony.com/search?q=form
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-08-13T08:49:17Z
+
+@javiereguiluz maybe some commits from https://github.com/symfony/symfony/pull/12363 can be cherry-picked into this PR as improvements of exception page, what do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-13T08:53:21Z
+
+@Koc I would rather keep it separate to make the review easier
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-08-13T09:32:51Z
+
+@stof separate PR makes sense, but probably we should adapt the new look & feel for error and exception pages? What do you think @javiereguiluz ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-13T11:32:48Z
+
+@apfelbox doing it separately also means we should finish this one before doing the other one IMO to avoid a mess (conflicts between them, and very hard to follow the review). And it is out of the scope of the discussion on this PR
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-13T12:06:22Z
+
+@apfelbox thanks for your nice and detailed review! I've made a lot of tweaks in a7ae8aa and I've added some ideas to the "Wish List" created in #15439
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-08-13T13:28:13Z
+
+Awesome!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-13T15:28:02Z
+
+The "Dump / Debug" panel has just been redesigned. It only contains some minor visual tweaks to match the new style:
+
+![profiler-dump](https://cloud.githubusercontent.com/assets/73419/9253861/8d05cc88-41e0-11e5-8853-66ea1a170537.png)
+
+When you click on the "Show code" link:
+
+![profiler-dump-expanded](https://cloud.githubusercontent.com/assets/73419/9253867/97061e40-41e0-11e5-967b-8c4894433530.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-13T16:05:18Z
+
+:-1: on changing the colors of the code block highlighting. These colors are the colors used for code examples throughout the Symfony docs (and after the exception page, throughout Symfony). We should keep that for consistency. Furthermore, for me the new colors look like there's a layer of dust on top of the code blocks.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-08-14T07:16:25Z
+
+"Furthermore, for me the new colors look like there's a layer of dust on top of the code blocks." LOL :joy:  But I do agree that the colors look consistent.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-15T23:42:44Z
+
+This is so gorgeous <3 great contribution @javiereguiluz!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-23T18:27:43Z
+
+A quick update to tell you that we've just finished the redesigning of all the built-in profiler panels. The last one was the "Email" panel:
+
+![profiler-email-panel](https://cloud.githubusercontent.com/assets/73419/9429574/41bd4ba0-49d5-11e5-9dbe-2d46f37818cd.png)
+
+The panel shows/hides some of its headings and information depending on the number of mailers and sent messages:
+
+1) Usual scenario (1 mailer and 1 mail):
+
+![email-profiler-1-mailer-1-message](https://cloud.githubusercontent.com/assets/73419/9429576/49d7d062-49d5-11e5-8591-99d37510606e.png)
+
+2) 1 mailer and several messages:
+
+![email-profiler-1-mailer-2-messages](https://cloud.githubusercontent.com/assets/73419/9429578/4fefb258-49d5-11e5-9897-55dcc99d4403.png)
+
+3) Several mailers and messages:
+
+![profiler-2-mailer-2-messages](https://cloud.githubusercontent.com/assets/73419/9429580/5563d318-49d5-11e5-801f-e17cdddd3f0d.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-23T18:31:01Z
+
+Good job!
+
+Very minor detail: I think there is too much spacing between "E-mails" and "Messages sent by each mailer" in screeshot (3).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-23T19:42:01Z
+
+This is so much better than before. Good job!
+
+2 minor suggestions:
+
+- Events panel without `framework.ide` could highlight the class name without namespace instead of the method name. The method name is kinda the same most of the time `on...`. The class would be more interesting.
+- The headlines capitalization should be unified: E.g. in config panel it's "Symfony Configuration" but also "PHP **c**onfiguration". In Doctrine it's "Database queries" and "Datebase Connections".
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-23T19:51:57Z
+
+I propose using the same title case as used in the docs, @javiereguiluz feel free to ping me if you are unsure what should be capitialized :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-24T11:23:48Z
+
+The time has come :)  I consider the profiler redesign **finished**, so you can now make the final review. I've implemented most, but not all, of the suggestions made so far in the comments of this pull request. Thanks.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-24T11:40:25Z
+
+please merge! I want to enjoy it ASAP :p
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-08-24T12:03:54Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-25T10:56:44Z
+
+Before merging this, I want the upgrade path to be considered for bundles having to be compatible with both designs (which is a must have for high-quality bundles as 2.7 is still supported for 3 years).
+The current way used by @javiereguiluz to upgrade bundles is just not maintainable.
+See https://github.com/doctrine/DoctrineBundle/pull/452#discussion_r36960481 for the discussion.
+
+---------------------------------------------------------------------------
+
+by dewos at 2015-08-25T16:14:33Z
+
+That's something I've always wondered: why singular "Exception" and "Translation" ... instead of the plural form? (note: some items are fine in singular, for example Doctrine, Twig, Security etc...).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-25T16:21:22Z
+
+@dewos once this PR is merged, people will easily test it and hopefully they'll report a lot of minor errors and inconsistencies like the one you mentioned. Merging this is only the first step into creating a polished profiler for 2.8 / 3.0 :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-25T20:05:44Z
+
+Please note https://github.com/symfony/symfony/pull/15523#issuecomment-130742053 , which seems to be completely ignored.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-25T20:07:52Z
+
+The dump toolbar block showns the number of dumps on that page, which is nice. I think this should be done in the menu item as well.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-26T06:28:32Z
+
+> The dump toolbar block showns the number of dumps on that page, which is nice. I think this should be done in the menu item as well.
+
+That's correct. Why did we do this? In the old profiler, all panels are always enabled. In the new profiler, when some panel contains no information (for example when you dump nothing), that panel is disabled. So, if "dump" is disabled, don't click on it; if it's enabled, you can be certain that it contains dumped contents. In the new profiler, the badges of the menu are reserved to show the number of errors.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-26T06:32:42Z
+
+> :-1: on changing the colors of the code block highlighting. These colors are the colors used for code examples throughout the Symfony docs (and after the exception page, throughout Symfony). We should keep that for consistency.
+
+The colors are exactly the same ... we've only changed their shades. In this case, the consistency should not be achieved with the Symfony docs, but with the rest of the new Symfony profiler design. I prefer to maintain this change, merge it and let people test it before 2.8/3.0 release. If they think it's horrible, be sure they will loudly say so and we'll fix it.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-26T07:15:52Z
+
+@javiereguiluz thanks for your comments, it turns out I was testing with the old Swiftmailer profiler, resulting in a number disabled in the menu and the other things I mentioned in the Swiftmailer PR. You can ignore all these comments, as the new profiler looks great!
+
+About JS, why don't we actually use jQuery? Given that this is an isolated page and that we are actually recreating jQuery in the Sfjs object...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-26T07:18:06Z
+
+@WouterJ I completely agree with using jQuery (and by the way, Bootstrap too). But let's leave that for a future PR.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-08-28T11:53:18Z
+
+The count box in sidebar is on the new line (Firefox):
+![screenshot-localhost 8000 2015-08-28 13-50-50](https://cloud.githubusercontent.com/assets/288535/9545616/dcc6437c-4d8b-11e5-81c8-8e93a3e09241.png)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-08-29T00:25:04Z
+
+Thanks @javiereguiluz! This new redesign WP is really great!
+
+So much wow! :D
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2015-09-01T07:49:36Z
+
+I see seme render issues on Doctrine panel.
+
+![zrzut ekranu 2015-09-01 09 48 24](https://cloud.githubusercontent.com/assets/298610/9598790/ba22538c-508e-11e5-9339-3e647cc5446e.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-01T08:21:23Z
+
+@ahilles107 there is an opened PR on DoctrineBundle to update it for the new design.
+
+@javiereguiluz this makes me think that the new design is not friendly to bundles which have not updated their panels yet.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-01T08:24:24Z
+
+@hason thanks for reporting this error. In ed53b7e I've made soem tweaks for Firefox and it seems to be fixed now:
+
+![firefox_menu_badges](https://cloud.githubusercontent.com/assets/73419/9599341/66284516-5093-11e5-80f9-fb800c570e9d.png)
+
+@ahilles107 it seems that you are not testing the latest version of the Doctrine panel (the "Expand all queries" button is gone for example). Here you can find the latest version: https://github.com/doctrine/DoctrineBundle/pull/452
+
+@stof the problem occurs because of the way I use the `table-layout` property. I'm going to fix it right now.
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2015-09-01T08:28:21Z
+
+@javiereguiluz - yep, it was outdated doctrine bundle - now it looks perfect! Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-03T08:07:37Z
+
+Since this pull request isn't merged yet, I keep adding features. The latest one is to display the priority of the listeners in the event panel (this has been asked for in #11915 and it's also related to #11263).
+
+It looks like it's working, but I confess that I don't know what I'm doing. So please, review carefully the changes in 705bad7. Thanks!
+
+![called_priority](https://cloud.githubusercontent.com/assets/73419/9653415/87f6af84-5223-11e5-9ac4-9d393bcc0008.png)
+
+![not_called_priority](https://cloud.githubusercontent.com/assets/73419/9653417/8a154cee-5223-11e5-826c-6f54a9c75d55.png)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-03T09:04:10Z
+
+Would it be an idea to show the events list with a background color for the first event? (kind a like a table per event, but still within the same table).
+
+* EventName (bg colored)
+* EventName (normal bg color)
+* EventName (normal bg color)
+* EventName2 (bg colored)
+
+As they are list by name and then sorted by priority, it's easier to see which events are related.
+
+The doted items would have a bg color.
+![events-list-color](https://cloud.githubusercontent.com/assets/904790/9654607/279e903a-522c-11e5-924d-ae78e73b9e08.jpg)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-09-03T09:09:06Z
+
+@sstok sort of grouping the called event listeners by event sounds like a good idea. :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-03T09:49:02Z
+
+After c8b46e6 changes, uncalled listeners are now displayed sorted by priority:
+
+![uncalled-listeners](https://cloud.githubusercontent.com/assets/73419/9655512/b9c43320-5231-11e5-854d-6fd220f449ec.png)
+
+Could we do something similar for called listeners?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-03T09:55:06Z
+
+@javiereguiluz ordering by priority first does not make sense: the priority of 2 listeners can be compared only if they are for the same event. Sorting listeners by priority is done per event in the dispatcher.
+It would make sense to sort them by event first, and then by priority
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-03T10:42:52Z
+
+@stof you are right. I'm going to revert the latest changes. We have 4 options for the events panel:
+
+-----
+
+1) Do nothing else (just display the priority, the event name and the listener).
+
+-----
+
+2) Group listeners by background color (similar to @sstok proposal):
+
+![separated-by-background](https://cloud.githubusercontent.com/assets/73419/9656515/27d62f7e-5239-11e5-81ce-5af4796deaaf.png)
+
+ -----
+
+3) Group listeners by a border line:
+
+![separated-by-lines](https://cloud.githubusercontent.com/assets/73419/9656517/2b214e16-5239-11e5-9266-4971899ac881.png)
+
+-----
+
+4) Group listeners by event name:
+
+![separated-by-event](https://cloud.githubusercontent.com/assets/73419/9656519/2e107f2a-5239-11e5-8750-44b9f4fc971b.png)
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2015-09-03T10:45:37Z
+
+:+1: for option 4
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-09-03T10:47:08Z
+
+Option 4 is most readeable IMO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-03T10:47:41Z
+
+I love the option 4 :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-03T11:07:58Z
+
+OK. I've committed the fourth option. Here it is a detailed screenshot in case you want to better analyze it:
+
+![grouped-events-detail](https://cloud.githubusercontent.com/assets/73419/9656925/bb69117c-523c-11e5-8f81-8beb1dabf958.png)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-09-03T12:41:11Z
+
+:+1: for option 4
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-09-03T12:47:59Z
+
+looks great
+
+---------------------------------------------------------------------------
+
+by pyrech at 2015-09-07T07:45:44Z
+
+The option 4 looks nicer :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-07T07:59:08Z
+
+This PR is now completely finished. We just need some thumbs up from Symfony deciders to merge it. Thanks!
+
+-----
+
+The error reported by Travis seems unrelated:
+
+```
+Fatal error: Call to undefined method
+Symfony\Component\DependencyInjection\ContainerBuilder::addScope() in
+/home/travis/build/symfony/symfony/src/Symfony/Bundle/TwigBundle/vendor/symfony/
+framework-bundle/FrameworkBundle.php on line 70
+
+KO TwigBundle
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-07T12:47:21Z
+
+@javiereguiluz Can you test this redesign with Silex 1.x and 2.x, to validate that we do not break it?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-07T12:49:11Z
+
+@fabpot absolutely! I'm going to do it right now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-07T14:11:34Z
+
+In https://github.com/symfony/symfony/commit/a808fa5c291741de4b5dd9deb9df848704ec3476 I've made some changes for Silex 1 and 2. Let's review the changes:
+
+### Silex 2
+
+**Old toolbar**
+
+![silex_2_before](https://cloud.githubusercontent.com/assets/73419/9718212/106c3de4-557a-11e5-9f4f-86eb05bd4744.png)
+
+**New toolbar**
+
+![silex_2_after](https://cloud.githubusercontent.com/assets/73419/9718218/16f74cee-557a-11e5-8401-f90963b27531.png)
+
+**New toolbar detail**
+
+![silex_2_after_detail](https://cloud.githubusercontent.com/assets/73419/9718229/34126f70-557a-11e5-91b3-d62cc89b8b99.png)
+
+All profiler panels are exactly the same as Symfony, except the following changes:
+
+**Config panel**
+
+![symfony_vs_silex_2_config](https://cloud.githubusercontent.com/assets/73419/9718240/5788c6e8-557a-11e5-8c20-ae06f9e78db0.png)
+
+**Logger panel** (there is no channel)
+
+![symfony_vs_silex_2_logger](https://cloud.githubusercontent.com/assets/73419/9718245/61e6ed0e-557a-11e5-9f62-db04c1a793c9.png)
+
+**Events panel** (there is no priority)
+
+![symfony_vs_silex_2_events](https://cloud.githubusercontent.com/assets/73419/9718248/68e59146-557a-11e5-95fa-5be7206152f6.png)
+
+### Silex 1
+
+First, I cannot make the profiler work for a freshly installed Silex 1 app because of [this issue](https://github.com/silexphp/Silex-WebProfiler/issues/67). The solution is to add the following in `src/app.php`:
+
+```php
+$app->register(new Silex\Provider\HttpFragmentServiceProvider());
+```
+
+The new toolbar looks the same, but it suffers the same shortcomings of the old toolbar:
+
+1) Instead of "Silex 2", you see the Symfony version:
+
+![silex_1_vs_2_toolbar](https://cloud.githubusercontent.com/assets/73419/9718282/bd1ddb60-557a-11e5-9240-d5b9fdfba529.png)
+
+2) The configuration panel also cannot display the Silex version:
+
+![silex_1_vs_2_config](https://cloud.githubusercontent.com/assets/73419/9718307/ee04c54a-557a-11e5-896c-50da5cf1d37c.png)
+
+3) The log messages are slightly different:
+
+![silex_1_vs_2_logger](https://cloud.githubusercontent.com/assets/73419/9718310/f5dd9d0a-557a-11e5-8807-699bfed02cfb.png)
+
+---------------------------------------------------------------------------
+
+by hason at 2015-09-07T14:13:58Z
+
+Perfect!
+I would change some things:
+
+* add responsive design for smaller devices (reintroduce minimizing of menu and remove min-width),
+* add support to disable clickable links (show all logs, all events etc. - old behaviour),
+* enable the full width on a bigger screen (remove max-width).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-07T14:41:43Z
+
+@hason I'd prefer to have this PR merged as it is and then let people experience the new profiler before changing any of the things you mentioned :)

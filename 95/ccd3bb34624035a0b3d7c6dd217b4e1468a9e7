@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by egeloen at 2015-02-08T10:19:18Z
+
+@fabpot Indeed, fixed + tests added.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-08T16:03:01Z
+
+So, I would deprecate `getContainerExtensionClass` in 2.7 and remove it in 3.0 as your new extension point does more than the old one.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2015-02-08T16:33:01Z
+
+@fabpot IMO, the two methods have different topics and so, the one which resolves the DI extension class name (`getContainerExtensionClass`) should not be deprecated otherwise, I will still need to resolve the DI extension class by myself because it will become part of the instantiation.
+
+I can obviously bring the two lines of code which resolves the DI extension class but if I can avoid it, I would follow this method.
+
+My point is I build a generic bundle implementation on top of the Symfony one, so, the DI extension class resolution is a feature I need but having it decouplated from the DI extension instanciation would be even better for passing dependencies :)
+
+---------------------------------------------------------------------------
+
+by egeloen at 2015-02-08T16:41:25Z
+
+An other way to do it would be to move the DI extension class resolution in the `getContainerExtension` method and then pass the resolved class as parameter to the new `createContainerExtension`. Then, developers can choose to use it or not. What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:44:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-14T08:20:45Z
+
+:+1:

@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 
 /**
  * Getting Entities through the ORM QueryBuilder.
@@ -35,7 +35,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * Construct an ORM Query Builder Loader.
      *
      * @param QueryBuilder|\Closure $queryBuilder
-     * @param EntityManager         $manager
+     * @param ObjectManager         $manager
      * @param string                $class
      *
      * @throws UnexpectedTypeException
@@ -49,8 +49,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         }
 
         if ($queryBuilder instanceof \Closure) {
-            if (!$manager instanceof EntityManager) {
-                throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManager');
+            if (!$manager instanceof ObjectManager) {
+                throw new UnexpectedTypeException($manager, 'Doctrine\Common\Persistence\ObjectManager');
             }
 
             $queryBuilder = $queryBuilder($manager->getRepository($class));

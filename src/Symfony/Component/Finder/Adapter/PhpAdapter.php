@@ -68,13 +68,13 @@ class PhpAdapter extends AbstractAdapter
             $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
         }
 
+        if ($this->paths || $this->notPaths) {
+            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+        }
+
         if ($this->sort) {
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
-        }
-
-        if ($this->paths || $this->notPaths) {
-            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
         return $iterator;

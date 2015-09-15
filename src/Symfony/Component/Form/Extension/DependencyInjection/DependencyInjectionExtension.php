@@ -68,7 +68,18 @@ class DependencyInjectionExtension implements FormExtensionInterface
 
         if (isset($this->typeExtensionServiceIds[$name])) {
             foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
-                $extensions[] = $this->container->get($serviceId);
+                $extensions[] = $extension = $this->container->get($serviceId);
+
+                // validate result of getExtendedType() to ensure it is consistent with the service definition
+                if ($extension->getExtendedType() !== $name) {
+                    throw new InvalidArgumentException(
+                        sprintf('The extended type specified for the service "%s" does not match the actual extended type. Expected "%s", given "%s".',
+                            $serviceId,
+                            $name,
+                            $extension->getExtendedType()
+                        )
+                    );
+                }
             }
         }
 

@@ -9,6 +9,7 @@ CHANGELOG
  * deprecated the "cascade_validation" option in favor of setting "constraints"
    with the Valid constraint
  * moved data trimming logic of TrimListener into StringUtil
+ * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
 
 2.7.0
 -----

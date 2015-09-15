@@ -39,7 +39,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Routing\RouteCollectionBuilder', $addedBuilder);
 
         // get the collection back so we can look at it
-        $addedCollection = $addedBuilder->flush();
+        $addedCollection = $addedBuilder->build();
         $route = $addedCollection->get('one_test_route');
         $this->assertNotNull($route);
         $this->assertEquals('/admin/foo/path', $route->getPath(), 'The prefix should be applied');
@@ -100,7 +100,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         // set an extra resource
         $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
 
-        $actualCollection = $collectionBuilder->flush();
+        $actualCollection = $collectionBuilder->build();
 
         $this->assertCount(9, $actualCollection);
         $actualRouteNames = array_keys($actualCollection->all());
@@ -139,7 +139,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder->add('/blogs', 'AppBundle:Blog:list')
             ->setMethods('GET');
 
-        $actualCollection = $collectionBuilder->flush();
+        $actualCollection = $collectionBuilder->build();
         $actualRouteNames = array_keys($actualCollection->all());
         $this->assertEquals(array(
             'admin_dashboard',
@@ -167,12 +167,12 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
 
         // flush once
-        $collectionBuilder->flush();
+        $collectionBuilder->build();
 
         // flush again - should not contain previous stuff
         $collectionBuilder->add('/blogs', 'list')
             ->setName('blog_list');
-        $secondCollection = $collectionBuilder->flush();
+        $secondCollection = $collectionBuilder->build();
 
         $this->assertCount(1, $secondCollection);
         $this->assertCount(0, $secondCollection->getResources());
@@ -225,7 +225,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->setSchemes('http')
             ->setMethods(array('GET', 'POST'));
 
-        $collection = $routes->flush();
+        $collection = $routes->build();
         $actualListRoute = $collection->get('blog_list');
 
         $this->assertEquals(1, $actualListRoute->getDefault('page'));
@@ -262,7 +262,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $routes->setPrefix($collectionPrefix);
 
         $routes->add($routePath, 'someController', 'test_route');
-        $collection = $routes->flush();
+        $collection = $routes->build();
 
         $this->assertEquals($expectedPath, $collection->get('test_route')->getPath());
     }
@@ -322,7 +322,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         // setting the prefix via this method has no affect (i.e. no /imported/imported)
         $routeBuilderFromImport->setPrefix('/imported');
 
-        $collection = $routes->flush();
+        $collection = $routes->build();
         $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');
         $this->assertEquals('/admin/users', $collection->get('admin_users')->getPath(), 'Routes after mounting have the prefix');
         $this->assertEquals('/admin/blog/new', $collection->get('admin_blog_new')->getPath(), 'Sub-collections receive prefix even if mounted before parent prefix');
@@ -340,7 +340,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $routes->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
 
         $routes->add('/', $routeController, 'test_route');
-        $collection = $routes->flush();
+        $collection = $routes->build();
         $this->assertEquals($expectedFinalController, $collection->get('test_route')->getDefault('_controller'));
     }
 

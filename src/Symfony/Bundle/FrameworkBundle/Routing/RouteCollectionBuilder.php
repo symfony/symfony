@@ -16,7 +16,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Helps add and import routes into a RouteCollection..
+ * Helps add and import routes into a RouteCollection.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
@@ -299,7 +299,7 @@ class RouteCollectionBuilder
      *
      * @return RouteCollection
      */
-    public function flush()
+    public function build()
     {
         $routeCollection = new RouteCollection();
 
@@ -338,7 +338,7 @@ class RouteCollectionBuilder
 
                 $routeCollection->add($name, $route);
             } elseif ($route instanceof self) {
-                $subCollection = $route->flush();
+                $subCollection = $route->build();
                 $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);

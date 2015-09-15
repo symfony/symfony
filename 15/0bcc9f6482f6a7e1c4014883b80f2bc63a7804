@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-15T08:27:52Z
+
+Would it fix #5951 completely?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T08:29:43Z
+
+So, as a bug fix, it's going to be merged into 2.3 instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T08:37:13Z
+
+Work great! 50% faster for the following code (from the Symfony root dir):
+
+```php
+require_once __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Finder\Finder;
+
+$finder = Finder::create();
+
+$ct = 1;
+foreach ($finder->in(__DIR__) as $file) {
+    ++$ct;
+}
+print "$ct\n";
+```
+
+And here is the result from [Blackfire](https://blackfire.io/):
+
+```
+  Total time:   985 ms    (-1.16 s)
+    CPU time:   924 ms    (-982 ms)
+         I/O:  61.1 ms    (-174 ms)
+      Memory:     1 MB  (+ 5.41 KB)
+     Network:      n/a
+```
+
+Visually, it confirms that we are doing a better job at limiting the number of calls:
+
+https://blackfire.io/profiles/compare/f45a1e98-0ab2-4f31-99bf-621da8a329fb/graph
+
+*Note:* For the record, the speed improvement for such a simple Finder command comes from the fact that we are excluding the VCS directories by default (which adds about 9 exclude directory constraints to the Finder).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T08:55:40Z
+
+It would be great to run benchmarks of the PHP adapter vs find-based adapters again with this change applied, to see how much better they behave ( @jfsimon had such benchmark when working on the component).
+
+@nicolas-grekas another possible improvement could be to split the DepthRangeFilterIterator in 2:
+- a min-depth filter which would applied after flattening the recursive iterator as today (it is necessary as a recursive filter would not be able to exclude a node while keeping its children)
+- a max-depth filter which would be applied before flattening the recursive iterator, which would avoid looking at children deeper than the limit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T08:58:11Z
+
+@stof I'm checking-out the benchmark suite.
+I thought the same for depth limiting, but there is nothing to fix: the max depth limiting is implemented natively by RecursiveIteratorIterator, which knows about RecursiveIterator and already skips children correctly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T09:09:19Z
+
+Benched with https://github.com/jfsimon/symfony-finder-benchmark:
+
+before:
+```
+   1010 files
+    110 directories
+     10 iterations
+      6 cases
+      2 adapters
+
+            case             php        gnu_find
+               0         134,536          32,502
+               1         139,751          32,799
+               2         146,635          55,269
+               3         165,655         108,679
+               4         153,492          26,968
+               5         181,146          34,751
+
+      0 Find files by name containing a*
+      1 Find files by name containing a* not containing *a
+      2 Find files by name containing ~^a.*~ not containing ~.*a$~
+      3 Find files by path containing a*
+      4 Find files by path containing a* not containing *a
+      5 Find files by path containing ~^a.*~ not containing ~.*a$~
+```
+
+after:
+```
+   1010 files
+    110 directories
+     10 iterations
+      6 cases
+      2 adapters
+
+            case             php        gnu_find
+               0          77,216          34,788
+               1          81,621          36,329
+               2          80,585          56,178
+               3          85,982          70,764
+               4          91,257          19,029
+               5          91,729          38,958
+
+      0 Find files by name containing a*
+      1 Find files by name containing a* not containing *a
+      2 Find files by name containing ~^a.*~ not containing ~.*a$~
+      3 Find files by path containing a*
+      4 Find files by path containing a* not containing *a
+      5 Find files by path containing ~^a.*~ not containing ~.*a$~
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T09:48:14Z
+
+> I thought the same for depth limiting, but there is nothing to fix: the max depth limiting is implemented natively by RecursiveIteratorIterator, which knows about RecursiveIterator and already skips children correctly.
+
+right. I forgot about the way the DepthRangeFilterIterator is implemented internally

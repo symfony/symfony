@@ -31,10 +31,13 @@ class PhpAdapter extends AbstractAdapter
             $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
         }
 
-        $iterator = new \RecursiveIteratorIterator(
-            new Iterator\RecursiveDirectoryIterator($dir, $flags, $this->ignoreUnreadableDirs),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
+        $iterator = new Iterator\RecursiveDirectoryIterator($dir, $flags, $this->ignoreUnreadableDirs);
+
+        if ($this->exclude) {
+            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
+        }
+
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
         if ($this->minDepth > 0 || $this->maxDepth < PHP_INT_MAX) {
             $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->minDepth, $this->maxDepth);
@@ -42,10 +45,6 @@ class PhpAdapter extends AbstractAdapter
 
         if ($this->mode) {
             $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
-        }
-
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
         }
 
         if ($this->names || $this->notNames) {

@@ -18,8 +18,18 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Alex Bogomazov
  */
-abstract class FilterIterator extends \FilterIterator
+abstract class FilterIterator extends \FilterIterator implements \RecursiveIterator
 {
+    public function hasChildren()
+    {
+        return $this->getInnerIterator() instanceof \RecursiveIterator && $this->getInnerIterator()->hasChildren();
+    }
+
+    public function getChildren()
+    {
+        return $this->getInnerIterator()->getChildren();
+    }
+
     /**
      * This is a workaround for the problem with \FilterIterator leaving inner \FilesystemIterator in wrong state after
      * rewind in some cases.

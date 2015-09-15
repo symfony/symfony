@@ -267,6 +267,15 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(2, $exitCode, '->run() returns integer exit code (casts numeric to int)');
     }
 
+    public function testRunWithApplication()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(new Application());
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+
+        $this->assertSame(0, $exitCode, '->run() returns an integer exit code');
+    }
+
     public function testRunReturnsAlwaysInteger()
     {
         $command = new \TestCommand();

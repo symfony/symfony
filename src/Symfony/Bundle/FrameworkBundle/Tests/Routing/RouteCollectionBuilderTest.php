@@ -147,47 +147,6 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         ), $actualRouteNames);
     }
 
-    public function testFlushClearsEverything()
-    {
-        $loader = $this->getLoader();
-        $collectionBuilder = new RouteCollectionBuilder($loader);
-
-        // add a "named" route
-        $collectionBuilder->add('/post', 'AppBundle:Admin:dashboard')
-            ->setName('admin_post');
-        $collectionBuilder->setPrefix('/admin');
-        $collectionBuilder->setDefault('_locale', 'fr');
-        $collectionBuilder->setMethods('POST');
-        $collectionBuilder->setSchemes('https');
-        $collectionBuilder->setCondition('foo');
-        $collectionBuilder->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
-        $collectionBuilder->setHost('example.com');
-        $collectionBuilder->setOption('expose', true);
-        $collectionBuilder->setRequirement('id', '\d+');
-        $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
-
-        // flush once
-        $collectionBuilder->build();
-
-        // flush again - should not contain previous stuff
-        $collectionBuilder->add('/blogs', 'list')
-            ->setName('blog_list');
-        $secondCollection = $collectionBuilder->build();
-
-        $this->assertCount(1, $secondCollection);
-        $this->assertCount(0, $secondCollection->getResources());
-        $blogListRoute = $secondCollection->get('blog_list');
-        $this->assertArrayNotHasKey('_locale', $blogListRoute->getDefaults());
-        $this->assertEmpty($blogListRoute->getMethods());
-        $this->assertEmpty($blogListRoute->getSchemes());
-        $this->assertEmpty($blogListRoute->getCondition());
-        // controller class should not have been added
-        $this->assertEquals('list', $blogListRoute->getDefault('_controller'));
-        $this->assertEmpty($blogListRoute->getHost());
-        $this->assertNull($blogListRoute->getOption('expose'));
-        $this->assertNull($blogListRoute->getRequirement('id'));
-    }
-
     public function testFlushSetsDetailsOnChildrenRoutes()
     {
         $loader = $this->getLoader();

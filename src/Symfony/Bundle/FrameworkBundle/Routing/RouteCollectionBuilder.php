@@ -354,19 +354,6 @@ class RouteCollectionBuilder
             $routeCollection->addResource($resource);
         }
 
-        // reset all the values
-        $this->routes = array();
-        $this->resources = array();
-        $this->defaults = array();
-        $this->options = array();
-        $this->requirements = array();
-        $this->prefix = null;
-        $this->host = null;
-        $this->condition = null;
-        $this->schemes = null;
-        $this->methods = null;
-        $this->controllerClass = null;
-
         return $routeCollection;
     }
 

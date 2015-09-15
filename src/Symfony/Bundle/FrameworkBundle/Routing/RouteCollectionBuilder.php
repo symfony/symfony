@@ -205,7 +205,7 @@ class RouteCollectionBuilder
      * requirement is already set.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed  $regex
      *
      * @return $this
      */

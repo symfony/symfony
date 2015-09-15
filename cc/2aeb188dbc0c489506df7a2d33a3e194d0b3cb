@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T08:49:50Z
+
+`src/Symfony/Bundle/WebProfilerBundle/Resources/config/commands.xml` should also be removed
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-15T08:58:23Z
+
+Removed.

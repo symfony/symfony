@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-23T09:00:17Z
+
+You get a :+1: from me for this idea. I've actually ran into this "issue" a few times myself. What about allowing callables to be passed to container itself? I know it would be a BC break for the current container, but it does allow you to flexibly add the passes at the right moment. Though the current PR makes it easier to add it to the most use cases, it will not allow you to register anything but the default.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:28:02Z
+
+I've updated the PR with the suggestions (removed new interface, reuse `CompilerPassInterface` and rename pass class name).
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T15:32:08Z
+
+@WouterJ but we can't register extension as instance of  CompilerPassInterface ? https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L133
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T15:35:47Z
+
+@aitboudad a class can implement multiple interfaces:
+
+```php
+class AppExtension implements ExtensionInterface, CompilerPassInterface
+{
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T15:44:55Z
+
+@WouterJ then how to avoid the duplicate call of process if someone already addCompilerPass for an extension ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:37:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-14T08:13:40Z
+
+Maybe dumb question, but is it possible/desirable to create a compiler tag for this instead of using the interface check? I'm not a big fan of "configuration by interface".
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-14T14:16:25Z
+
+@nicolas-grekas not sure how this would work. You'd need to register an extension as a service, right? This PR is all about decreasing amount of work the end user needs to do to get his compiler pass registered. DI Extension would also act as a compiler pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-14T16:40:24Z
+
+@jakzal ok, understood, extensions classes are not meant for wide range reuse
+:+1: then!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-15T08:20:44Z
+
+I'm :+1: btw :)

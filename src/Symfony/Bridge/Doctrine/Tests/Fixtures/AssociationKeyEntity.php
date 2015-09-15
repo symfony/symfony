@@ -22,7 +22,8 @@ use Doctrine\ORM\Mapping AS ORM;
 class AssociationKeyEntity
 {
     /**
-     * @ORM\Id @ORM\OneToOne(targetEntity="SingleIntIdEntity")
+     * @ORM\Id
+     * @ORM\OneToOne(targetEntity="SingleIntIdEntity")
      *
      * @var SingleIntIdEntity
      */

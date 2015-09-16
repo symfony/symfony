@@ -19,7 +19,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Charles-Henri Bruyand <charleshenri.bruyand@gmail.com>
  */
-class FileExistenceResource implements ResourceInterface, \Serializable
+class FileExistenceResource implements SelfCheckingResourceInterface, \Serializable
 {
     private $resource;
 

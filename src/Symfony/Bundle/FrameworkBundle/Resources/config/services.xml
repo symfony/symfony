@@ -13,6 +13,9 @@
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
         <parameter key="request_stack.class">Symfony\Component\HttpFoundation\RequestStack</parameter>
+        <parameter key="config_cache_factory.class">Symfony\Component\Config\ResourceCheckerConfigCacheFactory</parameter>
+        <parameter key="config_cache_default_resource_checker.class">Symfony\Component\Config\Resource\DefaultResourceChecker</parameter>
+        <parameter key="config_cache_bc_resource_interface_checker.class">Symfony\Component\Config\Resource\BCResourceInterfaceChecker</parameter>
     </parameters>
 
     <services>
@@ -63,5 +66,19 @@
         <service id="uri_signer" class="%uri_signer.class%">
             <argument>%kernel.secret%</argument>
         </service>
+
+        <service id="config_cache_factory" class="%config_cache_factory.class%" />
+
+        <service id="config_cache_default_resource_checker" class="%config_cache_default_resource_checker.class%">
+            <tag name="config_cache.resource_checker" priority="-990" />
+        </service>
+
+        <!--
+            This service is deprecated and will be removed in 3.0.
+        -->
+        <service id="config_cache_bc_resource_interface_checker" class="%config_cache_bc_resource_interface_checker.class%">
+            <tag name="config_cache.resource_checker" priority="-1000" />
+        </service>
+
     </services>
 </container>

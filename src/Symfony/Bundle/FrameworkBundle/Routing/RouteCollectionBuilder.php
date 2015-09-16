@@ -127,6 +127,7 @@ class RouteCollectionBuilder
      *
      * @param RouteCollection $collection
      * @param string|null     $prefix
+     *
      * @return $this
      */
     public function addRouteCollection(RouteCollection $collection, $prefix = null)
@@ -151,6 +152,7 @@ class RouteCollectionBuilder
      *
      * @param Route       $route
      * @param string|null $name
+     *
      * @return $this
      */
     public function addRoute(Route $route, $name = null)
@@ -361,7 +363,7 @@ class RouteCollectionBuilder
 
                 $routeCollection->add($name, $route);
             } else {
-                /** @var self $route */
+                /* @var self $route */
 
                 $subCollection = $route->build();
                 $subCollection->addPrefix($this->prefix);

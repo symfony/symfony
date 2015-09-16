@@ -135,7 +135,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
         // add an unnamed route
         $collectionBuilder->add('/blogs', 'AppBundle:Blog:list')
-            ->setMethods('GET');
+            ->setMethods(array('GET'));
 
         // integer route names are allowed - they don't confuse things
         $collectionBuilder->add('/products', 'AppBundle:Product:list', 100);
@@ -145,7 +145,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'admin_dashboard',
             'GET_blogs',
-            '100'
+            '100',
         ), $actualRouteNames);
     }
 
@@ -165,8 +165,8 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->setOption('fooBar', true)
             ->setHost('example.com')
             ->setCondition('request.isSecure()')
-            ->setSchemes('https')
-            ->setMethods('POST');
+            ->setSchemes(array('https'))
+            ->setMethods(array('POST'));
 
         // a simple route, nothing added to it
         $routes->add('/blogs/{id}', 'editAction', 'blog_edit');
@@ -183,7 +183,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->setDefault('_locale', 'fr')
             ->setRequirement('_locale', 'fr|en')
             ->setOption('niceRoute', true)
-            ->setSchemes('http')
+            ->setSchemes(array('http'))
             ->setMethods(array('GET', 'POST'));
 
         $collection = $routes->build();

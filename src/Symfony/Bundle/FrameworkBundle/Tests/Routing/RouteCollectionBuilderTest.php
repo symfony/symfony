@@ -275,9 +275,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('import')
             ->will($this->returnValue($importedCollection));
         // import this from the /admin route builder
-        $routeBuilderFromImport = $adminRoutes->import('admin.yml', '/imported');
-        // setting the prefix via this method has no affect (i.e. no /imported/imported)
-        $routeBuilderFromImport->setPrefix('/imported');
+        $adminRoutes->import('admin.yml', '/imported');
 
         $collection = $routes->build();
         $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');

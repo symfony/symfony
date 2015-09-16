@@ -28,7 +28,7 @@ class RouteCollectionBuilder
     /**
      * A mixture of different objects that hold routes.
      *
-     * @var Route[]|RouteCollectionBuilder[]|RouteCollection[]
+     * @var Route[]|RouteCollectionBuilder[]
      */
     private $routes = array();
 
@@ -75,14 +75,9 @@ class RouteCollectionBuilder
     {
         /** @var RouteCollection $subCollection */
         $subCollection = $this->loader->import($resource, $type);
+        $subCollection->addPrefix($prefix);
 
-        // turn this into a RouteCollectionBuilder
-        $builder = new self($this->loader);
-        $builder->setPrefix($prefix);
-        $builder->addRouteCollection($subCollection);
-        $this->routes[] = $builder;
-
-        return $builder;
+        return $this->addRouteCollection($subCollection);
     }
 
     /**
@@ -128,21 +123,34 @@ class RouteCollectionBuilder
     /**
      * Add a RouteCollectionBuilder.
      *
-     * @param RouteCollectionBuilder $routes
+     * @param RouteCollectionBuilder $builder
      */
-    public function mount(RouteCollectionBuilder $routes)
+    public function mount(RouteCollectionBuilder $builder)
     {
-        $this->routes[] = $routes;
+        $this->routes[] = $builder;
     }
 
     /**
-     * Adds a RouteCollection directly.
+     * Adds a RouteCollection directly and returns those routes in a RouteCollectionBuilder.
      *
      * @param RouteCollection $collection
+     * @return $this
      */
     public function addRouteCollection(RouteCollection $collection)
     {
-        $this->routes[] = $collection;
+        // create a builder from the RouteCollection
+        $builder = new self($this->loader);
+        foreach ($collection->all() as $name => $route) {
+            $builder->routes[(string) $name] = $route;
+        }
+
+        foreach ($collection->getResources() as $resource) {
+            $builder->addResource($resource);
+        }
+
+        $this->mount($builder);
+
+        return $builder;
     }
 
     /**
@@ -340,16 +348,13 @@ class RouteCollectionBuilder
                 }
 
                 $routeCollection->add($name, $route);
-            } elseif ($route instanceof self) {
+            } else {
+                /** @var self $route */
+
                 $subCollection = $route->build();
                 $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);
-            } else {
-                /* @var RouteCollection $route */
-                $route->addPrefix($this->prefix);
-
-                $routeCollection->addCollection($route);
             }
         }
 

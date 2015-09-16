@@ -75,9 +75,8 @@ class RouteCollectionBuilder
     {
         /** @var RouteCollection $subCollection */
         $subCollection = $this->loader->import($resource, $type);
-        $subCollection->addPrefix($prefix);
 
-        return $this->addRouteCollection($subCollection);
+        return $this->addRouteCollection($subCollection, $prefix);
     }
 
     /**
@@ -127,12 +126,13 @@ class RouteCollectionBuilder
      * Adds a RouteCollection directly and returns those routes in a RouteCollectionBuilder.
      *
      * @param RouteCollection $collection
+     * @param string|null     $prefix
      * @return $this
      */
-    public function addRouteCollection(RouteCollection $collection)
+    public function addRouteCollection(RouteCollection $collection, $prefix = null)
     {
         // create a builder from the RouteCollection
-        $builder = new self($this->loader);
+        $builder = $this->createCollection($prefix);
         foreach ($collection->all() as $name => $route) {
             $builder->addRoute($route, $name);
         }

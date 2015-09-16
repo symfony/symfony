@@ -93,14 +93,7 @@ class RouteCollectionBuilder
     {
         $route = new Route($path);
         $route->setDefault('_controller', $controller);
-
-        if (null === $name) {
-            // un-named routes have integer keys, are named later
-            $this->routes[] = $route;
-        } else {
-            // case the $name into a string, to make sure a number is a string
-            $this->routes[(string)$name] = $route;
-        }
+        $this->addRoute($route, $name);
 
         return $route;
     }
@@ -141,7 +134,7 @@ class RouteCollectionBuilder
         // create a builder from the RouteCollection
         $builder = new self($this->loader);
         foreach ($collection->all() as $name => $route) {
-            $builder->routes[(string) $name] = $route;
+            $builder->addRoute($route, $name);
         }
 
         foreach ($collection->getResources() as $resource) {
@@ -151,6 +144,25 @@ class RouteCollectionBuilder
         $this->mount($builder);
 
         return $builder;
+    }
+
+    /**
+     * Adds a Route object to the builder.
+     *
+     * @param Route       $route
+     * @param string|null $name
+     * @return $this
+     */
+    public function addRoute(Route $route, $name = null)
+    {
+        if (null === $name) {
+            // used as a flag to know which routes will need a name later
+            $name = '_unnamed_route_'.spl_object_hash($route);
+        }
+
+        $this->routes[$name] = $route;
+
+        return $this;
     }
 
     /**
@@ -316,8 +328,8 @@ class RouteCollectionBuilder
 
         foreach ($this->routes as $name => $route) {
             if ($route instanceof Route) {
-                // auto-generate the route name if it is just an index key
-                if (is_int($name)) {
+                // auto-generate the route name if it's been marked
+                if ('_unnamed_route_' === substr($name, 0, 15)) {
                     $name = $this->generateRouteName($route);
                 }
 

@@ -137,11 +137,15 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder->add('/blogs', 'AppBundle:Blog:list')
             ->setMethods('GET');
 
+        // integer route names are allowed - they don't confuse things
+        $collectionBuilder->add('/products', 'AppBundle:Product:list', 100);
+
         $actualCollection = $collectionBuilder->build();
         $actualRouteNames = array_keys($actualCollection->all());
         $this->assertEquals(array(
             'admin_dashboard',
             'GET_blogs',
+            '100'
         ), $actualRouteNames);
     }
 

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T16:15:15Z
+
+I agree with you, this structure will ease with deprecating in 2.8 and removing in 3.0
+What about merging AbstractFinderTest and FinderTest? we only need a protected getAdapter in FinderTest and to specialize it in Gnu/Bsd tests isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T16:25:33Z
+
+@nicolas-grekas this would run non-adapter related tests multiple times (once per adapter), making it harder to understand failures though
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T16:29:53Z
+
+Ok, :+1: (with comment + fabbot fix)
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T16:38:30Z
+
+done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T17:35:17Z
+
+Thinking twice here: if we remove completely the concept of adapters, then the tests split will create some difficulties. I'd be in favor of merging for this reason, and accept running the same tests many times...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T07:51:52Z
+
+@nicolas-grekas done

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T07:24:58Z
+
+Support for Xliff2 should also be added in the dumper
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T07:32:30Z
+
+should we have support for ``<cp hex="HHHH">`` for chars which are not allowed in XML itself ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-15T09:37:52Z
+
+@stof we can add support for `<cp hex="HHHH">`  later in another PR.
+
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T09:51:45Z
+
+:+1:

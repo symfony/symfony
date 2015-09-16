@@ -52,13 +52,19 @@
 
             <div id="sidebar">
                 <div id="sidebar-shortcuts">
-                    <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Latest profiles</a>
+                    <div class="shortcuts">
+                        <a href="#" class="visible-small" onclick="Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded'); return false;">
+                            <span class="icon">{{ include('@WebProfiler/Icon/menu.svg') }}</span>
+                        </a>
 
-                    <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
-                        {{ include('@WebProfiler/Icon/search.svg') }} Search
-                    </a>
+                        <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Latest profiles</a>
 
-                    {{ render(path('_profiler_search_bar')) }}
+                        <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
+                            {{ include('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>
+                        </a>
+
+                        {{ render(path('_profiler_search_bar')) }}
+                    </div>
                 </div>
 
                 {% if templates is defined %}

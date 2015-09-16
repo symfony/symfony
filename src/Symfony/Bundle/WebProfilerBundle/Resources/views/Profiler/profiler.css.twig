@@ -480,6 +480,7 @@ tr.status-warning td {
 }
 #sidebar .module {
     padding: 10px;
+    width: 220px;
 }
 #sidebar .module h3 {
     color: #999;
@@ -493,7 +494,6 @@ tr.status-warning td {
    ------------------------------------------------------------------------- #}
 #sidebar #sidebar-shortcuts {
     background: #333;
-    padding: 16px 10px;
     /* needed to prevent visual issues due to the pure CSS slideToggle() */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -501,6 +501,18 @@ tr.status-warning td {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    width: 220px;
+}
+#sidebar #sidebar-shortcuts .shortcuts {
+    position: relative;
+    padding: 16px 10px;
+}
+#sidebar-shortcuts .icon {
+    display: block;
+    float: left;
+    width: 50px;
+    margin: 2px 0 0 -10px;
+    text-align: center;
 }
 #sidebar #sidebar-shortcuts .btn {
     color: #F5F5F5;
@@ -558,6 +570,7 @@ tr.status-warning td {
 #menu-profiler li {
     position: relative;
     margin-bottom: 0;
+    width: 220px;
 }
 #menu-profiler li a {
     border: solid transparent;
@@ -841,4 +854,54 @@ table.logs .metadata strong {
 #search-results td {
     {{ mixins.sans_serif_font|raw }}
     vertical-align: middle;
+}
+
+{# Small screens
+   ========================================================================= #}
+
+.visible-small {
+    display: none;
+}
+.hidden-small {
+    display: inherit;
+}
+
+@media (max-width: 768px) {
+    #collector-content {
+        margin-left: 50px;
+    }
+
+    #sidebar {
+        width: 50px;
+        overflow-y: hidden;
+        transition: width 200ms ease-out;
+    }
+    #sidebar:hover, #sidebar.expanded {
+        width: 220px;
+    }
+
+    #sidebar-search {
+        display: none;
+    }
+    #sidebar:hover #sidebar-search.sf-toggle-visible, #sidebar.expanded #sidebar-search.sf-toggle-visible {
+        display: block;
+    }
+
+    #sidebar .module {
+        display: none;
+    }
+    #sidebar:hover .module, #sidebar.expanded .module {
+        display: block;
+    }
+
+    .visible-small {
+        display: inherit;
+    }
+    .hidden-small {
+        display: none;
+    }
+
+    .btn-sm svg {
+        margin-left: 2px;
+    }
 }

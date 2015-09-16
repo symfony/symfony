@@ -252,24 +252,24 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
 
-        $adminRoutes = $routes->createCollection('/admin');
+        $adminRoutes = $routes->createBuilder('/admin');
         $adminRoutes->add('/dashboard', 'AdminController::dashboardAction', 'admin_dashboard');
 
         // embedded collection under /admin
-        $adminBlogRoutes = $routes->createCollection('/blog');
+        $adminBlogRoutes = $routes->createBuilder('/blog');
         $adminBlogRoutes->add('/new', 'BlogController::newAction', 'admin_blog_new');
         // mount into admin, but before the parent collection has been mounted
-        $adminRoutes->mount($adminBlogRoutes);
+        $adminRoutes->addBuilder($adminBlogRoutes);
 
         // now mount the /admin routes, above should all still be /blog/admin
-        $routes->mount($adminRoutes);
+        $routes->addBuilder($adminRoutes);
         // add a route after mounting
         $adminRoutes->add('/users', 'AdminController::userAction', 'admin_users');
 
         // add another sub-collection after the mount
-        $otherAdminRoutes = $routes->createCollection('/stats');
+        $otherAdminRoutes = $routes->createBuilder('/stats');
         $otherAdminRoutes->add('/sales', 'StatsController::indexAction', 'admin_stats_sales');
-        $adminRoutes->mount($otherAdminRoutes);
+        $adminRoutes->addBuilder($otherAdminRoutes);
 
         // add a normal collection and see that it is also prefixed
         $importedCollection = new RouteCollection();

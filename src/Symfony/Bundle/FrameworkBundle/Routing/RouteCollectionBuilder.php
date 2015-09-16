@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Route;
 
 /**
  * Helps add and import routes into a RouteCollection.
@@ -87,22 +88,24 @@ class RouteCollectionBuilder
     /**
      * Adds a route and returns it for future modification.
      *
-     * @param string $path       The route path
-     * @param string $controller The route controller string
-     * @param string $name       The name to give this route
+     * @param string      $path       The route path
+     * @param string      $controller The route controller string
+     * @param string|null $name       The name to give this route
      *
      * @return Route
      */
     public function add($path, $controller, $name = null)
     {
-        // what if we have some other Route sub-class in our project: CmsRoute
-        // is it really ok to copy all the CmsRoute objects to our Route?
-        // -> we MUST somehow allow Component Route objects (no name attached)
-
         $route = new Route($path);
-        $route->setController($controller);
-        $route->setName($name);
-        $this->routes[] = $route;
+        $route->setDefault('_controller', $controller);
+
+        if (null === $name) {
+            // un-named routes have integer keys, are named later
+            $this->routes[] = $route;
+        } else {
+            // case the $name into a string, to make sure a number is a string
+            $this->routes[(string)$name] = $route;
+        }
 
         return $route;
     }
@@ -303,11 +306,11 @@ class RouteCollectionBuilder
     {
         $routeCollection = new RouteCollection();
 
-        foreach ($this->routes as $route) {
+        foreach ($this->routes as $name => $route) {
             if ($route instanceof Route) {
-                // auto-generate the route name if needed
-                if (!$name = $route->getName()) {
-                    $name = $route->generateRouteName();
+                // auto-generate the route name if it is just an index key
+                if (is_int($name)) {
+                    $name = $this->generateRouteName($route);
                 }
 
                 $this->ensureRouteController($route);
@@ -388,5 +391,24 @@ class RouteCollectionBuilder
 
         $controller = sprintf('%s::%s', $this->controllerClass, $controller);
         $route->setDefault('_controller', $controller);
+    }
+
+    /**
+     * Generates a route name based on details of this route.
+     *
+     * @return string
+     */
+    private function generateRouteName(Route $route)
+    {
+        $methods = implode('_', $route->getMethods()).'_';
+
+        $routeName = $methods.$route->getPath();
+        $routeName = str_replace(array('/', ':', '|', '-'), '_', $routeName);
+        $routeName = preg_replace('/[^a-z0-9A-Z_.]+/', '', $routeName);
+
+        // Collapse consecutive underscores down into a single underscore.
+        $routeName = preg_replace('/_+/', '_', $routeName);
+
+        return $routeName;
     }
 }

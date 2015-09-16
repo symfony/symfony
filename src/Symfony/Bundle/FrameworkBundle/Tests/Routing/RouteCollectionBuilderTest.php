@@ -52,9 +52,11 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         $addedRoute = $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout');
         $addedRoute2 = $collectionBuilder->add('/blogs', 'AppBundle:Blog:list', 'blog_list');
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Routing\Route', $addedRoute);
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $addedRoute);
         $this->assertEquals('AppBundle:Order:checkout', $addedRoute->getDefault('_controller'));
-        $this->assertEquals('blog_list', $addedRoute2->getName());
+
+        $finalCollection = $collectionBuilder->build();
+        $this->assertSame($addedRoute2, $finalCollection->get('blog_list'));
     }
 
     public function testFlushOrdering()
@@ -80,20 +82,17 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder = new RouteCollectionBuilder($loader);
 
         // 1) Add a route
-        $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout')
-            ->setName('checkout_route');
+        $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout', 'checkout_route');
         // 2) Add a collection directly
         $collectionBuilder->addRouteCollection($loadedCollection1);
         // 3) Import from a file
         $collectionBuilder->import('admin_routing.yml');
         // 4) Add another route
-        $collectionBuilder->add('/', 'AppBundle:Default:homepage')
-            ->setName('homepage');
+        $collectionBuilder->add('/', 'AppBundle:Default:homepage', 'homepage');
         // 5) Add another collection
         $collectionBuilder->addRouteCollection($loadedCollection2);
         // 6) Add another route
-        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard')
-            ->setName('admin_dashboard');
+        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
 
         // set a default value
         $collectionBuilder->setDefault('_locale', 'fr');
@@ -133,8 +132,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $collectionBuilder = new RouteCollectionBuilder($loader);
 
         // add a "named" route
-        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard')
-            ->setName('admin_dashboard');
+        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
         // add an unnamed route
         $collectionBuilder->add('/blogs', 'AppBundle:Blog:list')
             ->setMethods('GET');

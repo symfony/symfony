@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated Translator::getMessages(), rely on TranslatorBagInterface::getCatalogue() instead.
  * added option `json_encoding` to JsonFileDumper
  * added options `as_tree`, `inline` to YamlFileDumper
+ * added support for XLIFF 2.0.
  * added support for XLIFF target and tool attributes.
  * added message parameters to DataCollectorTranslator.
  * [DEPRECATION] The `DiffOperation` class has been deprecated and

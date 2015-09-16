@@ -25,12 +25,45 @@ class XliffFileDumper extends FileDumper
      */
     protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
+        $xliffVersion = '1.2';
+        if (array_key_exists('xliff_version', $options)) {
+            $xliffVersion = $options['xliff_version'];
+        }
+
         if (array_key_exists('default_locale', $options)) {
             $defaultLocale = $options['default_locale'];
         } else {
             $defaultLocale = \Locale::getDefault();
         }
 
+        if ('1.2' === $xliffVersion) {
+            return $this->dumpXliff1($defaultLocale, $messages, $domain, $options);
+        }
+        if ('2.0' === $xliffVersion) {
+            return $this->dumpXliff2($defaultLocale, $messages, $domain, $options);
+        }
+
+        throw new \InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        return $this->formatCatalogue($messages, $domain);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtension()
+    {
+        return 'xlf';
+    }
+
+    private function dumpXliff1($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
+    {
         $toolInfo = array('tool-id' => 'symfony', 'tool-name' => 'Symfony');
         if (array_key_exists('tool_info', $options)) {
             $toolInfo = array_merge($toolInfo, $options['tool_info']);
@@ -103,20 +136,46 @@ class XliffFileDumper extends FileDumper
         return $dom->saveXML();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function format(MessageCatalogue $messages, $domain)
+    private function dumpXliff2($defaultLocale, MessageCatalogue $messages, $domain, array $options = array())
     {
-        return $this->formatCatalogue($messages, $domain);
-    }
+        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom->formatOutput = true;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExtension()
-    {
-        return 'xlf';
+        $xliff = $dom->appendChild($dom->createElement('xliff'));
+        $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:2.0');
+        $xliff->setAttribute('version', '2.0');
+        $xliff->setAttribute('srcLang', str_replace('_', '-', $defaultLocale));
+        $xliff->setAttribute('trgLang', str_replace('_', '-', $messages->getLocale()));
+
+        $xliffFile = $xliff->appendChild($dom->createElement('file'));
+        $xliffFile->setAttribute('id', $domain.'.'.$messages->getLocale());
+
+        foreach ($messages->all($domain) as $source => $target) {
+            $translation = $dom->createElement('unit');
+            $translation->setAttribute('id', md5($source));
+
+            $segment = $translation->appendChild($dom->createElement('segment'));
+
+            $s = $segment->appendChild($dom->createElement('source'));
+            $s->appendChild($dom->createTextNode($source));
+
+            // Does the target contain characters requiring a CDATA section?
+            $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
+
+            $targetElement = $dom->createElement('target');
+            $metadata = $messages->getMetadata($source, $domain);
+            if ($this->hasMetadataArrayInfo('target-attributes', $metadata)) {
+                foreach ($metadata['target-attributes'] as $name => $value) {
+                    $targetElement->setAttribute($name, $value);
+                }
+            }
+            $t = $segment->appendChild($targetElement);
+            $t->appendChild($text);
+
+            $xliffFile->appendChild($translation);
+        }
+
+        return $dom->saveXML();
     }
 
     /**

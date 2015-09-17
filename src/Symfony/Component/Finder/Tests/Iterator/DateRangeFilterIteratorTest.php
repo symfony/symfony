@@ -37,6 +37,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -49,6 +50,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'test.py',
             'foo',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -62,6 +64,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/.git',
             '.foo',
         );
 

@@ -16,8 +16,9 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExcludeDirectoryFilterIterator extends FilterIterator
+class ExcludeDirectoryFilterIterator extends FilterIterator implements \RecursiveIterator
 {
+    private $isRecursive;
     private $patterns;
 
     /**
@@ -28,6 +29,7 @@ class ExcludeDirectoryFilterIterator extends FilterIterator
      */
     public function __construct(\Iterator $iterator, array $directories)
     {
+        $this->isRecursive = $iterator instanceof \RecursiveIterator;
         $this->patterns = array();
         foreach ($directories as $directory) {
             $this->patterns[] = '#(^|/)'.preg_quote($directory, '#').'(/|$)#';
@@ -52,5 +54,18 @@ class ExcludeDirectoryFilterIterator extends FilterIterator
         }
 
         return true;
+    }
+
+    public function hasChildren()
+    {
+        return $this->isRecursive && $this->getInnerIterator()->hasChildren();
+    }
+
+    public function getChildren()
+    {
+        $children = new self($this->getInnerIterator()->getChildren(), array());
+        $children->patterns = $this->patterns;
+
+        return $children;
     }
 }

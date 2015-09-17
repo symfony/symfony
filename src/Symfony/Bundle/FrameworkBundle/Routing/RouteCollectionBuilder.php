@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
@@ -53,9 +54,9 @@ class RouteCollectionBuilder
     private $controllerClass;
 
     /**
-     * @param Loader $loader
+     * @param LoaderInterface $loader
      */
-    public function __construct(Loader $loader)
+    public function __construct(LoaderInterface $loader)
     {
         $this->loader = $loader;
     }
@@ -74,7 +75,7 @@ class RouteCollectionBuilder
     public function import($resource, $prefix = null, $type = null)
     {
         /** @var RouteCollection $subCollection */
-        $subCollection = $this->loader->import($resource, $type);
+        $subCollection = $this->resolve($resource, $type)->load($resource, $type);
 
         return $this->addRouteCollection($subCollection, $prefix);
     }
@@ -429,5 +430,30 @@ class RouteCollectionBuilder
         $routeName = preg_replace('/_+/', '_', $routeName);
 
         return $routeName;
+    }
+
+    /**
+     * Finds a loader able to load an imported resource.
+     *
+     * @param mixed       $resource A resource
+     * @param string|null $type     The resource type or null if unknown
+     *
+     * @return LoaderInterface A LoaderInterface instance
+     *
+     * @throws FileLoaderLoadException If no loader is found
+     */
+    private function resolve($resource, $type = null)
+    {
+        if ($this->loader->supports($resource, $type)) {
+            return $this->loader;
+        }
+
+        $loader = null === $this->loader->getResolver() ? false : $this->loader->getResolver()->resolve($resource, $type);
+
+        if (false === $loader) {
+            throw new FileLoaderLoadException($resource);
+        }
+
+        return $loader;
     }
 }

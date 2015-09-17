@@ -20,16 +20,26 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 {
     public function testImport()
     {
-        $loader = $this->getLoader();
+        $resolvedLoader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $resolver = $this->getMock('Symfony\Component\Config\Loader\LoaderResolverInterface');
+        $resolver->expects($this->once())
+            ->method('resolve')
+            ->with('admin_routing.yml', 'yaml')
+            ->will($this->returnValue($resolvedLoader));
 
         $expectedCollection = new RouteCollection();
         $expectedCollection->add('one_test_route', new Route('/foo/path'));
 
-        $loader
+        $resolvedLoader
             ->expects($this->once())
-            ->method('import')
+            ->method('load')
             ->with('admin_routing.yml', 'yaml')
             ->will($this->returnValue($expectedCollection));
+
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $loader->expects($this->any())
+            ->method('getResolver')
+            ->will($this->returnValue($resolver));
 
         // import the file! (with a prefix)
         $collectionBuilder = new RouteCollectionBuilder($loader);
@@ -74,9 +84,13 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
         $loader = $this->getLoader();
+        // make this loader able to do the import - keeps mocking simple
+        $loader->expects($this->any())
+            ->method('supports')
+            ->will($this->returnValue(true));
         $loader
             ->expects($this->once())
-            ->method('import')
+            ->method('load')
             ->will($this->returnValue($importedCollection));
 
         $collectionBuilder = new RouteCollectionBuilder($loader);
@@ -274,9 +288,13 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         // add a normal collection and see that it is also prefixed
         $importedCollection = new RouteCollection();
         $importedCollection->add('imported_route', new Route('/foo'));
+        // make this loader able to do the import - keeps mocking simple
+        $loader->expects($this->any())
+            ->method('supports')
+            ->will($this->returnValue(true));
         $loader
             ->expects($this->any())
-            ->method('import')
+            ->method('load')
             ->will($this->returnValue($importedCollection));
         // import this from the /admin route builder
         $adminRoutes->import('admin.yml', '/imported');
@@ -336,9 +354,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     private function getLoader()
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\Loader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
 
         return $loader;
     }

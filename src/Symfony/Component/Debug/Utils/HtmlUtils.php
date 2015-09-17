@@ -3,11 +3,27 @@
 namespace Symfony\Component\Debug\Utils;
 
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Highlighter\Highlighter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 class HtmlUtils
 {
+    /**
+     * @var Highlighter[]
+     */
+    private $highlighters = array();
+
+    /**
+     * Constructor.
+     *
+     * @param Highlighter[] $highlighters
+     */
+    public function __construct(array $highlighters)
+    {
+        $this->highlighters = $highlighters;
+    }
+
     /**
      * Formats an array as a string.
      *
@@ -86,6 +102,29 @@ class HtmlUtils
                 return '<em>_</em>';
             default:
                 return str_replace("\n", '', var_export(htmlspecialchars((string) $arg[1], ENT_QUOTES), true));
+        }
+    }
+
+    public function highlight($fileOrCode, $line = null, $from = null, $to = null, $highlighter = null)
+    {
+        $code = is_readable($fileOrCode) ? file_get_contents($fileOrCode) : $fileOrCode;
+
+        if (null !== $line) {
+            $from = null === $from ? $line - 3 : 1;
+            $to = null === $to ? $line + 3 : -1;
+        }
+
+        $from = null === $from ? 1 : $from;
+        $to = null === $to ? -1 : $to;
+
+        if (isset($this->highlighters[$highlighter])) {
+            return $this->highlighters[$highlighter]->highlight($code, $from, $to, $line);
+        }
+
+        foreach ($this->highlighters as $highlighter) {
+            if ($highlighter->supports($fileOrCode)) {
+                return $highlighter->highlight($code, $from, $to, $line);
+            }
         }
     }
 }

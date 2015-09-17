@@ -45,6 +45,11 @@
         </service>
 
         <service id="debug.html_utils" class="Symfony\Component\Debug\Utils\HtmlUtils">
+            <argument type="collection" />
+        </service>
+
+        <service id="debug.php_highlighter" class="Symfony\Component\Debug\Highlighter\PHPHighlighter" public="false">
+            <tag name="code_highlighter" alias="php" />
         </service>
     </services>
 

@@ -181,5 +181,9 @@
             <tag name="exception.processor" />
             <argument type="service" id="twig" />
         </service>
+
+        <service id="twig.twig_highlighter" class="Symfony\Bridge\Twig\Debug\TwigHighlighter" public="false">
+            <tag name="code_highlighter" alias="twig" />
+        </service>
     </services>
 </container>

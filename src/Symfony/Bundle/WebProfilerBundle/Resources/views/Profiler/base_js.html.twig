@@ -80,6 +80,25 @@
 
             requestStack = [],
 
+            skipToolbars() = function() {
+
+                var skipEl;
+                var ids = ["sf-profiler-skipnav", "sf-profiler-skipnav-open"];
+
+                for (idx in ids) {
+
+                    skipEl = document.getElementById(ids[idx]);
+
+                    Sfjs.addEventListener(skipEl, "click", function(e) {
+                        var elId = skipEl.getAttribute("href").replace("#", "");
+                        var el = document.getElementById(elId);
+                        el.focus();
+                        e.preventDefault();
+                    });
+
+                }
+            },
+
             renderAjaxRequests = function() {
                 var requestCounter = document.querySelectorAll('.sf-toolbar-ajax-requests');
                 if (!requestCounter.length) {

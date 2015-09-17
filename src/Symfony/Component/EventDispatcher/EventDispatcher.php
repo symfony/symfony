@@ -61,6 +61,10 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
+            if (!isset($this->listeners[$eventName])) {
+                return array();
+            }
+
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -177,9 +181,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $this->sorted[$eventName] = array();
 
-        if (isset($this->listeners[$eventName])) {
-            krsort($this->listeners[$eventName]);
-            $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
-        }
+        krsort($this->listeners[$eventName]);
+        $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
     }
 }

@@ -381,8 +381,10 @@
                     Sfjs.addClass(element, 'sf-toggle-content');
 
                     if (toggles[i].hasAttribute('data-toggle-initial') && toggles[i].getAttribute('data-toggle-initial') == 'display') {
+                        Sfjs.removeClass(element, 'sf-toggle-hidden');
                         Sfjs.addClass(element, 'sf-toggle-visible');
                     } else {
+                        Sfjs.removeClass(element, 'sf-toggle-visible');
                         Sfjs.addClass(element, 'sf-toggle-hidden');
                     }
 

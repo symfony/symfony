@@ -33,9 +33,7 @@ class EventDispatcher implements EventDispatcherInterface
     private $sorted = array();
 
     /**
-     * @see EventDispatcherInterface::dispatch()
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -46,17 +44,15 @@ class EventDispatcher implements EventDispatcherInterface
         $event->setDispatcher($this);
         $event->setName($eventName);
 
-        if (!isset($this->listeners[$eventName])) {
-            return $event;
+        if ($listeners = $this->getListeners($eventName)) {
+            $this->doDispatch($listeners, $eventName, $event);
         }
-
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
 
         return $event;
     }
 
     /**
-     * @see EventDispatcherInterface::getListeners()
+     * {@inheritdoc}
      */
     public function getListeners($eventName = null)
     {
@@ -82,7 +78,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::hasListeners()
+     * {@inheritdoc}
      */
     public function hasListeners($eventName = null)
     {
@@ -90,9 +86,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addListener()
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -101,7 +95,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeListener()
+     * {@inheritdoc}
      */
     public function removeListener($eventName, $listener)
     {
@@ -117,9 +111,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addSubscriber()
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -137,7 +129,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeSubscriber()
+     * {@inheritdoc}
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {

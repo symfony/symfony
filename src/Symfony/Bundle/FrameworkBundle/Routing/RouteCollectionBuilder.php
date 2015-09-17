@@ -339,8 +339,14 @@ class RouteCollectionBuilder
                 $this->ensureRouteController($route);
 
                 $route->setDefaults(array_merge($this->defaults, $route->getDefaults()));
-                $route->setRequirements(array_merge($this->requirements, $route->getRequirements()));
                 $route->setOptions(array_merge($this->options, $route->getOptions()));
+
+                // we're extra careful here to avoid re-setting deprecated _method and _scheme
+                foreach ($this->requirements as $key => $val) {
+                    if (!$route->hasRequirement($key)) {
+                        $route->setRequirement($key, $val);
+                    }
+                }
 
                 if (null !== $this->prefix) {
                     $route->setPath('/'.$this->prefix.$route->getPath());

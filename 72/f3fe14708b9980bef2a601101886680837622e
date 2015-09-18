@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-18T16:36:42Z
+
+@ThomasLandauer so I assume you render the form manually with the label after the input? Otherwise the whitespace would be before the label and not between label and input.
+
+Looks good. :+1:
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2015-09-18T16:47:16Z
+
+No, in my case it is about radio buttons (type 'choice'). As far as I understand, the label rendering mechanism is the same as for text-input's.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-18T16:57:38Z
+
+I see

@@ -26,6 +26,7 @@
         "symfony/phpunit-bridge": "~2.8|~3.0",
         "doctrine/collections": "~1.0",
         "symfony/validator": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/security-csrf": "~2.8|~3.0",

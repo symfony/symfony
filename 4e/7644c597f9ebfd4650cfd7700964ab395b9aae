@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-17T12:48:31Z
+
+> This makes me think that an other and last round of optimization is possible by merging all regexps in one in MultiplePcreFilterIterator filters. If someone wants to work on this, please do it :)
+
+this is quite hard to do though, as it is not just a matter of concatenating regexes (combining regexes is very hard to do, and almost impossible in case complex regexes are involved)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-17T12:58:36Z
+
+@nicolas-grekas this seems to make PHP segfault
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-17T13:06:01Z
+
+@nicolas-grekas can you post the profiling and benchmarking results of the ExcludeDirectoryFilter optimization you posted, as this is a totally different optimization than the initial one ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-17T14:27:42Z
+
+@stof the profiling of the ExcludeDirectoryFilter is embedded in the above profiles: you need to click on the "current" node (bottom right) then on the magnifying glass on the left box to draw the graph around this node.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-17T14:48:04Z
+
+```
+   1010 files
+    110 directories
+     10 iterations
+      6 cases
+      2 adapters
+
+            case             php        gnu_find
+               0          92,396          33,565
+               1          99,673          32,776
+               2         103,553          54,970
+               3         102,736          61,805
+               4         105,615          19,072
+               5         107,359          35,432
+
+      0 Find files by name containing a*
+      1 Find files by name containing a* not containing *a
+      2 Find files by name containing ~^a.*~ not containing ~.*a$~
+      3 Find files by path containing a*
+      4 Find files by path containing a* not containing *a
+      5 Find files by path containing ~^a.*~ not containing ~.*a$~
+```
+See https://github.com/symfony/symfony/pull/15802#issuecomment-140331104 for comparison.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T08:55:27Z
+
+:+1: on this one
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T09:57:37Z
+
+hhvm fixed, good to merge
+Status: reviewed

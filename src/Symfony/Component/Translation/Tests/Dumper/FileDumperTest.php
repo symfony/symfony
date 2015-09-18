@@ -58,9 +58,14 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
 
 class ConcreteFileDumper extends FileDumper
 {
-    protected function format(MessageCatalogue $messages, $domain)
+    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         return '';
+    }
+
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        return $this->formatCatalogue($messages, $domain);
     }
 
     protected function getExtension()

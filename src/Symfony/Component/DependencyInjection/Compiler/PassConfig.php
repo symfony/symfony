@@ -45,6 +45,7 @@ class PassConfig
         $this->mergePass = new MergeExtensionConfigurationPass();
 
         $this->optimizationPasses = array(
+            new ExtensionCompilerPass(),
             new ResolveDefinitionTemplatesPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(),

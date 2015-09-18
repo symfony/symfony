@@ -45,6 +45,27 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
         unlink($this->tempDir.'/messages.en_US.xlf');
     }
 
+    public function testDumpXliff2()
+    {
+        $catalogue = new MessageCatalogue('en_US');
+        $catalogue->add(array(
+            'foo' => 'bar',
+            'key' => '',
+            'key.with.cdata' => '<source> & <target>',
+        ));
+        $catalogue->setMetadata('key', array('target-attributes' => array('order' => 1)));
+
+        $dumper = new XliffFileDumper();
+        $dumper->dump($catalogue, array('path' => $this->tempDir, 'default_locale' => 'fr_FR', 'xliff_version' => '2.0'));
+
+        $this->assertEquals(
+            file_get_contents(__DIR__.'/../fixtures/resources-2.0-clean.xlf'),
+            file_get_contents($this->tempDir.'/messages.en_US.xlf')
+        );
+
+        unlink($this->tempDir.'/messages.en_US.xlf');
+    }
+
     public function testDumpWithCustomToolInfo()
     {
         $options = array(

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T16:10:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-16T16:57:11Z
+
+:+1:
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by rquadling at 2015-09-18T12:28:47Z
+
+OOI, it was suggested to make this PR against the 2.3 branch. Should it be for an earlier release? Fixing the first branch with the issue?
+
+---------------------------------------------------------------------------
+
+by rquadling at 2015-09-18T12:29:26Z
+
+And if it is merged into 2.3, how does it get into the rest of the branches?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T12:59:11Z
+
+@rquadling we merge 2.3 into 2.7 (and then 2.7 into 2.8 and 2.8 into master) on a regular basis (approximately once a week, and we ensure it is done before any release)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T13:00:06Z
+
+however, this change should apply cleanly on the 2.3 branch, so you don't need to recreate the PR. Our merging tool will be able to rebase the PR on top of the 2.3 branch instead.
+
+edit: actually, the PR is already done for 2.3

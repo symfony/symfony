@@ -114,7 +114,10 @@ abstract class FileDumper implements DumperInterface
      *
      * @deprecated since version 2.8, to be removed in 3.0. Overwrite formatCatalogue() instead.
      */
-    abstract protected function format(MessageCatalogue $messages, $domain);
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        throw new \LogicException('The "FileDumper::format" method needs to be overwritten, you should implement either "format" or "formatCatalogue".');
+    }
 
     /**
      * Gets the file extension of the dumper.

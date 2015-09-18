@@ -63,11 +63,6 @@ class ConcreteFileDumper extends FileDumper
         return '';
     }
 
-    protected function format(MessageCatalogue $messages, $domain)
-    {
-        return $this->formatCatalogue($messages, $domain);
-    }
-
     protected function getExtension()
     {
         return 'concrete';

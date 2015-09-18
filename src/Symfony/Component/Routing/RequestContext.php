@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing;
 
+@trigger_error('The '.__NAMESPACE__.'\RequestContext class is deprecated since version 2.8 and will be removed in 3.0. Use Symfony\Component\Routing\Matcher\RequestMatcherInterface::matchRequest instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,6 +22,9 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Use request matching via {@link Symfony\Component\Routing\Matcher\RequestMatcherInterface} instead.
  */
 class RequestContext
 {

@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Routing;
 
+/**
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Use {@link Symfony\Component\Routing\Matcher\RequestMatcherInterface::matchRequest} instead.
+ */
 interface RequestContextAwareInterface
 {
     /**

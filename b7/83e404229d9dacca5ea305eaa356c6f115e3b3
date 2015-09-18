@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T09:51:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T10:04:34Z
+
+php 7 doesn't agree with us, still failing :)
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T10:06:49Z
+
+We could work around this failure by moving to a higher lowest version of Doctrine. Should we do it or wait for PHP to fix the issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T12:38:45Z
+
+After some investigation, the version bump is legitimate and related to a bc break in PHP7 (related to a new behavior of func_get_all()). Doctrine ORM 2.4.5 [fixes the issue](https://github.com/doctrine/doctrine2/pull/1142) and is required on PHP7.
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T12:47:49Z
+
+the bump is not an issue IMO. Doctrine 2.2 and 2.3 are long EOLed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-18T13:04:03Z
+
+:+1:

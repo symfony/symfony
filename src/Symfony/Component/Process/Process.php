@@ -275,7 +275,7 @@ class Process
         $commandline = $this->commandline;
 
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')';
+            $commandline = 'cmd /V:ON /E:ON /D /C "('.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
                 $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
             }

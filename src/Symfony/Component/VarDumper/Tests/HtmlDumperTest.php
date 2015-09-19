@@ -87,13 +87,13 @@ EOTXT;
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
   "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {{$r}<samp>{$closure54}
-    <span class=sf-dump-meta>parameters</span>: <span class=sf-dump-note>array:2</span> [<samp>
-      "<span class=sf-dump-key>\$a</span>" => []
-      "<span class=sf-dump-key>&amp;\$b</span>" => <span class=sf-dump-note>array:2</span> [<samp>
-        "<span class=sf-dump-key>typeHint</span>" => "<span class=sf-dump-str title="3 characters">PDO</span>"
-        "<span class=sf-dump-key>default</span>" => <span class=sf-dump-const>null</span>
-      </samp>]
-    </samp>]
+    <span class=sf-dump-meta>parameters</span>: {<samp>
+      <span class=sf-dump-meta>\$a</span>: {}
+      <span class=sf-dump-meta>&amp;\$b</span>: {<samp>
+        <span class=sf-dump-meta>typeHint</span>: "<span class=sf-dump-str title="3 characters">PDO</span>"
+        <span class=sf-dump-meta>default</span>: <span class=sf-dump-const>null</span>
+      </samp>}
+    </samp>}
     <span class=sf-dump-meta>file</span>: "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
     <span class=sf-dump-meta>line</span>: "<span class=sf-dump-str title="%d characters">{$var['line']} to {$var['line']}</span>"
   </samp>}

@@ -39,7 +39,6 @@ ReflectionClass {
 %A    +name: "name"
       +class: "ReflectionClass"
 %A    modifiers: "public"
-      extra: null
     }
 %A]
   methods: array:%d [
@@ -47,14 +46,33 @@ ReflectionClass {
     "export" => ReflectionMethod {
       +name: "export"
       +class: "ReflectionClass"
-      parameters: array:2 [
-        "$%s" => ReflectionParameter {
+      parameters: {
+        $%s: ReflectionParameter {
 %A         position: 0
-%A      }
-      ]
-      modifiers: "public static"
-    }
 %A
+}
+EOTXT
+            , $var
+        );
+    }
+
+    public function testClosureCaster()
+    {
+        $a = $b = 123;
+        $var = function ($x) use ($a, &$b) {};
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure {
+%Aparameters: {
+    \$x: {}
+  }
+  use: {
+    \$a: 123
+    \$b: & 123
+  }
+  file: "%sReflectionCasterTest.php"
+  line: "62 to 62"
 }
 EOTXT
             , $var

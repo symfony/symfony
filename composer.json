@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "doctrine/common": "~2.3",
+        "doctrine/common": "~2.4",
         "twig/twig": "~1.20|~2.0",
         "psr/log": "~1.0",
         "symfony/security-acl": "~2.7"
@@ -70,8 +70,8 @@
     "require-dev": {
         "symfony/phpunit-bridge": "self.version",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/dbal": "~2.4",
+        "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
         "ircmaxell/password-compat": "~1.0",

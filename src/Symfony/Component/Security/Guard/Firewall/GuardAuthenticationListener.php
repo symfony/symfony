@@ -165,13 +165,17 @@ class GuardAuthenticationListener implements ListenerInterface
      */
     private function triggerRememberMe(GuardAuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {
-        if (!$guardAuthenticator->supportsRememberMe()) {
-            return;
-        }
-
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
                 $this->logger->info('Remember me skipped: it is not configured for the firewall.', array('authenticator' => get_class($guardAuthenticator)));
+            }
+
+            return;
+        }
+
+        if (!$guardAuthenticator->supportsRememberMe()) {
+            if (null !== $this->logger) {
+                $this->logger->info('Remember me skipped: your authenticator does not support it.', array('authenticator' => get_class($guardAuthenticator)));
             }
 
             return;

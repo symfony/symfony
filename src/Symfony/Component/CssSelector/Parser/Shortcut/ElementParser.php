@@ -32,13 +32,12 @@ class ElementParser implements ParserInterface
     {
         // Matches an optional namespace, required element or `*`
         // $source = 'testns|testel';
-        // $matches = array (size=4)
-        //     0 => string 'testns:testel' (length=13)
-        //     1 => string 'testns:' (length=7)
-        //     2 => string 'testns' (length=6)
-        //     3 => string 'testel' (length=6)
-        if (preg_match('/^(([a-z]+)\|)?([\w-]+|\*)$/i', trim($source), $matches)) {
-            return array(new SelectorNode(new ElementNode($matches[2] ?: null, $matches[3])));
+        // $matches = array (size=3)
+        //     0 => string 'testns|testel' (length=13)
+        //     1 => string 'testns' (length=6)
+        //     2 => string 'testel' (length=6)
+        if (preg_match('/^(?:([a-z]++)\|)?([\w-]++|\*)$/i', trim($source), $matches)) {
+            return array(new SelectorNode(new ElementNode($matches[1] ?: null, $matches[2])));
         }
 
         return array();

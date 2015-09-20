@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Guard;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,7 +27,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * By having the logic here instead of the listener, more of the process
  * can be called directly (e.g. for manual authentication) or overridden.
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 class GuardAuthenticatorHandler
 {

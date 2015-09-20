@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -10,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Configures the "guard" authentication provider key under a firewall.
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 class GuardAuthenticationFactory implements SecurityFactoryInterface
 {

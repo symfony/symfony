@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Guard;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +27,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * process to give you the power to control most parts of the process from
  * one location.
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
 {

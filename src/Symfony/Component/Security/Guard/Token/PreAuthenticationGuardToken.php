@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Guard\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -11,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
  * immediately by the GuardAuthenticationProvider. If authentication is
  * successful, a different authenticated token is returned
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {

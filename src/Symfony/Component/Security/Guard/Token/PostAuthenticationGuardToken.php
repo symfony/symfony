@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Guard\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -12,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * If you're using Guard authentication, you *must* use a class that implements
  * GuardTokenInterface as your authenticated token (like this class).
  *
- * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>n@gmail.com>
  */
 class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {

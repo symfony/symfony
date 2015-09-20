@@ -96,10 +96,8 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
             }
         }
 
-        throw new \LogicException(sprintf(
-            'The correct GuardAuthenticator could not be found for unique key "%s". The listener and provider should be passed the same list of authenticators.',
-            $token->getGuardProviderKey()
-        ));
+        // no matching authenticator found - but there will be multiple GuardAuthenticationProvider
+        // instances that will be checked if you have multiple firewalls.
     }
 
     private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)

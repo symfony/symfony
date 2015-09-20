@@ -114,24 +114,21 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
         if (!$user instanceof UserInterface) {
             throw new \UnexpectedValueException(sprintf(
-                'The %s::getUser method must return a UserInterface. You returned %s.',
+                'The %s::getUser() method must return a UserInterface. You returned %s.',
                 get_class($guardAuthenticator),
                 is_object($user) ? get_class($user) : gettype($user)
             ));
         }
 
-        // check the preAuth UserChecker
         $this->userChecker->checkPreAuth($user);
-        // check the credentials
         $guardAuthenticator->checkCredentials($token->getCredentials(), $user);
-        // check the postAuth UserChecker
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface
         $authenticatedToken = $guardAuthenticator->createAuthenticatedToken($user, $this->providerKey);
         if (!$authenticatedToken instanceof TokenInterface) {
             throw new \UnexpectedValueException(sprintf(
-                'The %s::createAuthenticatedToken method must return a TokenInterface. You returned %s.',
+                'The %s::createAuthenticatedToken() method must return a TokenInterface. You returned %s.',
                 get_class($guardAuthenticator),
                 is_object($authenticatedToken) ? get_class($authenticatedToken) : gettype($authenticatedToken)
             ));

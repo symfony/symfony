@@ -1036,13 +1036,13 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @param $xpath
+     * @param string $xpath
      *
      * @return array
      */
     private function findNamespacePrefixes($xpath)
     {
-        if (preg_match_all('/(?P<prefix>[a-z_][a-z_0-9\-\.]*):[^"\/:]/i', $xpath, $matches)) {
+        if (preg_match_all('/(?P<prefix>[a-z_][a-z_0-9\-\.]*+):[^"\/:]/i', $xpath, $matches)) {
             return array_unique($matches['prefix']);
         }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Guard\Tests\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 

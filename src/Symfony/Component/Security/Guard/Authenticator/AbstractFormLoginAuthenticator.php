@@ -15,12 +15,8 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * A base class to make form login authentication easier!
@@ -30,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 {
     /**
-     * Return the URL to the login page
+     * Return the URL to the login page.
      *
      * @return string
      */
@@ -40,17 +36,18 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * The user will be redirected to the secure page they originally tried
      * to access. But if no such page exists (i.e. the user went to the
      * login page directly), this returns the URL the user should be redirected
-     * to after logging in successfully (e.g. your homepage)
+     * to after logging in successfully (e.g. your homepage).
      *
      * @return string
      */
     abstract protected function getDefaultSuccessRedirectUrl();
 
     /**
-     * Override to change what happens after a bad username/password is submitted
+     * Override to change what happens after a bad username/password is submitted.
      *
-     * @param Request $request
+     * @param Request                 $request
      * @param AuthenticationException $exception
+     *
      * @return RedirectResponse
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
@@ -62,11 +59,12 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     }
 
     /**
-     * Override to change what happens after successful authentication
+     * Override to change what happens after successful authentication.
      *
-     * @param Request $request
+     * @param Request        $request
      * @param TokenInterface $token
-     * @param string $providerKey
+     * @param string         $providerKey
+     *
      * @return RedirectResponse
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -91,8 +89,9 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * Override to control what happens when the user hits a secure page
      * but isn't logged in yet.
      *
-     * @param Request $request
+     * @param Request                      $request
      * @param AuthenticationException|null $authException
+     *
      * @return RedirectResponse
      */
     public function start(Request $request, AuthenticationException $authException = null)

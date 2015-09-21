@@ -113,7 +113,7 @@ class GuardAuthenticatorHandler
      * @param AuthenticationException     $authenticationException
      * @param Request                     $request
      * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string                      $providerKey The key of the firewall
+     * @param string                      $providerKey             The key of the firewall
      *
      * @return null|Response
      */

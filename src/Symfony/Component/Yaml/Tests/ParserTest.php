@@ -617,6 +617,43 @@ EOF
         ));
     }
 
+    public function testSecondLevelFoldedStringBlockWithComments()
+    {
+        $this->assertEquals(array(
+            'pages' => array(
+                array(
+                    'title' => 'some title',
+                    'content' => <<<EOT
+# comment 1
+header
+
+    # comment 2
+    <body>
+        <h1>title</h1>
+    </body>
+
+footer # comment3
+EOT
+                ),
+            ),
+        ), Yaml::parse(<<<EOF
+pages:
+    -
+        title: some title
+        content: |
+            # comment 1
+            header
+
+                # comment 2
+                <body>
+                    <h1>title</h1>
+                </body>
+
+            footer # comment3
+EOF
+        ));
+    }
+
     public function testNestedFoldedStringBlockWithComments()
     {
         $this->assertEquals(array(array(

@@ -35,6 +35,7 @@ class SecurityDataCollector extends DataCollector
      *
      * @param TokenStorageInterface|null  $tokenStorage
      * @param RoleHierarchyInterface|null $roleHierarchy
+     * @param LogoutUrlGenerator|null $logoutUrlGenerator
      */
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null)
     {
@@ -83,11 +84,13 @@ class SecurityDataCollector extends DataCollector
                 }
             }
 
+            $logoutUrl = null;
             try {
-                $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
+                if (null !== $this->logoutUrlGenerator) {
+                    $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
+                }
             } catch(\Exception $e) {
                 // fail silently when the logout URL cannot be generated
-                $logoutUrl = null;
             }
 
             $this->data = array(

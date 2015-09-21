@@ -37,6 +37,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
         return str_replace("\n", PHP_EOL, <<<EOL
 <!-- Namespace: http://example.org/schema/dic/acme_root -->
 <!-- scalar-required: Required -->
+<!-- enum-with-default: One of "this"; "that" -->
 <!-- enum: One of "this"; "that" -->
 <config
     boolean="true"
@@ -48,6 +49,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
     scalar-array-empty=""
     scalar-array-defaults="elem1,elem2"
     scalar-required=""
+    enum-with-default="this"
     enum=""
 >
 

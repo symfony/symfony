@@ -99,7 +99,7 @@ abstract class FileDumper implements DumperInterface
      */
     public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
-        @trigger_error('The '.__METHOD__.' method will replace the format method in 3.0. You should overwritten it instead of overwriting format instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method will replace the format method in 3.0. You should overwrite it instead of overwriting format instead.', E_USER_DEPRECATED);
 
         return $this->format($messages, $domain);
     }

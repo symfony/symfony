@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
@@ -112,12 +113,16 @@ class GuardAuthenticatorHandler
      * @param AuthenticationException     $authenticationException
      * @param Request                     $request
      * @param GuardAuthenticatorInterface $guardAuthenticator
+     * @param string                      $providerKey The key of the firewall
      *
      * @return null|Response
      */
-    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator)
+    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
     {
-        $this->tokenStorage->setToken(null);
+        $token = $this->tokenStorage->getToken();
+        if ($token instanceof PostAuthenticationGuardToken && $providerKey === $token->getProviderKey()) {
+            $this->tokenStorage->setToken(null);
+        }
 
         $response = $guardAuthenticator->onAuthenticationFailure($request, $authenticationException);
         if ($response instanceof Response || null === $response) {

@@ -18,9 +18,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-/**
- * @author Ryan Weaver <weaverryan@gmail.com>
- */
 class GuardAuthenticatorHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $tokenStorage;
@@ -63,7 +60,8 @@ class GuardAuthenticatorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleAuthenticationFailure()
     {
-        $this->tokenStorage->expects($this->once())
+        // setToken() not called - getToken() will return null, so there's nothing to clear
+        $this->tokenStorage->expects($this->never())
             ->method('setToken')
             ->with(null);
         $authException = new AuthenticationException('Bad password!');
@@ -75,8 +73,52 @@ class GuardAuthenticatorHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($response));
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
-        $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator);
+        $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, 'firewall_provider_key');
         $this->assertSame($response, $actualResponse);
+    }
+
+    /**
+     * @dataProvider getTokenClearingTests
+     */
+    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey, $shouldTokenBeCleared)
+    {
+        $token = $this->getMockBuilder($tokenClass)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $token->expects($this->any())
+            ->method('getProviderKey')
+            ->will($this->returnValue($tokenProviderKey));
+
+        // make the $token be the current token
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $this->tokenStorage->expects($shouldTokenBeCleared ? $this->once() : $this->never())
+            ->method('setToken')
+            ->with(null);
+        $authException = new AuthenticationException('Bad password!');
+
+        $response = new Response('Try again, but with the right password!');
+        $this->guardAuthenticator->expects($this->once())
+            ->method('onAuthenticationFailure')
+            ->with($this->request, $authException)
+            ->will($this->returnValue($response));
+
+        $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
+        $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, $actualProviderKey);
+        $this->assertSame($response, $actualResponse);
+    }
+
+    public function getTokenClearingTests()
+    {
+        $tests = array();
+        // correct token class and matching firewall => clear the token
+        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'the_firewall_key', true);
+        $tests[] = array('Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken', 'the_firewall_key', 'different_key', false);
+        $tests[] = array('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', 'the_firewall_key', 'the_firewall_key', false);
+
+        return $tests;
     }
 
     protected function setUp()

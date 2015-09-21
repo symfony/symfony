@@ -35,7 +35,7 @@ class SecurityDataCollector extends DataCollector
      *
      * @param TokenStorageInterface|null  $tokenStorage
      * @param RoleHierarchyInterface|null $roleHierarchy
-     * @param LogoutUrlGenerator|null $logoutUrlGenerator
+     * @param LogoutUrlGenerator|null     $logoutUrlGenerator
      */
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null)
     {

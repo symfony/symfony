@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**
  * SecurityDataCollector.
@@ -27,17 +28,20 @@ class SecurityDataCollector extends DataCollector
 {
     private $tokenStorage;
     private $roleHierarchy;
+    private $logoutUrlGenerator;
 
     /**
      * Constructor.
      *
      * @param TokenStorageInterface|null  $tokenStorage
      * @param RoleHierarchyInterface|null $roleHierarchy
+     * @param LogoutUrlGenerator|null     $logoutUrlGenerator
      */
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
+        $this->logoutUrlGenerator = $logoutUrlGenerator;
     }
 
     /**
@@ -50,7 +54,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => false,
                 'authenticated' => false,
                 'token_class' => null,
-                'provider_key' => null,
+                'logout_url' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -61,7 +65,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => true,
                 'authenticated' => false,
                 'token_class' => null,
-                'provider_key' => null,
+                'logout_url' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -70,6 +74,7 @@ class SecurityDataCollector extends DataCollector
         } else {
             $inheritedRoles = array();
             $assignedRoles = $token->getRoles();
+
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
                 foreach ($allRoles as $role) {
@@ -78,11 +83,21 @@ class SecurityDataCollector extends DataCollector
                     }
                 }
             }
+
+            $logoutUrl = null;
+            try {
+                if (null !== $this->logoutUrlGenerator) {
+                    $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
+                }
+            } catch(\Exception $e) {
+                // fail silently when the logout URL cannot be generated
+            }
+
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
-                'provider_key' => method_exists($token, 'getProviderKey') ? $token->getProviderKey() : null,
+                'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
                 'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
                 'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
@@ -167,9 +182,9 @@ class SecurityDataCollector extends DataCollector
      *
      * @return string The provider key
      */
-    public function getProviderKey()
+    public function getLogoutUrl()
     {
-        return $this->data['provider_key'];
+        return $this->data['logout_url'];
     }
 
     /**

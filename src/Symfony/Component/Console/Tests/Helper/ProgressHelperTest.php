@@ -13,9 +13,22 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tests;
+
+require_once __DIR__.'/../ClockMock.php';
 
 class ProgressHelperTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        Tests\with_clock_mock(true);
+    }
+
+    protected function tearDown()
+    {
+        Tests\with_clock_mock(false);
+    }
+
     public function testAdvance()
     {
         $progress = new ProgressHelper();

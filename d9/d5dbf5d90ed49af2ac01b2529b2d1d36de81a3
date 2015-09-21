@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-21T15:18:20Z
+
+:+1:
+
+It looks like 2.3 is not affected by this issue as it does not have a special dumping for enum nodes.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-09-21T15:31:56Z
+
+yep, 2.3 is not affected because of the reason you mentioned. Thanks!

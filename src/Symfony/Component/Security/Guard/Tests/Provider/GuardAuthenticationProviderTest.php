@@ -81,6 +81,9 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($authedToken, $actualAuthedToken);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationExpiredException
+     */
     public function testGuardWithNoLongerAuthenticatedTriggersLogout()
     {
         $providerKey = 'my_firewall_abc';
@@ -93,8 +96,6 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
         $provider = new GuardAuthenticationProvider(array(), $this->userProvider, $providerKey, $this->userChecker);
         $actualToken = $provider->authenticate($token);
-        // this should return the anonymous user
-        $this->assertEquals(new AnonymousToken($providerKey, 'anon.'), $actualToken);
     }
 
     protected function setUp()

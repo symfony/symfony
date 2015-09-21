@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 
 /**
  * Responsible for accepting the PreAuthenticationGuardToken and calling
@@ -81,8 +82,8 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
                 return $token;
             }
 
-            // cause the logout - the token is not authenticated
-            return new AnonymousToken($this->providerKey, 'anon.');
+            // this AccountStatusException causes the user to be logged out
+            throw new AuthenticationExpiredException();
         }
 
         // find the *one* GuardAuthenticator that this token originated from

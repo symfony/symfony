@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-21T00:12:42Z
+
+Note that these regexes are fully covered by the testsuite: all cases which should be matched are tested. So we can be sure that they are not broken here.

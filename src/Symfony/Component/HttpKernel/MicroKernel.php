@@ -25,26 +25,6 @@ use Symfony\Component\DependencyInjection\Loader\ContainerBuilderAwareLoader;
 abstract class MicroKernel extends Kernel
 {
     /**
-     * Configure dependency injection extensions that have been added to the container.
-     *
-     * $c->loadFromExtension('framework', array(
-     *     'secret' => '%secret%'
-     * ));
-     *
-     * @param ContainerBuilder $c
-     * @param LoaderInterface  $loader
-     */
-    abstract protected function configureExtensions(ContainerBuilder $c, LoaderInterface $loader);
-
-    /**
-     * Add any service definitions to your container.
-     *
-     * @param ContainerBuilder $c
-     * @param LoaderInterface  $loader
-     */
-    abstract protected function configureServices(ContainerBuilder $c, LoaderInterface $loader);
-
-    /**
      * Applies the bundle configuration and calls configureServices() for continued building.
      *
      * @param LoaderInterface $loader
@@ -57,6 +37,30 @@ abstract class MicroKernel extends Kernel
 
         $this->configureExtensions($loader->getContainerBuilder(), $loader->getResourceLoader());
         $this->configureServices($loader->getContainerBuilder(), $loader->getResourceLoader());
+    }
+
+    /**
+     * Configure dependency injection extensions that have been added to the container.
+     *
+     * $c->loadFromExtension('framework', array(
+     *     'secret' => '%secret%'
+     * ));
+     *
+     * @param ContainerBuilder $c
+     * @param LoaderInterface  $loader
+     */
+    protected function configureExtensions(ContainerBuilder $c, LoaderInterface $loader)
+    {
+    }
+
+    /**
+     * Add any service definitions to your container.
+     *
+     * @param ContainerBuilder $c
+     * @param LoaderInterface  $loader
+     */
+    protected function configureServices(ContainerBuilder $c, LoaderInterface $loader)
+    {
     }
 
     /**

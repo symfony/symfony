@@ -247,7 +247,7 @@ class CliDumper extends AbstractDumper
             $class = $this->utf8Encode($class);
         }
         if (Cursor::HASH_OBJECT === $type) {
-            $prefix = 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
+            $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource').($hasChild ? ' {' : ' ');
         } else {

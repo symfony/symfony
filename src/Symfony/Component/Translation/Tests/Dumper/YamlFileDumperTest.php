@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 
 class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTreeDump()
+    public function testTreeFormatCatalogue()
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(
@@ -25,16 +25,12 @@ class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
                 'foo.bar2' => 'value2',
             ));
 
-        $tempDir = sys_get_temp_dir();
         $dumper = new YamlFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir, 'as_tree' => true, 'inline' => 999));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/messages.yml'), file_get_contents($tempDir.'/messages.en.yml'));
-
-        unlink($tempDir.'/messages.en.yml');
+        $this->assertStringEqualsFile(__DIR__.'/../fixtures/messages.yml', $dumper->formatCatalogue($catalogue, 'messages', array('as_tree' => true, 'inline' => 999)));
     }
 
-    public function testLinearDump()
+    public function testLinearFormatCatalogue()
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(
@@ -43,12 +39,8 @@ class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
                 'foo.bar2' => 'value2',
             ));
 
-        $tempDir = sys_get_temp_dir();
         $dumper = new YamlFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/messages_linear.yml'), file_get_contents($tempDir.'/messages.en.yml'));
-
-        unlink($tempDir.'/messages.en.yml');
+        $this->assertStringEqualsFile(__DIR__.'/../fixtures/messages_linear.yml', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 }

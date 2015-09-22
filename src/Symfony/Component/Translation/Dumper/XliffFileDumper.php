@@ -23,7 +23,7 @@ class XliffFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $xliffVersion = '1.2';
         if (array_key_exists('xliff_version', $options)) {

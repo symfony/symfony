@@ -77,13 +77,13 @@ array:24 [
   "closure" => Closure {{$r}
     class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
-    parameters: array:2 [
-      "\$a" => []
-      "&\$b" => array:2 [
-        "typeHint" => "PDO"
-        "default" => null
-      ]
-    ]
+    parameters: {
+      \$a: {}
+      &\$b: {
+        typeHint: "PDO"
+        default: null
+      }
+    }
     file: "{$var['file']}"
     line: "{$var['line']} to {$var['line']}"
   }

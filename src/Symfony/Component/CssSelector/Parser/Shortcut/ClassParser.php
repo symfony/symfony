@@ -33,15 +33,14 @@ class ClassParser implements ParserInterface
     {
         // Matches an optional namespace, optional element, and required class
         // $source = 'test|input.ab6bd_field';
-        // $matches = array (size=5)
-        //     0 => string 'test:input.ab6bd_field' (length=22)
-        //     1 => string 'test:' (length=5)
-        //     2 => string 'test' (length=4)
-        //     3 => string 'input' (length=5)
-        //     4 => string 'ab6bd_field' (length=11)
-        if (preg_match('/^(([a-z]+)\|)?([\w-]+|\*)?\.([\w-]+)$/i', trim($source), $matches)) {
+        // $matches = array (size=4)
+        //     0 => string 'test|input.ab6bd_field' (length=22)
+        //     1 => string 'test' (length=4)
+        //     2 => string 'input' (length=5)
+        //     3 => string 'ab6bd_field' (length=11)
+        if (preg_match('/^(?:([a-z]++)\|)?+([\w-]++|\*)?+\.([\w-]++)$/i', trim($source), $matches)) {
             return array(
-                new SelectorNode(new ClassNode(new ElementNode($matches[2] ?: null, $matches[3] ?: null), $matches[4])),
+                new SelectorNode(new ClassNode(new ElementNode($matches[1] ?: null, $matches[2] ?: null), $matches[3])),
             );
         }
 

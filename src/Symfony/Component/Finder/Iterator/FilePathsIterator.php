@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
+@trigger_error('The '.__NAMESPACE__.'\FilePathsIterator class is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Iterate over shell command result.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @deprecated since 2.8, to be removed in 3.0.
  */
 class FilePathsIterator extends \ArrayIterator
 {

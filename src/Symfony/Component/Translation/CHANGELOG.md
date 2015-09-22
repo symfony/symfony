@@ -6,6 +6,7 @@ CHANGELOG
 
  * deprecated FileDumper::format(), overwrite FileDumper::formatCatalogue() instead.
  * deprecated Translator::getMessages(), rely on TranslatorBagInterface::getCatalogue() instead.
+ * added `FileDumper::formatCatalogue` which allows format the catalogue without dumping it into file.
  * added option `json_encoding` to JsonFileDumper
  * added options `as_tree`, `inline` to YamlFileDumper
  * added support for XLIFF 2.0.

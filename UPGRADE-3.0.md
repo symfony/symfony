@@ -728,6 +728,33 @@ UPGRADE FROM 2.x to 3.0
     }
    ```
 
+ * The method `FileDumper::format()` was removed. You should use
+   `FileDumper::formatCatalogue()` instead.
+
+   Before:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        protected function format(MessageCatalogue $messages, $domain)
+        {
+            ...
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+        {
+            ...
+        }
+    }
+   ```
+
 ### Twig Bridge
 
  * The `twig:lint` command has been deprecated since Symfony 2.7 and will be

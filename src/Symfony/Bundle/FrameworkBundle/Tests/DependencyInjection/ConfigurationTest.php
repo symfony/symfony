@@ -171,6 +171,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'property_access' => array(
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
+                'property_singularify' => null,
             ),
         );
     }

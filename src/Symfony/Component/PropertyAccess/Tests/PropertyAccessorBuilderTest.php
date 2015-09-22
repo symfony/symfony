@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularifyClass;
 
 class PropertyAccessorBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,5 +52,10 @@ class PropertyAccessorBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf('Symfony\Component\PropertyAccess\PropertyAccessor', $this->builder->getPropertyAccessor());
         $this->assertInstanceOf('Symfony\Component\PropertyAccess\PropertyAccessor', $this->builder->enableMagicCall()->getPropertyAccessor());
+    }
+
+    public function testPropertySingularify()
+    {
+        $this->assertInstanceOf('Symfony\Component\PropertyAccess\Tests\Fixtures\TestSingularifyClass', $this->builder->setPropertySingularify(new TestSingularifyClass())->getPropertySingularify());
     }
 }

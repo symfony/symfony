@@ -857,6 +857,7 @@ class FrameworkExtension extends Extension
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
+            ->replaceArgument(2, $config['property_singularify'])
         ;
     }
 

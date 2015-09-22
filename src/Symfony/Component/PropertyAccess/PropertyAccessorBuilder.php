@@ -29,6 +29,11 @@ class PropertyAccessorBuilder
     private $throwExceptionOnInvalidIndex = false;
 
     /**
+     * @var StringSingularifyInterface
+     */
+    private $propertySingularify = null;
+
+    /**
      * Enables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
@@ -98,12 +103,38 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Set the singularify class associated to the PropertyAccessor.
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function setPropertySingularify(StringSingularifyInterface $propertySingularify)
+    {
+        $this->propertySingularify = $propertySingularify;
+
+        return $this;
+    }
+
+    /**
+     * Get the singularify class associated to the PropertyAccessor.
+     *
+     * @return StringSingularifyInterface The singularify class
+     */
+    public function getPropertySingularify()
+    {
+        if (null === $this->propertySingularify) {
+            $this->propertySingularify = new StringSingularifyEnglish();
+        }
+
+        return $this->propertySingularify;
+    }
+
+    /**
      * Builds and returns a new PropertyAccessor object.
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->propertySingularify);
     }
 }

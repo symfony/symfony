@@ -23,16 +23,14 @@ require_once __DIR__.'/ClockMock.php';
  */
 class CookieTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         with_clock_mock(true);
-        parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         with_clock_mock(false);
-        parent::tearDown();
     }
 
     public function invalidNames()

@@ -9,14 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\Console\Helper;
+
+use Symfony\Component\Console\Tests;
 
 function time()
 {
     return Tests\time();
 }
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\Console\Tests;
 
 function with_clock_mock($enable = null)
 {

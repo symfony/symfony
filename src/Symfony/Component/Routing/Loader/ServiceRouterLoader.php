@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * A route loader that executes a service to load the routes.
  *
- * The depends on the DependencyInjection component
+ * This depends on the DependencyInjection component.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */

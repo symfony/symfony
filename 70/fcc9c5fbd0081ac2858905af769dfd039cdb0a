@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T05:24:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-15T07:05:59Z
+
+The current solution is too fragile. And doesn't work with 3.0 because there the type must be a string. So the tests wouldn't work anymore and the implementation is going to be different.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-15T08:33:34Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-17T22:18:43Z
+
+The PR has been updated to address @Tobion's considerations.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T11:56:49Z
+
+@Tobion Does it look good now?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-22T16:02:28Z
+
+:+1:

@@ -1,3 +1,5 @@
+{% autoescape false %}
+
 {# Mixins
    ========================================================================= #}
 {% set mixins = {
@@ -17,7 +19,7 @@ html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:1
 body {
     background-color: #F9F9F9;
     color: #222;
-    {{ mixins.sans_serif_font|raw }}
+    {{ mixins.sans_serif_font }}
     font-size: 14px;
     line-height: 1.4;
 }
@@ -87,13 +89,13 @@ abbr {
 }
 
 code, pre {
-    {{ mixins.monospace_font|raw }}
+    {{ mixins.monospace_font }}
 }
 
 {# Buttons
    ------------------------------------------------------------------------- #}
 button {
-    {{ mixins.sans_serif_font|raw }}
+    {{ mixins.sans_serif_font }}
 }
 .btn {
     background: #777;
@@ -125,7 +127,7 @@ table, tr, th, td {
     vertical-align: top;
 }
 table {
-    {{ mixins.subtle_border_and_shadow|raw }};
+    {{ mixins.subtle_border_and_shadow }};
     margin: 1em 0;
     width: 100%;
 }
@@ -147,13 +149,13 @@ table thead th.key {
 
 table tbody th,
 table tbody td {
-    {{ mixins.monospace_font|raw }}
+    {{ mixins.monospace_font }}
     border: 1px solid #E0E0E0;
     border-width: 1px 0;
 }
 
 table tbody td {
-    {{ mixins.break_long_words|raw }}
+    {{ mixins.break_long_words }}
 }
 
 table tbody div {
@@ -179,7 +181,7 @@ table tbody ul {
     display: block;
 }
 .break-long-words {
-    {{ mixins.break_long_words|raw }}
+    {{ mixins.break_long_words }}
 }
 .text-small {
     font-size: 12px !important;
@@ -197,7 +199,7 @@ table tbody ul {
     text-align: center;
 }
 .font-normal {
-    {{ mixins.sans_serif_font|raw }}
+    {{ mixins.sans_serif_font }}
     font-size: 14px;
 }
 .help {
@@ -237,7 +239,7 @@ table tbody ul {
 }
 
 .metric {
-    {{ mixins.subtle_border_and_shadow|raw }};
+    {{ mixins.subtle_border_and_shadow }};
     min-width: 100px;
     min-height: 70px;
 }
@@ -291,7 +293,7 @@ table tbody ul {
 {# Cards
    ------------------------------------------------------------------------- #}
 .card {
-    {{ mixins.subtle_border_and_shadow|raw }};
+    {{ mixins.subtle_border_and_shadow }};
     margin: 1em 0;
     padding: 10px;
 }
@@ -792,7 +794,7 @@ table.logs .metadata strong {
 #collector-content pre.sf-dump,
 #collector-content .sf-dump code,
 #collector-content .sf-dump samp {
-    {{ mixins.monospace_font|raw }}
+    {{ mixins.monospace_font }}
 }
 #collector-content pre.sf-dump {
     background: #222;
@@ -839,6 +841,8 @@ table.logs .metadata strong {
 {# Search Results page
    ========================================================================= #}
 #search-results td {
-    {{ mixins.sans_serif_font|raw }}
+    {{ mixins.sans_serif_font }}
     vertical-align: middle;
 }
+
+{% endautoescape %}

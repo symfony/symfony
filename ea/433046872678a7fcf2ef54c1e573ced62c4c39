@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T13:51:05Z
+
+I suggest doing the change of the way adapters are covered in the 2.3 branch instead:
+
+- this would mark tests for other adapters as skipped instead of deleting the tests entirely, which gives feedback on the fact that some tests are not running
+- this would simplify the merging of branches
+
+Tests which don't use the adapter data providers currently should also stay in a separate FinderTest instead of running several times (once per adapter testcase)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T13:58:19Z
+
+btw, the change in the way tests for unsupported adapters are ignored is something I wanted to do after looking at the finder testsuite today while reviewing your other PR. Knowing what is running or no is hard in the current setup
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T14:02:21Z
+
+@stof would you like to do the PR on 2.3 then?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T14:02:48Z
+
+Regarding the deprecation, should we actually deprecate it yet ? the comparison in https://github.com/symfony/symfony/pull/15802#issuecomment-140331104 still shows a significant difference between them, which means this introduces a potential slowdown for people using ``useBestAdapter`` when using the finder.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T14:03:06Z
+
+@nicolas-grekas not immediately, but I can, yes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T14:21:12Z
+
+I think we should deprecate the other adapter for several reasons:
+
+ * we now know that the PHP adapter can be fast enough;
+ * the other adapters are fragile;
+ * removing this code is something I wanted to do since ages :).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T14:23:45Z
+
+btw, the finder-benchmark has a bunch of other cases which have not been run when you compared it (they are commented in the latest commit of the finder benchmark repo but you can uncomment it). It would be great to run them too.
+
+@fabpot we know we can optimize the PHP adapter further. but shouldn't we do it before deprecating things ? ``useBestAdapter`` will now use the php adapter all the time unless people register the deprecated adapters explicitly.
+
+Btw, if we deprecate adapters, we should also deprecate adapter-related methods in the Finder class
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T14:35:27Z
+
+I'm all for removing everything related to the adapters in the Finder. I wouldn't want this code in 3.0 if possible. It was a mistake back then to introduce such a complex layer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T14:36:08Z
+
+From what I understand by reading quickly the code, the Gnu and Bsd adapters are never used by default. The only way to use them is to enabled them explicitly. Which means almost everyone uses the PhpAdapter. I'd be in favor of deprecating to have 3.0 cleaned from them.
+OK for removing all the adapter layer on my side.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T14:37:43Z
+
+@nicolas-grekas they would be used when using ``useBestAdapter()``.
+
+Note that I fully agree with you about the need to deprecate it and clean it. The question is whether we should work on optimization first or no.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T14:47:39Z
+
+Given that the feature freeze is in a few days, I'd be in favor of deprecating now, and optimize later
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T16:20:20Z
+
+Status: needs work
+To be rebased on top of #15808
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T16:47:38Z
+
+should we reopen https://github.com/symfony/symfony/issues/5951 until more optimization work is done ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T09:26:16Z
+
+@nicolas-grekas you can now work again on this (after merging branches together)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T07:57:26Z
+
+PR updated with all the adapter layer being deprecated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T08:12:25Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-18T09:02:23Z
+
+:+1:
+
+Status: reviewed

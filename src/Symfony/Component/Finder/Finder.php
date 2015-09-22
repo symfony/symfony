@@ -11,13 +11,8 @@
 
 namespace Symfony\Component\Finder;
 
-use Symfony\Component\Finder\Adapter\AdapterInterface;
-use Symfony\Component\Finder\Adapter\GnuFindAdapter;
-use Symfony\Component\Finder\Adapter\BsdFindAdapter;
-use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use Symfony\Component\Finder\Exception\ExceptionInterface;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;

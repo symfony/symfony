@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Finder\Tests;
 
-use Symfony\Component\Finder\Adapter\AdapterInterface;
-use Symfony\Component\Finder\Adapter\GnuFindAdapter;
-use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase

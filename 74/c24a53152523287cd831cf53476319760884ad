@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T12:16:39Z
+
+Please also add the ``e.preventDefault()`` in https://github.com/symfony/symfony/blob/f3b6ffc85a338abad7bb846c50a46ea57f996b2c/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/base_js.html.twig#L397 before the early return, otherwise this case will make the page scroll to the top.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-09-16T12:25:20Z
+
+Maybe better would be replace that `<a>` with `<button>`?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T12:26:44Z
+
+this would force to add a bunch of CSS to reset the styles (we don't want a huge button here), but it would be more semantic markup indeed.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-16T12:54:37Z
+
+switched into `button`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T11:47:00Z
+
+ping @symfony/deciders @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-22T12:37:12Z
+
+:+1:

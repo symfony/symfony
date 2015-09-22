@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T05:30:45Z
+
+Indeed, we can update the list of official HTTP status codes, but just changing the date is not enough. For instance, the 418 status code has been removed (yep, no more teapot).
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-09-15T06:38:46Z
+
+ok, working on it
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-09-15T07:35:40Z
+
+@fabpot done, I am just not sur about the
+`425 => 'Reserved for WebDAV advanced collections expired proposal'` as it is unassigned in the spec but there is still the RFC2817 and I failed to see the status of this RFC
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-15T11:40:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T11:58:57Z
+
+Merging it in 2.8

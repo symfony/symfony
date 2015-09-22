@@ -162,7 +162,7 @@
         {% endif %}
 
         {% if stack %}
-            <a class="text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show strack trace</a>
+            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show strack trace</button>
         {% endif %}
 
         {% for index, call in stack if index > 1 %}

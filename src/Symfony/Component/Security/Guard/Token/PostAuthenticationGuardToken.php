@@ -51,18 +51,6 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setAuthenticated($isAuthenticated)
-    {
-        if ($isAuthenticated) {
-            throw new \LogicException('Cannot set this token to trusted after instantiation.');
-        }
-
-        parent::setAuthenticated(false);
-    }
-
-    /**
      * This is meant to be only an authenticated token, where credentials
      * have already been used and are thus cleared.
      *

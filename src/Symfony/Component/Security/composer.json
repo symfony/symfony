@@ -39,7 +39,8 @@
         "symfony/validator": "",
         "symfony/routing": "",
         "doctrine/dbal": "to use the built-in ACL implementation",
-        "ircmaxell/password-compat": ""
+        "ircmaxell/password-compat": "",
+        "paragonie/random_compat": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\": "" }

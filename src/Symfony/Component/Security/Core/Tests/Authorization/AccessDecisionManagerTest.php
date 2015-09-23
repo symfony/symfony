@@ -139,6 +139,13 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
             array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), false, true, false),
             array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), true, true, true),
+
+            //highest not abstained strategy
+            array(AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED, $this->getVoters(1, 0, 0), false, false, true),
+            array(AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED, $this->getVoters(0, 1, 0), false, false, false),
+            array(AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED, $this->getVoters(0, 0, 1), false, false, false),
+            array(AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED, $this->getVoters(0, 0, 1), true, false, true),
+            array(AccessDecisionManager::STRATEGY_HIGHEST_NOT_ABSTAINED, $this->getVoters(1, 1, 1), false, false, true),
         );
     }
 

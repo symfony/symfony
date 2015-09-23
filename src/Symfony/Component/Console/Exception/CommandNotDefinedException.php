@@ -13,8 +13,10 @@ namespace Symfony\Component\Console\Exception;
 
 /**
  * Represents an incorrect command name typed in the console.
+ *
+ * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
-class CommandNotDefinedException extends \InvalidArgumentException
+class CommandNotDefinedException extends \InvalidArgumentException implements ExceptionInterface
 {
     private $alternatives;
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -38,7 +39,7 @@ class SymfonyQuestionHelper extends QuestionHelper
 
             // make required
             if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
-                throw new \Exception('A value is required.');
+                throw new LogicException('A value is required.');
             }
 
             return $value;

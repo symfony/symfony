@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * Provides helpers to display a table.
@@ -102,7 +103,7 @@ class Table
         }
 
         if (!self::$styles[$name]) {
-            throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
         }
 
         return self::$styles[$name];
@@ -122,7 +123,7 @@ class Table
         } elseif (isset(self::$styles[$name])) {
             $this->style = self::$styles[$name];
         } else {
-            throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
         }
 
         return $this;
@@ -175,7 +176,7 @@ class Table
         }
 
         if (!is_array($row)) {
-            throw new \InvalidArgumentException('A row must be an array or a TableSeparator instance.');
+            throw new InvalidArgumentException('A row must be an array or a TableSeparator instance.');
         }
 
         $this->rows[] = array_values($row);

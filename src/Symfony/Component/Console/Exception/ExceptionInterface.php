@@ -12,10 +12,12 @@
 namespace Symfony\Component\Console\Exception;
 
 /**
- * Represents an incorrect option name typed in the console.
+ * ExceptionInterface.
  *
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
+ *
+ * @api
  */
-class InvalidOptionException extends \InvalidArgumentException implements ExceptionInterface
+interface ExceptionInterface
 {
 }

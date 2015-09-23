@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Style;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -361,7 +362,7 @@ class SymfonyStyle extends OutputStyle
     private function getProgressBar()
     {
         if (!$this->progressBar) {
-            throw new \RuntimeException('The ProgressBar is not started.');
+            throw new RuntimeException('The ProgressBar is not started.');
         }
 
         return $this->progressBar;

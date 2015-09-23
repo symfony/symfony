@@ -48,6 +48,7 @@
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
+        "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
@@ -76,7 +77,11 @@
         "monolog/monolog": "~1.11",
         "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0",
-        "egulias/email-validator": "~1.2"
+        "egulias/email-validator": "~1.2",
+        "phpdocumentor/reflection": "^1.0.7"
+    },
+    "conflict": {
+        "phpdocumentor/reflection": "<1.0.7"
     },
     "autoload": {
         "psr-4": {

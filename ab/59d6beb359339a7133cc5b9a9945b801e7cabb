@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by pierredup at 2014-06-29T17:08:06Z
+
+Please add the DX label for this PR.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-22T14:58:27Z
+
+@pierredup I like this PR, so let's see if we can get it merged. This is the last week before the Symfony 2.6 feature freeze, so if we can work quickly, then this could get in for 2.6 :). The biggest issue I see is that there is a lot of logic here to get the message right, which makes it look disorganized. Perhaps if we moved a lot (or all) of this logic into different private functions, it'll help make things look more clear. Specifically, if all the logic from [line 92](https://github.com/symfony/symfony/pull/10788/files#diff-8518ab757bc9acd6d5a874a2e2737502R92) to [line 137](https://github.com/symfony/symfony/pull/10788/files#diff-8518ab757bc9acd6d5a874a2e2737502R137) were in a private function, then all the nested if's would be easier to read. I actually just have a hard time following which `if` block I'm in :).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-22T16:18:56Z
+
+@pierredup There are a few CS changes that I think you made accidentally and the PR needs to be rebased. But after that, :thumbsup: from me - I think it's certainly a big improvement.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2014-09-22T19:44:55Z
+
+I've simplified the check a bit more and squashed the commits, so I think this PR is ready now
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-24T16:26:22Z
+
+@pierredup I see you made the change fabpot suggested - awesome! Can you rebase if you have a chance to fix the conflict?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-11T13:53:15Z
+
+@pierredup Do you have some time to finish this PR?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-02-12T09:00:45Z
+
+@fabpot Done
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-08-31T15:17:37Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-03T20:50:14Z
+
+Ping @symfony/deciders - failing tests seem unrelated
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-04T10:53:52Z
+
+:+1: All the edge-cases for different types of controllers is quite complex, but I couldn't think of any other edge-cases, and if there are some, it will just cause a less-helpful error message that we can improve on.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-04T10:54:19Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-04T11:03:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T08:10:47Z
+
+@pierredup Can you have a look at the tests. They are broken.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-16T10:22:36Z
+
+@fabpot I'm looking into the failing builds, will let you know once the builds are passing
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-23T08:51:35Z
+
+Travis tests is now passing. The failures on appveyor looks unrelated to these changes.

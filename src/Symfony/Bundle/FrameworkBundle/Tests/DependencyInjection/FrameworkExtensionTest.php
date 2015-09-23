@@ -69,13 +69,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
-    public function testSecureRandomIsAvailableIfCsrfIsDisabled()
-    {
-        $container = $this->createContainerFromFile('csrf_disabled');
-
-        $this->assertTrue($container->hasDefinition('security.secure_random'));
-    }
-
     public function testProxies()
     {
         $container = $this->createContainerFromFile('full');

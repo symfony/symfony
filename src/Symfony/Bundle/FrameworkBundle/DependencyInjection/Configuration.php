@@ -43,6 +43,20 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            ->validate()
+                ->ifTrue(function ($v) { return !isset($v['assets']); })
+                ->then(function ($v) {
+                    $v['assets'] = array(
+                        'version' => null,
+                        'version_format' => '%%s?%%s',
+                        'base_path' => '',
+                        'base_urls' => array(),
+                        'packages' => array(),
+                    );
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')

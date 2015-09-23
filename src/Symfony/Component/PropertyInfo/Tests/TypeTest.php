@@ -38,7 +38,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "foo" is not a PHP valid type.
+     * @expectedExceptionMessage "foo" is not a valid PHP type.
      */
     public function testInvalidType()
     {

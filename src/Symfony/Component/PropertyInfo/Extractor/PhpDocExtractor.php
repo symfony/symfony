@@ -33,6 +33,7 @@ class PhpDocExtractor implements PropertyDescriptionInfoInterface, PropertyTypeI
      * @var FileReflector[]
      */
     private $fileReflectors = array();
+
     /**
      * @var DocBlock[]
      */

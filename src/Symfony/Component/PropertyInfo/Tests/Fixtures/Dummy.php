@@ -22,20 +22,24 @@ class Dummy extends ParentDummy
      * @var string This is bar.
      */
     private $bar;
+
     /**
      * Should be used.
      *
      * @var int Should be ignored.
      */
     protected $baz;
+
     /**
      * @var \DateTime
      */
     public $bal;
+
     /**
      * @var ParentDummy
      */
     public $parent;
+
     /**
      * @var \DateTime[]
      * @Groups({"a", "b"})

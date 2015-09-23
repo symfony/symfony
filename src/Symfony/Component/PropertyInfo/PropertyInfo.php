@@ -22,14 +22,17 @@ class PropertyInfo implements PropertyInfoInterface
      * @var PropertyListRetrieverInterface[]
      */
     private $listExtractors;
+
     /**
      * @var PropertyTypeInfoInterface[]
      */
     private $typeExtractors;
+
     /**
      * @var PropertyDescriptionInfoInterface[]
      */
     private $descriptionExtractors;
+
     /**
      * @var PropertyAccessInfoInterface[]
      */

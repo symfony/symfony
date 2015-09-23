@@ -22,22 +22,27 @@ class ParentDummy
      * Long description.
      */
     public $foo;
+
     /**
      * @var float
      */
     public $foo2;
+
     /**
      * @var callback
      */
     public $foo3;
+
     /**
      * @var void
      */
     public $foo4;
+
     /**
      * @var mixed
      */
     public $foo5;
+
     /**
      * @var \SplFileInfo[]|resource
      */

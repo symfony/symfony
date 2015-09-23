@@ -29,34 +29,42 @@ class DoctrineDummy
      * @Column(type="smallint")
      */
     public $id;
+
     /**
      * @ManyToOne(targetEntity="DoctrineRelation")
      */
     public $foo;
+
     /**
      * @ManyToMany(targetEntity="DoctrineRelation")
      */
     public $bar;
+
     /**
      * @Column(type="guid")
      */
     protected $guid;
+
     /**
      * @Column(type="time")
      */
     private $time;
+
     /**
      * @Column(type="json_array")
      */
     private $json;
+
     /**
      * @Column(type="simple_array")
      */
     private $simpleArray;
+
     /**
      * @Column(type="boolean")
      */
     private $bool;
+
     /**
      * @Column(type="binary")
      */

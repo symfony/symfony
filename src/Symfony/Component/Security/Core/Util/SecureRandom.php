@@ -42,12 +42,12 @@ final class SecureRandom implements SecureRandomInterface
         $this->seedFile = $seedFile;
         $this->logger = $logger;
 
+        $isUnsupportedPhp = '\\' === DIRECTORY_SEPARATOR && PHP_VERSION_ID < 50304;
+
         // determine whether to use OpenSSL
-        if ('\\' === DIRECTORY_SEPARATOR && PHP_VERSION_ID < 50304) {
-            $this->useOpenSsl = false;
-        } elseif (!function_exists('openssl_random_pseudo_bytes')) {
+        if (!function_exists('random_bytes') && ($isUnsupportedPhp || !function_exists('openssl_random_pseudo_bytes'))) {
             if (null !== $this->logger) {
-                $this->logger->notice('It is recommended that you enable the "openssl" extension for random number generation.');
+                $this->logger->notice('It is recommended that you install the "paragonie/random_compat" library or enable the "openssl" extension for random number generation.');
             }
             $this->useOpenSsl = false;
         } else {
@@ -60,6 +60,10 @@ final class SecureRandom implements SecureRandomInterface
      */
     public function nextBytes($nbBytes)
     {
+        if (function_exists('random_bytes')) {
+            return random_bytes($nbBytes);
+        }
+
         // try OpenSSL
         if ($this->useOpenSsl) {
             $bytes = openssl_random_pseudo_bytes($nbBytes, $strong);

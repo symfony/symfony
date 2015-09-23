@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-23T00:43:11Z
+
+Adding the optional constructor arg is consistent with our BC policy, but should be minimized. But since this is a data collector, it seems safe to me. As does swallowing the `\Exception`, which would normally be a problem.
+
+Unless someone has an issue with the added constructor arg, :+1:
+
+Status: Reviewed

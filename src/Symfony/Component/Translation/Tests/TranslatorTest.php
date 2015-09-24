@@ -75,10 +75,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($locale, $translator->getLocale());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetCatalogue()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $translator = new Translator('en');
 
         $this->assertEquals(new MessageCatalogue('en'), $translator->getCatalogue());
@@ -87,10 +88,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
     }
 
+    /**
+     * @deprecated
+     */
     public function testLegacyGetCatalogueReturnsConsolidatedCatalogue()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         /*
          * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).
          * In that case, getCatalogue() will probably have to load all missing domains in order to return

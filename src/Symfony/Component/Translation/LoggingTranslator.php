@@ -142,7 +142,9 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
 
         if ($locale === $resolvedLocale) {
             return;
-        } elseif ($resolvedLocale === null) {
+        }
+
+        if ($resolvedLocale === null) {
             $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $locale));
         } else {
             $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $resolvedLocale));

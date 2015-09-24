@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-23T06:27:01Z
+
+I think this is a fair compromise for the feature. The name `voteOnAttribute` also makes a lot more sense than `isGranted`, as this would imply that the voter grants access, while it's only one of many possible voters.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T08:22:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-24T01:23:21Z
+
+Done!
+
+Status: Reviewed

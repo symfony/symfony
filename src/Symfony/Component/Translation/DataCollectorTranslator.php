@@ -149,7 +149,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         $resolvedLocale = $this->translator->resolveLocale($id, $domain, $locale);
 
         switch (true) {
-            case $resolvedLocale == $locale:
+            case $resolvedLocale === $locale:
                 $state = self::MESSAGE_DEFINED;
                 break;
 

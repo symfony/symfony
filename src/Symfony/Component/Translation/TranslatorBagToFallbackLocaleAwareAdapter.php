@@ -37,7 +37,7 @@ class TranslatorBagToFallbackLocaleAwareAdapter implements FallbackLocaleAwareIn
      */
     public function resolveLocale($id, $domain = null, $locale = null)
     {
-        $id = (string)$id;
+        $id = (string) $id;
         $catalogue = $this->translatorBag->getCatalogue($locale);
         $locale = $catalogue->getLocale();
 
@@ -46,7 +46,7 @@ class TranslatorBagToFallbackLocaleAwareAdapter implements FallbackLocaleAwareIn
                 $catalogue = $cat;
                 $locale = $catalogue->getLocale();
             } else {
-                return null;
+                return;
             }
         }
 

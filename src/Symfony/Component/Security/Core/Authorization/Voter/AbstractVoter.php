@@ -120,7 +120,7 @@ abstract class AbstractVoter implements VoterInterface
      * @param object               $object
      * @param UserInterface|string $user
      *
-     * @deprecated Override voteOnAttribute instead
+     * @deprecated This method will be removed in 3.0 - override voteOnAttribute instead.
      *
      * @return bool
      */
@@ -135,6 +135,8 @@ abstract class AbstractVoter implements VoterInterface
      * $user can be one of the following:
      *   a UserInterface object (fully authenticated user)
      *   a string               (anonymously authenticated user).
+     *
+     * This method will become abstract in 3.0.
      *
      * @param string         $attribute
      * @param object         $object

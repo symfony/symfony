@@ -65,6 +65,12 @@ abstract class AbstractVoter implements VoterInterface
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
 
+        $reflector = new \ReflectionMethod($this, 'voteOnAttribute');
+        $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter';
+        if (!$isNewOverwritten) {
+            @trigger_error(sprintf("The AbstractVoter::isGranted method is deprecated since 2.8 and won't be called anymore in 3.0. Override voteOnAttribute() instead.", $reflector->class), E_USER_DEPRECATED);
+        }
+
         foreach ($attributes as $attribute) {
             if (!$this->supportsAttribute($attribute)) {
                 continue;
@@ -73,9 +79,16 @@ abstract class AbstractVoter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($this->isGranted($attribute, $object, $token->getUser())) {
-                // grant access as soon as at least one voter returns a positive response
-                return self::ACCESS_GRANTED;
+            if ($isNewOverwritten) {
+                if ($this->voteOnAttribute($attribute, $object, $token)) {
+                    // grant access as soon as at least one voter returns a positive response
+                    return self::ACCESS_GRANTED;
+                }
+            } else {
+                if ($this->isGranted($attribute, $object, $token->getUser())) {
+                    // grant access as soon as at least one voter returns a positive response
+                    return self::ACCESS_GRANTED;
+                }
             }
         }
 
@@ -107,7 +120,32 @@ abstract class AbstractVoter implements VoterInterface
      * @param object               $object
      * @param UserInterface|string $user
      *
+     * @deprecated This method will be removed in 3.0 - override voteOnAttribute instead.
+     *
      * @return bool
      */
-    abstract protected function isGranted($attribute, $object, $user = null);
+    protected function isGranted($attribute, $object, $user = null)
+    {
+        return false;
+    }
+
+    /**
+     * Perform a single access check operation on a given attribute, object and (optionally) user
+     * It is safe to assume that $attribute and $object's class pass supportsAttribute/supportsClass
+     * $user can be one of the following:
+     *   a UserInterface object (fully authenticated user)
+     *   a string               (anonymously authenticated user).
+     *
+     * This method will become abstract in 3.0.
+     *
+     * @param string         $attribute
+     * @param object         $object
+     * @param TokenInterface $token
+     *
+     * @return bool
+     */
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    {
+        return false;
+    }
 }

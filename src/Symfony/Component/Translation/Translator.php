@@ -494,7 +494,10 @@ EOF
     }
 
     /**
-     * Could be renamed back to getCatalogue() and made private once we drop TranslatorBagInterface in 3.0.
+     * Used internally to circumvent deprecation message in getCatalogue().
+     *
+     * Once TranslatorBagInterface has been removed in 3.0, we should rename this back to getCatalogue()
+     * but keep it private.
      *
      * @param string $locale
      *

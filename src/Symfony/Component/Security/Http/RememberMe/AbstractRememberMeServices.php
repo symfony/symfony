@@ -36,7 +36,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     protected $logger;
     protected $options = array(
         'secure' => false,
-        'httponly' => true
+        'httponly' => true,
     );
     private $providerKey;
     private $key;
@@ -296,8 +296,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             $this->logger->debug(sprintf('Clearing remember-me cookie "%s"', $this->options['name']));
         }
 
-
-        // Hard coded the default values for secure and http only, would be better if these where constants
         $request->attributes->set(
             self::COOKIE_ATTR_NAME,
             new Cookie($this->options['name'],

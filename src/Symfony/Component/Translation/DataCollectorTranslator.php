@@ -31,12 +31,23 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     private $messages = array();
 
     /**
+     * @var FallbackLocaleAwareInterface
+     */
+    private $fallbackLocaleAware;
+
+    /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
     public function __construct(TranslatorInterface $translator)
     {
-        if (!($translator instanceof TranslatorBagInterface && $translator instanceof FallbackLocaleAwareInterface)) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and FallbackLocaleAwareInterface.', get_class($translator)));
+        if (!($translator instanceof TranslatorBagInterface)) {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        }
+
+        if (!($translator instanceof FallbackLocaleAwareInterface)) {
+            $this->fallbackLocaleAware = new TranslatorBagToFallbackLocaleAwareAdapter($translator);
+        } else {
+            $this->fallbackLocaleAware = $translator;
         }
 
         $this->translator = $translator;
@@ -69,7 +80,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function resolveLocale($id, $domain = null, $locale = null)
     {
-        return $this->translator->resolveLocale($id, $domain, $locale);
+        return $this->fallbackLocaleAware->resolveLocale($id, $domain, $locale);
     }
 
     /**

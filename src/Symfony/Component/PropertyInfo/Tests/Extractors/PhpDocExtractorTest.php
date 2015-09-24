@@ -20,7 +20,7 @@ use Symfony\Component\PropertyInfo\Type;
 class PhpDocExtractorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PhpDocPropertyInfo
+     * @var PhpDocExtractor
      */
     private $extractor;
 

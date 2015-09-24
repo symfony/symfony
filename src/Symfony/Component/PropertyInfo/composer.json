@@ -28,7 +28,7 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",
         "symfony/serializer": "~2.7",
-        "phpdocumentor/reflection": "~1.0",
+        "phpdocumentor/reflection": "^1.0.7",
         "doctrine/annotations": "~1.0"
     },
     "conflict": {

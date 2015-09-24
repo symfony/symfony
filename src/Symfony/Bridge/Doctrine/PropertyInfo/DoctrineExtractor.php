@@ -85,19 +85,12 @@ class DoctrineExtractor implements PropertyListRetrieverInterface, PropertyTypeI
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
-            if ($metadata instanceof ClassMetadataInfo) {
-                $nullable = $metadata->isNullable($property);
-            } else {
-                $nullable = false;
-            }
+            $nullable = $metadata instanceof ClassMetadataInfo && $metadata->isNullable($property);
 
             switch ($typeOfField) {
                 case 'date':
-                    // No break
                 case 'datetime':
-                    // No break
                 case 'datetimetz':
-                    // No break
                 case 'time':
                     return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime'));
 

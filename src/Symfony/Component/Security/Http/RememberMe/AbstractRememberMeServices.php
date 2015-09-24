@@ -297,7 +297,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         }
 
 
-
         $request->attributes->set(
             self::COOKIE_ATTR_NAME,
             new Cookie($this->options['name'],
@@ -305,8 +304,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
                 1,
                 $this->options['path'],
                 $this->options['domain'],
-                isset($this->options['secure']) ? $this->options['secure'] : false,
-                isset($this->options['httponly']) ? $this->options['httponly'] : true
+                $this->options['secure'],
+                $this->options['httponly']
             )
         );
     }

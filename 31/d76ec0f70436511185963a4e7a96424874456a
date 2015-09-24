@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by zerustech at 2015-08-13T11:50:25Z
+
+@sstok As for your question about "expression like obj.(myVar)", it is actually not supported.
+Please check the following code in Parser.php:
+```php
+...
+            if ('.' === $token->value) {
+                $this->stream->next();
+                $token = $this->stream->current;
+                $this->stream->next();
+
+                if (
+                    $token->type !== Token::NAME_TYPE
+                    &&
+                    ($token->type !== Token::OPERATOR_TYPE || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
+                ) {
+                    throw new SyntaxError('Expected name', $token->cursor);
+                }
+...
+```
+The parser will throw an exception for such expressions.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-08-14T08:21:18Z
+
+OK :)

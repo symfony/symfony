@@ -87,8 +87,6 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
-        $loader->load('security.xml');
-
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);

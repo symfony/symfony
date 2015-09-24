@@ -6,7 +6,6 @@
 
     <services>
         <service id="security.csrf.token_generator" class="Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" public="false">
-            <argument type="service" id="security.secure_random" />
         </service>
 
         <service id="security.csrf.token_storage" class="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage" public="false">

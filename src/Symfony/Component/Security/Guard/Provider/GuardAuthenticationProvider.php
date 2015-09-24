@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
@@ -56,9 +55,9 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * Finds the correct authenticator for the token and calls it.
      *
-     * @param GuardTokenInterface $token
+     * @param TokenInterface|GuardTokenInterface $token
      *
-     * @return TokenInterface
+     * @return TokenInterface|GuardTokenInterface
      */
     public function authenticate(TokenInterface $token)
     {
@@ -101,6 +100,12 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         // instances that will be checked if you have multiple firewalls.
     }
 
+    /**
+     * @param GuardAuthenticatorInterface $guardAuthenticator
+     * @param PreAuthenticationGuardToken $token
+     *
+     * @return TokenInterface|GuardTokenInterface
+     */
     private function authenticateViaGuard(GuardAuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
@@ -138,6 +143,9 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         return $authenticatedToken;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof GuardTokenInterface;

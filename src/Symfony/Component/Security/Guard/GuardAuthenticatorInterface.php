@@ -96,7 +96,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * @param UserInterface $user
      * @param string        $providerKey The provider (i.e. firewall) key
      *
-     * @return GuardTokenInterface
+     * @return TokenInterface|GuardTokenInterface
      */
     public function createAuthenticatedToken(UserInterface $user, $providerKey);
 

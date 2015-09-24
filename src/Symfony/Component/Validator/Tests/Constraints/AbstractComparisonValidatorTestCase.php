@@ -36,7 +36,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
-        if (version_compare(PHP_VERSION, '5.5.0-dev', '<')) {
+        if (PHP_VERSION_ID < 50500) {
             return $comparisons;
         }
 

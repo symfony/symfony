@@ -103,6 +103,8 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated TranslatorBagInterface implementation will be removed in 3.0.
      */
     public function getCatalogue($locale = null)
     {

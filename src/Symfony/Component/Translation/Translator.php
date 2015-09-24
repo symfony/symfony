@@ -259,10 +259,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, Fallbac
      */
     public function getCatalogue($locale = null)
     {
-        trigger_error(
-            'The Translator will no longer implement TranslatorBagInterface in 3.0. If you want to find the locale actually used for a translation, use the resolveLocale() method instead.',
-            E_USER_DEPRECATED
-        );
+        @trigger_error('The Translator will no longer implement \Symfony\Component\Translation\TranslatorBagInterface in 3.0.', E_USER_DEPRECATED);
 
         return $this->getCatalogueInternal($locale);
     }

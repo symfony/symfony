@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Tests\Core\Authentication\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 
 /**
@@ -46,6 +47,17 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedVote, $this->voter->vote($this->token, $object, $attributes), $message);
     }
 
+    /**
+     * @dataProvider getData
+     * @group legacy
+     */
+    public function testVoteUsingDeprecatedIsGranted($expectedVote, $object, $attributes, $message)
+    {
+        $voter = new DeprecatedVoterFixture();
+
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+    }
+
     public function getData()
     {
         return array(
@@ -62,6 +74,26 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 }
 
 class VoterFixture extends AbstractVoter
+{
+    protected function getSupportedClasses()
+    {
+        return array(
+            'Symfony\Component\Security\Tests\Core\Authentication\Voter\ObjectFixture',
+        );
+    }
+
+    protected function getSupportedAttributes()
+    {
+        return array('foo', 'bar', 'baz');
+    }
+
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    {
+        return $attribute === 'foo';
+    }
+}
+
+class DeprecatedVoterFixture extends AbstractVoter
 {
     protected function getSupportedClasses()
     {

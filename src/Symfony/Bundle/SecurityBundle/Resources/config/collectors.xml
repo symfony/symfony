@@ -9,6 +9,7 @@
             <tag name="data_collector" template="@Security/Collector/security.html.twig" id="security" />
             <argument type="service" id="security.token_storage" on-invalid="ignore" />
             <argument type="service" id="security.role_hierarchy" />
+            <argument type="service" id="security.logout_url_generator" />
         </service>
     </services>
 </container>

@@ -33,10 +33,10 @@
                 <span>{{ collector.tokenClass|abbr_class }}</span>
             </div>
             {% endif %}
-            {% if collector.providerKey %}
+            {% if collector.logoutUrl %}
             <div class="sf-toolbar-info-piece">
                 <b>Actions</b>
-                <span><a href="{{ logout_path(collector.providerKey) }}">Logout</a></span>
+                <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
             </div>
             {% endif %}
         {% elseif collector.enabled %}

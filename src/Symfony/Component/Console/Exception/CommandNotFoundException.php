@@ -16,7 +16,7 @@ namespace Symfony\Component\Console\Exception;
  *
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
-class CommandNotDefinedException extends \InvalidArgumentException implements ExceptionInterface
+class CommandNotFoundException extends \InvalidArgumentException implements ExceptionInterface
 {
     private $alternatives;
 

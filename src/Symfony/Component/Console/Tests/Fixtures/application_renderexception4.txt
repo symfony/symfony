@@ -1,9 +1,9 @@
 
 
-                                                                    
-  [Symfony\Component\Console\Exception\CommandNotDefinedException]  
-  Command "foo" is not define                                       
-  d.                                                                
-                                                                    
+                                                                  
+  [Symfony\Component\Console\Exception\CommandNotFoundException]  
+  Command "foo" is not define                                     
+  d.                                                              
+                                                                  
 
 

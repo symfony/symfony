@@ -1,5 +1,5 @@
 services:
     foo_service:
-        class:    FooClass
+        class:            FooClass
         # types is not an array
-        types:     string
+        autowiring_types: string

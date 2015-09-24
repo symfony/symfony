@@ -1,4 +1,4 @@
 services:
     foo_service:
-        class:    FooClass
-        types:    [ Foo, Bar ]
+        class:            FooClass
+        autowiring_types: [ Foo, Bar ]

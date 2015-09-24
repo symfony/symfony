@@ -501,6 +501,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services22.xml');
 
-        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getTypes());
+        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
     }
 }

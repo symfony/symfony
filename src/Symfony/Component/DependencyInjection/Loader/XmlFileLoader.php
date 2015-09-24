@@ -247,8 +247,8 @@ class XmlFileLoader extends FileLoader
             $definition->addTag($tag->getAttribute('name'), $parameters);
         }
 
-        foreach ($this->getChildren($service, 'type') as $type) {
-            $definition->addType($type->textContent);
+        foreach ($this->getChildren($service, 'autowiring-type') as $type) {
+            $definition->addAutowiringType($type->textContent);
         }
 
         if ($value = $service->getAttribute('decorates')) {

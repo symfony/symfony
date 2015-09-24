@@ -122,7 +122,7 @@ class AutowiringPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('c1', __NAMESPACE__.'\CollisionA');
-        $container->register('c2', __NAMESPACE__.'\CollisionB')->addType(__NAMESPACE__.'\CollisionInterface');
+        $container->register('c2', __NAMESPACE__.'\CollisionB')->addAutowiringType(__NAMESPACE__.'\CollisionInterface');
         $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
         $aDefinition->addTag(AutowiringPass::AUTOWIRING);
 

@@ -130,7 +130,7 @@ class AutowiringPass implements CompilerPassInterface
             return;
         }
 
-        foreach ($definition->getTypes() as $type) {
+        foreach ($definition->getAutowiringTypes() as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
         }

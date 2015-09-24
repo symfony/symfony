@@ -307,6 +307,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services22.yml');
 
-        $this->assertEquals(array('Foo', 'Bar'), $container->getDefinition('foo_service')->getTypes());
+        $this->assertEquals(array('Foo', 'Bar'), $container->getDefinition('foo_service')->getAutowiringTypes());
     }
 }

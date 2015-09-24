@@ -299,17 +299,17 @@ class YamlFileLoader extends FileLoader
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
-        if (isset($service['types'])) {
-            if (!is_array($service['types'])) {
-                throw new InvalidArgumentException(sprintf('Parameter "types" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        if (isset($service['autowiring_types'])) {
+            if (!is_array($service['autowiring_types'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }
 
-            foreach ($service['types'] as $type) {
-                if (!is_string($type)) {
-                    throw new InvalidArgumentException(sprintf('A "types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            foreach ($service['autowiring_types'] as $autowiringType) {
+                if (!is_string($autowiringType)) {
+                    throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
                 }
 
-                $definition->addType($type);
+                $definition->addAutowiringType($autowiringType);
             }
         }
 

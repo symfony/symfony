@@ -41,7 +41,7 @@ class Definition
     private $synchronized = false;
     private $lazy = false;
     private $decoratedService;
-    private $types = array();
+    private $autowiringTypes = array();
 
     protected $arguments;
 
@@ -829,23 +829,23 @@ class Definition
      */
     public function setTypes(array $types)
     {
-        $this->types = array();
+        $this->autowiringTypes = array();
 
         foreach ($types as $type) {
-            $this->types[$type] = true;
+            $this->autowiringTypes[$type] = true;
         }
 
         return $this;
     }
 
     /**
-     * Gets types that will default to this definition.
+     * Gets autowiring types that will default to this definition.
      *
      * @return string[]
      */
-    public function getTypes()
+    public function getAutowiringTypes()
     {
-        return array_keys($this->types);
+        return array_keys($this->autowiringTypes);
     }
 
     /**
@@ -855,9 +855,9 @@ class Definition
      *
      * @return Definition The current instance
      */
-    public function addType($type)
+    public function addAutowiringType($type)
     {
-        $this->types[$type] = true;
+        $this->autowiringTypes[$type] = true;
 
         return $this;
     }
@@ -869,9 +869,9 @@ class Definition
      *
      * @return Definition The current instance
      */
-    public function removeType($type)
+    public function removeAutowiringType($type)
     {
-        unset($this->types[$type]);
+        unset($this->autowiringTypes[$type]);
 
         return $this;
     }
@@ -883,8 +883,8 @@ class Definition
      *
      * @return bool
      */
-    public function hasType($type)
+    public function hasAutowiringType($type)
     {
-        return isset($this->types[$type]);
+        return isset($this->autowiringTypes[$type]);
     }
 }

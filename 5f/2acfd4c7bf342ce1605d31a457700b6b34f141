@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-05-18T06:51:44Z
+
+I really love this PR! :+1: It makes things _a lot_ simpler. As you can see I have already worked my way through the changes to comment. It's really nice to see the difference between the pre and post authentication tokens.
+
+_Edit: also fixes #14300_
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-05-18T08:46:59Z
+
+:+1: congrats @weaverryan! It's a very nice move towards reducing perceived complexity of the Security component. I'd like to make two quick comments regarding the naming and code of some methods:
+
+**1)** Are you planning to add new methods to get credentials from different sources than the `Request` object? If not, maybe the `...FromRequest` part of the method name is redundant:
+
+```php
+// redundant method name?
+public function getCredentialsFromRequest(Request $request) { ... }
+
+// acceptable alternative?
+public function getCredentials(Request $request) { ... }
+```
+
+**2)** The [autoLogin() code](https://github.com/weaverryan/symfony-demo/blob/guard-auth/src/AppBundle/Controller/SecurityController.php#L45-66) looks very convoluted to me. In an ideal world, I'd like to do the following:
+
+```php
+$security->login($user);
+```
+
+I **know** that we can't do that for Symfony, but could we simplify that code as much as possible?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-18T13:44:55Z
+
+@javiereguiluz
+
+* Good idea on `checkCredentials()` - I've changed that.
+
+* For `autoLogin`, I hear you. The system is already a big improvement over before, where you had not access to your normal "success listener Response" nor an automatic way to dispatch the "interactive login" event, which now happens. What we're missing to make it easier is "user-land" access to *which* firewall we are currently under. I'm not aware of any way to access this currently, which is why we have that ugly `secured_area` thing in there.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-18T14:12:54Z
+
+Wow ! This looks great ! :+1:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-07-19T09:39:57Z
+
+great work :+1:
+
+---------------------------------------------------------------------------
+
+by ihsanudin at 2015-07-20T02:10:34Z
+
+very nice :+1:
+
+---------------------------------------------------------------------------
+
+by malas at 2015-07-23T12:42:24Z
+
+I waited for this so long! Hope it gets into core ASAP
+
+---------------------------------------------------------------------------
+
+by giovkanata at 2015-07-23T13:41:23Z
+
+Well done! This was one of the most lacked features in symfony until now.
+
+---------------------------------------------------------------------------
+
+by nielvrom at 2015-07-24T09:12:53Z
+
+Very nice! In the beginning of learning Symfony the authentication was not easy for me! This makes it so much easier for new users!
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2015-08-03T13:26:36Z
+
+Awesome work @weaverryan and something Symfony2 has long needed. Human Focused Development!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-22T23:57:37Z
+
+Ping @symfony/deciders
+
+This is a large feature and security is complex. For that reason, I released the KnpUGuard library 3+ months ago to get proven and work out bugs. It's gotten 1300+ installs, and I've talked with people who have used it to integrate LDAP, OAuth, API tokens auth, multiple firewalls, etc. So, fwiw, the tires have been kicked.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T08:33:58Z
+
+Not yet reviewed the code, but I have one suggestion: the guard sub-system is well contained into its own sub-namespace. I can see how this new system could be used by Silex as well, but to be able to do that I would need to depend on `symfony/security`. As all other sub-parts of the security component are available as independent Composer packages, I think it would make sense to do the same here. @weaverryan Can you make the needed changes?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T08:37:57Z
+
+Regarding the `simple_*` classes added a while back, I think we need to deprecate them; having 3 different ways to do the same thing is not a good idea. So, having a high level one like this one and a low-level one is probably more than enough.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T08:57:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-23T08:58:53Z
+
+I agree with @fabpot, but would that be needed for 2.8/3.0 already? In my opinion this will make a too big of a BC. In my case, this would add an additional month (minimal) of time to upgrade because it will need a complete rewrite.
+
+Maybe this is something that can be deprecated in 3.1 and removed in 4.0? The security component is quite complex so it would be nice to give people a lot of time to figure out this part.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T09:05:01Z
+
+@iltar fair enough; just created an issue to not forget to do that in 3.1 (see #15873)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-24T01:59:23Z
+
+I like the deprecation plan. We can replace simple* in the documentation with Guard for 2.8.
+
+I've added the pieces to make Guard its own component - but there's a good chance I foo-barred something with the versions in composer.json. The dependencies on the other security components could probably have lower versions, but do we care?

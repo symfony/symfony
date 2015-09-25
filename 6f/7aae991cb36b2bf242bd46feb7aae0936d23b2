@@ -1,0 +1,143 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-07-01T07:40:51Z
+
+Thanks @dosten. Fixed everything you mentioned :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:04:49Z
+
+@WouterJ I suggest you to mark methods as deprecated in the VoterInterface too, and to trigger the deprecation in the AbstractVoter when they are called.
+We should not trigger deprecations for people implementing the method: it is required, and it would not hurt to have them on 3.0 anyway.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2015-08-03T08:08:53Z
+
+> These methods aren't used at all in a Symfony application and don't make sense to use in the application.
+
+What do you mean? I use those methods on my Voters class, working with it.
+
+Sample:
+
+```php
+class DomainVoter extends AbstractVoter
+{
+    const VIEW      = 'view';
+    const EDIT      = 'edit';
+    const DELETE    = 'delete';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getSupportedClasses()
+    {
+        return [
+            'AppBundle\Entity\Domain',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getSupportedAttributes()
+    {
+        return [
+            self::VIEW,
+            self::EDIT,
+            self::DELETE,
+        ];
+    }
+
+    /**
+     * @param string               $attribute
+     * @param Domain               $object
+     * @param UserInterface|string $user
+     *
+     * @return bool
+     */
+    protected function isGranted($attribute, $object, $user = null)
+    {
+        return true; // Stuff
+    }
+}
+```
+
+What should be done instead of using those deprecated methods?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-03T09:19:56Z
+
+@Soullivaneuh if you look at the AbstractVoter, it uses these methods internally. But the methods of the interface are never used.
+The AbstractVoter could keep using these methods (to hook into the main logic of the ``vote`` method), but they should not be part of the VoterInterface
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-03T09:20:34Z
+
+And btw, the methods you are showing there are **not** the methods which are meant to be deprecated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-03T09:22:17Z
+
+@WouterJ Can you finish this one?
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2015-08-03T09:26:23Z
+
+@stof Indeed, my bad. Wrong reading.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-09T14:33:53Z
+
+Updated this PR:
+
+* I've changed the API of `AbstractVoter` to have a `supports($attribute, $class)` method. The reason behind this is to allow some attributes to be accepted for only some classes.
+* In order to remove too much duplication in `AbstractVoter#supports()`, I've added an `AbstractVoter#isClassInstanceOf()` helper method.
+* I've added some tests for `AbstractVoter`, in order to make sure the behaviour is kept equal.
+* I tried to trigger deprecation in as much places as possible.
+
+Fabbot's error is a bug in fabbot.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T12:53:16Z
+
+:+1: (should be rebased)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:45:54Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-24T14:14:36Z
+
+Rebased, so it can be merged directly if accepted by core
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-24T15:48:22Z
+
+Seems like some tests still test the deprecated features and should be added to the legacy group (:+1: when this is fixed).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-25T07:34:05Z
+
+So it seems like we now had 2 tests for AbstractVoter (one in `Security\Tests\Core` and one in `Security\Core\Tests`). I've now merged both test classes, everything should work now
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-25T11:32:08Z
+
+:+1: (the failures don't seem to be related)
+
+Status: Reviewed

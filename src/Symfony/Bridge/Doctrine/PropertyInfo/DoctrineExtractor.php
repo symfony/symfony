@@ -14,8 +14,8 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Symfony\Component\PropertyInfo\PropertyListRetrieverInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeInfoInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineExtractor implements PropertyListRetrieverInterface, PropertyTypeInfoInterface
+class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
 {
     /**
      * @var ClassMetadataFactory

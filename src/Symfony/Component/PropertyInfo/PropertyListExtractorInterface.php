@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyListRetrieverInterface
+interface PropertyListExtractorInterface
 {
     /**
      * Gets the list of properties available for the given class.

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\PropertyInfo\PropertyListRetrieverInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializerExtractor implements PropertyListRetrieverInterface
+class SerializerExtractor implements PropertyListExtractorInterface
 {
     /**
      * @var ClassMetadataFactoryInterface

@@ -11,32 +11,32 @@
 
 namespace Symfony\Component\PropertyInfo\PropertyInfo\Tests;
 
-use Symfony\Component\PropertyInfo\PropertyInfo;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyInfoTest extends \PHPUnit_Framework_TestCase
+class PropertyInfoExtractorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PropertyInfo
+     * @var PropertyInfoExtractor
      */
     private $propertyInfo;
 
     public function setUp()
     {
         $extractors = array(new DummyExtractor());
-        $this->propertyInfo = new PropertyInfo($extractors, $extractors, $extractors, $extractors);
+        $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);
     }
 
     public function testInstanceOf()
     {
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyInfoInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeInfoInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyDescriptionInfoInterface', $this->propertyInfo);
-        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyAccessInfoInterface', $this->propertyInfo);
+        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface', $this->propertyInfo);
     }
 
     public function testGetShortDescription()

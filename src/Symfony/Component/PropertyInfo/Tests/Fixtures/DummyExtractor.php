@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
 
-use Symfony\Component\PropertyInfo\PropertyAccessInfoInterface;
-use Symfony\Component\PropertyInfo\PropertyDescriptionInfoInterface;
-use Symfony\Component\PropertyInfo\PropertyListRetrieverInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeInfoInterface;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DummyExtractor implements PropertyListRetrieverInterface, PropertyDescriptionInfoInterface, PropertyTypeInfoInterface, PropertyAccessInfoInterface
+class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
     /**
      * {@inheritdoc}

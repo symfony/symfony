@@ -14,8 +14,8 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use phpDocumentor\Reflection\ClassReflector;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\FileReflector;
-use Symfony\Component\PropertyInfo\PropertyDescriptionInfoInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeInfoInterface;
+use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PhpDocExtractor implements PropertyDescriptionInfoInterface, PropertyTypeInfoInterface
+class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
 {
     const PROPERTY = 0;
     const ACCESSOR = 1;

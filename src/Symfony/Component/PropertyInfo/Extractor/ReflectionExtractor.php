@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\PropertyInfo\PropertyAccessInfoInterface;
-use Symfony\Component\PropertyInfo\PropertyListRetrieverInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeInfoInterface;
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ReflectionExtractor implements PropertyListRetrieverInterface, PropertyTypeInfoInterface, PropertyAccessInfoInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
     /**
      * @internal

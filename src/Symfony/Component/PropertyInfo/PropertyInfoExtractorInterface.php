@@ -18,6 +18,6 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyInfoInterface extends PropertyTypeInfoInterface, PropertyDescriptionInfoInterface, PropertyAccessInfoInterface, PropertyListRetrieverInterface
+interface PropertyInfoExtractorInterface extends PropertyTypeExtractorInterface, PropertyDescriptionExtractorInterface, PropertyAccessExtractorInterface, PropertyListExtractorInterface
 {
 }

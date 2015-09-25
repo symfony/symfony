@@ -12,37 +12,37 @@
 namespace Symfony\Component\PropertyInfo;
 
 /**
- * Default {@see PropertyInfoInterface} implementation.
+ * Default {@see PropertyInfoExtractorInterface} implementation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyInfo implements PropertyInfoInterface
+class PropertyInfoExtractor implements PropertyInfoExtractorInterface
 {
     /**
-     * @var PropertyListRetrieverInterface[]
+     * @var PropertyListExtractorInterface[]
      */
     private $listExtractors;
 
     /**
-     * @var PropertyTypeInfoInterface[]
+     * @var PropertyTypeExtractorInterface[]
      */
     private $typeExtractors;
 
     /**
-     * @var PropertyDescriptionInfoInterface[]
+     * @var PropertyDescriptionExtractorInterface[]
      */
     private $descriptionExtractors;
 
     /**
-     * @var PropertyAccessInfoInterface[]
+     * @var PropertyAccessExtractorInterface[]
      */
     private $accessExtractors;
 
     /**
-     * @param PropertyListRetrieverInterface[]   $listExtractors
-     * @param PropertyTypeInfoInterface[]        $typeExtractors
-     * @param PropertyDescriptionInfoInterface[] $descriptionExtractors
-     * @param PropertyAccessInfoInterface[]      $accessExtractors
+     * @param PropertyListExtractorInterface[]        $listExtractors
+     * @param PropertyTypeExtractorInterface[]        $typeExtractors
+     * @param PropertyDescriptionExtractorInterface[] $descriptionExtractors
+     * @param PropertyAccessExtractorInterface[]      $accessExtractors
      */
     public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array())
     {

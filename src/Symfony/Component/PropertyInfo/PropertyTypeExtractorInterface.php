@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyTypeInfoInterface
+interface PropertyTypeExtractorInterface
 {
     /**
      * Gets types of a property.

@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -34,7 +34,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             print $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-            $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
+            $twig->addExtension(new TranslationExtension($this->getTranslator('en')));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
@@ -136,12 +136,13 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ',
         );
 
-        $translator = new Translator('en', new MessageSelector());
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
-        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
-        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
-
+        $loaders = array('array' => new ArrayLoader());
+        $resources = array(
+            array('array', array('foo' => 'foo (messages)'), 'en'),
+            array('array', array('foo' => 'foo (custom)'), 'en', 'custom'),
+            array('array', array('foo' => 'foo (foo)'), 'en', 'foo'),
+        );
+        $translator = $this->getTranslator('en', $loaders, $resources);
         $template = $this->getTemplate($templates, $translator);
 
         $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
@@ -169,13 +170,15 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ',
         );
 
-        $translator = new Translator('en', new MessageSelector());
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
-        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
-        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
-        $translator->addResource('array', array('foo' => 'foo (fr)'), 'fr', 'custom');
+        $loaders = array('array' => new ArrayLoader());
+        $resources = array(
+            array('array', array('foo' => 'foo (messages)'), 'en'),
+            array('array', array('foo' => 'foo (custom)'), 'en', 'custom'),
+            array('array', array('foo' => 'foo (foo)'), 'en', 'foo'),
+            array('array', array('foo' => 'foo (fr)'), 'fr', 'custom'),
+        );
 
+        $translator = $this->getTranslator('en', $loaders, $resources);
         $template = $this->getTemplate($templates, $translator);
 
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render(array())));
@@ -184,7 +187,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     protected function getTemplate($template, $translator = null)
     {
         if (null === $translator) {
-            $translator = new Translator('en', new MessageSelector());
+            $translator = $this->getTranslator('en');
         }
 
         if (is_array($template)) {
@@ -196,5 +199,10 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
         $twig->addExtension(new TranslationExtension($translator));
 
         return $twig->loadTemplate('index');
+    }
+
+    private function getTranslator($locale, $loaders = array(), $resources = array())
+    {
+        return new Translator($locale, new ResourceMessageCatalogueProvider($loaders, $resources));
     }
 }

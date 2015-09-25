@@ -39,14 +39,13 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger)
     {
-        if (!$translator instanceof TranslatorBagInterface) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
-        }
-
-        if (!($translator instanceof FallbackLocaleAwareInterface)) {
+        if ($translator instanceof FallbackLocaleAwareInterface) {
+            $this->fallbackLocaleAware = $translator;
+        } else if ($translator instanceof TranslatorBagInterface) {
+            @trigger_error(sprintf('The Translator "%" should implement \Symfony\Component\Translation\FallbackLocaleAwareInterface instead of (or in addtion to) \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)), E_USER_DEPRECATED);
             $this->fallbackLocaleAware = new TranslatorBagToFallbackLocaleAwareAdapter($translator);
         } else {
-            $this->fallbackLocaleAware = $translator;
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" implements neither \Symfony\Component\Translation\FallbackLocaleAwareInterface nor the deprecated \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
@@ -108,6 +107,10 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
      */
     public function getCatalogue($locale = null)
     {
+        if (!$this->translator instanceof TranslatorBagInterface) {
+            throw new \RuntimeException(sprintf('You called the deprecated \Symfony\Component\Translation\LoggingTranslator::getCatalogue() method, but the Translator provided to the \Symfony\Component\Translation\LoggingTranslator constructor does not implement TranslatorBagInterface. (Hint: The class is %s.)',  get_class($this->translator)));
+        }
+
         return $this->translator->getCatalogue($locale);
     }
 

@@ -1,0 +1,198 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-08-12T13:38:45Z
+
+I'm not sure this should be in the core (I'm also not sur ethe IBAN deserves being in core, but it is there already and so needs to stay for BC reasons)
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-12T13:57:39Z
+
+Added UUIDs and fixed constraint message (non-plural).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-12T14:06:45Z
+
+i like this feature and think, we have IBAN, so we should provide the BIC Constraint, too.
+
+PR looks good to me
+
+---------------------------------------------------------------------------
+
+by DracoBlue at 2015-08-12T14:11:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dkeller85 at 2015-08-12T14:11:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-12T14:13:39Z
+
+The ``[WIP]`` should be removed from the PR subject @mvhirsch
+
+EDIT: sorry, didn't see the open todo for the docs....
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-12T15:04:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-12T15:10:22Z
+
+@javiereguiluz updated comment for clarity, because it was not English (I'm sorry).
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-12T15:13:00Z
+
+Oh no! I accidentially rebased on master branch, not 2.8.
+How can I undo this mistake? Please help me!
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-12T15:36:48Z
+
+Okay, I fixed the commit :-)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-12T15:40:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-13T06:25:40Z
+
+@Triiistan I've updated the code to use just one strlen call. It seems legit ;-)
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-08-17T11:43:34Z
+
+Why does the build fail on HHVM?
+Can we please re-run the Test-Suite?
+
+EDIT: Thanks to whoever ran the Test-Suite again, it now looks stable at all (even HHVM) :-)
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-08T07:01:13Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-08T07:17:55Z
+
+I'm also not convinced we should have this kind of validators in core, as this is smething that can be easily provided by a 3rd party extension. The IBAN validator gave us a few headaches.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-08T07:18:59Z
+
+I agree that a BIC validator is does not fit best in the core. However, we already have the IBAN validator and for consistency we imho should include this one too.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-09-08T08:17:30Z
+
+:+1:  @xabbuh
+
+otherwise 3.0 could be the right moment to remove not wanted stuff from core and move this to a separate bundle, isn't it?
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-08T09:24:43Z
+
+@jakzal @xabbuh @OskarStark we could provide a ValidatorExtraBundle or ValidatorFinanceExtraBundle (name proposal) for symfony 3.0. What do you think?
+For now we could add this in 2.8.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-09-08T09:39:29Z
+
+:+1:  @mvhirsch sounds good to me
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-11T18:15:05Z
+
+ping @jakzal @xabbuh
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-14T13:50:46Z
+
+@mvhirsch well, yes, but I don't think such a bundle (or component) needs to be provided in the Symfony organisation. It's a perfect candidate for a community extension.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-09-14T18:26:24Z
+
+anyway, i thin we should merge this as it is.
+
+the Iban is already in so....
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-21T08:59:43Z
+
+@jakzal we could add it for 2.8 anyway and extract/remove the parts for 3.0 and provide a community extension for those validators. What do you think?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-24T06:24:42Z
+
+Can you please add translations for the message (at least add it to the `validators.en.xlf` file)?
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-24T09:17:47Z
+
+@xabbuh I added translations for English and German language.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:39:04Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-24T12:15:34Z
+
+:+1: (besides my comment on the translation, but this shouldn't hold off merging imo)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T19:47:34Z
+
+Adding a new feature to deprecate it immediately doesn't sound to me like a good idea. IBAN and BIC validation is not so easy and is a very specific use case. I'm in favor of deprecating the IBAN validator in 2.8, remove it from 3.0 and provide a new community library with the IBAN and BIC validators. It would be cool to have a library usable without the DIC component (so no bundle but it can still include an optional extension).
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-09-25T07:17:43Z
+
+@xabbuh I fixed the German translation. Thank you!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T12:07:21Z
+
+As we don't this "community-driven" repository/bundle with such validators, I propose to merge this one for consistency.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-25T12:09:33Z
+
+agree

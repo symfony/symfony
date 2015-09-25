@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Core\Authentication\Voter;
+namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 

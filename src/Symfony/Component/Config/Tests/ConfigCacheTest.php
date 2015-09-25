@@ -12,29 +12,20 @@
 namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Tests\Resource\ResourceStub;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
-    private $resourceFile = null;
-
     private $cacheFile = null;
-
-    private $metaFile = null;
 
     protected function setUp()
     {
-        $this->resourceFile = tempnam(sys_get_temp_dir(), '_resource');
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
-        $this->metaFile = $this->cacheFile.'.meta';
-
-        $this->makeCacheFresh();
-        $this->generateMetaFile();
     }
 
     protected function tearDown()
     {
-        $files = array($this->cacheFile, $this->metaFile, $this->resourceFile);
+        $files = array($this->cacheFile, $this->cacheFile.'.meta');
 
         foreach ($files as $file) {
             if (file_exists($file)) {
@@ -43,96 +34,65 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetPath()
+    /**
+     * @dataProvider debugModes
+     */
+    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
     {
-        $cache = new ConfigCache($this->cacheFile, true);
-
-        $this->assertSame($this->cacheFile, $cache->getPath());
-    }
-
-    public function testCacheIsNotFreshIfFileDoesNotExist()
-    {
-        unlink($this->cacheFile);
-
-        $cache = new ConfigCache($this->cacheFile, false);
+        unlink($this->cacheFile); // remove tempnam() side effect
+        $cache = new ConfigCache($this->cacheFile, $debug);
 
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheIsAlwaysFreshIfFileExistsWithDebugDisabled()
+    public function testIsAlwaysFreshInProduction()
     {
-        $this->makeCacheStale();
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
 
         $cache = new ConfigCache($this->cacheFile, false);
+        $cache->write('', array($staleResource));
 
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testCacheIsNotFreshWithoutMetaFile()
+    /**
+     * @dataProvider debugModes
+     */
+    public function testIsFreshWhenNoResourceProvided($debug)
     {
-        unlink($this->metaFile);
-
-        $cache = new ConfigCache($this->cacheFile, true);
-
-        $this->assertFalse($cache->isFresh());
+        $cache = new ConfigCache($this->cacheFile, $debug);
+        $cache->write('', array());
+        $this->assertTrue($cache->isFresh());
     }
 
-    public function testCacheIsFreshIfResourceIsFresh()
+    public function testFreshResourceInDebug()
     {
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
         $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array($freshResource));
 
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testCacheIsNotFreshIfOneOfTheResourcesIsNotFresh()
+    public function testStaleResourceInDebug()
     {
-        $this->makeCacheStale();
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
 
         $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', array($staleResource));
 
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testWriteDumpsFile()
+    public function debugModes()
     {
-        unlink($this->cacheFile);
-        unlink($this->metaFile);
-
-        $cache = new ConfigCache($this->cacheFile, false);
-        $cache->write('FOOBAR');
-
-        $this->assertFileExists($this->cacheFile, 'Cache file is created');
-        $this->assertSame('FOOBAR', file_get_contents($this->cacheFile));
-        $this->assertFileNotExists($this->metaFile, 'Meta file is not created');
-    }
-
-    public function testWriteDumpsMetaFileWithDebugEnabled()
-    {
-        unlink($this->cacheFile);
-        unlink($this->metaFile);
-
-        $metadata = array(new FileResource($this->resourceFile));
-
-        $cache = new ConfigCache($this->cacheFile, true);
-        $cache->write('FOOBAR', $metadata);
-
-        $this->assertFileExists($this->cacheFile, 'Cache file is created');
-        $this->assertFileExists($this->metaFile, 'Meta file is created');
-        $this->assertSame(serialize($metadata), file_get_contents($this->metaFile));
-    }
-
-    private function makeCacheFresh()
-    {
-        touch($this->resourceFile, filemtime($this->cacheFile) - 3600);
-    }
-
-    private function makeCacheStale()
-    {
-        touch($this->cacheFile, filemtime($this->resourceFile) - 3600);
-    }
-
-    private function generateMetaFile()
-    {
-        file_put_contents($this->metaFile, serialize(array(new FileResource($this->resourceFile))));
+        return array(
+            array(true),
+            array(false),
+        );
     }
 }

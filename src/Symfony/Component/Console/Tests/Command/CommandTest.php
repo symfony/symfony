@@ -243,7 +243,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\InvalidOptionException
      * @expectedExceptionMessage The "--bar" option does not exist.
      */
     public function testRunWithInvalidOption()

@@ -263,7 +263,7 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('fr'), $calls[0][1][0]);
+        $this->assertEquals(array('fr'), $calls[1][1][0]);
     }
 
     public function testTranslatorMultipleFallbacks()
@@ -271,7 +271,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('translator_fallbacks');
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('en', 'fr'), $calls[0][1][0]);
+        $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
     }
 
     /**

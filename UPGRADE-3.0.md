@@ -1286,3 +1286,10 @@ UPGRADE FROM 2.x to 3.0
 ### HttpFoundation
 
 * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+
+### Config
+
+ * `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` has been removed. Also,
+   cache validation through this method (which was still supported in 2.8 for BC) does no longer
+   work because the `\Symfony\Component\Config\Resource\BCResourceInterfaceChecker` helper class
+   has been removed as well.

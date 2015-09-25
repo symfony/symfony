@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T14:40:37Z
+
+not needed IMO. You could just make it use form 2.8+ (as done anywhere else in our inter-component dependencies)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-08T15:46:40Z
+
+@stof What do you suggest to achieve that (the FrameworkBundle does not require the Form component)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-08T15:48:51Z
+
+@xabbuh by adding a conflict rule
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-08T16:09:39Z
+
+@nicolas-grekas that would work. But is the overhead that was added to the dependency resolution process justified just to avoid the condition here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-24T15:18:48Z
+
+@symfony/deciders What do you think? Should we use the test as implemented in this pull request or add a conflict rule instead?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T06:30:15Z
+
+:+1: for this PR as is
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-25T06:57:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-25T11:55:04Z
+
+:+1:

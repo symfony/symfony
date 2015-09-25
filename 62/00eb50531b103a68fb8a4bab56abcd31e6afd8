@@ -1,0 +1,310 @@
+---------------------------------------------------------------------------
+
+by apfelbox at 2015-08-07T17:16:23Z
+
+Aren't services lazy loaded? You could get away with just putting the `trigger_error` in the constructor of the service.
+
+This won't work for factories, etc… though
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-07T17:23:21Z
+
+A `trigger_error` could be used in the constructor indeed (except factories then), but my first goal was also to use a `deprecated` tag (or php and yaml equivalents) to suggest another service to use instead.
+
+And as services are indeed lazy-loaded, this trigger should happen only if you indeed use this service. so I think this is at the right place. I may be wrong though :}
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-07T17:23:57Z
+
+btw, the fabbot errors (and the php7 build error) have some errors that I will soon correct, but most of them are not coming from me :{
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-07T19:59:26Z
+
+What about easily suppressible (and collectible) notices upon building the container or when initializing the container?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-07T20:04:30Z
+
+Then I guess the notice would be fired only once when building the container, no ? Shouldn't the error be triggered at each use (or injection), so that everything can be tracked ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-07T20:07:05Z
+
+Finding the usage of a service is usually the easy part.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-08-09T21:47:28Z
+
+I'm :-1: on this, IMO the container shouldn't be aware of the how to handle the deprecation of services, this is out of the scope of the component.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-10T05:31:30Z
+
+@dosten but the framework bundle can, the component doesn't _have_ to know about it.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-10T06:23:15Z
+
+Fixes https://github.com/symfony/symfony/issues/14307
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-10T07:20:01Z
+
+Oh, didn't see the issue, so I'll add it in the PR header, as this is exactly what this PR aims to implement.
+
+As for the idea to implement it only in debug mode (In the debug component or the debug bundle ?), I'll need to check those to see how it can be implemented.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-10T09:53:42Z
+
+I like this PR (as much I liked the linked issue :) )
+I don't think the debug mode should influence the generated container. At least all other places that trigger deprecations are not sensitive to the env.
+@iltar is right but that's out of scope for this PR: we need a way to collect early deprecations that happen before the error handler (=deprecation handler) is set up.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-10T09:57:49Z
+
+I like this feature (it will also allow us to remove the request-specific hack in the current codebase in the container btw).
+
+When documenting it, we should however make it clear that when you are deprecating a class, you should trigger the deprecation the class itself, not in the service (so that it works for any usage of the class, not only for the usage as service). Deprecated services should be used only when the class itself is not deprecated.
+
+And should we also support marking aliases as deprecated ?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-10T10:01:24Z
+
+@stof so that all the aliases that points out to the deprecated service are also marked as deprecated (or at least trigger a deprecated error) ? I like that.
+
+But yes, the scope of such a tag / attribute would really be to deprecate _the service_, not if the class is deprecated (both at the same should be possible though), e.g if the service was renamed. I think this is a bit different.
+
+I could also add this tag / attribute on the alias tags, WDYT ? So that if an alias is created because it was a deprecated name for the service it points to, so this usage triggers the error
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-10T10:03:41Z
+
+@Taluu no. this would happen automatically as it would get the service itself.
+
+Deprecating an alias would be there in case you want to deprecate only the alias, but keeping the new name not deprecated. This would cover the case of renaming services and keeping an alias with the old name for BC (yes, it should be an alias otherwise you end up with 2 different unrelated services)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-10T10:05:05Z
+
+@Taluu the ContainerBuilder should also trigger deprecation errors when trying to instantiate a deprecated service from it (i.e. for the case where you are not dumping the container)
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-10T12:53:29Z
+
+I added the possibility to set a custom deprecation message when using the deprecated feature. /cc @nicolas-grekas @stof
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-10T13:33:49Z
+
+If I'm not wrong, a DefinitionDecorator will inherit the deprecation status from it's decorated service, which looks sensible.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-10T13:35:00Z
+
+There was a pass for the decorator, but I was not sure if I should propagate the status... Should I ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-10T13:52:39Z
+
+The way this works in the PHP Dumper when services are inlined should be checked too
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-08-11T09:49:06Z
+
+thank you, like this feature :+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-08-11T11:39:50Z
+
+:+1: for this feature
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-11T11:44:05Z
+
+For DefinitionDecorator, I'd say that a notice should be issued when one decorates a deprecated service. What is the current behavior? (And is it what we want?) ping @stof you must have a clue on this :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T12:14:34Z
+
+@nicolas-grekas DefinitionDecorator is not about decorating services. It is about service inheritance (i.e. a Definition inheriting the settings of the other one and overwriting some). Yes, the class name is quite misleading.
+
+For DefinitionDecorator, this should be handled somehow. But I don't know what would be the right way: either by inheriting the flag to mark the child service as deprecated, or by warning that the child service depends on a deprecated one
+
+For service decoration, if you inject the inner service in the decorator, this depends on what happens when inlining a deprecated private service. If inlined services trigger the warning properly, this will work for such case.
+But when decorating a service, the generated alias should probably be marked as deprecated (if we support this feature), to have a better warning message for people using it (showing the id they are using).
+However, we should probably also warn about the decorator service as it decorates a deprecated service and this would break in next major versions. This would involve triggering a deprecation during the building of the container though (in the compiler pass resolving decorators) and this is not very useful yet as these ones are not logged anywhere and so are invisible.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-17T09:50:32Z
+
+ping @Taluu any progress on this? Do you need help?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-17T09:54:20Z
+
+Sorry, didn't had the time to look into that yet. Well, I checked up a little bit (I guess I should mess with the decorator pass), but as @stof said, I'm not quite sure if I should just propagate the deprecated status or just fire a deprecated error ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-17T10:06:08Z
+
+About DefinitionDecorator, I'd be in favor of triggering both deprecations:
+- one when building the container, saying that this decorates a deprecated definition
+- an other one saying that the currently used service has been defined using a deprecated definition and thus is also deprecated by transitivity
+
+the second message is not necessarily true (the service defined by definition decoration is maybe not itself deprecated) but still, I'd prefer being noisy here to put pressure on the author of the decoration: the code needs an update .
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-17T10:29:25Z
+
+I think the DefinitionDecorator should handle this like it does for most other features: it inherits the flag by default but allows changing its value. This covers the case of non-deprecation child services by resetting it as ``deprecated="false"`` explicitly.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-08-17T11:44:26Z
+
+So basically, like other features, just mark a change in a overwritten method, and leave the compiler pass alone ? This looks like a good solution too
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-17T11:53:52Z
+
+@Taluu the compiler pass also needs to be updated for the change though.
+
+and it also needs to trigger the deprecation warning because of inheriting from a deprecated service
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-09T06:51:14Z
+
+@Taluu needing any help? I'd like this to be ready soon, I can help if you want
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-09T07:34:46Z
+
+I was planning to get back onto it this week, but sure why not !
+
+To sum up, here is what is missing (I think ?) :
+
+- handling "inline" / private definitions
+- handling decorated definition
+
+If I'm forgetting  something, do tell !
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-09T09:44:19Z
+
+Okay, I rebased the work on the current symfony's 2.8, and I added a basic support on decorator definitions. I marked the change if the status is indeed changed, and I am now triggering a deprecated error in the compiler pass.
+
+But I can't fully test if the deprecation error is really triggered, as even if I register a new error handler, it seems that it is not registered, unless I made a mistake ? cc @nicolas-grekas
+
+I just saw the method `addLog` in the Compiler, as it is used in the `InlineServiceDefinitionsPass`. Should I use also that in the compiler passes ? WDYT ?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-09T17:24:59Z
+
+@stof there is a problem with the overwriting of the deprecated flag in the decorators, as there is not anymore an attribute in the xml flag `deprecated="false"` / `deprecated="true"` as this is now a simple node `<deprecated>Message</deprecated>`, as  @nicolas-grekas suggested in https://github.com/symfony/symfony/pull/15491#discussion_r36615473
+
+So basically, once the flag has been turned on, it cannot be turned off (in the xml declaration anyway). Maybe I should allow an attribute which is overwritten by the tag if present ? Which then would use the default message... But this seems too complicated for something I consider an edge-case, or something that could be done later.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-10T16:15:02Z
+
+As I don't really see how I could handle deprecated inline definitions (when they are inline, i.e when they are used only once), as they are instanciated directly when they are dumped, I don't really see anything to do with those... When they are private (and thus have a proper method definition when dumped), it is already taken care of by adding the proper warning.
+
+And for the decorators, as I messed up the `ResolveTemplateDefinitionsPass` (which modify the `Definition` / `DefinitionDecorator` objects), I don't really see the point of adding yet another check into the `DefinitionDecoratorPass`, unless I read that wrong.
+
+Therefore, I'm open for another review !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-11T06:24:42Z
+
+LGTM with only minor comments :+1:
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-11T09:12:53Z
+
+I applied all @nicolas-grekas' comments and rebased commits together and updated with the upstream (2.8). I will add a PR to the docs ASAP.
+
+fabbot is still failing, but not because of my changes... And I can't fix it, as it is a behaviour due to the ExpressionLanguage (as it converts `a ~ b` into `$a . $b` instead of expected `$a.$b`...)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T05:32:29Z
+
+LGTM with minor comments :+1:
+Status: needs review
+@stof especially, it would be great if you could give an other round of review!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-15T12:32:46Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T10:50:44Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T12:31:56Z
+
+Apart from the small comment about the XSD, :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:37:01Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:37:30Z
+
+@Taluu Can you fixed fabbot issues?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-24T12:21:12Z
+
+I can't, this is due to ExpressionLanguage (and it is not a change I made) : https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/DependencyInjection/Tests/Fixtures/containers/container9.php#L52
+
+This is due to the concatenation in the container fixture file. but if I have to remove those spaces, wouldn't the ExpressionLanguage still convert those with a space between the dots ?

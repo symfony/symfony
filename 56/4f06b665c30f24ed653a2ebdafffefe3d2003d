@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-03T10:05:07Z
+
+It's also a matter of maintaining the theme. Any @symfony/deciders willing to maintain it. Personally, I'm :-1:
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-01-03T18:31:19Z
+
+I'd :+1: as I believe Foundation is a better base for custom apps (more neutral default theme, less override rules needed in the CSS to achieve a custom look) while Bootstrap is better geared at rapid prototyping and I'd argue Symfony is probably still better at building sustainable custom apps than prototypes.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T15:47:22Z
+
+The whitespace control is missing in this template to remove extra spaces (as done in the default theme)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-10T08:16:49Z
+
+@totophe Any news on this PR? Are you willing to finish it?
+
+---------------------------------------------------------------------------
+
+by totophe at 2015-02-10T08:19:34Z
+
+Yes, sorry, I was drawn into our sprints. I'll do that ASAP.
+
+---------------------------------------------------------------------------
+
+by totophe at 2015-02-10T08:39:46Z
+
+Hi, changes are made. Sorry @stof for the delay. I'll not procrastinate next time.
+
+---------------------------------------------------------------------------
+
+by Reyncor at 2015-05-22T03:02:21Z
+
+Would have saved me a some time had this been in the Twig bundle... Thank you!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-20T15:54:50Z
+
+@totophe could you open a doc PR (see this one for the bootstrap theme: https://github.com/symfony/symfony-docs/pull/4411)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-20T15:56:08Z
+
+:+1: with some comments above
+
+---------------------------------------------------------------------------
+
+by totophe at 2015-06-22T12:40:51Z
+
+@nicolas-grekas I'll fix that asap (this week)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-18T10:52:04Z
+
+ping @totophe
+
+---------------------------------------------------------------------------
+
+by totophe at 2015-09-18T11:23:49Z
+
+Doc PR done: https://github.com/symfony/symfony-docs/pull/5702 :-)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-23T13:43:31Z
+
+To be consistent with our Bootstrap practice and to be future-proof, we should probably rename the Twig template to `foundation_5_layout.html.twig`
+
+---------------------------------------------------------------------------
+
+by totophe at 2015-09-23T14:02:59Z
+
+Here you go
+
+---------------------------------------------------------------------------
+
+by florianbelhomme at 2015-09-24T09:24:08Z
+
+I'd :+1: Foundation make developement easier.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:38:47Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T19:58:31Z
+
+Foundation is interesting and it looks like a good idea to have support for it in Symfony but as I don't often use it and will not help to maintain this theme I prefer abstention.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-25T11:57:41Z
+
+I am neither pro nor contra. The implementation looks good, but it would be good to have someone being able to maintain the theme. On the other hand, a form theme is not a real big deal and could probably live in the core nonetheless.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T12:00:42Z
+
+ok, let's merge it in 2.8. If we have too many bug reports and noone fixing them, we will still be able to deprecate it and remove it later on.

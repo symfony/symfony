@@ -26,6 +26,8 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+
         return in_array($attribute, $this->getSupportedAttributes());
     }
 
@@ -34,6 +36,8 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsClass($class)
     {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+
         foreach ($this->getSupportedClasses() as $supportedClass) {
             if ($supportedClass === $class || is_subclass_of($class, $supportedClass)) {
                 return true;
@@ -58,12 +62,13 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$object || !$this->supportsClass(get_class($object))) {
+        if (!$object) {
             return self::ACCESS_ABSTAIN;
         }
 
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
+        $class = get_class($object);
 
         $reflector = new \ReflectionMethod($this, 'voteOnAttribute');
         $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter';
@@ -72,7 +77,7 @@ abstract class AbstractVoter implements VoterInterface
         }
 
         foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
+            if (!$this->supports($attribute, $class)) {
                 continue;
             }
 
@@ -96,18 +101,78 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
+     * Determines if the attribute and class are supported by this voter.
+     *
+     * To determine if the passed class is instance of the supported class, the
+     * isClassInstanceOf() method can be used.
+     *
+     * This method will become abstract in 3.0.
+     *
+     * @param string $attribute An attribute
+     * @param string $class     The fully qualified class name of the passed object
+     *
+     * @return bool True if the attribute and class is supported, false otherwise
+     */
+    protected function supports($attribute, $class)
+    {
+        @trigger_error('The getSupportedClasses and getSupportedAttributes methods are deprecated since version 2.8 and will be removed in version 3.0. Overwrite supports instead.');
+
+        $classIsSupported = false;
+        foreach ($this->getSupportedClasses() as $supportedClass) {
+            if ($this->isClassInstanceOf($class, $supportedClass)) {
+                $classIsSupported = true;
+                break;
+            }
+        }
+
+        if (!$classIsSupported) {
+            return false;
+        }
+
+        if (!in_array($attribute, $this->getSupportedAttributes())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * A helper method to test if the actual class is instanceof or equal
+     * to the expected class.
+     *
+     * @param string $actualClass   The actual class name
+     * @param string $expectedClass The expected class name
+     *
+     * @return bool
+     */
+    protected function isClassInstanceOf($actualClass, $expectedClass)
+    {
+        return $expectedClass === $actualClass || is_subclass_of($actualClass, $expectedClass);
+    }
+
+    /**
      * Return an array of supported classes. This will be called by supportsClass.
      *
      * @return array an array of supported classes, i.e. array('Acme\DemoBundle\Model\Product')
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use supports() instead.
      */
-    abstract protected function getSupportedClasses();
+    protected function getSupportedClasses()
+    {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+    }
 
     /**
      * Return an array of supported attributes. This will be called by supportsAttribute.
      *
      * @return array an array of supported attributes, i.e. array('CREATE', 'READ')
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use supports() instead.
      */
-    abstract protected function getSupportedAttributes();
+    protected function getSupportedAttributes()
+    {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+    }
 
     /**
      * Perform a single access check operation on a given attribute, object and (optionally) user

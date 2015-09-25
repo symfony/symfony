@@ -7,6 +7,36 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.5 (2015-09-25)
+
+ * bug #15866 [VarDumper] Fix dump comparison on large arrays (romainneutron)
+ * bug #15878 [OptionsResolver] Fix catched exception along the dependency tree mistakenly detects cyclic dependencies (lemoinem)
+ * bug #15795 [Console] Default to stderr for the console helpers (2.7+) (alcohol)
+ * bug #15821 [EventDispatcher] fix memory leak in getListeners (Tobion)
+ * bug #15859 [Config] Fix enum default value in Yaml dumper (romainneutron)
+ * bug #15826 [Finder] Optimize the hot-path (nicolas-grekas)
+ * bug #15804 [VarDumper] Fix HtmlDumper constructor calling CliDumper's (nicolas-grekas)
+ * bug #15802 [Finder] Handle filtering of recursive iterators and use it to skip looping over excluded directories (nicolas-grekas)
+ * bug #15803 [Finder] Exclude files based on path before applying the sorting (stof)
+ * feature #13761 Automatically process extensions when they implement CompilerPassInterface (WouterJ)
+ * bug #13794 [DomCrawler] Invalid uri created from forms if base tag present (danez)
+ * bug #15728 Use stderr by default when a specific output is not injected (Seldaek)
+ * bug #15637 Use ObjectManager interface instead of EntityManager (gnat42)
+ * bug #15783 [Debug] Fix case mismatch detection (nicolas-grekas)
+ * bug #14802 [HttpKernel] fix broken multiline <esi:remove> (sstok)
+ * bug #14841 [DoctrineBridge] Fixed #14840 (saksmt)
+ * bug #15770 [Yaml] Fix the parsing of float keys (jmgq)
+ * bug #15771 [Console] Ensure the console output is only detected as decorated when both stderr and stdout support colors (Seldaek)
+ * bug #15750 Add tests to the recently added exceptions thrown from YamlFileLoaders (jakzal)
+ * bug #15763 [HttpKernel] fix DumpDataCollector compat with Twig 2.0 (nicolas-grekas)
+ * bug #15718 Fix that two DirectoryResources with different patterns would be deduplicated (mpdude)
+ * bug #15516 [Translator][warmup][fallback locales] fixed missing cache file generation. (aitboudad)
+ * bug #14916 [WebProfilerBundle] Added tabindex="-1" to not interfer with normal UX (drAlberT)
+ * bug #15725 Dispatch console.terminate *after* console.exception (Seldaek)
+ * bug #15731 improve exceptions when parsing malformed files (xabbuh)
+ * bug #15737 Fix the injection of the container in invokable controllers (stof)
+ * bug #15729 [Kernel] Integer version constants (Tobion)
+
 * 2.7.4 (2015-09-08)
 
  * bug #15552 [ExpressionLanguage] Fixed expressions cache key generation (inso)

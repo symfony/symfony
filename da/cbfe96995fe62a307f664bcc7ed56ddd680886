@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-06-07T20:24:23Z
+
+Any idea how to fix this failing test ?
+https://travis-ci.org/symfony/symfony/jobs/65716176#L438
+
+```
+ 1) Symfony\Component\Console\Tests\ApplicationTest::testFindAlternativeNamespace
+ Failed asserting that Array &0 (
+    0 => 'foo'
+    1 => 'foo1'
+    2 => 'foo3'
+) is identical to Array &0 (
+    0 => 'foo3'
+    1 => 'foo1'
+    2 => 'foo'
+).
+ /home/travis/build/symfony/symfony/src/Symfony/Component/Console/Tests/ApplicationTest.php:444
+```
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-06-07T20:39:29Z
+
+AFAIK, the alternative names was originally [ordered](https://github.com/symfony/symfony/blob/99ec717a22b811f2a46a82b3c49889c87cd76db2/src/Symfony/Component/Console/Application.php#L1090) with ```levenshtein()```, but I don't know if your issue is related to this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T14:24:34Z
+
+As you are moving exceptions to specific ones, what about doing it for the whole component?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:07:48Z
+
+@GromNaN Any news on this one? Can you address the comments?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-09-22T11:38:26Z
+
+OK for moving remaining exception to specific ones. Is it necessary to keep the distinction between `InvalidArgumentException` and `LogicException` in classes like [Console/Question/Question](https://github.com/GromNaN/symfony/blob/console-exception/src/Symfony/Component/Console/Question/Question.php#L136) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-22T11:42:49Z
+
+Yes, I think we need to keep the distinction here (at least to keep BC).
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-09-22T12:10:32Z
+
+I'll create `Symfony\Component\Console\Exception\InvalidArgumentException` and  `Symfony\Component\Console\Exception\LogicException`
+
+And the interface `Symfony\Component\Console\Exception\ExceptionInterface`
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-09-23T19:57:50Z
+
+Rebased and made all changes.
+
+I still have this error on HHVM :
+```
+1) Symfony\Component\Console\Tests\ApplicationTest::testFindAlternativeNamespace
+Failed asserting that Array &0 (
+    0 => 'foo'
+    1 => 'foo1'
+    2 => 'foo3'
+) is identical to Array &0 (
+    0 => 'foo3'
+    1 => 'foo1'
+    2 => 'foo'
+).
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:45:02Z
+
+I made some minor comments, but I'm :+1: on this change.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T19:39:30Z
+
+:+1:

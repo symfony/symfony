@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81">
                 <source>This is not a valid Business Identifier Code (BIC).</source>
-                <target>Dieser Wert ist keine gültige BIC-Nummer.</target>
+                <target>Dieser Wert ist kein gültiger BIC.</target>
             </trans-unit>
         </body>
     </file>

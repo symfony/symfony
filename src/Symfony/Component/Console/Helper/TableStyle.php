@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
+
 /**
  * Defines the styles for a Table.
  *
@@ -39,7 +42,7 @@ class TableStyle
     public function setPaddingChar($paddingChar)
     {
         if (!$paddingChar) {
-            throw new \LogicException('The padding char must not be empty');
+            throw new LogicException('The padding char must not be empty');
         }
 
         $this->paddingChar = $paddingChar;
@@ -235,7 +238,7 @@ class TableStyle
     public function setPadType($padType)
     {
         if (!in_array($padType, array(STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH), true)) {
-            throw new \InvalidArgumentException('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');
+            throw new InvalidArgumentException('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');
         }
 
         $this->padType = $padType;

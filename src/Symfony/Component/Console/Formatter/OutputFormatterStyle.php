@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Formatter;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 /**
  * Formatter style class for defining styles.
  *
@@ -81,7 +83,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string|null $color The color name
      *
-     * @throws \InvalidArgumentException When the color name isn't defined
+     * @throws InvalidArgumentException When the color name isn't defined
      *
      * @api
      */
@@ -94,7 +96,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         if (!isset(static::$availableForegroundColors[$color])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid foreground color specified: "%s". Expected one of (%s)',
                 $color,
                 implode(', ', array_keys(static::$availableForegroundColors))
@@ -109,7 +111,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string|null $color The color name
      *
-     * @throws \InvalidArgumentException When the color name isn't defined
+     * @throws InvalidArgumentException When the color name isn't defined
      *
      * @api
      */
@@ -122,7 +124,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         if (!isset(static::$availableBackgroundColors[$color])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid background color specified: "%s". Expected one of (%s)',
                 $color,
                 implode(', ', array_keys(static::$availableBackgroundColors))
@@ -137,14 +139,14 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string $option The option name
      *
-     * @throws \InvalidArgumentException When the option name isn't defined
+     * @throws InvalidArgumentException When the option name isn't defined
      *
      * @api
      */
     public function setOption($option)
     {
         if (!isset(static::$availableOptions[$option])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid option specified: "%s". Expected one of (%s)',
                 $option,
                 implode(', ', array_keys(static::$availableOptions))
@@ -161,12 +163,12 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string $option The option name
      *
-     * @throws \InvalidArgumentException When the option name isn't defined
+     * @throws InvalidArgumentException When the option name isn't defined
      */
     public function unsetOption($option)
     {
         if (!isset(static::$availableOptions[$option])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid option specified: "%s". Expected one of (%s)',
                 $option,
                 implode(', ', array_keys(static::$availableOptions))

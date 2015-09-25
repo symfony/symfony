@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T06:15:36Z
+
+The UPGRADE-2.8.md and 3.0 file should be updated with instruction on how to upgrade.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-14T09:29:31Z
+
+I added entries in the UPGRADING files and hope that's what you expect.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-16T07:23:17Z
+
+@fabpot Anything else you'd like to see changed? Once this is merged I'd like to continue discussing #15719 and #7796, both would need to be addressed in 2.8/3.0 because of deprecations/removals.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-23T08:58:48Z
+
+Build failure due to transient test on Windows, added to the list at https://github.com/symfony/symfony/issues/15617#issuecomment-142533707
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-23T09:00:15Z
+
+*ping* @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T09:12:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:40:05Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T17:16:18Z
+
+:+1:

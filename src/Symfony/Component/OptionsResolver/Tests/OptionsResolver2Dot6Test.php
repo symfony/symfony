@@ -1103,6 +1103,56 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->resolve();
     }
 
+    public function testCatchedExceptionFromNormalizerDoesNotCrashOptionResolver()
+    {
+        $throw = true;
+
+        $this->resolver->setDefaults(array('catcher' => null, 'thrower' => null));
+
+        $this->resolver->setNormalizer('catcher', function (Options $options) {
+            try {
+                return $options['thrower'];
+            } catch(\Exception $e) {
+                return false;
+            }
+        });
+
+        $this->resolver->setNormalizer('thrower', function (Options $options) use (&$throw) {
+            if ($throw) {
+                $throw = false;
+                throw new \UnexpectedValueException('throwing');
+            }
+
+            return true;
+        });
+
+        $this->resolver->resolve();
+    }
+
+    public function testCatchedExceptionFromLazyDoesNotCrashOptionResolver()
+    {
+        $throw = true;
+
+        $this->resolver->setDefault('catcher', function (Options $options) {
+            try {
+                return $options['thrower'];
+            } catch(\Exception $e) {
+                return false;
+            }
+        });
+
+        $this->resolver->setDefault('thrower', function (Options $options) use (&$throw) {
+            if ($throw) {
+                $throw = false;
+                throw new \UnexpectedValueException('throwing');
+            }
+
+            return true;
+        });
+
+        $this->resolver->resolve();
+    }
+
     public function testInvokeEachNormalizerOnlyOnce()
     {
         $calls = 0;

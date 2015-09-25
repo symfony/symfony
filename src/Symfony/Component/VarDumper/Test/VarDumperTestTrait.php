@@ -33,6 +33,7 @@ trait VarDumperTestTrait
     {
         $h = fopen('php://memory', 'r+b');
         $cloner = new VarCloner();
+        $cloner->setMaxItems(-1);
         $dumper = new CliDumper($h);
         $dumper->setColors(false);
         $dumper->dump($cloner->cloneVar($data)->withRefHandles(false));

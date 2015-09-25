@@ -106,6 +106,8 @@ abstract class AbstractVoter implements VoterInterface
      * To determine if the passed class is instance of the supported class, the
      * isClassInstanceOf() method can be used.
      *
+     * This method will become abstract in 3.0.
+     *
      * @param string $attribute An attribute
      * @param string $class     The fully qualified class name of the passed object
      *

@@ -103,9 +103,6 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('foo', $children);
     }
 
-    /*
-     * https://github.com/symfony/symfony/issues/4693
-     */
     public function testMaintainOrderOfLazyAndExplicitChildren()
     {
         $this->builder->add('foo', 'text');
@@ -137,7 +134,6 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->builder->has('foo'));
     }
 
-    // https://github.com/symfony/symfony/pull/4826
     public function testRemoveAndGetForm()
     {
         $this->builder->add('foo', 'text');

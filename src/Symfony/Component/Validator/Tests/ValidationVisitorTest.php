@@ -440,7 +440,6 @@ class ValidationVisitorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->visitor->getViolations());
     }
 
-    // https://github.com/symfony/symfony/issues/6246
     public function testValidateCascadedPropertyRecursesArraysByDefault()
     {
         $entity = new Entity();

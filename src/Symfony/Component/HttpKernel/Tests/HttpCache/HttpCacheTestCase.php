@@ -135,7 +135,6 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         return $values;
     }
 
-    // A basic response with 200 status code and a tiny body.
     public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);

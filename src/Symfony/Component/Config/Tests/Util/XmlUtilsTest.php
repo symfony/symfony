@@ -148,7 +148,6 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
         XmlUtils::loadFile($file);
     }
 
-    // test for issue https://github.com/symfony/symfony/issues/9731
     public function testLoadWrongEmptyXMLWithErrorHandler()
     {
         $originalDisableEntities = libxml_disable_entity_loader(false);

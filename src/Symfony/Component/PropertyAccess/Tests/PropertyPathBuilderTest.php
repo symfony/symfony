@@ -239,7 +239,6 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
-    // https://github.com/symfony/symfony/issues/5605
     public function testReplaceWithLongerPath()
     {
         // error occurs when path contains at least two more elements

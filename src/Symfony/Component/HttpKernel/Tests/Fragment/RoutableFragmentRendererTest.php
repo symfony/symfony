@@ -65,6 +65,7 @@ class Renderer extends RoutableFragmentRenderer
     public function render($uri, Request $request, array $options = array())
     {
     }
+
     public function getName()
     {
     }

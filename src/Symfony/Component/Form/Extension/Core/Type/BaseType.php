@@ -93,7 +93,6 @@ abstract class BaseType extends AbstractType
             // Including the type is important too, because if rows of a
             // collection form have different types (dynamically), they should
             // be rendered differently.
-            // https://github.com/symfony/symfony/issues/5038
             'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
         ));
     }

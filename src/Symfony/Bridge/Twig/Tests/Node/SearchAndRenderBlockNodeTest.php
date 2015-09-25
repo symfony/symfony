@@ -158,7 +158,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
-        // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
                 '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
@@ -215,7 +214,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
-        // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
                 '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
@@ -252,7 +250,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
-        // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
                 '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',

@@ -121,7 +121,6 @@ class ObjectChoiceList extends ChoiceList
                     $group = $this->propertyAccessor->getValue($choice, $this->groupPath);
                 } catch (NoSuchPropertyException $e) {
                     // Don't group items whose group property does not exist
-                    // see https://github.com/symfony/symfony/commit/d9b7abb7c7a0f28e0ce970afc5e305dce5dccddf
                     $group = null;
                 }
 

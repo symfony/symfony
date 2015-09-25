@@ -139,7 +139,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->has('1'));
     }
 
-    // fix for https://github.com/symfony/symfony/pull/493
     public function testPreSubmitRemovesZeroKeys()
     {
         $this->form->add($this->getForm('0'));
@@ -189,7 +188,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->has('1'));
     }
 
-    // fixes https://github.com/symfony/symfony/pull/40
     public function testPreSubmitDealsWithEmptyData()
     {
         $this->form->add($this->getForm('1'));

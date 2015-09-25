@@ -88,7 +88,6 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $obj5 = (object) array('name' => 'E', 'category' => null);
 
         // Objects without the group property are not grouped either
-        // see https://github.com/symfony/symfony/commit/d9b7abb7c7a0f28e0ce970afc5e305dce5dccddf
         $obj6 = (object) array('name' => 'F');
 
         $this->list = new ObjectChoiceList(

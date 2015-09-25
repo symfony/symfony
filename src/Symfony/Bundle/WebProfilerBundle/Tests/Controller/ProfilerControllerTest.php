@@ -39,7 +39,6 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(null),
-            // "empty" is also a valid empty token case, see https://github.com/symfony/symfony/issues/10806
             array('empty'),
         );
     }

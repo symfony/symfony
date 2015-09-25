@@ -89,7 +89,9 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
-    // More specific mapping tests can be found in ViolationMapperTest
+    /**
+     * More specific mapping tests can be found in ViolationMapperTest.
+     */
     public function testMapViolation()
     {
         $violation = $this->getConstraintViolation();

@@ -134,7 +134,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($to, $transformer->reverseTransform($from));
     }
 
-    // https://github.com/symfony/symfony/issues/7609
     public function testReverseTransformWithGroupingAndFixedSpaces()
     {
         if (!function_exists('mb_detect_encoding')) {
@@ -301,8 +300,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     *
-     * @link https://github.com/symfony/symfony/issues/3161
      */
     public function testReverseTransformDisallowsNaN()
     {

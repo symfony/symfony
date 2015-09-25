@@ -185,9 +185,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foobar', $this->propertyAccessor->getValue($object, 'magicProperty'));
     }
 
-    /*
-     * https://github.com/symfony/symfony/pull/4450
-     */
     public function testGetValueReadsMagicGetThatReturnsConstant()
     {
         $object = new Magician();

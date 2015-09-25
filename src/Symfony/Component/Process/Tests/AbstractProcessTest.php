@@ -76,8 +76,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->verifyPosixIsEnabled();
 
         // exec is mandatory here since we send a signal to the process
-        // see https://github.com/symfony/symfony/issues/5030 about prepending
-        // command with exec
         $p = $this->getProcess('exec php '.__DIR__.'/NonStopableProcess.php 3');
         $p->start();
         usleep(100000);

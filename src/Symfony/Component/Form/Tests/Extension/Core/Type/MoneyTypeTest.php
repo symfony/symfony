@@ -44,7 +44,6 @@ class MoneyTypeTest extends TestCase
         $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
     }
 
-    // https://github.com/symfony/symfony/issues/5458
     public function testPassDifferentPatternsForDifferentCurrencies()
     {
         \Locale::setDefault('de_DE');

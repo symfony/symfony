@@ -23,7 +23,9 @@ class PropertyAccessorCollectionTest_Car
         $this->axes = $axes;
     }
 
-    // In the test, use a name that StringUtil can't uniquely singularify
+    /**
+     * In the test, use a name that StringUtil can't uniquely singularify.
+     */
     public function addAxis($axis)
     {
         $this->axes[] = $axis;

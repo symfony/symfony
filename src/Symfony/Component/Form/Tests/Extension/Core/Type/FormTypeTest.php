@@ -29,20 +29,26 @@ class FormTest_AuthorWithoutRefSetter
         $this->referenceCopy = $reference;
     }
 
-    // The returned object should be modified by reference without having
-    // to provide a setReference() method
+    /**
+     * The returned object should be modified by reference without having
+     * to provide a setReference() method.
+     */
     public function getReference()
     {
         return $this->reference;
     }
 
-    // The returned object is a copy, so setReferenceCopy() must be used
-    // to update it
+    /**
+     * The returned object should be modified by reference without having.
+     */
     public function getReferenceCopy()
     {
         return is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
     }
 
+    /**
+     * The returned object is a copy, so setReferenceCopy() must be used.
+     */
     public function setReferenceCopy($reference)
     {
         $this->referenceCopy = $reference;
@@ -227,9 +233,6 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals(new Author(), $form->getData());
     }
 
-    /*
-     * We need something to write the field values into
-     */
     public function testSubmitWithEmptyDataStoresArrayIfNoClassAvailable()
     {
         $form = $this->factory->createBuilder('form')
@@ -287,8 +290,6 @@ class FormTypeTest extends BaseTypeTest
 
     /**
      * @dataProvider provideZeros
-     *
-     * @see https://github.com/symfony/symfony/issues/1986
      */
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
@@ -572,7 +573,6 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame('bar', $view->vars['value']);
     }
 
-    // https://github.com/symfony/symfony/issues/6862
     public function testPassZeroLabelToView()
     {
         $view = $this->factory->create('form', null, array(

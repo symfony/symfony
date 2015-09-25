@@ -74,7 +74,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('bar', $form->getViewData());
     }
 
-    // https://github.com/symfony/symfony/commit/d4f4038f6daf7cf88ca7c7ab089473cce5ebf7d8#commitcomment-1632879
     public function testDataIsInitializedFromSubmit()
     {
         $mock = $this->getMockBuilder('\stdClass')
@@ -96,7 +95,6 @@ class SimpleFormTest extends AbstractFormTest
         $form->submit('foobar');
     }
 
-    // https://github.com/symfony/symfony/pull/7789
     public function testFalseIsConvertedToNull()
     {
         $mock = $this->getMockBuilder('\stdClass')
@@ -429,9 +427,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('third', $form->getNormData());
     }
 
-    /*
+    /**
      * When there is no data transformer, the data must have the same format
-     * in all three representations
+     * in all three representations.
      */
     public function testSetDataConvertsScalarToStringIfNoTransformer()
     {
@@ -444,9 +442,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('1', $form->getViewData());
     }
 
-    /*
+    /**
      * Data in client format should, if possible, always be a string to
-     * facilitate differentiation between '0' and ''
+     * facilitate differentiation between '0' and ''.
      */
     public function testSetDataConvertsScalarToStringIfOnlyModelTransformer()
     {
@@ -464,9 +462,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('23', $form->getViewData());
     }
 
-    /*
+    /**
      * NULL remains NULL in app and norm format to remove the need to treat
-     * empty values and NULL explicitly in the application
+     * empty values and NULL explicitly in the application.
      */
     public function testSetDataConvertsNullToStringIfNoTransformer()
     {
@@ -753,7 +751,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals(new PropertyPath('address.street'), $form->getPropertyPath());
     }
 
-    // see https://github.com/symfony/symfony/issues/3903
     public function testGetPropertyPathDefaultsToNameIfParentHasDataClass()
     {
         $parent = $this->getBuilder(null, null, 'stdClass')
@@ -766,7 +763,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
     }
 
-    // see https://github.com/symfony/symfony/issues/3903
     public function testGetPropertyPathDefaultsToIndexedNameIfParentDataClassIsNull()
     {
         $parent = $this->getBuilder()

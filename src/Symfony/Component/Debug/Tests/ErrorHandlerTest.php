@@ -144,7 +144,9 @@ PHP
         restore_error_handler();
     }
 
-    // dummy function to test trace in error handler.
+    /**
+     * Dummy function to test trace in error handler.
+     */
     private static function triggerNotice($that)
     {
         // dummy variable to check for in error handler.

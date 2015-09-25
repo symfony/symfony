@@ -398,11 +398,6 @@ EOF;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    /**
-     * Regression test for issue #7989.
-     *
-     * @see https://github.com/symfony/symfony/issues/7989
-     */
     public function testBlockLiteralWithLeadingNewlines()
     {
         $yaml = <<<'EOF'

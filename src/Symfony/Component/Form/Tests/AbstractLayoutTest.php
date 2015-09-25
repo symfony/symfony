@@ -275,7 +275,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    // https://github.com/symfony/symfony/issues/5029
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'text', null, array(
@@ -385,7 +384,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         // If the field is collapsed, has no "multiple" attribute, is required but
         // has *no* empty value, the "required" must not be added, otherwise
         // the resulting HTML is invalid.
-        // https://github.com/symfony/symfony/issues/8942
 
         // HTML 5 spec
         // http://www.w3.org/html/wg/drafts/html/master/forms.html#placeholder-label-option
@@ -573,7 +571,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         // The "disabled" attribute was removed again due to a bug in the
         // BlackBerry 10 browser.
-        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
@@ -599,7 +596,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         // The "disabled" attribute was removed again due to a bug in the
         // BlackBerry 10 browser.
-        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array('empty_value' => ''),
 '/select
     [@name="name"]

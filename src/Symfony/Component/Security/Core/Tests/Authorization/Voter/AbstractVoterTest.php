@@ -2,12 +2,13 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AbstractVoterTest_Voter extends AbstractVoter
 {
-    protected function isGranted($attribute, $object, $user = null)
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
     {
         return 'EDIT' === $attribute;
     }
@@ -34,23 +35,38 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 
     public function testAttributeAndClassSupported()
     {
-        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('EDIT')));
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('CREATE')));
-    }
-
-    public function testAttributeNotSupported()
-    {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->object, array('DELETE')));
+        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('EDIT')), 'ACCESS_GRANTED if attribute grants access');
+        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('CREATE')), 'ACESS_DENIED if attribute denies access');
     }
 
     public function testOneAttributeSupported()
     {
-        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('DELETE', 'EDIT')));
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('DELETE', 'CREATE')));
+        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('DELETE', 'EDIT')), 'ACCESS_GRANTED if supported attribute grants access');
+        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('DELETE', 'CREATE')), 'ACCESS_DENIED if supported attribute denies access');
+    }
+
+    public function testOneAttributeGrantsAccess()
+    {
+        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('CREATE', 'EDIT')), 'ACCESS_GRANTED');
+    }
+
+    public function testNoAttributeSupported()
+    {
+        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->object, array('DELETE')), 'ACCESS_ABSTAIN');
     }
 
     public function testClassNotSupported()
     {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->getMock('AbstractVoterTest_Object1'), array('EDIT')));
+        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->getMock('AbstractVoterTest_Object1'), array('EDIT')), 'ACCESS_ABSTAIN');
+    }
+
+    public function testNullObject()
+    {
+        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, null, array('EDIT')), 'ACCESS_ABSTAIN');
+    }
+
+    public function testNoAttributes()
+    {
+        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->object, array()), 'ACCESS_ABSTAIN');
     }
 }

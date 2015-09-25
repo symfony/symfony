@@ -127,6 +127,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if ($parentDef->getFactoryService(false)) {
             $def->setFactoryService($parentDef->getFactoryService(false));
         }
+        if ($parentDef->isDeprecated()) {
+            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
+        }
         $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
@@ -161,6 +164,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
+        }
+        if (isset($changes['deprecated'])) {
+            $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
         }
         if (isset($changes['decorated_service'])) {
             $decoratedService = $definition->getDecoratedService();

@@ -931,6 +931,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
 
+        if ($definition->isDeprecated()) {
+            @trigger_error($definition->getDeprecationMessage($id), E_USER_DEPRECATED);
+        }
+
         if ($tryProxy && $definition->isLazy()) {
             $container = $this;
 

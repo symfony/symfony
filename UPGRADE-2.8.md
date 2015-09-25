@@ -442,3 +442,34 @@ Security
        }
    }
    ```
+
+Config
+------
+
+ * The `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` method has been
+   deprecated and will be removed in Symfony 3.0 because it assumes that resource
+   implementations are able to check themselves for freshness. 
+
+   If you have custom resources that implement this method, change them to implement the
+   `\Symfony\Component\Config\Resource\SelfCheckingResourceInterface` sub-interface instead
+   of `\Symfony\Component\Config\Resource\ResourceInterface`.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Config\Resource\ResourceInterface;
+
+   class MyCustomResource implements ResourceInterface { ... }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
+
+   class MyCustomResource implements SelfCheckingResourceInterface { ... }
+   ```
+
+   Additionally, if you have implemented cache validation strategies *using* `isFresh()` 
+   yourself, you should have a look at the new cache validation system based on 
+   `ResourceChecker`s.

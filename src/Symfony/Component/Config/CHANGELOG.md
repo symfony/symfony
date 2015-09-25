@@ -20,6 +20,9 @@ Before: `InvalidArgumentException` (variable must contain at least two
 distinct elements).
 After: the code will work as expected and it will restrict the values of the
 `variable` option to just `value`.
+ 
+ * deprecated the `ResourceInterface::isFresh()` method. If you implement custom resource types and they
+   can be validated that way, make them implement the new `SelfCheckingResourceInterface`.
 
 2.7.0
 -----

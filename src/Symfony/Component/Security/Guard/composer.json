@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/security-core": "~2.8|~3.0.0",
-        "symfony/security-http": "~2.8|~3.0.0"
+        "symfony/security-core": "~2.8|~3.0",
+        "symfony/security-http": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.8|~3.0.0",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "autoload": {
@@ -30,7 +30,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

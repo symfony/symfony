@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-16T14:27:37Z
+
+I'm :-1: on this change too. I purposely removed this feature while the redesign.
+
+My reasoning:
+
+  1) The new sidebar is narrower than the old one, so the main contents enjoy more space.
+  2) Collapsing the sidebar gives you just a bit more pixels for the content.
+  3) Making the lines that contain text longer is not better but worse (as explained in the other pull request)
+  4) Lately Symfony favors not adding new features and even removing some of them if possible. I think that this "collapsible sidebar" can be a "removable feature" and we could even get rid of the `position` config. option.
+
+@hason in any case, keep in mind that my vote doesn't count for the merging or not of this PR, so you just have to convince the Symfony deciders.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T14:34:41Z
+
+I'm not convinced either we need this. I can tell that I never collapsed the profiler menu (I collapse the toolbar sometimes, for instance when it hides some of my own ``position: fixed`` content, but not the menu)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-09-16T14:50:29Z
+
+:-1: for collapsing using javascript,
+:+1: for collapsing on small screens with expanding on click/on hover.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-09-17T07:46:07Z
+
+The collapsed sidebar is enabled only on small screens.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-17T07:57:02Z
+
+Now that the behavior of this proposed feature has changed, I change my vote too for :+1:
+
+There are very small alignment issues:
+
+  * When collapsed, the menu icon doesn't appear centered horizontally as the other icons.
+  * When expanded, the icon of the Search button should be centered.
+  * When expanded, the menu icon should be vertically centered with the "Latest Profiles" and the Search buttons.
+
+---------------------------------------------------------------------------
+
+by hason at 2015-09-17T08:29:16Z
+
+@javiereguiluz I tried to correct alignment issues, but I'm not a webmaster. Could you review it, please?

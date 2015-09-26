@@ -66,7 +66,7 @@ class Crawler extends \SplObjectStorage
      */
     public function clear()
     {
-        $this->removeAll($this);
+        parent::removeAll($this);
     }
 
     /**
@@ -319,9 +319,9 @@ class Crawler extends \SplObjectStorage
     public function addNode(\DOMNode $node)
     {
         if ($node instanceof \DOMDocument) {
-            $this->attach($node->documentElement);
+            parent::attach($node->documentElement);
         } else {
-            $this->attach($node);
+            parent::attach($node);
         }
     }
 
@@ -874,6 +874,136 @@ class Crawler extends \SplObjectStorage
         }
 
         return sprintf('concat(%s)', implode($parts, ', '));
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function attach($object, $data = null)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::attach($object, $data);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function detach($object)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::detach($object);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function contains($object)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        return parent::contains($object);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function addAll($storage)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::addAll($storage);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function removeAll($storage)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::removeAll($storage);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function removeAllExcept($storage)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::removeAllExcept($storage);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function getInfo()
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        return parent::getInfo();
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function setInfo($data)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::setInfo($data);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function offsetExists($object)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        return parent::offsetExists($object);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function offsetSet($object, $data = null)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::offsetSet($object, $data);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function offsetUnset($object)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        parent::offsetUnset($object);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function offsetGet($object)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        return parent::offsetGet($object);
+    }
+
+    /**
+     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
+     */
+    public function getHash($object)
+    {
+        // Cannot trigger a deprecation warning here because SplObjectStorage calls this method when attaching an object.
+
+        return parent::getHash($object);
     }
 
     /**

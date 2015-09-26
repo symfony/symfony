@@ -105,9 +105,9 @@ EOF
 
     private function validate($content, $file = null)
     {
-        $this->parser = new Parser();
+        $parser = new Parser();
         try {
-            $this->parser->parse($content);
+            $parser->parse($content);
         } catch (ParseException $e) {
             return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
         }

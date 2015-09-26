@@ -64,7 +64,6 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             }
 
             $this->currentId = $id;
-            $this->currentDefinition = $definition;
             $this->currentScope = $scope = $definition->getScope();
 
             if (ContainerInterface::SCOPE_CONTAINER === $scope) {

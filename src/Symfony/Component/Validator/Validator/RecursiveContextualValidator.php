@@ -45,6 +45,16 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private $context;
 
     /**
+     * @var string
+     */
+    private $defaultPropertyPath;
+
+    /**
+     * @var array
+     */
+    private $defaultGroups;
+
+    /**
      * @var MetadataFactoryInterface
      */
     private $metadataFactory;

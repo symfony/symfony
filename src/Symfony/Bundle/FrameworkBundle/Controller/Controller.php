@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -292,16 +293,7 @@ abstract class Controller extends ContainerAware
      */
     protected function createFormBuilder($data = null, array $options = array())
     {
-        if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
-            $type = 'Symfony\Component\Form\Extension\Core\Type\FormType';
-        } else {
-            // not using the class name is deprecated since Symfony 2.8 and
-            // is only used for backwards compatibility with older versions
-            // of the Form component
-            $type = 'form';
-        }
-
-        return $this->container->get('form.factory')->createBuilder($type, $data, $options);
+        return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }
 
     /**

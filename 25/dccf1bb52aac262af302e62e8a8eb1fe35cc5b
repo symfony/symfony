@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-23T10:20:05Z
+
+Looks good to me. :+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-23T18:04:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T19:18:10Z
+
+I would do the same as for `ircmaxell/password-compat` where we require either the right PHP version or the dep in `composer.json` (#7853), at least for 3.0.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-23T21:10:43Z
+
+@fabpot This PR adds support for the `random_bytes` function in 2.3 if it is available (either by using PHP 7 or by manually including the compat library).
+
+#15879 deprecates the SecureRandom class for 2.8 and #15880 removes the class for 3.0 and only uses the `random_bytes` function with a hard dependency on the `paragonie/random_compat` library (which will only define the necessary functions when they are not available, I.E PHP < 7).
+
+I'm not sure if this is what you had in mind
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-09-24T13:09:37Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T12:13:11Z
+
+:+1:

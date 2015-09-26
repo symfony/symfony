@@ -141,7 +141,7 @@ class Router extends BaseRouter implements WarmableInterface
 
         $container = $this->container;
 
-        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value, $acceptArrayParameters) {
+        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
@@ -151,17 +151,15 @@ class Router extends BaseRouter implements WarmableInterface
 
             if (is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
-            }
-            if ($acceptArrayParameters && is_array($resolved)) {
+            } elseif ($acceptArrayParameters && is_array($resolved)) {
                 return implode('|', $resolved);
             }
 
             throw new RuntimeException(sprintf(
                 'The container parameter "%s", used in the route configuration value "%s", '.
-                'must be a %s, but it is of type %s.',
+                'must be a string or numeric, but it is of type %s.',
                 $match[1],
                 $value,
-                'string or numeric' . ($acceptArrayParameters ? ' or an array' : ''),
                 gettype($resolved)
                 )
             );

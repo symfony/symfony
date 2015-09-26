@@ -21,7 +21,7 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $routeLoader = $this->getMock('Symfony\Component\Routing\Loader\RouteLoaderInterface');
 
-        $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface', array('get'));
+        $container = $this->getMockedContainer();
 
         $container
             ->expects($this->any())
@@ -58,7 +58,7 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
         // anything that doesn't implement the interface
         $routeLoader = new \stdClass();
 
-        $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface', array('get'));
+        $container = $this->getMockedContainer();
 
         $container
             ->expects($this->once())
@@ -68,5 +68,12 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
 
         $serviceRouteLoader = new ServiceRouterLoader($container);
         $serviceRouteLoader->load('any_service_name', 'service');
+    }
+
+    private function getMockedContainer()
+    {
+        return $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerInterface')
+            //->setMethods(array('get'))
+            ->getMockForAbstractClass();
     }
 }

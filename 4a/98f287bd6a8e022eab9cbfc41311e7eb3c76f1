@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-06T12:53:20Z
+
+What is your use case?
+
+---------------------------------------------------------------------------
+
+by Naktibalda at 2015-09-06T15:50:08Z
+
+https://github.com/Codeception/Codeception/pull/2329
+
+I want to intercept the redirect, do some actions and then follow the redirect.
+My problem is that the instance of BrowserKit Client is public and following redirects can be disabled or limited by 3rd party code and I need to know that.

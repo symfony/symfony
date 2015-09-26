@@ -100,6 +100,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synthetic: true\n");
         }
 
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        deprecated: %s\n", $definition->getDeprecationMessage('%service_id%'));
+        }
+
         if ($definition->isLazy()) {
             $code .= sprintf("        lazy: true\n");
         }

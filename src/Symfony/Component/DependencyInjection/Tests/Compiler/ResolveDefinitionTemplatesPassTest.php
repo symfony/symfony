@@ -222,6 +222,36 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo', 'foo_inner', 0), $container->getDefinition('child1')->getDecoratedService());
     }
 
+    public function testDecoratedServiceCopiesDeprecatedStatusFromParent()
+    {
+        $container = new ContainerBuilder();
+        $container->register('deprecated_parent')
+            ->setDeprecated(true)
+        ;
+
+        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'));
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
+    }
+
+    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
+    {
+        $container = new ContainerBuilder();
+        $container->register('deprecated_parent')
+            ->setDeprecated(true)
+        ;
+
+        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'))
+            ->setDeprecated(false)
+        ;
+
+        $this->process($container);
+
+        $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

@@ -61,6 +61,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCreateDeprecatedService()
+    {
+        $definition = new Definition('stdClass');
+        $definition->setDeprecated(true);
+
+        $that = $this;
+        $wasTriggered = false;
+
+        set_error_handler(function ($errno, $errstr) use ($that, &$wasTriggered) {
+            $that->assertSame(E_USER_DEPRECATED, $errno);
+            $that->assertSame('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $errstr);
+            $wasTriggered = true;
+        });
+
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('deprecated_foo', $definition);
+        $builder->get('deprecated_foo');
+
+        restore_error_handler();
+
+        $this->assertTrue($wasTriggered);
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::register
      */

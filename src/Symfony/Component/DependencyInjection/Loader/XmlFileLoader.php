@@ -158,6 +158,10 @@ class XmlFileLoader extends FileLoader
             $definition->setFile($files[0]->nodeValue);
         }
 
+        if ($deprecated = $this->getChildren($service, 'deprecated')) {
+            $definition->setDeprecated(true, $deprecated[0]->nodeValue);
+        }
+
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
 

@@ -116,6 +116,7 @@ class DateTimeType extends AbstractType
                 'days',
                 'empty_value',
                 'placeholder',
+                'choice_translation_domain',
                 'required',
                 'translation_domain',
                 'html5',
@@ -131,6 +132,7 @@ class DateTimeType extends AbstractType
                 'with_seconds',
                 'empty_value',
                 'placeholder',
+                'choice_translation_domain',
                 'required',
                 'translation_domain',
                 'html5',
@@ -245,6 +247,7 @@ class DateTimeType extends AbstractType
         $resolver->setDefined(array(
             'empty_value', // deprecated
             'placeholder',
+            'choice_translation_domain',
             'years',
             'months',
             'days',

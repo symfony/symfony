@@ -390,6 +390,13 @@
                         e.preventDefault();
 
                         var toggle = e.target || e.srcElement;
+
+                        /* needed because when the toggle contains HTML contents, user can click */
+                        /* on any of those elements instead of their parent '.sf-toggle' element */
+                        while (!Sfjs.hasClass(toggle, 'sf-toggle')) {
+                            toggle = toggle.parentNode;
+                        }
+
                         var element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
 
                         Sfjs.toggleClass(element, 'sf-toggle-hidden');

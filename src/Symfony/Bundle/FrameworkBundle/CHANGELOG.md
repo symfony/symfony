@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * Deprecated the Shell
+
 2.7.0
 -----
 

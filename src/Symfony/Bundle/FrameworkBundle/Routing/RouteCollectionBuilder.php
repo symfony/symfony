@@ -299,7 +299,7 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Set a controller class that all added embedded should use.
+     * Set a controller class that all added embedded routes should use.
      *
      * With this, the controller for embedded routes can just be a method name.
      * If an embedded route has a full controller (e.g. class::methodName), the

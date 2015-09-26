@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T07:40:01Z
+
+I think we need to introduce a whole new resource system, which would move the checking of freshness outside the resource (it is not possible to implement such feature in the existing interface). As such, I don't think we need to deprecate part of the interface now (we should deprecate the whole interface when implementing the new system)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-08T07:44:01Z
+
+@stof please see ~~#15692~~ #15738, I think we can make it with refactorings.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T08:06:58Z
+
+@mpdude the issue is that ``ResourceInterface::isFresh`` simply cannot be implemented for the new system, as resources don't have the necessary info to check themselves (in the general case).
+This is why we need a new API, with a new interface (and the new interface should be enforced to be Serializable IMO).
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-08T08:36:45Z
+
+@stof ~~#15692~~ #15738 tries to shift resource validation to services which are called `MetadataValidator` there.
+
+For resources implementing `ResourceInterface`, a generic validator can be used and it needs the `isFresh` method.
+
+If we remove `ResourceInterface::getResource()` because we don't need it, the only requirement for resources in the *general case* is to implement `__toString` which is needed for de-duplication.
+
+So, we could extract that into a base interface (`ResourceMetadata`, `CacheMetadata` or ...?) and make this base interface the only requirement for resources.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T09:48:12Z
+
+@mpdude a resource should also be serializable, as we serialize it in the meta file. This is why I think we need a new interface (freeing us from BC on the interface itself), with an implementation wrapping the existing ResourceInterface.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-08T09:50:32Z
+
+Is it really necessary to extend \Serializable? What difference does it make?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T09:52:58Z
+
+@mpdude makig sure resources are actually serializable (people broke things in the past when putting a PDO instance in their own resources as this would not make them serializable anymore)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-08T10:01:16Z
+
+Yes, but they will find out rather quickly and still can implement \Serializable, not?
+
+For most simple resources that work fine with the built-in serialization mechanism, I'd like to avoid the hassle of having to implement __sleep and __wakeup. Plus it's not a BC issue on `ResourceInterface` which works without `Serializable` right now, and changing that is hard (or even impossible).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-08T10:08:53Z
+
+@mpdude if you don't implement Serializable, it also means you are not allowed to modify your class anymore, because it would break BC for the unserialization of existing meta. This is why core resources are serializable btw (and also to reduce the size of the serialized data)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-24T21:48:53Z
+
+*ping* @fabpot / @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T07:48:06Z
+
+needs a rebase
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-25T08:18:40Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-25T11:05:27Z
+
+Do we really need to keep this interface for 3.0?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-25T11:07:17Z
+
+We need the __toString() for resource deduplication, plus there are `@api` interfaces that use it for type hints.

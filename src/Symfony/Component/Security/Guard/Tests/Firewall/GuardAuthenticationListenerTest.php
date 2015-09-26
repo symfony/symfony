@@ -79,6 +79,36 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($this->event);
     }
 
+    public function testHandleSuccessStopsAfterResponseIsSet()
+    {
+        $authenticator1 = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+        $authenticator2 = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+
+        // mock the first authenticator to fail, and set a Response
+        $authenticator1
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->willThrowException(new AuthenticationException());
+        $this->guardAuthenticatorHandler
+            ->expects($this->once())
+            ->method('handleAuthenticationFailure')
+            ->willReturn(new Response());
+        // the second authenticator should *never* be called
+        $authenticator2
+            ->expects($this->never())
+            ->method('getCredentials');
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            'my_firewall',
+            array($authenticator1, $authenticator2),
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
     public function testHandleSuccessWithRememberMe()
     {
         $authenticator = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
@@ -201,7 +231,10 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->request = new Request(array(), array(), array(), array(), array(), array());
 
-        $this->event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRequest'))
+            ->getMock();
         $this->event
             ->expects($this->any())
             ->method('getRequest')

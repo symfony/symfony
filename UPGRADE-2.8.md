@@ -235,6 +235,23 @@ Form
    match the type returned by `getExtendedType` is now forbidden. Fix your
    implementation to define the right type.
 
+ * The alias option of the `form.type_extension` tag is deprecated in favor of
+   the `extended_type` option.
+
+   Before:
+   ```xml
+   <service id="app.type_extension" class="Vendor\Form\Extension\MyTypeExtension">
+       <tag name="form.type_extension" alias="text" />
+   </service>
+   ```
+
+   After:
+   ```xml
+   <service id="app.type_extension" class="Vendor\Form\Extension\MyTypeExtension">
+       <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\TextType" />
+   </service>
+   ```
+
 Translator
 ----------
 

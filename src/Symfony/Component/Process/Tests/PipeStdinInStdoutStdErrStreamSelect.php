@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 define('ERR_SELECT_FAILED', 1);
 define('ERR_TIMEOUT', 2);
 define('ERR_READ_FAILED', 3);

@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,9 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
+
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\InitAclCommand;
 use Symfony\Bundle\SecurityBundle\Command\SetAclCommand;

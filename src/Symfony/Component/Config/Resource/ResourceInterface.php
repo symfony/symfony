@@ -47,6 +47,12 @@ interface ResourceInterface
      * Returns the tied resource.
      *
      * @return mixed The resource
+     *
+     * @deprecated since 2.8, to be removed in 3.0. As there are many different kinds of resource,
+     *             a single getResource() method does not make sense at the interface level. You
+     *             can still call getResource() on implementing classes, probably after performing
+     *             a type check. If you know the concrete type of Resource at hand, the return value
+     *             of this method may make sense to you.
      */
     public function getResource();
 }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2015-09-26T12:39:58Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T12:41:02Z
+
+This PR should contain only the files not fixed already in the 2.3 branch though (same for PRs against 2.8 and master), as we merge branches together.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-09-26T12:49:09Z
+
+@stof that's the case here I think. I fixed 2.3 than I merged the fixed branch into 2.7 and fixed 2.7 as well and cherry-picked the fix commit so these are the fixes for 2.7 without my merge commit of 2.3, and the same for 2.8 but merged the fixed 2.7 branch.

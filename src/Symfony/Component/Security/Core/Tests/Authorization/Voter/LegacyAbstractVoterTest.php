@@ -13,6 +13,26 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 
+class LegacyAbstractVoterTest extends AbstractVoterTest
+{
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->voter = new LegacyAbstractVoterTest_Voter();
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \BadMethodCallException
+     */
+    public function testNoOverriddenMethodsThrowsException()
+    {
+        $voter = new LegacyAbstractVoterTest_NothingImplementedVoter();
+        $voter->vote($this->token, $this->object, array('foo'));
+    }
+}
+
 class LegacyAbstractVoterTest_Voter extends AbstractVoter
 {
     protected function getSupportedClasses()
@@ -31,12 +51,19 @@ class LegacyAbstractVoterTest_Voter extends AbstractVoter
     }
 }
 
-class LegacyAbstractVoterTest extends AbstractVoterTest
+class LegacyAbstractVoterTest_NothingImplementedVoter extends AbstractVoter
 {
-    protected function setUp()
+    protected function getSupportedClasses()
     {
-        parent::setUp();
-
-        $this->voter = new LegacyAbstractVoterTest_Voter();
+        return array(
+            'Symfony\Component\Security\Core\Tests\Authorization\Voter\ObjectFixture',
+        );
     }
+
+    protected function getSupportedAttributes()
+    {
+        return array('EDIT', 'CREATE');
+    }
+
+    // this is a bad voter that hasn't overridden isGranted or voteOnAttribute
 }

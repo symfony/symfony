@@ -67,6 +67,7 @@ class DateType extends AbstractType
         } else {
             $yearOptions = $monthOptions = $dayOptions = array(
                 'error_bubbling' => true,
+                'choice_translation_domain' => false,
             );
 
             $formatter = new \IntlDateFormatter(

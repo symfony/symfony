@@ -52,6 +52,7 @@ class TimeType extends AbstractType
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,
+                'choice_translation_domain' => false,
             );
 
             if ('choice' === $options['widget']) {

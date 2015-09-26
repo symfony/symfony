@@ -22,32 +22,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 abstract class AbstractVoter implements VoterInterface
 {
     /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        return in_array($attribute, $this->getSupportedAttributes());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        foreach ($this->getSupportedClasses() as $supportedClass) {
-            if ($supportedClass === $class || is_subclass_of($class, $supportedClass)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Iteratively check all given attributes by calling isGranted.
      *
      * This method terminates as soon as it is able to return ACCESS_GRANTED
@@ -93,35 +67,12 @@ abstract class AbstractVoter implements VoterInterface
      * To determine if the passed class is instance of the supported class, the
      * isClassInstanceOf() method can be used.
      *
-     * This method will become abstract in 3.0.
-     *
      * @param string $attribute An attribute
      * @param string $class     The fully qualified class name of the passed object
      *
      * @return bool True if the attribute and class is supported, false otherwise
      */
-    protected function supports($attribute, $class)
-    {
-        @trigger_error('The getSupportedClasses and getSupportedAttributes methods are deprecated since version 2.8 and will be removed in version 3.0. Overwrite supports instead.', E_USER_DEPRECATED);
-
-        $classIsSupported = false;
-        foreach ($this->getSupportedClasses() as $supportedClass) {
-            if ($this->isClassInstanceOf($class, $supportedClass)) {
-                $classIsSupported = true;
-                break;
-            }
-        }
-
-        if (!$classIsSupported) {
-            return false;
-        }
-
-        if (!in_array($attribute, $this->getSupportedAttributes())) {
-            return false;
-        }
-
-        return true;
-    }
+    abstract protected function supports($attribute, $class);
 
     /**
      * A helper method to test if the actual class is instanceof or equal
@@ -135,30 +86,6 @@ abstract class AbstractVoter implements VoterInterface
     protected function isClassInstanceOf($actualClass, $expectedClass)
     {
         return $expectedClass === $actualClass || is_subclass_of($actualClass, $expectedClass);
-    }
-
-    /**
-     * Return an array of supported classes. This will be called by supportsClass.
-     *
-     * @return array an array of supported classes, i.e. array('Acme\DemoBundle\Model\Product')
-     *
-     * @deprecated since version 2.8, to be removed in 3.0. Use supports() instead.
-     */
-    protected function getSupportedClasses()
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-    }
-
-    /**
-     * Return an array of supported attributes. This will be called by supportsAttribute.
-     *
-     * @return array an array of supported attributes, i.e. array('CREATE', 'READ')
-     *
-     * @deprecated since version 2.8, to be removed in 3.0. Use supports() instead.
-     */
-    protected function getSupportedAttributes()
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
     }
 
     /**

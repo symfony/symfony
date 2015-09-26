@@ -7,6 +7,26 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.33 (2015-09-25)
+
+ * bug #15821 [EventDispatcher] fix memory leak in getListeners (Tobion)
+ * bug #15826 [Finder] Optimize the hot-path (nicolas-grekas)
+ * bug #15802 [Finder] Handle filtering of recursive iterators and use it to skip looping over excluded directories (nicolas-grekas)
+ * bug #15803 [Finder] Exclude files based on path before applying the sorting (stof)
+ * bug #13794 [DomCrawler] Invalid uri created from forms if base tag present (danez)
+ * bug #15637 Use ObjectManager interface instead of EntityManager (gnat42)
+ * bug #14802 [HttpKernel] fix broken multiline <esi:remove> (sstok)
+ * bug #14841 [DoctrineBridge] Fixed #14840 (saksmt)
+ * bug #15770 [Yaml] Fix the parsing of float keys (jmgq)
+ * bug #15771 [Console] Ensure the console output is only detected as decorated when both stderr and stdout support colors (Seldaek)
+ * bug #15750 Add tests to the recently added exceptions thrown from YamlFileLoaders (jakzal)
+ * bug #15718 Fix that two DirectoryResources with different patterns would be deduplicated (mpdude)
+ * bug #14916 [WebProfilerBundle] Added tabindex="-1" to not interfer with normal UX (drAlberT)
+ * bug #15725 Dispatch console.terminate *after* console.exception (Seldaek)
+ * bug #15731 improve exceptions when parsing malformed files (xabbuh)
+ * bug #15729 [Kernel] Integer version constants (Tobion)
+ * bug #15527 [Translator][fallback catalogues] fixed circular reference. (aitboudad)
+
 * 2.3.32 (2015-09-01)
 
  * bug #15601 [console] Use the description when no help is available (Nicofuma)

@@ -26,7 +26,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         return in_array($attribute, $this->getSupportedAttributes());
     }
@@ -36,7 +36,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsClass($class)
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         foreach ($this->getSupportedClasses() as $supportedClass) {
             if ($supportedClass === $class || is_subclass_of($class, $supportedClass)) {
@@ -115,7 +115,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function supports($attribute, $class)
     {
-        @trigger_error('The getSupportedClasses and getSupportedAttributes methods are deprecated since version 2.8 and will be removed in version 3.0. Overwrite supports instead.');
+        @trigger_error('The getSupportedClasses and getSupportedAttributes methods are deprecated since version 2.8 and will be removed in version 3.0. Overwrite supports instead.', E_USER_DEPRECATED);
 
         $classIsSupported = false;
         foreach ($this->getSupportedClasses() as $supportedClass) {
@@ -159,7 +159,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function getSupportedClasses()
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
     }
 
     /**
@@ -171,7 +171,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function getSupportedAttributes()
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.');
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
     }
 
     /**

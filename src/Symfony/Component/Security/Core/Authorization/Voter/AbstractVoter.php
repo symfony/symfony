@@ -84,16 +84,9 @@ abstract class AbstractVoter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($isNewOverwritten) {
-                if ($this->voteOnAttribute($attribute, $object, $token)) {
-                    // grant access as soon as at least one voter returns a positive response
-                    return self::ACCESS_GRANTED;
-                }
-            } else {
-                if ($this->isGranted($attribute, $object, $token->getUser())) {
-                    // grant access as soon as at least one voter returns a positive response
-                    return self::ACCESS_GRANTED;
-                }
+            if ($this->voteOnAttribute($attribute, $object, $token)) {
+                // grant access as soon as at least one voter returns a positive response
+                return self::ACCESS_GRANTED;
             }
         }
 
@@ -211,6 +204,6 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function voteOnAttribute($attribute, $object, TokenInterface $token)
     {
-        return false;
+        return $this->isGranted($attribute, $object, $token->getUser());
     }
 }

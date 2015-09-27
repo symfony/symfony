@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Guard\Token;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 /**
  * A marker interface that both guard tokens implement.
  *
@@ -20,6 +22,6 @@ namespace Symfony\Component\Security\Guard\Token;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-interface GuardTokenInterface
+interface GuardTokenInterface extends TokenInterface
 {
 }

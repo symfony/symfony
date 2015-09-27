@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class SessionController implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-    
+
     public function welcomeAction(Request $request, $name = null)
     {
         $session = $request->getSession();

@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T15:33:20Z
+
+Duplicate of https://github.com/symfony/symfony/pull/15886 ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T16:05:42Z
+
+@WouterJ it is - do you want to update your PR - i.e. add the trigger_error and remove the reflection stuff? I'm not convinced whether my BadMethodCallException is needed or not.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T16:41:44Z
+
+:+1:
+
+Status: reviewed
+
+@weaverryan the BadMethodCallException is a good idea: we will make ``voteOnAttribute`` abstract in 3.0 (we cannot yet in 2.8 for BC), so not overwriting anything must fail loudly
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T16:46:36Z
+
+@weaverryan I think it's easier to finish this PR, I've closed mine.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T16:56:48Z
+
+Great - PR updated - thanks!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T17:06:34Z
+
+I can't make any sense of the AbstractVoterTest. [This is how I implemented it](https://github.com/symfony/symfony/pull/15151/files#diff-98669b0f68376b77da4fe92a3ff1e569R1) in a PR merged yesterday, while the code shown in the branch now (and in your PR) is just a copy of the test in a bad location... (seems like something went wrong in the merge: https://github.com/symfony/symfony/commit/6f7aae991cb36b2bf242bd46feb7aae0936d23b2)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T18:21:49Z
+
+@WouterJ I don't see it. In this PR, the 2.8 branch and your linked PR, it all looks like its in `.../Security/Core/Tests/...`
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T18:27:19Z
+
+@weaverryan yeah, but take a look at the contents. The 2.8 branch (and your PR) has the contents of the tests that was in `Security/Tests/Core` (wrongly), while my linked PR has completely different tests
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T18:35:59Z
+
+@WouterJ Ah, yep - I see the same thing (I thought the path was the problem). You should create a new PR to fix this, then I can rebase after your merged. You better to do that since that's your test code that needs to be re-added.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-26T19:12:26Z
+
+As I explained in https://github.com/symfony/symfony/pull/15886#discussion_r40317396 here won't be any deprecation message for voters that don't support any attribute even though they will break in 3.0
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T19:30:07Z
+
+@Tobion good point - I'd vote to revert back to the Reflection stuff then - since the problem is with the *class* itself (not how some code in the class behaves), so it would be most awesome if we added a deprecation warning as soon as the problematic class is used.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T21:04:41Z
+
+@weaverryan can you rebase this branch so that tests of the Security component can actually run ? Your PR was opened at the time where the testsuite of the Security component was triggering a fatal error before reaching voters.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T21:08:13Z
+
+done - and thanks for fixing those tests
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T21:16:45Z
+
+@weaverryan see https://github.com/symfony/symfony/pull/15932 for fixing the tests

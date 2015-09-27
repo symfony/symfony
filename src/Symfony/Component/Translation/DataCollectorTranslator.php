@@ -43,7 +43,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         if ($translator instanceof FallbackLocaleAwareInterface) {
             $this->fallbackLocaleAware = $translator;
         } else if ($translator instanceof TranslatorBagInterface) {
-            @trigger_error(sprintf('The Translator "%" should implement \Symfony\Component\Translation\FallbackLocaleAwareInterface instead of (or in addtion to) \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The Translator "%" should implement \Symfony\Component\Translation\FallbackLocaleAwareInterface instead of (or in addition to) \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)), E_USER_DEPRECATED);
             $this->fallbackLocaleAware = new TranslatorBagToFallbackLocaleAwareAdapter($translator);
         } else {
             throw new \InvalidArgumentException(sprintf('The Translator "%s" implements neither \Symfony\Component\Translation\FallbackLocaleAwareInterface nor the deprecated \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)));

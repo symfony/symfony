@@ -943,6 +943,63 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
     }
 
+    public function testRunWithDispatcherAccessingInputOptions()
+    {
+        $noInteractionValue = null;
+        $quietValue = null;
+
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use (&$noInteractionValue, &$quietValue) {
+            $input = $event->getInput();
+
+            $noInteractionValue = $input->getOption('no-interaction');
+            $quietValue = $input->getOption('quiet');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--no-interaction' => true));
+
+        $this->assertTrue($noInteractionValue);
+        $this->assertFalse($quietValue);
+    }
+
+    public function testRunWithDispatcherAddingInputOptions()
+    {
+        $extraValue = null;
+
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use (&$extraValue) {
+            $definition = $event->getCommand()->getDefinition();
+            $input = $event->getInput();
+
+            $definition->addOption(new InputOption('extra', null, InputOption::VALUE_REQUIRED));
+            $input->bind($definition);
+
+            $extraValue = $input->getOption('extra');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--extra' => 'some test value'));
+
+        $this->assertEquals('some test value', $extraValue);
+    }
+
     public function testTerminalDimensions()
     {
         $application = new Application();

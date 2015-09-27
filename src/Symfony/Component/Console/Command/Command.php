@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
+use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -231,7 +232,7 @@ class Command
         // bind the input against the command specific arguments/options
         try {
             $input->bind($this->definition);
-        } catch (\Exception $e) {
+        } catch (ExceptionInterface $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
             }

@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['position']); })
+                ->ifTrue(function ($v) { return array_key_exists('position', $v); })
                 ->then(function ($v) {
                     @trigger_error('The web_profiler.position configuration key is deprecated since version 2.8 and will be removed in 3.0. No alternative configuration is available because the underlying feature has been removed.', E_USER_DEPRECATED);
 

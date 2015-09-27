@@ -15,6 +15,9 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 class SqliteProfilerStorage extends PdoProfilerStorage
 {

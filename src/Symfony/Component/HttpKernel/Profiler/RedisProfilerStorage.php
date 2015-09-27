@@ -16,6 +16,9 @@ namespace Symfony\Component\HttpKernel\Profiler;
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  * @author Stephane PY <py.stephane1@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 class RedisProfilerStorage implements ProfilerStorageInterface
 {

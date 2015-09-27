@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+/**
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
+ */
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;

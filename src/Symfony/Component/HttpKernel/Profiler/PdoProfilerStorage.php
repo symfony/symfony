@@ -16,6 +16,9 @@ namespace Symfony\Component\HttpKernel\Profiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schumann <js@schumann-it.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 abstract class PdoProfilerStorage implements ProfilerStorageInterface
 {

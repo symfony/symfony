@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * removed `ReferenceDumper` class
+ * removed the `ResourceInterface::isFresh()` method
+ * removed `BCResourceInterfaceChecker` class
 
 2.8.0
 -----

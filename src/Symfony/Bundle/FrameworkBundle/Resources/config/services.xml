@@ -49,12 +49,5 @@
             <tag name="config_cache.resource_checker" priority="-990" />
         </service>
 
-        <!--
-            This service is deprecated and will be removed in 3.0.
-        -->
-        <service class="Symfony\Component\Config\Resource\BCResourceInterfaceChecker" public="false">
-            <tag name="config_cache.resource_checker" priority="-1000" />
-        </service>
-
     </services>
 </container>

@@ -357,7 +357,6 @@ class MainConfiguration implements ConfigurationInterface
                         ),
                         'my_entity_provider' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username')),
                     ))
-                    ->disallowNewKeysInSubsequentConfigs()
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')

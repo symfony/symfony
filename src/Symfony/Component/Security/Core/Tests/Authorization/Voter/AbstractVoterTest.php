@@ -19,17 +19,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
  */
 class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var AbstractVoter
-     */
-    private $voter;
-
     private $token;
 
     protected function setUp()
     {
-        $this->voter = new VoterFixture();
-
         $tokenMock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $tokenMock
             ->expects($this->any())
@@ -44,7 +37,9 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVote($expectedVote, $object, $attributes, $message)
     {
-        $this->assertEquals($expectedVote, $this->voter->vote($this->token, $object, $attributes), $message);
+        $voter = new VoterFixture();
+
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
     /**
@@ -56,6 +51,16 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
         $voter = new DeprecatedVoterFixture();
 
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \BadMethodCallException
+     */
+    public function testNoOverriddenMethodsThrowsException()
+    {
+        $voter = new DeprecatedVoterNothingImplementedFixture();
+        $voter->vote($this->token, new ObjectFixture(), array('foo'));
     }
 
     public function getData()
@@ -111,6 +116,23 @@ class DeprecatedVoterFixture extends AbstractVoter
     {
         return $attribute === 'foo';
     }
+}
+
+class DeprecatedVoterNothingImplementedFixture extends AbstractVoter
+{
+    protected function getSupportedClasses()
+    {
+        return array(
+            'Symfony\Component\Security\Core\Tests\Authorization\Voter\ObjectFixture',
+        );
+    }
+
+    protected function getSupportedAttributes()
+    {
+        return array('foo', 'bar', 'baz');
+    }
+
+    // this is a bad voter that hasn't overridden isGranted or voteOnAttribute
 }
 
 class ObjectFixture

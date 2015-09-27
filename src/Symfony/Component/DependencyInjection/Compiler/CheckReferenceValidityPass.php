@@ -46,7 +46,6 @@ class CheckReferenceValidityPass implements CompilerPassInterface
             }
 
             $this->currentId = $id;
-            $this->currentDefinition = $definition;
 
             $this->validateReferences($definition->getArguments());
             $this->validateReferences($definition->getMethodCalls());

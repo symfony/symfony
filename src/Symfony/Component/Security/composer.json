@@ -24,6 +24,7 @@
     "replace": {
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
+        "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version"
     },
     "require-dev": {
@@ -41,10 +42,11 @@
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",
         "symfony/finder": "For using the ACL generateSql script",
+        "symfony/form": "",
         "symfony/validator": "For using the user password constraint",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",
-        "doctrine/dbal": "For using the built-in ACL implementation",
-        "symfony/expression-language": "For using the expression voter"
+        "symfony/expression-language": "For using the expression voter",
+        "paragonie/random_compat": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\": "" }

@@ -66,7 +66,7 @@ class GuardAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
+            $this->logger->debug('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
         }
 
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
@@ -75,6 +75,12 @@ class GuardAuthenticationListener implements ListenerInterface
             $uniqueGuardKey = $this->providerKey.'_'.$key;
 
             $this->executeGuardAuthenticator($uniqueGuardKey, $guardAuthenticator, $event);
+
+            if ($event->hasResponse()) {
+                $this->logger->debug(sprintf('The "%s" authenticator set the response. Any later authenticator will not be called', get_class($guardAuthenticator)));
+
+                break;
+            }
         }
     }
 
@@ -83,7 +89,7 @@ class GuardAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
         try {
             if (null !== $this->logger) {
-                $this->logger->info('Calling getCredentials on guard configurator.', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Calling getCredentials() on guard configurator.', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
             }
 
             // allow the authenticator to fetch authentication info from the request
@@ -98,7 +104,7 @@ class GuardAuthenticationListener implements ListenerInterface
             $token = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
 
             if (null !== $this->logger) {
-                $this->logger->info('Passing guard token information to the GuardAuthenticationProvider', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Passing guard token information to the GuardAuthenticationProvider', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
             }
             // pass the token into the AuthenticationManager system
             // this indirectly calls GuardAuthenticationProvider::authenticate()
@@ -130,13 +136,13 @@ class GuardAuthenticationListener implements ListenerInterface
         $response = $this->guardHandler->handleAuthenticationSuccess($token, $request, $guardAuthenticator, $this->providerKey);
         if ($response instanceof Response) {
             if (null !== $this->logger) {
-                $this->logger->info('Guard authenticator set success response.', array('response' => $response, 'authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Guard authenticator set success response.', array('response' => $response, 'authenticator' => get_class($guardAuthenticator)));
             }
 
             $event->setResponse($response);
         } else {
             if (null !== $this->logger) {
-                $this->logger->info('Guard authenticator set no success response: request continues.', array('authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Guard authenticator set no success response: request continues.', array('authenticator' => get_class($guardAuthenticator)));
             }
         }
 
@@ -167,7 +173,7 @@ class GuardAuthenticationListener implements ListenerInterface
     {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {
-                $this->logger->info('Remember me skipped: it is not configured for the firewall.', array('authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Remember me skipped: it is not configured for the firewall.', array('authenticator' => get_class($guardAuthenticator)));
             }
 
             return;
@@ -175,7 +181,7 @@ class GuardAuthenticationListener implements ListenerInterface
 
         if (!$guardAuthenticator->supportsRememberMe()) {
             if (null !== $this->logger) {
-                $this->logger->info('Remember me skipped: your authenticator does not support it.', array('authenticator' => get_class($guardAuthenticator)));
+                $this->logger->debug('Remember me skipped: your authenticator does not support it.', array('authenticator' => get_class($guardAuthenticator)));
             }
 
             return;

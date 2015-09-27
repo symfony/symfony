@@ -16,6 +16,8 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tests;
 
+require_once __DIR__.'/../ClockMock.php';
+
 class ProgressBarTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

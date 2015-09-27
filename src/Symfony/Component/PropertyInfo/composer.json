@@ -26,8 +26,8 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/serializer": "~2.7",
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/serializer": "~2.7|~3.0.0",
         "phpdocumentor/reflection": "^1.0.7",
         "doctrine/annotations": "~1.0"
     },

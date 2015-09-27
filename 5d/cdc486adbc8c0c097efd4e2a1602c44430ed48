@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-26T22:00:21Z
+
+The PR has been updated, as @stof pointed out an issue with the usage of `this` in the event listener, which isn't available in IE<9 because of the usage of `attachEvent` there.
+
+Is a list of supported browser versions available for the profiler? I think IE 8 must be the oldest supported IE because of the usage of `querySelector` and `querySelectorAll`, right?
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-26T22:59:50Z
+
+Thanks @stof, the PR has been updated again, considering your hint.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-27T08:40:59Z
+
+:+1: thanks @xelaris

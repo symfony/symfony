@@ -16,42 +16,36 @@ use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 class RecursiveDirectoryIteratorTest extends IteratorTestCase
 {
     /**
-     * @dataProvider getPaths
-     *
-     * @param string $path
-     * @param bool   $seekable
-     * @param bool   $contains
-     * @param string $message
+     * @group network
      */
-    public function testRewind($path, $seekable, $contains, $message = null)
+    public function testRewindOnFtp()
     {
         try {
-            $i = new RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
+            $i = new RecursiveDirectoryIterator('ftp://ftp.mozilla.org/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped(sprintf('Unsupported stream "%s".', $path));
+            $this->markTestSkipped('Unsupported stream "ftp".');
         }
 
         $i->rewind();
 
-        $this->assertTrue(true, $message);
+        $this->assertTrue(true);
     }
 
     /**
-     * @dataProvider getPaths
-     *
-     * @param string $path
-     * @param bool   $seekable
-     * @param bool   $contains
-     * @param string $message
+     * @group network
      */
-    public function testSeek($path, $seekable, $contains, $message = null)
+    public function testSeekOnFtp()
     {
         try {
-            $i = new RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
+            $i = new RecursiveDirectoryIterator('ftp://ftp.mozilla.org/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
-            $this->markTestSkipped(sprintf('Unsupported stream "%s".', $path));
+            $this->markTestSkipped('Unsupported stream "ftp".');
         }
 
+        $contains = array(
+            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'README',
+            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'pub',
+        );
         $actual = array();
 
         $i->seek(0);
@@ -61,19 +55,5 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         $actual[] = $i->getPathname();
 
         $this->assertEquals($contains, $actual);
-    }
-
-    public function getPaths()
-    {
-        $data = array();
-
-        // ftp
-        $contains = array(
-            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'README',
-            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'pub',
-        );
-        $data[] = array('ftp://ftp.mozilla.org/', false, $contains);
-
-        return $data;
     }
 }

@@ -175,7 +175,7 @@
                 <target>ความสูงของภาพไม่ได้ขนาด ({{ height }}px) อนุญาตให้สูงอย่างน้อยที่สุด {{ min_height }}px</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>ค่านี้ควรจะเป็นรหัสผ่านปัจจุบันของผู้ใช้</target>
             </trans-unit>
             <trans-unit id="48">

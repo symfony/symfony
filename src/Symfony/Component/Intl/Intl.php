@@ -11,15 +11,11 @@
 
 namespace Symfony\Component\Intl;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
-use Symfony\Component\Intl\Exception\InvalidArgumentException;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundle;
@@ -121,7 +117,7 @@ final class Intl
     {
         if (null === self::$currencyBundle) {
             self::$currencyBundle = new CurrencyBundle(
-                self::getDataDirectory().'/'.Intl::CURRENCY_DIR,
+                self::getDataDirectory().'/'.self::CURRENCY_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle()
             );
@@ -139,11 +135,11 @@ final class Intl
     {
         if (null === self::$languageBundle) {
             self::$languageBundle = new LanguageBundle(
-                self::getDataDirectory().'/'.Intl::LANGUAGE_DIR,
+                self::getDataDirectory().'/'.self::LANGUAGE_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle(),
                 new ScriptDataProvider(
-                    self::getDataDirectory().'/'.Intl::SCRIPT_DIR,
+                    self::getDataDirectory().'/'.self::SCRIPT_DIR,
                     self::getEntryReader()
                 )
             );
@@ -161,7 +157,7 @@ final class Intl
     {
         if (null === self::$localeBundle) {
             self::$localeBundle = new LocaleBundle(
-                self::getDataDirectory().'/'.Intl::LOCALE_DIR,
+                self::getDataDirectory().'/'.self::LOCALE_DIR,
                 self::getEntryReader()
             );
         }
@@ -178,7 +174,7 @@ final class Intl
     {
         if (null === self::$regionBundle) {
             self::$regionBundle = new RegionBundle(
-                self::getDataDirectory().'/'.Intl::REGION_DIR,
+                self::getDataDirectory().'/'.self::REGION_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle()
             );
@@ -266,20 +262,6 @@ final class Intl
         }
 
         return self::$entryReader;
-    }
-
-    /**
-     * Resets the internal state.
-     */
-    private static function reset()
-    {
-        self::$currencyBundle = null;
-        self::$languageBundle = null;
-        self::$localeBundle = null;
-        self::$regionBundle = null;
-        self::$icuVersion = false;
-        self::$icuDataVersion = false;
-        self::$entryReader = null;
     }
 
     /**

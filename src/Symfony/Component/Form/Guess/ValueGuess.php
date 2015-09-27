@@ -12,20 +12,21 @@
 namespace Symfony\Component\Form\Guess;
 
 /**
- * Contains a guessed value
+ * Contains a guessed value.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ValueGuess extends Guess
 {
     /**
-     * The guessed value
+     * The guessed value.
+     *
      * @var array
      */
     private $value;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $value      The guessed value
      * @param int    $confidence The confidence that the guessed class name
@@ -39,7 +40,7 @@ class ValueGuess extends Guess
     }
 
     /**
-     * Returns the guessed value
+     * Returns the guessed value.
      *
      * @return mixed
      */

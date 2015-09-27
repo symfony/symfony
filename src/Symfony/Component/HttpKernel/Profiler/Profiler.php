@@ -117,7 +117,7 @@ class Profiler
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.', array('configured_storage' => get_class($this->storage)));
         }
 
         return $ret;
@@ -129,38 +129,6 @@ class Profiler
     public function purge()
     {
         $this->storage->purge();
-    }
-
-    /**
-     * Exports the current profiler data.
-     *
-     * @param Profile $profile A Profile instance
-     *
-     * @return string The exported data
-     */
-    public function export(Profile $profile)
-    {
-        return base64_encode(serialize($profile));
-    }
-
-    /**
-     * Imports data into the profiler storage.
-     *
-     * @param string $data A data string as exported by the export() method
-     *
-     * @return Profile A Profile instance
-     */
-    public function import($data)
-    {
-        $profile = unserialize(base64_decode($data));
-
-        if ($this->storage->read($profile->getToken())) {
-            return false;
-        }
-
-        $this->saveProfile($profile);
-
-        return $profile;
     }
 
     /**
@@ -202,6 +170,7 @@ class Profiler
         $profile->setUrl($request->getUri());
         $profile->setIp($request->getClientIp());
         $profile->setMethod($request->getMethod());
+        $profile->setStatusCode($response->getStatusCode());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 

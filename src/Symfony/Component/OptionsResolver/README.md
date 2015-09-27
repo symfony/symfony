@@ -14,7 +14,7 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/OptionsResolver/
-    $ composer.phar install
+    $ composer install
     $ phpunit
 
-[1]: http://symfony.com/doc/current/components/options_resolver.html
+[1]: https://symfony.com/doc/current/components/options_resolver.html

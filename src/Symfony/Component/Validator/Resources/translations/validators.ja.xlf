@@ -175,7 +175,7 @@
                 <target>画像の高さが小さすぎます({{ height }}ピクセル)。{{ min_height }}ピクセル以上にしてください。</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>ユーザーの現在のパスワードでなければなりません。</target>
             </trans-unit>
             <trans-unit id="48">
@@ -301,6 +301,14 @@
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
                 <target>空のファイルは許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>ホストを解決できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>この値は予期される文字コード（{{ charset }}）と異なります。</target>
             </trans-unit>
         </body>
     </file>

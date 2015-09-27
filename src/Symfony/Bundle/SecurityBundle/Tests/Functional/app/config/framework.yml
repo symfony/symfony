@@ -1,10 +1,11 @@
 framework:
     secret:        test
-    csrf_protection:
-        enabled: true
     router:        { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
     validation:    { enabled: true, enable_annotations: true }
-    form: ~
+    assets: ~
+    form:
+        csrf_protection:
+            enabled: true
     test: ~
     default_locale: en
     session:
@@ -12,4 +13,4 @@ framework:
     profiler: { only_exceptions: false }
 
 services:
-    logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }
+    logger: { class: Psr\Log\NullLogger }

@@ -38,7 +38,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $this->session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->expects($this->any())->method('getSession')->will($this->returnValue($this->session));
-        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException', array('getMessage'));
     }
 
     public function testForward()
@@ -105,7 +105,10 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
 
     public function testRedirectIsLogged()
     {
-        $this->logger->expects($this->once())->method('debug')->with('Redirecting to /login');
+        $this->logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Authentication failure, redirect triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, array(), $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -119,7 +122,10 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
             ->method('createRequest')->with($this->request, '/login')
             ->will($this->returnValue($this->getRequest()));
 
-        $this->logger->expects($this->once())->method('debug')->with('Forwarding to /login');
+        $this->logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Authentication failure, forward triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);

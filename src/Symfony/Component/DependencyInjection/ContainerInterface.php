@@ -28,19 +28,16 @@ interface ContainerInterface
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE = 2;
     const IGNORE_ON_INVALID_REFERENCE = 3;
-    const SCOPE_CONTAINER = 'container';
-    const SCOPE_PROTOTYPE = 'prototype';
 
     /**
      * Sets a service.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
-     * @param string $scope   The scope of the service
      *
      * @api
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER);
+    public function set($id, $service);
 
     /**
      * Gets a service.
@@ -50,9 +47,8 @@ interface ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws InvalidArgumentException if the service is not defined
      * @throws ServiceCircularReferenceException When a circular reference is detected
-     * @throws ServiceNotFoundException When the service is not defined
+     * @throws ServiceNotFoundException          When the service is not defined
      *
      * @see Reference
      *
@@ -65,18 +61,27 @@ interface ContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return bool    true if the service is defined, false otherwise
+     * @return bool true if the service is defined, false otherwise
      *
      * @api
      */
     public function has($id);
 
     /**
+     * Check for whether or not a service has been initialized.
+     *
+     * @param string $id
+     *
+     * @return bool true if the service has been initialized, false otherwise
+     */
+    public function initialized($id);
+
+    /**
      * Gets a parameter.
      *
      * @param string $name The parameter name
      *
-     * @return mixed  The parameter value
+     * @return mixed The parameter value
      *
      * @throws InvalidArgumentException if the parameter is not defined
      *
@@ -89,7 +94,7 @@ interface ContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return bool    The presence of parameter in container
+     * @return bool The presence of parameter in container
      *
      * @api
      */
@@ -104,55 +109,4 @@ interface ContainerInterface
      * @api
      */
     public function setParameter($name, $value);
-
-    /**
-     * Enters the given scope
-     *
-     * @param string $name
-     *
-     * @api
-     */
-    public function enterScope($name);
-
-    /**
-     * Leaves the current scope, and re-enters the parent scope
-     *
-     * @param string $name
-     *
-     * @api
-     */
-    public function leaveScope($name);
-
-    /**
-     * Adds a scope to the container
-     *
-     * @param ScopeInterface $scope
-     *
-     * @api
-     */
-    public function addScope(ScopeInterface $scope);
-
-    /**
-     * Whether this container has the given scope
-     *
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @api
-     */
-    public function hasScope($name);
-
-    /**
-     * Determines whether the given scope is currently active.
-     *
-     * It does however not check if the scope actually exists.
-     *
-     * @param string $name
-     *
-     * @return bool
-     *
-     * @api
-     */
-    public function isScopeActive($name);
 }

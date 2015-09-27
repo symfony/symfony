@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
 use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
-use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -26,7 +26,10 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        IntlTestHelper::requireFullIntl($this);
+        // We only run tests if the intl extension is loaded...
+        if (!Intl::isExtensionLoaded()) {
+            $this->markTestSkipped('The intl extension is not available.');
+        }
 
         $this->reader = new IntlBundleReader();
     }
@@ -52,6 +55,10 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadDoesNotFollowFallback()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
+        }
+
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
@@ -64,6 +71,10 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadDoesNotFollowFallbackAlias()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
+        }
+
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 

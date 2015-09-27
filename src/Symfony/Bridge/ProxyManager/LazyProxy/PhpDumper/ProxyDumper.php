@@ -15,7 +15,6 @@ use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -27,20 +26,28 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 class ProxyDumper implements DumperInterface
 {
     /**
-     * @var \ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator
+     * @var string
+     */
+    private $salt;
+
+    /**
+     * @var LazyLoadingValueHolderGenerator
      */
     private $proxyGenerator;
 
     /**
-     * @var \ProxyManager\GeneratorStrategy\BaseGeneratorStrategy
+     * @var BaseGeneratorStrategy
      */
     private $classGenerator;
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @param string $salt
      */
-    public function __construct()
+    public function __construct($salt = '')
     {
+        $this->salt = $salt;
         $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
         $this->classGenerator = new BaseGeneratorStrategy();
     }
@@ -60,10 +67,8 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if ($definition->isShared()) {
             $instantiation .= " \$this->services['$id'] =";
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
-            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 
         $methodName = 'get'.Container::camelize($id).'Service';
@@ -71,11 +76,10 @@ class ProxyDumper implements DumperInterface
 
         return <<<EOF
         if (\$lazyLoad) {
-            \$container = \$this;
 
             $instantiation new $proxyClass(
-                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
-                    \$wrappedInstance = \$container->$methodName(false);
+                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+                    \$wrappedInstance = \$this->$methodName(false);
 
                     \$proxy->setProxyInitializer(null);
 
@@ -109,6 +113,6 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition);
+        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition).$this->salt;
     }
 }

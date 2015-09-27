@@ -40,21 +40,21 @@ class AssetsInstallCommand extends ContainerAwareCommand
             ->setDescription('Installs bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command installs bundle assets into a given
-directory (e.g. the web directory).
+directory (e.g. the <comment>web</comment> directory).
 
-<info>php %command.full_name% web</info>
+  <info>php %command.full_name% web</info>
 
-A "bundles" directory will be created inside the target directory, and the
+A "bundles" directory will be created inside the target directory and the
 "Resources/public" directory of each bundle will be copied into it.
 
 To create a symlink to each bundle instead of copying its assets, use the
 <info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
 
-<info>php %command.full_name% web --symlink</info>
+  <info>php %command.full_name% web --symlink</info>
 
 To make symlink relative, add the <info>--relative</info> option:
 
-<info>php %command.full_name% web --symlink --relative</info>
+  <info>php %command.full_name% web --symlink --relative</info>
 
 EOT
             )
@@ -106,6 +106,9 @@ EOT
 
                     try {
                         $filesystem->symlink($relativeOriginDir, $targetDir);
+                        if (!file_exists($targetDir)) {
+                            throw new IOException('Symbolic link is broken');
+                        }
                         $output->writeln('The assets were installed using symbolic links.');
                     } catch (IOException $e) {
                         if (!$input->getOption('relative')) {
@@ -116,6 +119,9 @@ EOT
                         // try again without the relative option
                         try {
                             $filesystem->symlink($originDir, $targetDir);
+                            if (!file_exists($targetDir)) {
+                                throw new IOException('Symbolic link is broken');
+                            }
                             $output->writeln('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
                         } catch (IOException $e) {
                             $this->hardCopy($originDir, $targetDir);
@@ -141,5 +147,4 @@ EOT
         // We use a custom iterator to ignore VCS files
         $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
     }
-
 }

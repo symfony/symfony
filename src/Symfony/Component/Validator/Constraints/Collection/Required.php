@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints\Collection;
 
+@trigger_error('The '.__NAMESPACE__.'\Required class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Validator\Constraints\Required class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraints\Required as BaseRequired;
 
 /**
@@ -19,8 +21,8 @@ use Symfony\Component\Validator\Constraints\Required as BaseRequired;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated in 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Validator\Constraints\Required} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Validator\Constraints\Required} instead.
  */
 class Required extends BaseRequired
 {

@@ -32,7 +32,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeScalar()
     {
         $obj = new ScalarDummy();
-        $obj->xmlFoo = "foo";
+        $obj->xmlFoo = 'foo';
 
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>foo</response>'."\n";
@@ -43,7 +43,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testSetRootNodeName()
     {
         $obj = new ScalarDummy();
-        $obj->xmlFoo = "foo";
+        $obj->xmlFoo = 'foo';
 
         $this->encoder->setRootNodeName('test');
         $expected = '<?xml version="1.0"?>'."\n".
@@ -70,11 +70,11 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 '@name' => 'Bar',
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $expected = '<?xml version="1.0"?>'."\n".
@@ -132,6 +132,26 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             'xml_version' => '1.1',
             'xml_encoding' => 'utf-8',
             'xml_standalone' => true,
+        );
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
+    public function testContext()
+    {
+        $array = array('person' => array('name' => 'George Abitbol'));
+        $expected = <<<XML
+<?xml version="1.0"?>
+<response>
+  <person>
+    <name>George Abitbol</name>
+  </person>
+</response>
+
+XML;
+
+        $context = array(
+            'xml_format_output' => true,
         );
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
@@ -356,28 +376,28 @@ XML;
         $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => array(
-                '@key' => "value",
-                'item' => array("@key" => 'key', "key-val" => 'val'),
+                '@key' => 'value',
+                'item' => array('@key' => 'key', 'key-val' => 'val'),
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $expected = array(
             'foo-bar' => array(
-                '@key' => "value",
-                'key' => array('@key' => 'key', "key-val" => 'val'),
+                '@key' => 'value',
+                'key' => array('@key' => 'key', 'key-val' => 'val'),
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $xml = $this->encoder->encode($obj, 'xml');
@@ -451,13 +471,13 @@ XML;
             '@xmlns:media' => 'http://search.yahoo.com/mrss/',
             '@xmlns:gd' => 'http://schemas.google.com/g/2005',
             '@xmlns:yt' => 'http://gdata.youtube.com/schemas/2007',
-            'qux' => "1",
-            'app:foo' => "foo",
-            'yt:bar' => array("a", "b"),
+            'qux' => '1',
+            'app:foo' => 'foo',
+            'yt:bar' => array('a', 'b'),
             'media:baz' => array(
-                'media:key' => "val",
-                'media:key2' => "val",
-                'A B' => "bar",
+                'media:key' => 'val',
+                'media:key2' => 'val',
+                'A B' => 'bar',
                 'item' => array(
                     array(
                         'title' => 'title1',
@@ -483,7 +503,7 @@ XML;
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
         $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', 'item' => array(array('title' => 'title1'), array('title' => 'title2')), 'Barry' => array('FooBar' => array('Baz' => 'Ed', '@id' => 1)));
-        $obj->qux = "1";
+        $obj->qux = '1';
 
         return $obj;
     }

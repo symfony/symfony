@@ -27,7 +27,7 @@ interface AccessDecisionManagerInterface
      * @param array          $attributes An array of attributes associated with the method being invoked
      * @param object         $object     The object to secure
      *
-     * @return bool    true if the access is granted, false otherwise
+     * @return bool true if the access is granted, false otherwise
      */
     public function decide(TokenInterface $token, array $attributes, $object = null);
 
@@ -36,7 +36,9 @@ interface AccessDecisionManagerInterface
      *
      * @param string $attribute An attribute
      *
-     * @return bool    true if this decision manager supports the attribute, false otherwise
+     * @return bool true if this decision manager supports the attribute, false otherwise
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function supportsAttribute($attribute);
 
@@ -46,6 +48,8 @@ interface AccessDecisionManagerInterface
      * @param string $class A class name
      *
      * @return true if this decision manager can process the class
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function supportsClass($class);
 }

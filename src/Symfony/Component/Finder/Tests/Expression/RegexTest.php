@@ -23,7 +23,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
         $expr = new Expression($regex);
 
         $this->assertEquals($start, $expr->getRegex()->hasStartFlag());
-        $this->assertEquals($end,   $expr->getRegex()->hasEndFlag());
+        $this->assertEquals($end, $expr->getRegex()->hasEndFlag());
     }
 
     /**
@@ -34,7 +34,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
         $expr = new Expression($regex);
 
         $this->assertEquals($start, $expr->getRegex()->hasStartJoker());
-        $this->assertEquals($end,   $expr->getRegex()->hasEndJoker());
+        $this->assertEquals($end, $expr->getRegex()->hasEndJoker());
     }
 
     /**

@@ -17,7 +17,7 @@ namespace Symfony\Component\VarDumper\Cloner;
 class Data
 {
     private $data;
-    private $maxDepth = -1;
+    private $maxDepth = 20;
     private $maxItemsPerDepth = -1;
     private $useRefHandles = -1;
 
@@ -40,17 +40,43 @@ class Data
     /**
      * Returns a depth limited clone of $this.
      *
-     * @param int  $maxDepth         The max dumped depth level.
-     * @param int  $maxItemsPerDepth The max number of items dumped per depth level.
-     * @param bool $useRefHandles    False to hide ref. handles.
+     * @param int $maxDepth The max dumped depth level.
      *
-     * @return self A depth limited clone of $this.
+     * @return self A clone of $this.
      */
-    public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
+    public function withMaxDepth($maxDepth)
     {
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
+
+        return $data;
+    }
+
+    /**
+     * Limits the numbers of elements per depth level.
+     *
+     * @param int $maxItemsPerDepth The max number of items dumped per depth level.
+     *
+     * @return self A clone of $this.
+     */
+    public function withMaxItemsPerDepth($maxItemsPerDepth)
+    {
+        $data = clone $this;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+
+        return $data;
+    }
+
+    /**
+     * Enables/disables objects' identifiers tracking.
+     *
+     * @param bool $useRefHandles False to hide global ref. handles.
+     *
+     * @return self A clone of $this.
+     */
+    public function withRefHandles($useRefHandles)
+    {
+        $data = clone $this;
         $data->useRefHandles = $useRefHandles ? -1 : 0;
 
         return $data;
@@ -127,16 +153,20 @@ class Data
                     break;
 
                 case Stub::TYPE_ARRAY:
-                    $dumper->enterHash($cursor, $item->class, $item->value, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->class);
-                    $dumper->leaveHash($cursor, $item->class, $item->value, (bool) $children, $cut);
-                    break;
-
+                    $item = clone $item;
+                    $item->type = $item->class;
+                    $item->class = $item->value;
+                    // No break;
                 case Stub::TYPE_OBJECT:
                 case Stub::TYPE_RESOURCE:
-                    $dumper->enterHash($cursor, $item->type, $item->class, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
-                    $dumper->leaveHash($cursor, $item->type, $item->class, (bool) $children, $cut);
+                    $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
+                    $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
+                    if ($withChildren) {
+                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
+                    } elseif ($children && 0 <= $cut) {
+                        $cut += count($children);
+                    }
+                    $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
 
                 default:
@@ -166,58 +196,23 @@ class Data
      */
     private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType)
     {
-        if ($children) {
-            if ($parentCursor->depth !== $this->maxDepth && $this->maxItemsPerDepth) {
-                $cursor = clone $parentCursor;
-                ++$cursor->depth;
-                $cursor->hashType = $hashType;
-                $cursor->hashIndex = 0;
-                $cursor->hashLength = count($children);
-                $cursor->hashCut = $hashCut;
-                foreach ($children as $key => $child) {
-                    $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-                    $cursor->hashKey = $cursor->hashKeyIsBinary ? self::utf8Encode($key) : $key;
-                    $this->dumpItem($dumper, $cursor, $refs, $child);
-                    if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
-                        $parentCursor->stop = true;
+        $cursor = clone $parentCursor;
+        ++$cursor->depth;
+        $cursor->hashType = $hashType;
+        $cursor->hashIndex = 0;
+        $cursor->hashLength = count($children);
+        $cursor->hashCut = $hashCut;
+        foreach ($children as $key => $child) {
+            $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
+            $cursor->hashKey = $key;
+            $this->dumpItem($dumper, $cursor, $refs, $child);
+            if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
+                $parentCursor->stop = true;
 
-                        return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
-                    }
-                }
-            } elseif ($hashCut >= 0) {
-                $hashCut += count($children);
+                return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
             }
         }
 
         return $hashCut;
-    }
-
-    /**
-     * Portable variant of utf8_encode()
-     *
-     * @param string $s
-     *
-     * @return string
-     *
-     * @internal
-     */
-    public static function utf8Encode($s)
-    {
-        if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($s, 'UTF-8', 'CP1252');
-        }
-
-        $s .= $s;
-        $len = strlen($s);
-
-        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
-            switch (true) {
-                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                default: $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
-            }
-        }
-
-        return substr($s, 0, $j);
     }
 }

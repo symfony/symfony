@@ -24,6 +24,19 @@ class BooleanNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $node->normalize($value));
     }
 
+    /**
+     * @dataProvider getValidValues
+     *
+     * @param bool $value
+     */
+    public function testValidNonEmptyValues($value)
+    {
+        $node = new BooleanNode('test');
+        $node->setAllowEmptyValue(false);
+
+        $this->assertSame($value, $node->finalize($value));
+    }
+
     public function getValidValues()
     {
         return array(

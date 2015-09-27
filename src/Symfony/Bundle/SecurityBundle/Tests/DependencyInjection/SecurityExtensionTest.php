@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
@@ -59,6 +60,33 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
+                ),
+            ),
+        ));
+
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Unable to create definition for "security.user.provider.concrete.my_foo" user provider
+     */
+    public function testFirewallWithInvalidUserProvider()
+    {
+        $container = $this->getRawContainer();
+
+        $extension = $container->getExtension('security');
+        $extension->addUserProviderFactory(new DummyProvider());
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'my_foo' => array('foo' => array()),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
                 ),
             ),
         ));

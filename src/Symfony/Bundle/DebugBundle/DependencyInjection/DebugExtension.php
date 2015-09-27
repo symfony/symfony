@@ -14,6 +14,7 @@ namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -35,8 +36,17 @@ class DebugExtension extends Extension
         $loader->load('services.xml');
 
         $container->getDefinition('var_dumper.cloner')
-            ->addMethodCall('setMaxItems',  array($config['max_items']))
+            ->addMethodCall('setMaxItems', array($config['max_items']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
+
+        if (null !== $config['dump_destination']) {
+            $container->getDefinition('var_dumper.cli_dumper')
+                ->replaceArgument(0, $config['dump_destination'])
+            ;
+            $container->getDefinition('data_collector.dump')
+                ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
+            ;
+        }
     }
 
     /**

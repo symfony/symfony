@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
@@ -25,6 +26,8 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      *
+     * @throws LogicException if the ParameterBagInterface can not be cleared
+     *
      * @api
      */
     public function clear();
@@ -33,6 +36,8 @@ interface ParameterBagInterface
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
+     *
+     * @throws LogicException if the parameter can not be added
      *
      * @api
      */
@@ -52,7 +57,7 @@ interface ParameterBagInterface
      *
      * @param string $name The parameter name
      *
-     * @return mixed  The parameter value
+     * @return mixed The parameter value
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      *
@@ -61,10 +66,19 @@ interface ParameterBagInterface
     public function get($name);
 
     /**
+     * Removes a parameter.
+     *
+     * @param string $name The parameter name
+     */
+    public function remove($name);
+
+    /**
      * Sets a service container parameter.
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @throws LogicException if the parameter can not be set
      *
      * @api
      */
@@ -75,7 +89,7 @@ interface ParameterBagInterface
      *
      * @param string $name The parameter name
      *
-     * @return bool    true if the parameter name is defined, false otherwise
+     * @return bool true if the parameter name is defined, false otherwise
      *
      * @api
      */
@@ -96,7 +110,7 @@ interface ParameterBagInterface
     public function resolveValue($value);
 
     /**
-     * Escape parameter placeholders %
+     * Escape parameter placeholders %.
      *
      * @param mixed $value
      *
@@ -105,7 +119,7 @@ interface ParameterBagInterface
     public function escapeValue($value);
 
     /**
-     * Unescape parameter placeholders %
+     * Unescape parameter placeholders %.
      *
      * @param mixed $value
      *

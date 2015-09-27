@@ -23,6 +23,12 @@ interface SecurityFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
 
+    /**
+     * Defines the position at which the provider is called.
+     * Possible values: pre_auth, form, http, and remember_me.
+     *
+     * @return string
+     */
     public function getPosition();
 
     public function getKey();

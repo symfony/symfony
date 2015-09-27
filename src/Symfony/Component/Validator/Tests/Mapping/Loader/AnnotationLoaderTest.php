@@ -18,20 +18,10 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\True;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
-
-require_once __DIR__.'/../../../Constraints/All.php';
-require_once __DIR__.'/../../../Constraints/Callback.php';
-require_once __DIR__.'/../../../Constraints/Choice.php';
-require_once __DIR__.'/../../../Constraints/Collection.php';
-require_once __DIR__.'/../../../Constraints/GroupSequence.php';
-require_once __DIR__.'/../../../Constraints/GroupSequenceProvider.php';
-require_once __DIR__.'/../../../Constraints/NotNull.php';
-require_once __DIR__.'/../../../Constraints/Range.php';
-require_once __DIR__.'/../../Fixtures/ConstraintA.php';
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -78,8 +68,8 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new True());
-        $expected->addGetterConstraint('permissions', new True());
+        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
@@ -147,8 +137,8 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new True());
-        $expected->addGetterConstraint('permissions', new True());
+        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();

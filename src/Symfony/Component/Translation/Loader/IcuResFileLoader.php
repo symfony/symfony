@@ -52,13 +52,16 @@ class IcuResFileLoader implements LoaderInterface
         $messages = $this->flatten($rb);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
-        $catalogue->addResource(new DirectoryResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\DirectoryResource')) {
+            $catalogue->addResource(new DirectoryResource($resource));
+        }
 
         return $catalogue;
     }
 
     /**
-     * Flattens an ResourceBundle
+     * Flattens an ResourceBundle.
      *
      * The scheme used is:
      *   key { key2 { key3 { "value" } } }

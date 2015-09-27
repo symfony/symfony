@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -61,7 +62,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         $result = array();
         while (count($result) < $limit && $line = $this->readLineFromFile($file)) {
-            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
+            $values = str_getcsv($line);
+            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = $values;
+            $csvStatusCode = isset($values[6]) ? $values[6] : null;
 
             $csvTime = (int) $csvTime;
 
@@ -84,6 +87,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'url' => $csvUrl,
                 'time' => $csvTime,
                 'parent' => $csvParent,
+                'status_code' => $csvStatusCode,
             );
         }
 
@@ -167,6 +171,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getUrl(),
                 $profile->getTime(),
                 $profile->getParentToken(),
+                $profile->getStatusCode(),
             ));
             fclose($file);
         }

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Shell as BaseShell;
 /**
  * Shell.
  *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Shell extends BaseShell
@@ -29,12 +31,12 @@ class Shell extends BaseShell
     {
         return <<<EOF
 <info>
-      _____                  __                  ___
-     / ____|                / _|                |__ \
-    | (___  _   _ _ __ ___ | |_ ___  _ __  _   _   ) |
-     \___ \| | | | '_ ` _ \|  _/ _ \| '_ \| | | | / /
-     ____) | |_| | | | | | | || (_) | | | | |_| |/ /_
-    |_____/ \__, |_| |_| |_|_| \___/|_| |_|\__, |____|
+      _____                  __
+     / ____|                / _|
+    | (___  _   _ _ __ ___ | |_ ___  _ __  _   _
+     \___ \| | | | '_ ` _ \|  _/ _ \| '_ \| | | |
+     ____) | |_| | | | | | | || (_) | | | | |_| |
+    |_____/ \__, |_| |_| |_|_| \___/|_| |_|\__, |
              __/ |                          __/ |
             |___/                          |___/
 

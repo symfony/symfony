@@ -85,10 +85,10 @@ class EntityUserProvider implements UserProviderInterface
             // That's the case when the user has been changed by a form with
             // validation errors.
             if (!$id = $this->metadata->getIdentifierValues($user)) {
-                throw new \InvalidArgumentException("You cannot refresh a user ".
-                    "from the EntityUserProvider that does not contain an identifier. ".
-                    "The user object has to be serialized with its own identifier ".
-                    "mapped by Doctrine."
+                throw new \InvalidArgumentException('You cannot refresh a user '.
+                    'from the EntityUserProvider that does not contain an identifier. '.
+                    'The user object has to be serialized with its own identifier '.
+                    'mapped by Doctrine.'
                 );
             }
 

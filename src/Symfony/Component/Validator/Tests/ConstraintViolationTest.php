@@ -40,7 +40,7 @@ EOF;
             '42 cannot be used here',
             'this is the message template',
             array(),
-            array('some_value' =>  42),
+            array('some_value' => 42),
             'some_value',
             null
         );

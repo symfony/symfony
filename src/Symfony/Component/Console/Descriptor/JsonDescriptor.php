@@ -21,6 +21,8 @@ use Symfony\Component\Console\Input\InputOption;
  * JSON descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @internal
  */
 class JsonDescriptor extends Descriptor
 {
@@ -100,7 +102,7 @@ class JsonDescriptor extends Descriptor
             'name' => $argument->getName(),
             'is_required' => $argument->isRequired(),
             'is_array' => $argument->isArray(),
-            'description' => $argument->getDescription(),
+            'description' => preg_replace('/\s*[\r\n]\s*/', ' ', $argument->getDescription()),
             'default' => $argument->getDefault(),
         );
     }
@@ -118,7 +120,7 @@ class JsonDescriptor extends Descriptor
             'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
             'is_multiple' => $option->isArray(),
-            'description' => $option->getDescription(),
+            'description' => preg_replace('/\s*[\r\n]\s*/', ' ', $option->getDescription()),
             'default' => $option->getDefault(),
         );
     }
@@ -155,10 +157,9 @@ class JsonDescriptor extends Descriptor
 
         return array(
             'name' => $command->getName(),
-            'usage' => $command->getSynopsis(),
+            'usage' => array_merge(array($command->getSynopsis()), $command->getUsages(), $command->getAliases()),
             'description' => $command->getDescription(),
             'help' => $command->getProcessedHelp(),
-            'aliases' => $command->getAliases(),
             'definition' => $this->getInputDefinitionData($command->getNativeDefinition()),
         );
     }

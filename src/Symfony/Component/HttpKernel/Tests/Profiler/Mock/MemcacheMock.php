@@ -22,11 +22,11 @@ class MemcacheMock
     private $storage = array();
 
     /**
-     * Open memcached server connection
+     * Open memcached server connection.
      *
-     * @param string  $host
-     * @param int     $port
-     * @param int     $timeout
+     * @param string $host
+     * @param int    $port
+     * @param int    $timeout
      *
      * @return bool
      */
@@ -42,11 +42,11 @@ class MemcacheMock
     }
 
     /**
-     * Open memcached server persistent connection
+     * Open memcached server persistent connection.
      *
-     * @param string  $host
-     * @param int     $port
-     * @param int     $timeout
+     * @param string $host
+     * @param int    $port
+     * @param int    $timeout
      *
      * @return bool
      */
@@ -62,7 +62,7 @@ class MemcacheMock
     }
 
     /**
-     * Add a memcached server to connection pool
+     * Add a memcached server to connection pool.
      *
      * @param string   $host
      * @param int      $port
@@ -90,10 +90,10 @@ class MemcacheMock
     /**
      * Add an item to the server only if such key doesn't exist at the server yet.
      *
-     * @param string  $key
-     * @param mixed   $var
-     * @param int     $flag
-     * @param int     $expire
+     * @param string $key
+     * @param mixed  $var
+     * @param int    $flag
+     * @param int    $expire
      *
      * @return bool
      */
@@ -115,10 +115,10 @@ class MemcacheMock
     /**
      * Store data at the server.
      *
-     * @param string  $key
-     * @param string  $var
-     * @param int     $flag
-     * @param int     $expire
+     * @param string $key
+     * @param string $var
+     * @param int    $flag
+     * @param int    $expire
      *
      * @return bool
      */
@@ -136,10 +136,10 @@ class MemcacheMock
     /**
      * Replace value of the existing item.
      *
-     * @param string  $key
-     * @param mixed   $var
-     * @param int     $flag
-     * @param int     $expire
+     * @param string $key
+     * @param mixed  $var
+     * @param int    $flag
+     * @param int    $expire
      *
      * @return bool
      */
@@ -161,8 +161,8 @@ class MemcacheMock
     /**
      * Retrieve item from the server.
      *
-     * @param string|array  $key
-     * @param int|array     $flags
+     * @param string|array $key
+     * @param int|array    $flags
      *
      * @return mixed
      */
@@ -187,7 +187,7 @@ class MemcacheMock
     }
 
     /**
-     * Delete item from the server
+     * Delete item from the server.
      *
      * @param string $key
      *
@@ -209,7 +209,7 @@ class MemcacheMock
     }
 
     /**
-     * Flush all existing items at the server
+     * Flush all existing items at the server.
      *
      * @return bool
      */
@@ -225,7 +225,7 @@ class MemcacheMock
     }
 
     /**
-     * Close memcached server connection
+     * Close memcached server connection.
      *
      * @return bool
      */

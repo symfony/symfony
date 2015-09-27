@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 
@@ -26,8 +25,9 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that collectors that specify a template but no "id" will throw
-     * an exception (both are needed if the template is specified). Thus,
-     * a fully-valid tag looks something like this:
+     * an exception (both are needed if the template is specified).
+     *
+     * Thus, a fully-valid tag looks something like this:
      *
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */

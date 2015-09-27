@@ -3,7 +3,7 @@ Test symfony_zval_info API
 --SKIPIF--
 <?php if (!extension_loaded("symfony_debug")) print "skip"; ?>
 --FILE--
-<?php 
+<?php
 
 $int = 42;
 $float = 42.42;
@@ -88,7 +88,7 @@ array(8) {
   ["object_hash"]=>
   string(32) "%s"
   ["object_handle"]=>
-  int(1)
+  int(%d)
 }
 array(5) {
   ["type"]=>
@@ -112,7 +112,7 @@ array(7) {
   ["zval_isref"]=>
   bool(false)
   ["resource_handle"]=>
-  int(4)
+  int(%d)
   ["resource_type"]=>
   string(6) "stream"
   ["resource_refcount"]=>

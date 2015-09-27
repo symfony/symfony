@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
- * ServerBagTest
+ * ServerBagTest.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
@@ -136,6 +136,16 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $headerContent));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $headerContent,
+        ), $bag->getHeaders());
+    }
+
+    public function testOAuthBearerAuthWithRedirect()
+    {
+        $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
+        $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => $headerContent));
 
         $this->assertEquals(array(
             'AUTHORIZATION' => $headerContent,

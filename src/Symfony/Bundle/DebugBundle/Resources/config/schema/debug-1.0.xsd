@@ -9,5 +9,6 @@
     <xsd:complexType name="config">
         <xsd:attribute name="max-items" type="xsd:integer" />
         <xsd:attribute name="max-string-length" type="xsd:integer" />
+        <xsd:attribute name="dump-destination" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

@@ -6,13 +6,15 @@ UPGRADE FROM 2.x to 3.0
  * The `UniversalClassLoader` class has been removed in favor of
    `ClassLoader`. The only difference is that some method names are different:
 
-      * `registerNamespaces()` -> `addPrefixes()`
-      * `registerPrefixes()` -> `addPrefixes()`
-      * `registerNamespaces()` -> `addPrefix()`
-      * `registerPrefixes()` -> `addPrefix()`
-      * `getNamespaces()` -> `getPrefixes()`
-      * `getNamespaceFallbacks()` -> `getFallbackDirs()`
-      * `getPrefixFallbacks()` -> `getFallbackDirs()`
+   | Old name | New name
+   | -------- | ---
+   | `registerNamespaces()` | `addPrefixes()`
+   | `registerPrefixes()` | `addPrefixes()`
+   | `registerNamespaces()` | `addPrefix()`
+   | `registerPrefixes()` | `addPrefix()`
+   | `getNamespaces()` | `getPrefixes()`
+   | `getNamespaceFallbacks()` | `getFallbackDirs()`
+   | `getPrefixFallbacks()` | `getFallbackDirs()`
 
  * The `DebugUniversalClassLoader` class has been removed in favor of
    `DebugClassLoader`. The difference is that the constructor now takes a
@@ -29,7 +31,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $h = new ProgressHelper();
    $h->start($output, 10);
    for ($i = 1; $i < 5; $i++) {
@@ -41,7 +43,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $bar = new ProgressBar($output, 10);
    $bar->start();
    for ($i = 1; $i < 5; $i++) {
@@ -54,7 +56,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $table = $app->getHelperSet()->get('table');
    $table
        ->setHeaders(array('ISBN', 'Title', 'Author'))
@@ -70,7 +72,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Console\Helper\Table;
 
    $table = new Table($output);
@@ -86,12 +88,22 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+* Parameters of `renderException()` method of the
+  `Symfony\Component\Console\Application` are type hinted.
+  You must add the type hint to your implementations.
+
 ### DependencyInjection
+
+ * The method `remove` was added to `Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface`.
 
  * The methods `Definition::setFactoryClass()`,
    `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
    been removed in favor of `Definition::setFactory()`. Services defined using
    YAML or XML use the same syntax as configurators.
+
+ * Synchronized services are deprecated and the following methods have been
+   removed: `ContainerBuilder::synchronize()`, `Definition::isSynchronized()`,
+   and `Definition::setSynchronized()`.
 
 ### EventDispatcher
 
@@ -99,6 +111,29 @@ UPGRADE FROM 2.x to 3.0
    extends `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
 
 ### Form
+
+ * The option "precision" was renamed to "scale".
+
+   Before:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'precision' => 3,
+   ));
+   ```
+
+   After:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'scale' => 3,
+   ));
+   ```
+
+ * The method `AbstractType::setDefaultOptions(OptionsResolverInterface $resolver)` and
+   `AbstractTypeExtension::setDefaultOptions(OptionsResolverInterface $resolver)` have been
+   renamed. You should use `AbstractType::configureOptions(OptionsResolver $resolver)` and
+   `AbstractTypeExtension::configureOptions(OptionsResolver $resolver)` instead.
 
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should
    use `Form::submit()` and `Form::isSubmitted()` instead.
@@ -157,8 +192,8 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
- * The events PRE_BIND, BIND and POST_BIND were renamed to PRE_SUBMIT, SUBMIT
-   and POST_SUBMIT.
+ * The events `PRE_BIND`, `BIND` and `POST_BIND` were renamed to `PRE_SUBMIT`, `SUBMIT`
+   and `POST_SUBMIT`.
 
    Before:
 
@@ -176,7 +211,7 @@ UPGRADE FROM 2.x to 3.0
    });
    ```
 
- * The option "virtual" was renamed to "inherit_data".
+ * The option "`virtual`" was renamed to "`inherit_data`".
 
    Before:
 
@@ -194,7 +229,7 @@ UPGRADE FROM 2.x to 3.0
    ));
    ```
 
- * The class VirtualFormAwareIterator was renamed to InheritDataAwareIterator.
+ * The class `VirtualFormAwareIterator` was renamed to `InheritDataAwareIterator`.
 
    Before:
 
@@ -252,8 +287,8 @@ UPGRADE FROM 2.x to 3.0
    and all of its implementations were removed. Use the new interface
    `Symfony\Component\Security\Csrf\CsrfTokenManagerInterface` instead.
 
- * The options "csrf_provider" and "intention" were renamed to "csrf_token_generator"
-   and "csrf_token_id".
+ * The options "`csrf_provider`" and "`intention`" were renamed to  "`csrf_token_generator`"
+   and "`csrf_token_id`".
 
  * The method `Form::getErrorsAsString()` was removed. Use `Form::getErrors()`
    instead with the argument `$deep` set to true and `$flatten` set to false
@@ -261,18 +296,33 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    echo $form->getErrorsAsString();
    ```
 
    After:
 
-   ```
+   ```php
    echo $form->getErrors(true, false);
    ```
+   * The `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList` class has been removed in
+     favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
 
+   * The `Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList` class has been removed in
+     favor of `Symfony\Component\Form\ChoiceList\LazyChoiceList`.
+
+   * The `Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList` class has been removed in
+     favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
+
+   * The `Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList` class has been removed in
+     favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
 
 ### FrameworkBundle
+
+ * The `config:debug`, `container:debug`, `router:debug`, `translation:debug`
+   and `yaml:lint` commands have been deprecated since Symfony 2.7 and will
+   be removed in Symfony 3.0. Use the `debug:config`, `debug:container`,
+   `debug:router`, `debug:translation` and `lint:yaml` commands instead.
 
  * The `getRequest` method of the base `Controller` class has been deprecated
    since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
@@ -280,7 +330,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    namespace Acme\FooBundle\Controller;
 
    class DemoController
@@ -295,7 +345,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    namespace Acme\FooBundle\Controller;
 
    use Symfony\Component\HttpFoundation\Request;
@@ -311,6 +361,51 @@ UPGRADE FROM 2.x to 3.0
 
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
+
+ * The `templating.helper.assets` was removed in Symfony 3.0. You should
+   use the `assets.package` service instead.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+
+   class DemoService
+   {
+       private $assetsHelper;
+
+       public function __construct(CoreAssetsHelper $assetsHelper)
+       {
+           $this->assetsHelper = $assetsHelper;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetsHelper->getUrl('thumbnail.png', null, $this->assetsHelper->getVersion());
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Asset\Packages;
+
+   class DemoService
+   {
+       private $assetPackages;
+
+       public function __construct(Packages $assetPackages)
+       {
+           $this->assetPackages = $assetPackages;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetPackages->getUrl('thumbnail.png').$this->assetPackages->getVersion();
+       }
+   }
+   ```
 
  * The `enctype` method of the `form` helper was removed. You should use the
    new method `start` instead.
@@ -364,16 +459,35 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+ * The `createEsi` method of `Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache` was removed. Use `createSurrogate` instead.
+
+ * The `templating.helper.router` service was moved to `templating_php.xml`. You
+   have to ensure that the PHP templating engine is enabled to be able to use it:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['php']
+   ```
+
+ * The `form.csrf_provider` service is removed as it implements an adapter for
+   the new token manager to the deprecated
+   `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`
+   interface.
+   The `security.csrf.token_manager` should be used instead.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
    favor of `Psr\Log\LoggerInterface`. The only difference is that some method
    names are different:
 
-     * `emerg()` -> `emergency()`
-     * `crit()`  -> `critical()`
-     * `err()`   -> `error()`
-     * `warn()`  -> `warning()`
+   | Old name | New name
+   | -------- | ---
+   | `emerg()` | `emergency()`
+   | `crit()` | `critical()`
+   | `err()` | `error()`
+   | `warn()` | `warning()`
 
    The previous method renames also happened to the following classes:
 
@@ -385,10 +499,12 @@ UPGRADE FROM 2.x to 3.0
  * The following classes have been renamed as they have been moved to the
    Debug component:
 
-    * `Symfony\Component\HttpKernel\Debug\ErrorHandler` -> `Symfony\Component\Debug\ErrorHandler`
-    * `Symfony\Component\HttpKernel\Debug\ExceptionHandler` -> `Symfony\Component\Debug\ExceptionHandler`
-    * `Symfony\Component\HttpKernel\Exception\FatalErrorException` -> `Symfony\Component\Debug\Exception\FatalErrorException`
-    * `Symfony\Component\HttpKernel\Exception\FlattenException` -> `Symfony\Component\Debug\Exception\FlattenException`
+   | Old name | New name
+   | -------- | ---
+   | `Symfony\Component\HttpKernel\Debug\ErrorHandler` | `Symfony\Component\Debug\ErrorHandler`
+   | `Symfony\Component\HttpKernel\Debug\ExceptionHandler` | `Symfony\Component\Debug\ExceptionHandler`
+   | `Symfony\Component\HttpKernel\Exception\FatalErrorException` | `Symfony\Component\Debug\Exception\FatalErrorException`
+   | `Symfony\Component\HttpKernel\Exception\FlattenException` | `Symfony\Component\Debug\Exception\FlattenException`
 
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
@@ -402,12 +518,14 @@ UPGRADE FROM 2.x to 3.0
    Instead of the methods in `Symfony\Component\Locale\Locale`, you should use
    these equivalent methods in `Symfony\Component\Intl\Intl` now:
 
-    * `Locale::getDisplayCountries()` -> `Intl::getRegionBundle()->getCountryNames()`
-    * `Locale::getCountries()` -> `array_keys(Intl::getRegionBundle()->getCountryNames())`
-    * `Locale::getDisplayLanguages()` -> `Intl::getLanguageBundle()->getLanguageNames()`
-    * `Locale::getLanguages()` -> `array_keys(Intl::getLanguageBundle()->getLanguageNames())`
-    * `Locale::getDisplayLocales()` -> `Intl::getLocaleBundle()->getLocaleNames()`
-    * `Locale::getLocales()` -> `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
+   | Old way | New way
+   | ------- | ---
+   | `Locale::getDisplayCountries()` | `Intl::getRegionBundle()->getCountryNames()`
+   | `Locale::getCountries()` | `array_keys(Intl::getRegionBundle()->getCountryNames())`
+   | `Locale::getDisplayLanguages()` | `Intl::getLanguageBundle()->getLanguageNames()`
+   | `Locale::getLanguages()` | `array_keys(Intl::getLanguageBundle()->getLanguageNames())`
+   | `Locale::getDisplayLocales()` | `Intl::getLocaleBundle()->getLocaleNames()`
+   | `Locale::getLocales()` | `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
 
 ### PropertyAccess
 
@@ -490,12 +608,194 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Resources/` directory was moved to `Core/Resources/`
 
+ * The `key` settings of `anonymous` and `remember_me` are renamed to `secret`.
+
+   Before:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { key: "%secret%" }
+               remember_me:
+                   key: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous key="%secret%"/>
+           <remember-me key="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('key' => '%secret%'),
+           'remember_me' => array('key' => '%secret%'),
+       ),
+   ));
+   ```
+
+   After:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { secret: "%secret%" }
+               remember_me:
+                   secret: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous secret="%secret%"/>
+           <remember-me secret="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('secret' => '%secret%'),
+           'remember_me' => array('secret' => '%secret%'),
+       ),
+   ));
+  ```
+
+ * The `AbstractVoter::getSupportedAttributes()` and `AbstractVoter::getSupportedClasses()`
+   methods have been removed in favor of `AbstractVoter::supports()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function getSupportedAttributes()
+       {
+           return array('CREATE', 'EDIT');
+       }
+
+       protected function getSupportedClasses()
+       {
+           return array('AppBundle\Entity\Post');
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $class)
+       {
+           return $this->isClassInstanceOf($class, 'AppBundle\Entity\Post')
+               && in_array($attribute, array('CREATE', 'EDIT'));
+       }
+
+       // ...
+   }
+   ```
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
    `Translator::setFallbackLocales()`.
 
+ * The visibility of the `locale` property has been changed from protected to private. Rely on `getLocale` and `setLocale`
+   instead.
+
+   Before:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->locale;
+
+           // update locale
+           $this->locale = $locale;
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->getLocale();
+
+           // update locale
+           $this->setLocale($locale);
+       }
+    }
+   ```
+
+ * The method `FileDumper::format()` was removed. You should use
+   `FileDumper::formatCatalogue()` instead.
+
+   Before:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        protected function format(MessageCatalogue $messages, $domain)
+        {
+            ...
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+        {
+            ...
+        }
+    }
+   ```
+
 ### Twig Bridge
+
+ * The `twig:lint` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `lint:twig` command instead.
 
  * The `render` tag is deprecated in favor of the `render` function.
 
@@ -549,6 +849,11 @@ UPGRADE FROM 2.x to 3.0
    {{ form_end(form) }}
    ```
 
+### TwigBundle
+
+ * The `twig:debug` command has been deprecated since Symfony 2.7 and will be
+   removed in Symfony 3.0. Use the `debug:twig` command instead.
+
 ### Validator
 
  * The class `Symfony\Component\Validator\Mapping\Cache\ApcCache` has been removed in favor
@@ -556,7 +861,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
    $cache = new ApcCache('symfony.validator');
@@ -564,7 +869,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
    use Doctrine\Common\Cache\ApcCache;
 
@@ -606,31 +911,31 @@ UPGRADE FROM 2.x to 3.0
    private $property;
    ```
 
- * The option "methods" of the `Callback` constraint was removed. You should
-   use the option "callback" instead. If you have multiple callbacks, add
+ * The option "`methods`" of the `Callback` constraint was removed. You should
+   use the option "`callback`" instead. If you have multiple callbacks, add
    multiple callback constraints instead.
 
    Before (YAML):
 
-   ```
+   ```yaml
    constraints:
      - Callback: [firstCallback, secondCallback]
    ```
 
    After (YAML):
 
-   ```
+   ```yaml
    constraints:
      - Callback: firstCallback
      - Callback: secondCallback
    ```
 
-   When using annotations, you can now put the Callback constraint directly on
+   When using annotations, you can now put the `Callback` constraint directly on
    the method that should be executed.
 
    Before (Annotations):
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
    use Symfony\Component\Validator\ExecutionContextInterface;
 
@@ -648,7 +953,7 @@ UPGRADE FROM 2.x to 3.0
 
    After (Annotations):
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
    use Symfony\Component\Validator\ExecutionContextInterface;
 
@@ -672,7 +977,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $validator->validate($object, 'Strict');
 
    $validator->validateValue($value, new NotNull());
@@ -680,7 +985,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $validator->validate($object, null, 'Strict');
 
    $validator->validate($value, new NotNull());
@@ -690,7 +995,7 @@ UPGRADE FROM 2.x to 3.0
    were added. The first of them allows to run multiple validations in the
    same context and aggregate their violations:
 
-   ```
+   ```php
    $violations = $validator->startContext()
        ->atPath('firstName')->validate($firstName, new NotNull())
        ->atPath('age')->validate($age, new Type('integer'))
@@ -701,7 +1006,7 @@ UPGRADE FROM 2.x to 3.0
    especially useful when calling the validator from within constraint
    validators:
 
-   ```
+   ```php
    $validator->inContext($context)->validate($object);
    ```
 
@@ -720,13 +1025,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\MetadataInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\MetadataInterface;
    ```
 
@@ -737,7 +1042,7 @@ UPGRADE FROM 2.x to 3.0
 
    Example:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
    public function getTraversalStrategy()
@@ -751,13 +1056,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\PropertyMetadataInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
    ```
 
@@ -766,13 +1071,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\PropertyMetadataContainerInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
    ```
 
@@ -790,7 +1095,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\ClassBasedInterface;
 
    class MyClassMetadata implements ClassBasedInterface
@@ -801,7 +1106,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 
    class MyClassMetadata implements ClassMetadataInterface
@@ -814,7 +1119,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ElementMetadata;
 
    class MyMetadata extends ElementMetadata
@@ -824,7 +1129,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\GenericMetadata;
 
    class MyMetadata extends GenericMetadata
@@ -837,13 +1142,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\ExecutionContextInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Context\ExecutionContextInterface;
    ```
 
@@ -865,7 +1170,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $context->addViolationAt('property', 'The value {{ value }} is invalid.', array(
        '{{ value }}' => $invalidValue,
    ));
@@ -873,7 +1178,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $context->buildViolation('The value {{ value }} is invalid.')
        ->atPath('property')
        ->setParameter('{{ value }}', $invalidValue)
@@ -885,13 +1190,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $context->validate($object);
    ```
 
    After:
 
-   ```
+   ```php
    $context->getValidator()
        ->inContext($context)
        ->validate($object);
@@ -907,13 +1212,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $metadata = $context->getMetadataFactory()->getMetadataFor($myClass);
    ```
 
    After:
 
-   ```
+   ```php
    $metadata = $context->getValidator()->getMetadataFor($myClass);
    ```
 
@@ -928,7 +1233,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 
    $factory = new ClassMetadataFactory($loader);
@@ -936,7 +1241,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 
    $factory = new LazyLoadingMetadataFactory($loader);
@@ -954,16 +1259,32 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $parameters = $violation->getMessageParameters();
    $plural = $violation->getMessagePluralization();
    ```
 
    After:
 
-   ```
+   ```php
    $parameters = $violation->getParameters();
    $plural = $violation->getPlural();
+   ```
+
+ * The class `Symfony\Component\Validator\DefaultTranslator` was removed. You
+   should use `Symfony\Component\Translation\IdentityTranslator` instead.
+
+   Before:
+
+   ```php
+   $translator = new \Symfony\Component\Validator\DefaultTranslator();
+   ```
+
+   After:
+
+   ```php
+   $translator = new \Symfony\Component\Translation\IdentityTranslator();
+   $translator->setLocale('en');
    ```
 
 ### Yaml
@@ -984,6 +1305,28 @@ UPGRADE FROM 2.x to 3.0
 
 ### Process
 
- * Process::setStdin() and Process::getStdin() have been removed. Use
-   Process::setInput() and Process::getInput() that works the same way.
- * Process::setInput() and ProcessBuilder::setInput() do not accept non-scalar types.
+ * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
+   `Process::setInput()` and `Process::getInput()` that works the same way.
+ * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+
+### Monolog Bridge
+
+ * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.
+
+### Swiftmailer Bridge
+
+ * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
+
+### HttpFoundation
+
+* `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+
+### Config
+
+ * `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` has been removed. Also,
+   cache validation through this method (which was still supported in 2.8 for BC) does no longer
+   work because the `\Symfony\Component\Config\Resource\BCResourceInterfaceChecker` helper class
+   has been removed as well.

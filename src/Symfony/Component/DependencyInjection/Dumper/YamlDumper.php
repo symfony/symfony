@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -33,20 +32,6 @@ class YamlDumper extends Dumper
     private $dumper;
 
     /**
-     * Constructor.
-     *
-     * @param ContainerBuilder $container The service container to dump
-     *
-     * @api
-     */
-    public function __construct(ContainerBuilder $container)
-    {
-        parent::__construct($container);
-
-        $this->dumper = new YmlDumper();
-    }
-
-    /**
      * Dumps the service container as an YAML string.
      *
      * @param array $options An array of options
@@ -57,11 +42,19 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
+        if (!class_exists('Symfony\Component\Yaml\Dumper')) {
+            throw new RuntimeException('Unable to dump the container as the Symfony Yaml Component is not installed.');
+        }
+
+        if (null === $this->dumper) {
+            $this->dumper = new YmlDumper();
+        }
+
         return $this->addParameters()."\n".$this->addServices();
     }
 
     /**
-     * Adds a service
+     * Adds a service.
      *
      * @param string     $id
      * @param Definition $definition
@@ -71,8 +64,12 @@ class YamlDumper extends Dumper
     private function addService($id, $definition)
     {
         $code = "    $id:\n";
-        if ($definition->getClass()) {
-            $code .= sprintf("        class: %s\n", $definition->getClass());
+        if ($class = $definition->getClass()) {
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
+            }
+
+            $code .= sprintf("        class: %s\n", $class);
         }
 
         if (!$definition->isPublic()) {
@@ -86,7 +83,7 @@ class YamlDumper extends Dumper
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
-                $att = $att ? ', '.implode(' ', $att) : '';
+                $att = $att ? ', '.implode(', ', $att) : '';
 
                 $tagsCode .= sprintf("            - { name: %s%s }\n", $this->dumper->dump($name), $att);
             }
@@ -103,24 +100,12 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synthetic: true\n");
         }
 
-        if ($definition->isSynchronized()) {
-            $code .= sprintf("        synchronized: true\n");
-        }
-
-        if ($definition->getFactoryClass()) {
-            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        deprecated: %s\n", $definition->getDeprecationMessage('%service_id%'));
         }
 
         if ($definition->isLazy()) {
             $code .= sprintf("        lazy: true\n");
-        }
-
-        if ($definition->getFactoryMethod()) {
-            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
-        }
-
-        if ($definition->getFactoryService()) {
-            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
         }
 
         if ($definition->getArguments()) {
@@ -135,15 +120,18 @@ class YamlDumper extends Dumper
             $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
 
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("        scope: %s\n", $scope);
+        if (!$definition->isShared()) {
+            $code .= "        shared: false\n";
         }
 
         if (null !== $decorated = $definition->getDecoratedService()) {
-            list ($decorated, $renamedId) = $decorated;
+            list($decorated, $renamedId, $priority) = $decorated;
             $code .= sprintf("        decorates: %s\n", $decorated);
             if (null !== $renamedId) {
                 $code .= sprintf("        decoration_inner_name: %s\n", $renamedId);
+            }
+            if (0 !== $priority) {
+                $code .= sprintf("        decoration_priority: %s\n", $priority);
             }
         }
 
@@ -159,7 +147,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds a service alias
+     * Adds a service alias.
      *
      * @param string $alias
      * @param Alias  $id
@@ -176,7 +164,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds services
+     * Adds services.
      *
      * @return string
      */
@@ -203,7 +191,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds parameters
+     * Adds parameters.
      *
      * @return string
      */
@@ -219,7 +207,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Dumps callable to YAML format
+     * Dumps callable to YAML format.
      *
      * @param callable $callable
      *
@@ -239,7 +227,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Dumps the value to YAML format
+     * Dumps the value to YAML format.
      *
      * @param mixed $value
      *
@@ -306,8 +294,8 @@ class YamlDumper extends Dumper
     /**
      * Prepares parameters.
      *
-     * @param array   $parameters
-     * @param bool    $escape
+     * @param array $parameters
+     * @param bool  $escape
      *
      * @return array
      */
@@ -328,7 +316,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Escapes arguments
+     * Escapes arguments.
      *
      * @param array $arguments
      *

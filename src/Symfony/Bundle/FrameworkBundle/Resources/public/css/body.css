@@ -52,6 +52,7 @@ build: 56
     background-color: #FFFFFF;
     border: 1px solid #dfdfdf;
     padding: 40px 50px;
+    word-break: break-all;
 }
 .sf-reset h2 {
     font-size: 16px;

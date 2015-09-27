@@ -37,8 +37,7 @@ class HelpCommand extends Command
             ->setName('help')
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
             ))
             ->setDescription('Displays help for a command')
@@ -58,7 +57,7 @@ EOF
     }
 
     /**
-     * Sets the command
+     * Sets the command.
      *
      * @param Command $command The command to set
      */
@@ -76,14 +75,10 @@ EOF
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        if ($input->getOption('xml')) {
-            $input->setOption('format', 'xml');
-        }
-
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->command, array(
             'format' => $input->getOption('format'),
-            'raw' => $input->getOption('raw'),
+            'raw_text' => $input->getOption('raw'),
         ));
 
         $this->command = null;

@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* removed classes, methods and interfaces deprecated in 2.x
+
+2.8.0
+-----
+
+* added BufferingLogger for errors that happen before a proper logger is configured
+* allow throwing from `__toString()` with `return trigger_error($e, E_USER_ERROR);`
+* deprecate ExceptionHandler::createResponse
+
+2.7.0
+-----
+
+* added deprecations checking for parent interfaces/classes to DebugClassLoader
+* added ZTS support to symfony_debug extension
+* added symfony_debug_backtrace() to symfony_debug extension
+  to track the backtrace of fatal errors
+
 2.6.0
 -----
 

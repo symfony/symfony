@@ -21,10 +21,15 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimeType extends AbstractType
 {
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -99,14 +104,14 @@ class TimeType extends AbstractType
                 }
             }
 
-            $builder->add('hour', $options['widget'], $hourOptions);
+            $builder->add('hour', self::$widgets[$options['widget']], $hourOptions);
 
             if ($options['with_minutes']) {
-                $builder->add('minute', $options['widget'], $minuteOptions);
+                $builder->add('minute', self::$widgets[$options['widget']], $minuteOptions);
             }
 
             if ($options['with_seconds']) {
-                $builder->add('second', $options['widget'], $secondOptions);
+                $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
@@ -157,7 +162,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
             return $options['widget'] !== 'single_text';
@@ -214,36 +219,38 @@ class TimeType extends AbstractType
             'compound' => $compound,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'hours' => 'array',
-            'minutes' => 'array',
-            'seconds' => 'array',
-        ));
+        $resolver->setAllowedTypes('hours', 'array');
+        $resolver->setAllowedTypes('minutes', 'array');
+        $resolver->setAllowedTypes('seconds', 'array');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'time';
     }

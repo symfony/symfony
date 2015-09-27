@@ -25,7 +25,7 @@ interface RequestMatcherInterface
      *
      * @param Request $request The request to check for a match
      *
-     * @return bool    true if the request matches, false otherwise
+     * @return bool true if the request matches, false otherwise
      *
      * @api
      */

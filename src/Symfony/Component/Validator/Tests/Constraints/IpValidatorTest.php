@@ -153,6 +153,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -185,6 +186,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -211,6 +213,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -237,6 +240,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -259,6 +263,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -295,6 +300,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -321,6 +327,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -346,6 +353,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -368,6 +376,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -390,6 +399,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -412,6 +422,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 
@@ -434,6 +445,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
 

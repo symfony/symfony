@@ -27,6 +27,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDoNoDuplicateDefaultFormResources()
+    {
+        $input = array('templating' => array(
+            'form' => array('resources' => array('FrameworkBundle:Form')),
+            'engines' => array('php'),
+        ));
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), array($input));
+
+        $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
+    }
+
     /**
      * @dataProvider getTestValidTrustedProxiesData
      */
@@ -86,6 +99,23 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testAssetsCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(
@@ -96,13 +126,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'form' => array(
                 'enabled' => false,
                 'csrf_protection' => array(
-                    'enabled' => null, // defaults to csrf_protection.enabled
-                    'field_name' => null,
+                    'enabled' => false,
+                    'field_name' => '_token',
                 ),
-            ),
-            'csrf_protection' => array(
-                'enabled' => false,
-                'field_name' => '_token',
             ),
             'esi' => array('enabled' => false),
             'ssi' => array('enabled' => false),
@@ -122,8 +148,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'translator' => array(
                 'enabled' => false,
-                'fallback' => 'en',
+                'fallbacks' => array('en'),
                 'logging' => true,
+                'paths' => array(),
             ),
             'validation' => array(
                 'enabled' => false,
@@ -131,7 +158,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
-                'api' => version_compare(PHP_VERSION, '5.3.9', '<') ? '2.4' : '2.5-bc',
             ),
             'annotations' => array(
                 'cache' => 'file',
@@ -140,6 +166,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer' => array(
                 'enabled' => false,
+                'enable_annotations' => false,
             ),
             'property_access' => array(
                 'magic_call' => false,

@@ -33,6 +33,18 @@ class ControllerResolverTest extends BaseControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
+    public function testGetControllerOnContainerAwareInvokable()
+    {
+        $resolver = $this->createControllerResolver();
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController');
+
+        $controller = $resolver->getController($request);
+
+        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
+    }
+
     public function testGetControllerWithBundleNotation()
     {
         $shortName = 'FooBundle:Default:test';
@@ -101,21 +113,25 @@ class ControllerResolverTest extends BaseControllerResolverTest
      */
     public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
     {
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected excetion and not use the regex
+        $resolver = $this->createControllerResolver();
+        $this->setExpectedExceptionRegExp($exceptionName, $exceptionMessage);
 
-        parent::testGetControllerOnNonUndefinedFunction($controller);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $controller);
+        $resolver->getController($request);
     }
 
     public function getUndefinedControllers()
     {
         return array(
-            array('foo', '\LogicException', 'Unable to parse the controller name "foo".'),
-            array('foo::bar', '\InvalidArgumentException', 'Class "foo" does not exist.'),
-            array('stdClass', '\LogicException', 'Unable to parse the controller name "stdClass".'),
+            array('foo', '\LogicException', '/Unable to parse the controller name "foo"\./'),
+            array('foo::bar', '\InvalidArgumentException', '/Class "foo" does not exist\./'),
+            array('stdClass', '\LogicException', '/Unable to parse the controller name "stdClass"\./'),
             array(
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',
                 '\InvalidArgumentException',
-                'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar" for URI "/" is not callable.',
+                '/.?[cC]ontroller(.*?) for URI "\/" is not callable\.( Expected method(.*) Available methods)?/',
             ),
         );
     }
@@ -159,6 +175,10 @@ class ContainerAwareController implements ContainerAwareInterface
     }
 
     public function testAction()
+    {
+    }
+
+    public function __invoke()
     {
     }
 }

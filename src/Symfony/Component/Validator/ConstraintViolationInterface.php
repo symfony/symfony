@@ -65,9 +65,11 @@ interface ConstraintViolationInterface
      * @return array A possibly empty list of parameters indexed by the names
      *               that appear in the message template.
      *
-     * @see getMessageTemplate
+     * @see getMessageTemplate()
      *
      * @api
+     *
+     * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
      */
     public function getMessageParameters();
 
@@ -85,7 +87,9 @@ interface ConstraintViolationInterface
      * This method returns the value of the parameter for choosing the right
      * pluralization form (in this case "choices").
      *
-     * @return int|null     The number to use to pluralize of the message.
+     * @return int|null The number to use to pluralize of the message.
+     *
+     * @deprecated since version 2.7, to be replaced by getPlural() in 3.0.
      */
     public function getMessagePluralization();
 
@@ -130,7 +134,7 @@ interface ConstraintViolationInterface
     /**
      * Returns a machine-digestible error code for the violation.
      *
-     * @return mixed The error code.
+     * @return string|null The error code.
      */
     public function getCode();
 }

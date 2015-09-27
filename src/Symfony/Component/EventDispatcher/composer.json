@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony EventDispatcher Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,17 +12,18 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/dependency-injection": "~2.6",
-        "symfony/expression-language": "~2.6",
-        "symfony/config": "~2.0",
-        "symfony/stopwatch": "~2.2",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
@@ -30,9 +31,8 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\EventDispatcher\\": "" }
+        "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" }
     },
-    "target-dir": "Symfony/Component/EventDispatcher",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

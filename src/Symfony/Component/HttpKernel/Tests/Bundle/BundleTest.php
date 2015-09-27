@@ -11,14 +11,23 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand;
-use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
 class BundleTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetContainerExtension()
+    {
+        $bundle = new ExtensionPresentBundle();
+
+        $this->assertInstanceOf(
+            'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\DependencyInjection\ExtensionPresentExtension',
+            $bundle->getContainerExtension()
+        );
+    }
+
     public function testRegisterCommands()
     {
         $cmd = new FooCommand();
@@ -31,5 +40,15 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $bundle2 = new ExtensionAbsentBundle();
 
         $this->assertNull($bundle2->registerCommands($app));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage must implement Symfony\Component\DependencyInjection\Extension\ExtensionInterface
+     */
+    public function testGetContainerExtensionWithInvalidClass()
+    {
+        $bundle = new ExtensionNotValidBundle();
+        $bundle->getContainerExtension();
     }
 }

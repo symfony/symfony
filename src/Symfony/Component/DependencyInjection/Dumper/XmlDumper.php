@@ -114,20 +114,15 @@ class XmlDumper extends Dumper
         if (null !== $id) {
             $service->setAttribute('id', $id);
         }
-        if ($definition->getClass()) {
-            $service->setAttribute('class', $definition->getClass());
+        if ($class = $definition->getClass()) {
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
+            }
+
+            $service->setAttribute('class', $class);
         }
-        if ($definition->getFactoryMethod()) {
-            $service->setAttribute('factory-method', $definition->getFactoryMethod());
-        }
-        if ($definition->getFactoryClass()) {
-            $service->setAttribute('factory-class', $definition->getFactoryClass());
-        }
-        if ($definition->getFactoryService()) {
-            $service->setAttribute('factory-service', $definition->getFactoryService());
-        }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $service->setAttribute('scope', $scope);
+        if (!$definition->isShared()) {
+            $service->setAttribute('shared', 'false');
         }
         if (!$definition->isPublic()) {
             $service->setAttribute('public', 'false');
@@ -135,17 +130,17 @@ class XmlDumper extends Dumper
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
         }
-        if ($definition->isSynchronized()) {
-            $service->setAttribute('synchronized', 'true');
-        }
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
         if (null !== $decorated = $definition->getDecoratedService()) {
-            list ($decorated, $renamedId) = $decorated;
+            list($decorated, $renamedId, $priority) = $decorated;
             $service->setAttribute('decorates', $decorated);
             if (null !== $renamedId) {
                 $service->setAttribute('decoration-inner-name', $renamedId);
+            }
+            if (0 !== $priority) {
+                $service->setAttribute('decoration-priority', $priority);
             }
         }
 
@@ -178,7 +173,11 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $factory);
+                $factory->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $factory->setAttribute('method', $callable[1]);
             } else {
@@ -187,9 +186,20 @@ class XmlDumper extends Dumper
             $service->appendChild($factory);
         }
 
+        if ($definition->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $configurator);
+                $configurator->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
@@ -275,9 +285,6 @@ class XmlDumper extends Dumper
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-                if (!$value->isStrict()) {
-                    $element->setAttribute('strict', 'false');
-                }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
@@ -297,7 +304,7 @@ class XmlDumper extends Dumper
     }
 
     /**
-     * Escapes arguments
+     * Escapes arguments.
      *
      * @param array $arguments
      *

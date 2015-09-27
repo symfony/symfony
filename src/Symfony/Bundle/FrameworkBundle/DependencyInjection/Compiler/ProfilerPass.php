@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds tagged data_collector services to profiler service
+ * Adds tagged data_collector services to profiler service.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

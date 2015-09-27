@@ -36,9 +36,9 @@ class RouterHelper extends Helper
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string         $name          The name of the route
-     * @param mixed          $parameters    An array of parameters
-     * @param bool|string    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     * @param string      $name          The name of the route
+     * @param mixed       $parameters    An array of parameters
+     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
      *
@@ -50,9 +50,7 @@ class RouterHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

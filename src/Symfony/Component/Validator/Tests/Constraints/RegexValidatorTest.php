@@ -84,6 +84,7 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setCode(Regex::REGEX_FAILED_ERROR)
             ->assertRaised();
     }
 

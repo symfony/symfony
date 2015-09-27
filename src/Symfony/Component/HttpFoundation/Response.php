@@ -116,7 +116,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link http://www.iana.org/assignments/http-status-codes/ Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2012-02-13).
+     * (last updated 2015-05-19).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
@@ -142,7 +142,6 @@ class Response
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        306 => 'Reserved',
         307 => 'Temporary Redirect',
         308 => 'Permanent Redirect',    // RFC7238
         400 => 'Bad Request',
@@ -158,12 +157,11 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',                                               // RFC2324
         422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
@@ -188,9 +186,9 @@ class Response
     /**
      * Constructor.
      *
-     * @param mixed   $content The response content, see setContent()
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed $content The response content, see setContent()
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
@@ -202,22 +200,19 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
-        }
     }
 
     /**
-     * Factory method for chainability
+     * Factory method for chainability.
      *
      * Example:
      *
      *     return Response::create($body, 200)
      *         ->setSharedMaxAge(300);
      *
-     * @param mixed   $content The response content, see setContent()
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed $content The response content, see setContent()
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
      *
      * @return Response
      */
@@ -268,7 +263,7 @@ class Response
     {
         $headers = $this->headers;
 
-        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
+        if ($this->isInformational() || $this->isEmpty()) {
             $this->setContent(null);
             $headers->remove('Content-Type');
             $headers->remove('Content-Length');
@@ -333,6 +328,10 @@ class Response
             return $this;
         }
 
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
+        }
+
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText), true, $this->statusCode);
 
@@ -379,7 +378,6 @@ class Response
             fastcgi_finish_request();
         } elseif ('cli' !== PHP_SAPI) {
             static::closeOutputBuffers(0, true);
-            flush();
         }
 
         return $this;
@@ -452,8 +450,8 @@ class Response
     /**
      * Sets the response status code.
      *
-     * @param int     $code HTTP status code
-     * @param mixed   $text HTTP status text
+     * @param int   $code HTTP status code
+     * @param mixed $text HTTP status text
      *
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
@@ -491,7 +489,7 @@ class Response
     /**
      * Retrieves the status code for the current web response.
      *
-     * @return int     Status code
+     * @return int Status code
      *
      * @api
      */
@@ -537,7 +535,7 @@ class Response
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
      *
-     * @return bool    true if the response is worth caching, false otherwise
+     * @return bool true if the response is worth caching, false otherwise
      *
      * @api
      */
@@ -561,7 +559,7 @@ class Response
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expires header and the calculated age is less than the freshness lifetime.
      *
-     * @return bool    true if the response is fresh, false otherwise
+     * @return bool true if the response is fresh, false otherwise
      *
      * @api
      */
@@ -574,7 +572,7 @@ class Response
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
      *
-     * @return bool    true if the response is validateable, false otherwise
+     * @return bool true if the response is validateable, false otherwise
      *
      * @api
      */
@@ -625,13 +623,13 @@ class Response
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
-     * @return bool    true if the response must be revalidated by a cache, false otherwise
+     * @return bool true if the response must be revalidated by a cache, false otherwise
      *
      * @api
      */
     public function mustRevalidate()
     {
-        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('proxy-revalidate');
+        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->hasCacheControlDirective('proxy-revalidate');
     }
 
     /**
@@ -645,7 +643,11 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**
@@ -668,7 +670,7 @@ class Response
     /**
      * Returns the age of the response.
      *
-     * @return int     The age of the response in seconds
+     * @return int The age of the response in seconds
      */
     public function getAge()
     {
@@ -743,7 +745,7 @@ class Response
      * First, it checks for a s-maxage directive, then a max-age directive, and then it falls
      * back on an expires header. It returns null when no maximum age can be established.
      *
-     * @return int|null     Number of seconds
+     * @return int|null Number of seconds
      *
      * @api
      */
@@ -767,7 +769,7 @@ class Response
      *
      * This methods sets the Cache-Control max-age directive.
      *
-     * @param int     $value Number of seconds
+     * @param int $value Number of seconds
      *
      * @return Response
      *
@@ -785,7 +787,7 @@ class Response
      *
      * This methods sets the Cache-Control s-maxage directive.
      *
-     * @param int     $value Number of seconds
+     * @param int $value Number of seconds
      *
      * @return Response
      *
@@ -807,7 +809,7 @@ class Response
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
-     * @return int|null     The TTL in seconds
+     * @return int|null The TTL in seconds
      *
      * @api
      */
@@ -823,7 +825,7 @@ class Response
      *
      * This method adjusts the Cache-Control/s-maxage directive.
      *
-     * @param int     $seconds Number of seconds
+     * @param int $seconds Number of seconds
      *
      * @return Response
      *
@@ -841,7 +843,7 @@ class Response
      *
      * This method adjusts the Cache-Control/max-age directive.
      *
-     * @param int     $seconds Number of seconds
+     * @param int $seconds Number of seconds
      *
      * @return Response
      *
@@ -1011,7 +1013,7 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return bool    true if the response includes a Vary header, false otherwise
+     * @return bool true if the response includes a Vary header, false otherwise
      *
      * @api
      */
@@ -1067,7 +1069,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if the Response validators match the Request, false otherwise
+     * @return bool true if the Response validators match the Request, false otherwise
      *
      * @api
      */
@@ -1081,7 +1083,7 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if ($etags = $request->getEtags()) {
+        if ($etags = $request->getETags()) {
             $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
         }
 
@@ -1243,15 +1245,10 @@ class Response
     {
         $status = ob_get_status(true);
         $level = count($status);
+        // PHP_OUTPUT_HANDLER_* are not defined on HHVM 3.3
+        $flags = defined('PHP_OUTPUT_HANDLER_REMOVABLE') ? PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
 
-        while ($level-- > $targetLevel
-            && (!empty($status[$level]['del'])
-                || (isset($status[$level]['flags'])
-                    && ($status[$level]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)
-                    && ($status[$level]['flags'] & ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE))
-                )
-            )
-        ) {
+        while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || $flags === ($s['flags'] & $flags) : $s['del'])) {
             if ($flush) {
                 ob_end_flush();
             } else {
@@ -1261,14 +1258,14 @@ class Response
     }
 
     /**
-     * Checks if we need to remove Cache-Control for SSL encrypted downloads when using IE < 9
+     * Checks if we need to remove Cache-Control for SSL encrypted downloads when using IE < 9.
      *
      * @link http://support.microsoft.com/kb/323308
      */
     protected function ensureIEOverSSLCompatibility(Request $request)
     {
         if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
-            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
+            if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {
                 $this->headers->remove('Cache-Control');
             }
         }

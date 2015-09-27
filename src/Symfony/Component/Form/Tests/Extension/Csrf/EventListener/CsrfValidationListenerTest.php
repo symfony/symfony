@@ -63,7 +63,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
     // https://github.com/symfony/symfony/pull/5838
     public function testStringFormData()
     {
-        $data = "XP4HUzmHPi";
+        $data = 'XP4HUzmHPi';
         $event = new FormEvent($this->form, $data);
 
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');

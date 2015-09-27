@@ -13,7 +13,7 @@ namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
-use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -34,12 +34,8 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-            $this->markTestSkipped('This test requires at least PHP 5.4.0.');
-        }
-
         $this->writer = new JsonBundleWriter();
-        $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.rand(1000, 9999);
+        $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
 
         $this->filesystem->mkdir($this->directory);
@@ -47,10 +43,6 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-            return;
-        }
-
         $this->filesystem->remove($this->directory);
     }
 
@@ -74,7 +66,10 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteResourceBundle()
     {
-        IntlTestHelper::requireFullIntl($this);
+        // We only run tests if the intl extension is loaded...
+        if (!Intl::isExtensionLoaded()) {
+            $this->markTestSkipped('The intl extension is not available.');
+        }
 
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 

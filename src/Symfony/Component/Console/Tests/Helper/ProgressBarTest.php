@@ -14,9 +14,20 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tests;
 
 class ProgressBarTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        Tests\with_clock_mock(true);
+    }
+
+    protected function tearDown()
+    {
+        Tests\with_clock_mock(false);
+    }
+
     public function testMultipleStart()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());
@@ -315,7 +326,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
         $bar->start();
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 200; ++$i) {
             $bar->advance();
         }
 
@@ -323,17 +334,17 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            "   0/200 [>---------------------------]   0%\n".
-            "  20/200 [==>-------------------------]  10%\n".
-            "  40/200 [=====>----------------------]  20%\n".
-            "  60/200 [========>-------------------]  30%\n".
-            "  80/200 [===========>----------------]  40%\n".
-            " 100/200 [==============>-------------]  50%\n".
-            " 120/200 [================>-----------]  60%\n".
-            " 140/200 [===================>--------]  70%\n".
-            " 160/200 [======================>-----]  80%\n".
-            " 180/200 [=========================>--]  90%\n".
-            " 200/200 [============================] 100%",
+            '   0/200 [>---------------------------]   0%'.PHP_EOL.
+            '  20/200 [==>-------------------------]  10%'.PHP_EOL.
+            '  40/200 [=====>----------------------]  20%'.PHP_EOL.
+            '  60/200 [========>-------------------]  30%'.PHP_EOL.
+            '  80/200 [===========>----------------]  40%'.PHP_EOL.
+            ' 100/200 [==============>-------------]  50%'.PHP_EOL.
+            ' 120/200 [================>-----------]  60%'.PHP_EOL.
+            ' 140/200 [===================>--------]  70%'.PHP_EOL.
+            ' 160/200 [======================>-----]  80%'.PHP_EOL.
+            ' 180/200 [=========================>--]  90%'.PHP_EOL.
+            ' 200/200 [============================] 100%',
             stream_get_contents($output->getStream())
         );
     }
@@ -349,9 +360,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            "  0/50 [>---------------------------]   0%\n".
-            " 25/50 [==============>-------------]  50%\n".
-            " 50/50 [============================] 100%",
+            '  0/50 [>---------------------------]   0%'.PHP_EOL.
+            ' 25/50 [==============>-------------]  50%'.PHP_EOL.
+            ' 50/50 [============================] 100%',
             stream_get_contents($output->getStream())
         );
     }
@@ -364,8 +375,8 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            "    0 [>---------------------------]\n".
-            "    1 [->--------------------------]",
+            '    0 [>---------------------------]'.PHP_EOL.
+            '    1 [->--------------------------]',
             stream_get_contents($output->getStream())
         );
     }
@@ -384,7 +395,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $output->write("\n");
         $bar3->start();
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             // up two lines
             $output->write("\033[2A");
             if ($i <= 2) {
@@ -492,6 +503,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testAnsiColorsAndEmojis()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);
@@ -500,7 +514,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $mem = 100000 * $i;
             $colors = $i++ ? '41;37' : '44;37';
 
-            return "\033[".$colors."m ".Helper::formatMemory($mem)." \033[0m";
+            return "\033[".$colors.'m '.Helper::formatMemory($mem)." \033[0m";
         });
         $bar->setFormat(" \033[44;37m %title:-37s% \033[0m\n %current%/%max% %bar% %percent:3s%%\n 🏁  %remaining:-10s% %memory:37s%");
         $bar->setBarCharacter($done = "\033[32m●\033[0m");
@@ -518,17 +532,17 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $this->generateOutput(
                 " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
-                "  0/15 ".$progress.str_repeat($empty, 26)."   0%\n".
+                '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
                 " \xf0\x9f\x8f\x81  1 sec                          \033[44;37m 0 B \033[0m"
             ).
             $this->generateOutput(
                 " \033[44;37m Looks good to me...                   \033[0m\n".
-                "  4/15 ".str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
+                '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
                 " \xf0\x9f\x8f\x81  1 sec                       \033[41;37m 97 KiB \033[0m"
             ).
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
-                " 15/15 ".str_repeat($done, 28)." 100%\n".
+                ' 15/15 '.str_repeat($done, 28)." 100%\n".
                 " \xf0\x9f\x8f\x81  1 sec                      \033[41;37m 195 KiB \033[0m"
             ),
             stream_get_contents($output->getStream())
@@ -570,7 +584,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Provides each defined format
+     * Provides each defined format.
      *
      * @return array
      */

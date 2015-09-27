@@ -11,20 +11,25 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTypeTest extends TypeTestCase
+class DateTypeTest extends TestCase
 {
+    private $defaultTimezone;
+
     protected function setUp()
     {
         parent::setUp();
+        $this->defaultTimezone = date_default_timezone_get();
+    }
 
-        // we test against "de_AT", so we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
-
-        \Locale::setDefault('de_AT');
+    protected function tearDown()
+    {
+        date_default_timezone_set($this->defaultTimezone);
+        \Locale::setDefault('en');
     }
 
     /**
@@ -32,7 +37,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testInvalidWidgetOption()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'fake_widget',
         ));
     }
@@ -42,14 +47,14 @@ class DateTypeTest extends TypeTestCase
      */
     public function testInvalidInputOption()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'input' => 'fake_input',
         ));
     }
 
     public function testSubmitFromSingleTextDateTimeWithDefaultFormat()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -64,7 +69,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromSingleTextDateTime()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
@@ -80,7 +90,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromSingleTextString()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
@@ -96,7 +111,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromSingleTextTimestamp()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
@@ -114,7 +134,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromSingleTextRaw()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
@@ -136,7 +161,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromText()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'text',
@@ -158,7 +183,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromChoice()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -180,7 +205,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromChoiceEmpty()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -201,7 +226,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromInputDateTimeDifferentPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
@@ -217,7 +242,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromInputStringDifferentPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
@@ -233,7 +258,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromInputTimestampDifferentPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
@@ -251,7 +276,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testSubmitFromInputRawDifferentPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
@@ -276,7 +301,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testDatePatternWithFormatOption($format, $pattern)
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => $format,
         ));
 
@@ -302,7 +327,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfFormatIsNoPattern()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => '0',
             'widget' => 'single_text',
             'input' => 'string',
@@ -314,7 +339,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => array(6, 7),
             'format' => 'yy',
         ));
@@ -325,7 +350,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfFormatIsNoConstant()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => 105,
         ));
     }
@@ -335,7 +360,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfFormatIsInvalid()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => array(),
         ));
     }
@@ -345,7 +370,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfYearsIsInvalid()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'years' => 'bad value',
         ));
     }
@@ -355,7 +380,7 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfMonthsIsInvalid()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => 'bad value',
         ));
     }
@@ -365,47 +390,61 @@ class DateTypeTest extends TypeTestCase
      */
     public function testThrowExceptionIfDaysIsInvalid()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'days' => 'bad value',
         ));
     }
 
-    public function testSetDataWithDifferentTimezones()
+    public function testSetDataWithNegativeTimezoneOffsetStringInput()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Pacific/Tahiti',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'America/New_York',
             'input' => 'string',
             'widget' => 'single_text',
         ));
 
         $form->setData('2010-06-02');
 
+        // 2010-06-02 00:00:00 UTC
+        // 2010-06-01 20:00:00 UTC-4
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
-    public function testSetDataWithDifferentTimezonesDateTime()
+    public function testSetDataWithNegativeTimezoneOffsetDateTimeInput()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::MEDIUM,
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Pacific/Tahiti',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'America/New_York',
             'input' => 'datetime',
             'widget' => 'single_text',
         ));
 
-        $dateTime = new \DateTime('2010-06-02 America/New_York');
+        $dateTime = new \DateTime('2010-06-02 UTC');
 
         $form->setData($dateTime);
 
+        // 2010-06-02 00:00:00 UTC
+        // 2010-06-01 20:00:00 UTC-4
         $this->assertDateTimeEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testYearsOption()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'years' => array(2010, 2011),
         ));
 
@@ -419,21 +458,27 @@ class DateTypeTest extends TypeTestCase
 
     public function testMonthsOption()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => array(6, 7),
+            'format' => \IntlDateFormatter::SHORT,
         ));
 
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView(6, '6', '06'),
+            new ChoiceView(7, '7', '07'),
         ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionShortFormat()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => array(1, 4),
             'format' => 'dd.MMM.yy',
         ));
@@ -441,14 +486,19 @@ class DateTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jän'),
-            new ChoiceView('4', '4', 'Apr.'),
+            new ChoiceView(1, '1', 'Jän'),
+            new ChoiceView(4, '4', 'Apr.'),
         ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionLongFormat()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => array(1, 4),
             'format' => 'dd.MMMM.yy',
         ));
@@ -456,14 +506,19 @@ class DateTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jänner'),
-            new ChoiceView('4', '4', 'April'),
+            new ChoiceView(1, '1', 'Jänner'),
+            new ChoiceView(4, '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionLongFormatWithDifferentTimezone()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'months' => array(1, 4),
             'format' => 'dd.MMMM.yy',
         ));
@@ -471,22 +526,22 @@ class DateTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jänner'),
-            new ChoiceView('4', '4', 'April'),
+            new ChoiceView(1, '1', 'Jänner'),
+            new ChoiceView(4, '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'days' => array(6, 7),
         ));
 
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView(6, '6', '06'),
+            new ChoiceView(7, '7', '07'),
         ), $view['day']->vars['choices']);
     }
 
@@ -494,7 +549,7 @@ class DateTypeTest extends TypeTestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -509,7 +564,7 @@ class DateTypeTest extends TypeTestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -528,7 +583,7 @@ class DateTypeTest extends TypeTestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -547,7 +602,7 @@ class DateTypeTest extends TypeTestCase
     {
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
@@ -564,7 +619,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassDatePatternToView()
     {
-        $form = $this->factory->create('date');
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType');
         $view = $form->createView();
 
         $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
@@ -572,7 +632,12 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassDatePatternToViewDifferentFormat()
     {
-        $form = $this->factory->create('date', null, array(
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_AT');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => \IntlDateFormatter::LONG,
         ));
 
@@ -583,7 +648,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassDatePatternToViewDifferentPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => 'MMyyyydd',
         ));
 
@@ -594,7 +659,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassDatePatternToViewDifferentPatternWithSeparators()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'format' => 'MM*yyyy*dd',
         ));
 
@@ -605,7 +670,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testDontPassDatePatternIfText()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
         ));
         $view = $form->createView();
@@ -613,9 +678,26 @@ class DateTypeTest extends TypeTestCase
         $this->assertFalse(isset($view->vars['date_pattern']));
     }
 
+    public function testDatePatternFormatWithQuotedStrings()
+    {
+        // we test against "es_ES", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('es_ES');
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
+            // EEEE, d 'de' MMMM 'de' y
+            'format' => \IntlDateFormatter::FULL,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
+    }
+
     public function testPassWidgetToView()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
         ));
         $view = $form->createView();
@@ -628,12 +710,12 @@ class DateTypeTest extends TypeTestCase
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
-        $this->factory->create('date', new \DateTime());
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', new \DateTime());
     }
 
     public function testSingleTextWidgetShouldUseTheRightInputType()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
         ));
 
@@ -643,7 +725,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'required' => false,
         ));
 
@@ -655,7 +737,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassNoPlaceholderToViewIfRequired()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'required' => true,
         ));
 
@@ -667,7 +749,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassPlaceholderAsString()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'placeholder' => 'Empty',
         ));
 
@@ -677,24 +759,9 @@ class DateTypeTest extends TypeTestCase
         $this->assertSame('Empty', $view['day']->vars['placeholder']);
     }
 
-    public function testPassEmptyValueBC()
-    {
-        $form = $this->factory->create('date', null, array(
-            'empty_value' => 'Empty',
-        ));
-
-        $view = $form->createView();
-        $this->assertSame('Empty', $view['year']->vars['placeholder']);
-        $this->assertSame('Empty', $view['month']->vars['placeholder']);
-        $this->assertSame('Empty', $view['day']->vars['placeholder']);
-        $this->assertSame('Empty', $view['year']->vars['empty_value']);
-        $this->assertSame('Empty', $view['month']->vars['empty_value']);
-        $this->assertSame('Empty', $view['day']->vars['empty_value']);
-    }
-
     public function testPassPlaceholderAsArray()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'placeholder' => array(
                 'year' => 'Empty year',
                 'month' => 'Empty month',
@@ -710,7 +777,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'required' => false,
             'placeholder' => array(
                 'year' => 'Empty year',
@@ -726,7 +793,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'required' => true,
             'placeholder' => array(
                 'year' => 'Empty year',
@@ -742,7 +809,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testPassHtml5TypeIfSingleTextAndHtml5Format()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
         ));
 
@@ -752,7 +819,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testDontPassHtml5TypeIfHtml5NotAllowed()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
             'html5' => false,
         ));
@@ -763,7 +830,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
             'format' => \IntlDateFormatter::MEDIUM,
         ));
@@ -774,7 +841,7 @@ class DateTypeTest extends TypeTestCase
 
     public function testDontPassHtml5TypeIfNotSingleText()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'text',
         ));
 
@@ -796,7 +863,7 @@ class DateTypeTest extends TypeTestCase
     public function testYearErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => $widget,
         ));
         $form['year']->addError($error);
@@ -811,7 +878,7 @@ class DateTypeTest extends TypeTestCase
     public function testMonthErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => $widget,
         ));
         $form['month']->addError($error);
@@ -826,7 +893,7 @@ class DateTypeTest extends TypeTestCase
     public function testDayErrorsBubbleUp($widget)
     {
         $error = new FormError('Invalid!');
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => $widget,
         ));
         $form['day']->addError($error);
@@ -842,7 +909,7 @@ class DateTypeTest extends TypeTestCase
                 'PHP must be compiled in 32 bit mode to run this test');
         }
 
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'years' => range(1900, 2040),
         ));
 

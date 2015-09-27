@@ -81,6 +81,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharset()
     {
@@ -115,6 +116,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharsetGbk()
     {
@@ -235,7 +237,7 @@ EOF
         $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
 
         $crawler = new Crawler();
-        $crawler->addContent(mb_convert_encoding('<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>', 'SJIS', 'UTF-8'));
+        $crawler->addContent(iconv('UTF-8', 'SJIS', '<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
     }
 
@@ -327,7 +329,7 @@ EOF
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $nodes = $crawler->reduce(function ($node, $i) {
-            return $i == 1 ? false : true;
+            return $i !== 1;
         });
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $nodes, '->reduce() returns a new instance of a crawler');
@@ -385,8 +387,7 @@ EOF
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
-        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>'
-            , trim($this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html()));
+        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>', trim($this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html()));
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->html();
@@ -949,16 +950,52 @@ HTML;
         }
     }
 
-    public function testBaseTag()
+    /**
+     * @dataProvider getBaseTagData
+     */
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = new Crawler('<html><base href="http://base.com"><a href="link"></a></html>');
-        $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
+    }
 
-        $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less URL');
+    public function getBaseTagData()
+    {
+        return array(
+            array('http://base.com', 'link', 'http://base.com/link'),
+            array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
+            array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
+            array('http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'),
+            array('http://base.com', '', 'http://base.com', 'http://domain.com/path/link', '<base> tag does work with empty links'),
+        );
+    }
 
-        $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
+    /**
+     * @dataProvider getBaseTagWithFormData
+     */
+    public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
+    {
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
+    }
+
+    public function getBaseTagWithFormData()
+    {
+        return array(
+            array('https://base.com/', 'link/', 'https://base.com/link/', 'https://base.com/link/', '<base> tag does work with a path and relative form action'),
+            array('/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'),
+            array('/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'),
+            array('http://base.com/', '/registration', 'http://base.com/registration', 'http://domain.com/registration', '<base> tag does work with a URL and form action'),
+            array('http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'),
+            array('http://base.com/path', '/registration', 'http://base.com/registration', 'http://domain.com/path/form', '<base> tag does work with a URL and form action'),
+        );
+    }
+
+    public function testCountOfNestedElements()
+    {
+        $crawler = new Crawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
+
+        $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
     }
 
     public function createTestCrawler($uri = null)

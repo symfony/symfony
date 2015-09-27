@@ -210,17 +210,20 @@ class FlattenException
         }
     }
 
-    private function flattenArgs($args, $level = 0)
+    private function flattenArgs($args, $level = 0, &$count = 0)
     {
         $result = array();
         foreach ($args as $key => $value) {
+            if (++$count > 1e4) {
+                return array('array', '*SKIPPED over 10000 entries*');
+            }
             if (is_object($value)) {
                 $result[$key] = array('object', get_class($value));
             } elseif (is_array($value)) {
                 if ($level > 10) {
                     $result[$key] = array('array', '*DEEP NESTED ARRAY*');
                 } else {
-                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1));
+                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1, $count));
                 }
             } elseif (null === $value) {
                 $result[$key] = array('null', null);

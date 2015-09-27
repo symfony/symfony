@@ -29,7 +29,7 @@ class Variable
     private $name;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $name
      */
@@ -39,7 +39,7 @@ class Variable
     }
 
     /**
-     * Converts the object to a string
+     * Converts the object to a string.
      *
      * @return string
      */

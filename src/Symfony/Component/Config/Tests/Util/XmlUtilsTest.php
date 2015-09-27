@@ -163,10 +163,17 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
 
         $file = __DIR__.'/../Fixtures/foo.xml';
         try {
-            XmlUtils::loadFile($file);
-            $this->fail('An exception should have been raised');
-        } catch (\InvalidArgumentException $e) {
-            $this->assertEquals(sprintf('File %s does not contain valid XML, it is empty.', $file), $e->getMessage());
+            try {
+                XmlUtils::loadFile($file);
+                $this->fail('An exception should have been raised');
+            } catch (\InvalidArgumentException $e) {
+                $this->assertEquals(sprintf('File %s does not contain valid XML, it is empty.', $file), $e->getMessage());
+            }
+        } catch (\Exception $e) {
+            restore_error_handler();
+            error_reporting($errorReporting);
+
+            throw $e;
         }
 
         restore_error_handler();

@@ -162,7 +162,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
 
         $this->assertTrue($this->metadata->hasPropertyMetadata('firstName'));
-        $this->assertFalse($this->metadata->hasPropertyMetadata('non_existant_field'));
+        $this->assertFalse($this->metadata->hasPropertyMetadata('non_existent_field'));
     }
 
     public function testMergeConstraintsKeepsPrivateMembersSeparate()
@@ -271,15 +271,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * https://github.com/symfony/symfony/issues/11604
-     */
-    public function testGetMemberMetadatasReturnsEmptyArrayWithoutConfiguredMetadata()
-    {
-        $this->assertCount(0, $this->metadata->getMemberMetadatas('foo'), '->getMemberMetadatas() returns an empty collection if no metadata is configured for the given property');
-    }
-
-    /**
-     * https://github.com/symfony/symfony/issues/11604
+     * https://github.com/symfony/symfony/issues/11604.
      */
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {

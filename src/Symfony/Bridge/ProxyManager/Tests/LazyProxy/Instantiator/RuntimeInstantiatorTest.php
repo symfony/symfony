@@ -11,13 +11,11 @@
 
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
-use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}
+ * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  *
@@ -33,7 +31,7 @@ class RuntimeInstantiatorTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->instantiator = new RuntimeInstantiator();
     }

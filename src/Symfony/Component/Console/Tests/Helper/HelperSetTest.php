@@ -75,10 +75,11 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $helperset = new HelperSet();
         try {
             $helperset->get('foo');
-            $this->fail('->get() throws \InvalidArgumentException when helper not found');
+            $this->fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws \InvalidArgumentException when helper not found');
-            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws \InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\ExceptionInterface', $e, '->get() throws domain specific exception when helper not found');
+            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
     }
 
@@ -128,7 +129,7 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-   /**
+    /**
      * Create a generic mock for the helper interface. Optionally check for a call to setHelperSet with a specific
      * helperset instance.
      *

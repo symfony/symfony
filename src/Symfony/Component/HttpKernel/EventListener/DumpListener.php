@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
@@ -23,34 +24,27 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListener implements EventSubscriberInterface
 {
-    private $container;
+    private $cloner;
     private $dumper;
 
     /**
-     * @param ContainerInterface $container Service container, for lazy loading.
-     * @param string             $dumper    var_dumper dumper service to use.
+     * @param ClonerInterface     $cloner Cloner service.
+     * @param DataDumperInterface $dumper Dumper service.
      */
-    public function __construct(ContainerInterface $container, $dumper)
+    public function __construct(ClonerInterface $cloner, DataDumperInterface $dumper)
     {
-        $this->container = $container;
+        $this->cloner = $cloner;
         $this->dumper = $dumper;
     }
 
     public function configure()
     {
-        if ($this->container) {
-            $container = $this->container;
-            $dumper = $this->dumper;
-            $this->container = null;
+        $cloner = $this->cloner;
+        $dumper = $this->dumper;
 
-            VarDumper::setHandler(function ($var) use ($container, $dumper) {
-                $dumper = $container->get($dumper);
-                $cloner = $container->get('var_dumper.cloner');
-                $handler = function ($var) use ($dumper, $cloner) {$dumper->dump($cloner->cloneVar($var));};
-                VarDumper::setHandler($handler);
-                $handler($var);
-            });
-        }
+        VarDumper::setHandler(function ($var) use ($cloner, $dumper) {
+            $dumper->dump($cloner->cloneVar($var));
+        });
     }
 
     public static function getSubscribedEvents()

@@ -44,13 +44,13 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Adds a route or collection
+     * Adds a route or collection.
      *
      * @param DumperRoute|DumperCollection The route or collection
      */
     public function add($child)
     {
-        if ($child instanceof DumperCollection) {
+        if ($child instanceof self) {
             $child->setParent($this);
         }
         $this->children[] = $child;
@@ -64,7 +64,7 @@ class DumperCollection implements \IteratorAggregate
     public function setAll(array $children)
     {
         foreach ($children as $child) {
-            if ($child instanceof DumperCollection) {
+            if ($child instanceof self) {
                 $child->setParent($this);
             }
         }
@@ -116,7 +116,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param string $name The attribute name
      *
-     * @return bool    true if the attribute is defined, false otherwise
+     * @return bool true if the attribute is defined, false otherwise
      */
     public function hasAttribute($name)
     {

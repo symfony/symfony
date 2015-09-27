@@ -139,14 +139,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $defaults = array_replace($globals['defaults'], $annot->getDefaults());
         foreach ($method->getParameters() as $param) {
-            if (!isset($defaults[$param->getName()]) && $param->isOptional()) {
+            if (!isset($defaults[$param->getName()]) && $param->isDefaultValueAvailable()) {
                 $defaults[$param->getName()] = $param->getDefaultValue();
             }
         }
         $requirements = array_replace($globals['requirements'], $annot->getRequirements());
         $options = array_replace($globals['options'], $annot->getOptions());
-        $schemes = array_replace($globals['schemes'], $annot->getSchemes());
-        $methods = array_replace($globals['methods'], $annot->getMethods());
+        $schemes = array_merge($globals['schemes'], $annot->getSchemes());
+        $methods = array_merge($globals['methods'], $annot->getMethods());
 
         $host = $annot->getHost();
         if (null === $host) {
@@ -201,7 +201,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         if ($this->defaultRouteIndex > 0) {
             $name .= '_'.$this->defaultRouteIndex;
         }
-        $this->defaultRouteIndex++;
+        ++$this->defaultRouteIndex;
 
         return $name;
     }
@@ -220,11 +220,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            // for BC reasons
             if (null !== $annot->getPath()) {
                 $globals['path'] = $annot->getPath();
-            } elseif (null !== $annot->getPattern()) {
-                $globals['path'] = $annot->getPattern();
             }
 
             if (null !== $annot->getRequirements()) {

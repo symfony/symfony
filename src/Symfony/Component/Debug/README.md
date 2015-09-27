@@ -24,7 +24,7 @@ if ('cli' !== php_sapi_name()) {
 } elseif (!ini_get('log_errors') || ini_get('error_log')) {
     ini_set('display_errors', 1);
 }
-ErrorHandler::register($errorReportingLevel);
+ErrorHandler::register();
 ```
 
 Note that the `Debug::enable()` call also registers the debug class loader
@@ -39,5 +39,5 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Debug/
-    $ composer.phar install --dev
+    $ composer install
     $ phpunit

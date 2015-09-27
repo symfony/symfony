@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * Transforms between a timestamp and a DateTime object
+ * Transforms between a timestamp and a DateTime object.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
@@ -24,7 +24,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone.
      *
-     * @param \DateTime $value A \DateTime object
+     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
      * @return int A timestamp
      *
@@ -38,22 +38,15 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!$value instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        if (!$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
-        $value = clone $value;
-        try {
-            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
-        } catch (\Exception $e) {
-            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return (int) $value->format('U');
+        return $value->getTimestamp();
     }
 
     /**
-     * Transforms a timestamp in the configured timezone into a DateTime object
+     * Transforms a timestamp in the configured timezone into a DateTime object.
      *
      * @param string $value A timestamp
      *

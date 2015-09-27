@@ -32,7 +32,7 @@ class ExpressionLanguage
     protected $functions = array();
 
     /**
-     * @param ParserCacheInterface $cache
+     * @param ParserCacheInterface                  $cache
      * @param ExpressionFunctionProviderInterface[] $providers
      */
     public function __construct(ParserCacheInterface $cache = null, array $providers = array())
@@ -84,7 +84,14 @@ class ExpressionLanguage
             return $expression;
         }
 
-        $key = $expression.'//'.implode('-', $names);
+        asort($names);
+        $cacheKeyItems = array();
+
+        foreach ($names as $nameKey => $name) {
+            $cacheKeyItems[] = is_int($nameKey) ? $name : $nameKey.':'.$name;
+        }
+
+        $key = $expression.'//'.implode('|', $cacheKeyItems);
 
         if (null === $parsedExpression = $this->cache->fetch($key)) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);

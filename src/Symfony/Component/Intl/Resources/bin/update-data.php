@@ -38,7 +38,7 @@ if ($argc > 3 || 2 === $argc && '-h' === $argv[1]) {
     bailout(<<<MESSAGE
 Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 
-Updates the ICU data for Symfony2 to the latest version of ICU.
+Updates the ICU data for Symfony to the latest version of ICU.
 
 If you downloaded the SVN repository before, you can pass the path to the
 repository source in the first optional argument.
@@ -50,14 +50,14 @@ the subdirectories bin/ and lib/.
 For running this script, the intl extension must be loaded and all vendors
 must have been installed through composer:
 
-composer install --dev
+composer install
 
 MESSAGE
     );
 }
 
 echo LINE;
-echo centered("ICU Resource Bundle Compilation")."\n";
+echo centered('ICU Resource Bundle Compilation')."\n";
 echo LINE;
 
 if (!Intl::isExtensionLoaded()) {
@@ -75,7 +75,6 @@ foreach ($urls as $urlVersion => $url) {
     $maxVersion = IcuVersion::compare($maxVersion, $urlVersion, '<')
         ? $urlVersion
         : $maxVersion;
-
 
     echo "  $urlVersion\n";
 }
@@ -124,42 +123,42 @@ if ($argc >= 3) {
     // will run into problems when building genrb.
     $filesystem->mkdir($sourceDir.'/bin');
 
-    echo "[1/6] libicudata.so...";
+    echo '[1/6] libicudata.so...';
 
     cd($sourceDir.'/stubdata');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[2/6] libicuuc.so...";
+    echo '[2/6] libicuuc.so...';
 
     cd($sourceDir.'/common');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[3/6] libicui18n.so...";
+    echo '[3/6] libicui18n.so...';
 
     cd($sourceDir.'/i18n');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[4/6] libicutu.so...";
+    echo '[4/6] libicutu.so...';
 
     cd($sourceDir.'/tools/toolutil');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[5/6] libicuio.so...";
+    echo '[5/6] libicuio.so...';
 
     cd($sourceDir.'/io');
     run('make 2>&1 && make install 2>&1');
 
     echo " ok.\n";
 
-    echo "[6/6] genrb...";
+    echo '[6/6] genrb...';
 
     cd($sourceDir.'/tools/genrb');
     run('make 2>&1 && make install 2>&1');
@@ -179,8 +178,7 @@ echo "Preparing resource bundle compilation (version $icuVersionInDownload)...\n
 $compiler = new GenrbCompiler($genrb, $genrbEnv);
 $config = new GeneratorConfig($sourceDir.'/data', $icuVersionInDownload);
 
-// Don't wrap "/data" in realpath(), in case the directory does not exist
-$baseDir = realpath(__DIR__.'/..').'/data';
+$baseDir = dirname(__DIR__).'/data';
 
 //$txtDir = $baseDir.'/txt';
 $jsonDir = $baseDir;

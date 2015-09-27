@@ -24,7 +24,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     private $memcache;
 
     /**
-     * @var int     Time to live in seconds
+     * @var int Time to live in seconds
      */
     private $ttl;
 
@@ -108,7 +108,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a Memcache instance
+     * Return a Memcache instance.
      *
      * @return \Memcache
      */

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Encapsulates common logic of {@link FormTypeValidatorExtension} and
@@ -26,7 +26,7 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         // Make sure that validation groups end up as null, closure or array
         $validationGroupsNormalizer = function (Options $options, $groups) {
@@ -49,8 +49,6 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
             'validation_groups' => null,
         ));
 
-        $resolver->setNormalizers(array(
-            'validation_groups' => $validationGroupsNormalizer,
-        ));
+        $resolver->setNormalizer('validation_groups', $validationGroupsNormalizer);
     }
 }

@@ -12,11 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -200,12 +197,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services6.xml');
         $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses <service> elements');
+        $this->assertFalse($services['not_shared']->isShared(), '->load() parses shared flag');
         $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Definition', $services['foo'], '->load() converts <service> element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
-        $this->assertEquals('container', $services['scope.container']->getScope());
-        $this->assertEquals('custom', $services['scope.custom']->getScope());
-        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
-        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod(), '->load() parses the factory-method attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
@@ -213,16 +207,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(array('setBar', array()), array('setBar', array(new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")')))), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
-        $this->assertNull($services['factory_service']->getClass());
-        $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
-        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array(new Reference('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
-
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses <service> elements');
@@ -232,9 +219,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
 
-        $this->assertNull($services['request']->getDecoratedService());
-        $this->assertEquals(array('decorated', null), $services['decorator_service']->getDecoratedService());
-        $this->assertEquals(array('decorated', 'decorated.pif-pouf'), $services['decorator_service_with_name']->getDecoratedService());
+        $this->assertEquals(array('decorated', null, 0), $services['decorator_service']->getDecoratedService());
+        $this->assertEquals(array('decorated', 'decorated.pif-pouf', 0), $services['decorator_service_with_name']->getDecoratedService());
+        $this->assertEquals(array('decorated', 'decorated.pif-pouf', 5), $services['decorator_service_with_name_and_priority']->getDecoratedService());
     }
 
     public function testParsesTags()
@@ -262,31 +249,31 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testConvertDomElementToArray()
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo>bar</foo>');
         $this->assertEquals('bar', XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo foo="bar" />');
         $this->assertEquals(array('foo' => 'bar'), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo>bar</foo></foo>');
         $this->assertEquals(array('foo' => 'bar'), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo>bar<foo>bar</foo></foo></foo>');
         $this->assertEquals(array('foo' => array('value' => 'bar', 'foo' => 'bar')), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo></foo></foo>');
         $this->assertEquals(array('foo' => null), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo><!-- foo --></foo></foo>');
         $this->assertEquals(array('foo' => null), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo foo="bar"/><foo foo="bar"/></foo>');
         $this->assertEquals(array('foo' => array(array('foo' => 'bar'), array('foo' => 'bar'))), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
     }
@@ -454,5 +441,34 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services14.xml');
 
         $this->assertEquals(array('index_0' => 'app'), $container->findDefinition('logger')->getArguments());
+    }
+
+    public function testLoadInlinedServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services21.xml');
+
+        $foo = $container->getDefinition('foo');
+
+        $fooFactory = $foo->getFactory();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactory[0]);
+        $this->assertSame('FooFactory', $fooFactory[0]->getClass());
+        $this->assertSame('createFoo', $fooFactory[1]);
+
+        $fooFactoryFactory = $fooFactory[0]->getFactory();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactoryFactory[0]);
+        $this->assertSame('Foobar', $fooFactoryFactory[0]->getClass());
+        $this->assertSame('createFooFactory', $fooFactoryFactory[1]);
+
+        $fooConfigurator = $foo->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooConfigurator[0]);
+        $this->assertSame('Bar', $fooConfigurator[0]->getClass());
+        $this->assertSame('configureFoo', $fooConfigurator[1]);
+
+        $barConfigurator = $fooConfigurator[0]->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $barConfigurator[0]);
+        $this->assertSame('Baz', $barConfigurator[0]->getClass());
+        $this->assertSame('configureBar', $barConfigurator[1]);
     }
 }

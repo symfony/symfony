@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
- * Extension supporting the Symfony2 Validator component in forms.
+ * Extension supporting the Symfony Validator component in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -50,7 +50,7 @@ class ValidatorExtension extends AbstractExtension
         // the DIC, where the XML file is loaded automatically. Thus the following
         // code must be kept synchronized with validation.xml
 
-        /** @var $metadata ClassMetadata */
+        /* @var $metadata ClassMetadata */
         $metadata->addConstraint(new Form());
         $metadata->addPropertyConstraint('children', new Valid());
 
@@ -59,13 +59,13 @@ class ValidatorExtension extends AbstractExtension
 
     public function loadTypeGuesser()
     {
-        // 2.4 API
-        if ($this->validator instanceof LegacyValidatorInterface) {
-            return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+        // 2.5 API
+        if ($this->validator instanceof ValidatorInterface) {
+            return new ValidatorTypeGuesser($this->validator);
         }
 
-        // 2.5 API - ValidatorInterface extends MetadataFactoryInterface
-        return new ValidatorTypeGuesser($this->validator);
+        // 2.4 API
+        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
     }
 
     protected function loadTypeExtensions()

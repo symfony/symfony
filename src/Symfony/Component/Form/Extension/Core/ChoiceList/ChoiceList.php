@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+@trigger_error('The '.__NAMESPACE__.'\ChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
@@ -29,10 +31,13 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * <code>
  * $choices = array(true, false);
  * $labels = array('Agree', 'Disagree');
- * $choiceList = new ChoiceList($choices, $labels);
+ * $choiceList = new ArrayChoiceList($choices, $labels);
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList} instead.
  */
 class ChoiceList implements ChoiceListInterface
 {
@@ -69,16 +74,16 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Creates a new choice list.
      *
-     * @param array|\Traversable $choices The array of choices. Choices may also be given
-     *                                    as hierarchy of unlimited depth. Hierarchies are
-     *                                    created by creating nested arrays. The title of
-     *                                    the sub-hierarchy can be stored in the array
-     *                                    key pointing to the nested array. The topmost
-     *                                    level of the hierarchy may also be a \Traversable.
-     * @param array $labels               The array of labels. The structure of this array
-     *                                    should match the structure of $choices.
-     * @param array $preferredChoices     A flat array of choices that should be
-     *                                    presented to the user with priority.
+     * @param array|\Traversable $choices          The array of choices. Choices may also be given
+     *                                             as hierarchy of unlimited depth. Hierarchies are
+     *                                             created by creating nested arrays. The title of
+     *                                             the sub-hierarchy can be stored in the array
+     *                                             key pointing to the nested array. The topmost
+     *                                             level of the hierarchy may also be a \Traversable.
+     * @param array              $labels           The array of labels. The structure of this array
+     *                                             should match the structure of $choices.
+     * @param array              $preferredChoices A flat array of choices that should be
+     *                                             presented to the user with priority.
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */
@@ -199,10 +204,12 @@ class ChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $choices = $this->fixChoices($choices);
         $indices = array();
 
@@ -225,10 +232,12 @@ class ChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $values = $this->fixValues($values);
         $indices = array();
 
@@ -385,7 +394,7 @@ class ChoiceList implements ChoiceListInterface
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
-        return false !== array_search($choice, $preferredChoices, true);
+        return in_array($choice, $preferredChoices, true);
     }
 
     /**
@@ -505,7 +514,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @return array The fixed choices.
      *
-     * @see fixChoice
+     * @see fixChoice()
      */
     protected function fixChoices(array $choices)
     {

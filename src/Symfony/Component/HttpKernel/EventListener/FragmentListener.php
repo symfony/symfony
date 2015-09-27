@@ -57,7 +57,7 @@ class FragmentListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($this->fragmentPath !== rawurldecode($request->getPathInfo())) {
+        if ($request->attributes->has('_controller') || $this->fragmentPath !== rawurldecode($request->getPathInfo())) {
             return;
         }
 
@@ -85,16 +85,6 @@ class FragmentListener implements EventSubscriberInterface
         }
 
         throw new AccessDeniedHttpException();
-    }
-
-    /**
-     * @deprecated Deprecated since 2.3.19, to be removed in 3.0.
-     *
-     * @return string[]
-     */
-    protected function getLocalIpAddresses()
-    {
-        return array('127.0.0.1', 'fe80::1', '::1');
     }
 
     public static function getSubscribedEvents()

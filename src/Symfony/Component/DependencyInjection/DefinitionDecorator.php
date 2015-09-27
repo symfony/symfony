@@ -91,42 +91,6 @@ class DefinitionDecorator extends Definition
      *
      * @api
      */
-    public function setFactoryClass($class)
-    {
-        $this->changes['factory_class'] = true;
-
-        return parent::setFactoryClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryMethod($method)
-    {
-        $this->changes['factory_method'] = true;
-
-        return parent::setFactoryMethod($method);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryService($service)
-    {
-        $this->changes['factory_service'] = true;
-
-        return parent::setFactoryService($service);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
     public function setConfigurator($callable)
     {
         $this->changes['configurator'] = true;
@@ -171,12 +135,32 @@ class DefinitionDecorator extends Definition
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setDecoratedService($id, $renamedId = null, $priority = 0)
+    {
+        $this->changes['decorated_service'] = true;
+
+        return parent::setDecoratedService($id, $renamedId, $priority);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDeprecated($boolean = true, $template = null)
+    {
+        $this->changes['deprecated'] = true;
+
+        return parent::setDeprecated($boolean, $template);
+    }
+
+    /**
      * Gets an argument to pass to the service constructor/factory method.
      *
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int     $index
+     * @param int $index
      *
      * @return mixed The argument value
      *
@@ -207,10 +191,11 @@ class DefinitionDecorator extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int     $index
-     * @param mixed   $value
+     * @param int   $index
+     * @param mixed $value
      *
      * @return DefinitionDecorator the current instance
+     *
      * @throws InvalidArgumentException when $index isn't an integer
      *
      * @api

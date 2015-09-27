@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * AbstractFactory is the base class for all classes inheriting from
- * AbstractAuthenticationListener
+ * AbstractAuthenticationListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
@@ -146,7 +146,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @param array $config
      *
-     * @return bool    Whether a possibly configured RememberMeServices should be set for this listener
+     * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
     protected function isRememberMeAware($config)
     {

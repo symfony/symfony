@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Question;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
+
 /**
  * Represents a Question.
  *
@@ -72,16 +75,16 @@ class Question
     /**
      * Sets whether the user response must be hidden or not.
      *
-     * @param bool    $hidden
+     * @param bool $hidden
      *
      * @return Question The current instance
      *
-     * @throws \LogicException In case the autocompleter is also used
+     * @throws LogicException In case the autocompleter is also used
      */
     public function setHidden($hidden)
     {
         if ($this->autocompleterValues) {
-            throw new \LogicException('A hidden question cannot use the autocompleter.');
+            throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->hidden = (bool) $hidden;
@@ -102,7 +105,7 @@ class Question
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
      *
-     * @param bool    $fallback
+     * @param bool $fallback
      *
      * @return Question The current instance
      */
@@ -116,7 +119,7 @@ class Question
     /**
      * Gets values for the autocompleter.
      *
-     * @return null|array|Traversable
+     * @return null|array|\Traversable
      */
     public function getAutocompleterValues()
     {
@@ -126,23 +129,27 @@ class Question
     /**
      * Sets values for the autocompleter.
      *
-     * @param null|array|Traversable $values
+     * @param null|array|\Traversable $values
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function setAutocompleterValues($values)
     {
+        if (is_array($values) && $this->isAssoc($values)) {
+            $values = array_merge(array_keys($values), array_values($values));
+        }
+
         if (null !== $values && !is_array($values)) {
             if (!$values instanceof \Traversable || $values instanceof \Countable) {
-                throw new \InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
+                throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
             }
         }
 
         if ($this->hidden) {
-            throw new \LogicException('A hidden question cannot use the autocompleter.');
+            throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->autocompleterValues = $values;
@@ -165,7 +172,7 @@ class Question
     }
 
     /**
-     * Gets the validator for the question
+     * Gets the validator for the question.
      *
      * @return null|callable
      */
@@ -179,16 +186,16 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @param null|int     $attempts
+     * @param null|int $attempts
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException In case the number of attempts is invalid.
+     * @throws InvalidArgumentException In case the number of attempts is invalid.
      */
     public function setMaxAttempts($attempts)
     {
         if (null !== $attempts && $attempts < 1) {
-            throw new \InvalidArgumentException('Maximum number of attempts must be a positive value.');
+            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
 
         $this->attempts = $attempts;
@@ -211,9 +218,9 @@ class Question
     /**
      * Sets a normalizer for the response.
      *
-     * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
+     * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
      *
-     * @param string|Closure $normalizer
+     * @param string|\Closure $normalizer
      *
      * @return Question The current instance
      */
@@ -229,10 +236,15 @@ class Question
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return string|Closure
+     * @return string|\Closure
      */
     public function getNormalizer()
     {
         return $this->normalizer;
+    }
+
+    protected function isAssoc($array)
+    {
+        return (bool) count(array_filter(array_keys($array), 'is_string'));
     }
 }

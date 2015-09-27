@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validator for Callback constraint
+ * Validator for Callback constraint.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -50,30 +50,29 @@ class CallbackValidator extends ConstraintValidator
         $methods = $constraint->methods ?: array($constraint->callback);
 
         foreach ($methods as $method) {
-            if (is_array($method) || $method instanceof \Closure) {
+            if ($method instanceof \Closure) {
+                $method($object, $this->context);
+            } elseif (is_array($method)) {
                 if (!is_callable($method)) {
-                    throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
+                    if (isset($method[0]) && is_object($method[0])) {
+                        $method[0] = get_class($method[0]);
+                    }
+                    throw new ConstraintDefinitionException(sprintf('%s targeted by Callback constraint is not a valid callable', json_encode($method)));
                 }
 
                 call_user_func($method, $object, $this->context);
+            } elseif (null !== $object) {
+                if (!method_exists($object, $method)) {
+                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist in class %s', $method, get_class($object)));
+                }
 
-                continue;
-            }
+                $reflMethod = new \ReflectionMethod($object, $method);
 
-            if (null === $object) {
-                continue;
-            }
-
-            if (!method_exists($object, $method)) {
-                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
-            }
-
-            $reflMethod = new \ReflectionMethod($object, $method);
-
-            if ($reflMethod->isStatic()) {
-                $reflMethod->invoke(null, $object, $this->context);
-            } else {
-                $reflMethod->invoke($object, $this->context);
+                if ($reflMethod->isStatic()) {
+                    $reflMethod->invoke(null, $object, $this->context);
+                } else {
+                    $reflMethod->invoke($object, $this->context);
+                }
             }
         }
     }

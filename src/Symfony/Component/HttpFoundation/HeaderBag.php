@@ -115,9 +115,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a header value by name.
      *
-     * @param string  $key     The header name
-     * @param mixed   $default The default value
-     * @param bool    $first   Whether to return the first value or all header values
+     * @param string $key     The header name
+     * @param mixed  $default The default value
+     * @param bool   $first   Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      *
@@ -173,7 +173,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header
      *
-     * @return bool    true if the parameter exists, false otherwise
+     * @return bool true if the parameter exists, false otherwise
      *
      * @api
      */
@@ -188,7 +188,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The HTTP header name
      * @param string $value The HTTP value
      *
-     * @return bool    true if the value is contained in the header, false otherwise
+     * @return bool true if the value is contained in the header, false otherwise
      *
      * @api
      */

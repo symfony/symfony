@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContainerAwareEventManagerTest extends \PHPUnit_Framework_TestCase
 {
+    private $container;
+    private $evm;
+
     protected function setUp()
     {
         $this->container = new Container();

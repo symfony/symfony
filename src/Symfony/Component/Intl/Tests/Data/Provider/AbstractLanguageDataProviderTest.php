@@ -633,7 +633,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'zza',
     );
 
-    protected static $alpha2ToAlpha3 = array (
+    protected static $alpha2ToAlpha3 = array(
         'aa' => 'aar',
         'ab' => 'abk',
         'ae' => 'ave',

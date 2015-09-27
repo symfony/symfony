@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added the BIC (SWIFT-Code) validator
+
+2.7.0
+-----
+
+ * deprecated `DefaultTranslator` in favor of `Symfony\Component\Translation\IdentityTranslator`
+ * deprecated PHP7-incompatible constraints (Null, True, False) and related validators (NullValidator, TrueValidator, FalseValidator) in favor of their `Is`-prefixed equivalent
+
 2.6.0
 -----
 
@@ -74,13 +85,18 @@ CHANGELOG
  * added `Util\PropertyPath`
  * made the PropertyAccess component an optional dependency
  * deprecated `ValidatorBuilder::setPropertyAccessor()`
-
+ * deprecated `validate` and `validateValue` on `Validator\Context\ExecutionContext` use `getValidator()` together with `inContext()` instead
 
 2.4.0
 -----
 
  * added a constraint the uses the expression language
  * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+
+2.3.29
+------
+
+ * fixed compatibility with PHP7 and up by introducing new constraints (IsNull, IsTrue, IsFalse) and related validators (IsNullValidator, IsTrueValidator, IsFalseValidator)
 
 2.3.0
 -----

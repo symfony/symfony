@@ -12,6 +12,9 @@
 #endif
 
 #include "php.h"
+#ifdef ZTS
+#include "TSRM.h"
+#endif
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_symfony_debug.h"
@@ -19,6 +22,13 @@
 #include "ext/standard/php_lcg.h"
 #include "ext/spl/php_spl.h"
 #include "Zend/zend_gc.h"
+#include "Zend/zend_builtin_functions.h"
+#include "Zend/zend_extensions.h" /* for ZEND_EXTENSION_API_NO */
+#include "ext/standard/php_array.h"
+#include "Zend/zend_interfaces.h"
+#include "SAPI.h"
+
+#define IS_PHP_53 ZEND_EXTENSION_API_NO == 220090626
 
 ZEND_DECLARE_MODULE_GLOBALS(symfony_debug)
 
@@ -30,8 +40,27 @@ ZEND_END_ARG_INFO()
 
 const zend_function_entry symfony_debug_functions[] = {
 	PHP_FE(symfony_zval_info,	symfony_zval_arginfo)
+	PHP_FE(symfony_debug_backtrace, NULL)
 	PHP_FE_END
 };
+
+PHP_FUNCTION(symfony_debug_backtrace)
+{
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+#if IS_PHP_53
+	zend_fetch_debug_backtrace(return_value, 1, 0 TSRMLS_CC);
+#else
+	zend_fetch_debug_backtrace(return_value, 1, 0, 0 TSRMLS_CC);
+#endif
+
+	if (!SYMFONY_DEBUG_G(debug_bt)) {
+		return;
+	}
+
+	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(SYMFONY_DEBUG_G(debug_bt)), 0 TSRMLS_CC);
+}
 
 PHP_FUNCTION(symfony_zval_info)
 {
@@ -40,7 +69,7 @@ PHP_FUNCTION(symfony_zval_info)
 	HashTable *array = NULL;
 	long options = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zh|l", &key, &array, &options) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zh|l", &key, &array, &options) == FAILURE) {
 		return;
 	}
 
@@ -62,13 +91,14 @@ PHP_FUNCTION(symfony_zval_info)
 	array_init(return_value);
 
 	add_assoc_string(return_value, "type", (char *)_symfony_debug_zval_type(arg), 1);
-	add_assoc_stringl(return_value, "zval_hash", _symfony_debug_memory_address_hash((void *)arg), 16, 1);
+	add_assoc_stringl(return_value, "zval_hash", _symfony_debug_memory_address_hash((void *)arg TSRMLS_CC), 16, 0);
 	add_assoc_long(return_value, "zval_refcount", Z_REFCOUNT_P(arg));
 	add_assoc_bool(return_value, "zval_isref", (zend_bool)Z_ISREF_P(arg));
 
 	if (Z_TYPE_P(arg) == IS_OBJECT) {
-		static char hash[33] = {0};
-		php_spl_object_hash(arg, (char *)hash);
+		char hash[33] = {0};
+
+		php_spl_object_hash(arg, (char *)hash TSRMLS_CC);
 		add_assoc_stringl(return_value, "object_class", (char *)Z_OBJCE_P(arg)->name, Z_OBJCE_P(arg)->name_length, 1);
 		add_assoc_long(return_value, "object_refcount", EG(objects_store).object_buckets[Z_OBJ_HANDLE_P(arg)].bucket.obj.refcount);
 		add_assoc_string(return_value, "object_hash", hash, 1);
@@ -77,17 +107,41 @@ PHP_FUNCTION(symfony_zval_info)
 		add_assoc_long(return_value, "array_count", zend_hash_num_elements(Z_ARRVAL_P(arg)));
 	} else if(Z_TYPE_P(arg) == IS_RESOURCE) {
 		add_assoc_long(return_value, "resource_handle", Z_LVAL_P(arg));
-		add_assoc_string(return_value, "resource_type", (char *)_symfony_debug_get_resource_type(Z_LVAL_P(arg)), 1);
-		add_assoc_long(return_value, "resource_refcount", _symfony_debug_get_resource_refcount(Z_LVAL_P(arg)));
+		add_assoc_string(return_value, "resource_type", (char *)_symfony_debug_get_resource_type(Z_LVAL_P(arg) TSRMLS_CC), 1);
+		add_assoc_long(return_value, "resource_refcount", _symfony_debug_get_resource_refcount(Z_LVAL_P(arg) TSRMLS_CC));
 	} else if (Z_TYPE_P(arg) == IS_STRING) {
 		add_assoc_long(return_value, "strlen", Z_STRLEN_P(arg));
 	}
 }
 
-static const char* _symfony_debug_get_resource_type(long rsid)
+void symfony_debug_error_cb(int type, const char *error_filename, const uint error_lineno, const char *format, va_list args)
+{
+	TSRMLS_FETCH();
+	zval *retval;
+
+	switch (type) {
+		case E_ERROR:
+		case E_PARSE:
+		case E_CORE_ERROR:
+		case E_CORE_WARNING:
+		case E_COMPILE_ERROR:
+		case E_COMPILE_WARNING:
+			ALLOC_INIT_ZVAL(retval);
+#if IS_PHP_53
+			zend_fetch_debug_backtrace(retval, 1, 0 TSRMLS_CC);
+#else
+			zend_fetch_debug_backtrace(retval, 1, 0, 0 TSRMLS_CC);
+#endif
+			SYMFONY_DEBUG_G(debug_bt) = retval;
+	}
+
+	SYMFONY_DEBUG_G(old_error_cb)(type, error_filename, error_lineno, format, args);
+}
+
+static const char* _symfony_debug_get_resource_type(long rsid TSRMLS_DC)
 {
 	const char *res_type;
-	res_type = zend_rsrc_list_get_rsrc_type(rsid);
+	res_type = zend_rsrc_list_get_rsrc_type(rsid TSRMLS_CC);
 
 	if (!res_type) {
 		return "Unknown";
@@ -96,7 +150,7 @@ static const char* _symfony_debug_get_resource_type(long rsid)
 	return res_type;
 }
 
-static int _symfony_debug_get_resource_refcount(long rsid)
+static int _symfony_debug_get_resource_refcount(long rsid TSRMLS_DC)
 {
 	zend_rsrc_list_entry *le;
 
@@ -107,21 +161,21 @@ static int _symfony_debug_get_resource_refcount(long rsid)
 	return 0;
 }
 
-static char *_symfony_debug_memory_address_hash(void *address)
+static char *_symfony_debug_memory_address_hash(void *address TSRMLS_DC)
 {
-	static char result[17] = {0};
+	char *result = NULL;
 	intptr_t address_rand;
 
 	if (!SYMFONY_DEBUG_G(req_rand_init)) {
 		if (!BG(mt_rand_is_seeded)) {
 			php_mt_srand(GENERATE_SEED() TSRMLS_CC);
 		}
-		SYMFONY_DEBUG_G(req_rand_init) = (intptr_t)php_mt_rand();
+		SYMFONY_DEBUG_G(req_rand_init) = (intptr_t)php_mt_rand(TSRMLS_C);
 	}
 
 	address_rand = (intptr_t)address ^ SYMFONY_DEBUG_G(req_rand_init);
 
-	snprintf(result, 17, "%016zx", address_rand);
+	spprintf(&result, 17, "%016zx", address_rand);
 
 	return result;
 }
@@ -187,7 +241,7 @@ ZEND_GET_MODULE(symfony_debug)
 
 PHP_GINIT_FUNCTION(symfony_debug)
 {
-	symfony_debug_globals->req_rand_init = 0;
+	memset(symfony_debug_globals, 0 , sizeof(*symfony_debug_globals));
 }
 
 PHP_GSHUTDOWN_FUNCTION(symfony_debug)
@@ -197,11 +251,16 @@ PHP_GSHUTDOWN_FUNCTION(symfony_debug)
 
 PHP_MINIT_FUNCTION(symfony_debug)
 {
+	SYMFONY_DEBUG_G(old_error_cb) = zend_error_cb;
+	zend_error_cb                 = symfony_debug_error_cb;
+
 	return SUCCESS;
 }
 
 PHP_MSHUTDOWN_FUNCTION(symfony_debug)
 {
+	zend_error_cb = SYMFONY_DEBUG_G(old_error_cb);
+
 	return SUCCESS;
 }
 

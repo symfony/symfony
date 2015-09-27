@@ -21,7 +21,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface UserPasswordEncoderInterface
 {
     /**
-     *
      * Encodes the plain password.
      *
      * @param UserInterface $user          The user

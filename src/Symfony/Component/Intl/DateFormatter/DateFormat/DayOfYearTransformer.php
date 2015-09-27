@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 /**
- * Parser and formatter for day of year format
+ * Parser and formatter for day of year format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */

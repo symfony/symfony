@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between a normalized time and a localized time string
+ * Transforms between a normalized time and a localized time string.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
@@ -32,12 +32,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @see BaseDateTimeTransformer::formats for available format options
      *
-     * @param string  $inputTimezone  The name of the input timezone
-     * @param string  $outputTimezone The name of the output timezone
-     * @param int     $dateFormat     The date format
-     * @param int     $timeFormat     The time format
-     * @param int     $calendar       One of the \IntlDateFormatter calendar constants
-     * @param string  $pattern        A pattern to pass to \IntlDateFormatter
+     * @param string $inputTimezone  The name of the input timezone
+     * @param string $outputTimezone The name of the output timezone
+     * @param int    $dateFormat     The date format
+     * @param int    $timeFormat     The time format
+     * @param int    $calendar       One of the \IntlDateFormatter calendar constants
+     * @param string $pattern        A pattern to pass to \IntlDateFormatter
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
@@ -70,7 +70,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param \DateTime $dateTime Normalized date.
+     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
      * @return string|array Localized date string/array.
      *
@@ -84,17 +84,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
-        // convert time to UTC before passing it to the formatter
-        $dateTime = clone $dateTime;
-        if ('UTC' !== $this->inputTimezone) {
-            $dateTime->setTimezone(new \DateTimeZone('UTC'));
-        }
-
-        $value = $this->getIntlDateFormatter()->format((int) $dateTime->format('U'));
+        $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());
 
         if (intl_get_error_code() != 0) {
             throw new TransformationFailedException(intl_get_error_message());
@@ -149,7 +143,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     }
 
     /**
-     * Returns a preconfigured IntlDateFormatter instance
+     * Returns a preconfigured IntlDateFormatter instance.
      *
      * @return \IntlDateFormatter
      *

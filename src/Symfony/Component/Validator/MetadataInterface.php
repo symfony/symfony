@@ -42,7 +42,7 @@ namespace Symfony\Component\Validator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Mapping\MetadataInterface} instead.
  */
 interface MetadataInterface
@@ -58,7 +58,7 @@ interface MetadataInterface
      * @param string|string[]            $group        The validation group to validate in
      * @param string                     $propertyPath The current property path in the validation graph
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
 

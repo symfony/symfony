@@ -35,7 +35,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
             ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument($config['key'])
+            ->addArgument($config['secret'])
             ->addArgument($id)
         ;
 
@@ -56,7 +56,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
@@ -119,11 +119,13 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        $node->fixXmlConfig('user_provider');
-        $builder = $node->children();
+        $builder = $node
+            ->fixXmlConfig('user_provider')
+            ->children()
+        ;
 
         $builder
-            ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()

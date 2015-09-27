@@ -34,7 +34,7 @@ class TemplateReference extends BaseTemplateReference
     /**
      * Returns the path to the template
      *  - as a path when the template is not part of a bundle
-     *  - as a resource when the template is part of a bundle
+     *  - as a resource when the template is part of a bundle.
      *
      * @return string A path to the template or a resource
      */

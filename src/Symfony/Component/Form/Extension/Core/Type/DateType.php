@@ -21,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
@@ -35,6 +35,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
+    );
+
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
     );
 
     /**
@@ -73,7 +78,7 @@ class DateType extends AbstractType
                 \Locale::getDefault(),
                 $dateFormat,
                 $timeFormat,
-                'UTC',
+                null,
                 $calendar,
                 $pattern
             );
@@ -101,9 +106,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -146,6 +151,10 @@ class DateType extends AbstractType
 
             // remove special characters unless the format was explicitly specified
             if (!is_string($options['format'])) {
+                // remove quoted strings first
+                $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
+
+                // remove remaining special chars
                 $pattern = preg_replace('/[^yMd]+/', '', $pattern);
             }
 
@@ -165,7 +174,7 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
             return $options['widget'] !== 'single_text';
@@ -224,37 +233,39 @@ class DateType extends AbstractType
             'compound' => $compound,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'format' => array('int', 'string'),
-            'years' => 'array',
-            'months' => 'array',
-            'days' => 'array',
-        ));
+        $resolver->setAllowedTypes('format', array('int', 'string'));
+        $resolver->setAllowedTypes('years', 'array');
+        $resolver->setAllowedTypes('months', 'array');
+        $resolver->setAllowedTypes('days', 'array');
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'date';
     }
@@ -264,7 +275,7 @@ class DateType extends AbstractType
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
-        if ($setTimeZone = method_exists($formatter, 'setTimeZone')) {
+        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
             $formatter->setTimeZone('UTC');
         } else {
             $formatter->setTimeZoneId('UTC');

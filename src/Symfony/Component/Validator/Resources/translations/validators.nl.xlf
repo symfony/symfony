@@ -259,7 +259,7 @@
                 <target>Deze waarde moet groter dan of gelijk aan {{ compared_value }} zijn.</target>
             </trans-unit>
             <trans-unit id="68">
-                <source>This value should be identical  to {{ compared_value_type }} {{ compared_value }}.</source>
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Deze waarde moet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
@@ -275,8 +275,8 @@
                 <target>Deze waarde mag niet gelijk zijn aan {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
-                <source>This value should not be identical to {{ compared_value }}.</source>
-                <target>Deze waarde mag niet identiek zijn aan {{ compared_value }}.</target>
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Deze waarde mag niet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -301,6 +301,10 @@
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
                 <target>Lege bestanden zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Deze waarde is niet in de verwachte tekencodering {{ charset }}.</target>
             </trans-unit>
         </body>
     </file>

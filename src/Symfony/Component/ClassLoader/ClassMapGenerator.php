@@ -11,19 +11,15 @@
 
 namespace Symfony\Component\ClassLoader;
 
-if (!defined('T_TRAIT')) {
-    define('T_TRAIT', 0);
-}
-
 /**
- * ClassMapGenerator
+ * ClassMapGenerator.
  *
  * @author Gyula Sallai <salla016@gmail.com>
  */
 class ClassMapGenerator
 {
     /**
-     * Generate a class map file
+     * Generate a class map file.
      *
      * @param array|string $dirs Directories or a single path to search in
      * @param string       $file The name of the class map file
@@ -41,7 +37,7 @@ class ClassMapGenerator
     }
 
     /**
-     * Iterate over all files in the given directory searching for classes
+     * Iterate over all files in the given directory searching for classes.
      *
      * @param \Iterator|string $dir The directory to search in or an iterator
      *
@@ -77,7 +73,7 @@ class ClassMapGenerator
     }
 
     /**
-     * Extract the classes in the given file
+     * Extract the classes in the given file.
      *
      * @param string $path The file to check
      *
@@ -91,7 +87,7 @@ class ClassMapGenerator
         $classes = array();
 
         $namespace = '';
-        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
+        for ($i = 0, $max = count($tokens); $i < $max; ++$i) {
             $token = $tokens[$i];
 
             if (is_string($token)) {
@@ -114,6 +110,25 @@ class ClassMapGenerator
                 case T_CLASS:
                 case T_INTERFACE:
                 case T_TRAIT:
+                    // Skip usage of ::class constant
+                    $isClassConstant = false;
+                    for ($j = $i - 1; $j > 0; --$j) {
+                        if (is_string($tokens[$j])) {
+                            break;
+                        }
+
+                        if (T_DOUBLE_COLON === $tokens[$j][0]) {
+                            $isClassConstant = true;
+                            break;
+                        } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                            break;
+                        }
+                    }
+
+                    if ($isClassConstant) {
+                        continue;
+                    }
+
                     // Find the classname
                     while (($t = $tokens[++$i]) && is_array($t)) {
                         if (T_STRING === $t[0]) {

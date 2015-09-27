@@ -203,9 +203,8 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Failed calling Symfony\Component\HttpFoundation\Tests\JsonSerializableObject::jsonSerialize()
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php#114688
+     * @expectedException \Exception
+     * @expectedExceptionMessage This error is expected
      */
     public function testSetContentJsonSerializeError()
     {
@@ -224,9 +223,7 @@ if (interface_exists('JsonSerializable')) {
     {
         public function jsonSerialize()
         {
-            trigger_error('This error is expected', E_USER_WARNING);
-
-            return array();
+            throw new \Exception('This error is expected');
         }
     }
 }

@@ -98,8 +98,8 @@ class NativeRequestHandler implements RequestHandlerInterface
             }
 
             $fixedFiles = array();
-            foreach ($_FILES as $name => $file) {
-                $fixedFiles[$name] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
+            foreach ($_FILES as $fileKey => $file) {
+                $fixedFiles[$fileKey] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
             }
 
             if ('' === $name) {
@@ -159,7 +159,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * This method is identical to {@link Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
+     * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
      *
      * @param array $data
@@ -184,10 +184,10 @@ class NativeRequestHandler implements RequestHandlerInterface
             unset($files[$k]);
         }
 
-        foreach (array_keys($data['name']) as $key) {
+        foreach ($data['name'] as $key => $name) {
             $files[$key] = self::fixPhpFilesArray(array(
                 'error' => $data['error'][$key],
-                'name' => $data['name'][$key],
+                'name' => $name,
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],

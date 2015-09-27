@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
@@ -41,15 +42,15 @@ class Controller implements ContainerAwareInterface
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string         $route         The name of the route
-     * @param mixed          $parameters    An array of parameters
-     * @param bool|string    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     * @param string      $route         The name of the route
+     * @param mixed       $parameters    An array of parameters
+     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
      *
      * @see UrlGeneratorInterface
      */
-    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -63,7 +64,7 @@ class Controller implements ContainerAwareInterface
      *
      * @return Response A Response instance
      */
-    public function forward($controller, array $path = array(), array $query = array())
+    protected function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
         $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
@@ -74,12 +75,12 @@ class Controller implements ContainerAwareInterface
     /**
      * Returns a RedirectResponse to the given URL.
      *
-     * @param string  $url    The URL to redirect to
-     * @param int     $status The status code to use for the Response
+     * @param string $url    The URL to redirect to
+     * @param int    $status The status code to use for the Response
      *
      * @return RedirectResponse
      */
-    public function redirect($url, $status = 302)
+    protected function redirect($url, $status = 302)
     {
         return new RedirectResponse($url, $status);
     }
@@ -121,16 +122,17 @@ class Controller implements ContainerAwareInterface
      * @param mixed $attributes The attributes
      * @param mixed $object     The object
      *
-     * @throws \LogicException
      * @return bool
+     *
+     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null)
     {
-        if (!$this->container->has('security.context')) {
+        if (!$this->container->has('security.authorization_checker')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        return $this->container->get('security.context')->isGranted($attributes, $object);
+        return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
     }
 
     /**
@@ -158,9 +160,17 @@ class Controller implements ContainerAwareInterface
      *
      * @return string The rendered view
      */
-    public function renderView($view, array $parameters = array())
+    protected function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
@@ -172,9 +182,23 @@ class Controller implements ContainerAwareInterface
      *
      * @return Response A Response instance
      */
-    public function render($view, array $parameters = array(), Response $response = null)
+    protected function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($this->container->get('twig')->render($view, $parameters));
+
+        return $response;
     }
 
     /**
@@ -186,13 +210,23 @@ class Controller implements ContainerAwareInterface
      *
      * @return StreamedResponse A StreamedResponse instance
      */
-    public function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $templating = $this->container->get('templating');
+        if ($this->container->has('templating')) {
+            $templating = $this->container->get('templating');
 
-        $callback = function () use ($templating, $view, $parameters) {
-            $templating->stream($view, $parameters);
-        };
+            $callback = function () use ($templating, $view, $parameters) {
+                $templating->stream($view, $parameters);
+            };
+        } elseif ($this->container->has('twig')) {
+            $twig = $this->container->get('twig');
+
+            $callback = function () use ($twig, $view, $parameters) {
+                $twig->display($view, $parameters);
+            };
+        } else {
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if (null === $response) {
             return new StreamedResponse($callback);
@@ -215,7 +249,7 @@ class Controller implements ContainerAwareInterface
      *
      * @return NotFoundHttpException
      */
-    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -232,7 +266,7 @@ class Controller implements ContainerAwareInterface
      *
      * @return AccessDeniedException
      */
-    public function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -246,36 +280,31 @@ class Controller implements ContainerAwareInterface
      *
      * @return Form
      */
-    public function createForm($type, $data = null, array $options = array())
+    protected function createForm($type, $data = null, array $options = array())
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
 
     /**
-     * Creates and returns a form builder instance
+     * Creates and returns a form builder instance.
      *
      * @param mixed $data    The initial data for the form
      * @param array $options Options for the form
      *
      * @return FormBuilder
      */
-    public function createFormBuilder($data = null, array $options = array())
+    protected function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
-    }
+        if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
+            $type = 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        } else {
+            // not using the class name is deprecated since Symfony 2.8 and
+            // is only used for backwards compatibility with older versions
+            // of the Form component
+            $type = 'form';
+        }
 
-    /**
-     * Shortcut to return the request service.
-     *
-     * @return Request
-     *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0. Ask
-     *             Symfony to inject the Request object into your controller
-     *             method instead by type hinting it in the method's signature.
-     */
-    public function getRequest()
-    {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->container->get('form.factory')->createBuilder($type, $data, $options);
     }
 
     /**
@@ -285,7 +314,7 @@ class Controller implements ContainerAwareInterface
      *
      * @throws \LogicException If DoctrineBundle is not available
      */
-    public function getDoctrine()
+    protected function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application.');
@@ -295,25 +324,26 @@ class Controller implements ContainerAwareInterface
     }
 
     /**
-     * Get a user from the Security Context
+     * Get a user from the Security Token Storage.
      *
      * @return mixed
      *
      * @throws \LogicException If SecurityBundle is not available
      *
-     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
+     * @see TokenInterface::getUser()
      */
-    public function getUser()
+    protected function getUser()
     {
-        if (!$this->container->has('security.context')) {
+        if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        if (null === $token = $this->container->get('security.context')->getToken()) {
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return;
         }
 
         if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
             return;
         }
 
@@ -325,27 +355,39 @@ class Controller implements ContainerAwareInterface
      *
      * @param string $id The service id
      *
-     * @return bool    true if the service id is defined, false otherwise
+     * @return bool true if the service id is defined, false otherwise
      */
-    public function has($id)
+    protected function has($id)
     {
         return $this->container->has($id);
     }
 
     /**
-     * Gets a service by id.
+     * Gets a container service by its id.
      *
      * @param string $id The service id
      *
      * @return object The service
      */
-    public function get($id)
+    protected function get($id)
     {
         return $this->container->get($id);
     }
 
     /**
-     * Checks the validity of a CSRF token
+     * Gets a container configuration parameter by its name.
+     *
+     * @param string $name The parameter name
+     *
+     * @return mixed
+     */
+    protected function getParameter($name)
+    {
+        return $this->container->getParameter($name);
+    }
+
+    /**
+     * Checks the validity of a CSRF token.
      *
      * @param string $id    The id used when generating the token
      * @param string $token The actual token sent with the request that should be validated

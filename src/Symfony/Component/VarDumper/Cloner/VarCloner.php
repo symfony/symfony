@@ -24,7 +24,7 @@ class VarCloner extends AbstractCloner
      */
     protected function doClone($var)
     {
-        $useExt = extension_loaded('symfony_debug');
+        $useExt = $this->useExt;
         $i = 0;                         // Current iteration position in $queue
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
@@ -38,8 +38,9 @@ class VarCloner extends AbstractCloner
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $cookie = (object) array();     // Unique object used to detect hard references
+        $gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
         $a = null;                      // Array cast for nested structures
-        $stub = null;                   // Stub capturing the main properties of an original item value,
+        $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
         $zval = array(                  // Main properties of the current value
             'type' => null,
@@ -76,7 +77,7 @@ class VarCloner extends AbstractCloner
                     $zval['type'] = gettype($v);
                 }
                 if ($zval['zval_isref']) {
-                    $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
+                    $queue[$i][$k] = &$stub;    // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
                     if (isset($hardRefs[$zval['zval_hash']])) {
                         $queue[$i][$k] = $useExt ? ($v = $hardRefs[$zval['zval_hash']]) : ($step[$k] = $v);
@@ -97,11 +98,10 @@ class VarCloner extends AbstractCloner
                             $stub->class = Stub::STRING_BINARY;
                             if (0 <= $maxString && 0 < $cut = strlen($v) - $maxString) {
                                 $stub->cut = $cut;
-                                $cut = substr_replace($v, '', -$cut);
+                                $stub->value = substr($v, 0, -$cut);
                             } else {
-                                $cut = $v;
+                                $stub->value = $v;
                             }
-                            $stub->value = Data::utf8Encode($cut);
                         } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
@@ -119,8 +119,24 @@ class VarCloner extends AbstractCloner
                             $stub = $arrayRefs[$len] = new Stub();
                             $stub->type = Stub::TYPE_ARRAY;
                             $stub->class = Stub::ARRAY_ASSOC;
-                            $stub->value = $zval['array_count'] ?: count($v);
+
+                            // Copies of $GLOBALS have very strange behavior,
+                            // let's detect them with some black magic
                             $a = $v;
+                            $a[$gid] = true;
+
+                            // Happens with copies of $GLOBALS
+                            if (isset($v[$gid])) {
+                                unset($v[$gid]);
+                                $a = array();
+                                foreach ($v as $gk => &$gv) {
+                                    $a[$gk] = &$gv;
+                                }
+                            } else {
+                                $a = $v;
+                            }
+
+                            $stub->value = $zval['array_count'] ?: count($a);
                         }
                         break;
 
@@ -194,7 +210,7 @@ class VarCloner extends AbstractCloner
                             $step[$k] = new Stub();
                             $step[$k]->value = $stub;
                             $h = spl_object_hash($step[$k]);
-                            $queue[$i][$k] = $hardRefs[$h] =& $step[$k];
+                            $queue[$i][$k] = $hardRefs[$h] = &$step[$k];
                             $values[$h] = $v;
                         }
                         $queue[$i][$k]->handle = ++$refs;
@@ -233,7 +249,7 @@ class VarCloner extends AbstractCloner
                         $step[$k] = $queue[$i][$k] = new Stub();
                         $step[$k]->value = $v;
                         $h = spl_object_hash($step[$k]);
-                        $hardRefs[$h] =& $step[$k];
+                        $hardRefs[$h] = &$step[$k];
                         $values[$h] = $v;
                     }
                     $queue[$i][$k]->handle = ++$refs;
@@ -266,7 +282,7 @@ class VarCloner extends AbstractCloner
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
             $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
-            foreach (debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
                 if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;
                     break;

@@ -19,7 +19,7 @@ class DumpNodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new \Twig_Environment();
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -39,6 +39,30 @@ EOTXT;
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
 
+    public function testIndented()
+    {
+        $node = new DumpNode('bar', null, 7);
+
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
+        $compiler = new \Twig_Compiler($env);
+
+        $expected = <<<'EOTXT'
+    if ($this->env->isDebug()) {
+        $barvars = array();
+        foreach ($context as $barkey => $barval) {
+            if (!$barval instanceof \Twig_Template) {
+                $barvars[$barkey] = $barval;
+            }
+        }
+        // line 7
+        \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+    }
+
+EOTXT;
+
+        $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
+    }
+
     public function testOneVar()
     {
         $vars = new \Twig_Node(array(
@@ -46,7 +70,7 @@ EOTXT;
         ));
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new \Twig_Environment();
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -56,7 +80,7 @@ if ($this->env->isDebug()) {
 }
 
 EOTXT;
-        $expected = preg_replace('/%(.*?)%/', version_compare(PHP_VERSION, '5.4.0') >= 0 ? '(isset($context["$1"]) ? $context["$1"] : null)' : '$this->getContext($context, "$1")', $expected);
+        $expected = preg_replace('/%(.*?)%/', '(isset($context["$1"]) ? $context["$1"] : null)', $expected);
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
@@ -69,7 +93,7 @@ EOTXT;
         ));
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new \Twig_Environment();
+        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -82,7 +106,7 @@ if ($this->env->isDebug()) {
 }
 
 EOTXT;
-        $expected = preg_replace('/%(.*?)%/', version_compare(PHP_VERSION, '5.4.0') >= 0 ? '(isset($context["$1"]) ? $context["$1"] : null)' : '$this->getContext($context, "$1")', $expected);
+        $expected = preg_replace('/%(.*?)%/', '(isset($context["$1"]) ? $context["$1"] : null)', $expected);
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }

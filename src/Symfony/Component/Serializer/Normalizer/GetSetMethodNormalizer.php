@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -36,142 +36,50 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class GetSetMethodNormalizer extends AbstractNormalizer
 {
-    protected $circularReferenceLimit = 1;
-    protected $circularReferenceHandler;
-    protected $callbacks = array();
-    protected $ignoredAttributes = array();
-    protected $camelizedAttributes = array();
-
-    /**
-     * Set circular reference limit.
-     *
-     * @param $circularReferenceLimit limit of iterations for the same object
-     *
-     * @return self
-     */
-    public function setCircularReferenceLimit($circularReferenceLimit)
-    {
-        $this->circularReferenceLimit = $circularReferenceLimit;
-
-        return $this;
-    }
-
-    /**
-     * Set circular reference handler.
-     *
-     * @param callable $circularReferenceHandler
-     *
-     * @return self
-     *
-     * @throws InvalidArgumentException
-     */
-    public function setCircularReferenceHandler($circularReferenceHandler)
-    {
-        if (!is_callable($circularReferenceHandler)) {
-            throw new InvalidArgumentException('The given circular reference handler is not callable.');
-        }
-
-        $this->circularReferenceHandler = $circularReferenceHandler;
-
-        return $this;
-    }
-
-    /**
-     * Set normalization callbacks.
-     *
-     * @param callable[] $callbacks help normalize the result
-     *
-     * @throws InvalidArgumentException if a non-callable callback is set
-     *
-     * @return self
-     */
-    public function setCallbacks(array $callbacks)
-    {
-        foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
-            }
-        }
-        $this->callbacks = $callbacks;
-
-        return $this;
-    }
-
-    /**
-     * Set ignored attributes for normalization.
-     *
-     * @param array $ignoredAttributes
-     *
-     * @return self
-     */
-    public function setIgnoredAttributes(array $ignoredAttributes)
-    {
-        $this->ignoredAttributes = $ignoredAttributes;
-
-        return $this;
-    }
-
-    /**
-     * Set attributes to be camelized on denormalize.
-     *
-     * @param array $camelizedAttributes
-     *
-     * @return self
-     */
-    public function setCamelizedAttributes(array $camelizedAttributes)
-    {
-        $this->camelizedAttributes = $camelizedAttributes;
-
-        return $this;
-    }
-
     /**
      * {@inheritdoc}
+     *
+     * @throws LogicException
+     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $objectHash = spl_object_hash($object);
-
-        if (isset($context['circular_reference_limit'][$objectHash])) {
-            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context['circular_reference_limit'][$objectHash]);
-
-                if ($this->circularReferenceHandler) {
-                    return call_user_func($this->circularReferenceHandler, $object);
-                }
-
-                throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
-            }
-
-            $context['circular_reference_limit'][$objectHash]++;
-        } else {
-            $context['circular_reference_limit'][$objectHash] = 1;
+        if ($this->isCircularReference($object, $context)) {
+            return $this->handleCircularReference($object);
         }
 
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
                 $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-
                 if (in_array($attributeName, $this->ignoredAttributes)) {
                     continue;
                 }
 
+                if (false !== $allowedAttributes && !in_array($attributeName, $allowedAttributes)) {
+                    continue;
+                }
+
                 $attributeValue = $method->invoke($object);
-                if (array_key_exists($attributeName, $this->callbacks)) {
+                if (isset($this->callbacks[$attributeName])) {
                     $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     if (!$this->serializer instanceof NormalizerInterface) {
-                        throw new \LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
+                        throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
                     }
 
                     $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                }
+
+                if ($this->nameConverter) {
+                    $attributeName = $this->nameConverter->normalize($attributeName);
                 }
 
                 $attributes[$attributeName] = $attributeValue;
@@ -183,56 +91,32 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
-            $normalizedData = $data;
-        } elseif (is_object($data)) {
-            $normalizedData = array();
-
-            foreach ($data as $attribute => $value) {
-                $normalizedData[$attribute] = $value;
-            }
-        } else {
-            $normalizedData = array();
-        }
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
+        $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
+        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
-
-                if (isset($normalizedData[$paramName])) {
-                    $params[] = $normalizedData[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($normalizedData[$paramName]);
-                } elseif ($constructorParameter->isOptional()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new RuntimeException(
-                        'Cannot create an instance of '.$class.
-                        ' from serialized data because its constructor requires '.
-                        'parameter "'.$constructorParameter->name.
-                        '" to be present.');
-                }
+        $classMethods = get_class_methods($object);
+        foreach ($normalizedData as $attribute => $value) {
+            if ($this->nameConverter) {
+                $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class();
-        }
+            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
+            $ignored = in_array($attribute, $this->ignoredAttributes);
 
-        foreach ($normalizedData as $attribute => $value) {
-            $setter = 'set'.$this->formatAttribute($attribute);
+            if ($allowed && !$ignored) {
+                $setter = 'set'.ucfirst($attribute);
 
-            if (method_exists($object, $setter)) {
-                $object->$setter($value);
+                if (in_array($setter, $classMethods)) {
+                    $object->$setter($value);
+                }
             }
         }
 
@@ -240,33 +124,11 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Format attribute name to access parameters or methods
-     * As option, if attribute name is found on camelizedAttributes array
-     * returns attribute name in camelcase format.
-     *
-     * @param string $attributeName
-     *
-     * @return string
-     */
-    protected function formatAttribute($attributeName)
-    {
-        if (in_array($attributeName, $this->camelizedAttributes)) {
-            return preg_replace_callback(
-                '/(^|_|\.)+(.)/', function ($match) {
-                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-                }, $attributeName
-            );
-        }
-
-        return $attributeName;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
     }
 
     /**
@@ -274,7 +136,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->supports($type);
+        return class_exists($type) && $this->supports($type);
     }
 
     /**

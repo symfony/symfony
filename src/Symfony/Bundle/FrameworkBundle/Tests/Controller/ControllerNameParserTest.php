@@ -29,7 +29,7 @@ class ControllerNameParserTest extends TestCase
         $this->loader->register();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         spl_autoload_unregister(array($this->loader, 'loadClass'));
 

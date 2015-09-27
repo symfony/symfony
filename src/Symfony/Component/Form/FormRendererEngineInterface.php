@@ -120,7 +120,7 @@ interface FormRendererEngineInterface
      *                                     looking. Level 0 indicates the root block, i.e.
      *                                     the first element of $blockNameHierarchy.
      *
-     * @return int|bool        The hierarchy level or false, if no resource was found.
+     * @return int|bool The hierarchy level or false, if no resource was found.
      */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 

@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
-use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -850,11 +848,10 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->setContent('');
             $response->setStatusCode(200);
-            $that->assertEquals('HEAD', $request->getMethod());
+            $this->assertEquals('HEAD', $request->getMethod());
         });
 
         $this->request('HEAD', '/', array('HTTP_EXPECT' => 'something ...'));
@@ -864,12 +861,11 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
-            $that->assertNotEquals('HEAD', $request->getMethod());
+            $this->assertNotEquals('HEAD', $request->getMethod());
         });
 
         $this->request('GET', '/');
@@ -886,8 +882,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testSendsNoContentWhenFresh()
     {
         $time = \DateTime::createFromFormat('U', time());
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });
@@ -1069,7 +1064,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponses($responses);
 
         $this->request('GET', '/', array(), array(), true);
-        $this->assertEquals("Hello World! My name is Bobby.", $this->response->getContent());
+        $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
 
         // check for 100 or 99 as the test can be executed after a second change
         $this->assertTrue(in_array($this->response->getTtl(), array(99, 100)));

@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -73,7 +74,7 @@ class ObjectsProvider
         $builder->setParameter('database_name', 'symfony');
 
         return array(
-            'parameter' =>  $builder,
+            'parameter' => $builder,
         );
     }
 
@@ -96,22 +97,18 @@ class ObjectsProvider
                 ->setPublic(true)
                 ->setSynthetic(false)
                 ->setLazy(true)
-                ->setSynchronized(true)
                 ->setAbstract(true)
-                ->setFactoryClass('Full\\Qualified\\FactoryClass')
-                ->setFactoryMethod('get'),
+                ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
                 ->setLazy(false)
-                ->setSynchronized(false)
                 ->setAbstract(false)
                 ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
                 ->addTag('tag1', array('attr3' => 'val3'))
                 ->addTag('tag2')
-                ->setFactoryService('factory.service')
-                ->setFactoryMethod('get'),
+                ->setFactory(array(new Reference('factory.service'), 'get')),
         );
     }
 
@@ -127,8 +124,8 @@ class ObjectsProvider
     {
         $eventDispatcher = new EventDispatcher();
 
-        $eventDispatcher->addListener('event1', 'global_function');
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; });
+        $eventDispatcher->addListener('event1', 'global_function', 255);
+        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return array('event_dispatcher_1' => $eventDispatcher);

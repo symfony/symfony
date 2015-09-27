@@ -24,7 +24,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     private $rememberMeClass;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $anonymousClass
      * @param string $rememberMeClass

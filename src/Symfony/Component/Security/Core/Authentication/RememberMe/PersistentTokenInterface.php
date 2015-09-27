@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
  * Interface to be implemented by persistent token classes (such as
- * Doctrine entities representing a remember-me token)
+ * Doctrine entities representing a remember-me token).
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

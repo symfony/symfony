@@ -28,7 +28,7 @@ class ServerParams
     /**
      * Returns maximum post size in bytes.
      *
-     * @return null|int     The maximum post size in bytes
+     * @return null|int The maximum post size in bytes
      */
     public function getPostMaxSize()
     {
@@ -44,7 +44,7 @@ class ServerParams
         } elseif (0 === strpos($max, '0')) {
             $max = intval($max, 8);
         } else {
-            $max = intval($max);
+            $max = (int) $max;
         }
 
         switch (substr($iniMax, -1)) {

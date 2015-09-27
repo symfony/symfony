@@ -205,7 +205,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace)
+     * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace).
      */
     public function testWriteDifferentSessionIdThanRead()
     {

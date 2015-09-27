@@ -81,7 +81,7 @@ class User
     }
 
     /**
-     * @Assert\True(message = "The user should have a Google Mail account")
+     * @Assert\IsTrue(message = "The user should have a Google Mail account")
      */
     public function isGmailUser()
     {
@@ -109,11 +109,11 @@ Resources
 
 Silex integration:
 
-https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceProvider.php
+https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/ValidatorServiceProvider.php
 
 Documentation:
 
-http://symfony.com/doc/3.0/book/validation.html
+https://symfony.com/doc/3.0/book/validation.html
 
 JSR-303 Specification:
 
@@ -122,5 +122,5 @@ http://jcp.org/en/jsr/detail?id=303
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Validator/
-    $ composer.phar install
+    $ composer install
     $ phpunit

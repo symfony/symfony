@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * HelperSet represents a set of helpers to be used with a command.
@@ -56,7 +57,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @param string $name The helper name
      *
-     * @return bool    true if the helper is defined, false otherwise
+     * @return bool true if the helper is defined, false otherwise
      */
     public function has($name)
     {
@@ -70,12 +71,12 @@ class HelperSet implements \IteratorAggregate
      *
      * @return HelperInterface The helper instance
      *
-     * @throws \InvalidArgumentException if the helper is not defined
+     * @throws InvalidArgumentException if the helper is not defined
      */
     public function get($name)
     {
         if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+            throw new InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 
         return $this->helpers[$name];

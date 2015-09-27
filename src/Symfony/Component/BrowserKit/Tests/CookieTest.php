@@ -74,30 +74,30 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
     public function testFromStringWithUrl()
     {
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar', 'http://www.example.com'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar', 'http://www.example.com?foo'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::FromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
-        $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::FromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com?foo'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::fromString('foo=bar', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar; path=/', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
     {
         $this->setExpectedException('InvalidArgumentException');
-        Cookie::FromString('foo');
+        Cookie::fromString('foo');
     }
 
     public function testFromStringThrowsAnExceptionIfCookieDateIsNotValid()
     {
         $this->setExpectedException('InvalidArgumentException');
-        Cookie::FromString('foo=bar; expires=Flursday July 31st 2020, 08:49:37 GMT');
+        Cookie::fromString('foo=bar; expires=Flursday July 31st 2020, 08:49:37 GMT');
     }
 
     public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
     {
         $this->setExpectedException('InvalidArgumentException');
-        Cookie::FromString('foo=bar', 'foobar');
+        Cookie::fromString('foo=bar', 'foobar');
     }
 
     public function testGetName()

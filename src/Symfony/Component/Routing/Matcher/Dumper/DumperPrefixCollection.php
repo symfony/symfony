@@ -66,8 +66,8 @@ class DumperPrefixCollection extends DumperCollection
 
             // Prefix starts with route's prefix
             if ('' === $collection->prefix || 0 === strpos($prefix, $collection->prefix)) {
-                $child = new DumperPrefixCollection();
-                $child->setPrefix(substr($prefix, 0, strlen($collection->prefix)+1));
+                $child = new self();
+                $child->setPrefix(substr($prefix, 0, strlen($collection->prefix) + 1));
                 $collection->add($child);
 
                 return $child->addPrefixRoute($route);
@@ -75,11 +75,11 @@ class DumperPrefixCollection extends DumperCollection
         }
 
         // Reached only if the root has a non empty prefix
-        throw new \LogicException("The collection root must not have a prefix");
+        throw new \LogicException('The collection root must not have a prefix');
     }
 
     /**
-     * Merges nodes whose prefix ends with a slash
+     * Merges nodes whose prefix ends with a slash.
      *
      * Children of a node whose prefix ends with a slash are moved to the parent node
      */

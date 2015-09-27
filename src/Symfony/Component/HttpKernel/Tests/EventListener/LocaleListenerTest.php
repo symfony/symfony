@@ -28,7 +28,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLocaleWithoutSession()
     {
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->onKernelRequest($event);
@@ -42,7 +42,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->cookies->set('foo', 'value');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -61,16 +61,12 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelRequest($this->getEvent($request));
     }
 
     public function testRouterResetWithParentRequestOnKernelFinishRequest()
     {
-        if (!class_exists('Symfony\Component\Routing\Router')) {
-            $this->markTestSkipped('The "Routing" component is not available');
-        }
-
         // the request context is updated
         $context = $this->getMock('Symfony\Component\Routing\RequestContext');
         $context->expects($this->once())->method('setParameter')->with('_locale', 'es');
@@ -85,7 +81,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\FinishRequestEvent', array(), array(), '', false);
 
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelFinishRequest($event);
     }
 
@@ -93,7 +89,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('/');
         $request->setLocale('de');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);

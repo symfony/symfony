@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\True;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -50,10 +50,6 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
-
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
         $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $this->metadataFactory->expects($this->any())
@@ -68,7 +64,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return array(
             array(new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
             array(new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
-            array(new True(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
+            array(new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
             array(new Length(10), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
             array(new Range(array('min' => 1, 'max' => 20)), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
         );
@@ -113,7 +109,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     public function maxLengthTypeProvider()
     {
-        return array (
+        return array(
             array('double'),
             array('float'),
             array('numeric'),

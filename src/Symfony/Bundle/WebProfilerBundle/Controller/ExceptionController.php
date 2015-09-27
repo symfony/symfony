@@ -55,7 +55,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->twig->getLoader()->exists($template)) {
-            $handler = new ExceptionHandler();
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset());
 
             return new Response($handler->getContent($exception), 200, array('Content-Type' => 'text/html'));
         }
@@ -95,7 +95,7 @@ class ExceptionController
         $template = $this->getTemplate();
 
         if (!$this->templateExists($template)) {
-            $handler = new ExceptionHandler();
+            $handler = new ExceptionHandler($this->debug, $this->twig->getCharset());
 
             return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
         }

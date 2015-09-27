@@ -41,21 +41,6 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirectBC()
-    {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
-
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
-        $matcher
-            ->expects($this->once())
-            ->method('redirect')
-            ->with('/foo', 'foo', 'https')
-            ->will($this->returnValue(array('_route' => 'foo')))
-        ;
-        $matcher->match('/foo');
-    }
-
     public function testSchemeRedirectRedirectsToFirstScheme()
     {
         $coll = new RouteCollection();

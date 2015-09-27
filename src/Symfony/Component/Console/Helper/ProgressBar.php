@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -54,6 +56,10 @@ class ProgressBar
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $this->output = $output;
         $this->setMaxSteps($max);
 
@@ -151,7 +157,7 @@ class ProgressBar
     /**
      * Gets the progress bar start time.
      *
-     * @return int     The progress bar start time
+     * @return int The progress bar start time
      */
     public function getStartTime()
     {
@@ -161,23 +167,11 @@ class ProgressBar
     /**
      * Gets the progress bar maximal steps.
      *
-     * @return int     The progress bar max steps
+     * @return int The progress bar max steps
      */
     public function getMaxSteps()
     {
         return $this->max;
-    }
-
-    /**
-     * Gets the progress bar step.
-     *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
-     *
-     * @return int     The progress bar step
-     */
-    public function getStep()
-    {
-        return $this->getProgress();
     }
 
     /**
@@ -193,11 +187,9 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
-     * @internal This method is public for PHP 5.3 compatibility, it should not be used.
-     *
-     * @return int     The progress bar step width
+     * @return int The progress bar step width
      */
-    public function getStepWidth()
+    private function getStepWidth()
     {
         return $this->stepWidth;
     }
@@ -215,7 +207,7 @@ class ProgressBar
     /**
      * Sets the progress bar width.
      *
-     * @param int     $size The progress bar size
+     * @param int $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -225,7 +217,7 @@ class ProgressBar
     /**
      * Gets the progress bar width.
      *
-     * @return int     The progress bar size
+     * @return int The progress bar size
      */
     public function getBarWidth()
     {
@@ -318,7 +310,7 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param int     $freq The frequency in steps
+     * @param int $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -346,9 +338,9 @@ class ProgressBar
     /**
      * Advances the progress output X steps.
      *
-     * @param int     $step Number of steps to advance
+     * @param int $step Number of steps to advance
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function advance($step = 1)
     {
@@ -356,21 +348,7 @@ class ProgressBar
     }
 
     /**
-     * Sets the current progress.
-     *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
-     *
-     * @param int     $step The current progress
-     *
-     * @throws \LogicException
-     */
-    public function setCurrent($step)
-    {
-        $this->setProgress($step);
-    }
-
-    /**
-     * Sets whether to overwrite the progressbar, false for new line
+     * Sets whether to overwrite the progressbar, false for new line.
      *
      * @param bool $overwrite
      */
@@ -382,23 +360,23 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setProgress($step)
     {
         $step = (int) $step;
         if ($step < $this->step) {
-            throw new \LogicException('You can\'t regress the progress bar.');
+            throw new LogicException('You can\'t regress the progress bar.');
         }
 
         if ($this->max && $step > $this->max) {
             $this->max = $step;
         }
 
-        $prevPeriod = intval($this->step / $this->redrawFreq);
-        $currPeriod = intval($step / $this->redrawFreq);
+        $prevPeriod = (int) ($this->step / $this->redrawFreq);
+        $currPeriod = (int) ($step / $this->redrawFreq);
         $this->step = $step;
         $this->percent = $this->max ? (float) $this->step / $this->max : 0;
         if ($prevPeriod !== $currPeriod || $this->max === $step) {
@@ -432,15 +410,11 @@ class ProgressBar
             return;
         }
 
-        // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
-        $self = $this;
-        $output = $this->output;
-        $messages = $this->messages;
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self, $output, $messages) {
-            if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                $text = call_user_func($formatter, $self, $output);
-            } elseif (isset($messages[$matches[1]])) {
-                $text = $messages[$matches[1]];
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $this, $this->output);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
             } else {
                 return $matches[0];
             }
@@ -472,7 +446,7 @@ class ProgressBar
     /**
      * Sets the progress bar maximal steps.
      *
-     * @param int     The progress bar max steps
+     * @param int $max The progress bar max steps
      */
     private function setMaxSteps($max)
     {
@@ -553,7 +527,7 @@ class ProgressBar
             },
             'remaining' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {
@@ -566,7 +540,7 @@ class ProgressBar
             },
             'estimated' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * UnsupportedException
+ * UnsupportedException.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

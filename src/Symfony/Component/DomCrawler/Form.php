@@ -34,19 +34,26 @@ class Form extends Link implements \ArrayAccess
     private $fields;
 
     /**
+     * @var string
+     */
+    private $baseHref;
+
+    /**
      * Constructor.
      *
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the form is embedded
      * @param string      $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param string      $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
      * @throws \LogicException if the node is not a button inside a form tag
      *
      * @api
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = null)
+    public function __construct(\DOMElement $node, $currentUri, $method = null, $baseHref = null)
     {
         parent::__construct($node, $currentUri, $method);
+        $this->baseHref = $baseHref;
 
         $this->initialize();
     }
@@ -197,9 +204,18 @@ class Form extends Link implements \ArrayAccess
     {
         $uri = parent::getUri();
 
-        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH')) && $queryString = http_build_query($this->getValues(), null, '&')) {
-            $sep = false === strpos($uri, '?') ? '?' : '&';
-            $uri .= $sep.$queryString;
+        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
+            $query = parse_url($uri, PHP_URL_QUERY);
+            $currentParameters = array();
+            if ($query) {
+                parse_str($query, $currentParameters);
+            }
+
+            $queryString = http_build_query(array_merge($currentParameters, $this->getValues()), null, '&');
+
+            $pos = strpos($uri, '?');
+            $base = false === $pos ? $uri : substr($uri, 0, $pos);
+            $uri = rtrim($base.'?'.$queryString, '?');
         }
 
         return $uri;
@@ -233,7 +249,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return bool    true if the field exists, false otherwise
+     * @return bool true if the field exists, false otherwise
      *
      * @api
      */
@@ -301,7 +317,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return bool    true if the field exists, false otherwise
+     * @return bool true if the field exists, false otherwise
      */
     public function offsetExists($name)
     {
@@ -346,7 +362,7 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Disables validation
+     * Disables validation.
      *
      * @return self
      */
@@ -448,6 +464,10 @@ class Form extends Link implements \ArrayAccess
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
+        }
+
+        if ($this->baseHref && '' !== $this->node->getAttribute('action')) {
+            $this->currentUri = $this->baseHref;
         }
     }
 

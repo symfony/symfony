@@ -15,12 +15,15 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class MarkdownDescriptor extends Descriptor
 {
@@ -46,18 +49,16 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         $output = '- Path: '.$route->getPath()
+            ."\n".'- Path Regex: '.$route->compile()->getRegex()
             ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
+            ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
-            ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NONE'
-            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
-            ."\n".'- Path-Regex: '.$route->compile()->getRegex();
+            ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')
+            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
         $this->write(isset($options['name'])
             ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n\n".$output
@@ -109,7 +110,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
-            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
     }
 
@@ -175,12 +176,34 @@ class MarkdownDescriptor extends Descriptor
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
         $output = '- Class: `'.$definition->getClass().'`'
-            ."\n".'- Scope: `'.$definition->getScope().'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
-            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no');
+            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
+            ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
+        ;
+
+        if (method_exists($definition, 'isShared')) {
+            $output .= "\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no');
+        }
+
+        $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $output .= "\n".'- Factory Service: `'.$factory[0].'`';
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $output .= "\n".'- Factory Class: `'.$factory[0].'`';
+                }
+                $output .= "\n".'- Factory Method: `'.$factory[1].'`';
+            } else {
+                $output .= "\n".'- Factory Function: `'.$factory.'`';
+            }
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
@@ -230,21 +253,30 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(sprintf('# %s', $title)."\n");
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
         if (null !== $event) {
-            foreach ($registeredListeners as $order => $listener) {
-                $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");
-                $this->describeCallable($listener);
+            krsort($registeredListeners);
+            $order = 1;
+            foreach ($registeredListeners as $priority => $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->write("\n".sprintf('## Listener %d', $order++)."\n");
+                    $this->describeCallable($listener);
+                    $this->write(sprintf('- Priority: `%d`', $priority)."\n");
+                }
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->write("\n".sprintf('## %s', $eventListened)."\n");
-
-                foreach ($eventListeners as $order => $eventListener) {
-                    $this->write("\n".sprintf('### Listener %d', $order + 1)."\n");
-                    $this->describeCallable($eventListener);
+                krsort($eventListeners);
+                $order = 1;
+                foreach ($eventListeners as $priority => $listeners) {
+                    foreach ($listeners as $listener) {
+                        $this->write("\n".sprintf('### Listener %d', $order++)."\n");
+                        $this->describeCallable($listener);
+                        $this->write(sprintf('- Priority: `%d`', $priority)."\n");
+                    }
                 }
             }
         }

@@ -36,10 +36,6 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
-        if (version_compare(PHP_VERSION, '5.5.0-dev', '<')) {
-            return $comparisons;
-        }
-
         $result = $comparisons;
 
         // Duplicate all tests involving DateTime objects to be tested with
@@ -80,6 +76,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 
     /**
      * @dataProvider provideAllValidComparisons
+     *
      * @param mixed $dirtyValue
      * @param mixed $comparisonValue
      */
@@ -115,6 +112,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 
     /**
      * @dataProvider provideAllInvalidComparisons
+     *
      * @param mixed  $dirtyValue
      * @param mixed  $dirtyValueAsString
      * @param mixed  $comparedValue
@@ -138,6 +136,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
             ->setParameter('{{ value }}', $dirtyValueAsString)
             ->setParameter('{{ compared_value }}', $comparedValueString)
             ->setParameter('{{ compared_value_type }}', $comparedValueType)
+            ->setCode($this->getErrorCode())
             ->assertRaised();
     }
 
@@ -163,8 +162,16 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
     abstract public function provideInvalidComparisons();
 
     /**
-     * @param  array      $options Options for the constraint
+     * @param array $options Options for the constraint
+     *
      * @return Constraint
      */
     abstract protected function createConstraint(array $options);
+
+    /**
+     * @return string|null
+     */
+    protected function getErrorCode()
+    {
+    }
 }

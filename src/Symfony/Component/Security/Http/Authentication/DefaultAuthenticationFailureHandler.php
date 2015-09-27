@@ -92,7 +92,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
         if ($this->options['failure_forward']) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
+                $this->logger->debug('Authentication failure, forward triggered.', array('failure_path' => $this->options['failure_path']));
             }
 
             $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
@@ -102,7 +102,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
+            $this->logger->debug('Authentication failure, redirect triggered.', array('failure_path' => $this->options['failure_path']));
         }
 
         $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);

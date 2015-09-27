@@ -100,7 +100,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
     public function testCleanup()
     {
         $dt = new \DateTime('-2 day');
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $dt->modify('-1 day');
             $profile = new Profile('time_'.$i);
             $profile->setTime($dt->getTimestamp());

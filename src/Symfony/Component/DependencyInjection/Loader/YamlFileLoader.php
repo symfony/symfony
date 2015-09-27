@@ -17,7 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -74,11 +76,11 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
+        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true);
     }
 
     /**
-     * Parses all imports
+     * Parses all imports.
      *
      * @param array  $content
      * @param string $file
@@ -104,7 +106,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses definitions
+     * Parses definitions.
      *
      * @param array  $content
      * @param string $file
@@ -162,16 +164,12 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
-        if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
         }
 
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
-        }
-
-        if (isset($service['synchronized'])) {
-            $definition->setSynchronized($service['synchronized']);
         }
 
         if (isset($service['lazy'])) {
@@ -186,6 +184,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (array_key_exists('deprecated', $service)) {
+            $definition->setDeprecated(true, $service['deprecated']);
+        }
+
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
                 if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
@@ -197,18 +199,6 @@ class YamlFileLoader extends FileLoader
             } else {
                 $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
             }
-        }
-
-        if (isset($service['factory_class'])) {
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {
@@ -237,8 +227,15 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service['calls'] as $call) {
-                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
-                $definition->addMethodCall($call[0], $args);
+                if (isset($call['method'])) {
+                    $method = $call['method'];
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                } else {
+                    $method = $call[0];
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                }
+
+                $definition->addMethodCall($method, $args);
             }
         }
 
@@ -271,7 +268,8 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['decorates'])) {
             $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $definition->setDecoratedService($service['decorates'], $renameId);
+            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
         $this->container->setDefinition($id, $definition);
@@ -288,6 +286,10 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
+        }
+
         if (!stream_is_local($file)) {
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
         }
@@ -300,7 +302,13 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        return $this->validate($this->yamlParser->parse(file_get_contents($file)), $file);
+        try {
+            $configuration = $this->yamlParser->parse(file_get_contents($file));
+        } catch (ParseException $e) {
+            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
+        }
+
+        return $this->validate($configuration, $file);
     }
 
     /**
@@ -323,7 +331,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        foreach (array_keys($content) as $namespace) {
+        foreach ($content as $namespace => $data) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }
@@ -384,7 +392,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Loads from Extensions
+     * Loads from Extensions.
      *
      * @param array $content
      */

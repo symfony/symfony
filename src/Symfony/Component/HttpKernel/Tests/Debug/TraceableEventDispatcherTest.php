@@ -75,6 +75,37 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request);
     }
 
+    public function testAddListenerNested()
+    {
+        $called1 = false;
+        $called2 = false;
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('my-event', function () use ($dispatcher, &$called1, &$called2) {
+            $called1 = true;
+            $dispatcher->addListener('my-event', function () use (&$called2) {
+                $called2 = true;
+            });
+        });
+        $dispatcher->dispatch('my-event');
+        $this->assertTrue($called1);
+        $this->assertFalse($called2);
+        $dispatcher->dispatch('my-event');
+        $this->assertTrue($called2);
+    }
+
+    public function testListenerCanRemoveItselfWhenExecuted()
+    {
+        $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $listener1 = function () use ($eventDispatcher, &$listener1) {
+            $eventDispatcher->removeListener('foo', $listener1);
+        };
+        $eventDispatcher->addListener('foo', $listener1);
+        $eventDispatcher->addListener('foo', function () {});
+        $eventDispatcher->dispatch('foo');
+
+        $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
+    }
+
     protected function getHttpKernel($dispatcher, $controller)
     {
         $resolver = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');

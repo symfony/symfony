@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -39,14 +39,6 @@ class ExceptionListener implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        static $handling;
-
-        if (true === $handling) {
-            return false;
-        }
-
-        $handling = true;
-
         $exception = $event->getException();
         $request = $event->getRequest();
 
@@ -55,20 +47,26 @@ class ExceptionListener implements EventSubscriberInterface
         $request = $this->duplicateRequest($exception, $request);
 
         try {
-            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
-            $this->logException($exception, sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()), false);
+            $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), false);
 
-            // set handling to false otherwise it wont be able to handle further more
-            $handling = false;
+            $wrapper = $e;
 
-            // re-throw the exception from within HttpKernel as this is a catch-all
-            return;
+            while ($prev = $wrapper->getPrevious()) {
+                if ($exception === $wrapper = $prev) {
+                    throw $e;
+                }
+            }
+
+            $prev = new \ReflectionProperty('Exception', 'previous');
+            $prev->setAccessible(true);
+            $prev->setValue($wrapper, $exception);
+
+            throw $e;
         }
 
         $event->setResponse($response);
-
-        $handling = false;
     }
 
     public static function getSubscribedEvents()
@@ -81,22 +79,17 @@ class ExceptionListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      *
-     * @param \Exception $exception The original \Exception instance
+     * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
-     * @param bool       $original  False when the handling of the exception thrown another exception
      */
-    protected function logException(\Exception $exception, $message, $original = true)
+    protected function logException(\Exception $exception, $message)
     {
-        $isCritical = !$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500;
-        $context = array('exception' => $exception);
         if (null !== $this->logger) {
-            if ($isCritical) {
-                $this->logger->critical($message, $context);
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+                $this->logger->critical($message, array('exception' => $exception));
             } else {
-                $this->logger->error($message, $context);
+                $this->logger->error($message, array('exception' => $exception));
             }
-        } elseif (!$original || $isCritical) {
-            error_log($message);
         }
     }
 
@@ -104,7 +97,7 @@ class ExceptionListener implements EventSubscriberInterface
      * Clones the request for the exception.
      *
      * @param \Exception $exception The thrown exception.
-     * @param Request $request The original request.
+     * @param Request    $request   The original request.
      *
      * @return Request $request The cloned request.
      */
@@ -114,10 +107,6 @@ class ExceptionListener implements EventSubscriberInterface
             '_controller' => $this->controller,
             'exception' => FlattenException::create($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            // keep for BC -- as $format can be an argument of the controller callable
-            // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php
-            // @deprecated in 2.4, to be removed in 3.0
-            'format' => $request->getRequestFormat(),
         );
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');

@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Validator Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,24 +12,24 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/translation": "~2.0"
+        "php": ">=5.5.9",
+        "symfony/translation": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "~2.1",
-        "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.0",
-        "symfony/config": "~2.2",
-        "symfony/property-access": "~2.2",
-        "symfony/expression-language": "~2.4",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "~1.0",
-        "symfony/expression-language": "~2.4"
+        "egulias/email-validator": "~1.2,>=1.2.1"
     },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
@@ -43,9 +43,8 @@
         "symfony/expression-language": "For using the 2.4 Expression validator"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator\\": "" }
+        "psr-4": { "Symfony\\Component\\Validator\\": "" }
     },
-    "target-dir": "Symfony/Component/Validator",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

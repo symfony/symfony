@@ -62,7 +62,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     public function testMultiRowIndexFile()
     {
         $iteration = 3;
-        for ($i = 0; $i < $iteration; $i++) {
+        for ($i = 0; $i < $iteration; ++$i) {
             $profile = new Profile('token'.$i);
             $profile->setIp('127.0.0.'.$i);
             $profile->setUrl('http://foo.bar/'.$i);
@@ -74,7 +74,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         }
 
         $handle = fopen(self::$tmpDir.'/index.csv', 'r');
-        for ($i = 0; $i < $iteration; $i++) {
+        for ($i = 0; $i < $iteration; ++$i) {
             $row = fgetcsv($handle);
             $this->assertEquals('token'.$i, $row[0]);
             $this->assertEquals('127.0.0.'.$i, $row[1]);
@@ -94,7 +94,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         fwrite($h, "line1\n\n\nline2\n");
         fseek($h, 0, SEEK_END);
 
-        $this->assertEquals("line2", $r->invoke(self::$storage, $h));
-        $this->assertEquals("line1", $r->invoke(self::$storage, $h));
+        $this->assertEquals('line2', $r->invoke(self::$storage, $h));
+        $this->assertEquals('line1', $r->invoke(self::$storage, $h));
     }
 }

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\HttpFoundation\Request;
@@ -117,7 +115,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         try {
             $service->autoLogin($request);
             $this->fail('Expected CookieTheftException was not thrown.');
-        } catch (CookieTheftException $theft) {
+        } catch (CookieTheftException $e) {
         }
 
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
@@ -176,7 +174,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $returnedToken);
         $this->assertSame($user, $returnedToken->getUser());
-        $this->assertEquals('fookey', $returnedToken->getKey());
+        $this->assertEquals('foosecret', $returnedToken->getSecret());
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
@@ -313,7 +311,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
             $userProvider = $this->getProvider();
         }
 
-        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger, new SecureRandom(sys_get_temp_dir().'/_sf2.seed'));
+        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger, new SecureRandom(sys_get_temp_dir().'/_sf2.seed'));
     }
 
     protected function getProvider()

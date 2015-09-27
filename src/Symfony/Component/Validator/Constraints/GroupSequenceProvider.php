@@ -12,10 +12,12 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * Annotation to define a group sequence provider
+ * Annotation to define a group sequence provider.
  *
  * @Annotation
  * @Target({"CLASS", "ANNOTATION"})
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class GroupSequenceProvider
 {

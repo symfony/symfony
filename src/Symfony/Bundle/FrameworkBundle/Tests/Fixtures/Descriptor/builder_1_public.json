@@ -2,10 +2,14 @@
     "definitions": {
         "definition_1": {
             "class": "Full\\Qualified\\Class1",
-            "scope": "container",
             "public": true,
             "synthetic": false,
+            "lazy": true,
+            "shared": true,
+            "abstract": true,
             "file": null,
+            "factory_class": "Full\\Qualified\\FactoryClass",
+            "factory_method": "get",
             "tags": [
 
             ]

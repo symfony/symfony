@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity;
 
 /**
- * Car
+ * Car.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  */

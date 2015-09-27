@@ -19,9 +19,9 @@ class ValueExporter
     /**
      * Converts a PHP value to a string.
      *
-     * @param mixed   $value The PHP value
-     * @param int     $depth only for internal usage
-     * @param bool    $deep  only for internal usage
+     * @param mixed $value The PHP value
+     * @param int   $depth only for internal usage
+     * @param bool  $deep  only for internal usage
      *
      * @return string The string representation of the given value
      */
@@ -54,7 +54,7 @@ class ValueExporter
                 return sprintf("[\n%s%s\n%s]", $indent, implode(sprintf(", \n%s", $indent), $a), str_repeat('  ', $depth - 1));
             }
 
-            return sprintf("[%s]", implode(', ', $a));
+            return sprintf('[%s]', implode(', ', $a));
         }
 
         if (is_resource($value)) {

@@ -267,6 +267,50 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitMultipleFiles($method)
+    {
+        $form = $this->getMockForm('param1', $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            'param1' => null,
+        ), array(
+            'param2' => $this->getMockFile('2'),
+            'param1' => $file,
+            'param3' => $this->getMockFile('3'),
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitFileWithNamelessForm($method)
+    {
+        $form = $this->getMockForm(null, $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            '' => null,
+        ), array(
+            '' => $file,
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
      * @dataProvider getPostMaxSizeFixtures
      */
     public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
@@ -279,15 +323,16 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($iniMax));
 
         $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->factory->createNamed('name', 'text', null, $options);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
         $this->setRequestData('POST', array(), array());
 
         $this->requestHandler->handleRequest($form, $this->request);
 
         if ($shouldFail) {
-            $errors = array(new FormError($options['post_max_size_message'], null, $errorParams));
+            $error = new FormError($options['post_max_size_message'], null, $errorParams);
+            $error->setOrigin($form);
 
-            $this->assertEquals($errors, iterator_to_array($form->getErrors()));
+            $this->assertEquals(array($error), iterator_to_array($form->getErrors()));
             $this->assertTrue($form->isSubmitted());
         } else {
             $this->assertCount(0, $form->getErrors());
@@ -314,7 +359,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function getRequestHandler();
 
-    abstract protected function getMockFile();
+    abstract protected function getMockFile($suffix = '');
 
     protected function getMockForm($name, $method = null, $compound = true)
     {

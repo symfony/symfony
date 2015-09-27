@@ -17,7 +17,7 @@ class SimpleProcessTest extends AbstractProcessTest
 {
     private $enabledSigchild = false;
 
-    public function setUp()
+    protected function setUp()
     {
         ob_start();
         phpinfo(INFO_GENERAL);
@@ -150,11 +150,11 @@ class SimpleProcessTest extends AbstractProcessTest
     public function testStopTerminatesProcessCleanly()
     {
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 $process->stop();
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to stop() is not expected to cause wait() to throw a RuntimeException');
         }
     }
@@ -164,13 +164,13 @@ class SimpleProcessTest extends AbstractProcessTest
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
                     $process->signal(defined('SIGKILL') ? SIGKILL : 9);
                 }
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
         }
     }
@@ -180,13 +180,13 @@ class SimpleProcessTest extends AbstractProcessTest
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
         try {
-            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
                     $process->signal(defined('SIGTERM') ? SIGTERM : 15);
                 }
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
         }
     }

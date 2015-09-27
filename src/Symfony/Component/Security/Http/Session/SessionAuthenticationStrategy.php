@@ -47,7 +47,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
                 return;
 
             case self::MIGRATE:
-                $request->getSession()->migrate();
+                $request->getSession()->migrate(true);
 
                 return;
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
@@ -35,19 +37,19 @@ class StreamOutput extends Output
     /**
      * Constructor.
      *
-     * @param mixed                         $stream    A stream resource
+     * @param resource                      $stream    A stream resource
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
      * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
-     * @throws \InvalidArgumentException When first argument is not a real stream
+     * @throws InvalidArgumentException When first argument is not a real stream
      *
      * @api
      */
     public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
-            throw new \InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
+            throw new InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
         }
 
         $this->stream = $stream;
@@ -76,7 +78,7 @@ class StreamOutput extends Output
     {
         if (false === @fwrite($this->stream, $message.($newline ? PHP_EOL : ''))) {
             // should never happen
-            throw new \RuntimeException('Unable to write output.');
+            throw new RuntimeException('Unable to write output.');
         }
 
         fflush($this->stream);
@@ -90,11 +92,11 @@ class StreamOutput extends Output
      *  -  Windows without Ansicon and ConEmu
      *  -  non tty consoles
      *
-     * @return bool    true if the stream supports colorization, false otherwise
+     * @return bool true if the stream supports colorization, false otherwise
      */
     protected function hasColorSupport()
     {
-        if (DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
         }
 

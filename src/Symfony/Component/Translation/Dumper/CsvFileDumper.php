@@ -26,7 +26,7 @@ class CsvFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $handle = fopen('php://memory', 'rb+');
 

@@ -30,10 +30,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsExposedWhenNotProtected($config)
     {
-        if (strpos(PHP_OS, "WIN") === 0 && version_compare(phpversion(), "5.3.9", "<")) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
-        }
-
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->insulate();
         $client->request('GET', '/unprotected_resource');
@@ -46,10 +42,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
     {
-        if (strpos(PHP_OS, "WIN") === 0 && version_compare(phpversion(), "5.3.9", "<")) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
-        }
-
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->insulate();
 
@@ -65,12 +57,11 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
     /**
      * @dataProvider getConfigs
-     * @group ip_whitelist
      */
     public function testSecurityConfigurationForSingleIPAddress($config)
     {
-        $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array("REMOTE_ADDR" => "10.10.10.10"));
-        $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array("REMOTE_ADDR" => "10.10.20.10"));
+        $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '10.10.10.10'));
+        $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '10.10.20.10'));
 
         $this->assertAllowed($allowedClient, '/secured-by-one-ip');
         $this->assertRestricted($barredClient, '/secured-by-one-ip');
@@ -78,13 +69,12 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
     /**
      * @dataProvider getConfigs
-     * @group ip_whitelist
      */
     public function testSecurityConfigurationForMultipleIPAddresses($config)
     {
-        $allowedClientA = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array("REMOTE_ADDR" => "1.1.1.1"));
-        $allowedClientB = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array("REMOTE_ADDR" => "2.2.2.2"));
-        $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array("REMOTE_ADDR" => "192.168.1.1"));
+        $allowedClientA = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '1.1.1.1'));
+        $allowedClientB = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '2.2.2.2'));
+        $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '192.168.1.1'));
 
         $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');

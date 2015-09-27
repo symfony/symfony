@@ -11,12 +11,17 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,12 +29,22 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
      * @var GetSetMethodNormalizer
      */
     private $normalizer;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     protected function setUp()
     {
         $this->serializer = $this->getMock(__NAMESPACE__.'\SerializerNormalizer');
         $this->normalizer = new GetSetMethodNormalizer();
         $this->normalizer->setSerializer($this->serializer);
+    }
+
+    public function testInterface()
+    {
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
     }
 
     public function testNormalize()
@@ -85,42 +100,9 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testDenormalizeOnCamelCaseFormat()
-    {
-        $this->normalizer->setCamelizedAttributes(array('camel_case'));
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\GetSetDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
     public function testDenormalizeNull()
     {
         $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\GetSetDummy'));
-    }
-
-    /**
-     * @dataProvider attributeProvider
-     */
-    public function testFormatAttribute($attribute, $camelizedAttributes, $result)
-    {
-        $r = new \ReflectionObject($this->normalizer);
-        $m = $r->getMethod('formatAttribute');
-        $m->setAccessible(true);
-
-        $this->normalizer->setCamelizedAttributes($camelizedAttributes);
-        $this->assertEquals($m->invoke($this->normalizer, $attribute, $camelizedAttributes), $result);
-    }
-
-    public function attributeProvider()
-    {
-        return array(
-            array('attribute_test', array('attribute_test'),'AttributeTest'),
-            array('attribute_test', array('any'),'attribute_test'),
-            array('attribute', array('attribute'),'Attribute'),
-            array('attribute', array(), 'attribute'),
-        );
     }
 
     public function testConstructorDenormalize()
@@ -130,6 +112,16 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             __NAMESPACE__.'\GetConstructorDummy', 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+        $this->assertTrue($obj->isBaz());
+    }
+
+    public function testConstructorDenormalizeWithNullArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => null, 'baz' => true),
+            __NAMESPACE__.'\GetConstructorDummy', 'any');
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertNull($obj->getBar());
         $this->assertTrue($obj->isBaz());
     }
 
@@ -143,6 +135,37 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
     }
 
+    public function testConstructorDenormalizeWithOptionalDefaultArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('bar' => 'test'),
+            __NAMESPACE__.'\GetConstructorArgsWithDefaultValueDummy', 'any');
+        $this->assertEquals(array(), $obj->getFoo());
+        $this->assertEquals('test', $obj->getBar());
+    }
+
+    /**
+     * @requires PHP 5.6
+     */
+    public function testConstructorDenormalizeWithVariadicArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => array(1, 2, 3)),
+            'Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorArgsDummy', 'any');
+        $this->assertEquals(array(1, 2, 3), $obj->getFoo());
+    }
+
+    /**
+     * @requires PHP 5.6
+     */
+    public function testConstructorDenormalizeWithMissingVariadicArgument()
+    {
+        $obj = $this->normalizer->denormalize(
+            array(),
+            'Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorArgsDummy', 'any');
+        $this->assertEquals(array(), $obj->getFoo());
+    }
+
     public function testConstructorWithObjectDenormalize()
     {
         $data = new \stdClass();
@@ -153,6 +176,112 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $obj = $this->normalizer->denormalize($data, __NAMESPACE__.'\GetConstructorDummy', 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testConstructorWArgWithPrivateMutator()
+    {
+        $obj = $this->normalizer->denormalize(array('foo' => 'bar'), __NAMESPACE__.'\ObjectConstructorArgsWithPrivateMutatorDummy', 'any');
+        $this->assertEquals('bar', $obj->getFoo());
+    }
+
+    public function testGroupsNormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setFooBar('fooBar');
+        $obj->setSymfony('symfony');
+        $obj->setKevin('kevin');
+        $obj->setCoopTilleuls('coopTilleuls');
+
+        $this->assertEquals(array(
+            'bar' => 'bar',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('c'))));
+
+        $this->assertEquals(array(
+            'symfony' => 'symfony',
+            'foo' => 'foo',
+            'fooBar' => 'fooBar',
+            'bar' => 'bar',
+            'kevin' => 'kevin',
+            'coopTilleuls' => 'coopTilleuls',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('a', 'c'))));
+    }
+
+    public function testGroupsDenormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $toNormalize = array('foo' => 'foo', 'bar' => 'bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a'))
+        );
+        $this->assertEquals($obj, $normalized);
+
+        $obj->setBar('bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a', 'b'))
+        );
+        $this->assertEquals($obj, $normalized);
+    }
+
+    public function testGroupsNormalizeWithNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+        $obj->setCoopTilleuls('les-tilleuls.coop');
+
+        $this->assertEquals(
+            array(
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+            ),
+            $this->normalizer->normalize($obj, null, array('groups' => array('name_converter')))
+        );
+    }
+
+    public function testGroupsDenormalizeWithNameConverter()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFooBar('@dunglas');
+        $obj->setSymfony('@coopTilleuls');
+
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize(array(
+                'bar' => null,
+                'foo_bar' => '@dunglas',
+                'symfony' => '@coopTilleuls',
+                'coop_tilleuls' => 'les-tilleuls.coop',
+            ), 'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy', null, array('groups' => array('name_converter')))
+        );
     }
 
     /**
@@ -260,7 +389,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
      * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
@@ -316,6 +445,42 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
         $this->assertEquals($expected, $this->normalizer->normalize($obj));
+    }
+
+    public function testObjectToPopulate()
+    {
+        $dummy = new GetSetDummy();
+        $dummy->setFoo('foo');
+
+        $obj = $this->normalizer->denormalize(
+            array('bar' => 'bar'),
+            __NAMESPACE__.'\GetSetDummy',
+            null,
+            array('object_to_populate' => $dummy)
+        );
+
+        $this->assertEquals($dummy, $obj);
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testDenormalizeNonExistingAttribute()
+    {
+        $this->assertEquals(
+            new GetSetDummy(),
+            $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\GetSetDummy')
+        );
+    }
+
+    public function testNoTraversableSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
+    }
+
+    public function testPrivateSetter()
+    {
+        $obj = $this->normalizer->denormalize(array('foo' => 'foobar'), __NAMESPACE__.'\ObjectWithPrivateSetterDummy');
+        $this->assertEquals('bar', $obj->getFoo());
     }
 }
 
@@ -374,7 +539,7 @@ class GetSetDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 
     public function setObject($object)
@@ -418,7 +583,7 @@ class GetConstructorDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 }
 
@@ -456,6 +621,104 @@ class GetConstructorOptionalArgsDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class GetConstructorArgsWithDefaultValueDummy
+{
+    protected $foo;
+    protected $bar;
+
+    public function __construct($foo = array(), $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
+    }
+
+    public function otherMethod()
+    {
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class GetCamelizedDummy
+{
+    private $kevinDunglas;
+    private $fooBar;
+    private $bar_foo;
+
+    public function __construct($kevinDunglas = null)
+    {
+        $this->kevinDunglas = $kevinDunglas;
+    }
+
+    public function getKevinDunglas()
+    {
+        return $this->kevinDunglas;
+    }
+
+    public function setFooBar($fooBar)
+    {
+        $this->fooBar = $fooBar;
+    }
+
+    public function getFooBar()
+    {
+        return $this->fooBar;
+    }
+
+    public function setBar_foo($bar_foo)
+    {
+        $this->bar_foo = $bar_foo;
+    }
+
+    public function getBar_foo()
+    {
+        return $this->bar_foo;
+    }
+}
+
+class ObjectConstructorArgsWithPrivateMutatorDummy
+{
+    private $foo;
+
+    public function __construct($foo)
+    {
+        $this->setFoo($foo);
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    private function setFoo($foo)
+    {
+        $this->foo = $foo;
+    }
+}
+
+class ObjectWithPrivateSetterDummy
+{
+    private $foo = 'bar';
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    private function setFoo($foo)
+    {
     }
 }

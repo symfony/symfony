@@ -20,6 +20,7 @@ namespace Symfony\Component\Validator\Violation;
  * execution context.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ConstraintViolationBuilderInterface
@@ -82,7 +83,7 @@ interface ConstraintViolationBuilderInterface
      * Sets the number which determines how the plural form of the violation
      * message is chosen when it is translated.
      *
-     * @param int     $number The number for determining the plural form
+     * @param int $number The number for determining the plural form
      *
      * @return ConstraintViolationBuilderInterface This builder
      *
@@ -93,7 +94,7 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets the violation code.
      *
-     * @param int $code The violation code
+     * @param string|null $code The violation code
      *
      * @return ConstraintViolationBuilderInterface This builder
      */

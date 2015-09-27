@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 class TimezoneTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testTimezonesAreSelectable()
     {
-        $form = $this->factory->create('timezone');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimezoneType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

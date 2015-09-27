@@ -18,13 +18,6 @@ use Symfony\Component\Validator\Validation;
 
 class CountryValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function setUp()
-    {
-        IntlTestHelper::requireFullIntl($this);
-
-        parent::setUp();
-    }
-
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_5;
@@ -89,6 +82,7 @@ class CountryValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$country.'"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
             ->assertRaised();
     }
 

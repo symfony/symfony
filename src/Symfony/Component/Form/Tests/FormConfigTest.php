@@ -49,7 +49,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             array('9', true),
             // Contrary to the HTML4 spec, we allow names starting with an
             // underscore, since this is already a widely used practice in
-            // Symfony2.
+            // Symfony.
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
             array('_', true),

@@ -93,7 +93,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     public function save()
     {
         if (!$this->started) {
-            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed");
+            throw new \RuntimeException('Trying to save a session that was not started yet or was already closed');
         }
 
         file_put_contents($this->getFilePath(), serialize($this->data));

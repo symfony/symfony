@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Extracts Security Errors from Request
+ * Extracts Security Errors from Request.
  *
  * @author Boris Vujicic <boris.vujicic@gmail.com>
  */
@@ -38,7 +38,8 @@ class AuthenticationUtils
 
     /**
      * @param bool $clearSession
-     * @return null|AuthenticationException
+     *
+     * @return AuthenticationException|null
      */
     public function getLastAuthenticationError($clearSession = true)
     {
@@ -71,6 +72,7 @@ class AuthenticationUtils
 
     /**
      * @return Request
+     *
      * @throws \LogicException
      */
     private function getRequest()

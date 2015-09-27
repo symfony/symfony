@@ -36,26 +36,10 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('The "Form" component is not available');
-        }
-
-        if (!class_exists('Doctrine\DBAL\Platforms\MySqlPlatform')) {
-            $this->markTestSkipped('Doctrine DBAL is not available.');
-        }
-
-        if (!class_exists('Doctrine\Common\Version')) {
-            $this->markTestSkipped('Doctrine Common is not available.');
-        }
-
-        if (!class_exists('Doctrine\ORM\EntityManager')) {
-            $this->markTestSkipped('Doctrine ORM is not available.');
-        }
-
         $this->em = DoctrineTestHelper::createTestEntityManager();
 
         $schemaTool = new SchemaTool($this->em);
-        $classes = array($this->em->getClassMetadata($this->getEntityClass()));
+        $classes = $this->getClassesMetadata();
 
         try {
             $schemaTool->dropSchema($classes);
@@ -88,6 +72,11 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
     abstract protected function getEntityClass();
 
     abstract protected function createObjects();
+
+    protected function getClassesMetadata()
+    {
+        return array($this->em->getClassMetadata($this->getEntityClass()));
+    }
 
     /**
      * @return \Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface

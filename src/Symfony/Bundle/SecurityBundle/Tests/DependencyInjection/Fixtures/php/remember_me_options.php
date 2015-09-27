@@ -1,4 +1,5 @@
 <?php
+
 $container->loadFromExtension('security', array(
     'providers' => array(
         'default' => array('id' => 'foo'),
@@ -8,7 +9,7 @@ $container->loadFromExtension('security', array(
         'main' => array(
             'form_login' => true,
             'remember_me' => array(
-                'key' => 'TheyKey',
+                'secret' => 'TheSecret',
                 'catch_exceptions' => false,
                 'token_provider' => 'token_provider_id',
             ),

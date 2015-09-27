@@ -1,7 +1,9 @@
 <info>[container]</info> List of parameters
- Parameter Value                    
- array     [12,"Hello world!",true] 
- boolean   true                     
- integer   12                       
- string    Hello world!             
-                                    
++-----------+--------------------------+
+|[32m Parameter [39m|[32m Value                    [39m|
++-----------+--------------------------+
+| array     | [12,"Hello world!",true] |
+| boolean   | true                     |
+| integer   | 12                       |
+| string    | Hello world!             |
++-----------+--------------------------+

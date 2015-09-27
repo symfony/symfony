@@ -37,8 +37,8 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true))
         ;
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token))
@@ -53,7 +53,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new AccessListener(
-            $context,
+            $tokenStorage,
             $accessDecisionManager,
             $accessMap,
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')
@@ -103,13 +103,13 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($authenticatedToken))
         ;
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($notAuthenticatedToken))
         ;
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo($authenticatedToken))
@@ -124,7 +124,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new AccessListener(
-            $context,
+            $tokenStorage,
             $accessDecisionManager,
             $accessMap,
             $authManager
@@ -158,15 +158,15 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isAuthenticated')
         ;
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token))
         ;
 
         $listener = new AccessListener(
-            $context,
+            $tokenStorage,
             $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface'),
             $accessMap,
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')
@@ -185,17 +185,17 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
      */
-    public function testHandleWhenTheSecurityContextHasNoToken()
+    public function testHandleWhenTheSecurityTokenStorageHasNoToken()
     {
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue(null))
         ;
 
         $listener = new AccessListener(
-            $context,
+            $tokenStorage,
             $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface'),
             $this->getMock('Symfony\Component\Security\Http\AccessMapInterface'),
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')

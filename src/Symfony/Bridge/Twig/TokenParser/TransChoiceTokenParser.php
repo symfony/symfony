@@ -25,7 +25,7 @@ class TransChoiceTokenParser extends TransTokenParser
      *
      * @param \Twig_Token $token A Twig_Token instance
      *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     * @return \Twig_Node A Twig_Node instance
      *
      * @throws \Twig_Error_Syntax
      */
@@ -56,7 +56,7 @@ class TransChoiceTokenParser extends TransTokenParser
         if ($stream->test('into')) {
             // {% transchoice count into "fr" %}
             $stream->next();
-            $locale =  $this->parser->getExpressionParser()->parseExpression();
+            $locale = $this->parser->getExpressionParser()->parseExpression();
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

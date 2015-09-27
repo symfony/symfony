@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * A console command for dumping available configuration reference.
@@ -36,7 +37,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
             ->setName('config:dump-reference')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The format, either yaml or xml', 'yaml'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
             ))
             ->setDescription('Dumps the default configuration for an extension')
             ->setHelp(<<<EOF
@@ -48,7 +49,7 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
-With the <info>format</info> option specifies the format of the configuration,
+With the <info>--format</info> option specifies the format of the configuration,
 this is either <comment>yaml</comment> or <comment>xml</comment>.
 When the option is not provided, <comment>yaml</comment> is used.
 
@@ -66,6 +67,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
 
         if (empty($name)) {

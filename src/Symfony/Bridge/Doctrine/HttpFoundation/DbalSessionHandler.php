@@ -159,6 +159,14 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $mergeStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
+
+                //Oracle has a bug that will intermitently happen if you
+                //have only 1 bind on a CLOB field for 2 different statements
+                //(INSERT and UPDATE in this case)
+                if ('oracle' == $this->con->getDatabasePlatform()->getName()) {
+                    $mergeStmt->bindParam(':data2', $encoded, \PDO::PARAM_STR);
+                }
+
                 $mergeStmt->execute();
 
                 return true;
@@ -224,7 +232,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 // DUAL is Oracle specific dummy table
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) ".
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) ".
-                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time";
+                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data2, $this->timeCol = :time";
             case $this->con->getDatabasePlatform() instanceof SQLServer2008Platform:
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                 // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx

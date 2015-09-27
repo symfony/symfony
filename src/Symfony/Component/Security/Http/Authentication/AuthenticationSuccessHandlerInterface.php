@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Interface for a custom authentication success handler
+ * Interface for a custom authentication success handler.
  *
  * If you want to customize the success handling process, instead of
  * overwriting the respective listener globally, you can set a custom success

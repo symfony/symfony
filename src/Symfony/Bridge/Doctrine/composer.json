@@ -3,7 +3,7 @@
     "type": "symfony-bridge",
     "description": "Symfony Doctrine Bridge",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,36 +12,40 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "doctrine/common": "~2.2"
+        "php": ">=5.5.9",
+        "doctrine/common": "~2.4"
     },
     "require-dev": {
-        "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0",
-        "symfony/form": "~2.2",
-        "symfony/http-kernel": "~2.2",
-        "symfony/security": "~2.2",
-        "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.4",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/stopwatch": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/form": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0",
+        "symfony/property-info": "~2.8|3.0",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3"
+        "doctrine/dbal": "~2.4",
+        "doctrine/orm": "~2.4,>=2.4.5"
     },
     "suggest": {
         "symfony/form": "",
         "symfony/validator": "",
+        "symfony/property-info": "",
         "doctrine/data-fixtures": "",
         "doctrine/dbal": "",
         "doctrine/orm": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Doctrine",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

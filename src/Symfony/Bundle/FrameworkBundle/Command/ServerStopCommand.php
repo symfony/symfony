@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Stops a background process running PHP's built-in web server.
@@ -29,18 +30,19 @@ class ServerStopCommand extends ServerCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
             ))
             ->setName('server:stop')
             ->setDescription('Stops PHP\'s built-in web server that was started with the server:start command')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> stops PHP's built-in web server:
 
-  <info>%command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 To change the default bind address and the default port use the <info>address</info> argument:
 
-  <info>%command.full_name% 127.0.0.1:8080</info>
+  <info>php %command.full_name% 127.0.0.1:8080</info>
 
 EOF
             )
@@ -53,6 +55,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $address = $input->getArgument('address');
+        if (false === strpos($address, ':')) {
+            $address = $address.':'.$input->getOption('port');
+        }
+
         $lockFile = $this->getLockFile($address);
 
         if (!file_exists($lockFile)) {

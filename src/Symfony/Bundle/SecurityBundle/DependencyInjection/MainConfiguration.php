@@ -16,9 +16,12 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
- * This class contains the configuration information for the following tags:
+ * This class contains the configuration information.
+ *
+ * This information is for the following tags:
  *
  *   * security.config
  *   * security.acl
@@ -48,7 +51,7 @@ class MainConfiguration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
@@ -58,14 +61,20 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
-                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->info('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
+                ->enumNode('session_fixation_strategy')
+                    ->values(array(SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE))
+                    ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
+                ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('strategy')->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)->end()
+                        ->enumNode('strategy')
+                            ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS))
+                            ->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)
+                        ->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
@@ -153,6 +162,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->cannotBeOverwritten()
                     ->prototype('array')
                         ->fixXmlConfig('ip')
+                        ->fixXmlConfig('method')
                         ->children()
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')
@@ -277,7 +287,7 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('anonymous')
                 ->canBeUnset()
                 ->children()
-                    ->scalarNode('key')->defaultValue(uniqid())->end()
+                    ->scalarNode('secret')->defaultValue(uniqid('', true))->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')

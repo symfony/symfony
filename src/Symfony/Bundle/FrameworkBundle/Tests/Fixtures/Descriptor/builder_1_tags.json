@@ -2,19 +2,27 @@
     "tag1": [
         {
             "class": "Full\\Qualified\\Class2",
-            "scope": "container",
             "public": false,
             "synthetic": true,
-            "file": "\/path\/to\/file"
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get"
         }
     ],
     "tag2": [
         {
             "class": "Full\\Qualified\\Class2",
-            "scope": "container",
             "public": false,
             "synthetic": true,
-            "file": "\/path\/to\/file"
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get"
         }
     ]
 }

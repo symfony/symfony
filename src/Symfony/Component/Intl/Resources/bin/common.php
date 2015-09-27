@@ -29,7 +29,7 @@ function strip_minor_versions($version)
 
 function centered($text)
 {
-    $padding = (int) ((LINE_WIDTH - strlen($text))/2);
+    $padding = (int) ((LINE_WIDTH - strlen($text)) / 2);
 
     return str_repeat(' ', $padding).$text;
 }
@@ -79,11 +79,11 @@ set_exception_handler(function (\Exception $exception) {
             echo "Caused by\n";
         }
 
-        echo get_class($cause).": ".$cause->getMessage()."\n";
+        echo get_class($cause).': '.$cause->getMessage()."\n";
         echo "\n";
-        echo $cause->getFile().":".$cause->getLine()."\n";
+        echo $cause->getFile().':'.$cause->getLine()."\n";
         foreach ($cause->getTrace() as $trace) {
-            echo $trace['file'].":".$trace['line']."\n";
+            echo $trace['file'].':'.$trace['line']."\n";
         }
         echo "\n";
 

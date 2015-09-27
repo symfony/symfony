@@ -17,13 +17,13 @@ namespace Symfony\Component\EventDispatcher;
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
- * @author  Fabien Potencier <fabien@symfony.com>
- * @author  Jordi Boggiano <j.boggiano@seld.be>
- * @author  Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  *
  * @api
  */
@@ -33,9 +33,7 @@ class EventDispatcher implements EventDispatcherInterface
     private $sorted = array();
 
     /**
-     * @see EventDispatcherInterface::dispatch
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -43,24 +41,27 @@ class EventDispatcher implements EventDispatcherInterface
             $event = new Event();
         }
 
-        $event->setDispatcher($this);
-        $event->setName($eventName);
-
-        if (!isset($this->listeners[$eventName])) {
-            return $event;
+        if ($listeners = $this->getListeners($eventName)) {
+            $this->doDispatch($listeners, $eventName, $event);
         }
-
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
 
         return $event;
     }
 
     /**
-     * @see EventDispatcherInterface::getListeners
+     * {@inheritdoc}
      */
-    public function getListeners($eventName = null)
+    public function getListeners($eventName = null, $withPriorities = false)
     {
+        if (true === $withPriorities) {
+            return $eventName ? $this->listeners[$eventName] : array_filter($this->listeners);
+        }
+
         if (null !== $eventName) {
+            if (!isset($this->listeners[$eventName])) {
+                return array();
+            }
+
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -68,7 +69,7 @@ class EventDispatcher implements EventDispatcherInterface
             return $this->sorted[$eventName];
         }
 
-        foreach (array_keys($this->listeners) as $eventName) {
+        foreach ($this->listeners as $eventName => $eventListeners) {
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -78,7 +79,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::hasListeners
+     * {@inheritdoc}
      */
     public function hasListeners($eventName = null)
     {
@@ -86,9 +87,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addListener
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -97,7 +96,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeListener
+     * {@inheritdoc}
      */
     public function removeListener($eventName, $listener)
     {
@@ -113,9 +112,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addSubscriber
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -133,7 +130,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeSubscriber
+     * {@inheritdoc}
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -177,9 +174,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $this->sorted[$eventName] = array();
 
-        if (isset($this->listeners[$eventName])) {
-            krsort($this->listeners[$eventName]);
-            $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
-        }
+        krsort($this->listeners[$eventName]);
+        $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
     }
 }

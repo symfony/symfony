@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 
 class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +20,8 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $list = new SimpleChoiceList(array('' => 'A', 0 => 'B', 1 => 'C'));
+        $list = new ArrayChoiceList(array('', 0, 'X'));
+
         $this->transformer = new ChoiceToValueTransformer($list);
     }
 
@@ -33,9 +34,8 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // more extensive test set can be found in FormUtilTest
-            array(0, '0'),
-            array(false, '0'),
-            array('', ''),
+            array('', '0'),
+            array(0, '1'),
         );
     }
 
@@ -52,9 +52,9 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
         return array(
             // values are expected to be valid choice keys already and stay
             // the same
-            array('0', 0),
-            array('', null),
-            array(null, null),
+            array('0', ''),
+            array('1', 0),
+            array('2', 'X'),
         );
     }
 

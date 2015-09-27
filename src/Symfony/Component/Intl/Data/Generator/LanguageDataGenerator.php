@@ -27,7 +27,7 @@ use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 class LanguageDataGenerator extends AbstractDataGenerator
 {
     /**
-     * Source: http://www-01.sil.org/iso639-3/codes.asp
+     * Source: http://www-01.sil.org/iso639-3/codes.asp.
      *
      * @var array
      */
@@ -84,7 +84,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
     );
 
     /**
-     * Collects all available language codes
+     * Collects all available language codes.
      *
      * @var string[]
      */

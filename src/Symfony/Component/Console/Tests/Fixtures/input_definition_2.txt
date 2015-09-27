@@ -1,2 +1,2 @@
 <comment>Arguments:</comment>
- <info>argument_name </info>
+  <info>argument_name</info>

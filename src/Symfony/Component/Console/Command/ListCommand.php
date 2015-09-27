@@ -68,10 +68,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('xml')) {
-            $input->setOption('format', 'xml');
-        }
-
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->getApplication(), array(
             'format' => $input->getOption('format'),
@@ -87,9 +83,8 @@ EOF
     {
         return new InputDefinition(array(
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
-            new InputOption('xml', null, InputOption::VALUE_NONE, 'To output list as XML'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output list in other formats', 'txt'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
         ));
     }
 }

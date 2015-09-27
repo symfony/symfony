@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 class SessionLogoutHandler implements LogoutHandlerInterface
 {
     /**
-     * Invalidate the current session
+     * Invalidate the current session.
      *
      * @param Request        $request
      * @param Response       $response

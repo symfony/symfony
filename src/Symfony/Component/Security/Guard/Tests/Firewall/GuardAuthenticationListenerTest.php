@@ -218,5 +218,6 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $this->event = null;
         $this->logger = null;
         $this->request = null;
+        $this->rememberMeServices = null;
     }
 }

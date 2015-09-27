@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T10:12:37Z
+
+All inherited methods are deprecated, except a few ones:
+
+- ``Iterator`` methods, because the iteration is not deprecated (even though I will probably use ``IteratorAggregate`` to implement it when removing the SplObjectStorage inheritance in 3.0)
+- ``count`` (we still want to implement ``Countable``)
+- ``Serializable`` methods, which are totally broken and so I submitted #15906 to 2.3 instead
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T09:58:26Z
+
+Should we now implement the desired interfaces explicitly so that we are aware of the fact that we need to ship custom implementations once we break the inheritance?
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-27T13:00:14Z
+
+@xabbuh the only interfaces we need at Traversable and Countable. And we will notice it when rewriting the implementation, because most tests of the crawler are relying on them anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-27T13:07:10Z
+
+Updated.
+
+Status: needs review

@@ -155,7 +155,8 @@ class Router extends BaseRouter implements WarmableInterface
 
             if (is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
-            } elseif ($acceptArrayParameters && is_array($resolved)) {
+            }
+            if ($acceptArrayParameters && is_array($resolved)) {
                 return implode('|', $resolved);
             }
 

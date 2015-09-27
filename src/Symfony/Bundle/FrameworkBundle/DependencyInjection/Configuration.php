@@ -264,6 +264,23 @@ class Configuration implements ConfigurationInterface
     private function addProfilerSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return 'file:' !== substr($v['dsn'], 0, 5); })
+                ->then(function ($v) {
+                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                    return $v;
+                })
+                ->ifTrue(function ($v) { return array_key_exists('username', $v); })
+                ->then(function ($v) {
+                    @trigger_error('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                    return $v;
+                })
+                ->ifTrue(function ($v) { return array_key_exists('password', $v); })
+                ->then(function ($v) {
+                    @trigger_error('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('profiler')
                     ->info('profiler configuration')

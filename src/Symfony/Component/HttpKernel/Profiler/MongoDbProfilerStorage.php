@@ -27,6 +27,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
+        @trigger_error('The '.__CLASS__.' class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
         $this->dsn = $dsn;
         $this->lifetime = (int) $lifetime;
     }

@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-08-13T07:47:45Z
+
+If I used a foreach loop instead of array_filter, I could improve the exception message and say 'Not enough arguments. "name" is missing.'. What do you think?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-08-13T08:15:27Z
+
+This broke tests in FrameworkBundle. Looking into this.
+
+---------------------------------------------------------------------------
+
+by nochso at 2015-08-13T17:56:25Z
+
+I had a look at the tests for HelpCommand:
+```
+1) Symfony\Component\Console\Tests\Command\HelpCommandTest::testExecuteForCommandAlias
+RuntimeException: Not enough arguments.
+
+2) Symfony\Component\Console\Tests\Command\HelpCommandTest::testExecuteForApplicationCommand
+RuntimeException: Not enough arguments.
+
+3) Symfony\Component\Console\Tests\Command\HelpCommandTest::testExecuteForApplicationCommandWithXmlOption
+RuntimeException: Not enough arguments.
+```
+
+`testExecuteForCommandAlias` specifically:
+
+What is passed as arguments:
+`array('command_name' => 'li')`
+
+HelpCommand has no required arguments:
+`new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),`
+
+`getArgumentRequiredCount()` returns 1
+
+However, the `command => 'help'` is missing which is the argument that's actually required. That's the default required argument for `Application` though, right?
+
+---------------------------------------------------------------------------
+
+by mheki at 2015-08-16T21:40:26Z
+
+I had a quick look at these failing tests as well. `command`  As you said @nochso adding `        $commandTester->execute(array('command' => 'help', 'command_name' => 'li'));` solves the problem with failing tests for the help command test. Normally it's been added here: https://github.com/mheki/symfony/blob/2.3/src/Symfony/Component/Console/Application.php#L176-176 when you pass either `--help` or `-h`
+As this PR checks also required arguments added during runtime, more difficult to fix is test for router match command as it uses `router:debug` internally and in order to make that test pass, the `command` argument should be injected here: https://github.com/mheki/symfony/blob/2.3/src/Symfony/Bundle/FrameworkBundle/Command/RouterMatchCommand.php#L83-83
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T06:51:43Z
+
+@jakzal Any news on this one? And to answer your question, I would indeed give more information in the error message if possible.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-14T09:43:39Z
+
+I added a better exception message: `Not enough arguments (missing: "name").`
+
+Solving the problem with failing command tests is a bit more complex.
+
+The `command` is a required argument added from the application's definition. It's usually omitted when command is tested with CommandTester or if the command is called directly (like in RouterMatchCommand indicated by @mheki).
+
+The previous version of `Input::validate()` worked becase it was only comparing number of arguments and there was usually at least one argument given.
+
+To fix this we need to either:
+* require the user to always pass the `command` argument
+* add the command in its run() method:
+
+    ```php
+        if ($input->hasArgument('command') && null === $input->getArgument('command')) {
+            $input->setArgument('command', $this->getName());
+        }
+    ```
+
+First solution would break lots of existing command tests, and the second doesn't seem like the right place (as the command argument is added by the application).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-15T08:12:01Z
+
+I went with option 2. Happy to receive feedback. Ping @symfony/deciders.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-16T09:15:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T20:24:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T10:21:16Z
+
+@jakzal Usually, when using the `CommandTester` class, the `command` argument should be added automatically when missing: https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Console/Tester/CommandTester.php#L60-65 Can't we just fix those lines to get rid of adding the argument in the `Console` class itself?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-27T11:05:11Z
+
+@xabbuh that's not gonna fix the case of calling commands directly, like here: https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bundle/FrameworkBundle/Command/RouterMatchCommand.php#L83-83
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T11:25:43Z
+
+Hm, indeed. :+1:
+
+Status: Reviewed

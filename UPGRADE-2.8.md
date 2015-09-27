@@ -170,7 +170,7 @@ Form
    }
    ```
 
-   If your extension has to be compatible with Symfony 2.3-2.8, use the 
+   If your extension has to be compatible with Symfony 2.3-2.8, use the
    following statement:
 
    ```php
@@ -332,66 +332,81 @@ DependencyInjection
 WebProfiler
 -----------
 
-The `profiler:import` and `profiler:export` commands have been deprecated and
-will be removed in 3.0.
+ * The `profiler:import` and `profiler:export` commands have been deprecated and
+   will be removed in 3.0.
 
-The web development toolbar has been completely redesigned. This update has
-introduced some changes in the HTML markup of the toolbar items.
+ * The web development toolbar has been completely redesigned. This update has
+   introduced some changes in the HTML markup of the toolbar items.
 
-Before:
+   Before:
 
-Information was wrapped with simple `<span>` elements:
+   Information was wrapped with simple `<span>` elements:
 
-```twig
-{% block toolbar %}
-    {% set icon %}
-        <span>
-            <svg ...></svg>
-            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
-        </span>
-    {% endset %}
-{% endblock %}
-```
+   ```twig
+   {% block toolbar %}
+       {% set icon %}
+           <span>
+               <svg ...></svg>
+               <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
+           </span>
+       {% endset %}
+   {% endblock %}
+   ```
 
-After:
+   After:
 
-Information is now semantically divided into values and labels according to
-the `class` attribute of each `<span>` element:
+   Information is now semantically divided into values and labels according to
+   the `class` attribute of each `<span>` element:
 
-```twig
-{% block toolbar %}
-    {% set icon %}
-        <svg ...></svg>
-        <span class="sf-toolbar-value">
-            {{ '%.1f'|format(collector.memory / 1024 / 1024) }}
-        </span>
-        <span class="sf-toolbar-label">MB</span>
-    {% endset %}
-{% endblock %}
-```
+   ```twig
+   {% block toolbar %}
+       {% set icon %}
+           <svg ...></svg>
+           <span class="sf-toolbar-value">
+               {{ '%.1f'|format(collector.memory / 1024 / 1024) }}
+           </span>
+           <span class="sf-toolbar-label">MB</span>
+       {% endset %}
+   {% endblock %}
+   ```
 
-Most of the blocks designed for the previous toolbar will still be displayed
-correctly. However, if you want to support both the old and the new toolbar,
-it's better to make use of the new `profiler_markup_version` variable passed
-to the toolbar templates:
+   Most of the blocks designed for the previous toolbar will still be displayed
+   correctly. However, if you want to support both the old and the new toolbar,
+   it's better to make use of the new `profiler_markup_version` variable passed
+   to the toolbar templates:
 
-```twig
-{% block toolbar %}
-    {% set profiler_markup_version = profiler_markup_version|default(1) %}
+   ```twig
+   {% block toolbar %}
+       {% set profiler_markup_version = profiler_markup_version|default(1) %}
 
-    {% set icon %}
-        {% if profiler_markup_version == 1 %}
+       {% set icon %}
+           {% if profiler_markup_version == 1 %}
 
-            {# code for the original toolbar #}
+               {# code for the original toolbar #}
 
-        {% else %}
+           {% else %}
 
-            {# code for the new toolbar (Symfony 2.8+) #}
+               {# code for the new toolbar (Symfony 2.8+) #}
 
-        {% endif %}
-    {% endset %}
-{% endblock %}
-```
+           {% endif %}
+       {% endset %}
+   {% endblock %}
+   ```
+
+ * All the profiler storages different than `FileProfilerStorage` have been
+   deprecated. The deprecated classes are:
+
+    - `Symfony\Component\HttpKernel\Profiler\BaseMemcacheProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\PdoProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage`
+
+   The alternative solution is to use the `FileProfilerStorage` or create your
+   own storage implementing the `ProfileStorageInterface`.
 
 FrameworkBundle
 ---------------
@@ -448,7 +463,7 @@ Config
 
  * The `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` method has been
    deprecated and will be removed in Symfony 3.0 because it assumes that resource
-   implementations are able to check themselves for freshness. 
+   implementations are able to check themselves for freshness.
 
    If you have custom resources that implement this method, change them to implement the
    `\Symfony\Component\Config\Resource\SelfCheckingResourceInterface` sub-interface instead
@@ -470,6 +485,6 @@ Config
    class MyCustomResource implements SelfCheckingResourceInterface { ... }
    ```
 
-   Additionally, if you have implemented cache validation strategies *using* `isFresh()` 
-   yourself, you should have a look at the new cache validation system based on 
+   Additionally, if you have implemented cache validation strategies *using* `isFresh()`
+   yourself, you should have a look at the new cache validation system based on
    `ResourceChecker`s.

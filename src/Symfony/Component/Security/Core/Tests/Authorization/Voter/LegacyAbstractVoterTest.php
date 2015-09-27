@@ -13,6 +13,16 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 
+class LegacyAbstractVoterTest extends AbstractVoterTest
+{
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->voter = new LegacyAbstractVoterTest_Voter();
+    }
+}
+
 class LegacyAbstractVoterTest_Voter extends AbstractVoter
 {
     protected function getSupportedClasses()
@@ -31,12 +41,3 @@ class LegacyAbstractVoterTest_Voter extends AbstractVoter
     }
 }
 
-class LegacyAbstractVoterTest extends AbstractVoterTest
-{
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->voter = new LegacyAbstractVoterTest_Voter();
-    }
-}

@@ -43,9 +43,9 @@ final class SecureRandom implements SecureRandomInterface
         $this->logger = $logger;
 
         // determine whether to use OpenSSL
-        if (!function_exists('openssl_random_pseudo_bytes')) {
+        if (!function_exists('random_bytes') && !function_exists('openssl_random_pseudo_bytes')) {
             if (null !== $this->logger) {
-                $this->logger->notice('It is recommended that you enable the "openssl" extension for random number generation.');
+                $this->logger->notice('It is recommended that you install the "paragonie/random_compat" library or enable the "openssl" extension for random number generation.');
             }
             $this->useOpenSsl = false;
         } else {
@@ -58,6 +58,10 @@ final class SecureRandom implements SecureRandomInterface
      */
     public function nextBytes($nbBytes)
     {
+        if (function_exists('random_bytes')) {
+            return random_bytes($nbBytes);
+        }
+
         // try OpenSSL
         if ($this->useOpenSsl) {
             $bytes = openssl_random_pseudo_bytes($nbBytes, $strong);

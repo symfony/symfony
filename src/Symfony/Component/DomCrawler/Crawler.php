@@ -325,6 +325,17 @@ class Crawler extends \SplObjectStorage
         }
     }
 
+    // Serializing and unserializing a crawler creates DOM objects in a corrupted state. DOM elements are not properly serializable.
+    public function unserialize($serialized)
+    {
+        throw new \BadMethodCallException('A Crawler cannot be serialized.');
+    }
+
+    public function serialize()
+    {
+        throw new \BadMethodCallException('A Crawler cannot be serialized.');
+    }
+
     /**
      * Returns a node given its position in the node list.
      *

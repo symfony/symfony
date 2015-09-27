@@ -441,7 +441,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
-            $this->assertSame(array('foo3', 'foo1', 'foo'), $e->getAlternatives());
+            $this->assertCount(3, $e->getAlternatives());
+            $this->assertContains('foo', $e->getAlternatives());
+            $this->assertContains('foo1', $e->getAlternatives());
+            $this->assertContains('foo3', $e->getAlternatives());
             $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative');
             $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo"');
             $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo1"');

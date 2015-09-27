@@ -17,52 +17,68 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 {
-    protected $voter;
     protected $object;
     protected $token;
 
     protected function setUp()
     {
-        $this->voter = new AbstractVoterTest_Voter();
         $this->object = $this->getMock('AbstractVoterTest_Object');
         $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
     }
 
-    public function testAttributeAndClassSupported()
+    public function getTests()
     {
-        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('EDIT')), 'ACCESS_GRANTED if attribute grants access');
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('CREATE')), 'ACESS_DENIED if attribute denies access');
+        $object = $this->getMock('AbstractVoterTest_Object');
+
+        return array(
+            array(array('EDIT'), VoterInterface::ACCESS_GRANTED, $object, 'ACCESS_GRANTED if attribute and class are supported and attribute grants access'),
+            array(array('CREATE'), VoterInterface::ACCESS_DENIED, $object, 'ACCESS_DENIED if attribute and class are supported and attribute does not grant access'),
+
+            array(array('DELETE', 'EDIT'), VoterInterface::ACCESS_GRANTED, $object, 'ACCESS_GRANTED if one attribute is supported and grants access'),
+            array(array('DELETE', 'CREATE'), VoterInterface::ACCESS_DENIED, $object, 'ACCESS_DENIED if one attribute is supported and denies access'),
+
+            array(array('CREATE', 'EDIT'), VoterInterface::ACCESS_GRANTED, $object, 'ACCESS_GRANTED if one attribute grants access'),
+
+            array(array('DELETE'), VoterInterface::ACCESS_ABSTAIN, $object, 'ACCESS_ABSTAIN if no attribute is supported'),
+
+            array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, $this->getMock('AbstractVoterTest_Object1'), 'ACCESS_ABSTAIN if class is not supported'),
+
+            array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, null, 'ACCESS_ABSTAIN if object is null'),
+
+            array(array(), VoterInterface::ACCESS_ABSTAIN, $object, 'ACCESS_ABSTAIN if no attributes were provided'),
+        );
     }
 
-    public function testOneAttributeSupported()
+    /**
+     * @dataProvider getTests
+     */
+    public function testVote(array $attributes, $expectedVote, $object, $message)
     {
-        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('DELETE', 'EDIT')), 'ACCESS_GRANTED if supported attribute grants access');
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $this->voter->vote($this->token, $this->object, array('DELETE', 'CREATE')), 'ACCESS_DENIED if supported attribute denies access');
+        $voter = new AbstractVoterTest_Voter();
+
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
-    public function testOneAttributeGrantsAccess()
+    /**
+     * @dataProvider getTests
+     * @group legacy
+     */
+    public function testVoteLegacy(array $attributes, $expectedVote, $object, $message)
     {
-        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $this->voter->vote($this->token, $this->object, array('CREATE', 'EDIT')), 'ACCESS_GRANTED');
+        $voter = new AbstractVoterTest_LegacyVoter();
+
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 
-    public function testNoAttributeSupported()
+    /**
+     * @group legacy
+     * @expectedException \BadMethodCallException
+     */
+    public function testNoOverriddenMethodsThrowsException()
     {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->object, array('DELETE')), 'ACCESS_ABSTAIN');
-    }
+        $voter = new AbstractVoterTest_NothingImplementedVoter();
 
-    public function testClassNotSupported()
-    {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->getMock('AbstractVoterTest_Object1'), array('EDIT')), 'ACCESS_ABSTAIN');
-    }
-
-    public function testNullObject()
-    {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, null, array('EDIT')), 'ACCESS_ABSTAIN');
-    }
-
-    public function testNoAttributes()
-    {
-        $this->assertEquals(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($this->token, $this->object, array()), 'ACCESS_ABSTAIN');
+        $voter->vote($this->token, $this->object, array('EDIT'));
     }
 }
 
@@ -78,4 +94,37 @@ class AbstractVoterTest_Voter extends AbstractVoter
         return $this->isClassInstanceOf($class, 'AbstractVoterTest_Object')
             && in_array($attribute, array('EDIT', 'CREATE'));
     }
+}
+
+class AbstractVoterTest_LegacyVoter extends AbstractVoter
+{
+    protected function getSupportedClasses()
+    {
+        return array('AbstractVoterTest_Object');
+    }
+
+    protected function getSupportedAttributes()
+    {
+        return array('EDIT', 'CREATE');
+    }
+
+    protected function isGranted($attribute, $object, $user = null)
+    {
+        return 'EDIT' === $attribute;
+    }
+}
+
+class AbstractVoterTest_NothingImplementedVoter extends AbstractVoter
+{
+    protected function getSupportedClasses()
+    {
+        return array('AbstractVoterTest_Object');
+    }
+
+    protected function getSupportedAttributes()
+    {
+        return array('EDIT', 'CREATE');
+    }
+
+    // this is a bad voter that hasn't overridden isGranted or voteOnAttribute
 }

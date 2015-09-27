@@ -70,12 +70,6 @@ abstract class AbstractVoter implements VoterInterface
         $vote = self::ACCESS_ABSTAIN;
         $class = get_class($object);
 
-        $reflector = new \ReflectionMethod($this, 'voteOnAttribute');
-        $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter';
-        if (!$isNewOverwritten) {
-            @trigger_error(sprintf("The AbstractVoter::isGranted method is deprecated since 2.8 and won't be called anymore in 3.0. Override voteOnAttribute() instead.", $reflector->class), E_USER_DEPRECATED);
-        }
-
         foreach ($attributes as $attribute) {
             if (!$this->supports($attribute, $class)) {
                 continue;
@@ -84,16 +78,9 @@ abstract class AbstractVoter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($isNewOverwritten) {
-                if ($this->voteOnAttribute($attribute, $object, $token)) {
-                    // grant access as soon as at least one voter returns a positive response
-                    return self::ACCESS_GRANTED;
-                }
-            } else {
-                if ($this->isGranted($attribute, $object, $token->getUser())) {
-                    // grant access as soon as at least one voter returns a positive response
-                    return self::ACCESS_GRANTED;
-                }
+            if ($this->voteOnAttribute($attribute, $object, $token)) {
+                // grant access as soon as at least one voter returns a positive response
+                return self::ACCESS_GRANTED;
             }
         }
 
@@ -191,7 +178,8 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function isGranted($attribute, $object, $user = null)
     {
-        return false;
+        // forces isGranted() or voteOnAttribute() to be overridden
+        throw new \BadMethodCallException(sprintf('You must override the voteOnAttribute() method in "%s".', get_class($this)));
     }
 
     /**
@@ -211,6 +199,9 @@ abstract class AbstractVoter implements VoterInterface
      */
     protected function voteOnAttribute($attribute, $object, TokenInterface $token)
     {
-        return false;
+        // the user should override this method, and not rely on the deprecated isGranted()
+        @trigger_error(sprintf("The AbstractVoter::isGranted() method is deprecated since 2.8 and won't be called anymore in 3.0. Override voteOnAttribute() in %s instead.", get_class($this)), E_USER_DEPRECATED);
+
+        return $this->isGranted($attribute, $object, $token->getUser());
     }
 }

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T11:59:52Z
+
+Note that Mintty is used in Cygwin, so this would mean that Cygwin users get colored output for free now, without the need to use a second tool handling colors just to make the color support detected (or to pass ``--ansi`` explicitly all the time)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T09:13:19Z
+
+Sounds like a bug to me, should be merged in 2.3 instead.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T09:52:37Z
+
+:+1: (also to merge this into the `2.3` branch)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T09:52:52Z
+
+Status: Reviewed

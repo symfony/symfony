@@ -94,12 +94,23 @@ class InputTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \RuntimeException
-     * @expectedExceptionMessage Not enough arguments.
+     * @expectedExceptionMessage Not enough arguments (missing: "name").
      */
     public function testValidateWithMissingArguments()
     {
         $input = new ArrayInput(array());
         $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
+        $input->validate();
+    }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Not enough arguments (missing: "name").
+     */
+    public function testValidateWithMissingRequiredArguments()
+    {
+        $input = new ArrayInput(array('bar' => 'baz'));
+        $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED), new InputArgument('bar', InputArgument::OPTIONAL))));
         $input->validate();
     }
 

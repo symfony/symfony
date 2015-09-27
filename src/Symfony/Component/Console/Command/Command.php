@@ -241,6 +241,13 @@ class Command
             $this->interact($input, $output);
         }
 
+        // The command name argument is often omitted when a command is executed directly with its run() method.
+        // It would fail the validation if we didn't make sure the command argument is present,
+        // since it's required by the application.
+        if ($input->hasArgument('command') && null === $input->getArgument('command')) {
+            $input->setArgument('command', $this->getName());
+        }
+
         $input->validate();
 
         if ($this->code) {

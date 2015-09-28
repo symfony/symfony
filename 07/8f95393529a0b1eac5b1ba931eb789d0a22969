@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:02:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-14T09:53:37Z
+
+This needs to be rebased on top of the new profiler.
+
+but otherwise, :+1:
+
+status: reviewed
+
+---------------------------------------------------------------------------
+
+by jbafford at 2015-09-15T20:20:04Z
+
+It appears the View Latest button got removed altogether at some point with the new profiler. This rebase re-adds it.
+
+Because there's limited space to fit the buttons, I've made the following changes:
+* s/Latest profiles/Last 10/
+* s/View Latest/Latest/
+* Changed the left/right padding on the buttons from .75em to .5em
+
+These changes allow the buttons to fit on one line, since it looks pretty bad if they're split on multiple lines, but it's still a pretty tight fit.
+
+Unfortunately, other changes to the new profiler break the original problem I was trying to resolve (specifically: reloading the logs page with the current filter still selected), but this is still better than what we had before.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-15T20:27:04Z
+
+@jbafford the "View Latest" button is displayed in the new profiler. Just tested:
+
+![view-latest](https://cloud.githubusercontent.com/assets/73419/9889066/de513be0-5bf8-11e5-8dfa-0443fc66f2bf.gif)
+
+---------------------------------------------------------------------------
+
+by jbafford at 2015-09-15T20:32:51Z
+
+@javiereguiluz In an earlier 2.8 commit, there was actually two buttons: one to view the list of the last ten, but also a button that was added that showed the current profiler page on the latest request (so that you didn't have to click last 10, click the most recent, and then click back to your current profiler page). The second button got removed at some point when the new profiler UI was added.
+
+To be clear, I'm referring to the button added in #14264.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-16T06:24:56Z
+
+@jbafford I think we should still get rid of this button ... and add it as a link in the "Symfony Profiler" page heading. "Going back to home" is the behaviour that people expect when clicking on the website heading.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T09:14:23Z
+
+We need a decision here. I trust @javiereguiluz about these kind of things, but if anyone want to give their 2c, please do so now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T09:52:36Z
+
+After rethinking about this, I think I was wrong. Putting this link in the `<h1>` element does not make sense because a request can have sub-request and then the navigation flow is not correct.
+
+@jbafford please do the following changes in `src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig` to be able to merge this:
+
+1) Revert the change that you made on the `padding` value of the `. btn` selector. It should be:
+
+```css
+.btn {
+    padding: .5em .75em;
+}
+```
+
+2) Change the `margin-left` value (which was `10px`) in this selector:
+
+```css
+#sidebar #sidebar-shortcuts .btn + .btn {
+    margin-left: 5px;
+}
+```
+
+3) Create this new rule to change the pading only for the shortcut buttons, not to the other buttons:
+
+```css
+#sidebar #sidebar-shortcuts .btn {
+    padding: .5em .6em;
+}
+```
+
+This is how it should look:
+
+![profiler-buttons](https://cloud.githubusercontent.com/assets/73419/10132575/64511e6c-65d7-11e5-8b1d-f54b60663a69.png)
+
+---------------------------------------------------------------------------
+
+by jbafford at 2015-09-28T13:24:45Z
+
+@javiereguiluz I've rebased against the current 2.8 and made the requested changes.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T13:33:03Z
+
+:+1: thanks @jbafford

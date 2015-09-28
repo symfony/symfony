@@ -95,13 +95,9 @@ class TextDescriptor extends Descriptor
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
 
-        if (isset($options['output_helper'])) {
-            $options['output_helper']->table($tableHeaders, $tableRows);
-        } else {
-            $table = new Table($this->getOutput());
-            $table->setHeaders($tableHeaders)->setRows($tableRows);
-            $table->render();
-        }
+        $table = new Table($this->getOutput());
+        $table->setHeaders($tableHeaders)->setRows($tableRows);
+        $table->render();
     }
 
     /**
@@ -183,7 +179,7 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $maxTags = array();
 
-        foreach ($serviceIds as $key =>  $serviceId) {
+        foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
                 // filter out private services unless shown explicitly
@@ -221,7 +217,7 @@ class TextDescriptor extends Descriptor
                     foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = array();
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
                         }
                         if (0 === $key) {
                             $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getClass())));
@@ -234,10 +230,10 @@ class TextDescriptor extends Descriptor
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             } else {
                 // we have no information (happens with "service_container")
-                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             }
         }
 
@@ -254,7 +250,7 @@ class TextDescriptor extends Descriptor
             : array();
 
         $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
-        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
+        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: '-');
 
         $tags = $definition->getTags();
         if (count($tags)) {

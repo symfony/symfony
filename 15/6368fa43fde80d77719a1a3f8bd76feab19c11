@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T15:45:42Z
+
+I've just made all the suggested changes. To avoid having the static method call, I've made the `$message` constructor be the safe message. I think this is still safe because I've renamed the class to highlight that you're passing in a safe message. We could *not* override the constructor and force the setter to be called to - it's just a little less convenient.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T15:58:04Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T16:03:36Z
+
+Updated!
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T17:01:19Z
+
+@WouterJ check it out now - I just simplified things - I think this makes more sense.

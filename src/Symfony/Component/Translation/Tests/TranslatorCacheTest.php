@@ -288,10 +288,6 @@ class StaleResource implements SelfCheckingResourceInterface
         return false;
     }
 
-    public function getResource()
-    {
-    }
-
     public function __toString()
     {
         return '';

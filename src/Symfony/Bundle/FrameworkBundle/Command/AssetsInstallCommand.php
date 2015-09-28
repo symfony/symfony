@@ -134,9 +134,9 @@ EOT
             }
         }
 
-        if (false && !$useSymlinks) {
+        if (!$useSymlinks) {
             $output->success('Assets were installed as hard copies.');
-        } elseif (true || ($useSymlinks && !$symlinksSupported)) {
+        } elseif ($useSymlinks && !$symlinksSupported) {
             $output->warning('Assets were installed as hard copies because your system does not support symlinks.');
         } else {
             $output->success('Assets were installed as symlinks.');

@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/css-selector": "~2.3|~3.0.0"
+        "symfony/css-selector": "~2.8|~3.0.0"
     },
     "suggest": {
         "symfony/css-selector": ""

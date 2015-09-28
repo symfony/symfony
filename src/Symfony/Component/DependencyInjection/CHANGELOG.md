@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed all deprecated codes from 2.x versions
+ * removed ContainerAware class in favor of ContainerAwareInterface + ContainerAwareTrait
 
 2.8.0
 -----

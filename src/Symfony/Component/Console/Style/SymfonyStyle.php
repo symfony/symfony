@@ -150,13 +150,31 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependText();
 
         if (!is_array($message)) {
-            $this->writeln(sprintf(' // %s', $message));
+            $this->writeln(sprintf(' %s', $message));
 
             return;
         }
 
         foreach ($message as $element) {
             $this->text($element);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function comment($message)
+    {
+        $this->autoPrependText();
+
+        if (!is_array($message)) {
+            $this->writeln(sprintf(' // %s', $message));
+
+            return;
+        }
+
+        foreach ($message as $element) {
+            $this->comment($element);
         }
     }
 

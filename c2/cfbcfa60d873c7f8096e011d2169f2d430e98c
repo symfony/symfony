@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-31T13:42:39Z
+
+Nice work! Let me know if you need help with any. Perhaps a checklist would be useful.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-31T14:20:59Z
+
+@kbond here it is the checklist #14138
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-08T14:00:08Z
+
+@javiereguiluz the screenshots show a `requirement: _method: DELETE` but actually that requirement should be ignored. According to the code it should already be removed, maybe it's just that the screenshots are not current?
+Otherwise looks good to me :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:31:19Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T13:46:05Z
+
+I've updated this PR to remove the unneeded option pointed by @Tobion.

@@ -26,13 +26,15 @@
         "symfony/translation": "~2.0,>=2.0.5|~3.0.0",
         "symfony/validator": "~2.5,>=2.5.5|~3.0.0",
         "psr/log": "~1.0",
-        "ircmaxell/password-compat": "1.0.*"
+        "ircmaxell/password-compat": "1.0.*",
+        "symfony/ldap": "~2.8|~3.0.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
         "symfony/validator": "For using the user password constraint",
         "symfony/expression-language": "For using the expression voter",
+        "symfony/ldap": "For using LDAP integration",
         "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
     },
     "autoload": {

@@ -38,7 +38,8 @@
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",
         "ircmaxell/password-compat": "~1.0",
-        "symfony/expression-language": "~2.6|~3.0.0"
+        "symfony/expression-language": "~2.6|~3.0.0",
+        "symfony/ldap": "~2.8|~3.0.0"
     },
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",
@@ -48,7 +49,8 @@
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",
         "symfony/expression-language": "For using the expression voter",
         "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5",
-        "paragonie/random_compat": ""
+        "paragonie/random_compat": "",
+        "symfony/ldap": "For using the LDAP user and authentication providers"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\": "" }

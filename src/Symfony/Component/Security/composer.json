@@ -47,7 +47,7 @@
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",
         "doctrine/dbal": "For using the built-in ACL implementation",
         "symfony/expression-language": "For using the expression voter",
-        "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
+        "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5",
         "paragonie/random_compat": ""
     },
     "autoload": {

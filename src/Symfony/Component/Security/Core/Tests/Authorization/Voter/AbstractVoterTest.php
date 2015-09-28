@@ -95,7 +95,7 @@ class AbstractVoterTest_LegacyVoter extends AbstractVoter
 {
     protected function getSupportedClasses()
     {
-        return array('AbstractVoterTest_Object');
+        return array('stdClass');
     }
 
     protected function getSupportedAttributes()
@@ -113,7 +113,7 @@ class AbstractVoterTest_NothingImplementedVoter extends AbstractVoter
 {
     protected function getSupportedClasses()
     {
-        return array('AbstractVoterTest_Object');
+        return array('stdClass');
     }
 
     protected function getSupportedAttributes()

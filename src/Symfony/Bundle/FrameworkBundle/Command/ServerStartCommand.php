@@ -118,7 +118,7 @@ EOF
         if (!$input->getOption('force') && $this->isOtherServerProcessRunning($address)) {
             $output->error(array(
                 sprintf('A process is already listening on http://%s.', $address),
-                'Use the --force option if the server process terminated unexpectedly to start a new web server process.'
+                'Use the --force option if the server process terminated unexpectedly to start a new web server process.',
             ));
 
             return 1;
@@ -178,9 +178,9 @@ EOF
      * Determine the absolute file path for the router script, using the environment to choose a standard script
      * if no custom router script is specified.
      *
-     * @param string|null     $router File path of the custom router script, if set by the user; otherwise null
-     * @param string          $env    The application environment
-     * @param SymfonyStyle    $output An SymfonyStyle instance
+     * @param string|null  $router File path of the custom router script, if set by the user; otherwise null
+     * @param string       $env    The application environment
+     * @param SymfonyStyle $output An SymfonyStyle instance
      *
      * @return string|bool The absolute file path of the router script, or false on failure
      */
@@ -206,10 +206,10 @@ EOF
     /**
      * Creates a process to start PHP's built-in web server.
      *
-     * @param SymfonyStyle    $output       A SymfonyStyle instance
-     * @param string          $address      IP address and port to listen to
-     * @param string          $documentRoot The application's document root
-     * @param string          $router       The router filename
+     * @param SymfonyStyle $output       A SymfonyStyle instance
+     * @param string       $address      IP address and port to listen to
+     * @param string       $documentRoot The application's document root
+     * @param string       $router       The router filename
      *
      * @return Process The process
      */

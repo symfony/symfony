@@ -116,7 +116,7 @@ EOF
             $output->error('Running PHP built-in server in production environment is NOT recommended!');
         }
 
-        $output->success(sprintf("Server running on http://%s", $address));
+        $output->success(sprintf('Server running on http://%s', $address));
         $output->comment('Quit the server with CONTROL-C.');
 
         if (null === $builder = $this->createPhpProcessBuilder($output, $address, $input->getOption('router'), $env)) {

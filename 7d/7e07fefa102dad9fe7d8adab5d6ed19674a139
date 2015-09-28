@@ -1,0 +1,264 @@
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-05-11T10:46:38Z
+
+@jakzal You can also add the `Feature` label, by the way, as it is a new feature! :)
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-07-03T09:01:48Z
+
+Ok. I'm running into an issue: Should LDAP classes be in `Symfony\Component\Security\Core`, or in their own namespace? Currently, that's the only thing preventing the tests from passing.
+
+Any advice on this, @weaverryan, @stof, @iltar?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-03T09:10:47Z
+
+If the LDAP connection and such is generic enough, it might not belong in the Security component at all.
+
+I'm still not satisfied with how this is going to be configured though, fetching your user from LDAP should be nothing more than changing your user provider. This will make it possible to use it with _any_ authentication provider.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-07-03T09:37:44Z
+
+It's already the case. Two things are implemented in this PR:
+
+* A user provider
+* An authentication provider
+
+Each of them are independent from each other. This means that you can fetch your users from your LDAP server, while checking their password as you would normally (should your LDAP provide the password hash), using ANY authentication provider. But in this case, you won't check the user's password using `ldap_bind()`.
+
+If you wish to check the user's password against an LDAP server, then you use the authentication provider. This provider lets you use any user provider, while checking the user's password against an LDAP server.
+
+This is the case because of Symfony's security component suffers from a limitation, which is that the password check mechanism is directly implemented inside the authentication providers. And I don't want to adress two things in a single PR.
+
+First, LDAP support. Second, refactor the security component, to separate the password check from the authentication providers.
+
+If you feel that this is really needed *now*, I'll separate this PR into two different PRs:
+
+* A PR to add an LDAP component, as well as the LDAP user provider (without support for `ldap_bind()`, as this means that the user provider needs to be aware of the password, which is a no go)
+* A PR to separate the password check logic from *all* authentication providers, and implement the LDAP password check mechanism as a password checker.
+
+What do you think about this?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-03T09:48:31Z
+
+The user providers meant to merely provide a user to authenticate, when you fetch the user, it contains a password. This authentication is method is fine and the password check IMO as well as not every provider needs a password. To verify if the user is correct, you simply verify the password with the encoding strategy selected by the configuration, which will be "plain" most likely.
+
+You're correct that it's absolutely not desired to store the password (plain) in the user as this is very risky. There's a solution for this, you'll have to implement the [`eraseCredentials()`](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Security/Core/User/User.php#L117) method in your user.
+
+If you need to call another method, you can always listen to an event that's fired when the login was successful and bind there.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2015-07-03T09:57:43Z
+
+Except LDAP auth doesn't work like this. Most of the time you don't have access to the user password, instead you connect to the server with the user credential and check if the login attempt succeeded or not.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-07-03T11:54:34Z
+
+Ping @fabpot Should we have an LDAP component?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-03T11:57:05Z
+
+@csarrazi If the classes are useful by themselves and are not trivial, I would say yes.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-07-03T12:06:54Z
+
+Ok. This would indeed resolve part of the issue, which would let us add the component in the `require-dev` section of composer.json, fixing the test issue.
+
+The class is not trivial by itself, as it provides a shim for `ldap_escape`, by back-porting the function from PHP 5.5 (otherwise, it would have meant bumping the PHP version to 5.5 in 2.8, which is a no-go). As the version requirement for Symfony 3.0 is 5.5.0, I will also add a deprecation notice in the class.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-09-23T09:00:11Z
+
+@iltar
+
+> I'm still not satisfied with how this is going to be configured though, fetching your user from LDAP should be nothing more than changing your user provider. This will make it possible to use it with any authentication provider.
+
+Did you already work with LDAP ? Because it looks like it's not the case. Symfony Security default workflow does not work with LDAP Authentication workflow.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-23T09:04:41Z
+
+@lyrixx I have worked with LDAP (and different ldap bundles), but I'm also looking from a DX point of view. There should be enough extension points to solve this while leaving it 'configurable' by the developer.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-23T09:26:13Z
+
+There are two different concerns here:
+
+* Fetching a user from the LDAP (which is the responsibility of the user provider)
+* Validating a user's credentials against the LDAP (which is the responsibility of the authentication provider)
+
+These are two different things, and this PR works with any combination of these use cases:
+
+* Authenticating using `ldap_bind` and fetching users from another storage (Database, for example).
+* Authenticating using `ldap_bind` and fetching users from an LDAP server.
+* Authenticating using password comparison and fetching users from another storage (Database, for example).
+* Authenticating using password comparison and fetching users from an LDAP server.
+
+As mentioned earlier, these are all different use cases.
+
+You may want to authenticate against your LDAP server, while fetching users from a database. Just like you would, if you wanted to fetch users from a local database, while validating the user's credentials from an OAuth 2.0 identity provider.
+
+Or you may want to fetch your users from an LDAP server. In this case, you can check the user's credentials using one of two strategies:
+
+* Comparing the user's password (from the LDAP user provider) against the information provided in the request (if using http-basic or a login form).
+* Binding the user's credentials (directly from the request's info) against an LDAP server.
+
+Like mentioned earlier, if we want to avoid duplication (and duplicating the authentication providers), we would need to separate the authentication check logic from the authentication provider (http-basic, etc.), so we can use different authentication check types, with a single authentication scheme (http-basic, login form, etc.).
+
+However, we need to think a bit more about this, as it would probably induce BC with the `2.x` branch of Symfony.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-09-23T15:12:20Z
+
+Does someone know how to setup travis + a ldap server ?
+I see [this](https://github.com/github/github-ldap/blob/master/.travis.yml) but it's not really easy
+
+---------------------------------------------------------------------------
+
+by amenophis at 2015-09-23T15:14:36Z
+
+@lyrixx maybe use a Saas Solution like https://jumpcloud.com ?
+It's free for 10 users.
+
+---------------------------------------------------------------------------
+
+by c33s at 2015-09-23T15:57:00Z
+
+there also exists a public free ldap test server http://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-09-24T08:21:20Z
+
+I have another question; Why do you force user to create the definition of a new service (ldap), then the user have to reference it in the configuration? You could expose a new configuration entry (`ldap_dsn` or something similar)?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-24T08:27:02Z
+
+It depends on the use case. Your LDAP connection may be used for
+
+* Authentication
+* Retrieving a user
+
+If you wish to use both at the same time, then you should use the name of the service to do so.
+Another thing which could be done is adding a `framework.ldap` configuration key in FrameworkBundle, to configure the LDAP server.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-09-24T08:28:05Z
+
+Yes, I though to the same same. But for simple use case, it's not "damn easy" ;)
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-24T10:15:26Z
+
+I do agree. What we could do is make the authentication provider and user provider use a default `ldap` service.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-24T10:15:55Z
+
+ And if you wish to have multiple, different ldap providers, you could override this in the provider.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:27:11Z
+
+@csarrazi LGTM (we then have 2 months to tweak as needed). Can you rebase and fix the tests?
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:38:15Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-24T11:51:42Z
+
+We just removed ACL from the core, so I'm not sure we really want to add LDAP to the core. Why not provide it via a bundle?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:54:42Z
+
+I don't think ACL and LDAP are related in any way. ACL were not supported anymore by anyone and depended on Doctrine heavily.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T11:57:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-24T18:21:28Z
+
+@fabpot The tests have been fixed, and the PR rebased. The tests which fail are not related to this PR.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-24T19:27:47Z
+
+Added the "Community" authors, and squashed everything into a single commit.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-25T09:35:31Z
+
+Separated into two commits. One for the LDAP component, another one for the implementation in the Security component.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-09-25T12:55:58Z
+
+:+1:
+
+@csarrazi could you remove `[WIP]` from the PR title?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-26T09:23:15Z
+
+Ping @fabpot @Tobion @dunglas
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-26T18:14:42Z
+
+Tests seem okay. However, some unrelated tests seem to break randomly on travis and/or appveyor.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T09:33:22Z
+
+Sorry about that but it looks like a rebase is needed.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-09-28T10:07:34Z
+
+No problem! I'll also include @lyrixx 's changes regarding the `setUp()` method and the test skipping when the `ldap` extension is not installed.

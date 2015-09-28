@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -53,6 +54,9 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $outputIsVerbose = $output->isVerbose();
+        $output = new SymfonyStyle($input, $output);
+
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         $oldCacheDir = $realCacheDir.'_old';
         $filesystem = $this->getContainer()->get('filesystem');
@@ -66,7 +70,7 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $output->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
@@ -78,14 +82,14 @@ EOF
             $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
-                if ($output->isVerbose()) {
-                    $output->writeln('  Clearing outdated warmup directory');
+                if ($outputIsVerbose) {
+                    $output->comment('Clearing outdated warmup directory...');
                 }
                 $filesystem->remove($warmupDir);
             }
 
-            if ($output->isVerbose()) {
-                $output->writeln('  Warming up cache');
+            if ($outputIsVerbose) {
+                $output->comment('Warming up cache...');
             }
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
@@ -96,15 +100,17 @@ EOF
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 
-        if ($output->isVerbose()) {
-            $output->writeln('  Removing old cache directory');
+        if ($outputIsVerbose) {
+            $output->comment('Removing old cache directory...');
         }
 
         $filesystem->remove($oldCacheDir);
 
-        if ($output->isVerbose()) {
-            $output->writeln('  Done');
+        if ($outputIsVerbose) {
+            $output->comment('Finished');
         }
+
+        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was succesfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
     /**

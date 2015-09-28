@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Finder\Finder;
 
@@ -68,6 +69,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
@@ -81,23 +83,18 @@ EOT
         $filesystem->mkdir($bundlesDir, 0777);
 
         // relative implies symlink
-        $symlink = $input->getOption('symlink') || $input->getOption('relative');
-
-        if ($symlink) {
-            $output->writeln('Trying to install assets as <comment>symbolic links</comment>.');
-        } else {
-            $output->writeln('Installing assets as <comment>hard copies</comment>.');
-        }
+        $useSymlinks = $input->getOption('symlink') || $input->getOption('relative');
+        $symlinksSupported = false;
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
-                $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
+                $output->text(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
 
                 $filesystem->remove($targetDir);
 
-                if ($symlink) {
+                if ($useSymlinks) {
                     if ($input->getOption('relative')) {
                         $relativeOriginDir = $filesystem->makePathRelative($originDir, realpath($bundlesDir));
                     } else {
@@ -109,11 +106,12 @@ EOT
                         if (!file_exists($targetDir)) {
                             throw new IOException('Symbolic link is broken');
                         }
-                        $output->writeln('The assets were installed using symbolic links.');
+                        $output->comment('The assets were installed using symbolic links.');
+                        $symlinksSupported = true;
                     } catch (IOException $e) {
                         if (!$input->getOption('relative')) {
                             $this->hardCopy($originDir, $targetDir);
-                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                            $output->comment('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
                         }
 
                         // try again without the relative option
@@ -122,16 +120,26 @@ EOT
                             if (!file_exists($targetDir)) {
                                 throw new IOException('Symbolic link is broken');
                             }
-                            $output->writeln('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
+                            $output->comment('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
                         } catch (IOException $e) {
                             $this->hardCopy($originDir, $targetDir);
-                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                            $output->comment('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
                         }
                     }
+
+                    $output->newLine();
                 } else {
                     $this->hardCopy($originDir, $targetDir);
                 }
             }
+        }
+
+        if (!$useSymlinks) {
+            $output->success('Assets were installed as hard copies.');
+        } elseif ($useSymlinks && !$symlinksSupported) {
+            $output->warning('Assets were installed as hard copies because your system does not support symlinks.');
+        } else {
+            $output->success('Assets were installed as symlinks.');
         }
     }
 

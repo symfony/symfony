@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T13:44:34Z
+
+LGTM. Do we add a command for the CLI to purge the profiles? Or is `cache:clear` enough (which does not purge profiles if one use a non-based filesystem profile storage)? ... which leads to my next question: do we really need several storages for profiles? Looks like keeping only the filesystem one is more than enough. Thoughts?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-27T13:59:14Z
+
+My opinion:
+
+  * Don't provide any command (`cache:clear` is enough)
+  * Remove all storages except the filesystem one
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T14:24:38Z
+
+@javiereguiluz Let's do it. Can you create a PR that deprecates all storages but the filesystem one? I think we can still keep the interface just in case.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-27T14:58:59Z
+
+Done in #15944.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T10:40:03Z
+
+:+1:

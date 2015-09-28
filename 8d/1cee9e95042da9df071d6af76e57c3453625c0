@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T19:24:07Z
+
+shouldn't it also be removed from implementations ? Or are the existing resources needing it ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-26T19:25:37Z
+
+Some tests rely on it and I don't know if users do.
+
+It only does not make sense at the *interface* level because different implementations returned different types of values.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T01:15:13Z
+
+When the implementations are kept, the documentation would need to be updated. They use `inheritdoc` at the moment which doesn't work anymore.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T01:18:05Z
+
+Several resources used for tests also implement getResource for no reason anymore.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-27T12:58:36Z
+
+this branch needs to be rebased too, as it conflicts with the current state
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-27T14:40:25Z
+
+Rebased, cleaned up and fixed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T14:54:02Z
+
+Why does DirectoryResource not call `realpath` but FileResource does, seems like a bug as well.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-27T14:59:05Z
+
+I don't know why `DirectoryResource` does not do that, and I also don't know what users expect from it. What I *do* know is that for `ConfigCache` we don't care :-).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T16:10:33Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T16:13:57Z
+
+Created #15946 for the remainder

@@ -303,6 +303,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
+            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

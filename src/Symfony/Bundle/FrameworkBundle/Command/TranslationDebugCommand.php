@@ -104,6 +104,8 @@ EOF
         /** @var Kernel $kernel */
         $kernel = $this->getContainer()->get('kernel');
 
+        $output->title('Translation Messages Debugger');
+
         // Define Root Path to App folder
         $transPaths = array($kernel->getRootDir().'/Resources/');
 
@@ -207,15 +209,15 @@ EOF
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<error>missing</error>';
+            return '<error> missing </error>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<comment>unused</comment>';
+            return '<comment> unused </comment>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<info>fallback</info>';
+            return '<info> fallback </info>';
         }
 
         return $state;
@@ -233,7 +235,7 @@ EOF
 
     private function formatId($id)
     {
-        return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
+        return sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
     private function sanitizeString($string, $length = 40)

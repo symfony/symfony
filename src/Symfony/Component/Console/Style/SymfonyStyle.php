@@ -110,7 +110,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ));
         $this->newLine();
     }
@@ -123,7 +123,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('-', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('-', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ));
         $this->newLine();
     }
@@ -149,14 +149,22 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        if (!is_array($message)) {
-            $this->writeln(sprintf(' // %s', $message));
-
-            return;
+        $messages = is_array($message) ? array_values($message) : array($message);
+        foreach ($messages as $message) {
+             $this->writeln(sprintf(' %s', $message));
         }
+    }
 
-        foreach ($message as $element) {
-            $this->text($element);
+    /**
+     * {@inheritdoc}
+     */
+    public function comment($message)
+    {
+        $this->autoPrependText();
+
+        $messages = is_array($message) ? array_values($message) : array($message);
+        foreach ($messages as $message) {
+             $this->writeln(sprintf(' // %s', $message));
         }
     }
 

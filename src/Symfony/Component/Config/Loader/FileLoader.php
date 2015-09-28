@@ -101,12 +101,9 @@ abstract class FileLoader extends Loader
 
             try {
                 $ret = $loader->load($resource, $type);
-            } catch (\Exception $e) {
+            } finally {
                 unset(self::$loading[$resource]);
-                throw $e;
             }
-
-            unset(self::$loading[$resource]);
 
             return $ret;
         } catch (FileLoaderImportCircularReferenceException $e) {

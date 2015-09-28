@@ -130,13 +130,9 @@ class DebugClassLoader
                 call_user_func($this->classLoader, $class);
                 $file = false;
             }
-        } catch (\Exception $e) {
+        } finally {
             ErrorHandler::unstackErrors();
-
-            throw $e;
         }
-
-        ErrorHandler::unstackErrors();
 
         $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 

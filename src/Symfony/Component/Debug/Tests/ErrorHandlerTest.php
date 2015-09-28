@@ -73,9 +73,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $this->fail('ContextErrorException expected');
         } catch (ContextErrorException $exception) {
             // if an exception is thrown, the test passed
-            restore_error_handler();
-            restore_exception_handler();
-
             $this->assertEquals(E_NOTICE, $exception->getSeverity());
             $this->assertEquals(__FILE__, $exception->getFile());
             $this->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
@@ -96,11 +93,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(__CLASS__, $trace[2]['class']);
             $this->assertEquals(__FUNCTION__, $trace[2]['function']);
             $this->assertEquals('->', $trace[2]['type']);
-        } catch (\Exception $e) {
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -118,14 +113,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $handler = ErrorHandler::register();
             $handler->throwAt(3, true);
             $this->assertEquals(3 | E_RECOVERABLE_ERROR | E_USER_ERROR, $handler->throwAt(0));
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -157,14 +147,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 E_CORE_ERROR => array(null, LogLevel::CRITICAL),
             );
             $this->assertSame($loggers, $handler->setLoggers(array()));
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -283,14 +268,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             }
 
             $this->assertSame($x, $e);
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -350,14 +330,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             });
 
             $handler->handleException($exception);
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -384,14 +359,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             @trigger_error('Silenced warning', E_USER_WARNING);
             $logger->log(LogLevel::WARNING, 'Dummy log');
             ErrorHandler::unstackErrors();
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 
@@ -513,14 +483,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             call_user_func_array(array($handler, 'handleError'), $error);
             $handler->handleFatalError($error);
-
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
         }
     }
 }

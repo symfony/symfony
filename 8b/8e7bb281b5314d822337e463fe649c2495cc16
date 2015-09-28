@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T15:56:32Z
+
+IMO it's enough to add the `UnusedTagsPass` only in debug mode.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T16:33:28Z
+
+Indeed, the pass is now only enabled on debug. That makes sense as the compile log is only dumped in debug mode anyway.
+
+Should be ready now.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T16:41:46Z
+
+:+1:
+
+Status: Reviewed

@@ -66,6 +66,8 @@ EOF
         $name = $input->getArgument('name');
 
         if (empty($name)) {
+            $output->comment('Provide the name of a bundle as the first argument of this command to dump its configuration.');
+            $output->newLine();
             $this->listBundles($output);
 
             return;
@@ -85,9 +87,9 @@ EOF
         $config = $processor->processConfiguration($configuration, $configs);
 
         if ($name === $extension->getAlias()) {
-            $output->writeln(sprintf('# Current configuration for extension with alias: "%s"', $name));
+            $output->title(sprintf('Current configuration for extension with alias "%s"', $name));
         } else {
-            $output->writeln(sprintf('# Current configuration for "%s"', $name));
+            $output->title(sprintf('Current configuration for "%s"', $name));
         }
 
         $output->writeln(Yaml::dump(array($extension->getAlias() => $config), 3));

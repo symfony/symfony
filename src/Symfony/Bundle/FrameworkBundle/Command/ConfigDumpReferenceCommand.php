@@ -71,6 +71,8 @@ EOF
         $name = $input->getArgument('name');
 
         if (empty($name)) {
+            $output->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration.');
+            $output->newLine();
             $this->listBundles($output);
 
             return;
@@ -83,18 +85,16 @@ EOF
         $this->validateConfiguration($extension, $configuration);
 
         if ($name === $extension->getAlias()) {
-            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
+            $output->title(sprintf('Default configuration for extension with alias: "%s"', $name));
         } else {
-            $message = sprintf('Default configuration for "%s"', $name);
+            $output->title(sprintf('Default configuration for "%s"', $name));
         }
 
         switch ($input->getOption('format')) {
             case 'yaml':
-                $output->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
-                $output->writeln(sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:

@@ -51,6 +51,7 @@ class FlattenException
 
 namespace Symfony\Component\Debug\Exception;
 
+use Symfony\Component\Debug\ArgumentsFlattenExceptionProcessor;
 use Symfony\Component\HttpKernel\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -69,9 +70,10 @@ class FlattenException extends LegacyFlattenException
     private $trace;
     private $class;
     private $statusCode;
-    private $headers;
+    private $headers = array();
     private $file;
     private $line;
+    private $extras = array();
 
     public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
@@ -94,9 +96,13 @@ class FlattenException extends LegacyFlattenException
         $e->setClass(get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
+
         if ($exception->getPrevious()) {
-            $e->setPrevious(static::create($exception->getPrevious()));
+            $e->setPrevious(static::create($exception->getPrevious(), -1));
         }
+
+        $processor = new ArgumentsFlattenExceptionProcessor(null, false);
+        $processor->process($exception, $e, -1 !== $statusCode);
 
         return $e;
     }
@@ -219,7 +225,8 @@ class FlattenException extends LegacyFlattenException
     public function setTrace($trace, $file, $line)
     {
         $this->trace = array();
-        $this->trace[] = array(
+
+        $this->trace[-1] = array(
             'namespace' => '',
             'short_class' => '',
             'class' => '',
@@ -229,7 +236,8 @@ class FlattenException extends LegacyFlattenException
             'line' => $line,
             'args' => array(),
         );
-        foreach ($trace as $entry) {
+
+        foreach ($trace as $key => $entry) {
             $class = '';
             $namespace = '';
             if (isset($entry['class'])) {
@@ -238,7 +246,7 @@ class FlattenException extends LegacyFlattenException
                 $namespace = implode('\\', $parts);
             }
 
-            $this->trace[] = array(
+            $this->trace[$key] = array(
                 'namespace' => $namespace,
                 'short_class' => $class,
                 'class' => isset($entry['class']) ? $entry['class'] : '',
@@ -246,47 +254,52 @@ class FlattenException extends LegacyFlattenException
                 'function' => isset($entry['function']) ? $entry['function'] : null,
                 'file' => isset($entry['file']) ? $entry['file'] : null,
                 'line' => isset($entry['line']) ? $entry['line'] : null,
-                'args' => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
+                'args' => array(),
             );
         }
     }
 
-    private function flattenArgs($args, $level = 0, &$count = 0)
+    /**
+     * Replaces trace.
+     *
+     * @param array $trace The trace
+     */
+    public function replaceTrace($trace)
     {
-        $result = array();
-        foreach ($args as $key => $value) {
-            if (++$count > 1e4) {
-                return array('array', '*SKIPPED over 10000 entries*');
-            }
-            if (is_object($value)) {
-                $result[$key] = array('object', get_class($value));
-            } elseif (is_array($value)) {
-                if ($level > 10) {
-                    $result[$key] = array('array', '*DEEP NESTED ARRAY*');
-                } else {
-                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1, $count));
-                }
-            } elseif (null === $value) {
-                $result[$key] = array('null', null);
-            } elseif (is_bool($value)) {
-                $result[$key] = array('boolean', $value);
-            } elseif (is_resource($value)) {
-                $result[$key] = array('resource', get_resource_type($value));
-            } elseif ($value instanceof \__PHP_Incomplete_Class) {
-                // Special case of object, is_object will return false
-                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
-            } else {
-                $result[$key] = array('string', (string) $value);
-            }
-        }
-
-        return $result;
+        $this->trace = (array) $trace;
     }
 
-    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
+    /**
+     * Returns all extras.
+     *
+     * @return array
+     */
+    public function getExtras()
     {
-        $array = new \ArrayObject($value);
+        return $this->extras;
+    }
 
-        return $array['__PHP_Incomplete_Class_Name'];
+    /**
+     * Returns an extra value.
+     *
+     * @param string $name    The name of the extra
+     * @param mixed  $default The value to return if the extra doesn't exist
+     *
+     * @return mixed
+     */
+    public function getExtra($name, $default = null)
+    {
+        return array_key_exists($name, $this->extras) ? $this->extras[$name] : $default;
+    }
+
+    /**
+     * Sets an extra value.
+     *
+     * @param string $name  The name of the extra
+     * @param mixed  $value The value
+     */
+    public function setExtra($name, $value)
+    {
+        $this->extras[$name] = $value;
     }
 }

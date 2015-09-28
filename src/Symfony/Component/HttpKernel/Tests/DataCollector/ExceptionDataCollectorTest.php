@@ -12,17 +12,18 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\ExceptionFlattener;
 use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCollect()
+    /**
+     * @dataProvider getData
+     */
+    public function testCollect($c, $e, $flattened)
     {
-        $e = new \Exception('foo', 500);
-        $c = new ExceptionDataCollector();
-        $flattened = FlattenException::create($e);
         $trace = $flattened->getTrace();
 
         $this->assertFalse($c->hasException());
@@ -34,6 +35,17 @@ class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $c->getMessage());
         $this->assertSame(500, $c->getCode());
         $this->assertSame('exception', $c->getName());
-        $this->assertSame($trace, $c->getTrace());
+        $this->assertEquals($trace, $c->getTrace());
+    }
+
+    public function getData()
+    {
+        $e = new \Exception('foo', 500);
+        $flattener = new ExceptionFlattener();
+
+        return array(
+            array(new ExceptionDataCollector(), $e, FlattenException::create($e)),
+            array(new ExceptionDataCollector($flattener), $e, $flattener->flatten($e)),
+        );
     }
 }

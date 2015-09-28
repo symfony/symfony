@@ -19,7 +19,8 @@
         "php": ">=5.3.9",
         "symfony/http-kernel": "~2.6|~3.0.0",
         "symfony/twig-bridge": "~2.6|~3.0.0",
-        "symfony/var-dumper": "~2.6|~3.0.0"
+        "symfony/var-dumper": "~2.6|~3.0.0",
+        "symfony/debug": "~2.6|~3.0.0"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",

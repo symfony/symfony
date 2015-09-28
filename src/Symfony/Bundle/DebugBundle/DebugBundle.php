@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\DebugBundle;
 
+use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\AddFlattenExceptionProcessorPass;
+use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\AddHighlighterPass;
 use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\DumpDataCollectorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -48,6 +50,8 @@ class DebugBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new AddFlattenExceptionProcessorPass());
         $container->addCompilerPass(new DumpDataCollectorPass());
+        $container->addCompilerPass(new AddHighlighterPass());
     }
 }

@@ -4,7 +4,7 @@
         <abbr title="{{ trace.class }}">{{ trace.short_class }}</abbr>
         {{ trace.type ~ trace.function }}
     </strong>
-    ({{ trace.args|format_args }})
+    ({{ trace.args|format_args(exception|default) }})
 {% endif %}
 
 {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
@@ -16,7 +16,20 @@
         <img class="toggle" id="icon-{{ prefix ~ '-' ~ i }}-open" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: {{ 0 == i ? 'none' : 'inline' }}" />
     </a>
     {% endspaceless %}
+
     <div id="trace-{{ prefix ~ '-' ~ i }}" style="display: {{ 0 == i ? 'block' : 'none' }}" class="trace">
-        {{ trace.file|file_excerpt(trace.line) }}
+        {% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+            <em>{{ trace.file|format_file(trace.line) }}</em>
+            <div class="trace">
+                {{ trace.file|highlight_code(trace.line, highlighter='php') }}
+            </div>
+        {% endif %}
+
+        {% for code in trace.related_codes|default([]) if code.file.path is defined %}
+            <em>{{ code.file.path|format_file(code.line|default(1), code.file.name|default) }}</em>
+            <div class="trace">
+                {{ code.file.path|highlight_code(code.line|default(1), highlighter=code.file.type|default) }}
+            </div>
+        {% endfor %}
     </div>
 {% endif %}

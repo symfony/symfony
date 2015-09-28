@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added TwigFlattenExceptionProcessor which adds twig files into the FlattenException
+
 2.7.0
 -----
 

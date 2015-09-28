@@ -161,7 +161,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
             array(
                 'message' => 'test',
                 'class' => 'Exception',
-                'trace' => array(array(
+                'trace' => array(-1 => array(
                     'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args' => array(),
                 )),
@@ -215,32 +215,33 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetTraceIncompleteClass()
     {
-        $flattened = FlattenException::create(new \Exception('test', 123));
-        $flattened->setTrace(
+        $exception = new \Exception('test', 123);
+        $traceReflection = new \ReflectionProperty($exception, 'trace');
+        $traceReflection->setAccessible(true);
+        $traceReflection->setValue($exception, array(
             array(
-                array(
-                    'file' => __FILE__,
-                    'line' => 123,
-                    'function' => 'test',
-                    'args' => array(
-                        unserialize('O:14:"BogusTestClass":0:{}'),
-                    ),
+                'file' => __FILE__,
+                'line' => 123,
+                'function' => 'test',
+                'args' => array(
+                    unserialize('O:14:"BogusTestClass":0:{}'),
                 ),
             ),
-            'foo.php', 123
-        );
+        ));
+
+        $flattened = FlattenException::create($exception);
 
         $this->assertEquals(array(
             array(
                 'message' => 'test',
                 'class' => 'Exception',
                 'trace' => array(
-                    array(
+                    -1 => array(
                         'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '',
-                        'file' => 'foo.php', 'line' => 123,
+                        'file' => __FILE__, 'line' => 218,
                         'args' => array(),
                     ),
-                    array(
+                    0 => array(
                         'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => 'test',
                         'file' => __FILE__, 'line' => 123,
                         'args' => array(

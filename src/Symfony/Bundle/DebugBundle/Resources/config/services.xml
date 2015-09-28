@@ -30,6 +30,27 @@
             <argument>null</argument><!-- debug.dump_destination -->
             <argument>%kernel.charset%</argument>
         </service>
+
+        <service id="exception_flattener" class="Symfony\Component\Debug\ExceptionFlattener">
+            <argument type="collection" />
+        </service>
+
+        <service id="debug.exception_processor.http" class="Symfony\Component\HttpKernel\Debug\HttpFlattenExceptionProcessor" public="false">
+            <tag name="exception.processor" />
+        </service>
+
+        <service id="debug.exception_processor.arguments" class="Symfony\Component\Debug\ArgumentsFlattenExceptionProcessor" public="false">
+            <tag name="exception.processor" />
+            <argument type="service" id="var_dumper.cloner" />
+        </service>
+
+        <service id="debug.html_utils" class="Symfony\Component\Debug\Utils\HtmlUtils">
+            <argument type="collection" />
+        </service>
+
+        <service id="debug.php_highlighter" class="Symfony\Component\Debug\Highlighter\PHPHighlighter" public="false">
+            <tag name="code_highlighter" alias="php" />
+        </service>
     </services>
 
 </container>

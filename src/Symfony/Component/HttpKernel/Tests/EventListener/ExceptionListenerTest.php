@@ -119,6 +119,25 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $response = $event->getResponse();
         $this->assertEquals('xml', $response->getContent());
     }
+
+    public function testUseFlattener()
+    {
+        $exception = new \Exception('foo');
+
+        $flattener = $this->getMock('Symfony\Component\Debug\ExceptionFlattener');
+        $flattener->expects($this->once())->method('flatten')->with($exception);
+
+        $listener = new ExceptionListener('foo', null, $flattener);
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function () {
+            return new Response();
+        }));
+
+        $request = Request::create('/');
+        $event = new GetResponseForExceptionEvent($kernel, $request, 'foo', $exception);
+        $listener->onKernelException($event);
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface

@@ -12,79 +12,63 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-/**
- * @author Roman Marintšenko <inoryy@gmail.com>
- */
 class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var AbstractVoter
-     */
-    private $voter;
-
-    private $token;
+    protected $token;
 
     protected function setUp()
     {
-        $this->voter = new VoterFixture();
+        $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+    }
 
-        $tokenMock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $tokenMock
-            ->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue('user'));
+    public function getTests()
+    {
+        return array(
+            array(array('EDIT'), VoterInterface::ACCESS_GRANTED, new \stdClass(), 'ACCESS_GRANTED if attribute and class are supported and attribute grants access'),
+            array(array('CREATE'), VoterInterface::ACCESS_DENIED, new \stdClass(), 'ACCESS_DENIED if attribute and class are supported and attribute does not grant access'),
 
-        $this->token = $tokenMock;
+            array(array('DELETE', 'EDIT'), VoterInterface::ACCESS_GRANTED, new \stdClass(), 'ACCESS_GRANTED if one attribute is supported and grants access'),
+            array(array('DELETE', 'CREATE'), VoterInterface::ACCESS_DENIED, new \stdClass(), 'ACCESS_DENIED if one attribute is supported and denies access'),
+
+            array(array('CREATE', 'EDIT'), VoterInterface::ACCESS_GRANTED, new \stdClass(), 'ACCESS_GRANTED if one attribute grants access'),
+
+            array(array('DELETE'), VoterInterface::ACCESS_ABSTAIN, new \stdClass(), 'ACCESS_ABSTAIN if no attribute is supported'),
+
+            array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, $this, 'ACCESS_ABSTAIN if class is not supported'),
+
+            array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, null, 'ACCESS_ABSTAIN if object is null'),
+
+            array(array(), VoterInterface::ACCESS_ABSTAIN, new \stdClass(), 'ACCESS_ABSTAIN if no attributes were provided'),
+        );
     }
 
     /**
-     * @dataProvider getData
+     * @dataProvider getTests
      */
-    public function testVote($expectedVote, $object, $attributes, $message)
+    public function testVote(array $attributes, $expectedVote, $object, $message)
     {
-        $this->assertEquals($expectedVote, $this->voter->vote($this->token, $object, $attributes), $message);
-    }
+        $voter = new AbstractVoterTest_Voter();
 
-    public function getData()
-    {
-        return array(
-            array(AbstractVoter::ACCESS_ABSTAIN, null, array(), 'ACCESS_ABSTAIN for null objects'),
-            array(AbstractVoter::ACCESS_ABSTAIN, new UnsupportedObjectFixture(), array(), 'ACCESS_ABSTAIN for objects with unsupported class'),
-            array(AbstractVoter::ACCESS_ABSTAIN, new ObjectFixture(), array(), 'ACCESS_ABSTAIN for no attributes'),
-            array(AbstractVoter::ACCESS_ABSTAIN, new ObjectFixture(), array('foobar'), 'ACCESS_ABSTAIN for unsupported attributes'),
-            array(AbstractVoter::ACCESS_GRANTED, new ObjectFixture(), array('foo'), 'ACCESS_GRANTED if attribute grants access'),
-            array(AbstractVoter::ACCESS_GRANTED, new ObjectFixture(), array('bar', 'foo'), 'ACCESS_GRANTED if *at least one* attribute grants access'),
-            array(AbstractVoter::ACCESS_GRANTED, new ObjectFixture(), array('foobar', 'foo'), 'ACCESS_GRANTED if *at least one* attribute grants access'),
-            array(AbstractVoter::ACCESS_DENIED, new ObjectFixture(), array('bar', 'baz'), 'ACCESS_DENIED for if no attribute grants access'),
-        );
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
 }
 
-class VoterFixture extends AbstractVoter
+class AbstractVoterTest_Voter extends AbstractVoter
 {
     protected function getSupportedClasses()
     {
-        return array(
-            'Symfony\Component\Security\Core\Tests\Authorization\Voter\ObjectFixture',
-        );
+        return array('stdClass');
     }
 
     protected function getSupportedAttributes()
     {
-        return array('foo', 'bar', 'baz');
+        return array('EDIT', 'CREATE');
     }
 
     protected function isGranted($attribute, $object, $user = null)
     {
-        return $attribute === 'foo';
+        return 'EDIT' === $attribute;
     }
-}
-
-class ObjectFixture
-{
-}
-
-class UnsupportedObjectFixture
-{
 }

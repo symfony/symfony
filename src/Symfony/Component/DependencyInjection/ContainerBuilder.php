@@ -91,6 +91,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $expressionLanguageProviders = array();
 
     /**
+     * @var string[] with tag names used by findTaggedServiceIds
+     */
+    private $usedTags = array();
+
+    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -1064,6 +1069,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findTaggedServiceIds($name)
     {
+        $this->usedTags[] = $name;
         $tags = array();
         foreach ($this->getDefinitions() as $id => $definition) {
             if ($definition->hasTag($name)) {
@@ -1087,6 +1093,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return array_unique($tags);
+    }
+
+    /**
+     * Returns all tags not queried by findTaggedServiceIds.
+     *
+     * @return string[] An array of tags
+     */
+    public function findUnusedTags()
+    {
+        return array_values(array_diff($this->findTags(), $this->usedTags));
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)

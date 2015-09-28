@@ -110,7 +110,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('=', Helper::strlenWithoutDecoration($message))),
         ));
         $this->newLine();
     }
@@ -120,14 +120,10 @@ class SymfonyStyle extends OutputStyle
      */
     public function section($message)
     {
-        // don't take into account the style tags to compute the message length
-        // otherwise, the underline displayed after the section title is too long
-        $messageLength = strlen(preg_replace('/<.*>/U', '', $message));
-
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('-', $messageLength)),
+            sprintf('<comment>%s</>', str_repeat('-', Helper::strlenWithoutDecoration($message))),
         ));
         $this->newLine();
     }

@@ -91,7 +91,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $expressionLanguageProviders = array();
 
     /**
-     * @var array with tag names used by findTaggedServiceIds
+     * @var string[] with tag names used by findTaggedServiceIds
      */
     private $usedTags = array();
 
@@ -1096,16 +1096,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns all tags not queried by findTaggedServiceIds
+     * Returns all tags not queried by findTaggedServiceIds.
      *
-     * @return array An array of tags
+     * @return string[] An array of tags
      */
     public function findUnusedTags()
     {
-        $tags = array_values(array_diff($this->findTags(), $this->usedTags));
-        $tags = array_unique($tags);
-
-        return $tags;
+        return array_values(array_diff($this->findTags(), $this->usedTags));
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)

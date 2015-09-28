@@ -28,7 +28,7 @@
         </service>
 
         <service id="security.authentication.provider.rememberme" class="%security.authentication.provider.rememberme.class%" abstract="true" public="false">
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
         </service>
 
         <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false" />

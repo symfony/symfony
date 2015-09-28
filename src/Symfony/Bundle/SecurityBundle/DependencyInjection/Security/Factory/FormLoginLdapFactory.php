@@ -30,6 +30,7 @@ class FormLoginLdapFactory extends FormLoginFactory
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.ldap_bind'))
             ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(1, new Reference('security.chain_user_checker.'.$id))
             ->replaceArgument(2, $id)
             ->replaceArgument(3, new Reference($config['service']))
             ->replaceArgument(4, $config['dn_string'])

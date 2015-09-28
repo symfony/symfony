@@ -109,6 +109,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
             'index_0' => array(new Reference('authenticator123')),
             'index_1' => new Reference('my_user_provider'),
             'index_2' => 'my_firewall',
+            'index_3' => new Reference('security.chain_user_checker.my_firewall'),
         ), $providerDefinition->getArguments());
 
         $listenerDefinition = $container->getDefinition('security.authentication.listener.guard.my_firewall');
@@ -123,7 +124,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
             'authenticators' => array('authenticator123'),
             'entry_point' => null,
         );
-        list($container, $entryPointId) = $this->executeCreate($config, 'some_default_entry_point');
+        list(, $entryPointId) = $this->executeCreate($config, 'some_default_entry_point');
         $this->assertEquals('some_default_entry_point', $entryPointId);
     }
 

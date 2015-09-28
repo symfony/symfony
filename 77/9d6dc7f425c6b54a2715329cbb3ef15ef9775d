@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T10:04:35Z
+
+:+1: this complex system is not necessary anymore now that we deprecated the find-based adapters.
+
+@fabpot is it possible to add tests for the regex detection here, including the case of all kinds of bracket delimiters ?
+The logic was currently covered by tests of the Expression class, but we need to cover it by itself now as we won't call the Expression class anymore here.
+
+and you need to mark tests of the ``Expression`` classes as legacy ones to avoid issues with deprecation warnings.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T10:22:05Z
+
+The tests where already in the iterator test class for `isRegex()`, but I've just added some more.
+We should be good now.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T10:23:05Z
+
+good to me

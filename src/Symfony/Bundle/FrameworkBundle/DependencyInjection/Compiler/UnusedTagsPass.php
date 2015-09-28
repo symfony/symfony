@@ -28,6 +28,7 @@ class UnusedTagsPass implements CompilerPassInterface
      */
     protected $whitelist = array(
         "console.command",
+        "config_cache.resource_checker",
         "data_collector",
         "form.type",
         "form.type_extension",
@@ -38,10 +39,13 @@ class UnusedTagsPass implements CompilerPassInterface
         "kernel.event_subscriber",
         "kernel.fragment_renderer",
         "monolog.logger",
+        "routing.expression_language_provider",
         "routing.loader",
+        "security.expression_language_provider",
         "security.remember_me_aware",
         "security.voter",
         "serializer.encoder",
+        "serializer.normalizer",
         "templating.helper",
         "translation.dumper",
         "translation.extractor",

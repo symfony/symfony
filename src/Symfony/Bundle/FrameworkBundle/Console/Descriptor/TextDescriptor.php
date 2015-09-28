@@ -182,7 +182,7 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $maxTags = array();
 
-        foreach ($serviceIds as $key =>  $serviceId) {
+        foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
                 // filter out private services unless shown explicitly
@@ -231,10 +231,10 @@ class TextDescriptor extends Descriptor
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $tableRows[] = array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array());
+                $tableRows[] = array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             } else {
                 // we have no information (happens with "service_container")
-                $tableRows[] = array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array());
+                $tableRows[] = array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array());
             }
         }
 
@@ -338,7 +338,7 @@ class TextDescriptor extends Descriptor
             array('Parameter', 'Value'),
             array(
                 array($options['parameter'], $this->formatParameter($parameter),
-            )
+            ),
         ));
     }
 

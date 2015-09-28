@@ -150,7 +150,6 @@ EOF
             return;
         }
 
-
         // show compiled list of messages
         if ($input->getOption('dump-messages') === true) {
             $extractedMessagesCount = 0;

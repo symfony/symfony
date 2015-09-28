@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-27T16:09:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-27T18:55:02Z
+
+@stof FYI
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T06:35:35Z
+
+Doesn't the failing test mean that a feature that worked before will break now? Sorry for the question but I am actually not sure what we are testing here at all.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-09-28T08:40:53Z
+
+@xabbuh If it is a useful and well designed test, yes.
+
+In this particular case, the test loads translations from a fixture in `prod` mode. It then repeats this to make sure the cached information is used (all green so far).
+
+Then, in a third step, it re-creates the Translator *without*  adding the resource *and* switches to `debug` mode; it then expects the cache to be invalid.
+
+The problems with this are as follows:
+
+* When using different resource sets, the `Translator` should internally make sure it uses different cache files. This is not the case.
+* Switching from `prod` to `debug` probably considered the cache stale before #15738, because in `prod` the `.meta` file was not created. This is, however, an implementation detail not relevant for the working of `ConfigCache`. So, I'd say that this behaviour has even been fixed now because the resource used (the translation fixture file) is unchanged, to it is right to still consider the cache fresh.
+
+Of course you may ask whether we shouldn't fix the test instead of removing it, but honestly I don't even understand what it actually tries to test for (that hasn't been covered elsewhere already).

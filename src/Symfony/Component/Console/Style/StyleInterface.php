@@ -47,13 +47,6 @@ interface StyleInterface
     public function text($message);
 
     /**
-     * Formats secondary text of less importance than text().
-     *
-     * @param string|array $message
-     */
-    public function comment($message);
-
-    /**
      * Formats a success result bar.
      *
      * @param string|array $message

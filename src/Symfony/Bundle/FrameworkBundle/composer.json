@@ -47,7 +47,9 @@
         "symfony/expression-language": "~2.6|~3.0.0",
         "symfony/process": "~2.0,>=2.0.5|~3.0.0",
         "symfony/validator": "~2.5|~3.0.0",
-        "symfony/yaml": "~2.0,>=2.0.5|~3.0.0"
+        "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
+        "symfony/property-info": "~2.8|~3.0.0",
+        "phpdocumentor/reflection": "^1.0.7"
     },
     "suggest": {
         "symfony/console": "For using the console commands",
@@ -55,7 +57,8 @@
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
-        "symfony/yaml": "For using the debug:config and lint:yaml commands"
+        "symfony/yaml": "For using the debug:config and lint:yaml commands",
+        "symfony/property-info": "For using the property_info_extractor service"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

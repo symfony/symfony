@@ -11,31 +11,37 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
- * encoders and normalizers to the Serializer service.
+ * Adds extractors to the property_info service.
  *
- * @author Javier Lopez <f12loalf@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializerPass implements CompilerPassInterface
+class PropertyInfoPass implements CompilerPassInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('serializer')) {
+        if (!$container->hasDefinition('property_info')) {
             return;
         }
 
-        // Looks for all the services tagged "serializer.normalizer" and adds them to the Serializer service
-        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
-        $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
+        $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(0, $listExtractors);
 
-        // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
-        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
-        $container->getDefinition('serializer')->replaceArgument(1, $encoders);
+        $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(1, $typeExtractors);
+
+        $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(2, $descriptionExtractors);
+
+        $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(3, $accessExtractors);
     }
 
     /**
@@ -45,16 +51,10 @@ class SerializerPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @return array
-     *
-     * @throws \RuntimeException
      */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         $services = $container->findTaggedServiceIds($tagName);
-
-        if (empty($services)) {
-            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
-        }
 
         $sortedServices = array();
         foreach ($services as $serviceId => $tags) {
@@ -62,6 +62,10 @@ class SerializerPass implements CompilerPassInterface
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
                 $sortedServices[$priority][] = new Reference($serviceId);
             }
+        }
+
+        if (empty($sortedServices)) {
+            return array();
         }
 
         krsort($sortedServices);

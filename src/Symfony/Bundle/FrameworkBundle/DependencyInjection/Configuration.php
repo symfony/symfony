@@ -178,6 +178,7 @@ class Configuration implements ConfigurationInterface
         $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
+        $this->addPropertyInfoSection($rootNode);
 
         return $treeBuilder;
     }
@@ -719,6 +720,18 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('property_info')
+                    ->info('Property info configuration')
+                    ->canBeEnabled()
                 ->end()
             ->end()
         ;

@@ -131,6 +131,10 @@ class FrameworkExtension extends Extension
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
+        if (isset($config['property_info'])) {
+            $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
         $loader->load('debug_prod.xml');
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
@@ -983,6 +987,28 @@ class FrameworkExtension extends Extension
 
         if (isset($config['name_converter']) && $config['name_converter']) {
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
+        }
+    }
+
+    /**
+     * Loads property info configuration.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param XmlFileLoader    $loader
+     */
+    private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $loader->load('property_info.xml');
+
+        if (class_exists('phpDocumentor\Reflection\ClassReflector')) {
+            $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition->addTag('property_info.description_extractor', array('priority' => -1000));
+            $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }
     }
 

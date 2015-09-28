@@ -79,10 +79,6 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-
-                <div class="module">
-                    {{ include('@WebProfiler/Profiler/admin.html.twig', { token: token|default('') }, with_context = false) }}
-                </div>
             </div>
         </div>
     </div>

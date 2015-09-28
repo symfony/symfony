@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T15:49:34Z
+
+Looks like a correct addition, thanks @enumag!
+
+As this is probably considered a new feature, it'll be merged into the 2.8 branch (as new features can't be introduced in maintainance versions). You don't have to worry about this though, the merge tool used by the core team is able to do this very easily.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-09-26T16:09:49Z
+
+@WouterJ Thanks. I was not sure whether to consider this a new feature or not.

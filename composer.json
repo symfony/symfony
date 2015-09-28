@@ -43,6 +43,7 @@
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
+        "symfony/ldap": "self.version",
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",

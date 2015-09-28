@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-04-06T16:07:24Z
+
+:+1:  IMO this is way better than your previous proposal. But there is still an issue (raised by @stof : https://github.com/symfony/symfony/pull/13057#discussion_r22383039 ) using the table layout, which doesn't allow to stream the output.
+Can't we just use a list ?
+
+However, I don't think streaming the output for this command is an absolute requirement.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-04-06T16:34:11Z
+
+I was thinking about using a list too, but streaming the output with list is not possible for now either (at least using `SymfonyStyle`). I tried to steam the output using just `->sucess(), ->error(), ...`, but that was really ugly and unclear. I think the indentation provided by the table makes the output much more readable.
+
+> And if any exception happens, there won't be any report about the symlinks which have already been created
+
+Exceptions are caught and printed to the user.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-04-06T16:47:08Z
+
+As we're currently loosing the paths information, do you think the verbosity level should allow to print it in the bundle column ?
+
+```
+php app/console assets:install --symlink -v
+
+// Trying to install assets as absolute symbolic links
+
+--- --------------------------------------- ----------------------
+     Bundle                                  Method / Error
+--- --------------------------------------- ----------------------
+ ✔︎   FrameworkBundle                         absolute symlink
+     -> web/bundles/framework
+ ✔︎   SensioDistributionBundle                absolute symlink
+     -> web/bundles/sensiodistributions
+--- --------------------------------------- ----------------------
+```
+
+BTW, about the list and SymfonyStyle: IMO we do not have to use the SymfonyStyle exclusively, but to respect as much as possible the standards and the console style guide. That doesn't mean we cannot use our own way to print particular informations. Perhaps it will create new standards for use-cases not covered by the current guide.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-04-06T19:28:12Z
+
+I'm not sure of using UTF-8 characters as they appearance in the console depends on a lot of things.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-05-16T13:00:00Z
+
+How about a progress bar to indicate running? You can show the table after its done (as summary) but having no output may cause users to think its stuck or something.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T13:02:39Z
+
+This command should be really fast to execute, so I don't think fixing the "not streaming" problem is worth it.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-06-18T22:15:57Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-07-22T08:03:27Z
+
+@fabpot are there anything else I should do with this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:29:15Z
+
+:+1: for merge into 2.8.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-09-28T17:23:46Z
+
+@javiereguiluz what do you think about this?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T17:43:09Z
+
+:+1: thanks @1ed. Very nice work! Just solve the fabbot issue and we're good to merge :)
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-09-28T20:03:16Z
+
+Ready. Thank you!

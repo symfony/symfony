@@ -93,8 +93,13 @@ class TranslationExtension extends \Twig_Extension
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
+    /**
+     * @deprecated since version 2.8, to be removed in 3.0. Use the {@link trans} method instead.
+     */
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use trans() method instead.', E_USER_DEPRECATED);
+
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 

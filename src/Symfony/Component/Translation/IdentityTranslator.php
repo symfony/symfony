@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Formatter\LegacyIntlMessageFormatter;
+
 /**
  * IdentityTranslator does not translate anything.
  *
@@ -21,18 +24,28 @@ namespace Symfony\Component\Translation;
 class IdentityTranslator implements TranslatorInterface
 {
     private $selector;
+    private $formatter;
     private $locale;
 
     /**
-     * Constructor.
-     *
-     * @param MessageSelector|null $selector The message selector for pluralization
+     * @param MessageFormatterInterface|MessageSelector $formatter The message formatter
      *
      * @api
      */
-    public function __construct(MessageSelector $selector = null)
+    public function __construct($formatter = null)
     {
-        $this->selector = $selector ?: new MessageSelector();
+        if ($formatter instanceof MessageSelector) {
+            @trigger_error('Passing a MessageSelector instance into the '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Inject a MessageFormatterInterface instance instead.', E_USER_DEPRECATED);
+            $this->selector = $formatter;
+            $formatter = new LegacyIntlMessageFormatter();
+        } else {
+            $this->selector = new MessageSelector();
+        }
+
+        $this->formatter = $formatter ?: new LegacyIntlMessageFormatter();
+        if (!$this->formatter instanceof MessageFormatterInterface) {
+            throw new \InvalidArgumentException(sprintf('The message formatter "%s" must implement MessageFormatterInterface.', get_class($this->formatter)));
+        }
     }
 
     /**
@@ -62,7 +75,11 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr((string) $id, $parameters);
+        if (!$locale) {
+            $locale = $this->getLocale();
+        }
+
+        return $this->formatter->format($locale, (string) $id, $parameters);
     }
 
     /**
@@ -72,6 +89,11 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Rely on the MessageFormatterInterface and TranslatorInterface::trans() method instead.', E_USER_DEPRECATED);
+        if (!$locale) {
+            $locale = $this->getLocale();
+        }
+
+        return $this->formatter->format($locale, $this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
     }
 }

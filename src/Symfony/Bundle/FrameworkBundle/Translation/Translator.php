@@ -46,14 +46,14 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * debug:     Whether to enable debugging or not (false by default)
      *   * resource_files: List of translation resources available grouped by locale.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
+     * @param ContainerInterface                        $container A ContainerInterface instance
+     * @param MessageFormatterInterface|MessageSelector $formatter The message formatter
+     * @param array                                     $loaderIds An array of loader Ids
+     * @param array                                     $options   An array of options
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, $formatter, $loaderIds = array(), array $options = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -69,7 +69,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             $this->loadResources();
         }
 
-        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($container->getParameter('kernel.default_locale'), $formatter, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

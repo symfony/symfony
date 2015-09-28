@@ -521,7 +521,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             $context->buildViolation('Message %param%')
                 ->setParameter('%param%', 'value')
                 ->setInvalidValue('Invalid value')
-                ->setPlural(2)
                 ->setCode(42)
                 ->addViolation();
         };
@@ -538,7 +537,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertSame('', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame('Invalid value', $violations[0]->getInvalidValue());
-        $this->assertSame(2, $violations[0]->getPlural());
+        $this->assertNull($violations[0]->getPlural());
         $this->assertSame(42, $violations[0]->getCode());
     }
 

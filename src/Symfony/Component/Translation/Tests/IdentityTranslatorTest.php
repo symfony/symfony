@@ -28,6 +28,7 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getTransChoiceTests
+     * @group legacy
      */
     public function testTransChoiceWithExplicitLocale($expected, $id, $number, $parameters)
     {
@@ -39,6 +40,7 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getTransChoiceTests
+     * @group legacy
      */
     public function testTransChoiceWithDefaultLocale($expected, $id, $number, $parameters)
     {

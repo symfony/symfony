@@ -78,8 +78,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             self::IS_REF => true,
             self::IS_REF_CHAINED => true,
         ));
+        
+        $propertyMaxIndex = count($propertyValues) - 1;
 
-        for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
+        for ($i = $propertyMaxIndex; $i >= 0; --$i) {
             $objectOrArray = &$propertyValues[$i][self::VALUE];
 
             $property = $propertyPath->getElement($i);
@@ -95,7 +97,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // If you want to change its value to 'new-value',
             // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
             //
-            if ($i === count($propertyValues) - 1 || !$propertyValues[$i + 1][self::IS_REF]) {
+            if ($i === $propertyMaxIndex || !$propertyValues[$i + 1][self::IS_REF]) {
                 if ($propertyPath->isIndex($i)) {
                     $this->writeIndex($objectOrArray, $property, $value);
                 } else {
@@ -110,7 +112,6 @@ class PropertyAccessor implements PropertyAccessorInterface
                 if (is_object($propertyValues[$i][self::VALUE]) || $propertyValues[$i][self::IS_REF_CHAINED]) {
                     return;
                 }
-
             }
 
             $value = &$objectOrArray;
@@ -259,7 +260,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // it is the first element in the property path or
             // the IS_REF_CHAINED flag of its parent element is true
             // Basically, this flag is true only when the reference chain from the top element to current element is not broken
-            $propertyValue[self::IS_REF_CHAINED] = $propertyValue[self::IS_REF] && ($i == 0 || $propertyValues[$i - 1][self::IS_REF_CHAINED]);
+            $propertyValue[self::IS_REF_CHAINED] = $propertyValue[self::IS_REF] && (0 === $i || $propertyValues[$i - 1][self::IS_REF_CHAINED]);
 
             $propertyValues[] = &$propertyValue;
         }

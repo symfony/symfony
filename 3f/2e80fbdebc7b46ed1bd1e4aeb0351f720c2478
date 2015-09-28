@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T16:08:31Z
+
+you should add a test covering the fallback for getProcessedHelp though
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T18:37:22Z
+
+added a test

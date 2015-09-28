@@ -457,13 +457,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         try {
             $service = $this->createService($definition, $id);
-        } catch (\Exception $e) {
+        } finally {
             unset($this->loading[$id]);
-
-            throw $e;
         }
-
-        unset($this->loading[$id]);
 
         return $service;
     }

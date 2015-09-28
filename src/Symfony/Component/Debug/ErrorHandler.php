@@ -468,11 +468,8 @@ class ErrorHandler
             try {
                 $this->isRecursive = true;
                 $this->loggers[$type][0]->log(($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG, $message, $e);
+            } finally {
                 $this->isRecursive = false;
-            } catch (\Exception $e) {
-                $this->isRecursive = false;
-
-                throw $e;
             }
         }
 

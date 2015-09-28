@@ -783,11 +783,9 @@ class OptionsResolver implements Options
                 foreach ($this->lazy[$option] as $closure) {
                     $value = $closure($this, $value);
                 }
-            } catch (\Exception $e) {
+            } finally {
                 unset($this->calling[$option]);
-                throw $e;
             }
-            unset($this->calling[$option]);
             // END
         }
 
@@ -885,11 +883,9 @@ class OptionsResolver implements Options
             $this->calling[$option] = true;
             try {
                 $value = $normalizer($this, $value);
-            } catch (\Exception $e) {
+            } finally {
                 unset($this->calling[$option]);
-                throw $e;
             }
-            unset($this->calling[$option]);
             // END
         }
 

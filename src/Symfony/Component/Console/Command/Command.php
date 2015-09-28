@@ -491,7 +491,7 @@ class Command
      */
     public function getHelp()
     {
-        return $this->help ?: $this->description;
+        return $this->help;
     }
 
     /**
@@ -513,7 +513,7 @@ class Command
             $_SERVER['PHP_SELF'].' '.$name,
         );
 
-        return str_replace($placeholders, $replacements, $this->getHelp());
+        return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
     }
 
     /**

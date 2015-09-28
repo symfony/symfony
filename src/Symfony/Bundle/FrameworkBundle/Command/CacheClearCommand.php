@@ -110,7 +110,7 @@ EOF
             $output->comment('Finished');
         }
 
-        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was succesfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
     /**

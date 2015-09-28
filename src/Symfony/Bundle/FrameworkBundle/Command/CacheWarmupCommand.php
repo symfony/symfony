@@ -67,6 +67,6 @@ EOF
 
         $warmer->warmUp($this->getContainer()->getParameter('kernel.cache_dir'));
 
-        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was succesfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 }

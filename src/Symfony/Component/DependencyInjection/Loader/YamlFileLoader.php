@@ -299,6 +299,10 @@ class YamlFileLoader extends FileLoader
             $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
+        if (isset($service['autowire'])) {
+            $definition->setAutowired($service['autowire']);
+        }
+
         if (isset($service['autowiring_types'])) {
             if (!is_array($service['autowiring_types'])) {
                 throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));

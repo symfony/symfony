@@ -41,6 +41,7 @@ class Definition
     private $synchronized = false;
     private $lazy = false;
     private $decoratedService;
+    private $autowired = false;
     private $autowiringTypes = array();
 
     protected $arguments;
@@ -834,6 +835,30 @@ class Definition
         foreach ($types as $type) {
             $this->autowiringTypes[$type] = true;
         }
+
+        return $this;
+    }
+
+    /**
+     * Is the definition autowired?
+     *
+     * @return bool
+     */
+    public function isAutowired()
+    {
+        return $this->autowired;
+    }
+
+    /**
+     * Sets autowired.
+     *
+     * @param $autowired
+     *
+     * @return Definition The current instance
+     */
+    public function setAutowired($autowired)
+    {
+        $this->autowired = $autowired;
 
         return $this;
     }

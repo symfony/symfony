@@ -157,6 +157,10 @@ class XmlFileLoader extends FileLoader
             }
         }
 
+        if ($value = $service->getAttribute('autowire')) {
+            $definition->setAutowired(XmlUtils::phpize($value));
+        }
+
         if ($value = $service->getAttribute('scope')) {
             $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
 

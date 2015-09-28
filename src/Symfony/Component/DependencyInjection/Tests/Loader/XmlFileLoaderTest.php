@@ -503,4 +503,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
     }
+
+    public function testAutowire()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services23.xml');
+
+        $this->assertTrue($container->getDefinition('bar')->isAutowired());
+    }
 }

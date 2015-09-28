@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T11:30:55Z
+
+The first change is about adding a new method called `comment()` which is used to display secondary information. This text is prepended with `//` (like a code comment), which is what the original `text()` helper displayed. Now the `text()` helper just displays regular text.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T11:33:18Z
+
+The second change is about fixing the calculation of the underline length. We don't have to take into accoun the style tags length. E.g. `<info>ACME</info>` is a 4 char length message, not a 16 char length message.
+
+Before:
+
+![before](https://cloud.githubusercontent.com/assets/73419/10134359/71573516-65e5-11e5-8ff0-f78814433584.png)
+
+After:
+
+![after](https://cloud.githubusercontent.com/assets/73419/10134362/7474af4e-65e5-11e5-9be0-8cc5fecfd322.png)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-28T17:56:47Z
+
+Shouldn't the underline length calculation be applied to [`title`](https://github.com/symfony/symfony/pull/15964/files#diff-18b76c26b226bea37b2b821a5e4962ffR113) too ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T20:01:01Z
+
+Tests are broken
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T21:01:23Z
+
+This PR is no longer WIP. When tests are green again, this can be merged. Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T21:04:41Z
+
+Still one broken test for me:
+
+```
+There was 1 failure:
+
+1) Symfony\Component\Console\Tests\Style\SymfonyStyleTest::testOutputs with data set #5 ('/Users/fabien/Code/github/sym..._5.php', '/Users/fabien/Code/github/sym..._5.txt')
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+  consectetur adipiscing elit
+-
+-Lorem ipsum dolor sit amet
+- // Lorem ipsum dolor sit amet
+- // consectetur adipiscing elit
+ '
+
+/Users/fabien/Code/github/symfony/symfony/src/Symfony/Component/Console/Tests/Style/SymfonyStyleTest.php:48
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-28T21:08:07Z
+
+The failing test should be fixed now.

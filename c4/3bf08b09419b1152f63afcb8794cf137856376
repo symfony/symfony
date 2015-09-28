@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2015-08-05T08:18:11Z
+
+I don't know anything about xpath but I think it's not normal tests fail because of one space.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-05T08:53:21Z
+
+@MatTheCat it is normal, because this XPath query asserts the text of the label, and you now have a space in it which was not there before
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2015-08-05T09:13:49Z
+
+Should we use `normalize-space` then? Or should I add the space in tests?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-05T20:27:36Z
+
+I think you should add the space in the test. If we used `normalize-space`, we would not be able to detect future regressions.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2015-08-06T07:55:54Z
+
+I don't get why tests are failing past PHP5.5 =/
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-06T08:41:51Z
+
+@xabbuh thus it would not work. ``normalize-space`` will change multiple spaces to 1, but there would still be a difference between 1 space and none
+
+@MatTheCat we have an issue with the deps=low and deps=high tests. @nicolas-grekas is currently working on fixing them.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T06:57:01Z
+
+:+1:

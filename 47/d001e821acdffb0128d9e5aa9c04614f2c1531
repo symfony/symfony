@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T10:33:19Z
+
+@symfony/deciders please give your mind on this
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-28T10:50:59Z
+
+Looks good to me :+1:
+
+I would get rid of the static API as I prefer to have one way of doing the same thing. `CssSelector::toXpath('h2');` vs  `(new Converter())->toXpath('h2');` is not much of a difference.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T10:57:42Z
+
+Looks good to me and I agree with @jakzal that we can get rid of the static API in 3.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T11:06:06Z
+
+:+1: for removing the static API as well in 3.0.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T13:47:35Z
+
+:+1: for deprecating the static method
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T13:53:33Z
+
+The PR is updated.
+
+As the static API is now deprecated, I switched the DomCrawler component to use the non-static API already. Currently, it switched to XML mode as soon as you add XML content (and is HTML by default), which closes https://github.com/symfony/symfony/issues/8404
+As soon as #15849 is done (this evening), we will not have the possibility to load both XML and HTML content in the same crawler, making this unambiguous.
+
+I extracted the creation of sub crawlers (created by filtering an existing one) to a dedicated private method to avoid duplication of the code copying the state in multiple places in Symfony. this is something I would have done anyway as I will have more state to copy when doing the DomCrawler changes. This is cleaner than adding new constructor arguments used only internally (it would clutter the public API). Btw, this allowed me to spot a place where the baseHref property was not passed to the new crawler properly.

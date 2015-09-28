@@ -20,8 +20,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether a value is a valid currency.
  *
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
- *
- * @api
  */
 class CurrencyValidator extends ConstraintValidator
 {

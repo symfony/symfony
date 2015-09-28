@@ -24,8 +24,6 @@ namespace Symfony\Component\EventDispatcher;
  * @author Jonathan Wage <jonwage@gmail.com>
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Event
 {
@@ -50,8 +48,6 @@ class Event
      * @see Event::stopPropagation()
      *
      * @return bool Whether propagation was already stopped for this event.
-     *
-     * @api
      */
     public function isPropagationStopped()
     {
@@ -64,8 +60,6 @@ class Event
      * If multiple event listeners are connected to the same event, no
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
-     *
-     * @api
      */
     public function stopPropagation()
     {
@@ -76,8 +70,6 @@ class Event
      * Stores the EventDispatcher that dispatches this Event.
      *
      * @param EventDispatcherInterface $dispatcher
-     *
-     * @api
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
@@ -88,8 +80,6 @@ class Event
      * Returns the EventDispatcher that dispatches this Event.
      *
      * @return EventDispatcherInterface
-     *
-     * @api
      */
     public function getDispatcher()
     {
@@ -100,8 +90,6 @@ class Event
      * Gets the event's name.
      *
      * @return string
-     *
-     * @api
      */
     public function getName()
     {
@@ -112,8 +100,6 @@ class Event
      * Sets the event's name property.
      *
      * @param string $name The event name.
-     *
-     * @api
      */
     public function setName($name)
     {

@@ -20,8 +20,6 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @api
  */
 class DebugClassLoader
 {
@@ -31,8 +29,6 @@ class DebugClassLoader
      * Constructor.
      *
      * @param object $classFinder
-     *
-     * @api
      */
     public function __construct($classFinder)
     {

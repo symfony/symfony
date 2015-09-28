@@ -18,8 +18,6 @@ namespace Symfony\Component\Validator\Constraints;
  * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class GroupSequence
 {

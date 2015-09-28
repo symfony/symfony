@@ -57,8 +57,6 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
- *
- * @api
  */
 class ApcUniversalClassLoader extends UniversalClassLoader
 {
@@ -70,8 +68,6 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * @param string $prefix A prefix to create a namespace in APC
      *
      * @throws \RuntimeException
-     *
-     * @api
      */
     public function __construct($prefix)
     {

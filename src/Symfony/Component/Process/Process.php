@@ -20,8 +20,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Process
 {
@@ -129,8 +127,6 @@ class Process
      * @param array          $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
-     *
-     * @api
      */
     public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
     {
@@ -187,8 +183,6 @@ class Process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
-     *
-     * @api
      */
     public function run($callback = null)
     {
@@ -372,8 +366,6 @@ class Process
      * @return string The process output
      *
      * @throws LogicException In case the process is not started
-     *
-     * @api
      */
     public function getOutput()
     {
@@ -417,8 +409,6 @@ class Process
      * @return string The process error output
      *
      * @throws LogicException In case the process is not started
-     *
-     * @api
      */
     public function getErrorOutput()
     {
@@ -463,8 +453,6 @@ class Process
      * @return null|int The exit status code, null if the Process is not terminated
      *
      * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
-     *
-     * @api
      */
     public function getExitCode()
     {
@@ -503,8 +491,6 @@ class Process
      * Checks if the process ended successfully.
      *
      * @return bool true if the process ended successfully, false otherwise
-     *
-     * @api
      */
     public function isSuccessful()
     {
@@ -520,8 +506,6 @@ class Process
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws LogicException   In case the process is not terminated
-     *
-     * @api
      */
     public function hasBeenSignaled()
     {
@@ -545,8 +529,6 @@ class Process
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws LogicException   In case the process is not terminated
-     *
-     * @api
      */
     public function getTermSignal()
     {
@@ -569,8 +551,6 @@ class Process
      * @return bool
      *
      * @throws LogicException In case the process is not terminated
-     *
-     * @api
      */
     public function hasBeenStopped()
     {
@@ -589,8 +569,6 @@ class Process
      * @return int
      *
      * @throws LogicException In case the process is not terminated
-     *
-     * @api
      */
     public function getStopSignal()
     {

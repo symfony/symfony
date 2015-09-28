@@ -15,8 +15,6 @@ namespace Symfony\Component\Templating;
  * Internal representation of a template.
  *
  * @author Victor Berchet <victor@suumit.com>
- *
- * @api
  */
 class TemplateReference implements TemplateReferenceInterface
 {
@@ -44,8 +42,6 @@ class TemplateReference implements TemplateReferenceInterface
      * @return TemplateReferenceInterface The TemplateReferenceInterface instance
      *
      * @throws \InvalidArgumentException if the parameter is not defined
-     *
-     * @api
      */
     public function set($name, $value)
     {
@@ -66,8 +62,6 @@ class TemplateReference implements TemplateReferenceInterface
      * @return string The parameter value
      *
      * @throws \InvalidArgumentException if the parameter is not defined
-     *
-     * @api
      */
     public function get($name)
     {
@@ -82,8 +76,6 @@ class TemplateReference implements TemplateReferenceInterface
      * Gets the template parameters.
      *
      * @return array An array of parameters
-     *
-     * @api
      */
     public function all()
     {
@@ -96,8 +88,6 @@ class TemplateReference implements TemplateReferenceInterface
      * By default, it just returns the template name.
      *
      * @return string A path to the template or a resource
-     *
-     * @api
      */
     public function getPath()
     {
@@ -110,8 +100,6 @@ class TemplateReference implements TemplateReferenceInterface
      * The template name acts as a unique identifier for the template.
      *
      * @return string The template name
-     *
-     * @api
      */
     public function getLogicalName()
     {

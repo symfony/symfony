@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  * the controller method arguments.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ControllerResolver implements ControllerResolverInterface
 {
@@ -51,8 +49,6 @@ class ControllerResolver implements ControllerResolverInterface
      *                    or false if this resolver is not able to determine the controller
      *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
-     *
-     * @api
      */
     public function getController(Request $request)
     {
@@ -102,8 +98,6 @@ class ControllerResolver implements ControllerResolverInterface
      * @return array
      *
      * @throws \RuntimeException When value for argument given is not provided
-     *
-     * @api
      */
     public function getArguments(Request $request, $controller)
     {

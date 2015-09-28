@@ -25,8 +25,6 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Client
 {
@@ -52,8 +50,6 @@ abstract class Client
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
-     *
-     * @api
      */
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -71,8 +67,6 @@ abstract class Client
      * Sets whether to automatically follow redirects or not.
      *
      * @param bool $followRedirect Whether to follow redirects
-     *
-     * @api
      */
     public function followRedirects($followRedirect = true)
     {
@@ -96,8 +90,6 @@ abstract class Client
      * @param bool $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
-     *
-     * @api
      */
     public function insulate($insulated = true)
     {
@@ -114,8 +106,6 @@ abstract class Client
      * Sets server parameters.
      *
      * @param array $server An array of server parameters
-     *
-     * @api
      */
     public function setServerParameters(array $server)
     {
@@ -153,8 +143,6 @@ abstract class Client
      * Returns the History instance.
      *
      * @return History A History instance
-     *
-     * @api
      */
     public function getHistory()
     {
@@ -165,8 +153,6 @@ abstract class Client
      * Returns the CookieJar instance.
      *
      * @return CookieJar A CookieJar instance
-     *
-     * @api
      */
     public function getCookieJar()
     {
@@ -177,8 +163,6 @@ abstract class Client
      * Returns the current Crawler instance.
      *
      * @return Crawler|null A Crawler instance
-     *
-     * @api
      */
     public function getCrawler()
     {
@@ -189,8 +173,6 @@ abstract class Client
      * Returns the current BrowserKit Response instance.
      *
      * @return Response|null A BrowserKit Response instance
-     *
-     * @api
      */
     public function getInternalResponse()
     {
@@ -206,8 +188,6 @@ abstract class Client
      * @return object|null A response instance
      *
      * @see doRequest()
-     *
-     * @api
      */
     public function getResponse()
     {
@@ -218,8 +198,6 @@ abstract class Client
      * Returns the current BrowserKit Request instance.
      *
      * @return Request|null A BrowserKit Request instance
-     *
-     * @api
      */
     public function getInternalRequest()
     {
@@ -235,8 +213,6 @@ abstract class Client
      * @return object|null A Request instance
      *
      * @see doRequest()
-     *
-     * @api
      */
     public function getRequest()
     {
@@ -249,8 +225,6 @@ abstract class Client
      * @param Link $link A Link instance
      *
      * @return Crawler
-     *
-     * @api
      */
     public function click(Link $link)
     {
@@ -268,8 +242,6 @@ abstract class Client
      * @param array $values An array of form field values
      *
      * @return Crawler
-     *
-     * @api
      */
     public function submit(Form $form, array $values = array())
     {
@@ -290,8 +262,6 @@ abstract class Client
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
-     *
-     * @api
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
@@ -449,8 +419,6 @@ abstract class Client
      * Goes back in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function back()
     {
@@ -461,8 +429,6 @@ abstract class Client
      * Goes forward in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function forward()
     {
@@ -473,8 +439,6 @@ abstract class Client
      * Reloads the current browser.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function reload()
     {
@@ -487,8 +451,6 @@ abstract class Client
      * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
-     *
-     * @api
      */
     public function followRedirect()
     {
@@ -537,8 +499,6 @@ abstract class Client
      * Restarts the client.
      *
      * It flushes history and all cookies.
-     *
-     * @api
      */
     public function restart()
     {

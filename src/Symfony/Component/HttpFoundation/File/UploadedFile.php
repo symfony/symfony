@@ -21,8 +21,6 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class UploadedFile extends File
 {
@@ -86,8 +84,6 @@ class UploadedFile extends File
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
-     *
-     * @api
      */
     public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
     {
@@ -107,8 +103,6 @@ class UploadedFile extends File
      * Then it should not be considered as a safe value.
      *
      * @return string|null The original name
-     *
-     * @api
      */
     public function getClientOriginalName()
     {
@@ -140,8 +134,6 @@ class UploadedFile extends File
      * @return string|null The mime type
      *
      * @see getMimeType()
-     *
-     * @api
      */
     public function getClientMimeType()
     {
@@ -180,8 +172,6 @@ class UploadedFile extends File
      * Then it should not be considered as a safe value.
      *
      * @return int|null The file size
-     *
-     * @api
      */
     public function getClientSize()
     {
@@ -195,8 +185,6 @@ class UploadedFile extends File
      * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
      *
      * @return int The upload error
-     *
-     * @api
      */
     public function getError()
     {
@@ -207,8 +195,6 @@ class UploadedFile extends File
      * Returns whether the file was uploaded successfully.
      *
      * @return bool True if the file has been uploaded with HTTP and no error occurred.
-     *
-     * @api
      */
     public function isValid()
     {
@@ -226,8 +212,6 @@ class UploadedFile extends File
      * @return File A File object representing the new file
      *
      * @throws FileException if, for any reason, the file could not have been moved
-     *
-     * @api
      */
     public function move($directory, $name = null)
     {

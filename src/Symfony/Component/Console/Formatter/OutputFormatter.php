@@ -15,8 +15,6 @@ namespace Symfony\Component\Console\Formatter;
  * Formatter class for console output.
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
- *
- * @api
  */
 class OutputFormatter implements OutputFormatterInterface
 {
@@ -41,8 +39,6 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param bool                            $decorated Whether this formatter should actually decorate strings
      * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
-     *
-     * @api
      */
     public function __construct($decorated = false, array $styles = array())
     {
@@ -64,8 +60,6 @@ class OutputFormatter implements OutputFormatterInterface
      * Sets the decorated flag.
      *
      * @param bool $decorated Whether to decorate the messages or not
-     *
-     * @api
      */
     public function setDecorated($decorated)
     {
@@ -76,8 +70,6 @@ class OutputFormatter implements OutputFormatterInterface
      * Gets the decorated flag.
      *
      * @return bool true if the output will decorate messages, false otherwise
-     *
-     * @api
      */
     public function isDecorated()
     {
@@ -89,8 +81,6 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string                        $name  The style name
      * @param OutputFormatterStyleInterface $style The style instance
-     *
-     * @api
      */
     public function setStyle($name, OutputFormatterStyleInterface $style)
     {
@@ -103,8 +93,6 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $name
      *
      * @return bool
-     *
-     * @api
      */
     public function hasStyle($name)
     {
@@ -119,8 +107,6 @@ class OutputFormatter implements OutputFormatterInterface
      * @return OutputFormatterStyleInterface
      *
      * @throws \InvalidArgumentException When style isn't defined
-     *
-     * @api
      */
     public function getStyle($name)
     {
@@ -137,8 +123,6 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $message The message to style
      *
      * @return string The styled message
-     *
-     * @api
      */
     public function format($message)
     {

@@ -23,8 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * YamlDumper dumps a service container as a YAML string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class YamlDumper extends Dumper
 {
@@ -36,8 +34,6 @@ class YamlDumper extends Dumper
      * @param array $options An array of options
      *
      * @return string A YAML string representing of the service container
-     *
-     * @api
      */
     public function dump(array $options = array())
     {

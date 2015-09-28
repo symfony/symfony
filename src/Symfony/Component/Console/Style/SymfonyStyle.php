@@ -149,14 +149,9 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        if (!is_array($message)) {
-            $this->writeln(sprintf(' %s', $message));
-
-            return;
-        }
-
-        foreach ($message as $element) {
-            $this->text($element);
+        $messages = is_array($message) ? array_values($message) : array($message);
+        foreach ($messages as $message) {
+             $this->writeln(sprintf(' %s', $message));
         }
     }
 
@@ -167,14 +162,9 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        if (!is_array($message)) {
-            $this->writeln(sprintf(' // %s', $message));
-
-            return;
-        }
-
-        foreach ($message as $element) {
-            $this->comment($element);
+        $messages = is_array($message) ? array_values($message) : array($message);
+        foreach ($messages as $message) {
+             $this->writeln(sprintf(' // %s', $message));
         }
     }
 

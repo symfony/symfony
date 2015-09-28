@@ -57,7 +57,8 @@
                             <span class="icon">{{ include('@WebProfiler/Icon/menu.svg') }}</span>
                         </a>
 
-                        <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Latest profiles</a>
+                        <a class="btn btn-sm" href="{{ path('_profiler_search', { limit: 10 }) }}">Last 10</a>
+                        <a class="btn btn-sm" href="{{ path('_profiler', { token: 'latest' }|merge(request.query.all)) }}">Latest</a>
 
                         <a class="sf-toggle btn btn-sm" data-toggle-selector="#sidebar-search" {% if tokens is defined or about is defined %}data-toggle-initial="display"{% endif %}>
                             {{ include('@WebProfiler/Icon/search.svg') }} <span class="hidden-small">Search</span>

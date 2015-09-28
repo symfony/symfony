@@ -104,8 +104,6 @@ EOF
         /** @var Kernel $kernel */
         $kernel = $this->getContainer()->get('kernel');
 
-        $output->title('Translation Messages Debugger');
-
         // Define Root Path to App folder
         $transPaths = array($kernel->getRootDir().'/Resources/');
 

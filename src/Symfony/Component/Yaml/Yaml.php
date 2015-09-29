@@ -17,8 +17,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * Yaml offers convenience methods to load and dump YAML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Yaml
 {
@@ -42,8 +40,6 @@ class Yaml
      * @return array The YAML converted to a PHP array
      *
      * @throws ParseException If the YAML is not valid
-     *
-     * @api
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
@@ -65,8 +61,6 @@ class Yaml
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
      *
      * @return string A YAML string representing the original PHP array
-     *
-     * @api
      */
     public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
     {

@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * Definition represents a service definition.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Definition
 {
@@ -46,8 +44,6 @@ class Definition
      *
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
-     *
-     * @api
      */
     public function __construct($class = null, array $arguments = array())
     {
@@ -125,8 +121,6 @@ class Definition
      * @param string $class The service class
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setClass($class)
     {
@@ -139,8 +133,6 @@ class Definition
      * Gets the service class.
      *
      * @return string|null The service class
-     *
-     * @api
      */
     public function getClass()
     {
@@ -153,8 +145,6 @@ class Definition
      * @param array $arguments An array of arguments
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setArguments(array $arguments)
     {
@@ -163,9 +153,6 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -173,17 +160,11 @@ class Definition
         return $this;
     }
 
-    /**
-     * @api
-     */
     public function getProperties()
     {
         return $this->properties;
     }
 
-    /**
-     * @api
-     */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
@@ -197,8 +178,6 @@ class Definition
      * @param mixed $argument An argument
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addArgument($argument)
     {
@@ -216,8 +195,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
-     *
-     * @api
      */
     public function replaceArgument($index, $argument)
     {
@@ -234,8 +211,6 @@ class Definition
      * Gets the arguments to pass to the service constructor/factory method.
      *
      * @return array The array of arguments
-     *
-     * @api
      */
     public function getArguments()
     {
@@ -250,8 +225,6 @@ class Definition
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
-     *
-     * @api
      */
     public function getArgument($index)
     {
@@ -268,8 +241,6 @@ class Definition
      * @param array $calls An array of method calls
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setMethodCalls(array $calls = array())
     {
@@ -290,8 +261,6 @@ class Definition
      * @return Definition The current instance
      *
      * @throws InvalidArgumentException on empty $method param
-     *
-     * @api
      */
     public function addMethodCall($method, array $arguments = array())
     {
@@ -309,8 +278,6 @@ class Definition
      * @param string $method The method name to remove
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function removeMethodCall($method)
     {
@@ -330,8 +297,6 @@ class Definition
      * @param string $method The method name to search for
      *
      * @return bool
-     *
-     * @api
      */
     public function hasMethodCall($method)
     {
@@ -348,8 +313,6 @@ class Definition
      * Gets the methods to call after service initialization.
      *
      * @return array An array of method calls
-     *
-     * @api
      */
     public function getMethodCalls()
     {
@@ -362,8 +325,6 @@ class Definition
      * @param array $tags
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setTags(array $tags)
     {
@@ -376,8 +337,6 @@ class Definition
      * Returns all tags.
      *
      * @return array An array of tags
-     *
-     * @api
      */
     public function getTags()
     {
@@ -390,8 +349,6 @@ class Definition
      * @param string $name The tag name
      *
      * @return array An array of attributes
-     *
-     * @api
      */
     public function getTag($name)
     {
@@ -405,8 +362,6 @@ class Definition
      * @param array  $attributes An array of attributes
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function addTag($name, array $attributes = array())
     {
@@ -421,8 +376,6 @@ class Definition
      * @param string $name
      *
      * @return bool
-     *
-     * @api
      */
     public function hasTag($name)
     {
@@ -449,8 +402,6 @@ class Definition
      * Clears the tags for this definition.
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function clearTags()
     {
@@ -465,8 +416,6 @@ class Definition
      * @param string $file A full pathname to include
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFile($file)
     {
@@ -479,8 +428,6 @@ class Definition
      * Gets the file to require before creating the service.
      *
      * @return string|null The full pathname to include
-     *
-     * @api
      */
     public function getFile()
     {
@@ -493,8 +440,6 @@ class Definition
      * @param bool $shared Whether the service must be shared or not
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setShared($shared)
     {
@@ -507,8 +452,6 @@ class Definition
      * Whether this service is shared.
      *
      * @return bool
-     *
-     * @api
      */
     public function isShared()
     {
@@ -521,8 +464,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setPublic($boolean)
     {
@@ -535,8 +476,6 @@ class Definition
      * Whether this service is public facing.
      *
      * @return bool
-     *
-     * @api
      */
     public function isPublic()
     {
@@ -574,8 +513,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setSynthetic($boolean)
     {
@@ -589,8 +526,6 @@ class Definition
      * container, but dynamically injected.
      *
      * @return bool
-     *
-     * @api
      */
     public function isSynthetic()
     {
@@ -604,8 +539,6 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition the current instance
-     *
-     * @api
      */
     public function setAbstract($boolean)
     {
@@ -619,8 +552,6 @@ class Definition
      * template for other definitions.
      *
      * @return bool
-     *
-     * @api
      */
     public function isAbstract()
     {
@@ -637,8 +568,6 @@ class Definition
      * @return Definition the current instance
      *
      * @throws InvalidArgumentException When the message template is invalid.
-     *
-     * @api
      */
     public function setDeprecated($status = true, $template = null)
     {
@@ -664,8 +593,6 @@ class Definition
      * anymore.
      *
      * @return bool
-     *
-     * @api
      */
     public function isDeprecated()
     {
@@ -678,8 +605,6 @@ class Definition
      * @param string $id Service id relying on this definition
      *
      * @return string
-     *
-     * @api
      */
     public function getDeprecationMessage($id)
     {
@@ -692,8 +617,6 @@ class Definition
      * @param callable $callable A PHP callable
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setConfigurator($callable)
     {
@@ -706,8 +629,6 @@ class Definition
      * Gets the configurator to call after the service is fully initialized.
      *
      * @return callable|null The PHP callable to call
-     *
-     * @api
      */
     public function getConfigurator()
     {

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Route;
 
@@ -74,6 +75,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
+
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
 
@@ -82,11 +85,14 @@ EOF
             if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
+
             $this->convertController($route);
+
             $helper->describe($output, $route, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
+                'output' => $output,
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
@@ -99,6 +105,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'output' => $output,
             ));
         }
     }

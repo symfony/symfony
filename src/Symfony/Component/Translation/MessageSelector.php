@@ -16,8 +16,6 @@ namespace Symfony\Component\Translation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class MessageSelector
 {
@@ -46,8 +44,6 @@ class MessageSelector
      * @return string
      *
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function choose($message, $number, $locale)
     {

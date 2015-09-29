@@ -181,6 +181,16 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function regenerate($destroy = false, $lifetime = null)
     {
+        // Cannot regenerate the session ID for non-active sessions.
+        if (PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE !== session_status()) {
+            return false;
+        }
+
+        // Check if session ID exists in PHP 5.3
+        if (PHP_VERSION_ID < 50400 && '' === session_id()) {
+            return false;
+        }
+
         if (null !== $lifetime) {
             ini_set('session.cookie_lifetime', $lifetime);
         }

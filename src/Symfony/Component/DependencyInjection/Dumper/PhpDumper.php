@@ -31,8 +31,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 class PhpDumper extends Dumper
 {
@@ -66,8 +64,6 @@ class PhpDumper extends Dumper
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -98,8 +94,6 @@ class PhpDumper extends Dumper
      * @param array $options An array of options
      *
      * @return string A PHP class representing of the service container
-     *
-     * @api
      */
     public function dump(array $options = array())
     {

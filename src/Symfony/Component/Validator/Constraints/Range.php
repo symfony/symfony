@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Range extends Constraint
 {

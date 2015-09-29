@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
@@ -618,16 +617,12 @@ EOF
 
     public function testFilterWithNamespace()
     {
-        CssSelector::disableHtmlExtension();
-
         $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
         $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
     }
 
     public function testFilterWithMultipleNamespaces()
     {
-        CssSelector::disableHtmlExtension();
-
         $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('widescreen', $crawler->text());

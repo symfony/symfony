@@ -15,8 +15,6 @@ namespace Symfony\Component\Console\Exception;
  * ExceptionInterface.
  *
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
- *
- * @api
  */
 interface ExceptionInterface
 {

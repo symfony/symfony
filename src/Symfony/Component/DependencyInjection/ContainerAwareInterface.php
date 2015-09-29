@@ -15,8 +15,6 @@ namespace Symfony\Component\DependencyInjection;
  * ContainerAwareInterface should be implemented by classes that depends on a Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface ContainerAwareInterface
 {
@@ -24,8 +22,6 @@ interface ContainerAwareInterface
      * Sets the Container.
      *
      * @param ContainerInterface|null $container A ContainerInterface instance or null
-     *
-     * @api
      */
     public function setContainer(ContainerInterface $container = null);
 }

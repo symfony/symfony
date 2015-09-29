@@ -486,32 +486,15 @@ tr.status-warning td {
     padding-bottom: 99999px; {# needed for 'same-height columns' trick #}
     width: 220px;
 }
-#sidebar a {
-    color: #ADD8E6;
-}
 #sidebar .module {
     padding: 10px;
     width: 220px;
-}
-#sidebar .module h3 {
-    color: #999;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 10px;
 }
 
 {# Sidebar Shortcuts
    ------------------------------------------------------------------------- #}
 #sidebar #sidebar-shortcuts {
     background: #333;
-    /* needed to prevent visual issues due to the pure CSS slideToggle() */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     width: 220px;
 }
 #sidebar #sidebar-shortcuts .shortcuts {
@@ -529,7 +512,10 @@ tr.status-warning td {
     color: #F5F5F5;
 }
 #sidebar #sidebar-shortcuts .btn + .btn {
-    margin-left: 10px;
+    margin-left: 5px;
+}
+#sidebar #sidebar-shortcuts .btn {
+    padding: .5em .6em;
 }
 
 {# Sidebar Search
@@ -566,10 +552,6 @@ tr.status-warning td {
 #sidebar-search .form-group .btn {
     float: right;
     margin-right: 10px;
-}
-#sidebar-admin a {
-    font-size: 14px;
-    margin-left: 10px;
 }
 
 {# Sidebar Menu

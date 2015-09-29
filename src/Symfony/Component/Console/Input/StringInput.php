@@ -21,8 +21,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  *     $input = new StringInput('foo --bar="foobar"');
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class StringInput extends ArgvInput
 {
@@ -33,8 +31,6 @@ class StringInput extends ArgvInput
      * Constructor.
      *
      * @param string $input An array of parameters from the CLI (in the argv format)
-     *
-     * @api
      */
     public function __construct($input)
     {

@@ -18,8 +18,6 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
- *
- * @api
  */
 class Bic extends Constraint
 {

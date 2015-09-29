@@ -21,8 +21,6 @@ namespace Symfony\Component\Debug;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @api
  */
 class DebugClassLoader
 {
@@ -37,8 +35,6 @@ class DebugClassLoader
      * Constructor.
      *
      * @param callable $classLoader A class loader
-     *
-     * @api
      */
     public function __construct(callable $classLoader)
     {

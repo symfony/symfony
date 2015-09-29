@@ -25,13 +25,15 @@
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
         "symfony/validator": "~2.8|~3.0",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "symfony/ldap": "~2.8|~3.0.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
         "symfony/validator": "For using the user password constraint",
-        "symfony/expression-language": "For using the expression voter"
+        "symfony/expression-language": "For using the expression voter",
+        "symfony/ldap": "For using LDAP integration"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Core\\": "" }

@@ -504,6 +504,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
 
+    public function testFindUnusedTags()
+    {
+        $builder = new ContainerBuilder();
+        $builder
+            ->register('foo', 'Bar\FooClass')
+            ->addTag('kernel.event_listener', array('foo' => 'foo'))
+            ->addTag('kenrel.event_listener', array('bar' => 'bar'))
+        ;
+        $builder->findTaggedServiceIds('kernel.event_listener');
+        $this->assertEquals(array('kenrel.event_listener'), $builder->findUnusedTags(), '->findUnusedTags() returns an array with unused tags');
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::findDefinition
      */

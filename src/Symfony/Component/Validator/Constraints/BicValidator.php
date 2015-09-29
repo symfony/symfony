@@ -18,8 +18,6 @@ use Symfony\Component\Validator\ConstraintValidator;
  * @author Michael Hirschler <michael.vhirsch@gmail.com>
  *
  * @link https://en.wikipedia.org/wiki/ISO_9362#Structure
- *
- * @api
  */
 class BicValidator extends ConstraintValidator
 {

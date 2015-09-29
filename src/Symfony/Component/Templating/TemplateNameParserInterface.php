@@ -16,8 +16,6 @@ namespace Symfony\Component\Templating;
  * instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface TemplateNameParserInterface
 {
@@ -27,8 +25,6 @@ interface TemplateNameParserInterface
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return TemplateReferenceInterface A template
-     *
-     * @api
      */
     public function parse($name);
 }

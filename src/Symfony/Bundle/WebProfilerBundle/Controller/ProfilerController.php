@@ -125,6 +125,8 @@ class ProfilerController
      */
     public function purgeAction()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
@@ -301,6 +303,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
+            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

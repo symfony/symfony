@@ -13,9 +13,19 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    public function testEmptyIfNotSubmitted()
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
     {
         $form = $this->factory->create('password');
+
+        $this->assertSame('password', $form->getConfig()->getType()->getName());
+    }
+
+    public function testEmptyIfNotSubmitted()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType');
         $form->setData('pAs5w0rd');
         $view = $form->createView();
 
@@ -24,7 +34,7 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testEmptyIfSubmitted()
     {
-        $form = $this->factory->create('password');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType');
         $form->submit('pAs5w0rd');
         $view = $form->createView();
 
@@ -33,7 +43,7 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testNotEmptyIfSubmittedAndNotAlwaysEmpty()
     {
-        $form = $this->factory->create('password', null, array('always_empty' => false));
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType', null, array('always_empty' => false));
         $form->submit('pAs5w0rd');
         $view = $form->createView();
 
@@ -42,7 +52,7 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testNotTrimmed()
     {
-        $form = $this->factory->create('password', null);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType', null);
         $form->submit(' pAs5w0rd ');
         $data = $form->getData();
 

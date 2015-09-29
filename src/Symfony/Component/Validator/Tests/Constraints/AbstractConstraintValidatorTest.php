@@ -223,7 +223,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
             ->will($this->returnValue($validator));
         $validator->expects($this->at(2 * $i + 1))
             ->method('validate')
-            ->with($value, $this->logicalOr(null, array()), $group);
+            ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)

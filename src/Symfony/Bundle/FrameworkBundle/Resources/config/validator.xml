@@ -39,6 +39,16 @@
             <argument>%validator.mapping.cache.prefix%</argument>
         </service>
 
+        <service id="validator.mapping.cache.doctrine.apc" class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">
+            <argument type="service">
+                <service class="Doctrine\Common\Cache\ApcCache">
+                    <call method="setNamespace">
+                        <argument>%validator.mapping.cache.prefix%</argument>
+                    </call>
+                </service>
+            </argument>
+        </service>
+
         <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />

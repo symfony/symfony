@@ -1,6 +1,33 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+The edge case of defining just one value for nodes of type Enum is now allowed:
+
+```php
+$rootNode
+    ->children()
+        ->enumNode('variable')
+            ->values(array('value'))
+        ->end()
+    ->end()
+;
+```
+
+Before: `InvalidArgumentException` (variable must contain at least two
+distinct elements).
+After: the code will work as expected and it will restrict the values of the
+`variable` option to just `value`.
+ 
+ * deprecated the `ResourceInterface::isFresh()` method. If you implement custom resource types and they
+   can be validated that way, make them implement the new `SelfCheckingResourceInterface`.
+ * deprecated the getResource() method in ResourceInterface. You can still call this method
+   on concrete classes implementing the interface, but it does not make sense at the interface
+   level as you need to know about the particular type of resource at hand to understand the
+   semantics of the returned value.
+
 2.7.0
 -----
 

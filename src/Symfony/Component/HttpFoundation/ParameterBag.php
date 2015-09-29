@@ -78,6 +78,8 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns a parameter by name.
      *
+     * Note: Finding deep items is deprecated since version 2.8, to be removed in 3.0.
+     *
      * @param string $path    The key
      * @param mixed  $default The default value if the parameter key does not exist
      * @param bool   $deep    If true, a path like foo[bar] will find deeper items
@@ -88,6 +90,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function get($path, $default = null, $deep = false)
     {
+        if (true === $deep) {
+            @trigger_error('Using paths to find deeper items in '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Filter the returned value in your own code instead.', E_USER_DEPRECATED);
+        }
+
         if (!$deep || false === $pos = strpos($path, '[')) {
             return array_key_exists($path, $this->parameters) ? $this->parameters[$path] : $default;
         }

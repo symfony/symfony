@@ -17,17 +17,17 @@
 
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/config.html.twig" id="config" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/config.html.twig" id="config" priority="-255" />
             <call method="setKernel"><argument type="service" id="kernel" on-invalid="ignore" /></call>
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
             <tag name="kernel.event_subscriber" />
-            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="260" />
         </service>
 
         <service id="data_collector.ajax" class="Symfony\Bundle\FrameworkBundle\DataCollector\AjaxDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="256" />
         </service>
 
         <service id="data_collector.exception" class="%data_collector.exception.class%" public="false">
@@ -46,13 +46,13 @@
         </service>
 
         <service id="data_collector.time" class="%data_collector.time.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="259" />
             <argument type="service" id="kernel" on-invalid="ignore" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="258" />
         </service>
 
         <service id="data_collector.router" class="%data_collector.router.class%" >

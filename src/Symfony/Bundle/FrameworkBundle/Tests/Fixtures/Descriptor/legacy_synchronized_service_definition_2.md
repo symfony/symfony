@@ -3,6 +3,7 @@
 - Public: no
 - Synthetic: yes
 - Lazy: no
+- Shared: yes
 - Synchronized: no
 - Abstract: no
 - File: `/path/to/file`

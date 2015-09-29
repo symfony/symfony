@@ -11,13 +11,13 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -91,6 +91,10 @@ class ProfilerController
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
 
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+            $token = $latest['token'];
+        }
+
         if (!$profile = $this->profiler->loadProfile($token)) {
             return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
         }
@@ -108,6 +112,7 @@ class ProfilerController
             'request' => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
+            'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
         )), 200, array('Content-Type' => 'text/html'));
     }
 
@@ -120,6 +125,8 @@ class ProfilerController
      */
     public function purgeAction()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
@@ -203,6 +210,7 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
             'token' => $token,
+            'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
         )), 200, array('Content-Type' => 'text/html'));
     }
 
@@ -295,6 +303,7 @@ class ProfilerController
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
+            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

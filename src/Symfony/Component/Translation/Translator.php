@@ -267,9 +267,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string|null $locale Locale of translations, by default is current locale
      *
      * @return array[array] indexed by catalog
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.
      */
     public function getMessages($locale = null)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
+
         $catalogue = $this->getCatalogue($locale);
         $messages = $catalogue->all();
         while ($catalogue = $catalogue->getFallbackCatalogue()) {

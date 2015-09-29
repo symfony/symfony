@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Translation\Catalogue\DiffOperation;
+use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -139,7 +139,7 @@ EOF
 
         // process catalogues
         $operation = $input->getOption('clean')
-            ? new DiffOperation($currentCatalogue, $extractedCatalogue)
+            ? new TargetOperation($currentCatalogue, $extractedCatalogue)
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
 
         // Exit if no messages found.

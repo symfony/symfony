@@ -149,7 +149,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('/', $options['cookie_path']);
         $this->assertEquals('example.com', $options['cookie_domain']);
         $this->assertTrue($options['cookie_secure']);
-        $this->assertTrue($options['cookie_httponly']);
+        $this->assertFalse($options['cookie_httponly']);
+        $this->assertTrue($options['use_cookies']);
         $this->assertEquals(108, $options['gc_divisor']);
         $this->assertEquals(1, $options['gc_probability']);
         $this->assertEquals(90000, $options['gc_maxlifetime']);
@@ -242,9 +243,14 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/translations/test_paths.en.yml', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds translation resources in custom paths'
+        );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('fr'), $calls[0][1][0]);
+        $this->assertEquals(array('fr'), $calls[1][1][0]);
     }
 
     public function testTranslatorMultipleFallbacks()
@@ -252,7 +258,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('translator_fallbacks');
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('en', 'fr'), $calls[0][1][0]);
+        $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
     }
 
     /**
@@ -441,6 +447,13 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
         $this->assertTrue($container->has('serializer'));
+
+        $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+
+        $this->assertCount(1, $argument);
+        $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
+        $this->assertEquals(new Reference('serializer.mapping.cache.apc'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
+        $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()
@@ -457,6 +470,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
 
         $this->assertSame('assets.packages', (string) $packages);
+    }
+
+    public function testSerializerServiceIsRegisteredWhenEnabled()
+    {
+        $container = $this->createContainerFromFile('serializer_enabled');
+
+        $this->assertTrue($container->hasDefinition('serializer'));
+    }
+
+    public function testSerializerServiceIsNotRegisteredWhenDisabled()
+    {
+        $container = $this->createContainerFromFile('serializer_disabled');
+
+        $this->assertFalse($container->hasDefinition('serializer'));
     }
 
     protected function createContainer(array $data = array())

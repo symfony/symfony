@@ -22,7 +22,7 @@
         "symfony/http-foundation": ""
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/http-foundation": "~2.4"
     },
     "autoload": {
@@ -31,7 +31,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

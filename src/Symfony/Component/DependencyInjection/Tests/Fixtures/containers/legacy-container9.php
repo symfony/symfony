@@ -30,8 +30,13 @@ $container->
     setFactoryService('foo.baz')->
     setFactoryMethod('getInstance')
 ;
+$container
+    ->register('foo_bar', '%foo_class%')
+    ->setScope('prototype')
+;
 $container->getParameterBag()->clear();
 $container->getParameterBag()->add(array(
+    'foo_class' => 'Bar\FooClass',
     'baz_class' => 'BazClass',
     'foo' => 'bar',
 ));

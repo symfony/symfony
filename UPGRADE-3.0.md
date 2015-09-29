@@ -600,6 +600,123 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Resources/` directory was moved to `Core/Resources/`
 
+ * The `key` settings of `anonymous` and `remember_me` are renamed to `secret`.
+
+   Before:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { key: "%secret%" }
+               remember_me:
+                   key: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous key="%secret%"/>
+           <remember-me key="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('key' => '%secret%'),
+           'remember_me' => array('key' => '%secret%'),
+       ),
+   ));
+   ```
+
+   After:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { secret: "%secret%" }
+               remember_me:
+                   secret: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous secret="%secret%"/>
+           <remember-me secret="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('secret' => '%secret%'),
+           'remember_me' => array('secret' => '%secret%'),
+       ),
+   ));
+  ```
+
+ * The `AbstractVoter::getSupportedAttributes()` and `AbstractVoter::getSupportedClasses()`
+   methods have been removed in favor of `AbstractVoter::supports()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function getSupportedAttributes()
+       {
+           return array('CREATE', 'EDIT');
+       }
+
+       protected function getSupportedClasses()
+       {
+           return array('AppBundle\Entity\Post');
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $class)
+       {
+           return $this->isClassInstanceOf($class, 'AppBundle\Entity\Post')
+               && in_array($attribute, array('CREATE', 'EDIT'));
+       }
+
+       // ...
+   }
+   ```
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
@@ -1121,3 +1238,10 @@ UPGRADE FROM 2.x to 3.0
  * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
    `Process::setInput()` and `Process::getInput()` that works the same way.
  * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+
+### Config
+
+ * `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` has been removed. Also,
+   cache validation through this method (which was still supported in 2.8 for BC) does no longer
+   work because the `\Symfony\Component\Config\Resource\BCResourceInterfaceChecker` helper class
+   has been removed as well.

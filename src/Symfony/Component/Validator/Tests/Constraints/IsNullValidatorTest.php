@@ -47,6 +47,7 @@ class IsNullValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
+            ->setCode(IsNull::NOT_NULL_ERROR)
             ->assertRaised();
     }
 

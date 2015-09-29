@@ -164,8 +164,15 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
+        }
+
         if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+            if ('request' !== $id) {
+                @trigger_error(sprintf('The "scope" key of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
+            }
+            $definition->setScope($service['scope'], false);
         }
 
         if (isset($service['synthetic'])) {
@@ -187,6 +194,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['abstract'])) {
             $definition->setAbstract($service['abstract']);
+        }
+
+        if (array_key_exists('deprecated', $service)) {
+            $definition->setDeprecated(true, $service['deprecated']);
         }
 
         if (isset($service['factory'])) {
@@ -284,7 +295,8 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['decorates'])) {
             $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $definition->setDecoratedService($service['decorates'], $renameId);
+            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
         }
 
         $this->container->setDefinition($id, $definition);

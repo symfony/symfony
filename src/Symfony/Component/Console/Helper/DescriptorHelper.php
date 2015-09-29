@@ -17,6 +17,7 @@ use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * This class adds helper method to describe objects in various formats.
@@ -54,7 +55,7 @@ class DescriptorHelper extends Helper
      * @param object          $object
      * @param array           $options
      *
-     * @throws \InvalidArgumentException when the given format is not supported
+     * @throws InvalidArgumentException when the given format is not supported
      */
     public function describe(OutputInterface $output, $object, array $options = array())
     {
@@ -64,7 +65,7 @@ class DescriptorHelper extends Helper
         ), $options);
 
         if (!isset($this->descriptors[$options['format']])) {
-            throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
+            throw new InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
         }
 
         $descriptor = $this->descriptors[$options['format']];

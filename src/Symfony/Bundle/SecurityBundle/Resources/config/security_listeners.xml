@@ -223,6 +223,15 @@
             <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
 
+        <service id="security.authentication.provider.ldap_bind" class="Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider" public="false" abstract="true">
+            <argument /> <!-- User Provider -->
+            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- LDAP -->
+            <argument /> <!-- Base DN -->
+            <argument>%security.authentication.hide_user_not_found%</argument>
+        </service>
+
         <service id="security.authentication.provider.simple" class="%security.authentication.provider.simple.class%" abstract="true" public="false">
             <argument /> <!-- Simple Authenticator -->
             <argument /> <!-- User Provider -->

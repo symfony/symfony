@@ -28,6 +28,8 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -90,8 +92,10 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new SerializerPass());
 
         if ($container->getParameter('kernel.debug')) {
+            $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
+            $container->addCompilerPass(new ConfigCachePass());
         }
     }
 }

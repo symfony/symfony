@@ -42,7 +42,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                      ->method('getContext')
                      ->will($this->returnValue($context));
 
-        $listener = new RouterListener($urlMatcher, null, null, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
         $event = $this->createGetResponseEventForUri($uri);
         $listener->onKernelRequest($event);
 
@@ -80,7 +80,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMatcher()
     {
-        new RouterListener(new \stdClass(), null, null, $this->requestStack);
+        new RouterListener(new \stdClass(), $this->requestStack);
     }
 
     public function testRequestMatcher()
@@ -95,7 +95,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
                        ->will($this->returnValue(array()));
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -116,7 +116,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                        ->method('getContext')
                        ->will($this->returnValue($context));
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
@@ -147,7 +147,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $request = Request::create('http://localhost/');
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), $logger, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
         $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
     }
 

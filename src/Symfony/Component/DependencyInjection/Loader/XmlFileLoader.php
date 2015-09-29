@@ -147,7 +147,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'shared', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 if (in_array($key, array('factory-class', 'factory-method', 'factory-service'))) {
                     @trigger_error(sprintf('The "%s" attribute of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
@@ -155,6 +155,16 @@ class XmlFileLoader extends FileLoader
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
             }
+        }
+
+        if ($value = $service->getAttribute('scope')) {
+            $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
+
+            if ($triggerDeprecation) {
+                @trigger_error(sprintf('The "scope" attribute of service "%s" in file "%s" is deprecated since version 2.8 and will be removed in 3.0.', (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
+            }
+
+            $definition->setScope(XmlUtils::phpize($value), false);
         }
 
         if ($value = $service->getAttribute('synchronized')) {
@@ -169,6 +179,10 @@ class XmlFileLoader extends FileLoader
 
         if ($files = $this->getChildren($service, 'file')) {
             $definition->setFile($files[0]->nodeValue);
+        }
+
+        if ($deprecated = $this->getChildren($service, 'deprecated')) {
+            $definition->setDeprecated(true, $deprecated[0]->nodeValue);
         }
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
@@ -235,7 +249,8 @@ class XmlFileLoader extends FileLoader
 
         if ($value = $service->getAttribute('decorates')) {
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
-            $definition->setDecoratedService($value, $renameId);
+            $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;
+            $definition->setDecoratedService($value, $renameId, $priority);
         }
 
         return $definition;

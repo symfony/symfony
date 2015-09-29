@@ -126,6 +126,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$url.'"')
+            ->setCode(Url::INVALID_URL_ERROR)
             ->assertRaised();
     }
 

@@ -41,12 +41,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $voters, $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
-        if (!$voters) {
-            throw new \InvalidArgumentException('You must at least add one voter.');
-        }
-
         $strategyMethod = 'decide'.ucfirst($strategy);
         if (!is_callable(array($this, $strategyMethod))) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
@@ -56,6 +52,16 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+    }
+
+    /**
+     * Configures the voters.
+     *
+     * @param VoterInterface[] $voters An array of VoterInterface instances
+     */
+    public function setVoters(array $voters)
+    {
+        $this->voters = $voters;
     }
 
     /**
@@ -71,6 +77,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function supportsAttribute($attribute)
     {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
         foreach ($this->voters as $voter) {
             if ($voter->supportsAttribute($attribute)) {
                 return true;
@@ -85,6 +93,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function supportsClass($class)
     {
+        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
         foreach ($this->voters as $voter) {
             if ($voter->supportsClass($class)) {
                 return true;
@@ -144,7 +154,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $grant = 0;
         $deny = 0;
-        $abstain = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
@@ -158,11 +167,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     ++$deny;
 
                     break;
-
-                default:
-                    ++$abstain;
-
-                    break;
             }
         }
 
@@ -174,7 +178,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return false;
         }
 
-        if ($grant == $deny && $grant != 0) {
+        if ($grant > 0) {
             return $this->allowIfEqualGrantedDeniedDecisions;
         }
 

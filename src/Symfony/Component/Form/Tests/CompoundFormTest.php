@@ -110,7 +110,7 @@ class CompoundFormTest extends AbstractFormTest
         $factory = Forms::createFormFactoryBuilder()
             ->getFormFactory();
 
-        $child = $factory->create('file', null, array('auto_initialize' => false));
+        $child = $factory->createNamed('file', 'Symfony\Component\Form\Extension\Core\Type\FileType', null, array('auto_initialize' => false));
 
         $this->form->add($child);
         $this->form->submit(array('file' => null), false);

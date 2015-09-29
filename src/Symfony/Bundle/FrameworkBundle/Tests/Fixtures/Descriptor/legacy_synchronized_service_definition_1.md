@@ -3,6 +3,7 @@
 - Public: yes
 - Synthetic: no
 - Lazy: yes
+- Shared: yes
 - Synchronized: yes
 - Abstract: yes
 - Factory Class: `Full\Qualified\FactoryClass`

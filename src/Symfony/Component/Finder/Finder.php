@@ -60,7 +60,7 @@ class Finder implements \IteratorAggregate, \Countable
     private $iterators = array();
     private $contains = array();
     private $notContains = array();
-    private $adapters = array();
+    private $adapters = null;
     private $paths = array();
     private $notPaths = array();
     private $ignoreUnreadableDirs = false;
@@ -73,13 +73,6 @@ class Finder implements \IteratorAggregate, \Countable
     public function __construct()
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
-
-        $this
-            ->addAdapter(new GnuFindAdapter())
-            ->addAdapter(new BsdFindAdapter())
-            ->addAdapter(new PhpAdapter(), -50)
-            ->setAdapter('php')
-        ;
     }
 
     /**
@@ -99,9 +92,15 @@ class Finder implements \IteratorAggregate, \Countable
      * @param int              $priority Highest is selected first
      *
      * @return Finder The current Finder instance
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function addAdapter(AdapterInterface $adapter, $priority = 0)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        $this->initDefaultAdapters();
+
         $this->adapters[$adapter->getName()] = array(
             'adapter' => $adapter,
             'priority' => $priority,
@@ -115,9 +114,15 @@ class Finder implements \IteratorAggregate, \Countable
      * Sets the selected adapter to the best one according to the current platform the code is run on.
      *
      * @return Finder The current Finder instance
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function useBestAdapter()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        $this->initDefaultAdapters();
+
         $this->resetAdapterSelection();
 
         return $this->sortAdapters();
@@ -131,9 +136,15 @@ class Finder implements \IteratorAggregate, \Countable
      * @throws \InvalidArgumentException
      *
      * @return Finder The current Finder instance
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function setAdapter($name)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        $this->initDefaultAdapters();
+
         if (!isset($this->adapters[$name])) {
             throw new \InvalidArgumentException(sprintf('Adapter "%s" does not exist.', $name));
         }
@@ -148,9 +159,13 @@ class Finder implements \IteratorAggregate, \Countable
      * Removes all adapters registered in the finder.
      *
      * @return Finder The current Finder instance
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function removeAdapters()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $this->adapters = array();
 
         return $this;
@@ -160,9 +175,15 @@ class Finder implements \IteratorAggregate, \Countable
      * Returns registered adapters ordered by priority without extra information.
      *
      * @return AdapterInterface[]
+     *
+     * @deprecated since 2.8, to be removed in 3.0.
      */
     public function getAdapters()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        $this->initDefaultAdapters();
+
         return array_values(array_map(function (array $adapter) {
             return $adapter['adapter'];
         }, $this->adapters));
@@ -732,8 +753,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @param $dir
      *
      * @return \Iterator
-     *
-     * @throws \RuntimeException When none of the adapters are supported
      */
     private function searchInDirectory($dir)
     {
@@ -745,18 +764,93 @@ class Finder implements \IteratorAggregate, \Countable
             $this->notPaths[] = '#(^|/)\..+(/|$)#';
         }
 
-        foreach ($this->adapters as $adapter) {
-            if ($adapter['adapter']->isSupported()) {
-                try {
-                    return $this
-                        ->buildAdapter($adapter['adapter'])
-                        ->searchInDirectory($dir);
-                } catch (ExceptionInterface $e) {
+        if ($this->adapters) {
+            foreach ($this->adapters as $adapter) {
+                if ($adapter['adapter']->isSupported()) {
+                    try {
+                        return $this
+                            ->buildAdapter($adapter['adapter'])
+                            ->searchInDirectory($dir);
+                    } catch (ExceptionInterface $e) {
+                    }
                 }
             }
         }
 
-        throw new \RuntimeException('No supported adapter found.');
+        $minDepth = 0;
+        $maxDepth = PHP_INT_MAX;
+
+        foreach ($this->depths as $comparator) {
+            switch ($comparator->getOperator()) {
+                case '>':
+                    $minDepth = $comparator->getTarget() + 1;
+                    break;
+                case '>=':
+                    $minDepth = $comparator->getTarget();
+                    break;
+                case '<':
+                    $maxDepth = $comparator->getTarget() - 1;
+                    break;
+                case '<=':
+                    $maxDepth = $comparator->getTarget();
+                    break;
+                default:
+                    $minDepth = $maxDepth = $comparator->getTarget();
+            }
+        }
+
+        $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
+
+        if ($this->followLinks) {
+            $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
+        }
+
+        $iterator = new Iterator\RecursiveDirectoryIterator($dir, $flags, $this->ignoreUnreadableDirs);
+
+        if ($this->exclude) {
+            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
+        }
+
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+        if ($minDepth > 0 || $maxDepth < PHP_INT_MAX) {
+            $iterator = new Iterator\DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
+        }
+
+        if ($this->mode) {
+            $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
+        }
+
+        if ($this->names || $this->notNames) {
+            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+        }
+
+        if ($this->contains || $this->notContains) {
+            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
+        }
+
+        if ($this->sizes) {
+            $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
+        }
+
+        if ($this->dates) {
+            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
+        }
+
+        if ($this->filters) {
+            $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
+        }
+
+        if ($this->paths || $this->notPaths) {
+            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+        }
+
+        if ($this->sort) {
+            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
+            $iterator = $iteratorAggregate->getIterator();
+        }
+
+        return $iterator;
     }
 
     /**
@@ -794,5 +888,18 @@ class Finder implements \IteratorAggregate, \Countable
 
             return $properties;
         }, $this->adapters);
+    }
+
+    private function initDefaultAdapters()
+    {
+        if (null === $this->adapters) {
+            $this->adapters = array();
+            $this
+                ->addAdapter(new GnuFindAdapter())
+                ->addAdapter(new BsdFindAdapter())
+                ->addAdapter(new PhpAdapter(), -50)
+                ->setAdapter('php')
+            ;
+        }
     }
 }

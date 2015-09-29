@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\Input;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
@@ -100,20 +102,20 @@ class InputDefinition
      *
      * @param InputArgument $argument An InputArgument object
      *
-     * @throws \LogicException When incorrect argument is given
+     * @throws LogicException When incorrect argument is given
      */
     public function addArgument(InputArgument $argument)
     {
         if (isset($this->arguments[$argument->getName()])) {
-            throw new \LogicException(sprintf('An argument with name "%s" already exists.', $argument->getName()));
+            throw new LogicException(sprintf('An argument with name "%s" already exists.', $argument->getName()));
         }
 
         if ($this->hasAnArrayArgument) {
-            throw new \LogicException('Cannot add an argument after an array argument.');
+            throw new LogicException('Cannot add an argument after an array argument.');
         }
 
         if ($argument->isRequired() && $this->hasOptional) {
-            throw new \LogicException('Cannot add a required argument after an optional one.');
+            throw new LogicException('Cannot add a required argument after an optional one.');
         }
 
         if ($argument->isArray()) {
@@ -136,12 +138,12 @@ class InputDefinition
      *
      * @return InputArgument An InputArgument object
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function getArgument($name)
     {
         if (!$this->hasArgument($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
         $arguments = is_int($name) ? array_values($this->arguments) : $this->arguments;
@@ -237,18 +239,18 @@ class InputDefinition
      *
      * @param InputOption $option An InputOption object
      *
-     * @throws \LogicException When option given already exist
+     * @throws LogicException When option given already exist
      */
     public function addOption(InputOption $option)
     {
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
-            throw new \LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
+            throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         }
 
         if ($option->getShortcut()) {
             foreach (explode('|', $option->getShortcut()) as $shortcut) {
                 if (isset($this->shortcuts[$shortcut]) && !$option->equals($this->options[$this->shortcuts[$shortcut]])) {
-                    throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $shortcut));
+                    throw new LogicException(sprintf('An option with shortcut "%s" already exists.', $shortcut));
                 }
             }
         }
@@ -268,12 +270,12 @@ class InputDefinition
      *
      * @return InputOption A InputOption object
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function getOption($name)
     {
         if (!$this->hasOption($name)) {
-            throw new \InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
         }
 
         return $this->options[$name];
@@ -347,12 +349,12 @@ class InputDefinition
      *
      * @return string The InputOption name
      *
-     * @throws \InvalidArgumentException When option given does not exist
+     * @throws InvalidArgumentException When option given does not exist
      */
     private function shortcutToName($shortcut)
     {
         if (!isset($this->shortcuts[$shortcut])) {
-            throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
+            throw new InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
         }
 
         return $this->shortcuts[$shortcut];

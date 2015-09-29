@@ -16,11 +16,6 @@ class AuthorType extends AbstractType
         ;
     }
 
-    public function getName()
-    {
-        return 'author';
-    }
-
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(

@@ -1,4 +1,5 @@
 parameters:
+    foo_class: Bar\FooClass
     baz_class: BazClass
     foo: bar
 
@@ -26,3 +27,7 @@ services:
         class: Bar
         factory_method: getInstance
         factory_service: foo.baz
+    foo_bar:
+        class: %foo_class%
+        shared: false
+        scope: prototype

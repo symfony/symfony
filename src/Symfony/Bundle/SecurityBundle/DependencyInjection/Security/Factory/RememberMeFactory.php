@@ -35,7 +35,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
             ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument($config['key'])
+            ->addArgument($config['secret'])
             ->addArgument($id)
         ;
 
@@ -56,7 +56,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
@@ -120,10 +120,25 @@ class RememberMeFactory implements SecurityFactoryInterface
     public function addConfiguration(NodeDefinition $node)
     {
         $node->fixXmlConfig('user_provider');
-        $builder = $node->children();
+        $builder = $node
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['key']); })
+                ->then(function ($v) {
+                    if (isset($v['secret'])) {
+                        throw new \LogicException('Cannot set both key and secret options for remember_me, use only secret instead.');
+                    }
+
+                    @trigger_error('remember_me.key is deprecated since version 2.8 and will be removed in 3.0. Use remember_me.secret instead.', E_USER_DEPRECATED);
+
+                    $v['secret'] = $v['key'];
+
+                    unset($v['key']);
+                })
+                ->end()
+            ->children();
 
         $builder
-            ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()

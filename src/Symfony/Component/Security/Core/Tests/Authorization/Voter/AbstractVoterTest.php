@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -53,9 +54,44 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
     }
+
+    /**
+     * @dataProvider getTests
+     * @group legacy
+     */
+    public function testVoteLegacy(array $attributes, $expectedVote, $object, $message)
+    {
+        $voter = new AbstractVoterTest_LegacyVoter();
+
+        $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \BadMethodCallException
+     */
+    public function testNoOverriddenMethodsThrowsException()
+    {
+        $voter = new AbstractVoterTest_NothingImplementedVoter();
+        $voter->vote($this->token, new \stdClass(), array('EDIT'));
+    }
 }
 
 class AbstractVoterTest_Voter extends AbstractVoter
+{
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    {
+        return 'EDIT' === $attribute;
+    }
+
+    protected function supports($attribute, $class)
+    {
+        return $this->isClassInstanceOf($class, 'stdClass')
+            && in_array($attribute, array('EDIT', 'CREATE'));
+    }
+}
+
+class AbstractVoterTest_LegacyVoter extends AbstractVoter
 {
     protected function getSupportedClasses()
     {
@@ -71,4 +107,19 @@ class AbstractVoterTest_Voter extends AbstractVoter
     {
         return 'EDIT' === $attribute;
     }
+}
+
+class AbstractVoterTest_NothingImplementedVoter extends AbstractVoter
+{
+    protected function getSupportedClasses()
+    {
+        return array('stdClass');
+    }
+
+    protected function getSupportedAttributes()
+    {
+        return array('EDIT', 'CREATE');
+    }
+
+    // this is a bad voter that hasn't overridden isGranted or voteOnAttribute
 }

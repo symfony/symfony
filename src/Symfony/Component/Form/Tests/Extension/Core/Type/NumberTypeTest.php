@@ -26,9 +26,19 @@ class NumberTypeTest extends TestCase
         \Locale::setDefault('de_DE');
     }
 
-    public function testDefaultFormatting()
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
     {
         $form = $this->factory->create('number');
+
+        $this->assertSame('number', $form->getConfig()->getType()->getName());
+    }
+
+    public function testDefaultFormatting()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType');
         $form->setData('12345.67890');
         $view = $form->createView();
 
@@ -37,7 +47,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithGrouping()
     {
-        $form = $this->factory->create('number', null, array('grouping' => true));
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType', null, array('grouping' => true));
         $form->setData('12345.67890');
         $view = $form->createView();
 
@@ -46,7 +56,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithScale()
     {
-        $form = $this->factory->create('number', null, array('scale' => 2));
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType', null, array('scale' => 2));
         $form->setData('12345.67890');
         $view = $form->createView();
 
@@ -55,7 +65,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithRounding()
     {
-        $form = $this->factory->create('number', null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\NumberType', null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
         $form->setData('12345.54321');
         $view = $form->createView();
 

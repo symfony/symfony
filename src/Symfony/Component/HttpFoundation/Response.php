@@ -114,7 +114,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link http://www.iana.org/assignments/http-status-codes/ Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2012-02-13).
+     * (last updated 2015-05-19).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
@@ -140,7 +140,6 @@ class Response
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        306 => 'Reserved',
         307 => 'Temporary Redirect',
         308 => 'Permanent Redirect',    // RFC7238
         400 => 'Bad Request',
@@ -156,12 +155,11 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',                                               // RFC2324
         422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
@@ -198,9 +196,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
-        }
     }
 
     /**
@@ -327,6 +322,10 @@ class Response
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
+        }
+
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
         }
 
         // status
@@ -608,7 +607,11 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        if (!$this->headers->has('Date')) {
+            $this->setDate(new \DateTime());
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
  * LogoutListener logout users.
@@ -98,7 +99,7 @@ class LogoutListener implements ListenerInterface
         }
 
         if (null !== $this->csrfTokenManager) {
-            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
+            $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
             if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['intention'], $csrfToken))) {
                 throw new LogoutException('Invalid CSRF token.');

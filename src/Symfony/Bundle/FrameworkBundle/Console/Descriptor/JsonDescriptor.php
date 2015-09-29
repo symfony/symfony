@@ -213,11 +213,15 @@ class JsonDescriptor extends Descriptor
     {
         $data = array(
             'class' => (string) $definition->getClass(),
-            'scope' => $definition->getScope(),
+            'scope' => $definition->getScope(false),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
         );
+
+        if (method_exists($definition, 'isShared')) {
+            $data['shared'] = $definition->isShared();
+        }
 
         if (method_exists($definition, 'isSynchronized')) {
             $data['synchronized'] = $definition->isSynchronized(false);
@@ -290,17 +294,27 @@ class JsonDescriptor extends Descriptor
     {
         $data = array();
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
         if (null !== $event) {
-            foreach ($registeredListeners as $listener) {
-                $data[] = $this->getCallableData($listener);
+            krsort($registeredListeners);
+            foreach ($registeredListeners as $priority => $listeners) {
+                foreach ($listeners as $listener) {
+                    $listener = $this->getCallableData($listener);
+                    $listener['priority'] = $priority;
+                    $data[] = $listener;
+                }
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
-                foreach ($eventListeners as $eventListener) {
-                    $data[$eventListened][] = $this->getCallableData($eventListener);
+                krsort($eventListeners);
+                foreach ($eventListeners as $priority => $listeners) {
+                    foreach ($listeners as $listener) {
+                        $listener = $this->getCallableData($listener);
+                        $listener['priority'] = $priority;
+                        $data[$eventListened][] = $listener;
+                    }
                 }
             }
         }

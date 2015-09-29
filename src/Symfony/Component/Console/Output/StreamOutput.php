@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
@@ -38,12 +40,12 @@ class StreamOutput extends Output
      * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
-     * @throws \InvalidArgumentException When first argument is not a real stream
+     * @throws InvalidArgumentException When first argument is not a real stream
      */
     public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
-            throw new \InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
+            throw new InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
         }
 
         $this->stream = $stream;
@@ -72,7 +74,7 @@ class StreamOutput extends Output
     {
         if (false === @fwrite($this->stream, $message.($newline ? PHP_EOL : ''))) {
             // should never happen
-            throw new \RuntimeException('Unable to write output.');
+            throw new RuntimeException('Unable to write output.');
         }
 
         fflush($this->stream);

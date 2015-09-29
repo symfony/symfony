@@ -35,6 +35,7 @@ before_install:
     - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then (pecl install -f memcached-2.1.0 && echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without memcache extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]] && [ "$deps" = "no" ]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini); fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = ldap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - ./phpunit install
     - export PHPUNIT="$(readlink -f ./phpunit)"
 
@@ -48,5 +49,5 @@ install:
 script:
     - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; $PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
-    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data,legacy'; fi;
     - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;

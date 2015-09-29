@@ -3,7 +3,7 @@ BrowserKit Component
 
 BrowserKit simulates the behavior of a web browser.
 
-The component only provide an abstract client and does not provide any
+The component only provides an abstract client and does not provide any
 "default" backend for the HTTP layer.
 
 Resources

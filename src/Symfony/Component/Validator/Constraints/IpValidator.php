@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
- *
- * @api
  */
 class IpValidator extends ConstraintValidator
 {

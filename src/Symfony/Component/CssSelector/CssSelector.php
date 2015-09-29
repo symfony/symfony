@@ -58,8 +58,6 @@ namespace Symfony\Component\CssSelector;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @deprecated as of 2.8, will be removed in 3.0. Use the \Symfony\Component\CssSelector\Converter class instead.
- *
- * @api
  */
 class CssSelector
 {
@@ -74,8 +72,6 @@ class CssSelector
      * @param string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
-     *
-     * @api
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {

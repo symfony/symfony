@@ -60,8 +60,6 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  *
- * @api
- *
  * @deprecated since version 2.4, to be removed in 3.0.
  *             Use the {@link ClassLoader} class instead.
  */
@@ -75,8 +73,6 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * @param string $prefix A prefix to create a namespace in APC
      *
      * @throws \RuntimeException
-     *
-     * @api
      */
     public function __construct($prefix)
     {

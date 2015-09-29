@@ -21,15 +21,11 @@ use Symfony\Component\Config\Resource\FileResource;
  * XliffFileLoader loads translations from XLIFF files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class XliffFileLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function load($resource, $locale, $domain = 'messages')
     {

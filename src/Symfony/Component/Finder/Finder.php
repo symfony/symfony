@@ -39,8 +39,6 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
  * $finder = Finder::create()->files()->name('*.php')->in(__DIR__);
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Finder implements \IteratorAggregate, \Countable
 {
@@ -81,8 +79,6 @@ class Finder implements \IteratorAggregate, \Countable
      * Creates a new Finder.
      *
      * @return Finder A new Finder instance
-     *
-     * @api
      */
     public static function create()
     {
@@ -197,8 +193,6 @@ class Finder implements \IteratorAggregate, \Countable
      * Restricts the matching to directories only.
      *
      * @return Finder The current Finder instance
-     *
-     * @api
      */
     public function directories()
     {
@@ -211,8 +205,6 @@ class Finder implements \IteratorAggregate, \Countable
      * Restricts the matching to files only.
      *
      * @return Finder The current Finder instance
-     *
-     * @api
      */
     public function files()
     {
@@ -235,8 +227,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see DepthRangeFilterIterator
      * @see NumberComparator
-     *
-     * @api
      */
     public function depth($level)
     {
@@ -262,8 +252,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @see strtotime
      * @see DateRangeFilterIterator
      * @see DateComparator
-     *
-     * @api
      */
     public function date($date)
     {
@@ -286,8 +274,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see FilenameFilterIterator
-     *
-     * @api
      */
     public function name($pattern)
     {
@@ -304,8 +290,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see FilenameFilterIterator
-     *
-     * @api
      */
     public function notName($pattern)
     {
@@ -415,8 +399,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SizeRangeFilterIterator
      * @see NumberComparator
-     *
-     * @api
      */
     public function size($size)
     {
@@ -433,8 +415,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see ExcludeDirectoryFilterIterator
-     *
-     * @api
      */
     public function exclude($dirs)
     {
@@ -451,8 +431,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see ExcludeDirectoryFilterIterator
-     *
-     * @api
      */
     public function ignoreDotFiles($ignoreDotFiles)
     {
@@ -473,8 +451,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see ExcludeDirectoryFilterIterator
-     *
-     * @api
      */
     public function ignoreVCS($ignoreVCS)
     {
@@ -515,8 +491,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sort(\Closure $closure)
     {
@@ -533,8 +507,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sortByName()
     {
@@ -551,8 +523,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sortByType()
     {
@@ -571,8 +541,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sortByAccessedTime()
     {
@@ -593,8 +561,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sortByChangedTime()
     {
@@ -613,8 +579,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see SortableIterator
-     *
-     * @api
      */
     public function sortByModifiedTime()
     {
@@ -634,8 +598,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see CustomFilterIterator
-     *
-     * @api
      */
     public function filter(\Closure $closure)
     {
@@ -648,8 +610,6 @@ class Finder implements \IteratorAggregate, \Countable
      * Forces the following of symlinks.
      *
      * @return Finder The current Finder instance
-     *
-     * @api
      */
     public function followLinks()
     {
@@ -682,8 +642,6 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @throws \InvalidArgumentException if one of the directories does not exist
-     *
-     * @api
      */
     public function in($dirs)
     {

@@ -16,8 +16,6 @@ namespace Symfony\Component\Validator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @api
- *
  * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link \Symfony\Component\Validator\Validator\ValidatorInterface} instead.
  */
@@ -40,8 +38,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false);
 
@@ -57,8 +53,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validateProperty($containingValue, $property, $groups = null);
 
@@ -76,8 +70,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null);
 
@@ -91,8 +83,6 @@ interface ValidatorInterface
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
      *
-     * @api
-     *
      * @deprecated since version 2.5, to be removed in 3.0.
      *             Renamed to {@link Validator\ValidatorInterface::validate()}
      *             in Symfony 2.5.
@@ -103,8 +93,6 @@ interface ValidatorInterface
      * Returns the factory for metadata instances.
      *
      * @return MetadataFactoryInterface The metadata factory.
-     *
-     * @api
      *
      * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Validator\ValidatorInterface::getMetadataFor()} or

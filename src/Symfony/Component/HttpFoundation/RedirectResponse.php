@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpFoundation;
  * RedirectResponse represents an HTTP response doing a redirect.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class RedirectResponse extends Response
 {
@@ -32,8 +30,6 @@ class RedirectResponse extends Response
      * @throws \InvalidArgumentException
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
-     *
-     * @api
      */
     public function __construct($url, $status = 302, $headers = array())
     {

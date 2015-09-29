@@ -17,8 +17,6 @@ namespace Symfony\Component\EventDispatcher;
  * manager.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 interface EventDispatcherInterface
 {
@@ -32,8 +30,6 @@ interface EventDispatcherInterface
      *                          If not supplied, an empty Event instance is created.
      *
      * @return Event
-     *
-     * @api
      */
     public function dispatch($eventName, Event $event = null);
 
@@ -44,8 +40,6 @@ interface EventDispatcherInterface
      * @param callable $listener  The listener
      * @param int      $priority  The higher this value, the earlier an event
      *                            listener will be triggered in the chain (defaults to 0)
-     *
-     * @api
      */
     public function addListener($eventName, $listener, $priority = 0);
 
@@ -56,8 +50,6 @@ interface EventDispatcherInterface
      * interested in and added as a listener for these events.
      *
      * @param EventSubscriberInterface $subscriber The subscriber.
-     *
-     * @api
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);
 

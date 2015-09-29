@@ -17,8 +17,6 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  * CsvFileLoader loads translations from CSV files.
  *
  * @author Saša Stamenković <umpirsky@gmail.com>
- *
- * @api
  */
 class CsvFileLoader extends FileLoader
 {

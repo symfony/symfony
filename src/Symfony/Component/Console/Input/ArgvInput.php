@@ -37,8 +37,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
  *
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
  * @see http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
- *
- * @api
  */
 class ArgvInput extends Input
 {
@@ -50,8 +48,6 @@ class ArgvInput extends Input
      *
      * @param array           $argv       An array of parameters from the CLI (in the argv format)
      * @param InputDefinition $definition A InputDefinition instance
-     *
-     * @api
      */
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {

@@ -15,8 +15,6 @@ namespace Symfony\Component\DomCrawler;
  * Link represents an HTML link (an HTML a, area or link tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Link
 {
@@ -43,8 +41,6 @@ class Link
      * @param string      $method     The method to use for the link (get by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
-     *
-     * @api
      */
     public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
     {
@@ -71,8 +67,6 @@ class Link
      * Gets the method associated with this link.
      *
      * @return string The method
-     *
-     * @api
      */
     public function getMethod()
     {
@@ -83,8 +77,6 @@ class Link
      * Gets the URI associated with this link.
      *
      * @return string The URI
-     *
-     * @api
      */
     public function getUri()
     {

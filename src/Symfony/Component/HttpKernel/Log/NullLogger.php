@@ -19,38 +19,24 @@ use Psr\Log\NullLogger as PsrNullLogger;
  * NullLogger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class NullLogger extends PsrNullLogger implements LoggerInterface
 {
-    /**
-     * @api
-     */
     public function emerg($message, array $context = array())
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new emergency() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
-    /**
-     * @api
-     */
     public function crit($message, array $context = array())
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new critical() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
-    /**
-     * @api
-     */
     public function err($message, array $context = array())
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new error() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
-    /**
-     * @api
-     */
     public function warn($message, array $context = array())
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new warning() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);

@@ -162,7 +162,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@class="checkbox"]
     [
         ./label
-            [.="[trans]Name[/trans]"]
+            [.=" [trans]Name[/trans]"]
             [
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@checked="checked"][@value="1"]
             ]
@@ -180,7 +180,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@class="checkbox"]
     [
         ./label
-            [.="[trans]Name[/trans]"]
+            [.=" [trans]Name[/trans]"]
             [
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][not(@checked)]
             ]
@@ -200,7 +200,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@class="checkbox"]
     [
         ./label
-            [.="[trans]Name[/trans]"]
+            [.=" [trans]Name[/trans]"]
             [
                 ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@value="foo&bar"]
             ]
@@ -632,7 +632,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
                     ]
@@ -641,7 +641,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
                     ]
@@ -668,7 +668,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="Choice&A"]
+                    [.=" Choice&A"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
                     ]
@@ -677,7 +677,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="Choice&B"]
+                    [.=" Choice&B"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
                     ]
@@ -706,7 +706,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
                     ]
@@ -715,7 +715,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]'.$classPart.'
                     ]
@@ -742,7 +742,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Test&Me[/trans]"]
+                    [.=" [trans]Test&Me[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_placeholder"][not(@checked)]
                     ]
@@ -751,7 +751,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
                     ]
@@ -760,7 +760,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
                     ]
@@ -786,7 +786,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
                     ]
@@ -795,7 +795,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="radio"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
                     ]
@@ -822,7 +822,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
                     ]
@@ -831,7 +831,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
                     ]
@@ -840,7 +840,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&C[/trans]"]
+                    [.=" [trans]Choice&C[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
                     ]
@@ -868,7 +868,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="Choice&A"]
+                    [.=" Choice&A"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
                     ]
@@ -877,7 +877,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="Choice&B"]
+                    [.=" Choice&B"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
                     ]
@@ -886,7 +886,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="Choice&C"]
+                    [.=" Choice&C"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
                     ]
@@ -916,7 +916,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&A[/trans]"]
+                    [.=" [trans]Choice&A[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
                     ]
@@ -925,7 +925,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&B[/trans]"]
+                    [.=" [trans]Choice&B[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]'.$classPart.'
                     ]
@@ -934,7 +934,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="checkbox"]
             [
                 ./label
-                    [.="[trans]Choice&C[/trans]"]
+                    [.=" [trans]Choice&C[/trans]"]
                     [
                         ./input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
                     ]

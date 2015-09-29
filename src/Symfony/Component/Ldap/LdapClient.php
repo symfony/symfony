@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Ldap;
 
-use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Connection\Connection;
+use Symfony\Component\Ldap\Connection\ConnectionInterface;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -23,43 +26,17 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class LdapClient implements LdapClientInterface
 {
-    private $bound = false;
-    private $host;
-    private $port;
-    private $version;
-    private $useSsl;
-    private $useStartTls;
-    private $optReferrals;
     private $connection;
     private $charmaps;
 
     /**
      * Constructor.
      *
-     * @param string $host
-     * @param int    $port
-     * @param int    $version
-     * @param bool   $useSsl
-     * @param bool   $useStartTls
-     * @param bool   $optReferrals
+     * @param ConnectionInterface $connection A configured Ldap connection
      */
-    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false)
+    public function __construct(ConnectionInterface $connection = null)
     {
-        if (!extension_loaded('ldap')) {
-            throw new LdapException('The ldap module is needed.');
-        }
-
-        $this->host = $host;
-        $this->port = $port;
-        $this->version = $version;
-        $this->useSsl = (bool) $useSsl;
-        $this->useStartTls = (bool) $useStartTls;
-        $this->optReferrals = (bool) $optReferrals;
-    }
-
-    public function __destruct()
-    {
-        $this->disconnect();
+        $this->connection = $connection ?: new Connection();
     }
 
     /**
@@ -67,38 +44,45 @@ class LdapClient implements LdapClientInterface
      */
     public function bind($dn = null, $password = null)
     {
-        if (!$this->connection) {
-            $this->connect();
+        if (!$this->connection->isConnected()) {
+            $this->connection->connect();
         }
 
-        if (false === @ldap_bind($this->connection, $dn, $password)) {
-            throw new ConnectionException(ldap_error($this->connection));
-        }
-
-        $this->bound = true;
+        $this->connection->bind($dn, $password);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($dn, $query, $filter = '*')
+    public function find($dn, $query, array $options = array())
     {
-        if (!is_array($filter)) {
-            $filter = array($filter);
-        }
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(array(
+            'filter' => '*',
+            'maxItems' => 0,
+            'sizeLimit' => 0,
+            'timeout' => 0,
+            'deref' => LDAP_DEREF_NEVER,
+        ));
+        $resolver->setNormalizer('filter', function (Options $options, $value) {
+            return is_array($value) ? $value : array($value);
+        });
+        $options = $resolver->resolve($options);
 
         // If the connection is not bound, then we try an anonymous bind.
-        if (false === $this->bound) {
-            $this->bind();
+        if (!$this->connection->isBound()) {
+            $this->connection->bind();
         }
 
-        $search = ldap_search($this->connection, $dn, $query, $filter);
+        $connection = $this->connection->getConnection();
+
+        $search = ldap_search($connection, $dn, $query, $options['filter'], $options['attrsOnly'], $options['maxItems'], $options['timeout'], $options['deref']);
 
         if (false === $search) {
-            throw new LdapException(sprintf('Could not complete search with DN "%s", query "%s" and filters "%s"', $dn, $query, implode(',', $filter)));
+            throw new LdapException(sprintf('Could not complete search with DN "%s", query "%s" and filters "%s"', $dn, $query, implode(',', $options['filter'])));
         }
 
-        $infos = ldap_get_entries($this->connection, $search);
+        $infos = ldap_get_entries($connection, $search);
 
         if (0 === $infos['count']) {
             return;
@@ -126,34 +110,5 @@ class LdapClient implements LdapClientInterface
         }
 
         return $value;
-    }
-
-    private function connect()
-    {
-        if (!$this->connection) {
-            $host = $this->host;
-
-            if ($this->useSsl) {
-                $host = 'ldaps://'.$host;
-            }
-
-            $this->connection = ldap_connect($host, $this->port);
-
-            ldap_set_option($this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->version);
-            ldap_set_option($this->connection, LDAP_OPT_REFERRALS, $this->optReferrals);
-
-            if ($this->useStartTls) {
-                ldap_start_tls($this->connection);
-            }
-        }
-    }
-
-    private function disconnect()
-    {
-        if ($this->connection && is_resource($this->connection)) {
-            ldap_unbind($this->connection);
-        }
-
-        $this->connection = null;
     }
 }

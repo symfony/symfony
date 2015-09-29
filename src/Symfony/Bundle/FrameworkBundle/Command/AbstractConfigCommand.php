@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 

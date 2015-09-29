@@ -21,6 +21,7 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class LdapClient implements LdapClientInterface
 {
+    private $bound = false;
     private $host;
     private $port;
     private $version;
@@ -71,6 +72,8 @@ class LdapClient implements LdapClientInterface
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));
         }
+
+        $this->bound = true;
     }
 
     /**
@@ -82,7 +85,17 @@ class LdapClient implements LdapClientInterface
             $filter = array($filter);
         }
 
+        // If the connection is not bound, then we try an anonymous bind.
+        if (false === $this->bound) {
+            $this->bind();
+        }
+
         $search = ldap_search($this->connection, $dn, $query, $filter);
+
+        if (false === $search) {
+            throw new LdapException(sprintf('Could not complete search with DN "%s", query "%s" and filters "%s"', $dn, $query, implode(',', $filter)));
+        }
+
         $infos = ldap_get_entries($this->connection, $search);
 
         if (0 === $infos['count']) {

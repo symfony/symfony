@@ -18,8 +18,6 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Callback extends Constraint
 {

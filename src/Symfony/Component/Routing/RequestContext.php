@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class RequestContext
 {
@@ -48,8 +46,6 @@ class RequestContext
      * @param int    $httpsPort   The HTTPS port
      * @param string $path        The path
      * @param string $queryString The query string
-     *
-     * @api
      */
     public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443, $path = '/', $queryString = '')
     {
@@ -94,8 +90,6 @@ class RequestContext
      * Sets the base URL.
      *
      * @param string $baseUrl The base URL
-     *
-     * @api
      */
     public function setBaseUrl($baseUrl)
     {
@@ -138,8 +132,6 @@ class RequestContext
      * Sets the HTTP method.
      *
      * @param string $method The HTTP method
-     *
-     * @api
      */
     public function setMethod($method)
     {
@@ -162,8 +154,6 @@ class RequestContext
      * Sets the HTTP host.
      *
      * @param string $host The HTTP host
-     *
-     * @api
      */
     public function setHost($host)
     {
@@ -184,8 +174,6 @@ class RequestContext
      * Sets the HTTP scheme.
      *
      * @param string $scheme The HTTP scheme
-     *
-     * @api
      */
     public function setScheme($scheme)
     {
@@ -206,8 +194,6 @@ class RequestContext
      * Sets the HTTP port.
      *
      * @param int $httpPort The HTTP port
-     *
-     * @api
      */
     public function setHttpPort($httpPort)
     {
@@ -228,8 +214,6 @@ class RequestContext
      * Sets the HTTPS port.
      *
      * @param int $httpsPort The HTTPS port
-     *
-     * @api
      */
     public function setHttpsPort($httpsPort)
     {
@@ -250,8 +234,6 @@ class RequestContext
      * Sets the query string.
      *
      * @param string $queryString The query string (after "?")
-     *
-     * @api
      */
     public function setQueryString($queryString)
     {
@@ -312,8 +294,6 @@ class RequestContext
      *
      * @param string $name      A parameter name
      * @param mixed  $parameter The parameter value
-     *
-     * @api
      */
     public function setParameter($name, $parameter)
     {

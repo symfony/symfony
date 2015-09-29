@@ -22,8 +22,6 @@ use Symfony\Component\Config\Util\XmlUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class XmlFileLoader extends FileLoader
 {
@@ -40,8 +38,6 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme.
-     *
-     * @api
      */
     public function load($file, $type = null)
     {
@@ -94,8 +90,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {

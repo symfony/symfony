@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Pierre Minnieur <pierre.minnieur@sensiolabs.de>
- *
- * @api
  */
 interface TerminableInterface
 {
@@ -32,8 +30,6 @@ interface TerminableInterface
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
-     *
-     * @api
      */
     public function terminate(Request $request, Response $response);
 }

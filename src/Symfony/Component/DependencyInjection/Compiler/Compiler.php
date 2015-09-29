@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * This class is used to remove circular dependencies between individual passes.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 class Compiler
 {
@@ -42,8 +40,6 @@ class Compiler
      * Returns the PassConfig.
      *
      * @return PassConfig The PassConfig instance
-     *
-     * @api
      */
     public function getPassConfig()
     {
@@ -54,8 +50,6 @@ class Compiler
      * Returns the ServiceReferenceGraph.
      *
      * @return ServiceReferenceGraph The ServiceReferenceGraph instance
-     *
-     * @api
      */
     public function getServiceReferenceGraph()
     {
@@ -77,8 +71,6 @@ class Compiler
      *
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of the pass
-     *
-     * @api
      */
     public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
@@ -109,8 +101,6 @@ class Compiler
      * Run the Compiler and process all Passes.
      *
      * @param ContainerBuilder $container
-     *
-     * @api
      */
     public function compile(ContainerBuilder $container)
     {

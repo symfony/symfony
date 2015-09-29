@@ -26,8 +26,6 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  *  * quiet: -q (no output)
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Output implements OutputInterface
 {
@@ -40,8 +38,6 @@ abstract class Output implements OutputInterface
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
      * @param bool                          $decorated Whether to decorate messages
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
-     *
-     * @api
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
     {

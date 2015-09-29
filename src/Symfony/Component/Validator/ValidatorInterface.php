@@ -15,8 +15,6 @@ namespace Symfony\Component\Validator;
  * Validates values and graphs of objects and arrays.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 interface ValidatorInterface
 {
@@ -33,8 +31,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false);
 
@@ -50,8 +46,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validateProperty($containingValue, $property, $groups = null);
 
@@ -69,8 +63,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null);
 
@@ -83,8 +75,6 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
-     *
-     * @api
      */
     public function validateValue($value, $constraints, $groups = null);
 
@@ -92,8 +82,6 @@ interface ValidatorInterface
      * Returns the factory for metadata instances.
      *
      * @return MetadataFactoryInterface The metadata factory.
-     *
-     * @api
      */
     public function getMetadataFactory();
 }

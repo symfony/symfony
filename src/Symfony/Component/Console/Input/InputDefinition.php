@@ -25,8 +25,6 @@ use Symfony\Component\Console\Descriptor\XmlDescriptor;
  *     ));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class InputDefinition
 {
@@ -41,8 +39,6 @@ class InputDefinition
      * Constructor.
      *
      * @param array $definition An array of InputArgument and InputOption instance
-     *
-     * @api
      */
     public function __construct(array $definition = array())
     {
@@ -53,8 +49,6 @@ class InputDefinition
      * Sets the definition of the input.
      *
      * @param array $definition The definition array
-     *
-     * @api
      */
     public function setDefinition(array $definition)
     {
@@ -76,8 +70,6 @@ class InputDefinition
      * Sets the InputArgument objects.
      *
      * @param InputArgument[] $arguments An array of InputArgument objects
-     *
-     * @api
      */
     public function setArguments($arguments = array())
     {
@@ -92,8 +84,6 @@ class InputDefinition
      * Adds an array of InputArgument objects.
      *
      * @param InputArgument[] $arguments An array of InputArgument objects
-     *
-     * @api
      */
     public function addArguments($arguments = array())
     {
@@ -110,8 +100,6 @@ class InputDefinition
      * @param InputArgument $argument An InputArgument object
      *
      * @throws \LogicException When incorrect argument is given
-     *
-     * @api
      */
     public function addArgument(InputArgument $argument)
     {
@@ -148,8 +136,6 @@ class InputDefinition
      * @return InputArgument An InputArgument object
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
-     *
-     * @api
      */
     public function getArgument($name)
     {
@@ -168,8 +154,6 @@ class InputDefinition
      * @param string|int $name The InputArgument name or position
      *
      * @return bool true if the InputArgument object exists, false otherwise
-     *
-     * @api
      */
     public function hasArgument($name)
     {
@@ -182,8 +166,6 @@ class InputDefinition
      * Gets the array of InputArgument objects.
      *
      * @return InputArgument[] An array of InputArgument objects
-     *
-     * @api
      */
     public function getArguments()
     {
@@ -229,8 +211,6 @@ class InputDefinition
      * Sets the InputOption objects.
      *
      * @param InputOption[] $options An array of InputOption objects
-     *
-     * @api
      */
     public function setOptions($options = array())
     {
@@ -243,8 +223,6 @@ class InputDefinition
      * Adds an array of InputOption objects.
      *
      * @param InputOption[] $options An array of InputOption objects
-     *
-     * @api
      */
     public function addOptions($options = array())
     {
@@ -259,8 +237,6 @@ class InputDefinition
      * @param InputOption $option An InputOption object
      *
      * @throws \LogicException When option given already exist
-     *
-     * @api
      */
     public function addOption(InputOption $option)
     {
@@ -292,8 +268,6 @@ class InputDefinition
      * @return InputOption A InputOption object
      *
      * @throws \InvalidArgumentException When option given doesn't exist
-     *
-     * @api
      */
     public function getOption($name)
     {
@@ -310,8 +284,6 @@ class InputDefinition
      * @param string $name The InputOption name
      *
      * @return bool true if the InputOption object exists, false otherwise
-     *
-     * @api
      */
     public function hasOption($name)
     {
@@ -322,8 +294,6 @@ class InputDefinition
      * Gets the array of InputOption objects.
      *
      * @return InputOption[] An array of InputOption objects
-     *
-     * @api
      */
     public function getOptions()
     {

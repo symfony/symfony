@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  * ParameterBagInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface ParameterBagInterface
 {
@@ -27,8 +25,6 @@ interface ParameterBagInterface
      * Clears all parameters.
      *
      * @throws LogicException if the ParameterBagInterface can not be cleared
-     *
-     * @api
      */
     public function clear();
 
@@ -38,8 +34,6 @@ interface ParameterBagInterface
      * @param array $parameters An array of parameters
      *
      * @throws LogicException if the parameter can not be added
-     *
-     * @api
      */
     public function add(array $parameters);
 
@@ -47,8 +41,6 @@ interface ParameterBagInterface
      * Gets the service container parameters.
      *
      * @return array An array of parameters
-     *
-     * @api
      */
     public function all();
 
@@ -60,8 +52,6 @@ interface ParameterBagInterface
      * @return mixed The parameter value
      *
      * @throws ParameterNotFoundException if the parameter is not defined
-     *
-     * @api
      */
     public function get($name);
 
@@ -72,8 +62,6 @@ interface ParameterBagInterface
      * @param mixed  $value The parameter value
      *
      * @throws LogicException if the parameter can not be set
-     *
-     * @api
      */
     public function set($name, $value);
 
@@ -83,8 +71,6 @@ interface ParameterBagInterface
      * @param string $name The parameter name
      *
      * @return bool true if the parameter name is defined, false otherwise
-     *
-     * @api
      */
     public function has($name);
 

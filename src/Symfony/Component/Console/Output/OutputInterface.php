@@ -17,8 +17,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * OutputInterface is the interface implemented by all Output classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface OutputInterface
 {
@@ -40,8 +38,6 @@ interface OutputInterface
      * @param int          $type     The type of output (one of the OUTPUT constants)
      *
      * @throws \InvalidArgumentException When unknown output type is given
-     *
-     * @api
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL);
 
@@ -52,8 +48,6 @@ interface OutputInterface
      * @param int          $type     The type of output (one of the OUTPUT constants)
      *
      * @throws \InvalidArgumentException When unknown output type is given
-     *
-     * @api
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
@@ -61,8 +55,6 @@ interface OutputInterface
      * Sets the verbosity of the output.
      *
      * @param int $level The level of verbosity (one of the VERBOSITY constants)
-     *
-     * @api
      */
     public function setVerbosity($level);
 
@@ -70,8 +62,6 @@ interface OutputInterface
      * Gets the current verbosity of the output.
      *
      * @return int The current level of verbosity (one of the VERBOSITY constants)
-     *
-     * @api
      */
     public function getVerbosity();
 
@@ -79,8 +69,6 @@ interface OutputInterface
      * Sets the decorated flag.
      *
      * @param bool $decorated Whether to decorate the messages
-     *
-     * @api
      */
     public function setDecorated($decorated);
 
@@ -88,8 +76,6 @@ interface OutputInterface
      * Gets the decorated flag.
      *
      * @return bool true if the output will decorate messages, false otherwise
-     *
-     * @api
      */
     public function isDecorated();
 
@@ -97,8 +83,6 @@ interface OutputInterface
      * Sets output formatter.
      *
      * @param OutputFormatterInterface $formatter
-     *
-     * @api
      */
     public function setFormatter(OutputFormatterInterface $formatter);
 
@@ -106,8 +90,6 @@ interface OutputInterface
      * Returns current output formatter instance.
      *
      * @return OutputFormatterInterface
-     *
-     * @api
      */
     public function getFormatter();
 }

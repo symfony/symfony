@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Dumper is the abstract class for all built-in dumpers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Dumper implements DumperInterface
 {
@@ -28,8 +26,6 @@ abstract class Dumper implements DumperInterface
      * Constructor.
      *
      * @param ContainerBuilder $container The service container to dump
-     *
-     * @api
      */
     public function __construct(ContainerBuilder $container)
     {

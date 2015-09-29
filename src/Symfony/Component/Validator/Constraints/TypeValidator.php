@@ -16,8 +16,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class TypeValidator extends ConstraintValidator
 {

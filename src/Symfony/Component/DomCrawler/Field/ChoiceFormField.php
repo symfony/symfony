@@ -17,8 +17,6 @@ namespace Symfony\Component\DomCrawler\Field;
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ChoiceFormField extends FormField
 {
@@ -70,8 +68,6 @@ class ChoiceFormField extends FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
-     *
-     * @api
      */
     public function select($value)
     {
@@ -82,8 +78,6 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
-     *
-     * @api
      */
     public function tick()
     {
@@ -98,8 +92,6 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
-     *
-     * @api
      */
     public function untick()
     {

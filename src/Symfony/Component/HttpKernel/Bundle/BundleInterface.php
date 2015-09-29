@@ -19,22 +19,16 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  * BundleInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface BundleInterface extends ContainerAwareInterface
 {
     /**
      * Boots the Bundle.
-     *
-     * @api
      */
     public function boot();
 
     /**
      * Shutdowns the Bundle.
-     *
-     * @api
      */
     public function shutdown();
 
@@ -44,8 +38,6 @@ interface BundleInterface extends ContainerAwareInterface
      * It is only ever called once when the cache is empty.
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @api
      */
     public function build(ContainerBuilder $container);
 
@@ -53,8 +45,6 @@ interface BundleInterface extends ContainerAwareInterface
      * Returns the container extension that should be implicitly loaded.
      *
      * @return ExtensionInterface|null The default extension or null if there is none
-     *
-     * @api
      */
     public function getContainerExtension();
 
@@ -66,8 +56,6 @@ interface BundleInterface extends ContainerAwareInterface
      * bundle.
      *
      * @return string The Bundle name it overrides or null if no parent
-     *
-     * @api
      */
     public function getParent();
 
@@ -75,8 +63,6 @@ interface BundleInterface extends ContainerAwareInterface
      * Returns the bundle name (the class short name).
      *
      * @return string The Bundle name
-     *
-     * @api
      */
     public function getName();
 
@@ -84,8 +70,6 @@ interface BundleInterface extends ContainerAwareInterface
      * Gets the Bundle namespace.
      *
      * @return string The Bundle namespace
-     *
-     * @api
      */
     public function getNamespace();
 
@@ -95,8 +79,6 @@ interface BundleInterface extends ContainerAwareInterface
      * The path should always be returned as a Unix path (with /).
      *
      * @return string The Bundle absolute path
-     *
-     * @api
      */
     public function getPath();
 }

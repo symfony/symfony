@@ -20,6 +20,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()
             ->getMock();
+
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,8 +39,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('addPropertyConstraint')
             ->with('children', $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid'));
 
-        $validator
-            ->expects($this->never())
+        $validator->expects($this->never())
             ->method('getMetadataFactory');
 
         $extension = new ValidatorExtension($validator);

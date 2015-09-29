@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\ClassBasedInterface;
-use Symfony\Component\Validator\PropertyMetadataContainerInterface as LegacyPropertyMetadataContainerInterface;
-
 /**
  * Stores all metadata needed for validating objects of specific class.
  *
@@ -33,7 +30,7 @@ use Symfony\Component\Validator\PropertyMetadataContainerInterface as LegacyProp
  * @see \Symfony\Component\Validator\GroupSequenceProviderInterface
  * @see TraversalStrategy
  */
-interface ClassMetadataInterface extends MetadataInterface, LegacyPropertyMetadataContainerInterface, ClassBasedInterface
+interface ClassMetadataInterface extends MetadataInterface
 {
     /**
      * Returns the names of all constrained properties.

@@ -40,10 +40,6 @@ class Valid extends Constraint
             ));
         }
 
-        if (is_array($options) && array_key_exists('deep', $options)) {
-            @trigger_error('The "deep" option for the Valid constraint is deprecated since version 2.5 and will be removed in 3.0. When traversing arrays, nested arrays are always traversed. When traversing nested objects, their traversal strategy is used.', E_USER_DEPRECATED);
-        }
-
         parent::__construct($options);
     }
 }

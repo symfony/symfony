@@ -22,11 +22,11 @@ use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 
@@ -190,17 +190,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     public function validateProperty($object, $propertyName, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
-
-        if (!$classMetadata instanceof ClassMetadataInterface) {
-            // Cannot be UnsupportedMetadataException because of BC with
-            // Symfony < 2.5
-            throw new ValidatorException(sprintf(
-                'The metadata factory should return instances of '.
-                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                'got: "%s".',
-                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
-            ));
-        }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;

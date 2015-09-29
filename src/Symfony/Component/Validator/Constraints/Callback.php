@@ -47,16 +47,9 @@ class Callback extends Constraint
             $options = $options['value'];
         }
 
-        if (is_array($options) && isset($options['methods'])) {
-            @trigger_error('The "methods" option of the '.__CLASS__.' class is deprecated since version 2.4 and will be removed in 3.0. Use the "callback" option instead.', E_USER_DEPRECATED);
-        }
-
         if (is_array($options) && !isset($options['callback']) && !isset($options['methods']) && !isset($options['groups'])) {
             if (is_callable($options) || !$options) {
                 $options = array('callback' => $options);
-            } else {
-                // @deprecated, to be removed in 3.0
-                $options = array('methods' => $options);
             }
         }
 

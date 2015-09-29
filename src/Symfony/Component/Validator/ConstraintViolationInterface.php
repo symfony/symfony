@@ -60,40 +60,6 @@ interface ConstraintViolationInterface
     public function getMessageTemplate();
 
     /**
-     * Returns the parameters to be inserted into the raw violation message.
-     *
-     * @return array A possibly empty list of parameters indexed by the names
-     *               that appear in the message template.
-     *
-     * @see getMessageTemplate()
-     *
-     * @api
-     *
-     * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
-     */
-    public function getMessageParameters();
-
-    /**
-     * Returns a number for pluralizing the violation message.
-     *
-     * For example, the message template could have different translation based
-     * on a parameter "choices":
-     *
-     * <ul>
-     * <li>Please select exactly one entry. (choices=1)</li>
-     * <li>Please select two entries. (choices=2)</li>
-     * </ul>
-     *
-     * This method returns the value of the parameter for choosing the right
-     * pluralization form (in this case "choices").
-     *
-     * @return int|null The number to use to pluralize of the message.
-     *
-     * @deprecated since version 2.7, to be replaced by getPlural() in 3.0.
-     */
-    public function getMessagePluralization();
-
-    /**
      * Returns the root element of the validation.
      *
      * @return mixed The value that was passed originally to the validator when

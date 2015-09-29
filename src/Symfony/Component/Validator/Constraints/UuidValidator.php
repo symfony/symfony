@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Constraints\Deprecated\UuidValidator as Deprecated;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -56,21 +55,6 @@ class UuidValidator extends ConstraintValidator
 
     const LOOSE_MAX_LENGTH = 39;
     const LOOSE_FIRST_HYPHEN_POSITION = 4;
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const STRICT_PATTERN = '/^[a-f0-9]{8}-[a-f0-9]{4}-[%s][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i';
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const LOOSE_PATTERN = '/^[a-f0-9]{4}(?:-?[a-f0-9]{4}){7}$/i';
-
-    /**
-     * @deprecated since version 2.6, to be removed in 3.0
-     */
-    const STRICT_UUID_LENGTH = 36;
 
     /**
      * {@inheritdoc}

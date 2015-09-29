@@ -155,7 +155,7 @@ class TextDescriptor extends Descriptor
                 array(
                     array(isset($options['id']) ? $options['id'] : '-', get_class($service)),
                 )
-            ));
+            );
         }
     }
 

@@ -58,7 +58,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $config = $this->yamlParser->parse(file_get_contents($path));
+            $configParsed = $this->yamlParser->parse(file_get_contents($path));
         } catch (ParseException $e) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
         }
@@ -67,16 +67,16 @@ class YamlFileLoader extends FileLoader
         $collection->addResource(new FileResource($path));
 
         // empty file
-        if (null === $config) {
+        if (null === $configParsed) {
             return $collection;
         }
 
         // not an array
-        if (!is_array($config)) {
+        if (!is_array($configParsed)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
-        foreach ($config as $name => $config) {
+        foreach ($configParsed as $name => $config) {
             if (isset($config['pattern'])) {
                 if (isset($config['path'])) {
                     throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));

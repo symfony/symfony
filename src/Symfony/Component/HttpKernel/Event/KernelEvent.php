@@ -86,8 +86,6 @@ class KernelEvent extends Event
      * Checks if this is a master request.
      *
      * @return bool True if the request is a master request
-     *
-     * @api
      */
     public function isMasterRequest()
     {

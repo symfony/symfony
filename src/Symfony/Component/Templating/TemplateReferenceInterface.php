@@ -72,8 +72,6 @@ interface TemplateReferenceInterface
      * Alias of getLogicalName().
      *
      * @return string The template name
-     *
-     * @api
      */
     public function __toString();
 }

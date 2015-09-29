@@ -264,26 +264,6 @@ class Configuration implements ConfigurationInterface
     private function addProfilerSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return 'file:' !== substr($v['dsn'], 0, 5); })
-                ->then(function ($v) {
-                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-                ->ifTrue(function ($v) { return array_key_exists('username', $v); })
-                ->then(function ($v) {
-                    @trigger_error('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-                ->ifTrue(function ($v) { return array_key_exists('password', $v); })
-                ->then(function ($v) {
-                    @trigger_error('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->arrayNode('profiler')
                     ->info('profiler configuration')
@@ -292,9 +272,27 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('collect')->defaultTrue()->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
-                        ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
-                        ->scalarNode('username')->defaultValue('')->end()
-                        ->scalarNode('password')->defaultValue('')->end()
+                        ->scalarNode('dsn')
+                            ->defaultValue('file:%kernel.cache_dir%/profiler')
+                            ->beforeNormalization()
+                                ->always()
+                                ->thenInvalid('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.')
+                            ->end()
+                        ->end()
+                        ->scalarNode('username')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->thenInvalid('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.')
+                            ->end()
+                        ->end()
+                        ->scalarNode('password')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->thenInvalid('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.')
+                            ->end()
+                        ->end()
                         ->scalarNode('lifetime')->defaultValue(86400)->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()

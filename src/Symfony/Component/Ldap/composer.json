@@ -17,8 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/polyfill-php56": "~1.0",
-        "ext-ldap": "*"
+        "ext-ldap": "*",
+        "symfony/options_resolver": "~2.7|~3.0.0"
+        "symfony/polyfill-php56": "~1.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },

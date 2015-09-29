@@ -43,7 +43,7 @@ interface LdapClientInterface
      *
      * @return array|null
      */
-    public function find($dn, $query, $filter = '*');
+    public function find($dn, $query, array $options = array());
 
     /**
      * Escape a string for use in an LDAP filter or DN.

@@ -53,6 +53,7 @@
         <service id="security.context" class="%security.context.class%">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authorization_checker" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 2.6 and will be removed in 3.0.</deprecated>
         </service>
 
         <service id="security.authorization_checker" class="Symfony\Component\Security\Core\Authorization\AuthorizationChecker">

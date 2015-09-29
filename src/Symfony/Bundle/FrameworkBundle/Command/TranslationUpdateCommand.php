@@ -151,7 +151,7 @@ EOF
         }
 
         // show compiled list of messages
-        if ($input->getOption('dump-messages') === true) {
+        if (true === $input->getOption('dump-messages')) {
             $extractedMessagesCount = 0;
             $output->newLine();
             foreach ($operation->getDomains() as $domain) {
@@ -201,7 +201,7 @@ EOF
                 $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
             }
 
-            if ($input->getOption('dump-messages') === true) {
+            if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated.';
             } else {
                 $resultMessage = 'Translation files were successfully updated.';

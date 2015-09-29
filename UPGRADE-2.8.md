@@ -1,6 +1,11 @@
 ﻿UPGRADE FROM 2.7 to 2.8
 =======================
 
+Console
+-------
+
+ * Deprecated the Shell
+
 Form
 ----
 

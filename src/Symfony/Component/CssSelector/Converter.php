@@ -20,8 +20,6 @@ use Symfony\Component\CssSelector\XPath\Translator;
 
 /**
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @api
  */
 class Converter implements ConverterInterface
 {

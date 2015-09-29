@@ -548,8 +548,6 @@ class Definition
      * @param bool $shared Whether the service must be shared or not
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setShared($shared)
     {
@@ -562,8 +560,6 @@ class Definition
      * Whether this service is shared.
      *
      * @return bool
-     *
-     * @api
      */
     public function isShared()
     {
@@ -756,8 +752,6 @@ class Definition
      * @return Definition the current instance
      *
      * @throws InvalidArgumentException When the message template is invalid.
-     *
-     * @api
      */
     public function setDeprecated($status = true, $template = null)
     {
@@ -783,8 +777,6 @@ class Definition
      * anymore.
      *
      * @return bool
-     *
-     * @api
      */
     public function isDeprecated()
     {
@@ -797,8 +789,6 @@ class Definition
      * @param string $id Service id relying on this definition
      *
      * @return string
-     *
-     * @api
      */
     public function getDeprecationMessage($id)
     {

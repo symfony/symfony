@@ -52,8 +52,6 @@ namespace Symfony\Component\CssSelector;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @api
  */
 interface ConverterInterface
 {
@@ -67,8 +65,6 @@ interface ConverterInterface
      * @param string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
-     *
-     * @api
      */
     public function toXPath($cssExpr, $prefix = 'descendant-or-self::');
 

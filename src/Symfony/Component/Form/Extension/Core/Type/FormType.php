@@ -99,6 +99,7 @@ class FormType extends BaseType
             'method' => $form->getConfig()->getMethod(),
             'action' => $form->getConfig()->getAction(),
             'submitted' => $form->isSubmitted(),
+            'omit_action' => $options['omit_action'],
         ));
     }
 
@@ -207,6 +208,7 @@ class FormType extends BaseType
             'action' => '',
             'attr' => $defaultAttr,
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+            'omit_action' => false,
         ));
 
         $resolver->setAllowedTypes('label_attr', 'array');

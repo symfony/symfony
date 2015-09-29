@@ -24,8 +24,6 @@ namespace Symfony\Component\EventDispatcher;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
- *
- * @api
  */
 class EventDispatcher implements EventDispatcherInterface
 {

@@ -15,18 +15,10 @@ namespace Symfony\Component\DependencyInjection;
  * Scope Interface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 interface ScopeInterface
 {
-    /**
-     * @api
-     */
     public function getName();
 
-    /**
-     * @api
-     */
     public function getParentName();
 }

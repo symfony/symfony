@@ -45,8 +45,6 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Kim Hemsø Rasmussen <kimhemsoe@gmail.com>
- *
- * @api
  */
 class XcacheClassLoader
 {
@@ -67,8 +65,6 @@ class XcacheClassLoader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function __construct($prefix, $decorated)
     {

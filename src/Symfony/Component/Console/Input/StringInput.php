@@ -19,8 +19,6 @@ namespace Symfony\Component\Console\Input;
  *     $input = new StringInput('foo --bar="foobar"');
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class StringInput extends ArgvInput
 {
@@ -34,8 +32,6 @@ class StringInput extends ArgvInput
      * @param InputDefinition $definition A InputDefinition instance
      *
      * @deprecated The second argument is deprecated as it does not work (will be removed in 3.0), use 'bind' method instead
-     *
-     * @api
      */
     public function __construct($input, InputDefinition $definition = null)
     {

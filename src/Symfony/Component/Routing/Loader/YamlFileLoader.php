@@ -23,8 +23,6 @@ use Symfony\Component\Config\Loader\FileLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class YamlFileLoader extends FileLoader
 {
@@ -42,8 +40,6 @@ class YamlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
-     *
-     * @api
      */
     public function load($file, $type = null)
     {
@@ -106,8 +102,6 @@ class YamlFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {

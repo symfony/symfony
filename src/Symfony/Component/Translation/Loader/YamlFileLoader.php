@@ -21,8 +21,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * YamlFileLoader loads translations from Yaml files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class YamlFileLoader extends ArrayLoader
 {
@@ -30,8 +28,6 @@ class YamlFileLoader extends ArrayLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function load($resource, $locale, $domain = 'messages')
     {

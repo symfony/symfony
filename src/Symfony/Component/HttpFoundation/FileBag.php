@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
- *
- * @api
  */
 class FileBag extends ParameterBag
 {
@@ -29,8 +27,6 @@ class FileBag extends ParameterBag
      * Constructor.
      *
      * @param array $parameters An array of HTTP files
-     *
-     * @api
      */
     public function __construct(array $parameters = array())
     {
@@ -39,8 +35,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function replace(array $files = array())
     {
@@ -50,8 +44,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function set($key, $value)
     {
@@ -64,8 +56,6 @@ class FileBag extends ParameterBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function add(array $files = array())
     {

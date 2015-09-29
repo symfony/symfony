@@ -20,8 +20,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validator for Callback constraint.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class CallbackValidator extends ConstraintValidator
 {

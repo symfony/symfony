@@ -73,8 +73,15 @@ abstract class Input implements InputInterface
      */
     public function validate()
     {
-        if (count($this->arguments) < $this->definition->getArgumentRequiredCount()) {
-            throw new \RuntimeException('Not enough arguments.');
+        $definition = $this->definition;
+        $givenArguments = $this->arguments;
+
+        $missingArguments = array_filter(array_keys($definition->getArguments()), function ($argument) use ($definition, $givenArguments) {
+            return !array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
+        });
+
+        if (count($missingArguments) > 0) {
+            throw new \RuntimeException(sprintf('Not enough arguments (missing: "%s").', implode(', ', $missingArguments)));
         }
     }
 

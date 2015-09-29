@@ -19,9 +19,12 @@ use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
 use Symfony\Component\CssSelector\XPath\Translator;
 
 /**
+ * CssSelectorConverter is the main entry point of the component and can convert CSS
+ * selectors to XPath expressions.
+ *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class Converter implements ConverterInterface
+class CssSelectorConverter
 {
     private $translator;
 
@@ -45,7 +48,15 @@ class Converter implements ConverterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Translates a CSS expression to its XPath equivalent.
+     *
+     * Optionally, a prefix can be added to the resulting XPath
+     * expression with the $prefix parameter.
+     *
+     * @param string $cssExpr The CSS expression.
+     * @param string $prefix  An optional prefix for the XPath expression.
+     *
+     * @return string
      */
     public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {

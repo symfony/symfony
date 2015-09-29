@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T17:10:11Z
+
+:+1:
+status: reviewed
+
+but I think the first step is actually to update the doc, to stop telling users about the distinction
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T18:02:35Z
+
+see symfony/symfony-docs#5735 for the docs changes
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-28T19:47:14Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T20:09:03Z
+
+:+1: I propose that you merge this PR and then merge it to 2.7/2.8/master, doing the needed addons; that would be much more efficient than doing a PR for each branch.

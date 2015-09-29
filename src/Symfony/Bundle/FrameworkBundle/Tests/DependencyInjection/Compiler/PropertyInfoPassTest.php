@@ -48,4 +48,25 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
+    public function testReturningEmptyArrayWhenNoService()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
+
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue(array()));
+
+        $propertyInfoPass = new PropertyInfoPass();
+
+        $method = new \ReflectionMethod(
+            'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass',
+            'findAndSortTaggedServices'
+        );
+        $method->setAccessible(true);
+
+        $actual = $method->invoke($propertyInfoPass, 'tag', $container);
+
+        $this->assertEquals(array(), $actual);
+    }
 }

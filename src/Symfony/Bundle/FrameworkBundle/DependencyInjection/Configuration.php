@@ -730,7 +730,6 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('property_info')
-                    ->addDefaultsIfNotSet()
                     ->info('Property info configuration')
                     ->canBeEnabled()
                 ->end()

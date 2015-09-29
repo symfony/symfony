@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
@@ -62,8 +63,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $stdout = $output;
+        $output = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':l')) {
-            $output->writeln('<comment>The use of "yaml:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:yaml" instead.</comment>');
+            $output->caution('The use of "yaml:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:yaml" instead.');
         }
 
         $filename = $input->getArgument('filename');
@@ -78,7 +81,7 @@ EOF
                 $content .= fread(STDIN, 1024);
             }
 
-            return $this->display($input, $output, array($this->validate($content)));
+            return $this->display($input, $stdout, $output, array($this->validate($content)));
         }
 
         if (0 !== strpos($filename, '@') && !is_readable($filename)) {
@@ -100,7 +103,7 @@ EOF
             $filesInfo[] = $this->validate(file_get_contents($file), $file);
         }
 
-        return $this->display($input, $output, $filesInfo);
+        return $this->display($input, $stdout, $output, $filesInfo);
     }
 
     private function validate($content, $file = null)
@@ -115,11 +118,11 @@ EOF
         return array('file' => $file, 'valid' => true);
     }
 
-    private function display(InputInterface $input, OutputInterface $output, $files)
+    private function display(InputInterface $input, OutputInterface $stdout, $output, $files)
     {
         switch ($input->getOption('format')) {
             case 'txt':
-                return $this->displayTxt($output, $files);
+                return $this->displayTxt($stdout, $output, $files);
             case 'json':
                 return $this->displayJson($output, $files);
             default:
@@ -127,21 +130,25 @@ EOF
         }
     }
 
-    private function displayTxt(OutputInterface $output, $filesInfo)
+    private function displayTxt(OutputInterface $stdout, $output, $filesInfo)
     {
         $errors = 0;
 
         foreach ($filesInfo as $info) {
-            if ($info['valid'] && $output->isVerbose()) {
-                $output->writeln('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
+            if ($info['valid'] && $stdout->isVerbose()) {
+                $output->comment('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
             } elseif (!$info['valid']) {
                 ++$errors;
-                $output->writeln(sprintf('<error>KO</error> in %s', $info['file']));
-                $output->writeln(sprintf('<error>>> %s</error>', $info['message']));
+                $output->text(sprintf('<error> ERROR </error> in %s', $info['file']));
+                $output->text(sprintf('<error> >> %s</error>', $info['message']));
             }
         }
 
-        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', count($filesInfo) - $errors, count($filesInfo)));
+        if ($errors === 0) {
+            $output->success(sprintf('All %d YAML files contain valid syntax.', count($filesInfo)));
+        } else {
+            $output->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', count($filesInfo) - $errors, $errors));
+        }
 
         return min($errors, 1);
     }

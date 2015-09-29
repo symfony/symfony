@@ -72,7 +72,7 @@ $container->loadFromExtension('security', array(
             'remote_user' => true,
             'logout' => true,
             'remember_me' => array('secret' => 'TheSecret'),
-            'user_checkers' => array(),
+            'user_checker' => null,
         ),
         'host' => array(
             'pattern' => '/test',
@@ -81,11 +81,8 @@ $container->loadFromExtension('security', array(
             'anonymous' => true,
             'http_basic' => true,
         ),
-        'with_user_checkers' => array(
-            'user_checkers' => array(
-                'app.user_checker1',
-                'app.user_checker2',
-            ),
+        'with_user_checker' => array(
+            'user_checker' => 'app.user_checker',
             'anonymous' => true,
             'http_basic' => true,
         ),

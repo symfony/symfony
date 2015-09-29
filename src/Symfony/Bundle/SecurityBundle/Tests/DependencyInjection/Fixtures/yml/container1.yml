@@ -56,7 +56,7 @@ security:
             logout: true
             remember_me:
                 secret: TheSecret
-            user_checkers:
+            user_checker: ~
 
         host:
             pattern: /test
@@ -65,12 +65,10 @@ security:
             anonymous: true
             http_basic: true
 
-        with_user_checkers:
+        with_user_checker:
             anonymous: ~
             http_basic: ~
-            user_checkers:
-                - "app.user_checker1"
-                - "app.user_checker2"
+            user_checker: app.user_checker
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

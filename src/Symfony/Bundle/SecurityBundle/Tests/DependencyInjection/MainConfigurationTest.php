@@ -119,7 +119,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new MainConfiguration(array(), array());
         $processedConfig = $processor->processConfiguration($configuration, array(static::$minimalConfig));
 
-        $this->assertEquals(array('security.user_checker'), $processedConfig['firewalls']['stub']['user_checkers']);
+        $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
     public function testUserCheckers()
@@ -127,10 +127,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'firewalls' => array(
                 'stub' => array(
-                    'user_checkers' => array(
-                        'security.dummy_checker',
-                        'app.henk_checker',
-                    ),
+                    'user_checker' => 'app.henk_checker',
                 ),
             ),
         );
@@ -140,6 +137,6 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new MainConfiguration(array(), array());
         $processedConfig = $processor->processConfiguration($configuration, array($config));
 
-        $this->assertEquals(array('security.dummy_checker', 'app.henk_checker'), $processedConfig['firewalls']['stub']['user_checkers']);
+        $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 }

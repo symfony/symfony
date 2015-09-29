@@ -370,15 +370,7 @@ class SecurityExtension extends Extension
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
-        $userCheckers = array();
-        foreach ($firewall['user_checkers'] as $userChecker) {
-            $userCheckers[] = new Reference($userChecker);
-        }
-
-        $chainUserChecker = new Definition('Symfony\Component\Security\Core\User\ChainUserChecker', array($userCheckers));
-        $chainUserChecker->setPublic(false);
-
-        $container->setDefinition('security.chain_user_checker.'.$id, $chainUserChecker);
+        $container->setAlias(new Alias('security.user_checker.'.$id, false), $firewall['user_checker']);
 
         return array($matcher, $listeners, $exceptionListener);
     }
@@ -588,7 +580,7 @@ class SecurityExtension extends Extension
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->replaceArgument(1, new Reference($userProvider));
-        $listener->replaceArgument(2, new Reference('security.chain_user_checker.'.$id));
+        $listener->replaceArgument(2, new Reference('security.user_checker.'.$id));
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);

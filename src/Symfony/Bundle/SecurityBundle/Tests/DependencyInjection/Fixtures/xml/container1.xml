@@ -55,7 +55,7 @@
             <switch-user />
             <x509 />
             <remote-user />
-            <user-checkers></user-checkers>
+            <user-checker />
             <logout />
             <remember-me secret="TheSecret"/>
         </firewall>
@@ -65,11 +65,10 @@
             <http-basic />
         </firewall>
 
-        <firewall name="with_user_checkers">
+        <firewall name="with_user_checker">
             <anonymous />
             <http-basic />
-            <user-checkers>app.user_checker1</user-checkers>
-            <user-checkers>app.user_checker2</user-checkers>
+            <user-checker>app.user_checker</user-checker>
         </firewall>
 
         <role id="ROLE_ADMIN">ROLE_USER</role>

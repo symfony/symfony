@@ -237,8 +237,6 @@ class Definition
      * Gets the service class.
      *
      * @return string|null The service class
-     *
-     * @return string The service class
      */
     public function getClass()
     {

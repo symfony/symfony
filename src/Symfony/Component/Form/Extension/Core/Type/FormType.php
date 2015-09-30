@@ -84,14 +84,11 @@ class FormType extends BaseType
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only' => isset($view->vars['attr']['readonly']) && false !== $view->vars['attr']['readonly'], // deprecated
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
             'data' => $form->getNormData(),
             'required' => $form->isRequired(),
-            'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
-            'pattern' => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
             'size' => null,
             'label_attr' => $options['label_attr'],
             'compound' => $form->getConfig()->getCompound(),
@@ -151,64 +148,17 @@ class FormType extends BaseType
             return $options['compound'];
         };
 
-        // BC with old "virtual" option
-        $inheritData = function (Options $options) {
-            if (null !== $options['virtual']) {
-                @trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
-
-                return $options['virtual'];
-            }
-
-            return false;
-        };
-
         // If data is given, the form is locked to that data
         // (independent of its value)
         $resolver->setDefined(array(
             'data',
         ));
 
-        // BC clause for the "max_length" and "pattern" option
-        // Add these values to the "attr" option instead
-        $defaultAttr = function (Options $options) {
-            $attributes = array();
-
-            if (null !== $options['max_length']) {
-                $attributes['maxlength'] = $options['max_length'];
-            }
-
-            if (null !== $options['pattern']) {
-                $attributes['pattern'] = $options['pattern'];
-            }
-
-            return $attributes;
-        };
-
-        // BC for "read_only" option
-        $attrNormalizer = function (Options $options, array $attr) {
-            if (!isset($attr['readonly']) && $options['read_only']) {
-                $attr['readonly'] = true;
-            }
-
-            return $attr;
-        };
-
-        $readOnlyNormalizer = function (Options $options, $readOnly) {
-            if (null !== $readOnly) {
-                @trigger_error('The form option "read_only" is deprecated since version 2.8 and will be removed in 3.0. Use "attr[\'readonly\']" instead.', E_USER_DEPRECATED);
-
-                return $readOnly;
-            }
-
-            return false;
-        };
-
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
             'required' => true,
-            'read_only' => null, // deprecated
             'max_length' => null,
             'pattern' => null,
             'property_path' => null,
@@ -216,19 +166,15 @@ class FormType extends BaseType
             'by_reference' => true,
             'error_bubbling' => $errorBubbling,
             'label_attr' => array(),
-            'virtual' => null,
-            'inherit_data' => $inheritData,
+            'inherit_data' => false,
             'compound' => true,
             'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
-            'attr' => $defaultAttr,
+            'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
-
-        $resolver->setNormalizer('attr', $attrNormalizer);
-        $resolver->setNormalizer('read_only', $readOnlyNormalizer);
 
         $resolver->setAllowedTypes('label_attr', 'array');
     }

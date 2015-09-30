@@ -171,13 +171,8 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholder = $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
-        };
-
-        // for BC with the "empty_value" option
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
@@ -224,7 +219,6 @@ class TimeType extends AbstractType
             'with_seconds' => false,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
             'placeholder' => $placeholder,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -240,7 +234,6 @@ class TimeType extends AbstractType
             'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 

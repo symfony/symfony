@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -28,7 +27,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as LegacyChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
@@ -202,7 +200,6 @@ class ChoiceType extends AbstractType
         }
 
         // BC
-        $view->vars['empty_value'] = $view->vars['placeholder'];
         $view->vars['empty_value_in_choices'] = $view->vars['placeholder_in_choices'];
 
         if ($options['multiple'] && !$options['expanded']) {
@@ -248,22 +245,13 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $emptyValue = function (Options $options) {
-            return $options['required'] ? null : '';
-        };
-
-        // for BC with the "empty_value" option
         $placeholder = function (Options $options) {
-            return $options['empty_value'];
+            return $options['required'] ? null : '';
         };
 
         $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
             if ($choiceList) {
                 @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
-
-                if ($choiceList instanceof LegacyChoiceListInterface) {
-                    return new LegacyChoiceListAdapter($choiceList);
-                }
 
                 return $choiceList;
             }
@@ -328,7 +316,6 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
-            'empty_value' => $emptyValue, // deprecated
             'placeholder' => $placeholder,
             'error_bubbling' => false,
             'compound' => $compound,
@@ -340,7 +327,6 @@ class ChoiceType extends AbstractType
         ));
 
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 

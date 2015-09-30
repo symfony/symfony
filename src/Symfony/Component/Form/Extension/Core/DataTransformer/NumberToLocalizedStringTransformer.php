@@ -73,27 +73,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
 
     /**
-     * Alias for {@link self::ROUND_HALF_EVEN}.
-     *
-     * @deprecated since version 2.4, to be removed in 3.0.
-     */
-    const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
-
-    /**
-     * Alias for {@link self::ROUND_HALF_UP}.
-     *
-     * @deprecated since version 2.4, to be removed in 3.0.
-     */
-    const ROUND_HALFUP = \NumberFormatter::ROUND_HALFUP;
-
-    /**
-     * Alias for {@link self::ROUND_HALF_DOWN}.
-     *
-     * @deprecated since version 2.4, to be removed in 3.0.
-     */
-    const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
-
-    /**
      * @deprecated since version 2.7, will be replaced by a $scale private property in 3.0.
      */
     protected $precision;

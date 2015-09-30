@@ -183,12 +183,8 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
-        };
-
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
@@ -238,8 +234,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -254,7 +249,6 @@ class DateType extends AbstractType
             'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 

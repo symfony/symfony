@@ -33,13 +33,13 @@ $exit = 0;
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
     // Find Symfony components in plain php for Windows portability
 
-    $finder = new RecursiveDirectoryIterator('src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+    $finder = new RecursiveDirectoryIterator(__DIR__.'/src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
     $finder = new RecursiveIteratorIterator($finder);
     $finder->setMaxDepth(3);
 
     array_shift($cmd);
     $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
-    $procs = array();
+    $runningProcs = array();
 
     foreach ($finder as $file => $fileInfo) {
         if ('phpunit.xml.dist' === $file) {
@@ -50,7 +50,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
             $c = escapeshellarg($component);
 
             if ($proc = proc_open(implode(' ', $cmd)." $c > $c/phpunit.stdout 2> $c/phpunit.stderr", array(), $pipes)) {
-                $procs[$component] = $proc;
+                $runningProcs[$component] = $proc;
             } else {
                 $exit = 1;
                 echo "\033[41mKO\033[0m $component\n\n";
@@ -59,7 +59,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     }
 
     // Fixes for colors support on appveyor
-    // See http://help.appveyor.com/discussions/suggestions/197-support-ansi-color-codes
+    // See https://github.com/appveyor/ci/issues/373
     $colorFixes = array(
         array("S\033[0m\033[0m\033[36m\033[1mS", "E\033[0m\033[0m\033[31m\033[1mE", "I\033[0m\033[0m\033[33m\033[1mI", "F\033[0m\033[0m\033[41m\033[37mF"),
         array("SS", "EE", "II", "FF"),
@@ -67,36 +67,46 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     $colorFixes[0] = array_merge($colorFixes[0], $colorFixes[0]);
     $colorFixes[1] = array_merge($colorFixes[1], $colorFixes[1]);
 
-    foreach ($procs as $component => $proc) {
-        $procStatus = proc_close($proc);
-
-        foreach (array('out', 'err') as $file) {
-            $file = "$component/phpunit.std$file";
-
-            if ('\\' === DIRECTORY_SEPARATOR) {
-                $h = fopen($file, 'rb');
-                while (false !== $line = fgets($h)) {
-                    echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
-                        '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
-                        "$1m\033[$2$3$4$4",
-                        $line
-                    ));
-                }
-                fclose($h);
-            } else {
-                readfile($file);
+    while ($runningProcs) {
+        usleep(300000);
+        $terminatedProcs = array();
+        foreach ($runningProcs as $component => $proc) {
+            $procStatus = proc_get_status($proc);
+            if (!$procStatus['running']) {
+                $terminatedProcs[$component] = $procStatus['exitcode'];
+                unset($runningProcs[$component]);
+                proc_close($proc);
             }
-            unlink($file);
         }
 
-        if ($procStatus) {
-            $exit = 1;
-            echo "\033[41mKO\033[0m $component\n\n";
-        } else {
-            echo "\033[32mOK\033[0m $component\n\n";
+        foreach ($terminatedProcs as $component => $procStatus) {
+            foreach (array('out', 'err') as $file) {
+                $file = "$component/phpunit.std$file";
+
+                if ('\\' === DIRECTORY_SEPARATOR) {
+                    $h = fopen($file, 'rb');
+                    while (false !== $line = fgets($h)) {
+                        echo str_replace($colorFixes[0], $colorFixes[1], preg_replace(
+                            '/(\033\[[0-9]++);([0-9]++m)(?:(.)(\033\[0m))?/',
+                            "$1m\033[$2$3$4$4",
+                            $line
+                        ));
+                    }
+                    fclose($h);
+                } else {
+                    readfile($file);
+                }
+                unlink($file);
+            }
+
+            if ($procStatus) {
+                $exit = 1;
+                echo "\033[41mKO\033[0m $component\n\n";
+            } else {
+                echo "\033[32mOK\033[0m $component\n\n";
+            }
         }
     }
-
 } elseif (!isset($argv[1]) || 'install' !== $argv[1]) {
     // Run regular phpunit in a subprocess
 

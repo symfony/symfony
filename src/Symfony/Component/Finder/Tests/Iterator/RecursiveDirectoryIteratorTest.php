@@ -21,7 +21,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     public function testRewindOnFtp()
     {
         try {
-            $i = new RecursiveDirectoryIterator('ftp://ftp.mozilla.org/', \RecursiveDirectoryIterator::SKIP_DOTS);
+            $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
             $this->markTestSkipped('Unsupported stream "ftp".');
         }
@@ -37,14 +37,14 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     public function testSeekOnFtp()
     {
         try {
-            $i = new RecursiveDirectoryIterator('ftp://ftp.mozilla.org/', \RecursiveDirectoryIterator::SKIP_DOTS);
+            $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
         } catch (\UnexpectedValueException $e) {
             $this->markTestSkipped('Unsupported stream "ftp".');
         }
 
         $contains = array(
-            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'README',
-            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'pub',
+            'ftp://speedtest.tele2.net'.DIRECTORY_SEPARATOR.'1000GB.zip',
+            'ftp://speedtest.tele2.net'.DIRECTORY_SEPARATOR.'100GB.zip',
         );
         $actual = array();
 

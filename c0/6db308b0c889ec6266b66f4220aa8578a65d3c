@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T06:21:48Z
+
+The `Converter` name is probably not the best one. I'm not a big fan of `CssToXPathConverter` either and I think the best one is still `CssSelector` (which implements the static interface). Not sure what to do here. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-29T06:49:33Z
+
+:+1:
+
+Status: Reviewed
+
+About the class name: We could merge the `Converter` and the `CssSelector` class and only deprecate the static method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T08:37:14Z
+
+@xabbuh `toXPath()` are in both the new and the old class (one is static, the other one is not).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-29T08:47:28Z
+
+@fabpot We could rename the new method to `asXPath()` or something like that or choose a class name like `CssTransformer`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-29T10:27:43Z
+
+I think `CssSelector` would be the wrong name for a non-static class. In OOP I would image an API of a CssSelector like `(new CssSelector($css))->toXPath()`. So the CssSelector represents a single css expression. But that is not the API we have here right now. So Converter/Transformer (but more specific) makes alot more sense, as you only need one converter to transform alot of css expressions.
+
+But again just `Converter` is too generic, as I wouldn't know what the purpose of this class is when I see `new Converter()`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-29T13:09:23Z
+
+How about any of `CssConverter`, `CssTransformer` or `CssTranslator`?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-29T13:18:07Z
+
+or `CssSelectorConverter` ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-29T13:20:21Z
+
++1 for `CssSelectorConverter ` as we are converting a selector and not css code
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T06:28:25Z
+
+Renamed and fixed the README to use the new API.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-30T07:22:10Z
+
+:+1:

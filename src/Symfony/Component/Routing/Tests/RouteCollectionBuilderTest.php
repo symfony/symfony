@@ -298,46 +298,27 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/admin/imported/foo', $collection->get('imported_route')->getPath(), 'Normal RouteCollections are also prefixed properly');
     }
 
-    /**
-     * @dataProvider provideControllerClassTests
-     */
-    public function testSetControllerClass($routeController, $controllerClass, $expectedFinalController)
+    public function testAutomaticRouteNamesDoNotConflict()
     {
         $routes = new RouteCollectionBuilder();
-        $routes->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
 
-        $routes->add('/', $routeController, 'test_route');
+        $adminRoutes = $routes->createBuilder();
+        // route 1
+        $adminRoutes->add('/dashboard', '');
+
+        $accountRoutes = $routes->createBuilder();
+        // route 2
+        $accountRoutes->add('/dashboard', '')
+            ->setMethods(array('GET'));
+        // route 3
+        $accountRoutes->add('/dashboard', '')
+            ->setMethods(array('POST'));
+
+        $routes->mount('/admin', $adminRoutes);
+        $routes->mount('/account', $accountRoutes);
+
         $collection = $routes->build();
-        $this->assertEquals($expectedFinalController, $collection->get('test_route')->getDefault('_controller'));
-    }
-
-    public function provideControllerClassTests()
-    {
-        $controllerClass = 'Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController';
-
-        $tests = array();
-        $tests[] = array('withControllerAction', $controllerClass, $controllerClass.'::'.'withControllerAction');
-
-        // the controllerClass should not be used in many cases
-        $tests[] = array('', $controllerClass, '');
-        $tests[] = array('Some\Class\FooController::fooAction', $controllerClass, 'Some\Class\FooController::fooAction');
-        $tests[] = array('AppBundle:Default:index', $controllerClass, 'AppBundle:Default:index');
-        $tests[] = array('foo_controller:fooAction', $controllerClass, 'foo_controller:fooAction');
-        $tests[] = array(array('Acme\FooController', 'fooAction'), $controllerClass, array('Acme\FooController', 'fooAction'));
-
-        $closure = function() {};
-        $tests[] = array($closure, $controllerClass, $closure);
-
-        return $tests;
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testExceptiononBadControllerClass()
-    {
-        $routes = new RouteCollectionBuilder();
-
-        $routes->setControllerClass('Acme\FakeController');
+        // there are 2 routes (i.e. with non-conflicting names)
+        $this->assertCount(3, $collection->all());
     }
 }

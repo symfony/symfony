@@ -41,7 +41,6 @@ class RouteCollectionBuilder
     private $schemes;
     private $methods;
     private $resources = array();
-    private $controllerClass;
 
     /**
      * @param LoaderInterface $loader
@@ -83,7 +82,7 @@ class RouteCollectionBuilder
      * Adds a route and returns it for future modification.
      *
      * @param string      $path       The route path
-     * @param string      $controller The route controller string
+     * @param string      $controller The route's controller
      * @param string|null $name       The name to give this route
      *
      * @return Route
@@ -257,28 +256,6 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Set a controller class that all added embedded routes should use.
-     *
-     * With this, the controller for embedded routes can just be a method name.
-     * If an embedded route has a full controller (e.g. class::methodName), the
-     * controllerClass won't be applied to that route.
-     *
-     * @param string $controllerClass
-     *
-     * @return $this
-     */
-    public function setControllerClass($controllerClass)
-    {
-        if (!class_exists($controllerClass)) {
-            throw new \InvalidArgumentException(sprintf('The controller class "%s" does not exist.', $controllerClass));
-        }
-
-        $this->controllerClass = $controllerClass;
-
-        return $this;
-    }
-
-    /**
      * Creates the final ArrayCollection, returns it, and clears everything.
      *
      * @return RouteCollection
@@ -289,13 +266,6 @@ class RouteCollectionBuilder
 
         foreach ($this->routes as $name => $route) {
             if ($route instanceof Route) {
-                // auto-generate the route name if it's been marked
-                if ('_unnamed_route_' === substr($name, 0, 15)) {
-                    $name = $this->generateRouteName($route);
-                }
-
-                $this->ensureRouteController($route);
-
                 $route->setDefaults(array_merge($this->defaults, $route->getDefaults()));
                 $route->setOptions(array_merge($this->options, $route->getOptions()));
 
@@ -326,10 +296,14 @@ class RouteCollectionBuilder
                     $route->setMethods($this->methods);
                 }
 
+                // auto-generate the route name if it's been marked
+                if ('_unnamed_route_' === substr($name, 0, 15)) {
+                    $name = $this->generateRouteName($route);
+                }
+
                 $routeCollection->add($name, $route);
             } else {
                 /* @var self $route */
-
                 $subCollection = $route->build();
                 $subCollection->addPrefix($this->prefix);
 
@@ -342,39 +316,6 @@ class RouteCollectionBuilder
         }
 
         return $routeCollection;
-    }
-
-    /**
-     * Attempts to safely prefix controllers with the controller class if necessary.
-     *
-     * @param Route $route
-     */
-    private function ensureRouteController(Route $route)
-    {
-        // only do work if there is a controller class set
-        if (!$this->controllerClass) {
-            return;
-        }
-
-        $controller = $route->getDefault('_controller');
-
-        // only apply controller class to a (non-empty) string
-        if (!is_string($controller) || !$controller) {
-            return;
-        }
-
-        // is the controller already a callable function/class?
-        if (method_exists($controller, '__invoke') || function_exists($controller)) {
-            return;
-        }
-
-        // is this already a controller format (a:b:c, or a:b, or a::b)?
-        if (false !== strpos($controller, ':')) {
-            return;
-        }
-
-        $controller = sprintf('%s::%s', $this->controllerClass, $controller);
-        $route->setDefault('_controller', $controller);
     }
 
     /**

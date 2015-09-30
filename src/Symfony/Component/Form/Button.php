@@ -184,9 +184,9 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrors()
+    public function getErrors($deep = false, $flatten = true)
     {
-        return array();
+        return new FormErrorIterator($this, array());
     }
 
     /**
@@ -336,6 +336,13 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
+     */
+    public function getTransformationFailure()
+    {
+    }
+
+    /**
+     * Unsupported method.
      *
      * @throws BadMethodCallException
      */
@@ -402,7 +409,15 @@ class Button implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        return $this->config->getType()->createView($this, $parent);
+        $type = $this->config->getType();
+        $options = $this->config->getOptions();
+
+        $view = $type->createView($this, $parent);
+
+        $type->buildView($view, $this, $options);
+        $type->finishView($view, $this, $options);
+
+        return $view;
     }
 
     /**

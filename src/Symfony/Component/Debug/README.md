@@ -18,14 +18,13 @@ You can also use the tools individually:
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
 
-error_reporting(-1);
-
-ErrorHandler::register($errorReportingLevel);
 if ('cli' !== php_sapi_name()) {
+    ini_set('display_errors', 0);
     ExceptionHandler::register();
 } elseif (!ini_get('log_errors') || ini_get('error_log')) {
     ini_set('display_errors', 1);
 }
+ErrorHandler::register();
 ```
 
 Note that the `Debug::enable()` call also registers the debug class loader

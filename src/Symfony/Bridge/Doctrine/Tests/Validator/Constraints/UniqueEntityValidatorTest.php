@@ -16,12 +16,13 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
+use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Validation;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
@@ -45,6 +46,11 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
      * @var ObjectRepository
      */
     protected $repository;
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
 
     protected function setUp()
     {

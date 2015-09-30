@@ -1,0 +1,33 @@
+parameters:
+    foo_class: Bar\FooClass
+    baz_class: BazClass
+    foo: bar
+
+services:
+    foo:
+        class: Bar\FooClass
+        tags:
+            - { name: foo, foo: foo }
+            - { name: foo, bar: bar }
+        factory_class: Bar\FooClass
+        factory_method: getInstance
+        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
+        properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
+        calls:
+            - [setBar, ['@bar']]
+            - [initialize, {  }]
+
+        configurator: sc_configure
+    foo.baz:
+        class: %baz_class%
+        factory_class: %baz_class%
+        factory_method: getInstance
+        configurator: ['%baz_class%', configureStatic1]
+    factory_service:
+        class: Bar
+        factory_method: getInstance
+        factory_service: foo.baz
+    foo_bar:
+        class: %foo_class%
+        shared: false
+        scope: prototype

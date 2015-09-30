@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
@@ -29,7 +29,8 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
      */
     public function testProcessDetectsSyntheticPrototypeDefinitions()
     {
@@ -40,12 +41,36 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
+     */
+    public function testProcessDetectsSharedPrototypeDefinitions()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setShared(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
+     */
+    public function testLegacyProcessDetectsBothFactorySyntaxesUsed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setFactory(array('a', 'b'))->setFactoryClass('a');
 
         $this->process($container);
     }
@@ -57,6 +82,28 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
         $container->register('b', 'class')->setSynthetic(true)->setPublic(true);
         $container->register('c', 'class')->setAbstract(true);
         $container->register('d', 'class')->setSynthetic(true);
+
+        $this->process($container);
+    }
+
+    public function testValidTags()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', 'class')->addTag('foo', array('bar' => 'baz'));
+        $container->register('b', 'class')->addTag('foo', array('bar' => null));
+        $container->register('c', 'class')->addTag('foo', array('bar' => 1));
+        $container->register('d', 'class')->addTag('foo', array('bar' => 1.1));
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
+    public function testInvalidTags()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', 'class')->addTag('foo', array('bar' => array('baz' => 'baz')));
 
         $this->process($container);
     }

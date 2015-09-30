@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
+use Symfony\Component\Validator\Validation;
 
 class TimeValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new TimeValidator();
@@ -72,7 +78,7 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidTimes
      */
-    public function testInvalidTimes($time)
+    public function testInvalidTimes($time, $code)
     {
         $constraint = new Time(array(
             'message' => 'myMessage',
@@ -82,19 +88,20 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$time.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 
     public function getInvalidTimes()
     {
         return array(
-            array('foobar'),
-            array('foobar 12:34:56'),
-            array('12:34:56 foobar'),
-            array('00:00'),
-            array('24:00:00'),
-            array('00:60:00'),
-            array('00:00:60'),
+            array('foobar', Time::INVALID_FORMAT_ERROR),
+            array('foobar 12:34:56', Time::INVALID_FORMAT_ERROR),
+            array('12:34:56 foobar', Time::INVALID_FORMAT_ERROR),
+            array('00:00', Time::INVALID_FORMAT_ERROR),
+            array('24:00:00', Time::INVALID_TIME_ERROR),
+            array('00:60:00', Time::INVALID_TIME_ERROR),
+            array('00:00:60', Time::INVALID_TIME_ERROR),
         );
     }
 }

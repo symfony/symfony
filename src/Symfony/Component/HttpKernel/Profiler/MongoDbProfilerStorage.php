@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\MongoDbProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
+/**
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
+ */
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;
@@ -36,7 +42,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time', 'status_code'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
         foreach ($cursor as $profile) {
@@ -83,6 +89,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
             'time' => $profile->getTime(),
+            'status_code' => $profile->getStatusCode(),
         );
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
@@ -212,6 +219,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'url' => isset($data['url']) ? $data['url'] : null,
             'time' => isset($data['time']) ? $data['time'] : null,
             'data' => isset($data['data']) ? $data['data'] : null,
+            'status_code' => isset($data['status_code']) ? $data['status_code'] : null,
         );
     }
 

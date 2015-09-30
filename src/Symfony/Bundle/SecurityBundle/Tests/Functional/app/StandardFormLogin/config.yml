@@ -23,7 +23,16 @@ security:
             form_login:
                 check_path: /login_check
                 default_target_path: /profile
+            logout: ~
             anonymous: ~
+
+        # This firewall is here just to check its the logout functionality
+        second_area:
+            http_basic: ~
+            anonymous: ~
+            logout:
+                target: /second/target
+                path: /second/logout
 
     access_control:
         - { path: ^/unprotected_resource$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
@@ -31,4 +40,5 @@ security:
         - { path: ^/secured-by-one-ip$, ip: 10.10.10.10, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secured-by-two-ips$, ips: [1.1.1.1, 2.2.2.2], roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
+        - { path: ^/protected-via-expression$, allow_if: "(is_anonymous() and request.headers.get('user-agent') matches '/Firefox/i') or has_role('ROLE_USER')" }
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

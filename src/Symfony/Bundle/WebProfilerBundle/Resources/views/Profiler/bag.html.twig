@@ -1,16 +1,19 @@
-<table {% if class is defined %}class='{{ class }}'{% endif %} >
+<table class="{{ class|default('') }}">
     <thead>
         <tr>
-            <th scope="col">Key</th>
-            <th scope="col">Value</th>
+            <th scope="col" class="key">{{ labels is defined ? labels[0] : 'Key' }}</th>
+            <th scope="col">{{ labels is defined ? labels[1] : 'Value' }}</th>
         </tr>
     </thead>
     <tbody>
         {% for key in bag.keys|sort %}
             <tr>
                 <th>{{ key }}</th>
-                {# JSON_UNESCAPED_SLASHES = 64, JSON_UNESCAPED_UNICODE = 256 #}
-                <td>{{ bag.get(key)|json_encode(64 b-or 256) }}</td>
+                <td>{{ profiler_dump(bag.get(key)) }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2">(no data)</td>
             </tr>
         {% endfor %}
     </tbody>

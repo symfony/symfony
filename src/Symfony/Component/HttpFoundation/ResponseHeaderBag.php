@@ -213,10 +213,12 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $name
      * @param string $path
      * @param string $domain
+     * @param bool   $secure
+     * @param bool   $httpOnly
      */
-    public function clearCookie($name, $path = '/', $domain = null)
+    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
-        $this->setCookie(new Cookie($name, null, 1, $path, $domain));
+        $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly));
     }
 
     /**

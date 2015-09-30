@@ -11,12 +11,7 @@
 
 namespace Symfony\Component\CssSelector;
 
-use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
-use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
-use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;
-use Symfony\Component\CssSelector\Parser\Shortcut\HashParser;
-use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
-use Symfony\Component\CssSelector\XPath\Translator;
+@trigger_error('The '.__NAMESPACE__.'\CssSelector class is deprecated since version 2.8 and will be removed in 3.0. Use directly the \Symfony\Component\CssSelector\CssSelectorConverter class instead.', E_USER_DEPRECATED);
 
 /**
  * CssSelector is the main entry point of the component and can convert CSS
@@ -61,6 +56,8 @@ use Symfony\Component\CssSelector\XPath\Translator;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated as of 2.8, will be removed in 3.0. Use the \Symfony\Component\CssSelector\CssSelectorConverter class instead.
  */
 class CssSelector
 {
@@ -78,20 +75,9 @@ class CssSelector
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
-        $translator = new Translator();
+        $converter = new CssSelectorConverter(self::$html);
 
-        if (self::$html) {
-            $translator->registerExtension(new HtmlExtension($translator));
-        }
-
-        $translator
-            ->registerParserShortcut(new EmptyStringParser())
-            ->registerParserShortcut(new ElementParser())
-            ->registerParserShortcut(new ClassParser())
-            ->registerParserShortcut(new HashParser())
-        ;
-
-        return $translator->cssToXPath($cssExpr, $prefix);
+        return $converter->toXPath($cssExpr, $prefix);
     }
 
     /**

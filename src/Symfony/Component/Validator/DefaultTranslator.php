@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Validator;
 
+@trigger_error('The class '.__NAMESPACE__.'\DefaultTranslator is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.', E_USER_DEPRECATED);
+
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Simple translator implementation that simply replaces the parameters in
@@ -42,6 +44,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * locales. Instead, it implements a subset of the capabilities of
  * {@link \Symfony\Component\Translation\Translator} and can be used in places
  * where translation is not required by default but should be optional.
+ *
+ * @deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Translation\IdentityTranslator instead.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

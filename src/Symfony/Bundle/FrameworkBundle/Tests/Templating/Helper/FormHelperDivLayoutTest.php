@@ -27,6 +27,10 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
      */
     protected $engine;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -44,7 +48,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         ));
 
         return array_merge(parent::getExtensions(), array(
-            new TemplatingExtension($this->engine, $this->csrfProvider, array(
+            new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
                 'FrameworkBundle:Form',
             )),
         ));

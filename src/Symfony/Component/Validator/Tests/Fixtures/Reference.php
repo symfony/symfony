@@ -13,4 +13,17 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 class Reference
 {
+    public $value;
+
+    private $privateValue;
+
+    public function setPrivateValue($privateValue)
+    {
+        $this->privateValue = $privateValue;
+    }
+
+    public function getPrivateValue()
+    {
+        return $this->privateValue;
+    }
 }

@@ -11,10 +11,16 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+@trigger_error('The '.__NAMESPACE__.'\ApacheUrlMatcher class is deprecated since version 2.5 and will be removed in 3.0. It\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             The performance gains are minimal and it's very hard to replicate
+ *             the behavior of PHP implementation.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>

@@ -86,6 +86,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getInvalidPaths
      * @expectedException \InvalidArgumentException
      */
@@ -106,6 +107,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetDeep()
     {
         $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
@@ -249,5 +253,18 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag($parameters);
 
         $this->assertEquals(count($parameters), count($bag));
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::getBoolean
+     */
+    public function testGetBoolean()
+    {
+        $parameters = array('string_true' => 'true', 'string_false' => 'false');
+        $bag = new ParameterBag($parameters);
+
+        $this->assertTrue($bag->getBoolean('string_true'), '->getBoolean() gets the string true as boolean true');
+        $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
+        $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
 }

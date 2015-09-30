@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Util\StringUtils;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
@@ -53,7 +54,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
         }
 
-        if (true !== $this->compareHashes($hash, $this->generateCookieHash($class, $username, $expires, $user->getPassword()))) {
+        if (true !== StringUtils::equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 
@@ -62,31 +63,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         return $user;
-    }
-
-    /**
-     * Compares two hashes using a constant-time algorithm to avoid (remote)
-     * timing attacks.
-     *
-     * This is the same implementation as used in the BasePasswordEncoder.
-     *
-     * @param string $hash1 The first hash
-     * @param string $hash2 The second hash
-     *
-     * @return bool true if the two hashes are the same, false otherwise
-     */
-    private function compareHashes($hash1, $hash2)
-    {
-        if (strlen($hash1) !== $c = strlen($hash2)) {
-            return false;
-        }
-
-        $result = 0;
-        for ($i = 0; $i < $c; ++$i) {
-            $result |= ord($hash1[$i]) ^ ord($hash2[$i]);
-        }
-
-        return 0 === $result;
     }
 
     /**
@@ -145,6 +121,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash('sha256', $class.$username.$expires.$password.$this->getKey());
+        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getSecret());
     }
 }

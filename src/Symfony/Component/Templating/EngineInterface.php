@@ -23,7 +23,7 @@ namespace Symfony\Component\Templating;
  * TemplateReferenceInterface, a TemplateNameParserInterface should be used to
  * convert the name to a TemplateReferenceInterface instance.
  *
- * Each template loader use the logical template name to look for
+ * Each template loader uses the logical template name to look for
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -33,8 +33,8 @@ interface EngineInterface
     /**
      * Renders a template.
      *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
+     * @param string|TemplateReferenceInterface $name       A template name or a TemplateReferenceInterface instance
+     * @param array                             $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
@@ -45,16 +45,18 @@ interface EngineInterface
     /**
      * Returns true if the template exists.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return bool true if the template exists, false otherwise
+     *
+     * @throws \RuntimeException if the engine cannot handle the template name
      */
     public function exists($name);
 
     /**
      * Returns true if this class is able to render the given template.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return bool true if this class supports the given template, false otherwise
      */

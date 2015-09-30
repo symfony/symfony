@@ -17,6 +17,7 @@ use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 /**
  * This class adds helper method to describe objects in various formats.
@@ -46,26 +47,29 @@ class DescriptorHelper extends Helper
     /**
      * Describes an object if supported.
      *
+     * Available options are:
+     * * format: string, the output format name
+     * * raw_text: boolean, sets output type as raw
+     *
      * @param OutputInterface $output
      * @param object          $object
-     * @param string|null     $format
-     * @param bool            $raw
-     * @param string|null     $namespace
+     * @param array           $options
      *
-     * @throws \InvalidArgumentException when the given format is not supported
+     * @throws InvalidArgumentException when the given format is not supported
      */
-    public function describe(OutputInterface $output, $object, $format = null, $raw = false, $namespace = null)
+    public function describe(OutputInterface $output, $object, array $options = array())
     {
-        $options = array('raw_text' => $raw, 'format' => $format ?: 'txt', 'namespace' => $namespace);
-        $type = !$raw && 'txt' === $options['format'] ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
+        $options = array_merge(array(
+            'raw_text' => false,
+            'format' => 'txt',
+        ), $options);
 
         if (!isset($this->descriptors[$options['format']])) {
-            throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
+            throw new InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
         }
 
         $descriptor = $this->descriptors[$options['format']];
-
-        $output->writeln($descriptor->describe($object, $options), $type);
+        $descriptor->describe($output, $object, $options);
     }
 
     /**

@@ -1,0 +1,15 @@
+services:
+    manager:
+        class: UserManager
+        arguments:
+          - true
+        calls:
+          - method: setLogger
+            arguments:
+              - @logger
+          - method: setClass
+            arguments:
+              - User
+        tags:
+          - name: manager
+            alias: user

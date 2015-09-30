@@ -17,9 +17,12 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * Base class for all commands.
@@ -30,31 +33,29 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $processTitle;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
-    private $applicationDefinitionMergedWithArgs;
+    private $ignoreValidationErrors = false;
+    private $applicationDefinitionMerged = false;
+    private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis;
+    private $synopsis = array();
+    private $usages = array();
     private $helperSet;
 
     /**
      * Constructor.
      *
-     * @param string $name The name of the command
+     * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
-     * @throws \LogicException When the command name is empty
+     * @throws LogicException When the command name is empty
      */
     public function __construct($name = null)
     {
         $this->definition = new InputDefinition();
-        $this->ignoreValidationErrors = false;
-        $this->applicationDefinitionMerged = false;
-        $this->applicationDefinitionMergedWithArgs = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);
@@ -63,7 +64,7 @@ class Command
         $this->configure();
 
         if (!$this->name) {
-            throw new \LogicException('The command name cannot be empty.');
+            throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
         }
     }
 
@@ -155,13 +156,13 @@ class Command
      *
      * @return null|int null or 0 if everything went fine, or an error code
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws LogicException When this abstract method is not implemented
      *
      * @see setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        throw new \LogicException('You must override the execute() method in the concrete command class.');
+        throw new LogicException('You must override the execute() method in the concrete command class.');
     }
 
     /**
@@ -211,7 +212,8 @@ class Command
     public function run(InputInterface $input, OutputInterface $output)
     {
         // force the creation of the synopsis before the merge with the app definition
-        $this->getSynopsis();
+        $this->getSynopsis(true);
+        $this->getSynopsis(false);
 
         // add the application arguments and options
         $this->mergeApplicationDefinition();
@@ -226,6 +228,16 @@ class Command
         }
 
         $this->initialize($input, $output);
+
+        if (null !== $this->processTitle) {
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processTitle);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processTitle);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
+        }
 
         if ($input->isInteractive()) {
             $this->interact($input, $output);
@@ -259,14 +271,21 @@ class Command
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @see execute()
      */
     public function setCode($code)
     {
         if (!is_callable($code)) {
-            throw new \InvalidArgumentException('Invalid callable provided to Command::setCode.');
+            throw new InvalidArgumentException('Invalid callable provided to Command::setCode.');
+        }
+
+        if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
+            $r = new \ReflectionFunction($code);
+            if (null === $r->getClosureThis()) {
+                $code = \Closure::bind($code, $this);
+            }
         }
 
         $this->code = $code;
@@ -393,13 +412,32 @@ class Command
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException When command name given is empty
+     * @throws InvalidArgumentException When the name is invalid
      */
     public function setName($name)
     {
         $this->validateName($name);
 
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Sets the process title of the command.
+     *
+     * This feature should be used only when creating a long process command,
+     * like a daemon.
+     *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
+     * @param string $title The process title
+     *
+     * @return Command The current instance
+     */
+    public function setProcessTitle($title)
+    {
+        $this->processTitle = $title;
 
         return $this;
     }
@@ -490,11 +528,13 @@ class Command
      * @param string[] $aliases An array of aliases for the command
      *
      * @return Command The current instance
+     *
+     * @throws InvalidArgumentException When an alias is invalid
      */
     public function setAliases($aliases)
     {
         if (!is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new \InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
+            throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
         }
 
         foreach ($aliases as $alias) {
@@ -519,15 +559,45 @@ class Command
     /**
      * Returns the synopsis for the command.
      *
+     * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
+     *
      * @return string The synopsis
      */
-    public function getSynopsis()
+    public function getSynopsis($short = false)
     {
-        if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
+        $key = $short ? 'short' : 'long';
+
+        if (!isset($this->synopsis[$key])) {
+            $this->synopsis[$key] = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis($short)));
         }
 
-        return $this->synopsis;
+        return $this->synopsis[$key];
+    }
+
+    /**
+     * Add a command usage example.
+     *
+     * @param string $usage The usage, it'll be prefixed with the command name
+     */
+    public function addUsage($usage)
+    {
+        if (0 !== strpos($usage, $this->name)) {
+            $usage = sprintf('%s %s', $this->name, $usage);
+        }
+
+        $this->usages[] = $usage;
+
+        return $this;
+    }
+
+    /**
+     * Returns alternative usages of the command.
+     *
+     * @return array
+     */
+    public function getUsages()
+    {
+        return $this->usages;
     }
 
     /**
@@ -537,7 +607,7 @@ class Command
      *
      * @return mixed The helper value
      *
-     * @throws \InvalidArgumentException if the helper is not defined
+     * @throws InvalidArgumentException if the helper is not defined
      */
     public function getHelper($name)
     {
@@ -549,13 +619,17 @@ class Command
      *
      * @return string A string representing the command
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
-        $descriptor = new TextDescriptor();
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-        return $descriptor->describe($this);
+        $descriptor = new TextDescriptor();
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $descriptor->describe($output, $this, array('raw_output' => true));
+
+        return $output->fetch();
     }
 
     /**
@@ -565,19 +639,37 @@ class Command
      *
      * @return string|\DOMDocument An XML string representing the command
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describe($this, array('as_dom' => $asDom));
+        if ($asDom) {
+            return $descriptor->getCommandDocument($this);
+        }
+
+        $output = new BufferedOutput();
+        $descriptor->describe($output, $this);
+
+        return $output->fetch();
     }
 
+    /**
+     * Validates a command name.
+     *
+     * It must be non-empty and parts can optionally be separated by ":".
+     *
+     * @param string $name
+     *
+     * @throws InvalidArgumentException When the name is invalid
+     */
     private function validateName($name)
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
+            throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }
 }

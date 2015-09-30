@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Asset;
  * Asset package interface.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since 2.7, will be removed in 3.0. Use the Asset component instead.
  */
 interface PackageInterface
 {
@@ -28,9 +30,10 @@ interface PackageInterface
     /**
      * Returns an absolute or root-relative public path.
      *
-     * @param string $path A path
+     * @param string           $path    A path
+     * @param string|bool|null $version A specific version for the path
      *
      * @return string The public path
      */
-    public function getUrl($path);
+    public function getUrl($path, $version = null);
 }

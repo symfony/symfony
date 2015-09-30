@@ -71,8 +71,11 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             $this->currentDefinition = $definition;
 
             $this->processArguments($definition->getArguments());
-            if ($definition->getFactoryService()) {
-                $this->processArguments(array(new Reference($definition->getFactoryService())));
+            if ($definition->getFactoryService(false)) {
+                $this->processArguments(array(new Reference($definition->getFactoryService(false))));
+            }
+            if (is_array($definition->getFactory())) {
+                $this->processArguments($definition->getFactory());
             }
 
             if (!$this->onlyConstructorArguments) {
@@ -112,8 +115,11 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->processArguments($argument->getMethodCalls());
                 $this->processArguments($argument->getProperties());
 
-                if ($argument->getFactoryService()) {
-                    $this->processArguments(array(new Reference($argument->getFactoryService())));
+                if (is_array($argument->getFactory())) {
+                    $this->processArguments($argument->getFactory());
+                }
+                if ($argument->getFactoryService(false)) {
+                    $this->processArguments(array(new Reference($argument->getFactoryService(false))));
                 }
             }
         }

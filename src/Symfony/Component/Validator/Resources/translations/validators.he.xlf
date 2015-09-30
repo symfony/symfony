@@ -175,7 +175,7 @@
                 <target>גובה התמונה קטן מדי ({{ height }}px). הגובה המינימלי הוא {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>הערך צריך להיות סיסמת המשתמש הנוכחי.</target>
             </trans-unit>
             <trans-unit id="48">

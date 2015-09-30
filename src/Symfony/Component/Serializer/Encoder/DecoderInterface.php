@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Defines the interface of decoders.
  *
@@ -31,6 +33,8 @@ interface DecoderInterface
      * phpdoc comment.
      *
      * @return mixed
+     *
+     * @throws UnexpectedValueException
      */
     public function decode($data, $format, array $context = array());
 

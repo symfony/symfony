@@ -91,7 +91,7 @@ class Logger implements LoggerInterface
      */
     public function emerg($message, array $context = array())
     {
-        trigger_error('Use emergency() which is PSR-3 compatible', E_USER_DEPRECATED);
+        @trigger_error('Use emergency() which is PSR-3 compatible', E_USER_DEPRECATED);
 
         $this->log('emergency', $message, $context);
     }
@@ -101,7 +101,7 @@ class Logger implements LoggerInterface
      */
     public function crit($message, array $context = array())
     {
-        trigger_error('Use critical() which is PSR-3 compatible', E_USER_DEPRECATED);
+        @trigger_error('Use critical() which is PSR-3 compatible', E_USER_DEPRECATED);
 
         $this->log('critical', $message, $context);
     }
@@ -111,7 +111,7 @@ class Logger implements LoggerInterface
      */
     public function err($message, array $context = array())
     {
-        trigger_error('Use error() which is PSR-3 compatible', E_USER_DEPRECATED);
+        @trigger_error('Use error() which is PSR-3 compatible', E_USER_DEPRECATED);
 
         $this->log('error', $message, $context);
     }
@@ -121,7 +121,7 @@ class Logger implements LoggerInterface
      */
     public function warn($message, array $context = array())
     {
-        trigger_error('Use warning() which is PSR-3 compatible', E_USER_DEPRECATED);
+        @trigger_error('Use warning() which is PSR-3 compatible', E_USER_DEPRECATED);
 
         $this->log('warning', $message, $context);
     }

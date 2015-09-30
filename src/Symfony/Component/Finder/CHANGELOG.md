@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated adapters and related classes
+
+2.5.0
+-----
+ * added support for GLOB_BRACE in the paths passed to Finder::in()
+
 2.3.0
 -----
 

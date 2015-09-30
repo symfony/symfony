@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 /**
  * @author Premi Giorgio <giosh94mhz@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class UnloadedEntityChoiceListSingleAssociationToIntIdWithQueryBuilderTest extends UnloadedEntityChoiceListSingleAssociationToIntIdTest
 {

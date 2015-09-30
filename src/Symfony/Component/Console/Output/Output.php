@@ -42,7 +42,7 @@ abstract class Output implements OutputInterface
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
     {
         $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
-        $this->formatter = null === $formatter ? new OutputFormatter() : $formatter;
+        $this->formatter = $formatter ?: new OutputFormatter();
         $this->formatter->setDecorated($decorated);
     }
 
@@ -94,24 +94,50 @@ abstract class Output implements OutputInterface
         return $this->verbosity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function isQuiet()
     {
-        $this->write($messages, true, $type);
+        return self::VERBOSITY_QUIET === $this->verbosity;
+    }
+
+    public function isVerbose()
+    {
+        return self::VERBOSITY_VERBOSE <= $this->verbosity;
+    }
+
+    public function isVeryVerbose()
+    {
+        return self::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
+    }
+
+    public function isDebug()
+    {
+        return self::VERBOSITY_DEBUG <= $this->verbosity;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $options = self::OUTPUT_NORMAL)
     {
-        if (self::VERBOSITY_QUIET === $this->verbosity) {
+        $this->write($messages, true, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL)
+    {
+        $messages = (array) $messages;
+
+        $types = self::OUTPUT_NORMAL | self::OUTPUT_RAW | self::OUTPUT_PLAIN;
+        $type = $types & $options ?: self::OUTPUT_NORMAL;
+
+        $verbosities = self::VERBOSITY_QUIET | self::VERBOSITY_NORMAL | self::VERBOSITY_VERBOSE | self::VERBOSITY_VERY_VERBOSE | self::VERBOSITY_DEBUG;
+        $verbosity = $verbosities & $options ?: self::VERBOSITY_NORMAL;
+
+        if ($verbosity > $this->getVerbosity()) {
             return;
         }
-
-        $messages = (array) $messages;
 
         foreach ($messages as $message) {
             switch ($type) {
@@ -123,8 +149,6 @@ abstract class Output implements OutputInterface
                 case OutputInterface::OUTPUT_PLAIN:
                     $message = strip_tags($this->formatter->format($message));
                     break;
-                default:
-                    throw new \InvalidArgumentException(sprintf('Unknown output type given (%s)', $type));
             }
 
             $this->doWrite($message, $newline);

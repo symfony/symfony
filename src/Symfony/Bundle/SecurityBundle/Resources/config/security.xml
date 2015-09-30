@@ -32,25 +32,38 @@
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
         <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter</parameter>
+        <parameter key="security.access.expression_voter.class">Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter</parameter>
 
         <parameter key="security.firewall.class">Symfony\Component\Security\Http\Firewall</parameter>
         <parameter key="security.firewall.map.class">Symfony\Bundle\SecurityBundle\Security\FirewallMap</parameter>
         <parameter key="security.firewall.context.class">Symfony\Bundle\SecurityBundle\Security\FirewallContext</parameter>
         <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
+        <parameter key="security.expression_matcher.class">Symfony\Component\HttpFoundation\ExpressionRequestMatcher</parameter>
 
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
 
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
+
+        <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
     </parameters>
 
     <services>
         <service id="security.context" class="%security.context.class%">
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.authorization_checker" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 2.6 and will be removed in 3.0.</deprecated>
+        </service>
+
+        <service id="security.authorization_checker" class="Symfony\Component\Security\Core\Authorization\AuthorizationChecker">
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.access.decision_manager" />
             <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
+
+        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
 
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
@@ -76,8 +89,19 @@
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic" />
 
+        <service id="security.user_password_encoder.generic" class="Symfony\Component\Security\Core\Encoder\UserPasswordEncoder" public="false">
+            <argument type="service" id="security.encoder_factory"></argument>
+        </service>
+
+        <service id="security.password_encoder" alias="security.user_password_encoder.generic"></service>
+
         <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
+        <service id="security.expression_language" class="%security.expression_language.class%" public="false" />
+
+        <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils">
+            <argument type="service" id="request_stack" />
+        </service>
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
@@ -104,6 +128,13 @@
             <tag name="security.voter" priority="245" />
         </service>
 
+        <service id="security.access.expression_voter" class="%security.access.expression_voter.class%" public="false">
+            <argument type="service" id="security.expression_language" />
+            <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.role_hierarchy" on-invalid="null" />
+            <tag name="security.voter" priority="245" />
+        </service>
+
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
@@ -122,9 +153,26 @@
             <argument type="service" id="security.exception_listener" />
         </service>
 
+        <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator" public="false">
+            <argument type="service" id="request_stack" on-invalid="null" />
+            <argument type="service" id="router" on-invalid="null" />
+            <argument type="service" id="security.token_storage" on-invalid="null" />
+        </service>
+
+
         <!-- Provisioning -->
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
+
+        <service id="security.user.provider.ldap" class="Symfony\Component\Security\Core\User\LdapUserProvider" abstract="true" public="false">
+            <argument /> <!-- security.ldap.ldap -->
+            <argument /> <!-- base dn -->
+            <argument /> <!-- search dn -->
+            <argument /> <!-- search password -->
+            <argument /> <!-- default_roles -->
+            <argument /> <!-- uid key -->
+            <argument /> <!-- filter -->
+        </service>
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
 
@@ -133,18 +181,12 @@
             <argument type="service" id="router" on-invalid="null" />
         </service>
 
+
         <!-- Validator -->
         <service id="security.validator.user_password" class="%security.validator.user_password.class%">
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
-        </service>
-
-        <!-- Pseudorandom Number Generator -->
-        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
-            <tag name="monolog.logger" channel="security" />
-            <argument>%kernel.cache_dir%/secure_random.seed</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>
 </container>

@@ -39,50 +39,42 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($name)
+    public function getEngine($name)
     {
-        foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
-                $engine = $this->engines[$i] = $this->container->get($engine);
-            }
+        $this->resolveEngines();
 
-            if ($engine->supports($name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return parent::getEngine($name);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getEngine($name)
+    public function renderResponse($view, array $parameters = array(), Response $response = null)
     {
-        foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
-                $engine = $this->engines[$i] = $this->container->get($engine);
-            }
+        $engine = $this->getEngine($view);
 
-            if ($engine->supports($name)) {
-                return $engine;
-            }
+        if ($engine instanceof EngineInterface) {
+            return $engine->renderResponse($view, $parameters, $response);
         }
 
-        throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($engine->render($view, $parameters));
+
+        return $response;
     }
 
     /**
-     * Renders a view and returns a Response.
-     *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
+     * Resolved engine ids to their real engine instances from the container.
      */
-    public function renderResponse($view, array $parameters = array(), Response $response = null)
+    private function resolveEngines()
     {
-        return $this->getEngine($view)->renderResponse($view, $parameters, $response);
+        foreach ($this->engines as $i => $engine) {
+            if (is_string($engine)) {
+                $this->engines[$i] = $this->container->get($engine);
+            }
+        }
     }
 }

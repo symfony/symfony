@@ -1,93 +1,138 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% from _self import display_timeline, dump_request_data %}
+{% import _self as helper %}
 
 {% if colors is not defined %}
     {% set colors = {
-        'default':                '#aacd4e',
-        'section':                '#666',
-        'event_listener':         '#3dd',
-        'event_listener_loading': '#add',
-        'template':               '#dd3',
-        'doctrine':               '#d3d',
-        'propel':                 '#f4d',
-        'child_sections':         '#eed',
+        'default':                '#999',
+        'section':                '#444',
+        'event_listener':         '#00B8F5',
+        'event_listener_loading': '#00B8F5',
+        'template':               '#66CC00',
+        'doctrine':               '#FF6633',
+        'propel':                 '#FF6633',
     } %}
 {% endif %}
 
 {% block toolbar %}
-    {% set duration = collector.events|length ? '%.0f ms'|format(collector.duration) : 'n/a' %}
+    {% set total_time = collector.events|length ? '%.0f'|format(collector.duration) : 'n/a' %}
+    {% set initialization_time = collector.events|length ? '%.0f'|format(collector.inittime) : 'n/a' %}
+    {% set status_color = collector.events|length and collector.duration > 1000 ? 'yellow' : '' %}
+
     {% set icon %}
-        <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII=" />
-        <span>{{ duration }}</span>
+        {{ include('@WebProfiler/Icon/time.svg') }}
+        <span class="sf-toolbar-value">{{ total_time }}</span>
+        <span class="sf-toolbar-label">ms</span>
     {% endset %}
+
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Total time</b>
-            <span>{{ duration }}</span>
+            <span>{{ total_time }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Initialization time</b>
+            <span>{{ initialization_time }} ms</span>
         </div>
     {% endset %}
-    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
 {% endblock %}
 
 {% block menu %}
-<span class="label">
-    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAhCAYAAADOHBvaAAACz0lEQVR42t2XXWhSYRjHc+pyWrC10e66qKggiGoF0Qh1SBPFDxCcX00yrG6EImFsRhAuvUjwQgZB1EUICYEkgRJGB0QmKMNGEYx1URYEg2w6amWY/YUXXH7Ms9M5RAk/PByf8/58P573ec+2Wq32V/g3xFKpdB3UQBV8JVTJvXUuxbXN+P96TODNzMzsNJvNo3UCgYCYszmmKKrPYrE4NBrNU7lcvtY8xGNjYyWtVvvEZrPZES9kQyy02+3nx8fH3xFJV5RK5RuHw2GqP8tInEgk+g0GwyN6wlZMJtPdfD6/Y0viVCo1iKHLMpM20Ov1FNqT0BWLsWhiXdImDyiQ7ybHVN1HnKibWHgNHxr5egXI6t90ej49PX0BsYKO4qWlpT1qtXqFhlhGnpHREWPaPiB2dydxL/7ZTRLMnpjg8/lcpNct4mGr1fqSK7HT6UwhfleLuFwuH1EoFBWuxDqd7jPiDzSLe+Lx+AQJYl9MKBQKZ+pb7kaxKBKJXGUgPgqCgGrQOc3S6fQEfuNvFEtisdgUA3E/kcsadE6zhYUFG9lKG2LcvMxA3EKnKUBx+bm6uqptFvcCtUql+kECWcdoNH6BQw56fltcYNTtdr/nSuzxeJbhONkujw9Fo9EYV+JkMvkAjv3txEOVSuUSytk3tqWoz2to/xwYaCcWgtPI5+dsSrGo6mn0GG2PtG6ZDYbBRb/f/5EtcSgUeos2J8HgpmURHMaQz6JglP5U6vV6P6G962Sr5HcUE/rAKXB7bm5uhenwhsPheim8BUa6HwQaSMjSv5HNZl+gstDOb5fL9X1xcTGLZ6fAMSDe6ilTBA4CO7iXyWReB4PBMo5F1WYZymkVc1nK5XKvEHsHWMA+sJ3p8VYAhkjvJ4EPRMCzYrE4XyqV5nGdBA/BLLCC46Tu8tl4kxCAAdKLE0AGzhKkZB73kqIh4PI1lQf4BB6TNn4B8KR3FN9bp4MAAAAASUVORK5CYII=" alt="Timeline"></span>
-    <strong>Timeline</strong>
-</span>
+    <span class="label">
+        <span class="icon">{{ include('@WebProfiler/Icon/time.svg') }}</span>
+        <strong>Performance</strong>
+    </span>
 {% endblock %}
 
 {% block panel %}
-    <h2>Timeline</h2>
-    {% if collector.events|length %}
-        {{ block('panelContent') }}
+    <h2>Performance metrics</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ '%.0f'|format(collector.duration) }} <span class="unit">ms</span></span>
+            <span class="label">Total execution time</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ '%.0f'|format(collector.inittime) }} <span class="unit">ms</span></span>
+            <span class="label">Symfony initialization</span>
+        </div>
+
+        {% if profile.children|length > 0 %}
+            <div class="metric">
+                <span class="value">{{ profile.children|length }}</span>
+                <span class="label">Sub-Requests</span>
+            </div>
+
+            {% set subrequests_time = 0 %}
+            {% for child in profile.children %}
+                {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
+            {% endfor %}
+
+            <div class="metric">
+                <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
+                <span class="label">Sub-Requests time</span>
+            </div>
+        {% endif %}
+
+        {% if profile.collectors.memory %}
+            <div class="metric">
+                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
+                <span class="label">Peak memory usage</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2>Execution timeline</h2>
+
+    {% if collector.events is empty %}
+        <div class="empty">
+            <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
+        </div>
     {% else %}
-        <p>
-            <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</em>
-        </p>
+        {{ block('panelContent') }}
     {% endif %}
 {% endblock %}
 
 {% block panelContent %}
     <form id="timeline-control" action="" method="get">
         <input type="hidden" name="panel" value="time">
-        <table>
-            <tr>
-                <th style="width: 20%">Total time</th>
-                <td>{{ '%.0f'|format(collector.duration) }} ms</td>
-            </tr>
-            <tr>
-                <th>Initialization time</th>
-                <td>{{ '%.0f'|format(collector.inittime) }} ms</td>
-            </tr>
-            <tr>
-                <th>Threshold</th>
-                <td><input type="number" size="3" name="threshold" value="1" min="0"> ms</td>
-            </tr>
-        </table>
+        <label for="threshold">Threshold</label>
+        <input type="number" size="3" name="threshold" id="threshold" value="3" min="0"> ms
+        <span class="help">(timeline only displays events with a duration longer than this threshold)</span>
     </form>
 
-    <h3>
-        {{ profile.parent ? "Request" : "Main Request" }}
-        <small>
-            - {{ collector.events.__section__.duration }} ms
-            {% if profile.parent %}
-                - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time' }) }}">parent</a>
-            {% endif %}
-        </small>
-    </h3>
+    {% if profile.parent %}
+        <h3>
+            Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
+            <small>
+                {{ collector.events.__section__.duration }} ms
+                <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
+            </small>
+        </h3>
+    {% elseif profile.children|length > 0 %}
+        <h3>
+            Main Request <small>{{ collector.events.__section__.duration }} ms</small>
+        </h3>
+    {% endif %}
 
-    {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
+    {{ helper.display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}
+        <p class="help">Note: sections with a striped background correspond to sub-requests.</p>
+
+        <h3>Sub-requests <small>({{ profile.children|length }})</small></h3>
+
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
-            <h3>
-                Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
-                <small> - {{ events.__section__.duration }} ms</small>
-            </h3>
+            <h4>
+                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
+                <small>{{ events.__section__.duration }} ms</small>
+            </h4>
 
-            {{ display_timeline('timeline_' ~ child.token, events, colors) }}
+            {{ helper.display_timeline('timeline_' ~ child.token, events, colors) }}
         {% endfor %}
     {% endif %}
 
@@ -219,14 +264,19 @@
                 ctx.lineWidth = 0;
 
                 // For each event, draw a line.
-                ctx.strokeStyle = "#dfdfdf";
+                ctx.strokeStyle = "#CCC";
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
                         var timelineHeadPosition = x + period.start * ratio;
 
                         if (isChildEvent(event)) {
-                            ctx.fillStyle = colors.child_sections;
+                            /* create a striped background dynamically */
+                            var img = new Image();
+                            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKBAMAAAB/HNKOAAAAIVBMVEX////w8PDd7h7d7h7d7h7d7h7w8PDw8PDw8PDw8PDw8PAOi84XAAAAKUlEQVQImWNI71zAwMBQMYuBgY0BxExnADErGEDMTgYQE8hnAKtCZwIAlcMNSR9a1OEAAAAASUVORK5CYII=';
+                            var pattern = ctx.createPattern(img, 'repeat');
+
+                            ctx.fillStyle = pattern;
                             ctx.fillRect(timelineHeadPosition, 0, (period.end - period.start) * ratio, canvasHeight);
                         } else if (isSectionEvent(event)) {
                             var timelineTailPosition = x + period.end * ratio;
@@ -271,7 +321,7 @@
                         var timelineHeadPosition = x + period.start * ratio;
 
                         if (!isSectionEvent(event)) {
-                            ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
+                            ctx.fillRect(timelineHeadPosition, h + 3, 2, 8);
                             ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {
                             var timelineTailPosition = x + period.end * ratio;
@@ -309,7 +359,7 @@
                     h += 30;
 
                     ctx.beginPath();
-                    ctx.strokeStyle = "#dfdfdf";
+                    ctx.strokeStyle = "#E0E0E0";
                     ctx.moveTo(0, h - 10);
                     ctx.lineTo(width, h - 10);
                     ctx.closePath();
@@ -324,24 +374,28 @@
                     ctx.fillStyle = "#444";
                     ctx.font = "12px sans-serif";
                     text = event.name;
-                    ms = " ~ " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / ~ " + event.memory + " MB";
+                    ms = "  " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
+                        ctx.fillStyle = "#777";
                         xc = x + event.endtime * ratio - 1;
                         ctx.fillText(ms, xc, h);
 
                         xc -= ctx.measureText(ms).width;
                         ctx.font = "12px sans-serif";
+                        ctx.fillStyle = "#222";
                         ctx.fillText(text, xc, h);
                     } else {
                         ctx.textAlign = "start";
-                        ctx.font = "12px sans-serif";
+                        ctx.font = "13px sans-serif";
+                        ctx.fillStyle = "#222";
                         xc = x + event.starttime * ratio + 1;
                         ctx.fillText(text, xc, h);
 
                         xc += ctx.measureText(text).width;
-                        ctx.font = "10px sans-serif";
+                        ctx.font = "11px sans-serif";
+                        ctx.fillStyle = "#777";
                         ctx.fillText(ms, xc, h);
                     }
 
@@ -399,12 +453,12 @@
         var requests_data = {
             "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
-{{ dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+{{ helper.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ helper.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]

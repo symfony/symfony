@@ -27,12 +27,12 @@ interface DenormalizableInterface
      * It is important to understand that the denormalize() call should denormalize
      * recursively all child objects of the implementor.
      *
-     * @param DenormalizerInterface            $denormalizer The denormalizer is given so that you
-     *                                                       can use it to denormalize objects contained within this object.
-     * @param array|string|bool|int|float|null $data         The data from which to re-create the object.
-     * @param string|null                      $format       The format is optionally given to be able to denormalize differently
-     *                                                       based on different input formats.
-     * @param array                            $context      options for denormalizing
+     * @param DenormalizerInterface $denormalizer The denormalizer is given so that you
+     *                                            can use it to denormalize objects contained within this object
+     * @param array|scalar          $data         The data from which to re-create the object.
+     * @param string|null           $format       The format is optionally given to be able to denormalize differently
+     *                                            based on different input formats
+     * @param array                 $context      options for denormalizing
      */
     public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array());
 }

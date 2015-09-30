@@ -63,22 +63,27 @@ class ControllerResolver extends BaseControllerResolver
                 list($service, $method) = explode(':', $controller, 2);
 
                 return array($this->container->get($service), $method);
+            } elseif ($this->container->has($controller) && method_exists($service = $this->container->get($controller), '__invoke')) {
+                return $service;
             } else {
                 throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
             }
         }
 
-        list($class, $method) = explode('::', $controller, 2);
+        return parent::createController($controller);
+    }
 
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
+    /**
+     * {@inheritdoc}
+     */
+    protected function instantiateController($class)
+    {
+        $controller = parent::instantiateController($class);
 
-        $controller = new $class();
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
 
-        return array($controller, $method);
+        return $controller;
     }
 }

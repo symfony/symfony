@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\MysqlProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * A ProfilerStorage for Mysql.
  *
  * @author Jan Schumann <js@schumann-it.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 class MysqlProfilerStorage extends PdoProfilerStorage
 {
@@ -33,7 +38,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
             }
 
             $db = new \PDO($this->dsn, $this->username, $this->password);
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), method VARCHAR(6), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (method), KEY (url), KEY (parent))');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), method VARCHAR(6), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, status_code SMALLINT UNSIGNED, KEY (created_at), KEY (ip), KEY (method), KEY (url), KEY (parent))');
 
             $this->db = $db;
         }

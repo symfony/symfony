@@ -25,12 +25,11 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
-    private $cache;
+    private $cache = array();
 
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
-        $this->cache = array();
     }
 
     /**
@@ -91,7 +90,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             return;
         }
 
-        /* @var ClassMetadataInfo $classMetadata */
+        /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $classMetadatas[0];
 
         // Check whether the field exists and is nullable or not

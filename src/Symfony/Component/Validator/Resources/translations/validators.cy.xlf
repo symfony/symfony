@@ -175,7 +175,7 @@
                 <target>Mae uchder y ddelwedd yn rhy fach ({{ width }}px). Yr uchder lleiaf â ganiateir yw {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Dylaid bod y gwerth hwn yn gyfrinair presenol y defnyddiwr.</target>
             </trans-unit>
             <trans-unit id="48">

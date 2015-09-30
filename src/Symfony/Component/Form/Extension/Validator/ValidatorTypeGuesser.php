@@ -15,8 +15,9 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
@@ -116,6 +117,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Country':
                 return new TypeGuess('country', array(), Guess::HIGH_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Currency':
+                return new TypeGuess('currency', array(), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Date':
                 return new TypeGuess('date', array('input' => 'string'), Guess::HIGH_CONFIDENCE);
@@ -267,8 +271,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         $guesses = array();
         $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
-        if ($classMetadata->hasMemberMetadatas($property)) {
-            $memberMetadatas = $classMetadata->getMemberMetadatas($property);
+        if ($classMetadata instanceof ClassMetadataInterface && $classMetadata->hasPropertyMetadata($property)) {
+            $memberMetadatas = $classMetadata->getPropertyMetadata($property);
 
             foreach ($memberMetadatas as $memberMetadata) {
                 $constraints = $memberMetadata->getConstraints();

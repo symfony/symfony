@@ -115,6 +115,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
     public function getDataForPhpize()
     {
         return array(
+            array('', ''),
             array(null, 'null'),
             array(true, 'true'),
             array(false, 'false'),
@@ -123,6 +124,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array(false, 'False'),
             array(0, '0'),
             array(1, '1'),
+            array(-1, '-1'),
             array(0777, '0777'),
             array(255, '0xFF'),
             array(100.0, '1e2'),
@@ -138,6 +140,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array('111,222,333,444', '111,222,333,444'),
             array('1111,2222,3333,4444,5555', '1111,2222,3333,4444,5555'),
             array('foo', 'foo'),
+            array(6, '0b0110'),
         );
     }
 

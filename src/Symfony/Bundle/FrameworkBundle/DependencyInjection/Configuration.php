@@ -22,6 +22,16 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    private $debug;
+
+    /**
+     * @param bool $debug Whether debugging is enabled or not
+     */
+    public function __construct($debug)
+    {
+        $this->debug = (bool) $debug;
+    }
+
     /**
      * Generates the configuration tree builder.
      *
@@ -33,10 +43,87 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            // Check deprecations before the config is processed to ensure
+            // the setting has been explicitly defined in a configuration file.
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['csrf_protection']['field_name']); })
+                ->then(function ($v) {
+                    @trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return !isset($v['assets']); })
+                ->then(function ($v) {
+                    if (!isset($v['templating'])
+                        || !$v['templating']['assets_version']
+                        && !count($v['templating']['assets_base_urls']['http'])
+                        && !count($v['templating']['assets_base_urls']['ssl'])
+                        && !count($v['templating']['packages'])
+                    ) {
+                        $v['assets'] = array(
+                            'version' => null,
+                            'version_format' => '%%s?%%s',
+                            'base_path' => '',
+                            'base_urls' => array(),
+                            'packages' => array(),
+                        );
+                    }
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['templating']); })
+                ->then(function ($v) {
+                    if ($v['templating']['assets_version']
+                        || count($v['templating']['assets_base_urls']['http'])
+                        || count($v['templating']['assets_base_urls']['ssl'])
+                        || count($v['templating']['packages'])
+                    ) {
+                        @trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
+
+                        // convert the old configuration to the new one
+                        if (isset($v['assets'])) {
+                            throw new \LogicException('You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.');
+                        }
+
+                        $v['assets'] = array(
+                            'version' => $v['templating']['assets_version'],
+                            'version_format' => $v['templating']['assets_version_format'],
+                            'base_path' => '',
+                            'base_urls' => array_values(array_unique(array_merge($v['templating']['assets_base_urls']['http'], $v['templating']['assets_base_urls']['ssl']))),
+                            'packages' => array(),
+                        );
+
+                        foreach ($v['templating']['packages'] as $name => $config) {
+                            $v['assets']['packages'][$name] = array(
+                                'version' => (string) $config['version'],
+                                'version_format' => $config['version_format'],
+                                'base_path' => '',
+                                'base_urls' => array_values(array_unique(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),
+                            );
+                        }
+                    }
+
+                    unset($v['templating']['assets_version'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+
+                    return $v;
+                })
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['validation']['api']); })
+                ->then(function ($v) {
+                    @trigger_error('The validation.api configuration key is deprecated since version 2.7 and will be removed in 3.0', E_USER_DEPRECATED);
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
-                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
+                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
                     ->defaultTrue()
                 ->end()
                 ->arrayNode('trusted_proxies')
@@ -75,19 +162,41 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+        $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
+        $this->addRequestSection($rootNode);
         $this->addTemplatingSection($rootNode);
+        $this->addAssetsSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode);
+        $this->addPropertyAccessSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('csrf_protection')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('field_name')
+                            ->defaultValue('_token')
+                            ->info('Deprecated since version 2.4, to be removed in 3.0. Use form.csrf_protection.field_name instead')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addFormSection(ArrayNodeDefinition $rootNode)
@@ -97,11 +206,17 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form')
                     ->info('form configuration')
                     ->canBeEnabled()
-                ->end()
-                ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
                     ->children()
-                        ->scalarNode('field_name')->defaultValue('_token')->end()
+                        ->arrayNode('csrf_protection')
+                            ->treatFalseLike(array('enabled' => false))
+                            ->treatTrueLike(array('enabled' => true))
+                            ->treatNullLike(array('enabled' => true))
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
+                                ->scalarNode('field_name')->defaultNull()->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -118,6 +233,17 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function addSsiSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('ssi')
+                    ->info('ssi configuration')
+                    ->canBeEnabled()
+                ->end()
+            ->end();
     }
 
     private function addFragmentsSection(ArrayNodeDefinition $rootNode)
@@ -146,20 +272,54 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('collect')->defaultTrue()->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
-                        ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
-                        ->scalarNode('username')->defaultValue('')->end()
-                        ->scalarNode('password')->defaultValue('')->end()
+                        ->scalarNode('dsn')
+                            ->defaultValue('file:%kernel.cache_dir%/profiler')
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return 'file:' !== substr($v, 0, 5); })
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('username')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('password')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                         ->scalarNode('lifetime')->defaultValue(86400)->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()
                             ->performNoDeepMerging()
+                            ->fixXmlConfig('ip')
                             ->children()
-                                ->scalarNode('ip')->end()
                                 ->scalarNode('path')
                                     ->info('use the urldecoded format')
                                     ->example('^/path to resource/')
                                 ->end()
                                 ->scalarNode('service')->end()
+                                ->arrayNode('ips')
+                                    ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
+                                    ->prototype('scalar')->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
@@ -210,11 +370,45 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_path')->end()
                         ->scalarNode('cookie_domain')->end()
                         ->booleanNode('cookie_secure')->end()
-                        ->booleanNode('cookie_httponly')->end()
+                        ->booleanNode('cookie_httponly')->defaultTrue()->end()
+                        ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
-                        ->scalarNode('gc_probability')->end()
+                        ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
+                        ->integerNode('metadata_update_threshold')
+                            ->defaultValue('0')
+                            ->info('seconds to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRequestSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('request')
+                    ->info('request configuration')
+                    ->canBeUnset()
+                    ->fixXmlConfig('format')
+                    ->children()
+                        ->arrayNode('formats')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) { return is_array($v) && isset($v['mime_type']); })
+                                    ->then(function ($v) { return $v['mime_type']; })
+                                ->end()
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) { return !is_array($v); })
+                                    ->then(function ($v) { return array($v); })
+                                ->end()
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -249,8 +443,8 @@ class Configuration implements ConfigurationInterface
                     ->info('templating configuration')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('assets_version')->defaultValue(null)->end()
-                        ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('assets_version')->defaultNull()->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
+                        ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
@@ -272,6 +466,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')
                             ->performNoDeepMerging()
                             ->addDefaultsIfNotSet()
                             ->beforeNormalization()
@@ -319,6 +514,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('package')
                     ->children()
                         ->arrayNode('packages')
+                            ->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')
@@ -354,6 +550,54 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addAssetsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('assets')
+                    ->info('assets configuration')
+                    ->canBeUnset()
+                    ->fixXmlConfig('base_url')
+                    ->children()
+                        ->scalarNode('version')->defaultNull()->end()
+                        ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('base_path')->defaultValue('')->end()
+                        ->arrayNode('base_urls')
+                            ->requiresAtLeastOneElement()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->then(function ($v) { return array($v); })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('package')
+                    ->children()
+                        ->arrayNode('packages')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->fixXmlConfig('base_url')
+                                ->children()
+                                    ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version_format')->defaultNull()->end()
+                                    ->scalarNode('base_path')->defaultValue('')->end()
+                                    ->arrayNode('base_urls')
+                                        ->requiresAtLeastOneElement()
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($v) { return !is_array($v); })
+                                            ->then(function ($v) { return array($v); })
+                                        ->end()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addTranslatorSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -362,11 +606,16 @@ class Configuration implements ConfigurationInterface
                     ->info('translator configuration')
                     ->canBeEnabled()
                     ->fixXmlConfig('fallback')
+                    ->fixXmlConfig('path')
                     ->children()
                         ->arrayNode('fallbacks')
                             ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                             ->prototype('scalar')->end()
                             ->defaultValue(array('en'))
+                        ->end()
+                        ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->arrayNode('paths')
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -382,9 +631,33 @@ class Configuration implements ConfigurationInterface
                     ->info('validation configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('cache')->end()
+                        ->scalarNode('cache')
+                            ->beforeNormalization()
+                                // Can be removed in 3.0, once ApcCache support is dropped
+                                ->ifString()->then(function ($v) { return 'apc' === $v ? 'validator.mapping.cache.apc' : $v; })
+                            ->end()
+                        ->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->arrayNode('static_method')
+                            ->defaultValue(array('loadValidatorMetadata'))
+                            ->prototype('scalar')->end()
+                            ->treatFalseLike(array())
+                            ->validate()
+                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->then(function ($v) { return (array) $v; })
+                            ->end()
+                        ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
+                        ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->enumNode('api')
+                            ->info('Deprecated since version 2.7, to be removed in 3.0')
+                            ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
+                            ->beforeNormalization()
+                                // XML/YAML parse as numbers, not as strings
+                                ->ifTrue(function ($v) { return is_scalar($v); })
+                                ->then(function ($v) { return (string) $v; })
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -415,6 +688,27 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                    ->children()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('cache')->end()
+                        ->scalarNode('name_converter')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('property_access')
+                    ->addDefaultsIfNotSet()
+                    ->info('Property access configuration')
+                    ->children()
+                        ->booleanNode('magic_call')->defaultFalse()->end()
+                        ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
+                    ->end()
                 ->end()
             ->end()
         ;

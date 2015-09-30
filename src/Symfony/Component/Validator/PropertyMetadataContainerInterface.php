@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator;
  * A container for {@link PropertyMetadataInterface} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Mapping\ClassMetadataInterface} instead.
  */
 interface PropertyMetadataContainerInterface
 {

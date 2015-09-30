@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Tester;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -58,5 +59,26 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
     public function testGetDisplay()
     {
         $this->assertEquals('foo'.PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+    }
+
+    public function testGetStatusCode()
+    {
+        $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
+    }
+
+    public function testCommandFromApplication()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+
+        $command = new Command('foo');
+        $command->setCode(function ($input, $output) { $output->writeln('foo'); });
+
+        $application->add($command);
+
+        $tester = new CommandTester($application->find('foo'));
+
+        // check that there is no need to pass the command name here
+        $this->assertEquals(0, $tester->execute(array()));
     }
 }

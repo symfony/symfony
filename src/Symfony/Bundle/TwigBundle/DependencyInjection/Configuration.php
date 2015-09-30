@@ -39,8 +39,10 @@ class Configuration implements ConfigurationInterface
         ;
 
         $this->addFormSection($rootNode);
+        $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
+        $this->addTwigFormatOptions($rootNode);
 
         return $treeBuilder;
     }
@@ -48,8 +50,29 @@ class Configuration implements ConfigurationInterface
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            // Check deprecation before the config is processed to ensure
+            // the setting has been explicitly defined in a configuration file.
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['form']['resources']); })
+                ->then(function ($v) {
+                    @trigger_error('The twig.form.resources configuration key is deprecated since version 2.6 and will be removed in 3.0. Use the twig.form_themes configuration key instead.', E_USER_DEPRECATED);
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) {
+                    return count($v['form']['resources']) > 0;
+                })
+                ->then(function ($v) {
+                    $v['form_themes'] = array_values(array_unique(array_merge($v['form']['resources'], $v['form_themes'])));
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('form')
+                    ->info('Deprecated since version 2.6, to be removed in 3.0. Use twig.form_themes instead')
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()
@@ -64,6 +87,26 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addFormThemesSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->fixXmlConfig('form_theme')
+            ->children()
+                ->arrayNode('form_themes')
+                    ->addDefaultChildrenIfNoneSet()
+                    ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
+                    ->example(array('MyBundle::form.html.twig'))
+                    ->validate()
+                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                        ->then(function ($v) {
+                            return array_merge(array('form_div_layout.html.twig'), $v);
+                        })
                     ->end()
                 ->end()
             ->end()
@@ -124,9 +167,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')
-                    ->defaultValue(array('Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy', 'guess'))
-                ->end()
+                ->variableNode('autoescape')->defaultValue('filename')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->cannotBeEmpty()->end()
@@ -163,6 +204,35 @@ class Configuration implements ConfigurationInterface
                         })
                     ->end()
                     ->prototype('variable')->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addTwigFormatOptions(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('date')
+                    ->info('The default format options used by the date filter')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('format')->defaultValue('F j, Y H:i')->end()
+                        ->scalarNode('interval_format')->defaultValue('%d days')->end()
+                        ->scalarNode('timezone')
+                            ->info('The timezone used when formatting dates, when set to null, the timezone returned by date_default_timezone_get() is used')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('number_format')
+                    ->info('The default format options for the number_format filter')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('decimals')->defaultValue(0)->end()
+                        ->scalarNode('decimal_point')->defaultValue('.')->end()
+                        ->scalarNode('thousands_separator')->defaultValue(',')->end()
+                    ->end()
                 ->end()
             ->end()
         ;

@@ -33,13 +33,21 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
      */
     public function getParent()
     {
-        return 'button';
+        return __NAMESPACE__.'\ButtonType';
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'submit';
     }

@@ -12,8 +12,9 @@
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -23,94 +24,55 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class LogoutUrlHelper extends Helper
 {
-    private $container;
-    private $listeners;
-    private $router;
+    private $generator;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface    $container A ContainerInterface instance
-     * @param UrlGeneratorInterface $router    A Router instance
-     */
-    public function __construct(ContainerInterface $container, UrlGeneratorInterface $router)
-    {
-        $this->container = $container;
-        $this->router = $router;
-        $this->listeners = array();
-    }
-
-    /**
-     * Registers a firewall's LogoutListener, allowing its URL to be generated.
+     * @param ContainerInterface|LogoutUrlGenerator $generator    A ContainerInterface or LogoutUrlGenerator instance
+     * @param UrlGeneratorInterface|null            $router       The router service
+     * @param TokenStorageInterface|null            $tokenStorage The token storage service
      *
-     * @param string                $key           The firewall key
-     * @param string                $logoutPath    The path that starts the logout process
-     * @param string                $intention     The intention for CSRF token generation
-     * @param string                $csrfParameter The CSRF token parameter name
-     * @param CsrfProviderInterface $csrfProvider  A CsrfProviderInterface instance
+     * @deprecated Passing a ContainerInterface as a first argument is deprecated since 2.7 and will be removed in 3.0.
+     * @deprecated Passing a second and third argument is deprecated since 2.7 and will be removed in 3.0.
      */
-    public function registerListener($key, $logoutPath, $intention, $csrfParameter, CsrfProviderInterface $csrfProvider = null)
+    public function __construct($generator, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
-        $this->listeners[$key] = array($logoutPath, $intention, $csrfParameter, $csrfProvider);
+        if ($generator instanceof ContainerInterface) {
+            @trigger_error('The '.__CLASS__.' constructor will require a LogoutUrlGenerator instead of a ContainerInterface instance in 3.0.', E_USER_DEPRECATED);
+
+            if ($generator->has('security.logout_url_generator')) {
+                $this->generator = $generator->get('security.logout_url_generator');
+            } else {
+                $this->generator = new LogoutUrlGenerator($generator->get('request_stack'), $router, $tokenStorage);
+            }
+        } else {
+            $this->generator = $generator;
+        }
     }
 
     /**
      * Generates the absolute logout path for the firewall.
      *
-     * @param string $key The firewall key
+     * @param string|null $key The firewall key or null to use the current firewall key
      *
      * @return string The logout path
      */
     public function getLogoutPath($key)
     {
-        return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
+        return $this->generator->getLogoutPath($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
      * Generates the absolute logout URL for the firewall.
      *
-     * @param string $key The firewall key
+     * @param string|null $key The firewall key or null to use the current firewall key
      *
      * @return string The logout URL
      */
     public function getLogoutUrl($key)
     {
-        return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
-    }
-
-    /**
-     * Generates the logout URL for the firewall.
-     *
-     * @param string      $key           The firewall key
-     * @param bool|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
-     *
-     * @return string The logout URL
-     *
-     * @throws \InvalidArgumentException if no LogoutListener is registered for the key
-     */
-    private function generateLogoutUrl($key, $referenceType)
-    {
-        if (!array_key_exists($key, $this->listeners)) {
-            throw new \InvalidArgumentException(sprintf('No LogoutListener found for firewall key "%s".', $key));
-        }
-
-        list($logoutPath, $intention, $csrfParameter, $csrfProvider) = $this->listeners[$key];
-
-        $parameters = null !== $csrfProvider ? array($csrfParameter => $csrfProvider->generateCsrfToken($intention)) : array();
-
-        if ('/' === $logoutPath[0]) {
-            $request = $this->container->get('request');
-
-            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath().$logoutPath;
-
-            if (!empty($parameters)) {
-                $url .= '?'.http_build_query($parameters);
-            }
-        } else {
-            $url = $this->router->generate($logoutPath, $parameters, $referenceType);
-        }
-
-        return $url;
+        return $this->generator->getLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**

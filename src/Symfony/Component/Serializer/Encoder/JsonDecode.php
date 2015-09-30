@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Decodes JSON data.
  *
@@ -33,6 +35,7 @@ class JsonDecode implements DecoderInterface
     private $recursionDepth;
 
     private $lastError = JSON_ERROR_NONE;
+
     protected $serializer;
 
     /**
@@ -52,10 +55,14 @@ class JsonDecode implements DecoderInterface
      *
      * @return int
      *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             The {@self decode()} method throws an exception if error found.
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */
     public function getLastError()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Catch the exception raised by the decode() method instead to get the last JSON decoding error.', E_USER_DEPRECATED);
+
         return $this->lastError;
     }
 
@@ -82,6 +89,8 @@ class JsonDecode implements DecoderInterface
      *
      * @return mixed
      *
+     * @throws UnexpectedValueException
+     *
      * @see http://php.net/json_decode json_decode
      */
     public function decode($data, $format, array $context = array())
@@ -98,7 +107,9 @@ class JsonDecode implements DecoderInterface
             $decodedData = json_decode($data, $associative, $recursionDepth);
         }
 
-        $this->lastError = json_last_error();
+        if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
+            throw new UnexpectedValueException(JsonEncoder::getLastErrorMessage());
+        }
 
         return $decodedData;
     }

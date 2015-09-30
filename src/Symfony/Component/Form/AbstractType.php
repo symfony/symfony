@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Util\StringUtil;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -44,6 +46,46 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        if (!$resolver instanceof OptionsResolver) {
+            throw new \InvalidArgumentException(sprintf('Custom resolver "%s" must extend "Symfony\Component\OptionsResolver\OptionsResolver".', get_class($resolver)));
+        }
+
+        $this->configureOptions($resolver);
+    }
+
+    /**
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options.
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        // As of Symfony 2.8, the name defaults to the fully-qualified class name
+        return get_class($this);
+    }
+
+    /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * The block prefixes default to the underscored short class name with
+     * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string The prefix of the template block name
+     */
+    public function getBlockPrefix()
+    {
+        $fqcn = get_class($this);
+        $name = $this->getName();
+
+        // For BC: Use the name as block prefix if one is set
+        return $name !== $fqcn ? $name : StringUtil::fqcnToBlockPrefix($fqcn);
     }
 
     /**
@@ -51,6 +93,6 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getParent()
     {
-        return 'form';
+        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
 }

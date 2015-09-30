@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 /**
- * @author Marcin Sikon<marcin.sikon@gmail.com>
+ * @author Marcin Sikon <marcin.sikon@gmail.com>
  */
 class RedirectControllerTest extends TestCase
 {

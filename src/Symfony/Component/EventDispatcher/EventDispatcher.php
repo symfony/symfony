@@ -52,8 +52,12 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners($eventName = null)
+    public function getListeners($eventName = null, $withPriorities = false)
     {
+        if (true === $withPriorities) {
+            return $eventName ? $this->listeners[$eventName] : array_filter($this->listeners);
+        }
+
         if (null !== $eventName) {
             if (!isset($this->listeners[$eventName])) {
                 return array();
@@ -148,14 +152,14 @@ class EventDispatcher implements EventDispatcherInterface
      * This method can be overridden to add functionality that is executed
      * for each listener.
      *
-     * @param array[callback] $listeners The event listeners.
-     * @param string          $eventName The name of the event to dispatch.
-     * @param Event           $event     The event object to pass to the event handlers/listeners.
+     * @param callable[] $listeners The event listeners.
+     * @param string     $eventName The name of the event to dispatch.
+     * @param Event      $event     The event object to pass to the event handlers/listeners.
      */
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            call_user_func($listener, $event);
+            call_user_func($listener, $event, $eventName, $this);
             if ($event->isPropagationStopped()) {
                 break;
             }

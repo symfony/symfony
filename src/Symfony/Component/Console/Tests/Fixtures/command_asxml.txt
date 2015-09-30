@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <command id="namespace:name" name="namespace:name">
-  <usage>namespace:name</usage>
+  <usages>
+    <usage>namespace:name</usage>
+    <usage>name</usage>
+  </usages>
   <description>description</description>
   <help>help</help>
-  <aliases>
-    <alias>name</alias>
-  </aliases>
   <arguments>
     <argument name="command" is_required="1" is_array="0">
       <description>The command to execute</description>

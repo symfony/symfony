@@ -175,7 +175,7 @@
                 <target>D'Héicht vum Bild ass ze kleng ({{ height }}px). Déi minimal Héicht ass {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Dëse Wäert sollt dem aktuelle Benotzerpasswuert entspriechen.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -277,6 +277,26 @@
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Dëse Wäert sollt net identesch si mat {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>D'Säiteverhältnis vum Bild ass ze grouss ({{ ratio }}). Den erlaabte Maximalwäert ass {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>D'Säiteverhältnis vum Bild ass ze kleng ({{ ratio }}). Den erwaarte Minimalwäert ass {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>D'Bild ass quadratesch ({{ width }}x{{ height }}px). Quadratesch Biller sinn net erlaabt.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>D'Bild ass am Queeschformat ({{ width }}x{{ height }}px). Biller am Queeschformat sinn net erlaabt.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>D'Bild ass am Héichformat ({{ width }}x{{ height }}px). Biller am Héichformat sinn net erlaabt.</target>
             </trans-unit>
         </body>
     </file>

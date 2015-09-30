@@ -175,7 +175,7 @@
                 <target>Gjatësia e imazhit është shumë e vogël ({{ height }}px). Gjatësia minimale e pritur është {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Kjo vlerë duhet të jetë fjalëkalimi aktual i përdoruesit.</target>
             </trans-unit>
             <trans-unit id="48">

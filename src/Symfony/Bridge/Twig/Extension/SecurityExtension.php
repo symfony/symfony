@@ -12,7 +12,8 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
 /**
  * SecurityExtension exposes security context features.
@@ -21,16 +22,16 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class SecurityExtension extends \Twig_Extension
 {
-    private $context;
+    private $securityChecker;
 
-    public function __construct(SecurityContextInterface $context = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
     {
-        $this->context = $context;
+        $this->securityChecker = $securityChecker;
     }
 
     public function isGranted($role, $object = null, $field = null)
     {
-        if (null === $this->context) {
+        if (null === $this->securityChecker) {
             return false;
         }
 
@@ -38,7 +39,11 @@ class SecurityExtension extends \Twig_Extension
             $object = new FieldVote($object, $field);
         }
 
-        return $this->context->isGranted($role, $object);
+        try {
+            return $this->securityChecker->isGranted($role, $object);
+        } catch (AuthenticationCredentialsNotFoundException $e) {
+            return false;
+        }
     }
 
     /**

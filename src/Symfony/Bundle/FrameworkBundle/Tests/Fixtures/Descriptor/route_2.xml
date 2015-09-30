@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<route class="Symfony\Component\Routing\Route">
+  <path regex="#^/name/add$#s">/name/add</path>
+  <host regex="#^localhost$#si">localhost</host>
+  <scheme>http</scheme>
+  <scheme>https</scheme>
+  <method>PUT</method>
+  <method>POST</method>
+  <options>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+    <option key="opt1">val1</option>
+    <option key="opt2">val2</option>
+  </options>
+</route>

@@ -1,0 +1,7 @@
+twig:
+    form_themes:
+        - "FooBundle:Form:bar.html.twig"
+    form:
+        resources:
+            - "form_table_layout.html.twig"
+            - "MyBundle:Form:my_theme.html.twig"

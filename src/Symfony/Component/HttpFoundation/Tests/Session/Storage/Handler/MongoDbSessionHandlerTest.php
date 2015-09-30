@@ -31,7 +31,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
         }
 
-        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
+        $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
 
         $this->mongo = $this->getMockBuilder($mongoClass)
             ->getMock();
@@ -138,6 +138,45 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
         $this->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
         $this->assertGreaterThanOrEqual($expectedExpiry, $data[$this->options['expiry_field']]->sec);
+    }
+
+    public function testWriteWhenUsingExpiresField()
+    {
+        $this->options = array(
+            'id_field' => '_id',
+            'data_field' => 'data',
+            'time_field' => 'time',
+            'database' => 'sf2-test',
+            'collection' => 'session-test',
+            'expiry_field' => 'expiresAt',
+        );
+
+        $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
+
+        $collection = $this->createMongoCollectionMock();
+
+        $this->mongo->expects($this->once())
+            ->method('selectCollection')
+            ->with($this->options['database'], $this->options['collection'])
+            ->will($this->returnValue($collection));
+
+        $that = $this;
+        $data = array();
+
+        $collection->expects($this->once())
+            ->method('update')
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use ($that, &$data) {
+                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
+                $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+
+                $data = $updateData['$set'];
+            }));
+
+        $this->assertTrue($this->storage->write('foo', 'bar'));
+
+        $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
+        $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+        $that->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
     }
 
     public function testReplaceSessionData()

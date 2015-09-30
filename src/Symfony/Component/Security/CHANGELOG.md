@@ -1,6 +1,49 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated `getKey()` of the `AnonymousToken`, `RememberMeToken` and `AbstractRememberMeServices` classes
+   in favor of `getSecret()`.
+ * deprecated `Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface`, use
+   `Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface` instead
+ * deprecated `Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface`, use
+   `Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface` instead
+ * deprecated `Symfony\Component\Security\Core\Util\ClassUtils`, use
+   `Symfony\Component\Security\Acl\Util\ClassUtils` instead
+ * deprecated `supportsAttribute()` and `supportsClass()` methods of
+   `Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface` and
+   `Symfony\Component\Security\Core\Authorization\Voter\VoterInterface`.
+ * deprecated `getSupportedAttributes()` and `getSupportedClasses()` methods of
+   `Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter`, use `supports()` instead.
+
+2.7.0
+-----
+
+ * added LogoutUrlGenerator
+ * added the triggering of the `Symfony\Component\Security\Http\SecurityEvents::INTERACTIVE_LOGIN` in `Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener`
+ * The MaskBuilder logic has been abstracted in the `Symfony\Component\Security\Acl\Permission\AbstractMaskBuilder`
+   and described in the `Symfony\Component\Security\Acl\Permission\MaskBuilderInterface`
+ * added interface `Symfony\Component\Security\Acl\Permission\MaskBuilderRetrievalInterface`
+
+2.6.0
+-----
+
+ * added Symfony\Component\Security\Http\Authentication\AuthenticationUtils
+ * Deprecated the `SecurityContext` class in favor of the `AuthorizationChecker` and `TokenStorage` classes
+
+2.4.0
+-----
+
+ * Translations in the `src/Symfony/Component/Security/Resources/translations/` directory are deprecated, ones in `src/Symfony/Component/Security/Core/Resources/translations/` must be used instead.
+ * The switch user listener now preserves the query string when switching a user
+ * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
+ * added simpler customization options
+ * structured component into three sub-components Acl, Core and Http
+ * added Csrf sub-component
+ * changed Http sub-component to depend on Csrf sub-component instead of the Form component
+
 2.3.0
 -----
 

@@ -75,10 +75,11 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $helperset = new HelperSet();
         try {
             $helperset->get('foo');
-            $this->fail('->get() throws \InvalidArgumentException when helper not found');
+            $this->fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws \InvalidArgumentException when helper not found');
-            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws \InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\ExceptionInterface', $e, '->get() throws domain specific exception when helper not found');
+            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
     }
 
@@ -109,6 +110,23 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $helperset = new HelperSet();
         $helperset->setCommand($cmd);
         $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
+    }
+
+    /**
+     * @covers \Symfony\Component\Console\Helper\HelperSet::getIterator
+     */
+    public function testIteration()
+    {
+        $helperset = new HelperSet();
+        $helperset->set($this->getGenericMockHelper('fake_helper_01', $helperset));
+        $helperset->set($this->getGenericMockHelper('fake_helper_02', $helperset));
+
+        $helpers = array('fake_helper_01', 'fake_helper_02');
+        $i = 0;
+
+        foreach ($helperset as $helper) {
+            $this->assertEquals($helpers[$i++], $helper->getName());
+        }
     }
 
     /**

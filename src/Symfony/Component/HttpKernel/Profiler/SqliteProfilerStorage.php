@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\SqliteProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 class SqliteProfilerStorage extends PdoProfilerStorage
 {
@@ -40,7 +45,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
             }
 
             $db->exec('PRAGMA temp_store=MEMORY; PRAGMA journal_mode=MEMORY;');
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, method STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, method STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER, status_code INTEGER)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON sf_profiler_data (created_at)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON sf_profiler_data (ip)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_method ON sf_profiler_data (method)');

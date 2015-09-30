@@ -14,6 +14,8 @@
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
         <parameter key="templating.finder.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder</parameter>
+        <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
+        <parameter key="templating.helper.router.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper</parameter>
     </parameters>
 
     <services>
@@ -52,13 +54,25 @@
         <service id="templating.loader.cache" class="%templating.loader.cache.class%" public="false">
             <argument type="service" id="templating.loader.wrapped" />
             <argument>%templating.loader.cache.path%</argument>
-            <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 
         <service id="templating.loader.chain" class="%templating.loader.chain.class%" public="false">
-            <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
+
+        <!--
+            The following services will be moved to templating_php.xml in version 3.0, they exist here for BC reasons.
+        -->
+        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
+            <tag name="templating.helper" alias="assets" />
+            <argument /> <!-- default package -->
+            <argument type="collection" /> <!-- named packages -->
+        </service>
+
+        <service id="templating.helper.router" class="%templating.helper.router.class%">
+            <tag name="templating.helper" alias="router" />
+            <argument type="service" id="router" />
+        </service>
     </services>
 </container>

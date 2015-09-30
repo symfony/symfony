@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Validator\Exception;
 
-class ValidatorException extends \RuntimeException
+class ValidatorException extends RuntimeException
 {
 }

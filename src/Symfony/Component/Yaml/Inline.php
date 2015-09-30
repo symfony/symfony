@@ -25,6 +25,7 @@ class Inline
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
+    private static $objectForMap = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -32,16 +33,18 @@ class Inline
      * @param string $value                  A YAML string
      * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool   $objectSupport          true if object support is enabled, false otherwise
+     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
      * @param array  $references             Mapping of variable names to values
      *
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $references = array())
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array())
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
+        self::$objectForMap = $objectForMap;
 
         $value = trim($value);
 
@@ -125,8 +128,17 @@ class Inline
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, 'C');
                 }
-                $repr = is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', (string) $value) : (string) $value);
-
+                if (is_float($value)) {
+                    $repr = (string) $value;
+                    if (is_infinite($value)) {
+                        $repr = str_ireplace('INF', '.Inf', $repr);
+                    } elseif (floor($value) == $value && $repr == $value) {
+                        // Preserve float data type since storing a whole number will result in integer value.
+                        $repr = '!!float '.$repr;
+                    }
+                } else {
+                    $repr = is_string($value) ? "'$value'" : (string) $value;
+                }
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, $locale);
                 }
@@ -344,6 +356,10 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
+                    if (self::$objectForMap) {
+                        return (object) $output;
+                    }
+
                     return $output;
             }
 
@@ -352,23 +368,42 @@ class Inline
 
             // value
             $done = false;
+
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $output[$key] = self::parseSequence($mapping, $i, $references);
+                        $value = self::parseSequence($mapping, $i, $references);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         break;
                     case '{':
                         // nested mapping
-                        $output[$key] = self::parseMapping($mapping, $i, $references);
+                        $value = self::parseMapping($mapping, $i, $references);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         break;
                     case ':':
                     case ' ':
                         break;
                     default:
-                        $output[$key] = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i, true, $references);
+                        $value = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i, true, $references);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         --$i;
                 }
@@ -444,6 +479,8 @@ class Inline
                         }
 
                         return;
+                    case 0 === strpos($scalar, '!!float '):
+                        return (float) substr($scalar, 8);
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;

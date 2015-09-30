@@ -23,12 +23,13 @@ class Route
 {
     private $path;
     private $name;
-    private $requirements;
-    private $options;
-    private $defaults;
+    private $requirements = array();
+    private $options = array();
+    private $defaults = array();
     private $host;
-    private $methods;
-    private $schemes;
+    private $methods = array();
+    private $schemes = array();
+    private $condition;
 
     /**
      * Constructor.
@@ -39,12 +40,6 @@ class Route
      */
     public function __construct(array $data)
     {
-        $this->requirements = array();
-        $this->options = array();
-        $this->defaults = array();
-        $this->methods = array();
-        $this->schemes = array();
-
         if (isset($data['value'])) {
             $data['path'] = $data['value'];
             unset($data['value']);
@@ -60,18 +55,22 @@ class Route
     }
 
     /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function setPattern($pattern)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the setPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
         $this->path = $pattern;
     }
 
     /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
      */
     public function getPattern()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the getPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
         return $this->path;
     }
 
@@ -107,6 +106,22 @@ class Route
 
     public function setRequirements($requirements)
     {
+        if (isset($requirements['_method'])) {
+            if (0 === count($this->methods)) {
+                $this->methods = explode('|', $requirements['_method']);
+            }
+
+            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', E_USER_DEPRECATED);
+        }
+
+        if (isset($requirements['_scheme'])) {
+            if (0 === count($this->schemes)) {
+                $this->schemes = explode('|', $requirements['_scheme']);
+            }
+
+            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', E_USER_DEPRECATED);
+        }
+
         $this->requirements = $requirements;
     }
 
@@ -153,5 +168,15 @@ class Route
     public function getMethods()
     {
         return $this->methods;
+    }
+
+    public function setCondition($condition)
+    {
+        $this->condition = $condition;
+    }
+
+    public function getCondition()
+    {
+        return $this->condition;
     }
 }

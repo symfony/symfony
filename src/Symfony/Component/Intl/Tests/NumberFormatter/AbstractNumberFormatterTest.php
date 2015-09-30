@@ -467,6 +467,102 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider formatRoundingModeRoundCeilingProvider
+     */
+    public function testFormatRoundingModeCeiling($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_CEILING);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_CEILING rounding mode.');
+    }
+
+    public function formatRoundingModeRoundCeilingProvider()
+    {
+        return array(
+            array(1.123, '1.13'),
+            array(1.125, '1.13'),
+            array(1.127, '1.13'),
+            array(-1.123, '-1.12'),
+            array(-1.125, '-1.12'),
+            array(-1.127, '-1.12'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundFloorProvider
+     */
+    public function testFormatRoundingModeFloor($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_FLOOR);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_FLOOR rounding mode.');
+    }
+
+    public function formatRoundingModeRoundFloorProvider()
+    {
+        return array(
+            array(1.123, '1.12'),
+            array(1.125, '1.12'),
+            array(1.127, '1.12'),
+            array(-1.123, '-1.13'),
+            array(-1.125, '-1.13'),
+            array(-1.127, '-1.13'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundDownProvider
+     */
+    public function testFormatRoundingModeDown($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_DOWN);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_DOWN rounding mode.');
+    }
+
+    public function formatRoundingModeRoundDownProvider()
+    {
+        return array(
+            array(1.123, '1.12'),
+            array(1.125, '1.12'),
+            array(1.127, '1.12'),
+            array(-1.123, '-1.12'),
+            array(-1.125, '-1.12'),
+            array(-1.127, '-1.12'),
+        );
+    }
+
+    /**
+     * @dataProvider formatRoundingModeRoundUpProvider
+     */
+    public function testFormatRoundingModeUp($value, $expected)
+    {
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, NumberFormatter::ROUND_UP);
+        $this->assertSame($expected, $formatter->format($value), '->format() with ROUND_UP rounding mode.');
+    }
+
+    public function formatRoundingModeRoundUpProvider()
+    {
+        return array(
+            array(1.123, '1.13'),
+            array(1.125, '1.13'),
+            array(1.127, '1.13'),
+            array(-1.123, '-1.13'),
+            array(-1.125, '-1.13'),
+            array(-1.127, '-1.13'),
+        );
+    }
+
     public function testGetLocale()
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);

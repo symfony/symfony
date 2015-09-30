@@ -21,6 +21,16 @@
     <!-- Custom constraint with namespace abbreviation-->
     <constraint name="custom:ConstraintB" />
 
+    <!-- Callbacks -->
+    <constraint name="Callback">validateMe</constraint>
+
+    <constraint name="Callback">validateMeStatic</constraint>
+
+    <constraint name="Callback">
+        <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+        <value>callback</value>
+    </constraint>
+
     <!-- PROPERTY CONSTRAINTS -->
 
     <property name="firstName">
@@ -91,6 +101,12 @@
 
     <getter property="lastName">
       <constraint name="NotNull" />
+    </getter>
+    <getter property="valid">
+      <constraint name="IsTrue" />
+    </getter>
+    <getter property="permissions">
+      <constraint name="IsTrue" />
     </getter>
   </class>
 

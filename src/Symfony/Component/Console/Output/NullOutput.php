@@ -73,10 +73,30 @@ class NullOutput implements OutputInterface
         return self::VERBOSITY_QUIET;
     }
 
+    public function isQuiet()
+    {
+        return true;
+    }
+
+    public function isVerbose()
+    {
+        return false;
+    }
+
+    public function isVeryVerbose()
+    {
+        return false;
+    }
+
+    public function isDebug()
+    {
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $options = self::OUTPUT_NORMAL)
     {
         // do nothing
     }
@@ -84,7 +104,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL)
     {
         // do nothing
     }

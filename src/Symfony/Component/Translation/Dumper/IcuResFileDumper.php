@@ -18,40 +18,27 @@ use Symfony\Component\Translation\MessageCatalogue;
  *
  * @author Stealth35
  */
-class IcuResFileDumper implements DumperInterface
+class IcuResFileDumper extends FileDumper
 {
     /**
      * {@inheritdoc}
      */
-    public function dump(MessageCatalogue $messages, $options = array())
-    {
-        if (!array_key_exists('path', $options)) {
-            throw new \InvalidArgumentException('The file dumper need a path options.');
-        }
-
-        // save a file for each domain
-        foreach ($messages->getDomains() as $domain) {
-            $file = $messages->getLocale().'.'.$this->getExtension();
-            $path = $options['path'].'/'.$domain.'/';
-
-            if (!file_exists($path)) {
-                mkdir($path);
-            }
-
-            // backup
-            if (file_exists($path.$file)) {
-                copy($path.$file, $path.$file.'~');
-            }
-
-            // save file
-            file_put_contents($path.$file, $this->format($messages, $domain));
-        }
-    }
+    protected $relativePathTemplate = '%domain%/%locale%.%extension%';
 
     /**
      * {@inheritdoc}
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use the formatCatalogue() method instead.', E_USER_DEPRECATED);
+
+        return $this->formatCatalogue($messages, $domain);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $data = $indexes = $resources = '';
 

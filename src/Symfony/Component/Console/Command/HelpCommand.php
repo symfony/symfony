@@ -38,7 +38,7 @@ class HelpCommand extends Command
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
             ))
             ->setDescription('Displays help for a command')
@@ -77,11 +77,17 @@ EOF
         }
 
         if ($input->getOption('xml')) {
+            @trigger_error('The --xml option was deprecated in version 2.7 and will be removed in version 3.0. Use the --format option instead.', E_USER_DEPRECATED);
+
             $input->setOption('format', 'xml');
         }
 
         $helper = new DescriptorHelper();
-        $helper->describe($output, $this->command, $input->getOption('format'), $input->getOption('raw'));
+        $helper->describe($output, $this->command, array(
+            'format' => $input->getOption('format'),
+            'raw_text' => $input->getOption('raw'),
+        ));
+
         $this->command = null;
     }
 }

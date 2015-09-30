@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * XmlDumper dumps a service container as an XML string.
@@ -116,16 +117,19 @@ class XmlDumper extends Dumper
 
             $service->setAttribute('class', $class);
         }
-        if ($definition->getFactoryMethod()) {
-            $service->setAttribute('factory-method', $definition->getFactoryMethod());
+        if ($definition->getFactoryMethod(false)) {
+            $service->setAttribute('factory-method', $definition->getFactoryMethod(false));
         }
-        if ($definition->getFactoryClass()) {
-            $service->setAttribute('factory-class', $definition->getFactoryClass());
+        if ($definition->getFactoryClass(false)) {
+            $service->setAttribute('factory-class', $definition->getFactoryClass(false));
         }
-        if ($definition->getFactoryService()) {
-            $service->setAttribute('factory-service', $definition->getFactoryService());
+        if ($definition->getFactoryService(false)) {
+            $service->setAttribute('factory-service', $definition->getFactoryService(false));
         }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
+        if (!$definition->isShared()) {
+            $service->setAttribute('shared', 'false');
+        }
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
             $service->setAttribute('scope', $scope);
         }
         if (!$definition->isPublic()) {
@@ -134,11 +138,21 @@ class XmlDumper extends Dumper
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
         }
-        if ($definition->isSynchronized()) {
+        if ($definition->isSynchronized(false)) {
             $service->setAttribute('synchronized', 'true');
         }
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
+        }
+        if (null !== $decorated = $definition->getDecoratedService()) {
+            list($decorated, $renamedId, $priority) = $decorated;
+            $service->setAttribute('decorates', $decorated);
+            if (null !== $renamedId) {
+                $service->setAttribute('decoration-inner-name', $renamedId);
+            }
+            if (0 !== $priority) {
+                $service->setAttribute('decoration-priority', $priority);
+            }
         }
 
         foreach ($definition->getTags() as $name => $tags) {
@@ -168,9 +182,35 @@ class XmlDumper extends Dumper
 
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
+        if ($callable = $definition->getFactory()) {
+            $factory = $this->document->createElement('factory');
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $factory);
+                $factory->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
+                $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
+                $factory->setAttribute('method', $callable[1]);
+            } else {
+                $factory->setAttribute('function', $callable);
+            }
+            $service->appendChild($factory);
+        }
+
+        if ($definition->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $configurator);
+                $configurator->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
@@ -256,12 +296,16 @@ class XmlDumper extends Dumper
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-                if (!$value->isStrict()) {
+                if (!$value->isStrict(false)) {
                     $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
+            } elseif ($value instanceof Expression) {
+                $element->setAttribute('type', 'expression');
+                $text = $this->document->createTextNode(self::phpToXml((string) $value));
+                $element->appendChild($text);
             } else {
                 if (in_array($value, array('null', 'true', 'false'), true)) {
                     $element->setAttribute('type', 'string');

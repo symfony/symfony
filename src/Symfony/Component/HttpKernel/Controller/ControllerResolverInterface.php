@@ -36,18 +36,18 @@ interface ControllerResolverInterface
      *
      * @param Request $request A Request instance
      *
-     * @return mixed|bool A PHP callable representing the Controller,
-     *                    or false if this resolver is not able to determine the controller
+     * @return callable|false A PHP callable representing the Controller,
+     *                        or false if this resolver is not able to determine the controller
      *
-     * @throws \InvalidArgumentException|\LogicException If the controller can't be found
+     * @throws \LogicException If the controller can't be found
      */
     public function getController(Request $request);
 
     /**
      * Returns the arguments to pass to the controller.
      *
-     * @param Request $request    A Request instance
-     * @param mixed   $controller A PHP callable
+     * @param Request  $request    A Request instance
+     * @param callable $controller A PHP callable
      *
      * @return array An array of arguments to pass to the controller
      *

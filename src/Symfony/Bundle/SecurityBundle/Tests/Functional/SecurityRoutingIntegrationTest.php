@@ -30,10 +30,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsExposedWhenNotProtected($config)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && PHP_VERSION_ID < 50309) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
-        }
-
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->insulate();
         $client->request('GET', '/unprotected_resource');
@@ -46,10 +42,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && PHP_VERSION_ID < 50309) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
-        }
-
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->insulate();
 
@@ -88,6 +80,28 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
         $this->assertRestricted($barredClient, '/secured-by-two-ips');
     }
+
+   /**
+    * @dataProvider getConfigs
+    */
+   public function testSecurityConfigurationForExpression($config)
+   {
+       $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('HTTP_USER_AGENT' => 'Firefox 1.0'));
+       $this->assertAllowed($allowedClient, '/protected-via-expression');
+
+       $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array());
+       $this->assertRestricted($barredClient, '/protected-via-expression');
+
+       $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array());
+
+       $allowedClient->request('GET', '/protected-via-expression');
+       $form = $allowedClient->followRedirect()->selectButton('login')->form();
+       $form['_username'] = 'johannes';
+       $form['_password'] = 'test';
+       $allowedClient->submit($form);
+       $this->assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
+       $this->assertAllowed($allowedClient, '/protected-via-expression');
+   }
 
     private function assertAllowed($client, $path)
     {

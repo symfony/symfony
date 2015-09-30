@@ -164,12 +164,12 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function testAddPrefixOverridesDefaultsAndRequirements()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', $foo = new Route('/foo'));
-        $collection->add('bar', $bar = new Route('/bar', array(), array('_scheme' => 'http')));
-        $collection->addPrefix('/admin', array(), array('_scheme' => 'https'));
+        $collection->add('foo', $foo = new Route('/foo.{_format}'));
+        $collection->add('bar', $bar = new Route('/bar.{_format}', array(), array('_format' => 'json')));
+        $collection->addPrefix('/admin', array(), array('_format' => 'html'));
 
-        $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
-        $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
+        $this->assertEquals('html', $collection->get('foo')->getRequirement('_format'), '->addPrefix() overrides existing requirements');
+        $this->assertEquals('html', $collection->get('bar')->getRequirement('_format'), '->addPrefix() overrides existing requirements');
     }
 
     public function testResource()
@@ -243,6 +243,20 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('{locale}.example.com', $routea->getHost());
         $this->assertEquals('{locale}.example.com', $routeb->getHost());
+    }
+
+    public function testSetCondition()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a');
+        $routeb = new Route('/b', array(), array(), array(), '{locale}.example.net', array(), array(), 'context.getMethod() == "GET"');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setCondition('context.getMethod() == "POST"');
+
+        $this->assertEquals('context.getMethod() == "POST"', $routea->getCondition());
+        $this->assertEquals('context.getMethod() == "POST"', $routeb->getCondition());
     }
 
     public function testClone()

@@ -14,8 +14,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -28,28 +28,31 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class RememberMeListener implements ListenerInterface
 {
-    private $securityContext;
+    private $tokenStorage;
     private $rememberMeServices;
     private $authenticationManager;
     private $logger;
     private $dispatcher;
+    private $catchExceptions = true;
 
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface       $securityContext
+     * @param TokenStorageInterface          $tokenStorage
      * @param RememberMeServicesInterface    $rememberMeServices
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface                $logger
      * @param EventDispatcherInterface       $dispatcher
+     * @param bool                           $catchExceptions
      */
-    public function __construct(SecurityContextInterface $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->catchExceptions = $catchExceptions;
     }
 
     /**
@@ -59,7 +62,7 @@ class RememberMeListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null !== $this->securityContext->getToken()) {
+        if (null !== $this->tokenStorage->getToken()) {
             return;
         }
 
@@ -70,7 +73,7 @@ class RememberMeListener implements ListenerInterface
 
         try {
             $token = $this->authenticationManager->authenticate($token);
-            $this->securityContext->setToken($token);
+            $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
@@ -78,18 +81,22 @@ class RememberMeListener implements ListenerInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->debug('SecurityContext populated with remember-me token.');
+                $this->logger->debug('Populated the token storage with a remember-me token.');
             }
         } catch (AuthenticationException $e) {
             if (null !== $this->logger) {
                 $this->logger->warning(
-                    'SecurityContext not populated with remember-me token as the'
+                    'The token storage was not populated with remember-me token as the'
                    .' AuthenticationManager rejected the AuthenticationToken returned'
-                   .' by the RememberMeServices: '.$e->getMessage()
+                   .' by the RememberMeServices.', array('exception' => $e)
                 );
             }
 
             $this->rememberMeServices->loginFail($request);
+
+            if (!$this->catchExceptions) {
+                throw $e;
+            }
         }
     }
 }

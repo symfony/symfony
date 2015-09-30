@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+@trigger_error('The '.__NAMESPACE__.'\ObjectChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -32,6 +34,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 2.7, to be removed in version 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList} instead.
  */
 class ObjectChoiceList extends ChoiceList
 {
@@ -146,6 +151,82 @@ class ObjectChoiceList extends ChoiceList
         $this->extractLabels($choices, $labels);
 
         parent::initialize($choices, $labels, $preferredChoices);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValuesForChoices(array $choices)
+    {
+        if (!$this->valuePath) {
+            return parent::getValuesForChoices($choices);
+        }
+
+        // Use the value path to compare the choices
+        $choices = $this->fixChoices($choices);
+        $values = array();
+
+        foreach ($choices as $i => $givenChoice) {
+            // Ignore non-readable choices
+            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+                continue;
+            }
+
+            $givenValue = (string) $this->propertyAccessor->getValue($givenChoice, $this->valuePath);
+
+            foreach ($this->values as $value) {
+                if ($value === $givenValue) {
+                    $values[$i] = $value;
+                    unset($choices[$i]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
+     */
+    public function getIndicesForChoices(array $choices)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        if (!$this->valuePath) {
+            return parent::getIndicesForChoices($choices);
+        }
+
+        // Use the value path to compare the choices
+        $choices = $this->fixChoices($choices);
+        $indices = array();
+
+        foreach ($choices as $i => $givenChoice) {
+            // Ignore non-readable choices
+            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+                continue;
+            }
+
+            $givenValue = (string) $this->propertyAccessor->getValue($givenChoice, $this->valuePath);
+
+            foreach ($this->values as $j => $value) {
+                if ($value === $givenValue) {
+                    $indices[$i] = $j;
+                    unset($choices[$i]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $indices;
     }
 
     /**

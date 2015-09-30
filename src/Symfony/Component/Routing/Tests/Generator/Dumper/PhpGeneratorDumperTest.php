@@ -114,4 +114,28 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($url, '/testing');
     }
+
+    public function testDumpWithSchemeRequirement()
+    {
+        $this->routeCollection->add('Test1', new Route('/testing', array(), array(), array(), '', array('ftp', 'https')));
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'SchemeUrlGenerator')));
+        include $this->testTmpFilepath;
+
+        $projectUrlGenerator = new \SchemeUrlGenerator(new RequestContext('/app.php'));
+
+        $absoluteUrl = $projectUrlGenerator->generate('Test1', array(), true);
+        $relativeUrl = $projectUrlGenerator->generate('Test1', array(), false);
+
+        $this->assertEquals($absoluteUrl, 'ftp://localhost/app.php/testing');
+        $this->assertEquals($relativeUrl, 'ftp://localhost/app.php/testing');
+
+        $projectUrlGenerator = new \SchemeUrlGenerator(new RequestContext('/app.php', 'GET', 'localhost', 'https'));
+
+        $absoluteUrl = $projectUrlGenerator->generate('Test1', array(), true);
+        $relativeUrl = $projectUrlGenerator->generate('Test1', array(), false);
+
+        $this->assertEquals($absoluteUrl, 'https://localhost/app.php/testing');
+        $this->assertEquals($relativeUrl, '/app.php/testing');
+    }
 }

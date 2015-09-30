@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+* [BC BREAK] The default value for checkbox and radio inputs without a value attribute have changed
+  from '1' to 'on' to match the HTML specification.
+* [BC BREAK] The typehints on the `Link`, `Form` and `FormField` classes have been changed from
+  `\DOMNode` to `DOMElement`. Using any other type of `DOMNode` was triggering fatal errors in previous
+  versions. Code extending these classes will need to update the typehints when overwriting these methods.
+
+2.4.0
+-----
+
+ * `Crawler::addXmlContent()` removes the default document namespace again if it's an only namespace.
+ * added support for automatic discovery and explicit registration of document
+   namespaces for `Crawler::filterXPath()` and `Crawler::filter()`
+ * improved content type guessing in `Crawler::addContent()`
+ * [BC BREAK] `Crawler::addXmlContent()` no longer removes the default document
+   namespace
+
 2.3.0
 -----
 

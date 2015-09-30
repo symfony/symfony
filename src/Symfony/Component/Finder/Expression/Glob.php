@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Finder\Expression;
 
+@trigger_error('The '.__NAMESPACE__.'\Glob class is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+use Symfony\Component\Finder\Glob as FinderGlob;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -100,58 +104,8 @@ class Glob implements ValueInterface
      */
     public function toRegex($strictLeadingDot = true, $strictWildcardSlash = true)
     {
-        $firstByte = true;
-        $escaping = false;
-        $inCurlies = 0;
-        $regex = '';
-        $sizeGlob = strlen($this->pattern);
-        for ($i = 0; $i < $sizeGlob; ++$i) {
-            $car = $this->pattern[$i];
-            if ($firstByte) {
-                if ($strictLeadingDot && '.' !== $car) {
-                    $regex .= '(?=[^\.])';
-                }
+        $regex = FinderGlob::toRegex($this->pattern, $strictLeadingDot, $strictWildcardSlash, '');
 
-                $firstByte = false;
-            }
-
-            if ('/' === $car) {
-                $firstByte = true;
-            }
-
-            if ('.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
-                $regex .= "\\$car";
-            } elseif ('*' === $car) {
-                $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
-            } elseif ('?' === $car) {
-                $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
-            } elseif ('{' === $car) {
-                $regex .= $escaping ? '\\{' : '(';
-                if (!$escaping) {
-                    ++$inCurlies;
-                }
-            } elseif ('}' === $car && $inCurlies) {
-                $regex .= $escaping ? '}' : ')';
-                if (!$escaping) {
-                    --$inCurlies;
-                }
-            } elseif (',' === $car && $inCurlies) {
-                $regex .= $escaping ? ',' : '|';
-            } elseif ('\\' === $car) {
-                if ($escaping) {
-                    $regex .= '\\\\';
-                    $escaping = false;
-                } else {
-                    $escaping = true;
-                }
-
-                continue;
-            } else {
-                $regex .= $car;
-            }
-            $escaping = false;
-        }
-
-        return new Regex('^'.$regex.'$');
+        return new Regex($regex);
     }
 }

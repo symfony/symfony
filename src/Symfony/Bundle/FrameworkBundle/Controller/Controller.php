@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -62,7 +64,7 @@ class Controller extends ContainerAware
     public function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->container->get('request')->duplicate($query, null, $path);
+        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -81,6 +83,73 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Returns a RedirectResponse to the given route with the given parameters.
+     *
+     * @param string $route      The name of the route
+     * @param array  $parameters An array of parameters
+     * @param int    $status     The status code to use for the Response
+     *
+     * @return RedirectResponse
+     */
+    protected function redirectToRoute($route, array $parameters = array(), $status = 302)
+    {
+        return $this->redirect($this->generateUrl($route, $parameters), $status);
+    }
+
+    /**
+     * Adds a flash message to the current session for type.
+     *
+     * @param string $type    The type
+     * @param string $message The message
+     *
+     * @throws \LogicException
+     */
+    protected function addFlash($type, $message)
+    {
+        if (!$this->container->has('session')) {
+            throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
+        }
+
+        $this->container->get('session')->getFlashBag()->add($type, $message);
+    }
+
+    /**
+     * Checks if the attributes are granted against the current authentication token and optionally supplied object.
+     *
+     * @param mixed $attributes The attributes
+     * @param mixed $object     The object
+     *
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    protected function isGranted($attributes, $object = null)
+    {
+        if (!$this->container->has('security.authorization_checker')) {
+            throw new \LogicException('The SecurityBundle is not registered in your application.');
+        }
+
+        return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
+    }
+
+    /**
+     * Throws an exception unless the attributes are granted against the current authentication token and optionally
+     * supplied object.
+     *
+     * @param mixed  $attributes The attributes
+     * @param mixed  $object     The object
+     * @param string $message    The message passed to the exception
+     *
+     * @throws AccessDeniedException
+     */
+    protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    {
+        if (!$this->isGranted($attributes, $object)) {
+            throw $this->createAccessDeniedException($message);
+        }
+    }
+
+    /**
      * Returns a rendered view.
      *
      * @param string $view       The view name
@@ -90,7 +159,15 @@ class Controller extends ContainerAware
      */
     public function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
@@ -104,7 +181,21 @@ class Controller extends ContainerAware
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($this->container->get('twig')->render($view, $parameters));
+
+        return $response;
     }
 
     /**
@@ -118,11 +209,21 @@ class Controller extends ContainerAware
      */
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $templating = $this->container->get('templating');
+        if ($this->container->has('templating')) {
+            $templating = $this->container->get('templating');
 
-        $callback = function () use ($templating, $view, $parameters) {
-            $templating->stream($view, $parameters);
-        };
+            $callback = function () use ($templating, $view, $parameters) {
+                $templating->stream($view, $parameters);
+            };
+        } elseif ($this->container->has('twig')) {
+            $twig = $this->container->get('twig');
+
+            $callback = function () use ($twig, $view, $parameters) {
+                $twig->display($view, $parameters);
+            };
+        } else {
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if (null === $response) {
             return new StreamedResponse($callback);
@@ -140,14 +241,31 @@ class Controller extends ContainerAware
      *
      *     throw $this->createNotFoundException('Page not found!');
      *
-     * @param string     $message  A message
-     * @param \Exception $previous The previous exception
+     * @param string          $message  A message
+     * @param \Exception|null $previous The previous exception
      *
      * @return NotFoundHttpException
      */
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
+    }
+
+    /**
+     * Returns an AccessDeniedException.
+     *
+     * This will result in a 403 response code. Usage example:
+     *
+     *     throw $this->createAccessDeniedException('Unable to access this page!');
+     *
+     * @param string          $message  A message
+     * @param \Exception|null $previous The previous exception
+     *
+     * @return AccessDeniedException
+     */
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
+    {
+        return new AccessDeniedException($message, $previous);
     }
 
     /**
@@ -174,17 +292,32 @@ class Controller extends ContainerAware
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        if (method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')) {
+            $type = 'Symfony\Component\Form\Extension\Core\Type\FormType';
+        } else {
+            // not using the class name is deprecated since Symfony 2.8 and
+            // is only used for backwards compatibility with older versions
+            // of the Form component
+            $type = 'form';
+        }
+
+        return $this->container->get('form.factory')->createBuilder($type, $data, $options);
     }
 
     /**
      * Shortcut to return the request service.
      *
      * @return Request
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
+     *             Ask Symfony to inject the Request object into your controller
+     *             method instead by type hinting it in the method's signature.
      */
     public function getRequest()
     {
-        return $this->container->get('request');
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The only reliable way to get the "Request" object is to inject it in the action method.', E_USER_DEPRECATED);
+
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 
     /**
@@ -204,7 +337,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Get a user from the Security Context.
+     * Get a user from the Security Token Storage.
      *
      * @return mixed
      *
@@ -214,15 +347,16 @@ class Controller extends ContainerAware
      */
     public function getUser()
     {
-        if (!$this->container->has('security.context')) {
+        if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        if (null === $token = $this->container->get('security.context')->getToken()) {
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return;
         }
 
         if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
             return;
         }
 
@@ -242,7 +376,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Gets a service by id.
+     * Gets a container service by its id.
      *
      * @param string $id The service id
      *
@@ -250,6 +384,39 @@ class Controller extends ContainerAware
      */
     public function get($id)
     {
+        if ('request' === $id) {
+            @trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
+        }
+
         return $this->container->get($id);
+    }
+
+    /**
+     * Gets a container configuration parameter by its name.
+     *
+     * @param string $name The parameter name
+     *
+     * @return mixed
+     */
+    protected function getParameter($name)
+    {
+        return $this->container->getParameter($name);
+    }
+
+    /**
+     * Checks the validity of a CSRF token.
+     *
+     * @param string $id    The id used when generating the token
+     * @param string $token The actual token sent with the request that should be validated
+     *
+     * @return bool
+     */
+    protected function isCsrfTokenValid($id, $token)
+    {
+        if (!$this->container->has('security.csrf.token_manager')) {
+            throw new \LogicException('CSRF protection is not enabled in your application.');
+        }
+
+        return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
 }

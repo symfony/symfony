@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 
 /**
@@ -21,16 +21,16 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
  */
 class AclSchemaListener
 {
-    private $container;
+    private $schema;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Schema $schema)
     {
-        $this->container = $container;
+        $this->schema = $schema;
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();
-        $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
+        $this->schema->addToSchema($schema);
     }
 }

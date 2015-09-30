@@ -175,7 +175,7 @@
                 <target>Chiều cao của hình quá thấp ({{ height }}px). Chiều cao tối thiểu phải là {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Giá trị này phải là mật khẩu hiện tại của người dùng.</target>
             </trans-unit>
             <trans-unit id="48">

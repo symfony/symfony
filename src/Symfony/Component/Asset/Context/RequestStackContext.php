@@ -1,0 +1,53 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Asset\Context;
+
+use Symfony\Component\HttpFoundation\RequestStack;
+
+/**
+ * Uses a RequestStack to populate the context.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+class RequestStackContext implements ContextInterface
+{
+    private $requestStack;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBasePath()
+    {
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            return '';
+        }
+
+        return $request->getBasePath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSecure()
+    {
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            return false;
+        }
+
+        return $request->isSecure();
+    }
+}

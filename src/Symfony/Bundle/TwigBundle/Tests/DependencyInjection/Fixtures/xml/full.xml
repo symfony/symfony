@@ -7,9 +7,7 @@
                         http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
     <twig:config auto-reload="true" autoescape="true" base-template-class="stdClass" cache="/tmp" charset="ISO-8859-1" debug="true" strict-variables="true">
-        <twig:form>
-            <twig:resource>MyBundle::form.html.twig</twig:resource>
-        </twig:form>
+        <twig:form-theme>MyBundle::form.html.twig</twig:form-theme>
         <twig:global key="foo" id="bar" type="service" />
         <twig:global key="baz">@@qux</twig:global>
         <twig:global key="pi">3.14</twig:global>

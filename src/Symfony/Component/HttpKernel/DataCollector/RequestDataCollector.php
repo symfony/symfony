@@ -48,14 +48,17 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $responseHeaders['Set-Cookie'] = $cookies;
         }
 
+        // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' === $key && is_object($value)) {
-                $attributes['_route'] = $this->varToString($value->getPath());
+                $attributes[$key] = $this->varToString($value->getPath());
             } elseif ('_route_params' === $key) {
-                foreach ($value as $key => $v) {
-                    $attributes['_route_params'][$key] = $this->varToString($v);
+                // we need to keep route params as an array (see getRouteParams())
+                foreach ($value as $k => $v) {
+                    $value[$k] = $this->varToString($v);
                 }
+                $attributes[$key] = $value;
             } else {
                 $attributes[$key] = $this->varToString($value);
             }
@@ -114,6 +117,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $this->data['request_server']['PHP_AUTH_PW'] = '******';
         }
 
+        if (isset($this->data['request_request']['_password'])) {
+            $this->data['request_request']['_password'] = '******';
+        }
+
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
             if (is_array($controller)) {
@@ -138,6 +145,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 }
             } elseif ($controller instanceof \Closure) {
                 $r = new \ReflectionFunction($controller);
+                $this->data['controller'] = array(
+                    'class' => $r->getName(),
+                    'method' => null,
+                    'file' => $r->getFileName(),
+                    'line' => $r->getStartLine(),
+                );
+            } elseif (is_object($controller)) {
+                $r = new \ReflectionClass($controller);
                 $this->data['controller'] = array(
                     'class' => $r->getName(),
                     'method' => null,

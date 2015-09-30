@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\BaseMemcacheProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * Base Memcache storage for profiling information in a Memcache.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 {
@@ -61,7 +66,9 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
+            $values = explode("\t", $item, 7);
+            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = $values;
+            $statusCode = isset($values[6]) ? $values[6] : null;
 
             $itemTime = (int) $itemTime;
 
@@ -84,6 +91,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 'url' => $itemUrl,
                 'time' => $itemTime,
                 'parent' => $itemParent,
+                'status_code' => $statusCode,
             );
             --$limit;
         }
@@ -176,6 +184,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                     $profile->getUrl(),
                     $profile->getTime(),
                     $profile->getParentToken(),
+                    $profile->getStatusCode(),
                 ))."\n";
 
                 return $this->appendValue($indexName, $indexRow, $this->lifetime);

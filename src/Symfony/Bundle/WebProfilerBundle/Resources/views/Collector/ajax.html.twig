@@ -1,0 +1,29 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('@WebProfiler/Icon/ajax.svg') }}
+        <span class="sf-toolbar-value sf-toolbar-ajax-requests">0</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b class="sf-toolbar-ajax-info"></b>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <table class="sf-toolbar-ajax-requests">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>URL</th>
+                        <th>Time</th>
+                        <th>Profile</th>
+                    </tr>
+                </thead>
+                <tbody class="sf-toolbar-ajax-request-list"></tbody>
+            </table>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+{% endblock %}

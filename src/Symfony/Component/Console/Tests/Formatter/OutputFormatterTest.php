@@ -31,7 +31,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\\<info>some info\\</info>', OutputFormatter::escape('<info>some info</info>'));
 
         $this->assertEquals(
-            "\033[33mSymfony\\Component\\Console does work very well!\033[0m",
+            "\033[33mSymfony\\Component\\Console does work very well!\033[39m",
             $formatter->format('<comment>Symfony\Component\Console does work very well!</comment>')
         );
     }
@@ -46,19 +46,19 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($formatter->hasStyle('question'));
 
         $this->assertEquals(
-            "\033[37;41msome error\033[0m",
+            "\033[37;41msome error\033[39;49m",
             $formatter->format('<error>some error</error>')
         );
         $this->assertEquals(
-            "\033[32msome info\033[0m",
+            "\033[32msome info\033[39m",
             $formatter->format('<info>some info</info>')
         );
         $this->assertEquals(
-            "\033[33msome comment\033[0m",
+            "\033[33msome comment\033[39m",
             $formatter->format('<comment>some comment</comment>')
         );
         $this->assertEquals(
-            "\033[30;46msome question\033[0m",
+            "\033[30;46msome question\033[39;49m",
             $formatter->format('<question>some question</question>')
         );
     }
@@ -68,7 +68,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "\033[37;41msome \033[0m\033[32msome info\033[0m\033[37;41m error\033[0m",
+            "\033[37;41msome \033[39;49m\033[32msome info\033[39m\033[37;41m error\033[39;49m",
             $formatter->format('<error>some <info>some info</info> error</error>')
         );
     }
@@ -78,7 +78,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "\033[37;41msome error\033[0m\033[32msome info\033[0m",
+            "\033[37;41msome error\033[39;49m\033[32msome info\033[39m",
             $formatter->format('<error>some error</error><info>some info</info>')
         );
     }
@@ -88,7 +88,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "(\033[32m>=2.0,<2.3\033[0m)",
+            "(\033[32m>=2.0,<2.3\033[39m)",
             $formatter->format('(<info>>=2.0,<2.3</info>)')
         );
     }
@@ -98,12 +98,12 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "(\033[32mz>=2.0,<a2.3\033[0m)",
+            "(\033[32mz>=2.0,<a2.3\033[39m)",
             $formatter->format('(<info>'.$formatter->escape('z>=2.0,<a2.3').'</info>)')
         );
 
         $this->assertEquals(
-            "\033[32m<error>some error</error>\033[0m",
+            "\033[32m<error>some error</error>\033[39m",
             $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')
         );
     }
@@ -113,7 +113,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "\033[37;41merror\033[0m\033[32minfo\033[0m\033[33mcomment\033[0m\033[37;41merror\033[0m",
+            "\033[37;41merror\033[39;49m\033[32minfo\033[39m\033[33mcomment\033[39m\033[37;41merror\033[39;49m",
             $formatter->format('<error>error<info>info<comment>comment</info>error</error>')
         );
     }
@@ -131,7 +131,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $style = new OutputFormatterStyle('blue', 'white');
         $formatter->setStyle('b', $style);
 
-        $this->assertEquals("\033[34;47msome \033[0m\033[34;47mcustom\033[0m\033[34;47m msg\033[0m", $formatter->format('<test>some <b>custom</b> msg</test>'));
+        $this->assertEquals("\033[34;47msome \033[39;49m\033[34;47mcustom\033[39;49m\033[34;47m msg\033[39;49m", $formatter->format('<test>some <b>custom</b> msg</test>'));
     }
 
     public function testRedefineStyle()
@@ -141,29 +141,29 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $style = new OutputFormatterStyle('blue', 'white');
         $formatter->setStyle('info', $style);
 
-        $this->assertEquals("\033[34;47msome custom msg\033[0m", $formatter->format('<info>some custom msg</info>'));
+        $this->assertEquals("\033[34;47msome custom msg\033[39;49m", $formatter->format('<info>some custom msg</info>'));
     }
 
     public function testInlineStyle()
     {
         $formatter = new OutputFormatter(true);
 
-        $this->assertEquals("\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</>'));
-        $this->assertEquals("\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
+        $this->assertEquals("\033[34;41msome text\033[39;49m", $formatter->format('<fg=blue;bg=red>some text</>'));
+        $this->assertEquals("\033[34;41msome text\033[39;49m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
     }
 
     public function testNonStyleTag()
     {
         $formatter = new OutputFormatter(true);
 
-        $this->assertEquals("\033[32msome \033[0m\033[32m<tag>\033[0m\033[32m \033[0m\033[32m<setting=value>\033[0m\033[32m styled \033[0m\033[32m<p>\033[0m\033[32msingle-char tag\033[0m\033[32m</p>\033[0m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
+        $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m \033[39m\033[32m<setting=value>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
     }
 
     public function testFormatLongString()
     {
         $formatter = new OutputFormatter(true);
         $long = str_repeat('\\', 14000);
-        $this->assertEquals("\033[37;41msome error\033[0m".$long, $formatter->format('<error>some error</error>'.$long));
+        $this->assertEquals("\033[37;41msome error\033[39;49m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
     public function testFormatToStringObject()
@@ -199,16 +199,16 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter->setDecorated(true);
 
         $this->assertEquals(
-            "\033[37;41msome error\033[0m", $formatter->format('<error>some error</error>')
+            "\033[37;41msome error\033[39;49m", $formatter->format('<error>some error</error>')
         );
         $this->assertEquals(
-            "\033[32msome info\033[0m", $formatter->format('<info>some info</info>')
+            "\033[32msome info\033[39m", $formatter->format('<info>some info</info>')
         );
         $this->assertEquals(
-            "\033[33msome comment\033[0m", $formatter->format('<comment>some comment</comment>')
+            "\033[33msome comment\033[39m", $formatter->format('<comment>some comment</comment>')
         );
         $this->assertEquals(
-            "\033[30;46msome question\033[0m", $formatter->format('<question>some question</question>')
+            "\033[30;46msome question\033[39;49m", $formatter->format('<question>some question</question>')
         );
     }
 
@@ -218,7 +218,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(<<<EOF
 \033[32m
-some text\033[0m
+some text\033[39m
 EOF
             , $formatter->format(<<<EOF
 <info>
@@ -228,7 +228,7 @@ EOF
 
         $this->assertEquals(<<<EOF
 \033[32msome text
-\033[0m
+\033[39m
 EOF
             , $formatter->format(<<<EOF
 <info>some text
@@ -239,7 +239,7 @@ EOF
         $this->assertEquals(<<<EOF
 \033[32m
 some text
-\033[0m
+\033[39m
 EOF
             , $formatter->format(<<<EOF
 <info>
@@ -252,7 +252,7 @@ EOF
 \033[32m
 some text
 more text
-\033[0m
+\033[39m
 EOF
             , $formatter->format(<<<EOF
 <info>

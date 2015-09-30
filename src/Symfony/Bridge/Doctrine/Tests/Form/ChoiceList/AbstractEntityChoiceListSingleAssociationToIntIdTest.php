@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
  *
  * @author Premi Giorgio <giosh94mhz@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 abstract class AbstractEntityChoiceListSingleAssociationToIntIdTest extends AbstractEntityChoiceListTest
 {

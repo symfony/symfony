@@ -592,11 +592,13 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @return bool Always returns false.
      *
-     * @deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link getInheritData()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link getInheritData()} instead.
      */
     public function getVirtual()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
+
         return false;
     }
 

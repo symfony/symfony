@@ -323,15 +323,16 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($iniMax));
 
         $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->factory->createNamed('name', 'text', null, $options);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
         $this->setRequestData('POST', array(), array());
 
         $this->requestHandler->handleRequest($form, $this->request);
 
         if ($shouldFail) {
-            $errors = array(new FormError($options['post_max_size_message'], null, $errorParams));
+            $error = new FormError($options['post_max_size_message'], null, $errorParams);
+            $error->setOrigin($form);
 
-            $this->assertEquals($errors, $form->getErrors());
+            $this->assertEquals(array($error), iterator_to_array($form->getErrors()));
             $this->assertTrue($form->isSubmitted());
         } else {
             $this->assertCount(0, $form->getErrors());

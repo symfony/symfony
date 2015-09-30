@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator;
  * Validates values and graphs of objects and arrays.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Validator\Validator\ValidatorInterface} instead.
  */
 interface ValidatorInterface
 {
@@ -23,6 +26,10 @@ interface ValidatorInterface
      *
      * The accepted values depend on the {@link MetadataFactoryInterface}
      * implementation.
+     *
+     * The signature changed with Symfony 2.5 (see
+     * {@link Validator\ValidatorInterface::validate()}. This signature will be
+     * disabled in Symfony 3.0.
      *
      * @param mixed      $value    The value to validate
      * @param array|null $groups   The validation groups to validate.
@@ -55,7 +62,7 @@ interface ValidatorInterface
      * The accepted values depend on the {@link MetadataFactoryInterface}
      * implementation.
      *
-     * @param string     $containingValue The value containing the property.
+     * @param mixed      $containingValue The value containing the property.
      * @param string     $property        The name of the property to validate
      * @param string     $value           The value to validate against the
      *                                    constraints of the property.
@@ -75,6 +82,10 @@ interface ValidatorInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Renamed to {@link Validator\ValidatorInterface::validate()}
+     *             in Symfony 2.5.
      */
     public function validateValue($value, $constraints, $groups = null);
 
@@ -82,6 +93,11 @@ interface ValidatorInterface
      * Returns the factory for metadata instances.
      *
      * @return MetadataFactoryInterface The metadata factory.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link Validator\ValidatorInterface::getMetadataFor()} or
+     *             {@link Validator\ValidatorInterface::hasMetadataFor()}
+     *             instead.
      */
     public function getMetadataFactory();
 }

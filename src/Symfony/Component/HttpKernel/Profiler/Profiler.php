@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -108,8 +109,15 @@ class Profiler
      */
     public function saveProfile(Profile $profile)
     {
+        // late collect
+        foreach ($profile->getCollectors() as $collector) {
+            if ($collector instanceof LateDataCollectorInterface) {
+                $collector->lateCollect();
+            }
+        }
+
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.', array('configured_storage' => get_class($this->storage)));
         }
 
         return $ret;
@@ -129,9 +137,13 @@ class Profiler
      * @param Profile $profile A Profile instance
      *
      * @return string The exported data
+     *
+     * @deprecated since Symfony 2.8, to be removed in 3.0.
      */
     public function export(Profile $profile)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return base64_encode(serialize($profile));
     }
 
@@ -141,9 +153,13 @@ class Profiler
      * @param string $data A data string as exported by the export() method
      *
      * @return Profile A Profile instance
+     *
+     * @deprecated since Symfony 2.8, to be removed in 3.0.
      */
     public function import($data)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $profile = unserialize(base64_decode($data));
 
         if ($this->storage->read($profile->getToken())) {
@@ -189,19 +205,20 @@ class Profiler
             return;
         }
 
-        $profile = new Profile(substr(sha1(uniqid(mt_rand(), true)), 0, 6));
+        $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setIp($request->getClientIp());
         $profile->setMethod($request->getMethod());
+        $profile->setStatusCode($response->getStatusCode());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 
         foreach ($this->collectors as $collector) {
             $collector->collect($request, $response, $exception);
 
-            // forces collectors to become "read/only" (they loose their object dependencies)
-            $profile->addCollector(unserialize(serialize($collector)));
+            // we need to clone for sub-requests
+            $profile->addCollector(clone $collector);
         }
 
         return $profile;

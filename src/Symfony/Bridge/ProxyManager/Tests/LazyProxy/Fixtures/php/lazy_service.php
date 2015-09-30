@@ -105,6 +105,8 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
 
     /**
      * @param string $name
+     *
+     * @return bool
      */
     public function __isset($name)
     {

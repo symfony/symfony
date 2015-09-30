@@ -41,7 +41,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeRedirect()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
 
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
 

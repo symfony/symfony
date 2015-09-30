@@ -52,7 +52,16 @@ security:
             anonymous: true
             switch_user: true
             x509: true
+            remote_user: true
             logout: true
+            remember_me:
+                secret: TheSecret
+        host:
+            pattern: /test
+            host: foo\.example\.org
+            methods: [GET,POST]
+            anonymous: true
+            http_basic: true
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
@@ -64,3 +73,4 @@ security:
         -
             path: /blog/.*
             role: IS_AUTHENTICATED_ANONYMOUSLY
+        - { path: /blog/524, role: IS_AUTHENTICATED_ANONYMOUSLY, allow_if: "token.getUsername() matches '/^admin/'" }

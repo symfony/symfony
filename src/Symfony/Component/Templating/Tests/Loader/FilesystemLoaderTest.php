@@ -58,15 +58,16 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass a relative template that exists');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the absolute path of the template');
 
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->exactly(2))->method('debug');
+
         $loader = new ProjectTemplateLoader2($pathPattern);
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
+        $loader->setLogger($logger);
         $this->assertFalse($loader->load(new TemplateReference('foo.xml', 'php')), '->load() returns false if the template does not exist for the given engine');
-        $this->assertTrue($debugger->hasMessage('Failed loading template'), '->load() logs a "Failed loading template" message if the template is not found');
 
         $loader = new ProjectTemplateLoader2(array(self::$fixturesPath.'/null/%name%', $pathPattern));
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
+        $loader->setLogger($logger);
         $loader->load(new TemplateReference('foo.php', 'php'));
-        $this->assertTrue($debugger->hasMessage('Loaded template file'), '->load() logs a "Loaded template file" message if the template is found');
     }
 }
 

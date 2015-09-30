@@ -248,6 +248,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
             __DIR__.DIRECTORY_SEPARATOR.'BsdFinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'GnuFinderTest.php',
+            __DIR__.DIRECTORY_SEPARATOR.'PhpFinderTest.php',
+            __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php',
         );
 
         $this->assertIterator($expected, $iterator);
@@ -277,6 +279,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = new Finder();
         $finder->in(__DIR__.'/Fixtures/A/a*');
+    }
+
+    public function testInWithGlobBrace()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(array(__DIR__.'/Fixtures/{A,copy/A}/B/C'))->getIterator();
+
+        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
     }
 
     /**
@@ -522,6 +532,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdaptersOrdering()
     {
         $finder = Finder::create()
@@ -540,6 +553,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdaptersChaining()
     {
         $iterator = new \ArrayIterator(array());
@@ -594,6 +610,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdapterSelection()
     {
         // test that by default, PhpAdapter is selected
@@ -716,18 +735,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
-    /**
-     * @return AdapterInterface
-     */
-    protected function getAdapter()
+    protected function buildFinder()
     {
-        return new PhpAdapter();
-    }
-
-    private function buildFinder()
-    {
-        return Finder::create()
-            ->removeAdapters()
-            ->addAdapter($this->getAdapter());
+        return Finder::create();
     }
 }

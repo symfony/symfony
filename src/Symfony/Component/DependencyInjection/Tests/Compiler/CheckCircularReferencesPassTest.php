@@ -53,13 +53,11 @@ class CheckCircularReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setFactoryService('b')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('b'), 'getInstance'));
 
         $container
             ->register('b', 'stdClass')
-            ->setFactoryService('a')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('a'), 'getInstance'));
 
         $this->process($container);
     }
@@ -88,8 +86,7 @@ class CheckCircularReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('b', 'stdClass')
-            ->setFactoryService('c')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('c'), 'getInstance'));
 
         $container->register('c')->addArgument(new Reference('a'));
 

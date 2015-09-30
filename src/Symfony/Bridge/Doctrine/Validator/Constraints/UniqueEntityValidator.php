@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -43,6 +44,10 @@ class UniqueEntityValidator extends ConstraintValidator
      */
     public function validate($entity, Constraint $constraint)
     {
+        if (!$constraint instanceof UniqueEntity) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UniqueEntity');
+        }
+
         if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
@@ -130,6 +135,16 @@ class UniqueEntityValidator extends ConstraintValidator
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
-        $this->context->addViolationAt($errorPath, $constraint->message, array(), $invalidValue);
+        if ($this->context instanceof ExecutionContextInterface) {
+            $this->context->buildViolation($constraint->message)
+                ->atPath($errorPath)
+                ->setInvalidValue($invalidValue)
+                ->addViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->atPath($errorPath)
+                ->setInvalidValue($invalidValue)
+                ->addViolation();
+        }
     }
 }

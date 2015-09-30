@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\IsTrueValidator;
+use Symfony\Component\Validator\Validation;
 
 class IsTrueValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new IsTrueValidator();
@@ -45,6 +51,7 @@ class IsTrueValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'false')
+            ->setCode(IsTrue::NOT_TRUE_ERROR)
             ->assertRaised();
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Formatter;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 /**
  * Formatter style class for defining styles.
  *
@@ -19,33 +21,33 @@ namespace Symfony\Component\Console\Formatter;
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
     private static $availableForegroundColors = array(
-        'black' => 30,
-        'red' => 31,
-        'green' => 32,
-        'yellow' => 33,
-        'blue' => 34,
-        'magenta' => 35,
-        'cyan' => 36,
-        'white' => 37,
-        'default' => 39,
+        'black' => array('set' => 30, 'unset' => 39),
+        'red' => array('set' => 31, 'unset' => 39),
+        'green' => array('set' => 32, 'unset' => 39),
+        'yellow' => array('set' => 33, 'unset' => 39),
+        'blue' => array('set' => 34, 'unset' => 39),
+        'magenta' => array('set' => 35, 'unset' => 39),
+        'cyan' => array('set' => 36, 'unset' => 39),
+        'white' => array('set' => 37, 'unset' => 39),
+        'default' => array('set' => 39, 'unset' => 39),
     );
     private static $availableBackgroundColors = array(
-        'black' => 40,
-        'red' => 41,
-        'green' => 42,
-        'yellow' => 43,
-        'blue' => 44,
-        'magenta' => 45,
-        'cyan' => 46,
-        'white' => 47,
-        'default' => 49,
+        'black' => array('set' => 40, 'unset' => 49),
+        'red' => array('set' => 41, 'unset' => 49),
+        'green' => array('set' => 42, 'unset' => 49),
+        'yellow' => array('set' => 43, 'unset' => 49),
+        'blue' => array('set' => 44, 'unset' => 49),
+        'magenta' => array('set' => 45, 'unset' => 49),
+        'cyan' => array('set' => 46, 'unset' => 49),
+        'white' => array('set' => 47, 'unset' => 49),
+        'default' => array('set' => 49, 'unset' => 49),
     );
     private static $availableOptions = array(
-        'bold' => 1,
-        'underscore' => 4,
-        'blink' => 5,
-        'reverse' => 7,
-        'conceal' => 8,
+        'bold' => array('set' => 1, 'unset' => 22),
+        'underscore' => array('set' => 4, 'unset' => 24),
+        'blink' => array('set' => 5, 'unset' => 25),
+        'reverse' => array('set' => 7, 'unset' => 27),
+        'conceal' => array('set' => 8, 'unset' => 28),
     );
 
     private $foreground;
@@ -77,7 +79,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string|null $color The color name
      *
-     * @throws \InvalidArgumentException When the color name isn't defined
+     * @throws InvalidArgumentException When the color name isn't defined
      */
     public function setForeground($color = null)
     {
@@ -88,7 +90,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         if (!isset(static::$availableForegroundColors[$color])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid foreground color specified: "%s". Expected one of (%s)',
                 $color,
                 implode(', ', array_keys(static::$availableForegroundColors))
@@ -103,7 +105,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string|null $color The color name
      *
-     * @throws \InvalidArgumentException When the color name isn't defined
+     * @throws InvalidArgumentException When the color name isn't defined
      */
     public function setBackground($color = null)
     {
@@ -114,7 +116,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
 
         if (!isset(static::$availableBackgroundColors[$color])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid background color specified: "%s". Expected one of (%s)',
                 $color,
                 implode(', ', array_keys(static::$availableBackgroundColors))
@@ -129,12 +131,12 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string $option The option name
      *
-     * @throws \InvalidArgumentException When the option name isn't defined
+     * @throws InvalidArgumentException When the option name isn't defined
      */
     public function setOption($option)
     {
         if (!isset(static::$availableOptions[$option])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid option specified: "%s". Expected one of (%s)',
                 $option,
                 implode(', ', array_keys(static::$availableOptions))
@@ -151,12 +153,12 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @param string $option The option name
      *
-     * @throws \InvalidArgumentException When the option name isn't defined
+     * @throws InvalidArgumentException When the option name isn't defined
      */
     public function unsetOption($option)
     {
         if (!isset(static::$availableOptions[$option])) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Invalid option specified: "%s". Expected one of (%s)',
                 $option,
                 implode(', ', array_keys(static::$availableOptions))
@@ -192,22 +194,28 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      */
     public function apply($text)
     {
-        $codes = array();
+        $setCodes = array();
+        $unsetCodes = array();
 
         if (null !== $this->foreground) {
-            $codes[] = $this->foreground;
+            $setCodes[] = $this->foreground['set'];
+            $unsetCodes[] = $this->foreground['unset'];
         }
         if (null !== $this->background) {
-            $codes[] = $this->background;
+            $setCodes[] = $this->background['set'];
+            $unsetCodes[] = $this->background['unset'];
         }
         if (count($this->options)) {
-            $codes = array_merge($codes, $this->options);
+            foreach ($this->options as $option) {
+                $setCodes[] = $option['set'];
+                $unsetCodes[] = $option['unset'];
+            }
         }
 
-        if (0 === count($codes)) {
+        if (0 === count($setCodes)) {
             return $text;
         }
 
-        return sprintf("\033[%sm%s\033[0m", implode(';', $codes), $text);
+        return sprintf("\033[%sm%s\033[%sm", implode(';', $setCodes), $text, implode(';', $unsetCodes));
     }
 }

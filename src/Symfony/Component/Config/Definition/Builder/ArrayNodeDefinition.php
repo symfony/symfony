@@ -22,18 +22,19 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {
-    protected $performDeepMerging;
-    protected $ignoreExtraKeys;
-    protected $children;
+    protected $performDeepMerging = true;
+    protected $ignoreExtraKeys = false;
+    protected $removeExtraKeys = true;
+    protected $children = array();
     protected $prototype;
-    protected $atLeastOne;
-    protected $allowNewKeys;
+    protected $atLeastOne = false;
+    protected $allowNewKeys = true;
     protected $key;
     protected $removeKeyItem;
-    protected $addDefaults;
-    protected $addDefaultChildren;
+    protected $addDefaults = false;
+    protected $addDefaultChildren = false;
     protected $nodeBuilder;
-    protected $normalizeKeys;
+    protected $normalizeKeys = true;
 
     /**
      * {@inheritdoc}
@@ -42,16 +43,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     {
         parent::__construct($name, $parent);
 
-        $this->children = array();
-        $this->addDefaults = false;
-        $this->addDefaultChildren = false;
-        $this->allowNewKeys = true;
-        $this->atLeastOne = false;
-        $this->allowEmptyValue = true;
-        $this->performDeepMerging = true;
         $this->nullEquivalent = array();
         $this->trueEquivalent = array();
-        $this->normalizeKeys = true;
     }
 
     /**
@@ -292,11 +285,14 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * you want to send an entire configuration array through a special
      * tree that processes only part of the array.
      *
+     * @param bool $remove Whether to remove the extra keys
+     *
      * @return ArrayNodeDefinition
      */
-    public function ignoreExtraKeys()
+    public function ignoreExtraKeys($remove = true)
     {
         $this->ignoreExtraKeys = true;
+        $this->removeExtraKeys = $remove;
 
         return $this;
     }
@@ -401,7 +397,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
-        $node->setIgnoreExtraKeys($this->ignoreExtraKeys);
+        $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
         $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {

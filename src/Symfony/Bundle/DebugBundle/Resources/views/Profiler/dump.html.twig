@@ -1,0 +1,78 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.dumpsCount %}
+        {% set icon %}
+            {{ include('@Debug/Profiler/icon.svg') }}
+            <span class="sf-toolbar-value">{{ collector.dumpsCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% for dump in collector.getDumps('html') %}
+                <div class="sf-toolbar-info-piece">
+                    <span>
+                    {% if dump.file %}
+                        {% set link = dump.file|file_link(dump.line) %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                        {% else %}
+                            <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                        {% endif %}
+                    {% else %}
+                        {{ dump.name }}
+                    {% endif %}
+                    </span>
+                    <span class="sf-toolbar-file-line">line {{ dump.line }}</span>
+
+                    {{ dump.data|raw }}
+                </div>
+            {% endfor %}
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.dumpsCount == 0 ? 'disabled' }}">
+        <span class="icon">{{ include('@Debug/Profiler/icon.svg') }}</span>
+        <strong>Debug</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Dumped Contents</h2>
+
+    {% for dump in collector.getDumps('html') %}
+        <div class="sf-dump sf-reset">
+            <h3>In
+                {% if dump.line %}
+                    {% set link = dump.file|file_link(dump.line) %}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                    {% else %}
+                        <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                    {% endif %}
+                {% else %}
+                    {{ dump.name }}
+                {% endif %}
+                <small>line {{ dump.line }}</small>
+
+                <a class="text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}" data-toggle-alt-content="Hide code">Show code</a>
+            </h3>
+
+            <div class="sf-dump-compact hidden" id="sf-trace-{{ loop.index0 }}">
+                <div class="trace">
+                    {{ dump.fileExcerpt ? dump.fileExcerpt|raw : dump.file|file_excerpt(dump.line) }}
+                </div>
+            </div>
+
+            {{ dump.data|raw }}
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>No content was dumped.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

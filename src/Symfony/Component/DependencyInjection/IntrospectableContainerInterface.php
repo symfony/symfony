@@ -16,6 +16,8 @@ namespace Symfony\Component\DependencyInjection;
  * for containers, allowing logic to be implemented based on a Container's state.
  *
  * @author Evan Villemez <evillemez@gmail.com>
+ *
+ * @deprecated since version 2.8, to be merged with ContainerInterface in 3.0.
  */
 interface IntrospectableContainerInterface extends ContainerInterface
 {

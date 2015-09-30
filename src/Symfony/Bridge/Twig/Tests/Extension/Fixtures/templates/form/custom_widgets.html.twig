@@ -6,11 +6,20 @@
 {% endspaceless %}
 {% endblock _text_id_widget %}
 
-{% block _name_entry_label %}
+{% block _names_entry_label %}
 {% spaceless %}
     {% if label is empty %}
         {% set label = name|humanize %}
     {% endif %}
     <label>Custom label: {{ label|trans({}, translation_domain) }}</label>
 {% endspaceless %}
-{% endblock _name_entry_label %}
+{% endblock _names_entry_label %}
+
+{% block _name_c_entry_label %}
+{% spaceless %}
+    {% if label is empty %}
+        {% set label = name|humanize %}
+    {% endif %}
+    <label>Custom name label: {{ label|trans({}, translation_domain) }}</label>
+{% endspaceless %}
+{% endblock _name_c_entry_label %}

@@ -32,8 +32,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface           $kernel     A HttpKernelInterface instance
-     * @param EventDispatcherInterface|null $dispatcher A EventDispatcherInterface instance
+     * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
+     * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
      */
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
@@ -61,14 +61,15 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $attributes = $reference->attributes;
             $reference->attributes = array();
 
-            // The request format and locale might have been overriden by the user
+            // The request format and locale might have been overridden by the user
             foreach (array('_format', '_locale') as $key) {
                 if (isset($attributes[$key])) {
                     $reference->attributes[$key] = $attributes[$key];
                 }
             }
 
-            $uri = $this->generateFragmentUri($uri, $request);
+            $uri = $this->generateFragmentUri($uri, $request, false, false);
+
             $reference->attributes = array_merge($attributes, $reference->attributes);
         }
 
@@ -92,9 +93,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             }
 
             // let's clean up the output buffers that were created by the sub-request
-            while (ob_get_level() > $level) {
-                ob_get_clean();
-            }
+            Response::closeOutputBuffers($level, false);
 
             if (isset($options['alt'])) {
                 $alt = $options['alt'];
@@ -131,7 +130,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
 
         $server['REMOTE_ADDR'] = '127.0.0.1';
 
-        $subRequest = $request::create($uri, 'get', array(), $cookies, array(), $server);
+        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
         if ($request->headers->has('Surrogate-Capability')) {
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }

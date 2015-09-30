@@ -27,7 +27,7 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
         $ret = $tester->execute(array('path_info' => '/foo', 'foo'), array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('[router] Route "foo"', $tester->getDisplay());
+        $this->assertContains('Route Name   | foo', $tester->getDisplay());
     }
 
     public function testWithNotMatchPath()
@@ -74,19 +74,22 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($requestContext))
         ;
 
+        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader')
+             ->disableOriginalConstructor()
+             ->getMock();
+
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->once())
             ->method('has')
             ->with('router')
-            ->will($this->returnValue(true))
-        ;
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->with('router')
-            ->will($this->returnValue($router))
-        ;
+            ->will($this->returnValue(true));
+        $container->method('get')
+            ->will($this->returnValueMap(array(
+                array('router', 1, $router),
+                array('controller_name_converter', 1, $loader),
+
+            )));
 
         return $container;
     }

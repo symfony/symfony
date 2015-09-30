@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated profiler:import and profiler:export commands
+
+2.7.0
+-----
+
+ * [BC BREAK] if you are using a DB to store profiles, the table must be dropped
+ * added the HTTP status code to profiles
+
 2.3.0
 -----
 

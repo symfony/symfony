@@ -175,7 +175,7 @@
                 <target>Billedhøjden er for lille ({{ height }}px). Forventet minimumshøjde er {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Værdien skal være brugerens nuværende password.</target>
             </trans-unit>
             <trans-unit id="48">

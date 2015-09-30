@@ -175,7 +175,7 @@
                 <target>Bildens höjd är för liten ({{ height }}px). Minsta förväntade höjd är {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Värdet ska vara användarens nuvarande lösenord.</target>
             </trans-unit>
             <trans-unit id="48">

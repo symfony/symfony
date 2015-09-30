@@ -88,7 +88,7 @@ interface InputInterface
      * @param string $name  The argument name
      * @param string $value The argument value
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     public function setArgument($name, $value);
 
@@ -123,7 +123,7 @@ interface InputInterface
      * @param string      $name  The option name
      * @param string|bool $value The option value
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidArgumentException When option given doesn't exist
      */
     public function setOption($name, $value);
 

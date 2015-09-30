@@ -11,13 +11,18 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * The Progress class provides helpers to display progress output.
  *
  * @author Chris Jones <leeked@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0
+ *             Use {@link ProgressBar} instead.
  */
 class ProgressHelper extends Helper
 {
@@ -114,6 +119,13 @@ class ProgressHelper extends Helper
         array(604800, 'days', 86400),
     );
 
+    public function __construct($triggerDeprecationError = true)
+    {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Console\Helper\ProgressBar class instead.', E_USER_DEPRECATED);
+        }
+    }
+
     /**
      * Sets the progress bar width.
      *
@@ -185,7 +197,9 @@ class ProgressHelper extends Helper
         $this->startTime = time();
         $this->current = 0;
         $this->max = (int) $max;
-        $this->output = $output;
+
+        // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
+        $this->output = $output->isDecorated() ? $output : new NullOutput();
         $this->lastMessagesLength = 0;
         $this->barCharOriginal = '';
 
@@ -223,26 +237,11 @@ class ProgressHelper extends Helper
      * @param int  $step   Number of steps to advance
      * @param bool $redraw Whether to redraw or not
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function advance($step = 1, $redraw = false)
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling advance().');
-        }
-
-        if (0 === $this->current) {
-            $redraw = true;
-        }
-
-        $prevPeriod = (int) ($this->current / $this->redrawFreq);
-
-        $this->current += $step;
-
-        $currPeriod = (int) ($this->current / $this->redrawFreq);
-        if ($redraw || $prevPeriod !== $currPeriod || $this->max === $this->current) {
-            $this->display();
-        }
+        $this->setCurrent($this->current + $step, $redraw);
     }
 
     /**
@@ -251,18 +250,18 @@ class ProgressHelper extends Helper
      * @param int  $current The current progress
      * @param bool $redraw  Whether to redraw or not
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setCurrent($current, $redraw = false)
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling setCurrent().');
+            throw new LogicException('You must start the progress bar before calling setCurrent().');
         }
 
         $current = (int) $current;
 
         if ($current < $this->current) {
-            throw new \LogicException('You can\'t regress the progress bar');
+            throw new LogicException('You can\'t regress the progress bar');
         }
 
         if (0 === $this->current) {
@@ -284,12 +283,12 @@ class ProgressHelper extends Helper
      *
      * @param bool $finish Forces the end result
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function display($finish = false)
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling display().');
+            throw new LogicException('You must start the progress bar before calling display().');
         }
 
         $message = $this->format;
@@ -300,12 +299,24 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * Removes the progress bar from the current line.
+     *
+     * This is useful if you wish to write some output
+     * while a progress bar is running.
+     * Call display() to show the progress bar again.
+     */
+    public function clear()
+    {
+        $this->overwrite($this->output, '');
+    }
+
+    /**
      * Finishes the progress output.
      */
     public function finish()
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling finish().');
+            throw new LogicException('You must start the progress bar before calling finish().');
         }
 
         if (null !== $this->startTime) {

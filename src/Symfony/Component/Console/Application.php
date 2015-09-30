@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -785,6 +786,14 @@ class Application
 
         if (null === $this->dispatcher) {
             return $command->run($input, $output);
+        }
+
+        // bind before the console.command event, so the listeners have access to input options/arguments
+        try {
+            $command->mergeApplicationDefinition();
+            $input->bind($command->getDefinition());
+        } catch (ExceptionInterface $e) {
+            // ignore invalid options/arguments for now, to allow the event listeners to customize the InputDefinition
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-07T06:16:02Z
+
+@teohhanhui I'm glad that after the discussion in #15477 issue you have created the pull request according to the format required by Symfony.
+
+We have a bot called "fabbot" which reviews the submitted pull requests for basic errors. Although the bot is reporting an error for this pull request, we can safely ignore it because it's related to some feature needed for the unit tests.
+
+So everything is ready to be reviewed by our team and ultimately merge it in Symfony. Let's wait for the revision. Thanks!
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2015-08-07T06:18:19Z
+
+@javiereguiluz No worries. Actually, I'm not new to Symfony and the contributing process.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-07T08:40:53Z
+
+@javiereguiluz we should make fabbot ignore the Yaml test fixtures to avoid reporting this issue here (or we should refactor the way we pass Yaml test fixtures)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2015-08-11T05:23:36Z
+
+PHP7 build is failing on Travis... Does it have anything to do with my code?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-08-11T07:24:22Z
+
+Tests for the [HttpFoundation fail](https://travis-ci.org/symfony/symfony/jobs/75031699#L1137), so it doesn't seem to be an issue related to your PR @teohhanhui.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2015-08-14T18:45:54Z
+
+Are we good on this?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2015-08-21T12:17:10Z
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2015-09-02T05:26:55Z
+
+Any changes required before this will get merged?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-02T07:53:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-09-29T10:10:34Z
+
+:+1:

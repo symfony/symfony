@@ -11,26 +11,21 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\ServiceRouterLoader;
+use Symfony\Component\Routing\Loader\ObjectRouteLoader;
+use Symfony\Component\Routing\Loader\RouteLoaderInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
+class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadCallsServiceAndReturnsCollection()
     {
         $routeLoader = $this->getMock('Symfony\Component\Routing\Loader\RouteLoaderInterface');
+        $serviceRouteLoader = new ObjectRouteLoaderForTest();
 
-        $container = $this->getMockedContainer();
-
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->with('my_route_provider_service')
-            ->will($this->returnValue($routeLoader))
-        ;
-
-        $serviceRouteLoader = new ServiceRouterLoader($container);
+        $serviceRouteLoader->loaderMap = array(
+            'my_route_provider_service' => $routeLoader
+        );
 
         // create a basic collection that will be returned
         $routes = new RouteCollection();
@@ -58,22 +53,21 @@ class ServiceRouterLoaderTest extends \PHPUnit_Framework_TestCase
         // anything that doesn't implement the interface
         $routeLoader = new \stdClass();
 
-        $container = $this->getMockedContainer();
+        $serviceRouteLoader = new ObjectRouteLoaderForTest();
+        $serviceRouteLoader->loaderMap = array(
+            'any_service_name' => $routeLoader
+        );
 
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($routeLoader))
-        ;
-
-        $serviceRouteLoader = new ServiceRouterLoader($container);
         $serviceRouteLoader->load('any_service_name', 'service');
     }
+}
 
-    private function getMockedContainer()
+class ObjectRouteLoaderForTest extends ObjectRouteLoader
+{
+    public $loaderMap = array();
+
+    protected function getRouteLoader($id)
     {
-        return $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerInterface')
-            //->setMethods(array('get'))
-            ->getMockForAbstractClass();
+        return isset($this->loaderMap[$id]) ? $this->loaderMap[$id] : null;
     }
 }

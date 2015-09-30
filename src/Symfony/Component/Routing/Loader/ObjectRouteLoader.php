@@ -13,28 +13,15 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * A route loader that executes a service to load the routes.
- *
- * This depends on the DependencyInjection component.
+ * A route loader that calls a method on an object to load the routes.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-class ServiceRouterLoader extends Loader
+abstract class ObjectRouteLoader extends Loader
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * Calls the service that will load the routes.
      *
@@ -45,16 +32,16 @@ class ServiceRouterLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        $service = $this->container->get($resource);
+        $routeLoader = $this->getRouteLoader($resource);
 
-        if (!$service instanceof RouteLoaderInterface) {
+        if (!$routeLoader instanceof RouteLoaderInterface) {
             throw new \LogicException(sprintf('Service "%s" must implement RouteLoaderInterface.', $resource));
         }
 
-        $routeCollection = $service->getRouteCollection($this);
+        $routeCollection = $routeLoader->getRouteCollection($this);
 
         // make the service file tracked so that if it changes, the cache rebuilds
-        $this->addClassResource(new \ReflectionClass($service), $routeCollection);
+        $this->addClassResource(new \ReflectionClass($routeLoader), $routeCollection);
 
         return $routeCollection;
     }
@@ -66,8 +53,19 @@ class ServiceRouterLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return 'service' === $type;
+        return 'object' === $type;
     }
+
+    /**
+     * Returns a RouteLoaderInterface object matching the id.
+     *
+     * For example, if your application uses a service container,
+     * the $id may be a service id.
+     *
+     * @param string $id
+     * @return RouteLoaderInterface
+     */
+    abstract protected function getRouteLoader($id);
 
     private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
     {

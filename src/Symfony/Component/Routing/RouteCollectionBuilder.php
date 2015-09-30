@@ -52,22 +52,31 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Import an external routing resource, like a file.
+     * Import an external routing resource and returns the RouteCollectionBuilder
      *
-     * Returns a RouteCollectionBuilder so you can continue to tweak options on the routes.
+     *  $routes->mount('/blog', $routes->import('blog.yml'));
      *
      * @param mixed  $resource
-     * @param string $prefix
      * @param string $type
      *
      * @return RouteCollectionBuilder
      */
-    public function import($resource, $prefix = null, $type = null)
+    public function import($resource, $type = null)
     {
-        /** @var RouteCollection $subCollection */
-        $subCollection = $this->resolve($resource, $type)->load($resource, $type);
+        /** @var RouteCollection $collection */
+        $collection = $this->resolve($resource, $type)->load($resource, $type);
 
-        return $this->addRouteCollection($subCollection, $prefix);
+        // create a builder from the RouteCollection
+        $builder = $this->createBuilder();
+        foreach ($collection->all() as $name => $route) {
+            $builder->addRoute($route, $name);
+        }
+
+        foreach ($collection->getResources() as $resource) {
+            $builder->addResource($resource);
+        }
+
+        return $builder;
     }
 
     /**
@@ -109,31 +118,6 @@ class RouteCollectionBuilder
     {
         $builder->prefix = trim(trim($prefix), '/');
         $this->routes[] = $builder;
-    }
-
-    /**
-     * Adds a RouteCollection directly and returns those routes in a RouteCollectionBuilder.
-     *
-     * @param RouteCollection $collection
-     * @param string|null     $prefix
-     *
-     * @return $this
-     */
-    public function addRouteCollection(RouteCollection $collection, $prefix = null)
-    {
-        // create a builder from the RouteCollection
-        $builder = $this->createBuilder();
-        foreach ($collection->all() as $name => $route) {
-            $builder->addRoute($route, $name);
-        }
-
-        foreach ($collection->getResources() as $resource) {
-            $builder->addResource($resource);
-        }
-
-        $this->mount($prefix, $builder);
-
-        return $builder;
     }
 
     /**

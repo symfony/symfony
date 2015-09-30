@@ -27,8 +27,9 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('admin_routing.yml', 'yaml')
             ->will($this->returnValue($resolvedLoader));
 
+        $originalRoute = new Route('/foo/path');
         $expectedCollection = new RouteCollection();
-        $expectedCollection->add('one_test_route', new Route('/foo/path'));
+        $expectedCollection->add('one_test_route', $originalRoute);
 
         $resolvedLoader
             ->expects($this->once())
@@ -41,18 +42,17 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getResolver')
             ->will($this->returnValue($resolver));
 
-        // import the file! (with a prefix)
-        $collectionBuilder = new RouteCollectionBuilder($loader);
-        $addedBuilder = $collectionBuilder->import('admin_routing.yml', '/admin', 'yaml');
+        // import the file!
+        $routes = new RouteCollectionBuilder($loader);
+        $importedRoutes = $routes->import('admin_routing.yml', 'yaml');
 
         // we should get back a RouteCollectionBuilder
-        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollectionBuilder', $addedBuilder);
+        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollectionBuilder', $importedRoutes);
 
         // get the collection back so we can look at it
-        $addedCollection = $addedBuilder->build();
+        $addedCollection = $importedRoutes->build();
         $route = $addedCollection->get('one_test_route');
-        $this->assertNotNull($route);
-        $this->assertEquals('/admin/foo/path', $route->getPath(), 'The prefix should be applied');
+        $this->assertSame($originalRoute, $route);
     }
 
     /**
@@ -79,14 +79,6 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushOrdering()
     {
-        $loadedCollection1 = new RouteCollection();
-        $loadedCollection1->add('first_collection_route1', new Route('/collection/first/blog1'));
-        $loadedCollection1->add('first_collection_route2', new Route('/collection/first/blog2'));
-
-        $loadedCollection2 = new RouteCollection();
-        $loadedCollection2->add('second_collection_route1', new Route('/collection/second/product1'));
-        $loadedCollection2->add('second_collection_route2', new Route('/collection/second/product2'));
-
         $importedCollection = new RouteCollection();
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
@@ -101,39 +93,31 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->will($this->returnValue($importedCollection));
 
-        $collectionBuilder = new RouteCollectionBuilder($loader);
+        $routes = new RouteCollectionBuilder($loader);
 
         // 1) Add a route
-        $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout', 'checkout_route');
-        // 2) Add a collection directly
-        $collectionBuilder->addRouteCollection($loadedCollection1);
-        // 3) Import from a file
-        $collectionBuilder->import('admin_routing.yml');
+        $routes->add('/checkout', 'AppBundle:Order:checkout', 'checkout_route');
+        // 2) Import from a file
+        $routes->mount('/', $routes->import('admin_routing.yml'));
+        // 3) Add another route
+        $routes->add('/', 'AppBundle:Default:homepage', 'homepage');
         // 4) Add another route
-        $collectionBuilder->add('/', 'AppBundle:Default:homepage', 'homepage');
-        // 5) Add another collection
-        $collectionBuilder->addRouteCollection($loadedCollection2);
-        // 6) Add another route
-        $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
+        $routes->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
 
         // set a default value
-        $collectionBuilder->setDefault('_locale', 'fr');
+        $routes->setDefault('_locale', 'fr');
         // set an extra resource
-        $collectionBuilder->addResource(new FileResource('foo_routing.xml'));
+        $routes->addResource(new FileResource('foo_routing.xml'));
 
-        $actualCollection = $collectionBuilder->build();
+        $actualCollection = $routes->build();
 
-        $this->assertCount(9, $actualCollection);
+        $this->assertCount(5, $actualCollection);
         $actualRouteNames = array_keys($actualCollection->all());
         $this->assertEquals(array(
             'checkout_route',
-            'first_collection_route1',
-            'first_collection_route2',
             'imported_route1',
             'imported_route2',
             'homepage',
-            'second_collection_route1',
-            'second_collection_route2',
             'admin_dashboard',
         ), $actualRouteNames);
 
@@ -304,7 +288,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->will($this->returnValue($importedCollection));
         // import this from the /admin route builder
-        $adminRoutes->import('admin.yml', '/imported');
+        $adminRoutes->mount('/imported', $adminRoutes->import('admin.yml'));
 
         $collection = $routes->build();
         $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');

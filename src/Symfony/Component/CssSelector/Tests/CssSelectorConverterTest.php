@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\CssSelector\Tests;
 
-use Symfony\Component\CssSelector\Converter;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
-class ConverterTest extends \PHPUnit_Framework_TestCase
+class CssSelectorConverterTest extends \PHPUnit_Framework_TestCase
 {
     public function testCssToXPath()
     {
-        $converter = new Converter();
+        $converter = new CssSelectorConverter();
 
         $this->assertEquals('descendant-or-self::*', $converter->toXPath(''));
         $this->assertEquals('descendant-or-self::h1', $converter->toXPath('h1'));
@@ -29,7 +29,7 @@ class ConverterTest extends \PHPUnit_Framework_TestCase
 
     public function testCssToXPathXml()
     {
-        $converter = new Converter(false);
+        $converter = new CssSelectorConverter(false);
 
         $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
     }

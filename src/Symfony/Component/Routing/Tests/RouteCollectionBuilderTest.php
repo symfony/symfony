@@ -14,7 +14,6 @@ namespace Symfony\Component\Routing\Tests;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Config\Resource\FileResource;
 
 class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 {

@@ -204,11 +204,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     abstract protected function createValidator();
 }
 

@@ -45,30 +45,12 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
     }
 
-    public function testValidatorInterfaceSinceSymfony25()
+    public function testValidatorInterface()
     {
-        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
-    }
-
-    public function testValidatorInterfaceUntilSymfony24()
-    {
-        // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-
-        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
-        $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidValidatorInterface()
-    {
-        new FormTypeValidatorExtension(null);
     }
 
     protected function createForm(array $options = array())

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\CssSelector;
 
-@trigger_error('The '.__NAMESPACE__.'\CssSelector class is deprecated since version 2.8 and will be removed in 3.0. Use directly the \Symfony\Component\CssSelector\Converter class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\CssSelector class is deprecated since version 2.8 and will be removed in 3.0. Use directly the \Symfony\Component\CssSelector\CssSelectorConverter class instead.', E_USER_DEPRECATED);
 
 /**
  * CssSelector is the main entry point of the component and can convert CSS
@@ -57,7 +57,7 @@ namespace Symfony\Component\CssSelector;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated as of 2.8, will be removed in 3.0. Use the \Symfony\Component\CssSelector\Converter class instead.
+ * @deprecated as of 2.8, will be removed in 3.0. Use the \Symfony\Component\CssSelector\CssSelectorConverter class instead.
  */
 class CssSelector
 {
@@ -75,7 +75,7 @@ class CssSelector
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
-        $converter = new Converter(self::$html);
+        $converter = new CssSelectorConverter(self::$html);
 
         return $converter->toXPath($cssExpr, $prefix);
     }

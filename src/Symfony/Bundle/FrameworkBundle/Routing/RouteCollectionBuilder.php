@@ -24,8 +24,6 @@ use Symfony\Component\Routing\Route;
  */
 class RouteCollectionBuilder
 {
-    private $loader;
-
     /**
      * A mixture of different objects that hold routes.
      *
@@ -33,24 +31,16 @@ class RouteCollectionBuilder
      */
     private $routes = array();
 
+    private $loader;
     private $defaults = array();
-
     private $prefix;
-
     private $host;
-
     private $condition;
-
     private $requirements = array();
-
     private $options = array();
-
     private $schemes;
-
     private $methods;
-
     private $resources = array();
-
     private $controllerClass;
 
     /**

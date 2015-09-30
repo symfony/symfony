@@ -19,6 +19,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -76,7 +77,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     protected function attemptAuthentication(Request $request)
     {
         if (null !== $this->csrfTokenManager) {
-            $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
+            $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
             if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['intention'], $csrfToken))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
@@ -84,11 +85,11 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         }
 
         if ($this->options['post_only']) {
-            $username = trim($request->request->get($this->options['username_parameter'], null, true));
-            $password = $request->request->get($this->options['password_parameter'], null, true);
+            $username = trim(ParameterBagUtils::getParameterBagValue($request->request, $this->options['username_parameter']));
+            $password = ParameterBagUtils::getParameterBagValue($request->request, $this->options['password_parameter']);
         } else {
-            $username = trim($request->get($this->options['username_parameter'], null, true));
-            $password = $request->get($this->options['password_parameter'], null, true);
+            $username = trim(ParameterBagUtils::getRequestParameterValue($request, $this->options['username_parameter']));
+            $password = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
         }
 
         $request->getSession()->set(Security::LAST_USERNAME, $username);

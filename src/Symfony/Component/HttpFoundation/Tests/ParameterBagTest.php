@@ -86,6 +86,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider getInvalidPaths
      * @expectedException \InvalidArgumentException
      */
@@ -106,6 +107,9 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetDeep()
     {
         $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));

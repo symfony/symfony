@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
  * Base class implementing the RememberMeServicesInterface.
@@ -319,7 +320,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             return true;
         }
 
-        $parameter = $request->get($this->options['remember_me_parameter'], null, true);
+        $parameter = ParameterBagUtils::getRequestParameterValue($request, $this->options['remember_me_parameter']);
 
         if (null === $parameter && null !== $this->logger) {
             $this->logger->debug('Did not send remember-me cookie.', array('parameter' => $this->options['remember_me_parameter']));

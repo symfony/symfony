@@ -63,7 +63,7 @@ class RouteCollectionBuilder
     public function import($resource, $type = null)
     {
         /** @var RouteCollection $collection */
-        $collection = $this->resolve($resource, $type)->load($resource, $type);
+        $collection = $this->load($resource, $type);
 
         // create a builder from the RouteCollection
         $builder = $this->createBuilder();
@@ -338,23 +338,23 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Finds a loader able to load an imported resource.
+     * Finds a loader able to load an imported resource and loads it.
      *
      * @param mixed       $resource A resource
      * @param string|null $type     The resource type or null if unknown
      *
-     * @return LoaderInterface A LoaderInterface instance
+     * @return RouteCollection
      *
      * @throws FileLoaderLoadException If no loader is found
      */
-    private function resolve($resource, $type = null)
+    private function load($resource, $type = null)
     {
         if (null === $this->loader) {
             throw new \BadMethodCallException('Cannot import other routing resources: you must pass a LoaderInterface when constructing RouteCollectionBuilder.');
         }
 
         if ($this->loader->supports($resource, $type)) {
-            return $this->loader;
+            return $this->loader->load($resource, $type);
         }
 
         $loader = null === $this->loader->getResolver() ? false : $this->loader->getResolver()->resolve($resource, $type);
@@ -363,6 +363,6 @@ class RouteCollectionBuilder
             throw new FileLoaderLoadException($resource);
         }
 
-        return $loader;
+        return $loader->load($resource, $type);
     }
 }

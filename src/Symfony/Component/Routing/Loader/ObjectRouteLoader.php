@@ -32,7 +32,7 @@ abstract class ObjectRouteLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        $routeLoader = $this->getRouteLoader($resource);
+        $routeLoader = $this->getRouteLoaderService($resource);
 
         if (!$routeLoader instanceof RouteLoaderInterface) {
             throw new \LogicException(sprintf('Service "%s" must implement RouteLoaderInterface.', $resource));
@@ -53,7 +53,7 @@ abstract class ObjectRouteLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return 'object' === $type;
+        return 'service' === $type;
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class ObjectRouteLoader extends Loader
      * @param string $id
      * @return RouteLoaderInterface
      */
-    abstract protected function getRouteLoader($id);
+    abstract protected function getRouteLoaderService($id);
 
     private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
     {

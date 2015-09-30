@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-19T21:48:44Z
+
+So, what about this bug fix ?
+cc @stof
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-22T22:58:49Z
+
+I can not evaluate this fix for now, but can confirm the issue in 2.8. To give a practical example... since #14238, it is possible to write meaningless configuration in a Symfony Standard Edition like:
+
+```
+framework:
+    secret:          "%secret%"
+    foo:             bar
+    default_locale:  "%locale%"
+```
+
+or more serious
+
+```
+security:
+  providers:
+    in_memory:
+      memory:
+        johndoe: { password: 'secet', roles: ['ROLE_USER'] }
+```
+
+without throwing an exception. Where the second example is missing the `users` key under the `memory`  provider which leads to errors which are very hard to find.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-26T18:15:44Z
+
+I think `testIgnoreExtraKeysNoException` and `testIgnoreExtraKeysNotRemoved` became redundant by the new `testIgnoreAndRemoveBehaviors` and can be removed. Apart from that the PR looks good to me. Thank you @ogizanagi for working on this!
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-26T19:17:03Z
+
+@xelaris : You're right. I removed these methods.
+Thanks for raising this.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-26T23:16:24Z
+
+Looks good to me.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-09-28T18:30:47Z
+
+Thanks @ogizanagi. I think this is ready to be merge now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T10:13:06Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-30T10:44:56Z
+
+:+1:

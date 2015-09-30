@@ -364,7 +364,7 @@ class TextDescriptor extends Descriptor
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
-                $options['output']->section(sprintf("\"%s\" event", $eventListened));
+                $options['output']->section(sprintf('"%s" event', $eventListened));
                 $this->renderEventListenerTable($eventListeners, $options['output']);
             }
         }

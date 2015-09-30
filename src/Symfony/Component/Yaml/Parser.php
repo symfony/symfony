@@ -464,10 +464,13 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (preg_match('/^'.self::FOLDED_SCALAR_PATTERN.'$/', $value, $matches)) {
+        if (preg_match('/^'.Inline::REGEX_TAG_PATTERN.self::FOLDED_SCALAR_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
-            return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+            $output = $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+            if (isset($matches['tag']) && $matches['tag'] == '!!binary')
+                $output = base64_decode($output);
+            return $output;
         }
 
         try {

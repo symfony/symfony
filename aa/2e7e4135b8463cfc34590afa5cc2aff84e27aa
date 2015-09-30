@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T19:33:32Z
+
+You need to update the VoterFixture class to implement ``supports`` (or to get rid of the class). Otherwise the testsuite is broken.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T21:15:00Z
+
+@stof fixed by https://github.com/symfony/symfony/pull/15932 (wrong tests made it into the 2.8 branch)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T13:00:19Z
+
+@WouterJ Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T13:11:01Z
+
+@fabpot done. I've also removed `AbstractVoter#isGranted()` now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T13:20:09Z
+
+hmm, I've not checked, but I'm pretty sure they are some tests that need to be updated, no?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T14:19:44Z
+
+Indeed, found some other tests and removed them as well
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T15:57:15Z
+
+@WouterJ Looks like `property-access` is not in the `composer.json` (it's not even in 2.8 apparently)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T17:38:14Z
+
+@fabpot that's a bug introduced in https://github.com/symfony/symfony/pull/16007 and fixed in https://github.com/symfony/symfony/pull/16030 and not related to this PR, neither can I relate the other build failures to this PR.

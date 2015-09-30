@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": ">=5.5.9",
         "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/class-loader": "~2.2|~3.0.0",
-        "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2|~3.0.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/class-loader": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Debug\\": "" }
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

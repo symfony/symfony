@@ -16,18 +16,6 @@ use Symfony\Component\Form\Tests\Fixtures\Author;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('collection', array(
-            'type' => 'text',
-        ));
-
-        $this->assertSame('collection', $form->getConfig()->getType()->getName());
-    }
-
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(

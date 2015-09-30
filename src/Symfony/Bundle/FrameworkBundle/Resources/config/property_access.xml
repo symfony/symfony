@@ -4,12 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="property_accessor.class">Symfony\Component\PropertyAccess\PropertyAccessor</parameter>
-    </parameters>
-
     <services>
-        <service id="property_accessor" class="%property_accessor.class%" >
+        <service id="property_accessor" class="Symfony\Component\PropertyAccess\PropertyAccessor" >
             <argument /> <!-- magicCall, set by the extension -->
             <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
         </service>

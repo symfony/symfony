@@ -97,13 +97,9 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
-
-            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-                $config['csrf_protection']['enabled'] = true;
-            }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['form']['csrf_protection'], $container, $loader);
 
         if (isset($config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -142,7 +138,7 @@ class FrameworkExtension extends Extension
             $loader->load('debug.xml');
 
             $definition = $container->findDefinition('http_kernel');
-            $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
+            $definition->replaceArgument(1, new Reference('debug.controller_resolver'));
 
             // replace the regular event_dispatcher service with the debug one
             $definition = $container->findDefinition('event_dispatcher');
@@ -200,20 +196,12 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (null === $config['form']['csrf_protection']['enabled']) {
-            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
-        }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-
-            if (null !== $config['form']['csrf_protection']['field_name']) {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
-            } else {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-            }
+            $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -560,12 +548,12 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
-        }
 
-        if ($container->hasDefinition('assets.packages')) {
-            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
-        } else {
-            $container->removeDefinition('templating.helper.assets');
+            if ($container->hasDefinition('assets.packages')) {
+                $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
+            } else {
+                $container->removeDefinition('templating.helper.assets');
+            }
         }
     }
 

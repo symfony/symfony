@@ -56,7 +56,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             // Here is the scenario:
             // - while routes are being loaded by parent::load() below, a fatal error
             //   occurs (e.g. parse error in a controller while loading annotations);
-            // - PHP abruptly empties the stack trace, bypassing all catch blocks;
+            // - PHP abruptly empties the stack trace, bypassing all catch/finally blocks;
             //   it then calls the registered shutdown functions;
             // - the ErrorHandler catches the fatal error and re-injects it for rendering
             //   thanks to HttpKernel->terminateWithException() (that calls handleException());
@@ -74,12 +74,9 @@ class DelegatingLoader extends BaseDelegatingLoader
 
         try {
             $collection = parent::load($resource, $type);
-        } catch (\Exception $e) {
+        } finally {
             $this->loading = false;
-            throw $e;
         }
-
-        $this->loading = false;
 
         foreach ($collection->all() as $route) {
             if ($controller = $route->getDefault('_controller')) {

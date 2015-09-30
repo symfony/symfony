@@ -58,10 +58,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
             $this->assertEquals('1.2', Inline::dump(1.2));
             $this->assertContains('fr', strtolower(setlocale(LC_NUMERIC, 0)));
+        } finally {
             setlocale(LC_NUMERIC, $locale);
-        } catch (\Exception $e) {
-            setlocale(LC_NUMERIC, $locale);
-            throw $e;
         }
     }
 

@@ -7,9 +7,10 @@ The component only goal is to convert CSS selectors to their XPath
 equivalents:
 
 ```php
-use Symfony\Component\CssSelector\CssSelector;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
-print CssSelector::toXPath('div.item > h4 > a');
+$converter = new CssSelectorConverter();
+print $converter->toXPath('div.item > h4 > a');
 ```
 
 HTML and XML are different
@@ -17,15 +18,12 @@ HTML and XML are different
 
 The `CssSelector` component comes with an `HTML` extension which is enabled by
 default. If you need to use this component with `XML` documents, you have to
-disable this `HTML` extension. That's because, `HTML` tag & attribute names
-are always lower-cased, but case-sensitive in `XML`:
+disable this `HTML` extension. That's because, `HTML` tag & attribute names are
+always lower-cased, but case-sensitive in `XML`:
 
 ```php
 // disable `HTML` extension:
-CssSelector::disableHtmlExtension();
-
-// re-enable `HTML` extension:
-CssSelector::enableHtmlExtension();
+$converter = new CssSelectorConverter(false);
 ```
 
 When the `HTML` extension is enabled, tag names are lower-cased, attribute
@@ -50,7 +48,7 @@ License
 -------
 
 This component is a port of the Python cssselect library,
-which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+which is copyright Ian Bicking, https://github.com/SimonSapin/cssselect.
 
 Copyright (c) 2007-2012 Ian Bicking and contributors. See AUTHORS
 for more details.

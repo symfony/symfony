@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\PdoProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * Base PDO storage for profiling information in a PDO database.
  *
@@ -38,8 +40,6 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
-        @trigger_error('The '.__CLASS__.' class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
-
         $this->dsn = $dsn;
         $this->username = $username;
         $this->password = $password;

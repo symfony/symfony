@@ -15,20 +15,19 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Translator;
 
 /**
- * Implements MessageCatalogueProviderInterface by dispatching back
- * to a Translator instance.
+ * The Translator::initializeCatalogue() method that was responsible for loading
+ * message catalogues may be overwritten by clients.
  *
- * This is needed for providing a BC upgrade path. As of writing, the actual
- * loading of MessageCatalogues takes place below the protected Translator::initializeCatalogue()
- * method.
+ * During the deprecation phase, this class can be used to call the existing
+ * initializeCatalogue() implementation from places where MessageCatalogueProviderInterface
+ * is expected.
  *
- * Translator now features an accessInitializeCatalogue() method to allow access to possible
- * subclass implementations.
+ * Caution: Because the implementation of Translator::initializeCatalogue() only
+ * accepted a primary locale and relied on the fallback locales internal to Translator,
+ * the $fallbackLocales argument to provideCatalogue() cannot be used.
  *
- * This class expects to decorate another MessageCatalogueProviderInterface instance. Configuration
- * will be forwarded to this inner instance, however the provideCatalogue() implementation will
- * dispatch to the Translator. It is expected that the Translator will actually call the
- * "inner" instance in turn.
+ * So, using this class is only safe from within Translator itself (because the
+ * fallback locales it would pass are the same as initializeCatalogue() assumes anyway).
  *
  * @internal
  *
@@ -37,34 +36,25 @@ use Symfony\Component\Translation\Translator;
 class TranslatorLegacyHelper implements MessageCatalogueProviderInterface
 {
     /**
-     * @var MessageCatalogueProviderInterface
-     */
-    private $inner;
-
-    /**
      * @var Translator
      */
     private $translator;
 
-    public function __construct(Translator $translator, MessageCatalogueProviderInterface $inner)
+    public function __construct(Translator $translator)
     {
         $this->translator = $translator;
-        $this->inner = $inner;
     }
 
     public function addLoader($format, LoaderInterface $loader)
     {
-        $this->inner->addLoader($format, $loader);
     }
 
     public function getLoaders()
     {
-        return $this->inner->getLoaders();
     }
 
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        $this->inner->addResource($format, $resource, $locale, $domain);
     }
 
     public function provideCatalogue($locale, $fallbackLocales = array())

@@ -21,15 +21,13 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * Caches the results provided by a MessageCatalogueProviderInterface
  * in a ConfigCacheInterface instance.
  *
+ * Registered resources are tracked so different cache locations can be
+ * used for different resource sets.
+ *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
 class Cache implements MessageCatalogueProviderInterface
 {
-    /**
-     * @var bool
-     */
-    private $debug;
-
     /**
      * @var string
      */
@@ -48,13 +46,13 @@ class Cache implements MessageCatalogueProviderInterface
     /**
      * @var MessageCatalogueProviderInterface
      */
-    private $inner;
+    private $decorated;
 
-    public function __construct(MessageCatalogueProviderInterface $inner, $debug, $cacheDir)
+    public function __construct(MessageCatalogueProviderInterface $decorated, $cacheDir, $debug)
     {
-        $this->inner = $inner;
-        $this->debug = $debug;
+        $this->decorated = $decorated;
         $this->cacheDir = $cacheDir;
+        $this->configCacheFactory = new ConfigCacheFactory($debug);
     }
 
     /**
@@ -69,19 +67,19 @@ class Cache implements MessageCatalogueProviderInterface
 
     public function addLoader($format, LoaderInterface $loader)
     {
-        $this->inner->addLoader($format, $loader);
+        $this->decorated->addLoader($format, $loader);
     }
 
     public function getLoaders()
     {
-        return $this->inner->getLoaders();
+        return $this->decorated->getLoaders();
     }
 
     public function addResource($format, $resource, $locale, $domain = null)
     {
         // track resources for cache file path only
         $this->resources[$locale][] = array($format, $resource, $domain ?: 'messages');
-        $this->inner->addResource($format, $resource, $locale, $domain);
+        $this->decorated->addResource($format, $resource, $locale, $domain);
     }
 
     public function provideCatalogue($locale, $fallbackLocales = array())
@@ -89,7 +87,7 @@ class Cache implements MessageCatalogueProviderInterface
         $tmpCatalogue = null;
 
         $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-        $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale, $fallbackLocales),
+        $cache = $this->configCacheFactory->cache($this->getCatalogueCachePath($locale, $fallbackLocales),
             function (ConfigCacheInterface $cache) use ($self, $locale, $fallbackLocales, &$tmpCatalogue) {
                 $tmpCatalogue = $self->dumpCatalogue($locale, $fallbackLocales, $cache);
             }
@@ -111,7 +109,7 @@ class Cache implements MessageCatalogueProviderInterface
      */
     public function dumpCatalogue($locale, $fallbackLocales, ConfigCacheInterface $cache)
     {
-        $catalogue = $this->inner->provideCatalogue($locale, $fallbackLocales);
+        $catalogue = $this->decorated->provideCatalogue($locale, $fallbackLocales);
         $fallbackContent = $this->getFallbackContent($catalogue);
 
         $content = sprintf(<<<EOF
@@ -174,20 +172,5 @@ EOF
         )));
 
         return $this->cacheDir.'/catalogue.'.$locale.'.'.$catalogueHash.'.php';
-    }
-
-    /**
-     * Provides the ConfigCache factory implementation, falling back to a
-     * default implementation if necessary.
-     *
-     * @return ConfigCacheFactoryInterface $configCacheFactory
-     */
-    private function getConfigCacheFactory()
-    {
-        if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
-        }
-
-        return $this->configCacheFactory;
     }
 }

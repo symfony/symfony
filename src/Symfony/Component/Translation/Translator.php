@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Translation\Provider\Cache;
@@ -46,25 +47,29 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $selector;
 
     /**
-     * The MessageCatalogueProviderInterface instance that will be used
-     * from within loadCatalogue().
+     * The protected initializeCatalogue() method previously took care of loading
+     * an entire message catalogue chain by means of the private doLoadCatalogue()
+     * and loadFallbackCatalogues() methods, but it did not apply any caching.
+     *
+     * This part of the code has been factored out into DefaultProvider, but in 2.x
+     * we need to keep the protected initializeCatalogue() method around for BC.
+     *
+     * Thus, we keep the MessageCatalogueProviderInstance that does the loading
+     * (without caching) in this field. This field should be removed along with
+     * the initializeCatalogue() method in 3.0.
      *
      * @var MessageCatalogueProviderInterface
+     * @deprecated from the start and @internal
      */
-    private $provider;
+    private $initializeCatalogueMessageCatalogueProvider;
 
     /**
-     * The MessageCatalogueProviderInterface instance that actually does the
-     * loading.
-     *
-     * We need to keep this as a separate entity so that it can be called
-     * independently from within initializeCatalogue(), which is a protected
-     * method and might be called by subclasses without going through loadCatalogue()
-     * or without using the "regular" ::$messageCatalogueProvider.
+     * The MessageCatalogueProviderInstance instance used to load (and possibly cache)
+     * catalogues. This will be used from within loadCatalogue().
      *
      * @var MessageCatalogueProviderInterface
      */
-    private $loader;
+    private $messageCatalogueProvider;
 
     /**
      * Constructor.
@@ -78,18 +83,20 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
     {
+        $this->checkDeprecations();
+
         $this->setLocale($locale);
         $this->selector = $selector ?: new MessageSelector();
 
-        $this->loader = new DefaultProvider();
-
-        $provider = new TranslatorLegacyHelper($this, $this->loader);
-
+        $this->provider = new TranslatorLegacyHelper($this); // for BC, this will call back to initializeCatalogue()
         if ($cacheDir !== null) {
-            $this->provider = new Cache($provider, $debug, $cacheDir);
-        } else {
-            $this->provider = $provider;
+            /* The cache contains the logic previously found in initializeCacheCatalogue().
+               Conditionally adding it when we have the $cacheDir is what happened in the loadCatalogue()
+               method previously. */
+            $this->provider = new Cache($this->provider, $cacheDir, $debug);
         }
+
+        $this->initializeCatalogueMessageCatalogueProvider = new DefaultProvider();
     }
 
     /**
@@ -113,6 +120,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     public function addLoader($format, LoaderInterface $loader)
     {
         $this->provider->addLoader($format, $loader);
+        $this->initializeCatalogueMessageCatalogueProvider->addLoader($format, $loader);
     }
 
     /**
@@ -129,6 +137,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     {
         $this->assertValidLocale($locale);
         $this->provider->addResource($format, $resource, $locale, $domain);
+        $this->initializeCatalogueMessageCatalogueProvider->addResource($format, $resource, $locale, $domain);
 
         if (in_array($locale, $this->fallbackLocales)) {
             $this->catalogues = array();
@@ -299,7 +308,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     protected function initializeCatalogue($locale)
     {
         $this->assertValidLocale($locale);
-        $this->catalogues[$locale] = $this->loader->provideCatalogue($locale, $this->computeFallbackLocales($locale));
+        $this->catalogues[$locale] = $this->initializeCatalogueMessageCatalogueProvider->provideCatalogue($locale, $this->computeFallbackLocales($locale));
     }
 
     /**
@@ -344,6 +353,26 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
+        }
+    }
+
+    private function checkDeprecations()
+    {
+        $this->notifyIfMethodOverwritten('getCatalogue');
+        $this->notifyIfMethodOverwritten('loadCatalogue');
+        $this->notifyIfMethodOverwritten('initializeCatalogue');
+        $this->notifyIfMethodOverwritten('computeFallbackLocales');
+    }
+
+    private function notifyIfMethodOverwritten($method)
+    {
+        $reflector = new \ReflectionClass($this);
+        $reflectorMethod = $reflector->getMethod($method);
+        if ($reflectorMethod->getDeclaringClass()->getName() !== __CLASS__) {
+            @trigger_error(
+                'Overwriting methods in ' . __CLASS__ . ' has been deprecated in 2.8 and will not work anymore in 3.0. Check your implementation of ' . $method . '.',
+                E_USER_DEPRECATED
+            );
         }
     }
 }

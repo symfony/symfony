@@ -19,6 +19,8 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 /**
  * The default implementation for MessageCatalogueProviderInterface.
  *
+ * Loaders and Resources can be registered and will be used to load catalogues.
+ *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
 class DefaultProvider implements MessageCatalogueProviderInterface
@@ -49,7 +51,7 @@ class DefaultProvider implements MessageCatalogueProviderInterface
             $domain = 'messages';
         }
 
-        $this->resources[$locale][] = array($format, $resource, $domain);
+        $this->resources[$locale][] = array('format' => $format, 'resource' => $resource, 'domain' => $domain);
     }
 
     public function provideCatalogue($locale, $fallbackLocales = array())
@@ -72,10 +74,11 @@ class DefaultProvider implements MessageCatalogueProviderInterface
     {
         if (isset($this->resources[$locale])) {
             foreach ($this->resources[$locale] as $resource) {
-                if (!isset($this->loaders[$resource[0]])) {
-                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+                $format = $resource['format'];
+                if (!isset($this->loaders[$format])) {
+                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $format));
                 }
-                $catalogue->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+                $catalogue->addCatalogue($this->loaders[$format]->load($resource['resource'], $locale, $resource['domain']));
             }
         }
     }

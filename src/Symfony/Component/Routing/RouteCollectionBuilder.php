@@ -23,8 +23,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 class RouteCollectionBuilder
 {
     /**
-     * A mixture of different objects that hold routes.
-     *
      * @var Route[]|RouteCollectionBuilder[]
      */
     private $routes = array();
@@ -38,7 +36,6 @@ class RouteCollectionBuilder
     private $options = array();
     private $schemes;
     private $methods;
-    private $resources = array();
 
     /**
      * @param LoaderInterface $loader
@@ -101,9 +98,7 @@ class RouteCollectionBuilder
      */
     public function createBuilder()
     {
-        $builder = new self($this->loader);
-
-        return $builder;
+        return new self($this->loader);
     }
 
     /**
@@ -242,18 +237,6 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Adds a resource for this collection.
-     *
-     * @return $this
-     */
-    public function addResource(ResourceInterface $resource)
-    {
-        $this->resources[] = $resource;
-
-        return $this;
-    }
-
-    /**
      * Creates the final ArrayCollection, returns it, and clears everything.
      *
      * @return RouteCollection
@@ -307,10 +290,6 @@ class RouteCollectionBuilder
 
                 $routeCollection->addCollection($subCollection);
             }
-        }
-
-        foreach ($this->resources as $resource) {
-            $routeCollection->addResource($resource);
         }
 
         return $routeCollection;

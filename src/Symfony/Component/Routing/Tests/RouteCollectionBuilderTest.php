@@ -106,8 +106,6 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         // set a default value
         $routes->setDefault('_locale', 'fr');
-        // set an extra resource
-        $routes->addResource(new FileResource('foo_routing.xml'));
 
         $actualCollection = $routes->build();
 
@@ -126,10 +124,6 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $defaults = $checkoutRoute->getDefaults();
         $this->assertArrayHasKey('_locale', $defaults);
         $this->assertEquals('fr', $defaults['_locale']);
-
-        // technically, we should expect 2 here (admin_routing.yml + foo_routing.xml)
-        // but, admin_routing.yml would be added to the collection via the loader, which is mocked
-        $this->assertCount(1, $actualCollection->getResources(), 'The added resource is included');
     }
 
     public function testFlushSetsRouteNames()

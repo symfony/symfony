@@ -55,10 +55,18 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/admin/foo/path', $route->getPath(), 'The prefix should be applied');
     }
 
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function testImportWithoutLoaderThrowsException()
+    {
+        $collectionBuilder = new RouteCollectionBuilder();
+        $collectionBuilder->import('routing.yml');
+    }
+
     public function testAdd()
     {
-        $loader = $this->getLoader();
-        $collectionBuilder = new RouteCollectionBuilder($loader);
+        $collectionBuilder = new RouteCollectionBuilder();
 
         $addedRoute = $collectionBuilder->add('/checkout', 'AppBundle:Order:checkout');
         $addedRoute2 = $collectionBuilder->add('/blogs', 'AppBundle:Blog:list', 'blog_list');
@@ -83,7 +91,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
-        $loader = $this->getLoader();
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
@@ -142,8 +150,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushSetsRouteNames()
     {
-        $loader = $this->getLoader();
-        $collectionBuilder = new RouteCollectionBuilder($loader);
+        $collectionBuilder = new RouteCollectionBuilder();
 
         // add a "named" route
         $collectionBuilder->add('/admin', 'AppBundle:Admin:dashboard', 'admin_dashboard');
@@ -165,8 +172,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushSetsDetailsOnChildrenRoutes()
     {
-        $loader = $this->getLoader();
-        $routes = new RouteCollectionBuilder($loader);
+        $routes = new RouteCollectionBuilder();
 
         $routes->add('/blogs/{page}', 'listAction', 'blog_list')
             // unique things for the route
@@ -232,8 +238,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFlushPrefixesPaths($collectionPrefix, $routePath, $expectedPath)
     {
-        $loader = $this->getLoader();
-        $routes = new RouteCollectionBuilder($loader);
+        $routes = new RouteCollectionBuilder();
         $routes->setPrefix($collectionPrefix);
 
         $routes->add($routePath, 'someController', 'test_route');
@@ -261,7 +266,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushSetsPrefixedWithMultipleLevels()
     {
-        $loader = $this->getLoader();
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
         $routes = new RouteCollectionBuilder($loader);
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
@@ -312,8 +317,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetControllerClass($routeController, $controllerClass, $expectedFinalController)
     {
-        $loader = $this->getLoader();
-        $routes = new RouteCollectionBuilder($loader);
+        $routes = new RouteCollectionBuilder();
         $routes->setControllerClass('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController');
 
         $routes->add('/', $routeController, 'test_route');
@@ -342,20 +346,12 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptiononBadControllerClass()
     {
-        $loader = $this->getLoader();
-        $routes = new RouteCollectionBuilder($loader);
+        $routes = new RouteCollectionBuilder();
 
         $routes->setControllerClass('Acme\FakeController');
-    }
-
-    private function getLoader()
-    {
-        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
-
-        return $loader;
     }
 }

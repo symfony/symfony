@@ -56,7 +56,7 @@ class RouteCollectionBuilder
     /**
      * @param LoaderInterface $loader
      */
-    public function __construct(LoaderInterface $loader)
+    public function __construct(LoaderInterface $loader = null)
     {
         $this->loader = $loader;
     }
@@ -450,6 +450,10 @@ class RouteCollectionBuilder
      */
     private function resolve($resource, $type = null)
     {
+        if (null === $this->loader) {
+            throw new \BadMethodCallException('Cannot import other routing resources: you must pass a LoaderInterface when constructing RouteCollectionBuilder.');
+        }
+
         if ($this->loader->supports($resource, $type)) {
             return $this->loader;
         }

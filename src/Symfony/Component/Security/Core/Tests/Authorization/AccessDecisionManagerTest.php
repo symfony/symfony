@@ -137,24 +137,4 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
         return $voter;
     }
-
-    protected function getVoterSupportsClass($ret)
-    {
-        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->any())
-              ->method('supportsClass')
-              ->will($this->returnValue($ret));
-
-        return $voter;
-    }
-
-    protected function getVoterSupportsAttribute($ret)
-    {
-        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->any())
-              ->method('supportsAttribute')
-              ->will($this->returnValue($ret));
-
-        return $voter;
-    }
 }

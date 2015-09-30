@@ -725,6 +725,39 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
+ * The `AbstractVoter::isGranted()` method have been replaced by `AbstractVoter::voteOnAttribute()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function isGranted($attribute, $object, $user = null)
+       {
+           return 'EDIT' === $attribute && $user === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+       {
+           return 'EDIT' === $attribute && $token->getUser() === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+ * The `supportsAttribute()` and `supportsClass()` methods of classes `AuthenticatedVoter`, `ExpressionVoter`
+   and `RoleVoter` have been removed.
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of

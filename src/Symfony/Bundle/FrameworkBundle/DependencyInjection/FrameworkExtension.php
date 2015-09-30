@@ -668,6 +668,15 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('translator.logging', $config['logging']);
 
+        if (isset($config['message_catalogue_provider'])) {
+            $container->setParameter(
+                'translator.message_catalogue_provider.cache.prefix',
+                'translator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+            );
+
+            $container->setAlias('translation.message_catalogue_provider', $config['message_catalogue_provider']);
+        }
+
         // Discover translation directories
         $dirs = array();
         if (class_exists('Symfony\Component\Validator\Validation')) {

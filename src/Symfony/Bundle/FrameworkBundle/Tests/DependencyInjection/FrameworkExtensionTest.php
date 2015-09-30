@@ -251,6 +251,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(array('fr'), $calls[1][1][0]);
+        $this->assertEquals(array('fr'), $calls[0][1][0]);
+        $this->assertContains('translator_', $container->getParameter('translator.message_catalogue_provider.cache.prefix'));
     }
 
     public function testTranslatorMultipleFallbacks()

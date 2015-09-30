@@ -617,6 +617,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()
                         ->end()
+                        ->scalarNode('message_catalogue_provider')->defaultValue('translation.message_catalogue_provider.cache')->end()
                     ->end()
                 ->end()
             ->end()

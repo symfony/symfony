@@ -33,6 +33,7 @@
         <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
         <parameter key="translation.extractor.class">Symfony\Component\Translation\Extractor\ChainExtractor</parameter>
         <parameter key="translation.writer.class">Symfony\Component\Translation\Writer\TranslationWriter</parameter>
+        <parameter key="translator.message_catalogue_provider.cache.prefix" />
     </parameters>
 
     <services>

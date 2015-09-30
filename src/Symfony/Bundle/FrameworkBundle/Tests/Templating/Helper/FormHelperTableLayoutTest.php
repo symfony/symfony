@@ -31,6 +31,18 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         'choice_attr',
     );
 
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            'method' => 'get',
+            'action' => '',
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get">', $html);
+    }
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported

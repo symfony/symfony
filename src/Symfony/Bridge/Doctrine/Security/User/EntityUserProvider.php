@@ -56,10 +56,7 @@ class EntityUserProvider implements UserProviderInterface
         } else {
             if (!$this->repository instanceof UserLoaderInterface) {
                 if (!$this->repository instanceof UserProviderInterface) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'The Doctrine repository "%s" must implement UserLoaderInterface.',
-                        get_class($this->repository)
-                    ));
+                    throw new \InvalidArgumentException(sprintf('The Doctrine repository "%s" must implement UserLoaderInterface.', get_class($this->repository)));
                 }
 
                 @trigger_error('Implementing loadUserByUsername from Symfony\Component\Security\Core\User\UserProviderInterface is deprecated since version 2.8 and will be removed in 3.0. Implement the Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface instead.', E_USER_DEPRECATED);

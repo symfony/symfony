@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
  *
  * @see UserInterface
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Michal Trojanowski <michal@kmt-studio.pl>
  */
 interface UserLoaderInterface
 {

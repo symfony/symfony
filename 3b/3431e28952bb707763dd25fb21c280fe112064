@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-27T12:52:54Z
+
+wouldn't this break cases where the command is allowing to get arguments interactively in ``interact()`` ?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T12:54:41Z
+
+@stof afaics, this only binds, the validation is still done after interact. So I don't think it should cause trouble.
+
+It also means listeners can add options/arguments without getting validation errors.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T15:37:41Z
+
+Failures related to https://github.com/symfony/symfony/pull/15940 and not this PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T15:45:35Z
+
+@WouterJ You could rebase as #15940 was merged (though we will still see some failures due to the security tests I think).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T22:48:49Z
+
+Please also add a test where the listener adds an option. And check if it can be used.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T13:01:59Z
+
+I was looking when validation actually happens as I saw symfony/console#15.
+It seems validation can happen both
+- in `$input->bind` (when parsing), see https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Console/Command/Command.php#L234
+- in `$input->validate();` which is called after `interact`, see https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Console/Command/Command.php#L256
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T13:19:05Z
+
+> wouldn't this break cases where the command is allowing to get arguments interactively in interact() ?
+
+So this case from @stof doesn't break because
+- wrong arguments/options, e.g. too many would already error out when binding anyway
+- missing arguments can still be added in interact as the number of arguments is only validated later
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T13:22:42Z
+
+> Please also add a test where the listener adds an option. And check if it can be used.
+
+I think exactly that is still no possible with this solution. If you call a command with an option/argument that is only about to be added by a listener, it will throw an exception already when trying to parse the input via `$input->bind()`. So the listener won't have a chance to change the definition.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-28T13:31:24Z
+
+I think to solve the problem, we really need to refactor the validation. `bind()` should not validate but should parse everything indepently. And only `validate` checks if there are too many/missing/wrong arguments or options.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-28T19:57:53Z
+
+@Tobion yeah, or wrap things inside a try..catch loop as is done in other bind cases. (not doing validation in `bind()` is a BC break).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-28T21:11:06Z
+
+So `Input#validate()` only validates if required arguments are passed. `Input#bind()` validates if passed options/arguments are valid. Added a try..catch loop around the binding before the event listener and added a test.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T12:46:17Z
+
+ping @symfony/deciders PR is now updated and ready to be merged imo
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-30T13:22:49Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-30T20:11:17Z
+
+:+1:
+
+Should we add a changelog entry so that people interested in changing the definition notice this is possible now?

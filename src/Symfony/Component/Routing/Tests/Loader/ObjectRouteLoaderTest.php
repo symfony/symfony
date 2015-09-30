@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
-use Symfony\Component\Routing\Loader\RouteLoaderInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -24,7 +23,7 @@ class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
         $serviceRouteLoader = new ObjectRouteLoaderForTest();
 
         $serviceRouteLoader->loaderMap = array(
-            'my_route_provider_service' => $routeLoader
+            'my_route_provider_service' => $routeLoader,
         );
 
         // create a basic collection that will be returned
@@ -55,7 +54,7 @@ class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
 
         $serviceRouteLoader = new ObjectRouteLoaderForTest();
         $serviceRouteLoader->loaderMap = array(
-            'any_service_name' => $routeLoader
+            'any_service_name' => $routeLoader,
         );
 
         $serviceRouteLoader->load('any_service_name', 'service');

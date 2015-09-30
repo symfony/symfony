@@ -12,11 +12,8 @@
 namespace Symfony\Component\Routing\Loader\DependencyInjection;
 
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
-use Symfony\Component\Routing\Loader\RouteLoaderInterface;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A route loader that executes a service to load the routes.

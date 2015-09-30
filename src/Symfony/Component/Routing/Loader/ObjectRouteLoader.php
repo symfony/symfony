@@ -63,6 +63,7 @@ abstract class ObjectRouteLoader extends Loader
      * the $id may be a service id.
      *
      * @param string $id
+     *
      * @return RouteLoaderInterface
      */
     abstract protected function getRouteLoaderService($id);

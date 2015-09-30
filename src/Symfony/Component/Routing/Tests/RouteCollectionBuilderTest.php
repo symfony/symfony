@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
+namespace Symfony\Component\Routing\Tests;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Bundle\FrameworkBundle\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Config\Resource\FileResource;
 
 class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
@@ -46,7 +46,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $addedBuilder = $collectionBuilder->import('admin_routing.yml', '/admin', 'yaml');
 
         // we should get back a RouteCollectionBuilder
-        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Routing\RouteCollectionBuilder', $addedBuilder);
+        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollectionBuilder', $addedBuilder);
 
         // get the collection back so we can look at it
         $addedCollection = $addedBuilder->build();

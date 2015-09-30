@@ -14,8 +14,6 @@ namespace Symfony\Component\Routing;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 
 /**
  * Helps add and import routes into a RouteCollection.
@@ -51,7 +49,7 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Import an external routing resource and returns the RouteCollectionBuilder
+     * Import an external routing resource and returns the RouteCollectionBuilder.
      *
      *  $routes->mount('/blog', $routes->import('blog.yml'));
      *

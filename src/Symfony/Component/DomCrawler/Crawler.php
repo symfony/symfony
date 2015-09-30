@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\CssSelector\Converter;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Crawler eases navigation of a list of \DOMElement objects.
@@ -659,11 +659,11 @@ class Crawler extends \SplObjectStorage
      */
     public function filter($selector)
     {
-        if (!class_exists('Symfony\\Component\\CssSelector\\Converter')) {
+        if (!class_exists('Symfony\\Component\\CssSelector\\CssSelectorConverter')) {
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector 2.8+ is not installed (you can use filterXPath instead).');
         }
 
-        $converter = new Converter($this->isHtml);
+        $converter = new CssSelectorConverter($this->isHtml);
 
         // The CssSelector already prefixes the selector with descendant-or-self::
         return $this->filterRelativeXPath($converter->toXPath($selector));

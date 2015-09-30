@@ -327,11 +327,11 @@ class Crawler extends \SplObjectStorage
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
-                return new static($node, $this->uri, $this->baseHref);
+                return $this->createSubCrawler($node);
             }
         }
 
-        return new static(null, $this->uri, $this->baseHref);
+        return $this->createSubCrawler(null);
     }
 
     /**
@@ -354,7 +354,7 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure(new static($node, $this->uri, $this->baseHref), $i);
+            $data[] = $closure($this->createSubCrawler($node), $i);
         }
 
         return $data;
@@ -370,7 +370,7 @@ class Crawler extends \SplObjectStorage
      */
     public function slice($offset = 0, $length = -1)
     {
-        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
+        return $this->createSubCrawler(iterator_to_array(new \LimitIterator($this, $offset, $length)));
     }
 
     /**
@@ -386,12 +386,12 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure(new static($node, $this->uri, $this->baseHref), $i)) {
+            if (false !== $closure($this->createSubCrawler($node), $i)) {
                 $nodes[] = $node;
             }
         }
 
-        return new static($nodes, $this->uri, $this->baseHref);
+        return $this->createSubCrawler($nodes);
     }
 
     /**
@@ -427,7 +427,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->parentNode->firstChild), $this->uri, $this->baseHref);
+        return $this->createSubCrawler($this->sibling($this->getNode(0)->parentNode->firstChild));
     }
 
     /**
@@ -443,7 +443,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)), $this->uri, $this->baseHref);
+        return $this->createSubCrawler($this->sibling($this->getNode(0)));
     }
 
     /**
@@ -459,7 +459,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0), 'previousSibling'), $this->uri, $this->baseHref);
+        return $this->createSubCrawler($this->sibling($this->getNode(0), 'previousSibling'));
     }
 
     /**
@@ -484,7 +484,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return new static($nodes, $this->uri, $this->baseHref);
+        return $this->createSubCrawler($nodes);
     }
 
     /**
@@ -502,7 +502,7 @@ class Crawler extends \SplObjectStorage
 
         $node = $this->getNode(0)->firstChild;
 
-        return new static($node ? $this->sibling($node) : array(), $this->uri, $this->baseHref);
+        return $this->createSubCrawler($node ? $this->sibling($node) : array());
     }
 
     /**
@@ -631,7 +631,7 @@ class Crawler extends \SplObjectStorage
 
         // If we dropped all expressions in the XPath while preparing it, there would be no match
         if ('' === $xpath) {
-            return new static(null, $this->uri, $this->baseHref);
+            return $this->createSubCrawler(null);
         }
 
         return $this->filterRelativeXPath($xpath);
@@ -829,7 +829,7 @@ class Crawler extends \SplObjectStorage
     {
         $prefixes = $this->findNamespacePrefixes($xpath);
 
-        $crawler = new static(null, $this->uri, $this->baseHref);
+        $crawler = $this->createSubCrawler(null);
 
         foreach ($this as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
@@ -998,5 +998,19 @@ class Crawler extends \SplObjectStorage
         }
 
         return array();
+    }
+
+    /**
+     * Creates a crawler for some subnodes.
+     *
+     * @param \DOMElement|\DOMElement[]|\DOMNodeList|null $nodes
+     *
+     * @return static
+     */
+    private function createSubCrawler($nodes)
+    {
+        $crawler = new static($nodes, $this->uri, $this->baseHref);
+
+        return $crawler;
     }
 }

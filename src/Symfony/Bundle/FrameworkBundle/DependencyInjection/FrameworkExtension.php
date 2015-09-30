@@ -290,26 +290,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
-        $supported = array(
-            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql' => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file' => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
-            'memcache' => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
-            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
-            'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
-        );
         list($class) = explode(':', $config['dsn'], 2);
-        if (!isset($supported[$class])) {
+        if ('file' !== $class) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
-        $container->setParameter('profiler.storage.username', $config['username']);
-        $container->setParameter('profiler.storage.password', $config['password']);
-        $container->setParameter('profiler.storage.lifetime', $config['lifetime']);
-
-        $container->getDefinition('profiler.storage')->setClass($supported[$class]);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {

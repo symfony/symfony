@@ -95,40 +95,11 @@ abstract class AbstractVoter implements VoterInterface
      *   a UserInterface object (fully authenticated user)
      *   a string               (anonymously authenticated user).
      *
-     * @param string               $attribute
-     * @param object               $object
-     * @param UserInterface|string $user
-     *
-     * @deprecated This method will be removed in 3.0 - override voteOnAttribute instead.
-     *
-     * @return bool
-     */
-    protected function isGranted($attribute, $object, $user = null)
-    {
-        // forces isGranted() or voteOnAttribute() to be overridden
-        throw new \BadMethodCallException(sprintf('You must override the voteOnAttribute() method in "%s".', get_class($this)));
-    }
-
-    /**
-     * Perform a single access check operation on a given attribute, object and (optionally) user
-     * It is safe to assume that $attribute and $object's class pass supportsAttribute/supportsClass
-     * $user can be one of the following:
-     *   a UserInterface object (fully authenticated user)
-     *   a string               (anonymously authenticated user).
-     *
-     * This method will become abstract in 3.0.
-     *
      * @param string         $attribute
      * @param object         $object
      * @param TokenInterface $token
      *
      * @return bool
      */
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
-    {
-        // the user should override this method, and not rely on the deprecated isGranted()
-        @trigger_error(sprintf("The AbstractVoter::isGranted() method is deprecated since 2.8 and won't be called anymore in 3.0. Override voteOnAttribute() in %s instead.", get_class($this)), E_USER_DEPRECATED);
-
-        return $this->isGranted($attribute, $object, $token->getUser());
-    }
+    abstract protected function voteOnAttribute($attribute, $object, TokenInterface $token);
 }

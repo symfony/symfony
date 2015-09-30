@@ -41,7 +41,7 @@ class Crawler extends \SplObjectStorage
     private $baseHref;
 
     /**
-     * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath)
+     * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
      *
      * @var bool
      */
@@ -1142,7 +1142,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Creates a crawler for some subnodes
+     * Creates a crawler for some subnodes.
      *
      * @param \DOMElement|\DOMElement[]|\DOMNodeList|null $nodes
      *

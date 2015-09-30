@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Exception\OutOfBoundsException;
-
 /**
  * A sequence of validation groups.
  *

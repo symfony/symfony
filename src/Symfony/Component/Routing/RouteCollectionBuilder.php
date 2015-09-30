@@ -89,16 +89,13 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Returns a RouteCollectionBuilder that can be configured and then added with addBuilder().
-     *
-     * @param string $prefix A prefix to apply to all routes added to this collection
+     * Returns a RouteCollectionBuilder that can be configured and then added with mount().
      *
      * @return RouteCollectionBuilder
      */
-    public function createBuilder($prefix = null)
+    public function createBuilder()
     {
         $builder = new self($this->loader);
-        $builder->setPrefix($prefix);
 
         return $builder;
     }
@@ -108,8 +105,9 @@ class RouteCollectionBuilder
      *
      * @param RouteCollectionBuilder $builder
      */
-    public function addBuilder(RouteCollectionBuilder $builder)
+    public function mount($prefix, RouteCollectionBuilder $builder)
     {
+        $builder->prefix = trim(trim($prefix), '/');
         $this->routes[] = $builder;
     }
 
@@ -124,7 +122,7 @@ class RouteCollectionBuilder
     public function addRouteCollection(RouteCollection $collection, $prefix = null)
     {
         // create a builder from the RouteCollection
-        $builder = $this->createBuilder($prefix);
+        $builder = $this->createBuilder();
         foreach ($collection->all() as $name => $route) {
             $builder->addRoute($route, $name);
         }
@@ -133,7 +131,7 @@ class RouteCollectionBuilder
             $builder->addResource($resource);
         }
 
-        $this->addBuilder($builder);
+        $this->mount($prefix, $builder);
 
         return $builder;
     }
@@ -154,20 +152,6 @@ class RouteCollectionBuilder
         }
 
         $this->routes[$name] = $route;
-
-        return $this;
-    }
-
-    /**
-     * Sets a prefix (e.g. /admin) to be used with all embedded routes.
-     *
-     * @param string $prefix
-     *
-     * @return $this
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = trim(trim($prefix), '/');
 
         return $this;
     }

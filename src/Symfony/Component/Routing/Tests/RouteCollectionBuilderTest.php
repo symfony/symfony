@@ -239,10 +239,13 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
     public function testFlushPrefixesPaths($collectionPrefix, $routePath, $expectedPath)
     {
         $routes = new RouteCollectionBuilder();
-        $routes->setPrefix($collectionPrefix);
 
         $routes->add($routePath, 'someController', 'test_route');
-        $collection = $routes->build();
+
+        $outerRoutes = new RouteCollectionBuilder();
+        $outerRoutes->mount($collectionPrefix, $routes);
+
+        $collection = $outerRoutes->build();
 
         $this->assertEquals($expectedPath, $collection->get('test_route')->getPath());
     }
@@ -255,7 +258,6 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         // normal prefix - does not matter if it's a wildcard
         $tests[] = array('/{admin}', '/foo', '/{admin}/foo');
         // shows that a prefix will always be given the starting slash
-        $tests = array();
         $tests[] = array('0', '/foo', '/0/foo');
 
         // spaces are ok, and double slahses at the end are cleaned
@@ -271,24 +273,24 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');
 
-        $adminRoutes = $routes->createBuilder('/admin');
+        $adminRoutes = $routes->createBuilder();
         $adminRoutes->add('/dashboard', 'AdminController::dashboardAction', 'admin_dashboard');
 
         // embedded collection under /admin
-        $adminBlogRoutes = $routes->createBuilder('/blog');
+        $adminBlogRoutes = $routes->createBuilder();
         $adminBlogRoutes->add('/new', 'BlogController::newAction', 'admin_blog_new');
         // mount into admin, but before the parent collection has been mounted
-        $adminRoutes->addBuilder($adminBlogRoutes);
+        $adminRoutes->mount('/blog', $adminBlogRoutes);
 
         // now mount the /admin routes, above should all still be /blog/admin
-        $routes->addBuilder($adminRoutes);
+        $routes->mount('/admin', $adminRoutes);
         // add a route after mounting
         $adminRoutes->add('/users', 'AdminController::userAction', 'admin_users');
 
         // add another sub-collection after the mount
-        $otherAdminRoutes = $routes->createBuilder('/stats');
+        $otherAdminRoutes = $routes->createBuilder();
         $otherAdminRoutes->add('/sales', 'StatsController::indexAction', 'admin_stats_sales');
-        $adminRoutes->addBuilder($otherAdminRoutes);
+        $adminRoutes->mount('/stats', $otherAdminRoutes);
 
         // add a normal collection and see that it is also prefixed
         $importedCollection = new RouteCollection();

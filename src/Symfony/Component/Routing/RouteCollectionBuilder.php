@@ -334,9 +334,11 @@ class RouteCollectionBuilder
             return $this->loader->load($resource, $type);
         }
 
-        $loader = null === $this->loader->getResolver() ? false : $this->loader->getResolver()->resolve($resource, $type);
+        if (null === $resolver = $this->loader->getResolver()) {
+            throw new FileLoaderLoadException($resource);
+        }
 
-        if (false === $loader) {
+        if (false === $loader = $resolver->resolve($resource, $type)) {
             throw new FileLoaderLoadException($resource);
         }
 

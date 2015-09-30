@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T15:08:37Z
+
+Please add the `@deprecated` phpdoc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T15:11:34Z
+
+You also need to add `@group legacy` for test files related to the deprecated classes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T15:12:17Z
+
+`src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php` should also be updated to trigger a deprecation notice for people not using the filesystem.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-27T15:23:34Z
+
+Added `@deprecated` and `@group legacy`.
+
+Deprecation of config options has been done in `Configuration.php` instead of the mentioned `FrameworkExtension.php` file. Is that correct?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-27T15:32:35Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T15:59:19Z
+
+IMO the `dsn` config makes no sense as well (as you can see with the configs for usrname/password). A better approach would have been a `storage` config option that just accepts a service. Could we change that as well?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T10:32:15Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-30T06:45:44Z
+
+I've moved deprecation notices at the beginning of the classes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T07:52:21Z
+
+:+1:

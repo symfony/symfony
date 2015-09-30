@@ -46,7 +46,7 @@ install:
     - if [ "$deps" != "no" ]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $COMPONENTS; fi;
 
 script:
-    - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; $PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
+    - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu 'echo -e "\\nRunning {} tests"; $PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
-    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
-    - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu --keep-order -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;

@@ -47,6 +47,9 @@ class MongoDbProfilerStorageTestDataCollector extends DataCollector
     }
 }
 
+/**
+ * @group legacy
+ */
 class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;

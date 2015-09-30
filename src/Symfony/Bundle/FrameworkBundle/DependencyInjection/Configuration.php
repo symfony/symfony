@@ -272,9 +272,39 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('collect')->defaultTrue()->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
-                        ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
-                        ->scalarNode('username')->defaultValue('')->end()
-                        ->scalarNode('password')->defaultValue('')->end()
+                        ->scalarNode('dsn')
+                            ->defaultValue('file:%kernel.cache_dir%/profiler')
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return 'file:' !== substr($v, 0, 5); })
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('username')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('password')
+                            ->defaultValue('')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                         ->scalarNode('lifetime')->defaultValue(86400)->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()

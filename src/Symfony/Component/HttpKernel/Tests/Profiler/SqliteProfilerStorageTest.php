@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
+/**
+ * @group legacy
+ */
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $dbFile;

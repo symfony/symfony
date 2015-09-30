@@ -275,7 +275,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('dsn')
                             ->defaultValue('file:%kernel.cache_dir%/profiler')
                             ->beforeNormalization()
-                                ->always()
+                                ->ifTrue(function ($v) { return 'file:' !== substr($v, 0, 5); })
                                 ->then(function ($v) {
                                     @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 

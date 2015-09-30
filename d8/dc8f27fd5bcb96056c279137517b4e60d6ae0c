@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-29T10:12:13Z
+
+I think keeping order was necessary previous to avoid mixing results from multiple components. But as we are buffering them to a file now and displaying them at once when the process is ended, it is OK.
+
+:+1:

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Translation\Provider\Cache;
@@ -59,6 +58,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * the initializeCatalogue() method in 3.0.
      *
      * @var MessageCatalogueProviderInterface
+     *
      * @deprecated from the start and @internal
      */
     private $initializeCatalogueMessageCatalogueProvider;
@@ -370,7 +370,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $reflectorMethod = $reflector->getMethod($method);
         if ($reflectorMethod->getDeclaringClass()->getName() !== __CLASS__) {
             @trigger_error(
-                'Overwriting methods in ' . __CLASS__ . ' has been deprecated in 2.8 and will not work anymore in 3.0. Check your implementation of ' . $method . '.',
+                'Overwriting methods in '.__CLASS__.' has been deprecated in 2.8 and will not work anymore in 3.0. Check your implementation of '.$method.'.',
                 E_USER_DEPRECATED
             );
         }

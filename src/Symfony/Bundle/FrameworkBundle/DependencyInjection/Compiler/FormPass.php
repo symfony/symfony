@@ -30,7 +30,7 @@ class FormPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('form.extension');
 
-        // Builds an array with service IDs as keys and tag aliases as values
+        // Builds an array with fully-qualified type class names as keys and service IDs as values
         $types = array();
 
         foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
@@ -46,12 +46,8 @@ class FormPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
-            } elseif (isset($tag[0]['alias'])) {
-                @trigger_error('The alias option of the form.type_extension tag is deprecated since version 2.8 and will be removed in 3.0. Use the extended_type option instead.', E_USER_DEPRECATED);
-                $extendedType = $tag[0]['alias'];
             } else {
-                @trigger_error('The extended_type option of the form.type_extension tag is required since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-                $extendedType = $serviceId;
+                throw new \InvalidArgumentException(sprintf('Tagged form type extension must have the extended type configured using the extended_type/extended-type attribute, none was configured for the "%s" service.', $serviceId));
             }
 
             $typeExtensions[$extendedType][] = $serviceId;

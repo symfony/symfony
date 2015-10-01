@@ -12,41 +12,41 @@
 
         <service id="data_collector.request" class="Symfony\Component\HttpKernel\DataCollector\RequestDataCollector">
             <tag name="kernel.event_subscriber" />
-            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="260" />
+            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="335" />
         </service>
 
         <service id="data_collector.ajax" class="Symfony\Bundle\FrameworkBundle\DataCollector\AjaxDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="256" />
+            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="315" />
         </service>
 
         <service id="data_collector.exception" class="Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="305" />
         </service>
 
         <service id="data_collector.events" class="Symfony\Component\HttpKernel\DataCollector\EventDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="290" />
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.logger" class="Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300" />
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="259" />
+            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="330" />
             <argument type="service" id="kernel" on-invalid="ignore" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.memory" class="Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="258" />
+            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="325" />
         </service>
 
         <service id="data_collector.router" class="Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector" >
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
-            <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="285" />
         </service>
     </services>
 </container>

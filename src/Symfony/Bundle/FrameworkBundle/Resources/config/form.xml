@@ -146,7 +146,7 @@
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
             <argument type="service" id="form.type_extension.form.request_handler" />
-            <tag name="form.type_extension" alias="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
         </service>
 
         <!-- HttpFoundationRequestHandler -->
@@ -160,14 +160,14 @@
 
         <!-- FormTypeValidatorExtension -->
         <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
-            <tag name="form.type_extension" alias="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="validator" />
         </service>
         <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
-            <tag name="form.type_extension" alias="Symfony\Component\Form\Extension\Core\Type\RepeatedType" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\RepeatedType" />
         </service>
         <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
-            <tag name="form.type_extension" alias="Symfony\Component\Form\Extension\Core\Type\SubmitType" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType" />
         </service>
     </services>
 </container>

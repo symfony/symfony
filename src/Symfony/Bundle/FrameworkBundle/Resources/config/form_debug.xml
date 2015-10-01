@@ -14,7 +14,7 @@
 
         <!-- DataCollectorTypeExtension -->
         <service id="form.type_extension.form.data_collector" class="Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension">
-            <tag name="form.type_extension" alias="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="data_collector.form" />
         </service>
 
@@ -22,7 +22,7 @@
         <service id="data_collector.form.extractor" class="Symfony\Component\Form\Extension\DataCollector\FormDataExtractor" />
 
         <service id="data_collector.form" class="Symfony\Component\Form\Extension\DataCollector\FormDataCollector">
-            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
             <argument type="service" id="data_collector.form.extractor" />
         </service>
     </services>

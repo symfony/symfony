@@ -69,25 +69,20 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
 
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
-        $extDefinition->setArguments(array(
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
             new Reference('service_container'),
             array(),
             array(),
             array(),
         ));
 
-        $definition1 = new Definition('stdClass');
-        $definition1->addTag('form.type_extension', array('alias' => 'type1'));
-        $definition2 = new Definition('stdClass');
-        $definition2->addTag('form.type_extension', array('alias' => 'type1'));
-        $definition3 = new Definition('stdClass');
-        $definition3->addTag('form.type_extension', array('alias' => 'type2'));
-
         $container->setDefinition('form.extension', $extDefinition);
-        $container->setDefinition('my.type_extension1', $definition1);
-        $container->setDefinition('my.type_extension2', $definition2);
-        $container->setDefinition('my.type_extension3', $definition3);
+        $container->register('my.type_extension1', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type1'));
+        $container->register('my.type_extension2', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type1'));
+        $container->register('my.type_extension3', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type2'));
 
         $container->compile();
 
@@ -100,6 +95,41 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             ),
             'type2' => array(
                 'my.type_extension3',
+            ),
+        ), $extDefinition->getArgument(2));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testAliasOptionForTaggedTypeExtensions()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new FormPass());
+
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
+            new Reference('service_container'),
+            array(),
+            array(),
+            array(),
+        ));
+
+        $container->setDefinition('form.extension', $extDefinition);
+        $container->register('my.type_extension1', 'stdClass')
+            ->addTag('form.type_extension', array('alias' => 'type1'));
+        $container->register('my.type_extension2', 'stdClass')
+            ->addTag('form.type_extension', array('alias' => 'type2'));
+
+        $container->compile();
+
+        $extDefinition = $container->getDefinition('form.extension');
+
+        $this->assertSame(array(
+            'type1' => array(
+                'my.type_extension1',
+            ),
+            'type2' => array(
+                'my.type_extension2',
             ),
         ), $extDefinition->getArgument(2));
     }

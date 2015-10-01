@@ -44,11 +44,17 @@ class FormPass implements CompilerPassInterface
         $typeExtensions = array();
 
         foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
-            $alias = isset($tag[0]['alias'])
-                ? $tag[0]['alias']
-                : $serviceId;
+            if (isset($tag[0]['extended_type'])) {
+                $extendedType = $tag[0]['extended_type'];
+            } elseif (isset($tag[0]['alias'])) {
+                @trigger_error('The alias option of the form.type_extension tag is deprecated since version 2.8 and will be removed in 3.0. Use the extended_type option instead.', E_USER_DEPRECATED);
+                $extendedType = $tag[0]['alias'];
+            } else {
+                @trigger_error('The extended_type option of the form.type_extension tag is required since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                $extendedType = $serviceId;
+            }
 
-            $typeExtensions[$alias][] = $serviceId;
+            $typeExtensions[$extendedType][] = $serviceId;
         }
 
         $definition->replaceArgument(2, $typeExtensions);

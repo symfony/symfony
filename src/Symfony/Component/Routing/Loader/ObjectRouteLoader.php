@@ -23,25 +23,55 @@ use Symfony\Component\Routing\RouteCollection;
 abstract class ObjectRouteLoader extends Loader
 {
     /**
+     * Returns the object that the method will be called on to load routes.
+     *
+     * For example, if your application uses a service container,
+     * the $id may be a service id.
+     *
+     * @param string $id
+     *
+     * @return object
+     */
+    abstract protected function getServiceObject($id);
+
+    /**
      * Calls the service that will load the routes.
      *
-     * @param string      $resource The name of the service to load
+     * @param mixed       $resource Some value that will resolve to a callable
      * @param string|null $type     The resource type
      *
      * @return RouteCollection
      */
     public function load($resource, $type = null)
     {
-        $routeLoader = $this->getRouteLoaderService($resource);
-
-        if (!$routeLoader instanceof RouteLoaderInterface) {
-            throw new \LogicException(sprintf('Service "%s" must implement RouteLoaderInterface.', $resource));
+        $parts = explode(':', $resource);
+        if (count($parts) != 2) {
+            throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service_name:methodName"', $resource));
         }
 
-        $routeCollection = $routeLoader->getRouteCollection($this);
+        $serviceString = $parts[0];
+        $method = $parts[1];
+
+        $loaderObject = $this->getServiceObject($serviceString);
+
+        if (!is_object($loaderObject)) {
+            throw new \LogicException(sprintf('%s:getServiceObject() must return an object: %s returned', get_class($this), $loaderObject));
+        }
+
+        if (!method_exists($loaderObject, $method)) {
+            throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s"', $method, get_class($loaderObject), $resource));
+        }
+
+        $routeCollection = call_user_func(array($loaderObject, $method), $this);
+
+        if (!$routeCollection instanceof RouteCollection) {
+            $type = is_object($routeCollection) ? get_class($routeCollection) : gettype($routeCollection);
+
+            throw new \LogicException(sprintf('The %s::%s method must return a RouteCollection: %s returned', get_class($loaderObject), $method, $type));
+        }
 
         // make the service file tracked so that if it changes, the cache rebuilds
-        $this->addClassResource(new \ReflectionClass($routeLoader), $routeCollection);
+        $this->addClassResource(new \ReflectionClass($loaderObject), $routeCollection);
 
         return $routeCollection;
     }
@@ -55,18 +85,6 @@ abstract class ObjectRouteLoader extends Loader
     {
         return 'service' === $type;
     }
-
-    /**
-     * Returns a RouteLoaderInterface object matching the id.
-     *
-     * For example, if your application uses a service container,
-     * the $id may be a service id.
-     *
-     * @param string $id
-     *
-     * @return RouteLoaderInterface
-     */
-    abstract protected function getRouteLoaderService($id);
 
     private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
     {

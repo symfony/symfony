@@ -34,7 +34,7 @@ class ServiceRouterLoader extends ObjectRouteLoader
         $this->container = $container;
     }
 
-    protected function getRouteLoaderService($id)
+    protected function getServiceObject($id)
     {
         return $this->container->get($id);
     }

@@ -32,7 +32,6 @@ class ProfilerListener implements EventSubscriberInterface
     protected $onlyException;
     protected $onlyMasterRequests;
     protected $exception;
-    protected $requests = array();
     protected $profiles;
     protected $requestStack;
     protected $parents;
@@ -101,14 +100,7 @@ class ProfilerListener implements EventSubscriberInterface
 
         $this->profiles[$request] = $profile;
 
-        if (null !== $this->requestStack) {
-            $this->parents[$request] = $this->requestStack->getParentRequest();
-        } elseif (!$master) {
-            // to be removed when requestStack is required
-            array_pop($this->requests);
-
-            $this->parents[$request] = end($this->requests);
-        }
+        $this->parents[$request] = $this->requestStack->getParentRequest();
     }
 
     public function onKernelTerminate(PostResponseEvent $event)
@@ -130,7 +122,6 @@ class ProfilerListener implements EventSubscriberInterface
 
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
-        $this->requests = array();
     }
 
     public static function getSubscribedEvents()

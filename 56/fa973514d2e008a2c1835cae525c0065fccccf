@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-28T18:22:58Z
+
+> I have a question: is it mandatory that the output of this command is a valid YAML or XML file? If not, we can keep the changes in the title of the command. Otherwise, I'll revert those changes.
+
+That would be particular and maybe I'm wrong, but will using the `stderr` output to render anything but yaml output will allow to have both, while only getting the yaml output when piping it to a file / other streams ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-29T15:22:53Z
+
+@ogizanagi that could work ... but it looks like a hack to me, so I guess Symfony deciders will never accept it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T13:45:08Z
+
+Yes, it should be be valid YAML.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-01T13:53:33Z
+
+Reverted the wrong modifications and rebased.

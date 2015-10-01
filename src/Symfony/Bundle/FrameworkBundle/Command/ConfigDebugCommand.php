@@ -55,6 +55,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
 
         if (empty($name)) {

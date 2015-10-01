@@ -45,14 +45,9 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             array(),
         ));
 
-        $definition1 = new Definition(__CLASS__.'_Type1');
-        $definition1->addTag('form.type');
-        $definition2 = new Definition(__CLASS__.'_Type2');
-        $definition2->addTag('form.type');
-
         $container->setDefinition('form.extension', $extDefinition);
-        $container->setDefinition('my.type1', $definition1);
-        $container->setDefinition('my.type2', $definition2);
+        $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type');
+        $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type');
 
         $container->compile();
 
@@ -100,9 +95,10 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage extended-type attribute, none was configured for the "my.type_extension" service
      */
-    public function testAliasOptionForTaggedTypeExtensions()
+    public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttribute()
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
@@ -115,23 +111,10 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ));
 
         $container->setDefinition('form.extension', $extDefinition);
-        $container->register('my.type_extension1', 'stdClass')
-            ->addTag('form.type_extension', array('alias' => 'type1'));
-        $container->register('my.type_extension2', 'stdClass')
-            ->addTag('form.type_extension', array('alias' => 'type2'));
+        $container->register('my.type_extension', 'stdClass')
+            ->addTag('form.type_extension');
 
         $container->compile();
-
-        $extDefinition = $container->getDefinition('form.extension');
-
-        $this->assertSame(array(
-            'type1' => array(
-                'my.type_extension1',
-            ),
-            'type2' => array(
-                'my.type_extension2',
-            ),
-        ), $extDefinition->getArgument(2));
     }
 
     public function testAddTaggedGuessers()

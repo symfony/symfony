@@ -236,7 +236,7 @@ Form
    implementation to define the right type.
 
  * The alias option of the `form.type_extension` tag is deprecated in favor of
-   the `extended_type` option.
+   the `extended_type`/`extended-type` option.
 
    Before:
    ```xml

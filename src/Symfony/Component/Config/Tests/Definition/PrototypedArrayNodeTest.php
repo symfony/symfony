@@ -34,7 +34,9 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('test'), $node->getDefaultValue());
     }
 
-    // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used
+    /**
+     * A remapped key (e.g. "mapping" -> "mappings") should be unset after being used.
+     */
     public function testRemappedKeysAreUnset()
     {
         $node = new ArrayNode('root');

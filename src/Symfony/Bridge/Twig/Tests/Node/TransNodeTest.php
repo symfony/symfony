@@ -36,6 +36,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
              trim($compiler->compile($node)->getSource())
         );
     }
+
     protected function getVariableGetterWithoutStrictCheck($name)
     {
         if (PHP_VERSION_ID >= 50400) {

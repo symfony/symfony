@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    // https://github.com/symfony/symfony/pull/5028
     public function testSetData()
     {
         $form = $this->factory->createBuilder('file')->getForm();
@@ -34,7 +33,6 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame($data, $form->getData());
     }
 
-    // https://github.com/symfony/symfony/issues/6134
     public function testSubmitEmpty()
     {
         $form = $this->factory->createBuilder('file')->getForm();

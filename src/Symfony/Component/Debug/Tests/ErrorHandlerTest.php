@@ -109,7 +109,7 @@ PHP
         $exceptionCheck = function ($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 40, $exception->getLine());
+            $that->assertEquals(__LINE__ + 42, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegExp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
@@ -144,7 +144,9 @@ PHP
         restore_error_handler();
     }
 
-    // dummy function to test trace in error handler.
+    /**
+     * Dummy function to test trace in error handler.
+     */
     private static function triggerNotice($that)
     {
         // dummy variable to check for in error handler.

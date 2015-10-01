@@ -245,7 +245,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->choice1, $this->choice2), $this->list->getChoicesForValues($values));
     }
 
-    // https://github.com/symfony/symfony/issues/3446
     public function testGetChoicesForValuesEmpty()
     {
         $this->assertSame(array(), $this->list->getChoicesForValues(array()));

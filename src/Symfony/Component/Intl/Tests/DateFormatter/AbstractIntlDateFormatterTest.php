@@ -853,9 +853,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /*
-     * https://github.com/symfony/symfony/issues/4242
-     */
     public function testParseAfterError()
     {
         $this->testParseError('y-MMMMM-d', '1970-J-1');

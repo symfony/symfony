@@ -301,7 +301,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (null !== $methods) {
                 // At this point the add and remove methods have been found
                 // Use iterator_to_array() instead of clone in order to prevent side effects
-                // see https://github.com/symfony/symfony/issues/4670
                 $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
                 $itemToRemove = array();
                 $propertyValue = &$this->readProperty($object, $property);

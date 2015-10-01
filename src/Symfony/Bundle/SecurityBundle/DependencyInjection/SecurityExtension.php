@@ -477,7 +477,9 @@ class SecurityExtension extends Extension
         );
     }
 
-    // Parses user providers and returns an array of their ids
+    /**
+     * Parses user providers and returns an array of their ids.
+     */
     private function createUserProviders($config, ContainerBuilder $container)
     {
         $providerIds = array();
@@ -489,7 +491,9 @@ class SecurityExtension extends Extension
         return $providerIds;
     }
 
-    // Parses a <provider> tag and returns the id for the related user provider service
+    /**
+     * Parses a <provider> tag and returns the id for the related user provider service.
+     */
     private function createUserDaoProvider($name, $provider, ContainerBuilder $container)
     {
         $name = $this->getUserProviderId(strtolower($name));

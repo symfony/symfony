@@ -926,8 +926,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    /*
-     * We need this functionality to create choice fields for Boolean types,
+    /**
+     * We need this functionality to create choice fields for boolean types.
+     *
      * e.g. false => 'No', true => 'Yes'
      */
     public function testSetDataSingleNonExpandedAcceptsBoolean()
@@ -1198,7 +1199,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('name[]', $view->vars['full_name']);
     }
 
-    // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
         $this->factory->createNamed('name', 'choice', null, array(
@@ -1206,7 +1206,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
     }
 
-    // https://github.com/symfony/symfony/issues/10409
     public function testReuseNonUtf8ChoiceLists()
     {
         $form1 = $this->factory->createNamed('name', 'choice', null, array(

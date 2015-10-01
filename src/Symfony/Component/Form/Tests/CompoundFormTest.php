@@ -539,9 +539,6 @@ class CompoundFormTest extends AbstractFormTest
         ));
     }
 
-    /*
-     * https://github.com/symfony/symfony/issues/4480
-     */
     public function testSubmitRestoresViewDataIfCompoundAndEmpty()
     {
         $mapper = $this->getDataMapper();

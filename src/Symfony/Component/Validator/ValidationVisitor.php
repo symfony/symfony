@@ -144,7 +144,6 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
         // Validate arrays recursively by default, otherwise every driver needs
         // to implement special handling for arrays.
-        // https://github.com/symfony/symfony/issues/6246
         if (is_array($value) || ($traverse && $value instanceof \Traversable)) {
             foreach ($value as $key => $element) {
                 // Ignore any scalar values in the collection

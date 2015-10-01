@@ -298,7 +298,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    // https://github.com/symfony/symfony/issues/5038
     public function testCollectionWithAlternatingRowTypes()
     {
         $data = array(
@@ -446,7 +445,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
-    // https://github.com/symfony/symfony/issues/2308
     public function testNestedFormError()
     {
         $form = $this->factory->createNamedBuilder('name', 'form')

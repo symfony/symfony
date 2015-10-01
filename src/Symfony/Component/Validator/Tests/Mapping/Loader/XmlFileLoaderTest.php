@@ -108,9 +108,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($metadata);
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/pull/12158
-     */
     public function testDoNotModifyStateIfExceptionIsThrown()
     {
         $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');

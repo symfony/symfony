@@ -1761,7 +1761,7 @@ class Request
         }
     }
 
-    /*
+    /**
      * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *

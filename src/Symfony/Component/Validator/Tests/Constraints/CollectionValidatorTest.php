@@ -143,7 +143,6 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    // bug fix
     public function testNullNotConsideredExtraField()
     {
         $data = $this->prepareTestData(array(

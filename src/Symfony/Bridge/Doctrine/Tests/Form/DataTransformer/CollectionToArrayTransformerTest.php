@@ -43,8 +43,6 @@ class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
      * This test is needed for cases when getXxxs() in the entity returns the
      * result of $collection->toArray(), in order to prevent modifications of
      * the inner collection.
-     *
-     * See https://github.com/symfony/symfony/pull/9308
      */
     public function testTransformArray()
     {

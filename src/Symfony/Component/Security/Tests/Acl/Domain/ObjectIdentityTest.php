@@ -23,7 +23,9 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
             $this->assertEquals('footype', $id->getType());
         }
 
-        // Test that constructor never changes passed type, even with proxies
+        /**
+         * Test that constructor never changes passed type, even with proxies.
+         */
         public function testConstructorWithProxy()
         {
             $id = new ObjectIdentity('fooid', 'Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Tests\Acl\Domain\TestDomainObject');

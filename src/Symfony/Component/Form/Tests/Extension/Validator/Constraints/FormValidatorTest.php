@@ -201,7 +201,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
                 'invalid_message' => 'invalid_message_key',
                 // Invalid message parameters must be supported, because the
                 // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
                 'invalid_message_parameters' => array('{{ foo }}' => 'bar'),
             ))
             ->setData($object)
@@ -234,7 +233,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
                 'invalid_message' => 'invalid_message_key',
                 // Invalid message parameters must be supported, because the
                 // invalid message can be a translation key
-                // see https://github.com/symfony/symfony/issues/5144
                 'invalid_message_parameters' => array('{{ foo }}' => 'bar'),
                 'validation_groups' => array(),
             ))
@@ -293,7 +291,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    // https://github.com/symfony/symfony/issues/4359
     public function testDontMarkInvalidIfAnyChildIsNotSynchronized()
     {
         $object = $this->getMock('\stdClass');

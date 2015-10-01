@@ -118,7 +118,9 @@ class ExceptionController
         return new TemplateReference('TwigBundle', 'Exception', $debug ? 'exception_full' : $name, 'html', 'twig');
     }
 
-    // to be removed when the minimum required version of Twig is >= 2.0
+    /**
+     * To be removed when the minimum required version of Twig is >= 2.0.
+     */
     protected function templateExists($template)
     {
         $loader = $this->twig->getLoader();

@@ -72,7 +72,6 @@ class FormValidator extends ConstraintValidator
             // a second error in its parent form is pointless, or worse, may
             // lead to duplicate errors if error bubbling is enabled on the
             // child.
-            // See also https://github.com/symfony/symfony/issues/4359
             if ($childrenSynchronized) {
                 $clientDataAsString = is_scalar($form->getViewData())
                     ? (string) $form->getViewData()

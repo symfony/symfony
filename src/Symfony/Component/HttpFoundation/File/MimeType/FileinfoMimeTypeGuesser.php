@@ -62,7 +62,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
             return;
         }
 
-        if (!empty($this->magicFile)) {
+        if (null !== $this->magicFile) {
             $finfo = new \finfo(FILEINFO_MIME_TYPE, $this->magicFile);
         } else {
             $finfo = new \finfo(FILEINFO_MIME_TYPE);

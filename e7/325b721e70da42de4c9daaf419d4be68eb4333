@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T12:54:34Z
+
+PR updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T00:08:57Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T08:39:26Z
+
+Unless I missed something, I've now finished this PR:
+
+ * Added CHANGELOG + UPGRADE notes
+ * Deprecated the `alias` option for form types, but didn't trigger any deprecation notice as extra attributes don't cause problems (and it's not possible with the current BC layer to remove `alias` argument usages in the Symfony bundles)
+ * Renamed `alias` to `extended_type` for form type extensions (which is consistent with the `FormTypeExtensionInterface#getExtendedType()` method btw)
+ * Changed all usages of the deprecated options in the Symfony code base
+ * Deprecated the fallback to service id for `alias`/`extended_type`, `extended_type` is now required
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T08:39:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T10:04:20Z
+
+Build failures are not related to this PR btw
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T14:28:03Z
+
+Fixed, thanks @Tobion

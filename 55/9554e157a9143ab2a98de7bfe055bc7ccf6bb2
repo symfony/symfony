@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-30T13:13:16Z
+
+@javiereguiluz Swiftmailer sets the tag in the extension: https://github.com/symfony/swiftmailer-bundle/blob/master/DependencyInjection/SwiftmailerExtension.php#L60
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-09-30T13:14:02Z
+
+@WouterJ thanks!

@@ -137,14 +137,6 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame(10, $view->vars['attr']['maxlength']);
     }
 
-    public function testPassMaxLengthBCToView()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array('max_length' => 10));
-        $view = $form->createView();
-
-        $this->assertSame(10, $view->vars['attr']['maxlength']);
-    }
-
     public function testDataClassMayBeNull()
     {
         $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(

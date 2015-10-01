@@ -180,33 +180,11 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testValidatorInterfaceSinceSymfony25()
+    public function testValidatorInterface()
     {
-        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $listener = new ValidationListener($validator, $this->violationMapper);
         $this->assertAttributeSame($validator, 'validator', $listener);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testValidatorInterfaceUntilSymfony24()
-    {
-        // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-
-        $listener = new ValidationListener($validator, $this->violationMapper);
-        $this->assertAttributeSame($validator, 'validator', $listener);
-    }
-
-    /**
-     * @group legacy
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidValidatorInterface()
-    {
-        new ValidationListener(null, $this->violationMapper);
     }
 }

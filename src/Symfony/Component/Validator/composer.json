@@ -25,7 +25,6 @@
         "symfony/intl": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
-        "symfony/property-access": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
@@ -39,8 +38,7 @@
         "symfony/yaml": "",
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation",
-        "symfony/property-access": "For using the 2.4 Validator API",
-        "symfony/expression-language": "For using the 2.4 Expression validator"
+        "symfony/expression-language": "For using the Expression validator"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" }

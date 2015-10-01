@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -35,14 +34,10 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     private $violationMapper;
 
     /**
-     * @param ValidatorInterface|LegacyValidatorInterface $validator
+     * @param ValidatorInterface $validator
      */
-    public function __construct($validator)
+    public function __construct(ValidatorInterface $validator)
     {
-        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
-        }
-
         $this->validator = $validator;
         $this->violationMapper = new ViolationMapper();
     }
@@ -67,18 +62,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             return is_object($constraints) ? array($constraints) : (array) $constraints;
         };
 
-        $cascadeValidationNormalizer = function (Options $options, $cascadeValidation) {
-            if (null !== $cascadeValidation) {
-                @trigger_error('The "cascade_validation" option is deprecated since version 2.8 and will be removed in 3.0. Use "constraints" with a Valid constraint instead.', E_USER_DEPRECATED);
-            }
-
-            return null === $cascadeValidation ? false : $cascadeValidation;
-        };
-
         $resolver->setDefaults(array(
             'error_mapping' => array(),
             'constraints' => array(),
-            'cascade_validation' => null,
             'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => array(),
             'allow_extra_fields' => false,
@@ -86,7 +72,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         ));
 
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
-        $resolver->setNormalizer('cascade_validation', $cascadeValidationNormalizer);
     }
 
     /**

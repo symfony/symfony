@@ -674,23 +674,6 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Alias of {@link submit()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link submit()} instead.
-     */
-    public function bind($submittedData)
-    {
-        // This method is deprecated for Request too, but the error is
-        // triggered in Form::submit() method.
-        if (!$submittedData instanceof Request) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::submit method instead.', E_USER_DEPRECATED);
-        }
-
-        return $this->submit($submittedData);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function addError(FormError $error)
@@ -713,19 +696,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isSubmitted()
     {
-        return $this->submitted;
-    }
-
-    /**
-     * Alias of {@link isSubmitted()}.
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     *             Use {@link isSubmitted()} instead.
-     */
-    public function isBound()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::isSubmitted method instead.', E_USER_DEPRECATED);
-
         return $this->submitted;
     }
 
@@ -832,25 +802,6 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return new FormErrorIterator($this, $errors);
-    }
-
-    /**
-     * Returns a string representation of all form errors (including children errors).
-     *
-     * This method should only be used to help debug a form.
-     *
-     * @param int $level The indentation level (used internally)
-     *
-     * @return string A string representation of all errors
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     *             Use {@link getErrors()} instead and cast the result to a string.
-     */
-    public function getErrorsAsString($level = 0)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use (string) Form::getErrors(true, false) instead.', E_USER_DEPRECATED);
-
-        return self::indent((string) $this->getErrors(true, false), $level);
     }
 
     /**

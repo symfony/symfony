@@ -14,11 +14,11 @@ namespace Symfony\Component\Validator\Tests\Validator;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 
-class RecursiveValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
+class RecursiveValidatorTest extends AbstractTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {

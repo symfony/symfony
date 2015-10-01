@@ -105,16 +105,11 @@ class FormFactory implements FormFactoryInterface
             $options['data'] = $data;
         }
 
-        if ($type instanceof FormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
-            $type = $this->resolveType($type);
-        } elseif (is_string($type)) {
-            $type = $this->registry->getType($type);
-        } elseif ($type instanceof ResolvedFormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
-        } else {
-            throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
+        if (!is_string($type)) {
+            throw new UnexpectedTypeException($type, 'string');
         }
+
+        $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);
 

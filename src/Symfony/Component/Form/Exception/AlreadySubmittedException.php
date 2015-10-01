@@ -17,6 +17,6 @@ namespace Symfony\Component\Form\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class AlreadySubmittedException extends AlreadyBoundException
+class AlreadySubmittedException extends LogicException
 {
 }

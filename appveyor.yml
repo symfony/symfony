@@ -12,6 +12,7 @@ init:
     - SET COMPOSER_NO_INTERACTION=1
     - SET SYMFONY_DEPRECATIONS_HELPER=weak
     - SET PHP=1
+    - SET ANSICON=121x90 (121x90)
     - SET PHP_INI_MATRIX=php.ini-min-ext php.ini-max-ext
 
 install:

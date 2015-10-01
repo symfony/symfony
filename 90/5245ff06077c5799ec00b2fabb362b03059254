@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T15:38:11Z
+
+#15926 has been merged now. @WouterJ Can you rebase and update.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T15:42:35Z
+
+@fabpot 2.8 needs to be merged into master first. Are you on it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T15:46:23Z
+
+@Tobion No, I'm in a meeting right now, can you do it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T16:50:45Z
+
+@fabpot merged
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T19:10:43Z
+
+Rebased & included renaming alias -> extended_type

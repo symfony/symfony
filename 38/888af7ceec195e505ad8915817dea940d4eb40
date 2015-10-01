@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by tecnocat at 2015-09-30T07:15:31Z
+
+The CI test can't fail by this change, in the first pass all CI status got green (Except fabbot.io because the header message in github comment was missing)
+
+How can I relaunch the CI builds?

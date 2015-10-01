@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T16:36:04Z
+
+tests are broken
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T16:36:18Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T17:51:02Z
+
+Fixed.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-26T19:27:22Z
+
+@WouterJ I don't agree with you. Half of the tests of the bridge are still throwing exceptions instead of running properly.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-26T21:29:22Z
+
+@stof agreed. Fixed some more things and made the tests pass locally. Should be ready (hopefully).
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T09:33:08Z
+
+Fixed the comments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T13:50:59Z
+
+Broken tests are not related to this PR. Anything else before merging?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-01T14:00:38Z
+
+Afaik, no.

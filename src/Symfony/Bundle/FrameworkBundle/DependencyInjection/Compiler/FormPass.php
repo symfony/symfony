@@ -53,7 +53,7 @@ class FormPass implements CompilerPassInterface
         $typeExtensions = array();
 
         foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
-            $extendedType = $serviceId;
+            $extendedType = null;
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } elseif (isset($tag[0]['alias'])) {
@@ -61,6 +61,7 @@ class FormPass implements CompilerPassInterface
                 $extendedType = $tag[0]['alias'];
             } else {
                 @trigger_error('The extended_type option of the form.type_extension tag is required since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                $extendedType = $serviceId;
             }
 
             $typeExtensions[$extendedType][] = $serviceId;

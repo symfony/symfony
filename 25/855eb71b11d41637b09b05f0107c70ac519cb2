@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T08:30:48Z
+
+I opened the PR to the wrong branch. The commit was actually based on 2.3. The branch should be switched when merging.

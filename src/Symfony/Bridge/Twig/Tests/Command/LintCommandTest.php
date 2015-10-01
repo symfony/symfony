@@ -42,7 +42,7 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertRegExp('/^ERROR  in /', trim($tester->getDisplay()));
+        $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     /**
@@ -65,7 +65,7 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
-        $this->assertRegExp('/^ERROR  in /', trim($tester->getDisplay()));
+        $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
     /**

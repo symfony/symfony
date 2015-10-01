@@ -277,7 +277,7 @@ class TextDescriptor extends Descriptor
         }
         $tableRows[] = array('Tags', $tagInformation);
 
-        $tableRows[] = array('Scope', $definition->getScope());
+        $tableRows[] = array('Scope', $definition->getScope(false));
         $tableRows[] = array('Public', $definition->isPublic() ? 'yes' : 'no');
         $tableRows[] = array('Synthetic', $definition->isSynthetic() ? 'yes' : 'no');
         $tableRows[] = array('Lazy', $definition->isLazy() ? 'yes' : 'no');

@@ -20,7 +20,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = new Crawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $crawler = new Crawler(new \DOMNode());
+        $doc = new \DOMDocument();
+        $node = $doc->createElement('test');
+
+        $crawler = new Crawler($node);
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
@@ -71,6 +74,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
+    public function testAddHtmlContentWithBaseTag()
+    {
+        $crawler = new Crawler();
 
         $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
 
@@ -267,6 +278,7 @@ EOF
      */
     public function testAddNodes()
     {
+        $list = array();
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -290,7 +302,10 @@ EOF
 
     public function testClear()
     {
-        $crawler = new Crawler(new \DOMNode());
+        $doc = new \DOMDocument();
+        $node = $doc->createElement('test');
+
+        $crawler = new Crawler($node);
         $crawler->clear();
         $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
     }

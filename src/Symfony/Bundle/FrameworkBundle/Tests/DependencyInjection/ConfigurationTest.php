@@ -141,9 +141,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'only_exceptions' => false,
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
-                'username' => '',
-                'password' => '',
-                'lifetime' => 86400,
                 'collect' => true,
             ),
             'translator' => array(

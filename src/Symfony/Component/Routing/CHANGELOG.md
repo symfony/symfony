@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * allowed specifying a directory to recursively load all routing configuration files it contains
+ * Added ObjectRouteLoader and ServiceRouteLoader that allow routes to be loaded
+   by calling a method on an object/service.
 
 2.5.0
 -----

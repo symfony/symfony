@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\User;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
-use Symfony\Component\Ldap\LdapClientInterface;
+use Symfony\Component\Ldap\LdapInterface;
 
 /**
  * LdapUserProvider is a simple user provider on top of ldap.
@@ -32,15 +32,15 @@ class LdapUserProvider implements UserProviderInterface
     private $defaultSearch;
 
     /**
-     * @param LdapClientInterface $ldap
-     * @param string              $baseDn
-     * @param string              $searchDn
-     * @param string              $searchPassword
-     * @param array               $defaultRoles
-     * @param string              $uidKey
-     * @param string              $filter
+     * @param LdapInterface $ldap
+     * @param string        $baseDn
+     * @param string        $searchDn
+     * @param string        $searchPassword
+     * @param array         $defaultRoles
+     * @param string        $uidKey
+     * @param string        $filter
      */
-    public function __construct(LdapClientInterface $ldap, $baseDn, $searchDn = null, $searchPassword = null, array $defaultRoles = array(), $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})')
+    public function __construct(LdapInterface $ldap, $baseDn, $searchDn = null, $searchPassword = null, array $defaultRoles = array(), $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})')
     {
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
@@ -57,22 +57,25 @@ class LdapUserProvider implements UserProviderInterface
     {
         try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);
-            $username = $this->ldap->escape($username, '', LDAP_ESCAPE_FILTER);
+            $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_FILTER);
             $query = str_replace('{username}', $username, $this->defaultSearch);
-            $search = $this->ldap->find($this->baseDn, $query);
+            $search = $this->ldap->query($this->baseDn, $query);
         } catch (ConnectionException $e) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username), 0, $e);
         }
 
-        if (!$search) {
+        $entries = $search->all();
+        $count = count($entries);
+
+        if (!$count) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
         }
 
-        if ($search['count'] > 1) {
+        if ($count > 1) {
             throw new UsernameNotFoundException('More than one user found');
         }
 
-        $user = $search[0];
+        $user = $entries[0];
 
         return $this->loadUser($username, $user);
     }

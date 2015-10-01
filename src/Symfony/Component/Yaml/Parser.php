@@ -339,16 +339,8 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
 
-        // Comments must not be removed inside a block scalar
-        $removeCommentsPattern = '~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~';
-        $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
-
         while ($this->moveToNextLine()) {
             $indent = $this->getCurrentLineIndentation();
-
-            if ($indent === $newIndent) {
-                $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
-            }
 
             if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine) && $newIndent === $indent) {
                 $this->moveToPreviousLine();
@@ -357,10 +349,6 @@ class Parser
 
             if ($this->isCurrentLineBlank()) {
                 $data[] = substr($this->currentLine, $newIndent);
-                continue;
-            }
-
-            if ($removeComments && $this->isCurrentLineComment()) {
                 continue;
             }
 

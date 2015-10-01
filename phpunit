@@ -36,14 +36,35 @@ $cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
 
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
+    array_shift($cmd);
+}
+
+$cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
+$cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
+
+$phpIniMatrix = isset($_SERVER['PHP_INI_MATRIX']) ? explode(' ', $_SERVER['PHP_INI_MATRIX']) : array();
+if ($phpIniMatrix) {
+    if ('\\' !== DIRECTORY_SEPARATOR) {
+        echo "Error: PHP_INI_MATRIX is a Windows-only feature.\n";
+        exit(1);
+    }
+
+    $phpDir = dirname(`where.exe php`);
+
+    $newCmd = '(SET X=0';
+    foreach ($phpIniMatrix as $iniFile) {
+        $newCmd .= " & copy /Y $phpDir\\$iniFile $phpDir\\php.ini & echo. & echo Running tests with $iniFile: & $cmd & (if %%errorlevel%% NEQ 0 SET X=1)";
+    }
+    $cmd = $newCmd .= ' & exit %%X%%)';
+}
+
+if (isset($argv[1]) && 'symfony' === $argv[1]) {
     // Find Symfony components in plain php for Windows portability
 
     $finder = new RecursiveDirectoryIterator(__DIR__.'/src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
     $finder = new RecursiveIteratorIterator($finder);
     $finder->setMaxDepth(3);
 
-    array_shift($cmd);
-    $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
     $runningProcs = array();
 
     foreach ($finder as $file => $fileInfo) {
@@ -54,7 +75,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
 
             $c = escapeshellarg($component);
 
-            if ($proc = proc_open(implode(' ', $cmd)." $c > $c/phpunit.stdout 2> $c/phpunit.stderr", array(), $pipes)) {
+            if ($proc = proc_open(sprintf($cmd, $c)." > $c/phpunit.stdout 2> $c/phpunit.stderr", array(), $pipes)) {
                 $runningProcs[$component] = $proc;
             } else {
                 $exit = 1;
@@ -115,10 +136,8 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
 } elseif (!isset($argv[1]) || 'install' !== $argv[1]) {
     // Run regular phpunit in a subprocess
 
-    $cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
-
     $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
-    if ($proc = proc_open(implode(' ', $cmd).' 2> '.escapeshellarg($errFile), array(1 => array('pipe', 'w')), $pipes)) {
+    if ($proc = proc_open(sprintf($cmd, '').' 2> '.escapeshellarg($errFile), array(1 => array('pipe', 'w')), $pipes)) {
         stream_copy_to_stream($pipes[1], STDOUT);
         fclose($pipes[1]);
         $exit = proc_close($proc);

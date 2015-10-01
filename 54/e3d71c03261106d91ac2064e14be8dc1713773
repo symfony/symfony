@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-14T10:00:15Z
+
+:+1: for this feature, really like this :)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-09-14T10:31:23Z
+
+Hmmmm... http://ocramius.github.io/blog/fluent-interfaces-are-evil/
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-14T10:36:32Z
+
+@stloyd read the blog post you linked. Builders are precisely the place where they are not evil
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-09-14T10:44:34Z
+
+@stof I read that blog post & I checked the proposed code, as you can see that there is builder (for collection) & new class `Route` which is not real builder (if it would be real builder I would not mention this post)...
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-16T01:57:45Z
+
+Ping @symfony/deciders
+
+There are some deprecated warnings being triggered by this PR on some PHP version - I haven't tracked that down yet, but it's a non-issue.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-16T07:56:16Z
+
+@weaverryan IMO, it is not a non issue
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-16T14:05:09Z
+
+@stof without looking into it too far, you don't know why deprecation warnings would be thrown only when "deps" isn't set (deps=high and deps=low looks good)? I can't trigger the same deprecation warnings locally with this code, nor can I see how it's possible that this part of the code is being executed. It is an issue that will need to be resolved before merging, but fundamentally, the PR won't need to use deprecated functionality. I just have to track it down :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-17T02:57:56Z
+
+Nevermind - tests should now be green.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T09:41:25Z
+
+LGTM :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-28T23:55:18Z
+
+Status: Reviewed
+
+I'm really hoping this will be considered for 2.8 to make adding PHP routes easier. I've already trimmed it down a lot to make it an easier merge. If I need to, I can remove the `setControllerClass()` functionality, as it looks like the most controversial part.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T07:08:03Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-30T02:50:30Z
+
+@fabpot I agree with and made all the changes you suggested. As usual, it basically does the same thing as before, but is a bit simpler.
+
+I moved this into the Routing component: the only thing that makes it not *purely* Routing is that it assumes that your controller is on the `_controller` key that's an optional feature of course). But I still think it's best there: could be useful for Drupal peeps, for example.
+
+I haven't squashed to keep the history for now, but it probably needs a good squashing on merge.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-30T23:33:27Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T06:24:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T19:29:44Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T19:32:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-01T19:47:22Z
+
+:+1:

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T16:04:58Z
+
+Let's see if this change makes Travis CI (partially) happy again.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T16:07:56Z
+
+Maybe the same trick could be used for ``getHash`` on all platforms
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T16:11:09Z
+
+@stof Which `getHash()` call do you refer to?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T16:15:29Z
+
+@xabbuh ``SplObjectStorage::getHash``, which is marked as deprecated but without triggering the warning currently because even PHP is calling it when attaching, not only HHVM
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T17:35:11Z
+
+@stof I see, I updated `getHash()` as well. Tests pass on HHVM.

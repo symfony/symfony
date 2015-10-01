@@ -206,7 +206,17 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                         ->end()
-                        ->scalarNode('lifetime')->defaultValue(86400)->end()
+                        ->scalarNode('lifetime')
+                            ->defaultValue(86400)
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($v) {
+                                    @trigger_error('The profiler.lifetime configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()
                             ->performNoDeepMerging()

@@ -53,6 +53,8 @@ class RouteCollectionBuilder
      * @param string $type
      *
      * @return RouteCollectionBuilder
+     *
+     * @throws FileLoaderLoadException
      */
     public function import($resource, $type = null)
     {

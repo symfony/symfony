@@ -1,0 +1,189 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-10T14:47:18Z
+
+@stof I decided to type-hint against the existing `LoaderInterface`, as it's the smallest change. I'd still love to have `import` guaranteed, but I believe you can "import" manually by calling `getResolver()->resolve(...)->load()` on the `LoaderInterface`. If there's support for adding some sort of an `ImportingLoaderInterface` with the `import()` method, I would be very happy to add that.
+
+I've taken all the feedback into account. This is still ready for review :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-14T00:58:24Z
+
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-14T05:26:12Z
+
+Great! Would allow us to remove some magic regarding the router in API platform as well.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-09-14T05:52:48Z
+
+interesting. would also allow for simple integration of dynamic resources.
+
+/cc @dbu
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-14T09:44:57Z
+
+:+1: for this feature!
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-09-14T10:06:37Z
+
+:+1: really great
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-17T01:43:12Z
+
+The test failure is because FrameworkBundle now depends on a new class inside `symfony/router` that's also included in this PR (but the tests only pull committed code to `symfony/router`). Does anyone know if that test is safe to ignore - or if there's a way to fix it?
+
+Apart from fixing or finding out about the test, this is ready for feedback or voting.
+
+---------------------------------------------------------------------------
+
+by dbu at 2015-09-18T08:11:15Z
+
+indeed, good idea!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-23T14:03:08Z
+
+@weaverryan The failure for the low tests looks strange. Does it make a difference when you mock the `ContainerInterface` instead?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-23T14:12:40Z
+
+What I do not understand is the reason to have a container aware routing loader. Wouldn't it be easier if this loader were more like a registry where you could register `RouteLoaderInterface` instances with arbitrary keys (the FrameworkBundle could ship with a compiler pass so that you can just tag your services and they would be registered automatically)?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-23T15:18:04Z
+
+@xabbuh I understand your thought, but the purpose of this is different. I'm not aiming to make it possible to have RouteLoaderInterface services automatically called because they're registered+tagged. I want to keep loading routes explicit, just add one more way to load routes - via PHP in a real method+service (currently, you can only add routes via PHP in a flat-file).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-24T02:45:26Z
+
+@xabbuh yes - you were right about one of the tests - I've fixed that now.
+
+I believe the last failing test should be ignored: the functional tests in FrameworkBundle are not able to fetch the `router` service because it depends on the `ServiceRouteLoader`, which isn't included in the Symfony's core (since it's part of this PR). I don't think there's way to fix that (someone let me know if I'm wrong), but the tests should pass fine once merged.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-24T06:51:03Z
+
+@weaverryan I just mean that it would only be possible to use these services in your routing configuration if they have been registered that way before. The workflow would still be the same then with your approach. The only difference is that you would not try to locate the service in the container (the drawback might be that you then won't be able to lazy load the routing loader services though).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T14:27:01Z
+
+@xabbuh Ah, I understand better now. I'd still prefer to keep it this way - it feels logical to me that I should only need to register a class as a service and point to it in the config - the tagging seems unnecessary.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T14:44:52Z
+
+:+1: (being able to load services lazily and not having to tag your services are good reasons for keeping the container awareness)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-28T23:52:32Z
+
+Status: Reviewed
+
+... with some up-votes + "I like this" from core members :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T07:42:42Z
+
+I've just read the usage in #15948, so this is actually not needed at all. See my comment there (for what I think would a better solution).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-30T23:13:16Z
+
+Adding a comment that got covered up:
+
+We could remove the `RouteLoaderInterface` and instead have this method return a callable.
+
+The difference would then be that we'd probably need to include the method name in the "resource" when using this:
+
+```yml
+admin_routes:
+    resource: 'admin_route_loader::loadRoutes'
+    type: service
+```
+
+That would solve the need for the RouteLoaderInterface on the "Micro" kernel. It's also consistent with how event listeners, for example, work.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T06:37:05Z
+
+@weaverryan Indeed, that would be much better. IIRC, when using a service name, the convention is to use only one colon: `admin_router_loader:loadRoutes`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T13:38:41Z
+
+#15990 has been updated to work with the new `service` loader.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T13:55:27Z
+
+@fabpot I've already done work locally on this PR for the `kernel:methodName` syntax - I'll be able to push it within the next 2 hours.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T18:15:14Z
+
+@fabpot a little later, but I just updated the PR:
+
+This uses the `service_name:method` notation and is enforced in the `ObjectRouteLoader`, instead of allowing for more generic usage, where sub-classes could resolve strings of any format. I was trying to limit it to work just one way. For example, if you're not worried about the cached container and want to load routes via some "Callable", you cannot do it via the `ObjectLoader`: use the `ClosureLoader`.
+
+ping also @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-01T18:27:55Z
+
+:+1: , can you update the [CHANGELOG](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Routing/CHANGELOG.md).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T18:35:06Z
+
+done!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T19:25:09Z
+
+I made a small comment; :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T19:27:23Z
+
+comment addressed!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T19:28:25Z
+
+I think this one is ready now, ping @symfony/deciders

@@ -71,6 +71,8 @@ EOF
         $name = $input->getArgument('name');
 
         if (empty($name)) {
+            $output->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration.');
+            $output->newLine();
             $this->listBundles($output);
 
             return;

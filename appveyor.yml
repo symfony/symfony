@@ -41,7 +41,7 @@ install:
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max-ext
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max-ext
     - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini
+    - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max-ext
     - appveyor DownloadFile https://getcomposer.org/composer.phar
     - copy /Y php.ini-max-ext php.ini
     - cd c:\projects\symfony

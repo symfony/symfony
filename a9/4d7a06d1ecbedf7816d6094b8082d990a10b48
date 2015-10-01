@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T13:04:34Z
+
+I don't think introducing such lineLength setting in the public API just to fix tests make sense
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-09-28T13:13:10Z
+
+@stof Yeah, it seemed a little odd to me too. So should I use reflection in the tests to access the private property or do you have something better in mind?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T13:19:17Z
+
+yeah, using Reflection to force the length might be an option.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-09-28T21:28:02Z
+
+Updated to use reflection instead.

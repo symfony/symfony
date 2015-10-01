@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-30T15:39:42Z
+
+Tests are failing and you also need to remove code in https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L293
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T15:51:36Z
+
+Just realized that `lifetime` should be deprecated as well. I'm going to create a PR on 2.8.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T16:05:34Z
+
+See #16027

@@ -25,7 +25,7 @@ class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     public function testBindFailureShouldThrowAnException()
     {
         $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
         $ldap
             ->expects($this->once())
             ->method('bind')
@@ -48,7 +48,7 @@ class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->method('loadUserByUsername')
             ->with('foo')
         ;
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
 
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
 

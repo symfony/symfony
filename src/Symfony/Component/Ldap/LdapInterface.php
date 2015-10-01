@@ -35,7 +35,7 @@ interface LdapInterface
      */
     public function bind($dn = null, $password = null);
 
-    /*
+    /**
      * Queries a ldap server for entries matching the given criteria.
      *
      * @param string $dn

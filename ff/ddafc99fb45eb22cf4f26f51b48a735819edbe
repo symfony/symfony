@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-07-26T15:43:59Z
+
+I understand why the RequestStack is moved in front of optional arguments, but this misses a continuous upgrade path. Making this PR 2.8 compatible with deprecations notices would at least prevent people from not noticing the change.
+Can't we remove some type hint and add dynamic argument swapping + deprecation in 2.8?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-10T08:20:03Z
+
+@Tobion can you please rebase this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:50:36Z
+
+@Tobion Can you rebase this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:50:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:50:52Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T19:52:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-25T11:31:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-25T11:44:44Z
+
+We still need the rebase
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T10:10:41Z
+
+@Tobion Can you rebase?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T17:34:54Z
+
+Rebased

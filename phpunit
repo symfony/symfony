@@ -8,7 +8,7 @@ $PHPUNIT_DIR = __DIR__.'/.phpunit';
 
 // PHPUnit 4.8 does not support PHP 7, while 5.0 requires PHP 5.6+
 if (PHP_VERSION_ID >= 70000) {
-    $PHPUNIT_DIR = '5.0';
+    $PHPUNIT_VERSION = '5.0';
 }
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {

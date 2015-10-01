@@ -21,13 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 interface ResolvedFormTypeInterface
 {
     /**
-     * Returns the name of the type.
-     *
-     * @return string The type name.
-     */
-    public function getName();
-
-    /**
      * Returns the parent type.
      *
      * @return ResolvedFormTypeInterface|null The parent type or null.

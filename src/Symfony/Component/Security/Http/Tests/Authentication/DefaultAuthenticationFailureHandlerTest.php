@@ -17,17 +17,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    private $httpKernel = null;
-
-    private $httpUtils = null;
-
-    private $logger = null;
-
-    private $request = null;
-
-    private $session = null;
-
-    private $exception = null;
+    private $httpKernel;
+    private $httpUtils;
+    private $logger;
+    private $request;
+    private $session;
+    private $exception;
 
     protected function setUp()
     {
@@ -145,7 +140,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
     public function testFailurePathCanBeOverwrittenWithRequest()
     {
         $this->request->expects($this->once())
-            ->method('get')->with('_failure_path', null, false)
+            ->method('get')->with('_failure_path')
             ->will($this->returnValue('/auth/login'));
 
         $this->httpUtils->expects($this->once())
@@ -158,7 +153,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
     public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
     {
         $this->request->expects($this->once())
-            ->method('get')->with('_failure_path', null, false)
+            ->method('get')->with('_failure_path')
             ->will($this->returnValue(array('value' => '/auth/login')));
 
         $this->httpUtils->expects($this->once())
@@ -173,7 +168,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $options = array('failure_path_parameter' => '_my_failure_path');
 
         $this->request->expects($this->once())
-            ->method('get')->with('_my_failure_path', null, false)
+            ->method('get')->with('_my_failure_path')
             ->will($this->returnValue('/auth/login'));
 
         $this->httpUtils->expects($this->once())

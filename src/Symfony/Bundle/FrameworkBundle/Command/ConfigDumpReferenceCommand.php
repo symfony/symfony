@@ -85,16 +85,18 @@ EOF
         $this->validateConfiguration($extension, $configuration);
 
         if ($name === $extension->getAlias()) {
-            $output->title(sprintf('Default configuration for extension with alias: "%s"', $name));
+            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
-            $output->title(sprintf('Default configuration for "%s"', $name));
+            $message = sprintf('Default configuration for "%s"', $name);
         }
 
         switch ($input->getOption('format')) {
             case 'yaml':
+                $output->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
+                $output->writeln(sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:

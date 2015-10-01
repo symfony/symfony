@@ -28,17 +28,6 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $loader = new ConcreteExtension();
         $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
-
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Custom resolver "Symfony\Component\Form\Tests\Fixtures\CustomOptionsResolver" must extend "Symfony\Component\OptionsResolver\OptionsResolver".
-     */
-    public function testCustomOptionsResolver()
-    {
-        $extension = new Fixtures\LegacyFooTypeBarExtension();
-        $resolver = new Fixtures\CustomOptionsResolver();
-        $extension->setDefaultOptions($resolver);
-    }
 }
 
 class ConcreteExtension extends AbstractExtension

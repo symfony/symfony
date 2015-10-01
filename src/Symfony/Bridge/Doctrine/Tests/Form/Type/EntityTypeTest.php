@@ -109,19 +109,6 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-        ));
-
-        $this->assertSame('entity', $field->getConfig()->getType()->getName());
-    }
-
-    /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
     public function testClassOptionIsRequired()
@@ -1026,26 +1013,6 @@ class EntityTypeTest extends TypeTestCase
 
         $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $field1->getConfig()->getOption('choice_list'));
         $this->assertSame($field1->getConfig()->getOption('choice_list'), $field2->getConfig()->getOption('choice_list'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPropertyOption()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-        $entity2 = new SingleIntIdEntity(2, 'Bar');
-
-        $this->persist(array($entity1, $entity2));
-
-        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'property' => 'name',
-        ));
-
-        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     protected function createRegistryMock($name, $em)

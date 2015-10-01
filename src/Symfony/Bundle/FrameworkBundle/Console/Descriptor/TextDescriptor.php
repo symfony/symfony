@@ -77,9 +77,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         $tableHeaders = array('Property', 'Value');
         $tableRows = array(
             array('Route Name', isset($options['name']) ? $options['name'] : ''),
@@ -89,7 +86,7 @@ class TextDescriptor extends Descriptor
             array('Host Regex', ('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')),
             array('Scheme', ($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')),
             array('Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')),
-            array('Requirements', ($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')),
+            array('Requirements', ($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')),
             array('Class', get_class($route)),
             array('Defaults', $this->formatRouterConfig($route->getDefaults())),
             array('Options', $this->formatRouterConfig($route->getOptions())),
@@ -105,8 +102,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -206,8 +202,7 @@ class TextDescriptor extends Descriptor
         $tagsCount = count($maxTags);
         $tagsNames = array_keys($maxTags);
 
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -266,32 +261,16 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Tags</comment>             -';
         }
 
-        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope(false));
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
         if (method_exists($definition, 'isShared')) {
             $description[] = sprintf('<comment>Shared</comment>           %s', $definition->isShared() ? 'yes' : 'no');
         }
-        if (method_exists($definition, 'isSynchronized')) {
-            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized(false) ? 'yes' : 'no');
-        }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ?: '-');
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $description[] = sprintf('<comment>Factory Class</comment>    %s', $definition->getFactoryClass(false));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $description[] = sprintf('<comment>Factory Service</comment>  %s', $definition->getFactoryService(false));
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod(false));
         }
 
         if ($factory = $definition->getFactory()) {

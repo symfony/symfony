@@ -17,42 +17,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @group legacy
-     */
-    public function testSupportsClass()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(true),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertTrue($manager->supportsClass('FooClass'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(false),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertFalse($manager->supportsClass('FooClass'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSupportsAttribute()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(true),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertTrue($manager->supportsAttribute('foo'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(false),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertFalse($manager->supportsAttribute('foo'));
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      */
     public function testSetUnsupportedStrategy()

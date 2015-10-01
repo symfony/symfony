@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Util\StringUtil;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -43,20 +42,6 @@ abstract class AbstractType implements FormTypeInterface
 
     /**
      * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        if (!$resolver instanceof OptionsResolver) {
-            throw new \InvalidArgumentException(sprintf('Custom resolver "%s" must extend "Symfony\Component\OptionsResolver\OptionsResolver".', get_class($resolver)));
-        }
-
-        $this->configureOptions($resolver);
-    }
-
-    /**
-     * Configures the options for this type.
-     *
-     * @param OptionsResolver $resolver The resolver for the options.
      */
     public function configureOptions(OptionsResolver $resolver)
     {

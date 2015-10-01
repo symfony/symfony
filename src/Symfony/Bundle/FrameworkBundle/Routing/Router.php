@@ -92,10 +92,6 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                if ('_scheme' === $name || '_method' === $name) {
-                    continue; // ignore deprecated requirements to not trigger deprecation warnings
-                }
-
                 $route->setRequirement($name, $this->resolve($value));
             }
 

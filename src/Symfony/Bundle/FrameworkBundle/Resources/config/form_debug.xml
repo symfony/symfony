@@ -29,7 +29,7 @@
         <service id="data_collector.form.extractor" class="%data_collector.form.extractor.class%" />
 
         <service id="data_collector.form" class="%data_collector.form.class%">
-            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
             <argument type="service" id="data_collector.form.extractor" />
         </service>
     </services>

@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
@@ -58,6 +59,11 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var array
      */
     private $methodMappings = array();
+
+    /**
+     * @var LoaderInterface[]
+     */
+    private $loaders = array();
 
     /**
      * @var Reader|null
@@ -194,6 +200,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         $this->methodMappings = array_merge($this->methodMappings, $methodNames);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addLoader(LoaderInterface $loader)
+    {
+        $this->loaders[] = $loader;
 
         return $this;
     }
@@ -351,6 +367,10 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             foreach ($this->methodMappings as $methodName) {
                 $loaders[] = new StaticMethodLoader($methodName);
+            }
+
+            foreach ($this->loaders as $loader) {
+                $loaders[] = $loader;
             }
 
             if ($this->annotationReader) {

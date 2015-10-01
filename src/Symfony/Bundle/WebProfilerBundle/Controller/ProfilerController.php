@@ -32,7 +32,6 @@ class ProfilerController
     private $profiler;
     private $twig;
     private $templates;
-    private $toolbarPosition;
 
     /**
      * Constructor.
@@ -41,7 +40,7 @@ class ProfilerController
      * @param Profiler              $profiler        The profiler
      * @param \Twig_Environment     $twig            The twig environment
      * @param array                 $templates       The templates
-     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     * @param string                $toolbarPosition (Deprecated - This option is ignored) The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
@@ -49,7 +48,6 @@ class ProfilerController
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->templates = $templates;
-        $this->toolbarPosition = $toolbarPosition;
     }
 
     /**
@@ -192,11 +190,6 @@ class ProfilerController
             return new Response('', 404, array('Content-Type' => 'text/html'));
         }
 
-        // the toolbar position (top, bottom, normal, or null -- use the configuration)
-        if (null === $position = $request->query->get('position')) {
-            $position = $this->toolbarPosition;
-        }
-
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', array('token' => $token));
@@ -205,7 +198,6 @@ class ProfilerController
         }
 
         return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
-            'position' => $position,
             'profile' => $profile,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,

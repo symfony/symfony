@@ -53,7 +53,6 @@ class FormPass implements CompilerPassInterface
         $typeExtensions = array();
 
         foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
-            $extendedType = null;
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } elseif (isset($tag[0]['alias'])) {

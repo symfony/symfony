@@ -17,17 +17,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    private $httpKernel = null;
-
-    private $httpUtils = null;
-
-    private $logger = null;
-
-    private $request = null;
-
-    private $session = null;
-
-    private $exception = null;
+    private $httpKernel;
+    private $httpUtils;
+    private $logger;
+    private $request;
+    private $session;
+    private $exception;
 
     protected function setUp()
     {

@@ -157,6 +157,9 @@ class Router extends BaseRouter implements WarmableInterface
             if ($acceptArrayParameters && is_array($resolved)) {
                 return implode('|', $resolved);
             }
+            if ($acceptArrayParameters && is_array($resolved)) {
+                return implode('|', $resolved);
+            }
 
             throw new RuntimeException(sprintf(
                 'The container parameter "%s", used in the route configuration value "%s", '.

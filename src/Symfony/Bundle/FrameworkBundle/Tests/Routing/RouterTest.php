@@ -42,6 +42,30 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
+    public function testGenerateWithArrayParam()
+    {
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route(
+            ' /{_locale}',
+            array(
+                '_locale' => '%locale%',
+            ),
+            array(
+                '_locale' => '%active_locales%',
+            )
+        ));
+
+        $sc = $this->getServiceContainer($routes);
+        $sc->setParameter('locale', 'es');
+        $sc->setParameter('active_locales', array('es', 'en'));
+
+        $router = new Router($sc, 'foo');
+
+        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
+        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+    }
+
     public function testDefaultsPlaceholders()
     {
         $routes = new RouteCollection();

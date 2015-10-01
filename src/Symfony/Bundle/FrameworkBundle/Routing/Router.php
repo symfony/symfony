@@ -92,7 +92,7 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                $route->setRequirement($name, $this->resolve($value));
+                $route->setRequirement($name, $this->resolve($value, true));
             }
 
             $route->setPath($this->resolve($route->getPath()));
@@ -116,7 +116,8 @@ class Router extends BaseRouter implements WarmableInterface
     /**
      * Recursively replaces placeholders with the service container parameters.
      *
-     * @param mixed $value The source which might contain "%placeholders%"
+     * @param mixed $value                 The source which might contain "%placeholders%"
+     * @param bool  $acceptArrayParameters Allow the parameter array support (mean one element of the array)
      *
      * @return mixed The source with the placeholders replaced by the container
      *               parameters. Arrays are resolved recursively.
@@ -124,7 +125,7 @@ class Router extends BaseRouter implements WarmableInterface
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
      */
-    private function resolve($value)
+    private function resolve($value, $acceptArrayParameters = false)
     {
         if (is_array($value)) {
             foreach ($value as $key => $val) {
@@ -140,7 +141,7 @@ class Router extends BaseRouter implements WarmableInterface
 
         $container = $this->container;
 
-        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value) {
+        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value, $acceptArrayParameters) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
@@ -151,12 +152,16 @@ class Router extends BaseRouter implements WarmableInterface
             if (is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
             }
+            if ($acceptArrayParameters && is_array($resolved)) {
+                return implode('|', $resolved);
+            }
 
             throw new RuntimeException(sprintf(
                 'The container parameter "%s", used in the route configuration value "%s", '.
-                'must be a string or numeric, but it is of type %s.',
+                'must be a %s, but it is of type %s.',
                 $match[1],
                 $value,
+                'string or numeric' . ($acceptArrayParameters ? ' or an array' : ''),
                 gettype($resolved)
                 )
             );

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-30T19:57:23Z
+
+Seems that tests in the Form component are failing on the 2.8 build.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T20:55:32Z
+
+@xabbuh #16033 should fix that.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T08:02:04Z
+
+some tests for deps=low are broken in the component (the error reporting is broken because of an issue in PHPUnit 4.8 on PHP 7)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T08:32:24Z
+
+See https://github.com/symfony/symfony/pull/16041 for the issue with PHPUnit error reporting on PHP 7
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T08:41:13Z
+
+Rebased on current master to see if PHP7 issues are fixed by @stof phpunit version change for PHP7.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T10:28:41Z
+
+Let's stop here for now; not all deprecations are taken care of, but most of them are. The remaining are not trivial to handle and will be part of another PR.
+
+Ready for review: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T12:41:16Z
+
+Tests are failing.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T12:53:29Z
+
+hopefully, tests pass now. Let's wait for Travis.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T14:56:53Z
+
+Tests pass. Not sure about PHP 7 though.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-01T14:57:44Z
+
+there are only 3 failing tests now: 1 is fixed by #16050 and 2 other are unrelated security tests
+
+Good to merge :+1:

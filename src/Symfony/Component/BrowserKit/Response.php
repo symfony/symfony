@@ -18,8 +18,19 @@ namespace Symfony\Component\BrowserKit;
  */
 class Response
 {
+    /**
+     * @var string
+     */
     protected $content;
+
+    /**
+     * @var int
+     */
     protected $status;
+
+    /**
+     * @var array
+     */
     protected $headers;
 
     /**

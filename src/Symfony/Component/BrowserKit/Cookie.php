@@ -34,13 +34,44 @@ class Cookie
         'D M d H:i:s Y T',
     );
 
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var string
+     */
     protected $value;
+
+    /**
+     * @var int
+     */
     protected $expires;
+
+    /**
+     * @var string
+     */
     protected $path;
+
+    /**
+     * @var string
+     */
     protected $domain;
+
+    /**
+     * @var bool
+     */
     protected $secure;
+
+    /**
+     * @var bool
+     */
     protected $httponly;
+
+    /**
+     * @var string
+     */
     protected $rawValue;
 
     /**
@@ -196,6 +227,11 @@ class Cookie
         );
     }
 
+    /**
+     * @param string $dateValue
+     *
+     * @return int
+     */
     private static function parseDate($dateValue)
     {
         // trim single quotes around date if present

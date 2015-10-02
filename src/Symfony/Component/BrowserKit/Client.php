@@ -28,20 +28,74 @@ use Symfony\Component\Process\PhpProcess;
  */
 abstract class Client
 {
+    /**
+     * @var History
+     */
     protected $history;
+
+    /**
+     * @var CookieJar
+     */
     protected $cookieJar;
+
+    /**
+     * @var array
+     */
     protected $server = array();
+
+    /**
+     * @var Request
+     */
     protected $internalRequest;
+
+    /**
+     * @var Request
+     */
     protected $request;
+
+    /**
+     * @var Response
+     */
     protected $internalResponse;
+
+    /**
+     * @var Response
+     */
     protected $response;
+
+    /**
+     * @var Crawler
+     */
     protected $crawler;
+
+    /**
+     * @var bool
+     */
     protected $insulated = false;
+
+    /**
+     * @var string
+     */
     protected $redirect;
+
+    /**
+     * @var bool
+     */
     protected $followRedirects = true;
 
+    /**
+     * @var int
+     */
     private $maxRedirects = -1;
+
+    /**
+     * @var int
+     */
     private $redirectCount = 0;
+
+    /**
+     * @var bool
+     */
     private $isMainRequest = true;
 
     /**

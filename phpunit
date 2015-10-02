@@ -1,7 +1,10 @@
 #!/usr/bin/env php
 <?php
 
+use Symfony\Component\Process\ProcessUtils;
+
 error_reporting(-1);
+require __DIR__.'/src/Symfony/Component/Process/ProcessUtils.php';
 
 $PHPUNIT_VERSION = '4.8';
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
@@ -32,7 +35,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
     chdir($oldPwd);
 }
 
-$cmd = array_map('escapeshellarg', $argv);
+$cmd = array_map('Symfony\Component\Process\ProcessUtils::escapeArgument', $argv);
 $exit = 0;
 
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
@@ -51,11 +54,13 @@ if ($phpIniMatrix) {
 
     $phpDir = dirname(`where.exe php`);
 
-    $newCmd = '(SET X=0';
+    $newCmd = 'cmd /v:on /d /c "(SET X=0';
     foreach ($phpIniMatrix as $iniFile) {
-        $newCmd .= " & copy /Y $phpDir\\$iniFile $phpDir\\php.ini & echo. & echo Running tests with $iniFile: & $cmd & (if %%errorlevel%% NEQ 0 SET X=1)";
+        $newCmd .= " & copy /Y $phpDir\\$iniFile $phpDir\\php.ini & echo. & echo Running tests with $iniFile: & ($cmd || SET X=1)";
     }
-    $cmd = $newCmd .= ' & exit %%X%%)';
+    $cmd = $newCmd .= ' & exit !X!)%2$s"';
+} else {
+    $cmd .= ' %2$s';
 }
 
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
@@ -73,9 +78,9 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
 
             // Run phpunit tests in parallel
 
-            $c = escapeshellarg($component);
+            $c = ProcessUtils::escapeArgument($component);
 
-            if ($proc = proc_open(sprintf($cmd, $c)." > $c/phpunit.stdout 2> $c/phpunit.stderr", array(), $pipes)) {
+            if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
                 $runningProcs[$component] = $proc;
             } else {
                 $exit = 1;
@@ -137,7 +142,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     // Run regular phpunit in a subprocess
 
     $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
-    if ($proc = proc_open(sprintf($cmd, '').' 2> '.escapeshellarg($errFile), array(1 => array('pipe', 'w')), $pipes)) {
+    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.ProcessUtils::escapeArgument($errFile)), array(1 => array('pipe', 'w')), $pipes)) {
         stream_copy_to_stream($pipes[1], STDOUT);
         fclose($pipes[1]);
         $exit = proc_close($proc);

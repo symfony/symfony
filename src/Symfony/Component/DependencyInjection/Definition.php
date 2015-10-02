@@ -828,7 +828,7 @@ class Definition
      *
      * @return Definition The current instance
      */
-    public function setTypes(array $types)
+    public function setAutowiringTypes(array $types)
     {
         $this->autowiringTypes = array();
 

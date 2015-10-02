@@ -408,7 +408,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
 
         $this->assertEquals(array(), $def->getAutowiringTypes());
-        $this->assertSame($def, $def->setTypes(array('Foo')));
+        $this->assertSame($def, $def->setAutowiringTypes(array('Foo')));
         $this->assertEquals(array('Foo'), $def->getAutowiringTypes());
         $this->assertSame($def, $def->addAutowiringType('Bar'));
         $this->assertTrue($def->hasAutowiringType('Bar'));

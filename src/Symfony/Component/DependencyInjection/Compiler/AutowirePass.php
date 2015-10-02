@@ -59,18 +59,19 @@ class AutowirePass implements CompilerPassInterface
      */
     private function completeDefinition($id, Definition $definition)
     {
-        if (!($reflectionClass = $this->getReflectionClass($id, $definition))) {
+        if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {
             return;
         }
+
         $this->container->addClassResource($reflectionClass);
 
-        if (!($constructor = $reflectionClass->getConstructor())) {
+        if (!$constructor = $reflectionClass->getConstructor()) {
             return;
         }
 
         $arguments = $definition->getArguments();
         foreach ($constructor->getParameters() as $index => $parameter) {
-            if (!($typeHint = $parameter->getClass())) {
+            if (!$typeHint = $parameter->getClass()) {
                 continue;
             }
 
@@ -243,6 +244,10 @@ class AutowirePass implements CompilerPassInterface
 
         $class = $this->container->getParameterBag()->resolveValue($class);
 
-        return $this->reflectionClasses[$id] = new \ReflectionClass($class);
+        try {
+            return $this->reflectionClasses[$id] = new \ReflectionClass($class);
+        } catch (\ReflectionException $reflectionException) {
+            // return null
+        }
     }
 }

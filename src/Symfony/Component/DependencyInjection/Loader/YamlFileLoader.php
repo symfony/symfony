@@ -304,16 +304,20 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['autowiring_types'])) {
-            if (!is_array($service['autowiring_types'])) {
-                throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
-            }
-
-            foreach ($service['autowiring_types'] as $autowiringType) {
-                if (!is_string($autowiringType)) {
-                    throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            if (is_string($service['autowiring_types'])) {
+                $definition->addAutowiringType($service['autowiring_types']);
+            } else {
+                if (!is_array($service['autowiring_types'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
                 }
 
-                $definition->addAutowiringType($autowiringType);
+                foreach ($service['autowiring_types'] as $autowiringType) {
+                    if (!is_string($autowiringType)) {
+                        throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                    }
+
+                    $definition->addAutowiringType($autowiringType);
+                }
             }
         }
 

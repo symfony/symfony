@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-30T18:03:08Z
+
+Doing it that way is a BC break. I think it would be better to introduce a way to active the old behavior (off by default) and immediately deprecate this setting that would be removed in 3.0.
+
+---------------------------------------------------------------------------
+
+by pvandommelen at 2013-10-01T10:44:50Z
+
+In a similar way to enableHttpMethodParameterOverride? @fieg, since you had actual problems here, what is your opinion?
+
+---------------------------------------------------------------------------
+
+by fieg at 2013-10-01T11:44:52Z
+
+Handling it similar as the `httpMethodParameterOverride` method sounds like a great plan to me.
+
+I'm not sure if it should be deprecated tho, as the method parameter override isn't deprecated either? Perhaps they would both need to be deprecated then? Also, should a `getRealRequestFormat` method to be introduced, similar as `getRealMethod`?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-01T12:02:38Z
+
+@fieg the HTTP method override is needed in case you design your app to work with Restful methods, because browsers don't support all HTTP methods but only GET and POST for form submission.
+On the other hand, looking at the query string and the POST params to select the response format is not something mandated by a limitation of the client. It is only a mistake when implementing the method a few years ago. If BC was not a concern, we would simply fix the issue. But as some devs may have written code relying on this bug, we need to provide a BC layer for them (but mark them as deprecated because the good choice would be to fix their app)
+
+Implementing ``getRealRequestFormat`` does not make sense as there is no concept of "real" request format compared to an overriden one. This setting is not about overriding the request format but about determining it.
+
+---------------------------------------------------------------------------
+
+by fieg at 2013-10-01T13:35:38Z
+
+Thank you for the clarification. I totally agree with you.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-28T14:44:50Z
+
+@fabpot This is even worse than I thought. The GET parameter is winning over the request attribute. So even if you put a requirement on the ``_format`` placeholder, the format can be anything in a forged request adding a GET parameter.
+
+---------------------------------------------------------------------------
+
+by pvandommelen at 2013-10-28T15:28:59Z
+
+Yes, it is probably a security problem if you have different access rules for different formats in your app. I suppose this is not a common pattern though.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-11T22:39:52Z
+
+I agree this is a big and possibly security-related issue.
+
+Users can simply overwrite the format with whatever they want even when your route does not even support this format, e.g. `/foo.json?_format=html`
+
+The proposed change fixed it indeed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T07:16:14Z
+
+I'm going to merge this one on master for Symfony 3.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T07:17:52Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-02T11:31:53Z
+
+@fabpot so this would just need to be a documented BC break for 3.0? Or will we do more work to try to trigger deprecation warnings?
+
+Anyways, I agree with the change. The trick is not breaking existing apps and giving an upgrade path - and that part doesn't seem to be here yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T11:42:28Z
+
+I think documenting that this should be avoided in pre-2.8 is enough. People using the feature the wrong can easily fix their code as this is probably almost always a mis-configuration. Triggering a deprecation notice is also possible but then any end user will be able to trigger it which is probably not a good idea.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T12:10:22Z
+
+:+1:
+
+The preview error route also has a `_format` placeholder, so it is still possible to test errors in different formats: https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/TwigBundle/Resources/config/routing/errors.xml#L7

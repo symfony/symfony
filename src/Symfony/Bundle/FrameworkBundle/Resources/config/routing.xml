@@ -36,6 +36,16 @@
             <argument type="service" id="file_locator" />
         </service>
 
+        <service id="routing.loader.directory" class="Symfony\Component\Routing\Loader\DirectoryLoader" public="false">
+            <tag name="routing.loader" />
+            <argument type="service" id="file_locator" />
+        </service>
+
+        <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader" public="false">
+            <tag name="routing.loader" />
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader">
             <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />

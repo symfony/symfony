@@ -41,6 +41,11 @@ class Crawler extends \SplObjectStorage
     private $baseHref;
 
     /**
+     * @var \DOMDocument|null
+     */
+    private $document;
+
+    /**
      * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
      *
      * @var bool
@@ -68,6 +73,7 @@ class Crawler extends \SplObjectStorage
     public function clear()
     {
         parent::removeAll($this);
+        $this->document = null;
     }
 
     /**
@@ -307,11 +313,23 @@ class Crawler extends \SplObjectStorage
      */
     public function addNode(\DOMNode $node)
     {
-        if ($node instanceof \DOMDocument) {
-            parent::attach($node->documentElement);
-        } else {
-            parent::attach($node);
+        if (null !== $this->document && $this->document !== $node->ownerDocument) {
+            @trigger_error('Attaching DOM nodes from multiple documents in a Crawler is deprecated as of 2.8 and will be forbidden in 3.0.', E_USER_DEPRECATED);
         }
+
+        if (null === $this->document) {
+            $this->document = $node->ownerDocument;
+        }
+
+        if ($node instanceof \DOMDocument) {
+            $node = $node->documentElement;
+        }
+
+        if (!$node instanceof \DOMElement) {
+            throw new \InvalidArgumentException(sprintf('Nodes set in a Crawler must be DOMElement or DOMDocument instances, "%s" given.', get_class($node)));
+        }
+
+        parent::attach($node);
     }
 
     // Serializing and unserializing a crawler creates DOM objects in a corrupted state. DOM elements are not properly serializable.
@@ -832,7 +850,7 @@ class Crawler extends \SplObjectStorage
      */
     public function attach($object, $data = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::attach($object, $data);
     }
@@ -842,7 +860,7 @@ class Crawler extends \SplObjectStorage
      */
     public function detach($object)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::detach($object);
     }
@@ -852,7 +870,7 @@ class Crawler extends \SplObjectStorage
      */
     public function contains($object)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         return parent::contains($object);
     }
@@ -862,7 +880,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addAll($storage)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::addAll($storage);
     }
@@ -872,7 +890,7 @@ class Crawler extends \SplObjectStorage
      */
     public function removeAll($storage)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::removeAll($storage);
     }
@@ -882,7 +900,7 @@ class Crawler extends \SplObjectStorage
      */
     public function removeAllExcept($storage)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::removeAllExcept($storage);
     }
@@ -892,7 +910,7 @@ class Crawler extends \SplObjectStorage
      */
     public function getInfo()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         return parent::getInfo();
     }
@@ -902,7 +920,7 @@ class Crawler extends \SplObjectStorage
      */
     public function setInfo($data)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::setInfo($data);
     }
@@ -912,7 +930,7 @@ class Crawler extends \SplObjectStorage
      */
     public function offsetExists($object)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         return parent::offsetExists($object);
     }
@@ -922,7 +940,7 @@ class Crawler extends \SplObjectStorage
      */
     public function offsetSet($object, $data = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::offsetSet($object, $data);
     }
@@ -932,7 +950,7 @@ class Crawler extends \SplObjectStorage
      */
     public function offsetUnset($object)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         parent::offsetUnset($object);
     }
@@ -942,7 +960,7 @@ class Crawler extends \SplObjectStorage
      */
     public function offsetGet($object)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        $this->triggerDeprecation(__METHOD__);
 
         return parent::offsetGet($object);
     }
@@ -952,7 +970,7 @@ class Crawler extends \SplObjectStorage
      */
     public function getHash($object)
     {
-        // Cannot trigger a deprecation warning here because SplObjectStorage calls this method when attaching an object.
+        $this->triggerDeprecation(__METHOD__, true);
 
         return parent::getHash($object);
     }
@@ -974,7 +992,12 @@ class Crawler extends \SplObjectStorage
 
         foreach ($this as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
-            $crawler->add($domxpath->query($xpath, $node));
+
+            foreach ($domxpath->query($xpath, $node) as $subNode) {
+                if ($subNode->nodeType === 1) {
+                    $crawler->add($subNode);
+                }
+            }
         }
 
         return $crawler;
@@ -1152,7 +1175,27 @@ class Crawler extends \SplObjectStorage
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;
+        $crawler->document = $this->document;
 
         return $crawler;
+    }
+
+    private function triggerDeprecation($methodName, $useTrace = false)
+    {
+        $traces = array();
+        $caller = array();
+
+        if ($useTrace || defined('HHVM_VERSION')) {
+            $traces = debug_backtrace();
+            $caller = $traces[2];
+        }
+
+        // The SplObjectStorage class performs calls to its own methods. These
+        // method calls must not lead to triggered deprecation notices.
+        if (isset($caller['class']) && 'SplObjectStorage' === $caller['class']) {
+            return;
+        }
+
+        @trigger_error('The '.$methodName.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
     }
 }

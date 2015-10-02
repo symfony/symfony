@@ -25,9 +25,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
     private $guesser;
     private $guesserLoaded = false;
 
-    public function __construct(ContainerInterface $container,
-        array $typeServiceIds, array $typeExtensionServiceIds,
-        array $guesserServiceIds)
+    public function __construct(ContainerInterface $container, array $typeServiceIds, array $typeExtensionServiceIds, array $guesserServiceIds)
     {
         $this->container = $container;
         $this->typeServiceIds = $typeServiceIds;
@@ -41,20 +39,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
             throw new InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
         }
 
-        $type = $this->container->get($this->typeServiceIds[$name]);
-
-        // BC: validate result of getName() for legacy names (non-FQCN)
-        if ($name !== get_class($type) && $type->getName() !== $name) {
-            throw new InvalidArgumentException(
-                sprintf('The type name specified for the service "%s" does not match the actual name. Expected "%s", given "%s"',
-                    $this->typeServiceIds[$name],
-                    $name,
-                    $type->getName()
-                )
-            );
-        }
-
-        return $type;
+        return $this->container->get($this->typeServiceIds[$name]);
     }
 
     public function hasType($name)

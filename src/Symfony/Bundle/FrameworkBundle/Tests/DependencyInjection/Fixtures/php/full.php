@@ -5,14 +5,12 @@ $container->loadFromExtension('framework', array(
     'default_locale' => 'fr',
     'form' => array(
         'csrf_protection' => array(
+            'enabled' => true,
             'field_name' => '_csrf',
         ),
     ),
     'http_method_override' => false,
     'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
-    'csrf_protection' => array(
-        'enabled' => true,
-    ),
     'esi' => array(
         'enabled' => true,
     ),
@@ -47,6 +45,9 @@ $container->loadFromExtension('framework', array(
             'resources' => array('theme1', 'theme2'),
         ),
         'hinclude_default_template' => 'global_hinclude_template',
+    ),
+    'assets' => array(
+        'version' => 'v1',
     ),
     'translator' => array(
         'enabled' => true,

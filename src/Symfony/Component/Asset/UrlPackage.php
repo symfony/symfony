@@ -35,7 +35,14 @@ use Symfony\Component\Asset\Exception\LogicException;
  */
 class UrlPackage extends Package
 {
+    /**
+     * @var array
+     */
     private $baseUrls = array();
+
+    /**
+     * @var UrlPackage
+     */
     private $sslPackage;
 
     /**
@@ -118,6 +125,11 @@ class UrlPackage extends Package
         return fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }
 
+    /**
+     * @param $urls
+     *
+     * @return array
+     */
     private function getSslUrls($urls)
     {
         $sslUrls = array();

@@ -97,29 +97,6 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyDenormalizeOnCamelCaseFormat()
-    {
-        $this->normalizer->setCamelizedAttributes(array('camel_case'));
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\ObjectDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
-    public function testNameConverterSupport()
-    {
-        $this->normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\ObjectDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
     public function testDenormalizeNull()
     {
         $this->assertEquals(new ObjectDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\ObjectDummy'));
@@ -157,9 +134,6 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorDenormalizeWithOptionalDefaultArgument()
     {
-        if (PHP_VERSION_ID <= 50316) {
-            $this->markTestSkipped('See https://bugs.php.net/62715');
-        }
         $obj = $this->normalizer->denormalize(
             array('bar' => 'test'),
             __NAMESPACE__.'\ObjectConstructorArgsWithDefaultValueDummy', 'any');

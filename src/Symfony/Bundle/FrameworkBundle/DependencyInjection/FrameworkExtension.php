@@ -97,13 +97,9 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
-
-            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-                $config['csrf_protection']['enabled'] = true;
-            }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['form']['csrf_protection'], $container, $loader);
 
         if (isset($config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -142,7 +138,7 @@ class FrameworkExtension extends Extension
             $loader->load('debug.xml');
 
             $definition = $container->findDefinition('http_kernel');
-            $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
+            $definition->replaceArgument(1, new Reference('debug.controller_resolver'));
 
             // replace the regular event_dispatcher service with the debug one
             $definition = $container->findDefinition('event_dispatcher');
@@ -200,20 +196,12 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (null === $config['form']['csrf_protection']['enabled']) {
-            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
-        }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-
-            if (null !== $config['form']['csrf_protection']['field_name']) {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
-            } else {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-            }
+            $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -302,26 +290,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
-        $supported = array(
-            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql' => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file' => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
-            'memcache' => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
-            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
-            'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
-        );
         list($class) = explode(':', $config['dsn'], 2);
-        if (!isset($supported[$class])) {
+        if ('file' !== $class) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
-        $container->setParameter('profiler.storage.username', $config['username']);
-        $container->setParameter('profiler.storage.password', $config['password']);
-        $container->setParameter('profiler.storage.lifetime', $config['lifetime']);
-
-        $container->getDefinition('profiler.storage')->setClass($supported[$class]);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {
@@ -560,12 +534,12 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
-        }
 
-        if ($container->hasDefinition('assets.packages')) {
-            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
-        } else {
-            $container->removeDefinition('templating.helper.assets');
+            if ($container->hasDefinition('assets.packages')) {
+                $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
+            } else {
+                $container->removeDefinition('templating.helper.assets');
+            }
         }
     }
 
@@ -789,12 +763,6 @@ class FrameworkExtension extends Extension
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
-
-        // You can use this parameter to check the API version in your own
-        // bundle extension classes
-        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
-        // @deprecated since version 2.7, to be removed in 3.0
-        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)

@@ -18,9 +18,20 @@ namespace Symfony\Component\Asset\VersionStrategy;
  */
 class StaticVersionStrategy implements VersionStrategyInterface
 {
+    /**
+     * @var string
+     */
     private $version;
+
+    /**
+     * @var string
+     */
     private $format;
 
+    /**
+     * @param string      $version
+     * @param string|null $format
+     */
     public function __construct($version, $format = null)
     {
         $this->version = $version;

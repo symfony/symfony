@@ -1363,6 +1363,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
+
+	    $request = new Request(array('_format' => 'foo'));
+	    $this->assertEquals('html', $request->getRequestFormat());
     }
 
     public function testHasSession()

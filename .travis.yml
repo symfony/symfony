@@ -10,12 +10,11 @@ addons:
 matrix:
     include:
         - php: hhvm
-        - php: 5.3
-        - php: 5.4
         - php: 5.5
         - php: 5.6
-          env: deps=high
-        - php: 7
+        - php: 5.6
+          env: deps=2.8
+        - php: 7.0
           env: deps=low
     fast_finish: true
 
@@ -27,7 +26,7 @@ env:
         - SYMFONY_DEPRECATIONS_HELPER=weak
 
 before_install:
-    - if [[ "$deps" = "no" ]] && [[ "$TRAVIS_PHP_VERSION" =~ 5.[45] ]] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then export deps=skip; fi;
+    - if [[ "$deps" = "no" ]] && [[ "$TRAVIS_PHP_VERSION" = 5.6 ]] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then export deps=skip; fi;
     - if [ "$deps" != "skip" ]; then composer self-update; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "memory_limit = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then phpenv config-rm xdebug.ini; fi;
@@ -46,10 +45,12 @@ install:
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
     - if [ "$deps" != "skip" ]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi;
     - if [ "$deps" != "skip" ] && [ "$deps" != "no" ]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $COMPONENTS; fi;
+    - if [ "$deps" = "2.8" ]; then git fetch origin 2.8; git checkout -m FETCH_HEAD; export COMPOSER_ROOT_VERSION=2.8.x-dev; fi;
 
 script:
     - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu 'echo -e "\\nRunning {} tests"; $PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
-    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data,legacy'; fi;
+    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
     - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [ "$deps" = "2.8" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data,legacy'; fi;
     - if [ "$deps" = "skip" ]; then echo 'This matrix line is skipped for pull requests.'; fi;

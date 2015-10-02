@@ -461,7 +461,7 @@ class SecurityExtension extends Extension
             $arguments = array($config['ignore_case']);
 
             return array(
-                'class' => new Parameter('security.encoder.plain.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
                 'arguments' => $arguments,
             );
         }
@@ -469,7 +469,7 @@ class SecurityExtension extends Extension
         // pbkdf2 encoder
         if ('pbkdf2' === $config['algorithm']) {
             return array(
-                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
                 'arguments' => array(
                     $config['hash_algorithm'],
                     $config['encode_as_base64'],
@@ -482,14 +482,14 @@ class SecurityExtension extends Extension
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
             return array(
-                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => array($config['cost']),
             );
         }
 
         // message digest encoder
         return array(
-            'class' => new Parameter('security.encoder.digest.class'),
+            'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
             'arguments' => array(
                 $config['algorithm'],
                 $config['encode_as_base64'],
@@ -624,7 +624,7 @@ class SecurityExtension extends Extension
         }
 
         $container
-            ->register($id, '%security.matcher.class%')
+            ->register($id, 'Symfony\Component\HttpFoundation\RequestMatcher')
             ->setPublic(false)
             ->setArguments($arguments)
         ;

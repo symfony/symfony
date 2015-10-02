@@ -26,6 +26,9 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class PathPackage extends Package
 {
+    /**
+     * @var string
+     */
     private $basePath;
 
     /**

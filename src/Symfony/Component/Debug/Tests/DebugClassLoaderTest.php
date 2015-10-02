@@ -108,8 +108,6 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             $this->fail('ContextErrorException expected');
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
-            restore_error_handler();
-            restore_exception_handler();
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             if (PHP_VERSION_ID < 70000) {
                 $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
@@ -118,11 +116,9 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
                 $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_WARNING, $exception->getSeverity());
             }
-        } catch (\Exception $exception) {
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            throw $exception;
         }
     }
 

@@ -47,16 +47,6 @@ class IsbnValidator extends ConstraintValidator
         $value = (string) $value;
         $canonical = str_replace('-', '', $value);
 
-        if (null === $constraint->type) {
-            if ($constraint->isbn10 && !$constraint->isbn13) {
-                @trigger_error('The "isbn10" option of the Isbn constraint is deprecated since version 2.5 and will be removed in 3.0. Use the "type" option instead.', E_USER_DEPRECATED);
-                $constraint->type = 'isbn10';
-            } elseif ($constraint->isbn13 && !$constraint->isbn10) {
-                @trigger_error('The "isbn13" option of the Isbn constraint is deprecated since version 2.5 and will be removed in 3.0. Use the "type" option instead.', E_USER_DEPRECATED);
-                $constraint->type = 'isbn13';
-            }
-        }
-
         // Explicitly validate against ISBN-10
         if ('isbn10' === $constraint->type) {
             if (true !== ($code = $this->validateIsbn10($canonical))) {

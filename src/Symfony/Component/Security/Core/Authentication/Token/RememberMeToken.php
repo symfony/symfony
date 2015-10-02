@@ -74,16 +74,6 @@ class RememberMeToken extends AbstractToken
     }
 
     /**
-     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
-     */
-    public function getKey()
-    {
-        @trigger_error(__method__.'() is deprecated since version 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
-
-        return $this->getSecret();
-    }
-
-    /**
      * Returns the secret.
      *
      * @return string

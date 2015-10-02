@@ -103,6 +103,16 @@ class WebProfilerExtensionTest extends TestCase
         $this->assertSaneContainer($this->getDumpedContainer());
     }
 
+    public function testLoadWithoutTwig()
+    {
+        $this->container->removeDefinition('twig');
+
+        $extension = new WebProfilerExtension();
+        $extension->load(array(array()), $this->container);
+
+        $this->assertFalse($this->container->hasDefinition('web_profiler.controller.profiler'));
+    }
+
     public function getDebugModes()
     {
         return array(

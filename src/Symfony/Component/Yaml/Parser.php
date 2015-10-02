@@ -21,8 +21,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Parser
 {
     const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
-    // BC - wrongly named
-    const FOLDED_SCALAR_PATTERN = self::BLOCK_SCALAR_HEADER_PATTERN;
 
     private $offset = 0;
     private $lines = array();

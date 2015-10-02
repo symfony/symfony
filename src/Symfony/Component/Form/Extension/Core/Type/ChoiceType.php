@@ -245,17 +245,11 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $placeholder = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
-            if ($choiceList) {
-                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
-
-                return $choiceList;
-            }
-
+        $choiceListNormalizer = function (Options $options) use ($choiceListFactory) {
             if (null !== $options['choice_loader']) {
                 return $choiceListFactory->createListFromLoader(
                     $options['choice_loader'],
@@ -316,7 +310,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'error_bubbling' => false,
             'compound' => $compound,
             // The view data is always a string, even if the "data" option
@@ -330,7 +324,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choices_as_values', 'bool');

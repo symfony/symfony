@@ -35,10 +35,6 @@ class ValidationListener implements EventSubscriberInterface
         return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
-    /**
-     * @param ValidatorInterface       $validator
-     * @param ViolationMapperInterface $violationMapper
-     */
     public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
     {
         $this->validator = $validator;

@@ -162,7 +162,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface", "stdClass" given
+     * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
      */
     public function testCreateThrowsUnderstandableException()
     {
@@ -182,7 +182,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
-            ->with($this->factory, 'TYPE', $options)
+            ->with($this->factory, 'type', $options)
             ->will($this->returnValue($this->builder));
 
         $this->builder->expects($this->any())

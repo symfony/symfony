@@ -38,12 +38,6 @@ class ExceptionHandler
 
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
-        if (false !== strpos($charset, '%')) {
-            // Swap $charset and $fileLinkFormat for BC reasons
-            $pivot = $fileLinkFormat;
-            $fileLinkFormat = $charset;
-            $charset = $pivot;
-        }
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');

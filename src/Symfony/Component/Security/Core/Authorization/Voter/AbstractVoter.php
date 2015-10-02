@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -89,11 +88,8 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
-     * Perform a single access check operation on a given attribute, object and (optionally) user
-     * It is safe to assume that $attribute and $object's class pass supportsAttribute/supportsClass
-     * $user can be one of the following:
-     *   a UserInterface object (fully authenticated user)
-     *   a string               (anonymously authenticated user).
+     * Perform a single access check operation on a given attribute, object and token.
+     * It is safe to assume that $attribute and $object's class pass supports method call.
      *
      * @param string         $attribute
      * @param object         $object

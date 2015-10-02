@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T15:14:20Z
+
+Please also remove max_length from https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/FormFactoryInterface.php#L96
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-02T15:16:09Z
+
+Removed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T15:27:01Z
+
+The `choice_list` option must be removed still I think.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-02T15:56:03Z
+
+@Tobion I agree with you, but this is more tricky and could be left for an other PR.
+I added a few more removals btw.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T16:33:57Z
+
+The `choice_list` removal should be done as its own PR.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T16:40:10Z
+
+Apart from the changes in `Crawler` :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-02T16:57:51Z
+
+Crawler updated

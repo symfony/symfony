@@ -118,7 +118,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     (is_array($objectOrArray) && !array_key_exists($property, $objectOrArray))
                 )
             ) {
-                $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
+                if ($i + 1 < $propertyPath->getLength()) {
+                    $objectOrArray[$property] = array();
+                }
             }
 
             if ($isIndex) {

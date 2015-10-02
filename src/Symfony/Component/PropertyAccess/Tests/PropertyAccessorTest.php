@@ -103,6 +103,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, 'firstName'));
     }
 
+    public function testGetValueNotModifyObject()
+    {
+        $object = new Author();
+        $object->firstName = array('Bernhard');
+
+        $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
+        $this->assertSame(array('Bernhard'), $object->firstName);
+    }
+
     public function testGetValueIgnoresSingular()
     {
         $this->markTestSkipped('This feature is temporarily disabled as of 2.1');

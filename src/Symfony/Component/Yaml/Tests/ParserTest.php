@@ -560,6 +560,32 @@ EOF;
         $this->assertEquals(array('hash' => null), Yaml::parse($input));
     }
 
+    public function testCommentAtTheRootIndent()
+    {
+        $this->assertEquals(array(
+            'services' => array(
+                'app.foo_service' => array(
+                    'class' => 'Foo',
+                ),
+                'app/bar_service' => array(
+                    'class' => 'Bar',
+                ),
+            ),
+        ), Yaml::parse(<<<EOF
+# comment 1
+services:
+# comment 2
+    # comment 3
+    app.foo_service:
+        class: Foo
+# comment 4
+    # comment 5
+    app/bar_service:
+        class: Bar
+EOF
+        ));
+    }
+
     public function testStringBlockWithComments()
     {
         $this->assertEquals(array('content' => <<<EOT

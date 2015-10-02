@@ -313,20 +313,20 @@ class Crawler extends \SplObjectStorage
      */
     public function addNode(\DOMNode $node)
     {
-        if (null !== $this->document && $this->document !== $node->ownerDocument) {
-            @trigger_error('Attaching DOM nodes from multiple documents in a Crawler is deprecated as of 2.8 and will be forbidden in 3.0.', E_USER_DEPRECATED);
-        }
-
-        if (null === $this->document) {
-            $this->document = $node->ownerDocument;
-        }
-
         if ($node instanceof \DOMDocument) {
             $node = $node->documentElement;
         }
 
         if (!$node instanceof \DOMElement) {
             throw new \InvalidArgumentException(sprintf('Nodes set in a Crawler must be DOMElement or DOMDocument instances, "%s" given.', get_class($node)));
+        }
+
+        if (null !== $this->document && $this->document !== $node->ownerDocument) {
+            @trigger_error('Attaching DOM nodes from multiple documents in a Crawler is deprecated as of 2.8 and will be forbidden in 3.0.', E_USER_DEPRECATED);
+        }
+
+        if (null === $this->document) {
+            $this->document = $node->ownerDocument;
         }
 
         parent::attach($node);

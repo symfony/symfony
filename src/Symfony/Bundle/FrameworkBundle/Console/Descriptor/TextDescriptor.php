@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -357,7 +358,7 @@ class TextDescriptor extends Descriptor
 
         $options['output']->title($title);
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
 
         if (null !== $event) {
             $this->renderEventListenerTable($registeredListeners, $options['output']);
@@ -381,7 +382,7 @@ class TextDescriptor extends Descriptor
     /**
      * @param array $array
      */
-    private function renderEventListenerTable(array $eventListeners, $output)
+    private function renderEventListenerTable(array $eventListeners, SymfonyStyle $renderer)
     {
         $tableHeaders = array('Order', 'Callable', 'Priority');
         $tableRows = array();
@@ -394,7 +395,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $output->table($tableHeaders, $tableRows);
+        $renderer->table($tableHeaders, $tableRows);
     }
 
     /**

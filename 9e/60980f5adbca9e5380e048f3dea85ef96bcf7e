@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T23:25:37Z
+
+Note that I submitted it in 2.8 because there is a slight behavior change, and the previous changes about ``DOMNode`` vs ``DOMDocument`` were not applied in 2.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T05:44:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-02T08:02:47Z
+
+updated.
+
+This PR will conflict with #16057. I will rebase one of them after the merge of the first one.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-02T08:53:48Z
+
+@symfony/deciders this one is ready

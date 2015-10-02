@@ -622,6 +622,32 @@ EOF;
         $this->assertEquals(array('hash' => null), Yaml::parse($input));
     }
 
+    public function testCommentAtTheRootIndent()
+    {
+        $this->assertEquals(array(
+            'services' => array(
+                'app.foo_service' => array(
+                    'class' => 'Foo',
+                ),
+                'app/bar_service' => array(
+                    'class' => 'Bar',
+                ),
+            ),
+        ), Yaml::parse(<<<EOF
+# comment 1
+services:
+# comment 2
+    # comment 3
+    app.foo_service:
+        class: Foo
+# comment 4
+    # comment 5
+    app/bar_service:
+        class: Bar
+EOF
+        ));
+    }
+
     public function testStringBlockWithComments()
     {
         $this->assertEquals(array('content' => <<<EOT
@@ -675,43 +701,6 @@ EOT
             </body>
 
         footer # comment3
-EOF
-        ));
-    }
-
-    public function testSecondLevelFoldedStringBlockWithComments()
-    {
-        $this->assertEquals(array(
-            'pages' => array(
-                array(
-                    'title' => 'some title',
-                    'content' => <<<EOT
-# comment 1
-header
-
-    # comment 2
-    <body>
-        <h1>title</h1>
-    </body>
-
-footer # comment3
-EOT
-                ),
-            ),
-        ), Yaml::parse(<<<EOF
-pages:
-    -
-        title: some title
-        content: |
-            # comment 1
-            header
-
-                # comment 2
-                <body>
-                    <h1>title</h1>
-                </body>
-
-            footer # comment3
 EOF
         ));
     }

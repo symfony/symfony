@@ -1,0 +1,223 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-23T14:30:07Z
+
+@iltar I think we should add a bit more docs to `UserCheckerInterface` - specifically, to explain (briefly) that `checkPreAuth` and `checkPostAuth` should throw `AccountStatusException` if there is any issue.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-16T14:37:23Z
+
+Docs are added, for some reason the tests timed out. Any idea how to rebuild without a push? :(
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-16T14:40:50Z
+
+@iltar Can you rebase to get rid of the merge commit? That's a blocker for the merge.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-16T14:53:36Z
+
+@fabpot done
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-16T16:56:55Z
+
+Other than my last comment, :+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-16T17:56:00Z
+
+@weaverryan I think it's fixed now, running gitbash with a non-syntax highlighting php `$ git yolo`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-07-23T03:33:22Z
+
+Re-read the whole PR and the associated issue discussion.
+
+I'm :+1: on making the user checker configurable by firewall.
+
+I'm -0 for the addition of the chain user checker (or any other way to allow more than one user checker). Being able to configure the service responsible for user checking should be enough for the vast majority of use cases. If you really want/need to provide more than one user checker, you can still do the chain yourself. Or do you envision third party bundle to come with user checkers that you will mix with your own.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-07-30T06:44:49Z
+
+@fabpot I think you're right that it will cover most cases, but configuring only 1 user-checker per firewall would be hard to extend for those who do want multiple user-checkers. They will have to start decorating the service, collect and inject their own user-checkers etc.
+
+Providing a small extension point in the configuration with 1 additional class will save people with that specific case a lot of time, which includes myself.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T06:34:49Z
+
+I understand your point, but I'm still not convinced. It adds some complexity (and the security component does not need more complexity) for very edge cases. For the rare occasion where several user checkers are needed, the work is not that important, especially because you can now easily decorate a service in Symfony. Also, people will start asking for more, like being able to prioritize their user checkers and more. I'm still convinced that having more than one user checker is over-engineering we don't need.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-08-01T09:01:44Z
+
+I think it's okay to ship a chain user checker implementation with the Security component. However, I am not convinced if it is really necessary to configure it as the default user checker in the SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-01T15:50:32Z
+
+It doesn't really matter if it's default or not, the end-user won't notice it. I just have the ChainChecker injected because it's less configuration to inject the default in there than make a conditional default service. I can change it but I don't see any benefit to add an extra conditional for that.
+
+Regarding complexity, it won't really add a complex layer and has a nice documentation part in the book. It's merely another configuration option which people will find if they search for custom user checkers.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-28T09:31:42Z
+
+So, what's the status of this PR? For the record, I'm still against adding the chain user checker.
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-28T10:15:27Z
+
+For me this is as done as done can be. The `ChainUserChecker` won't be accessible/used-by the developer so it shouldn't bother them. This is merely to allow the developer to use multiple user-checkers without having to write code to allow this.
+
+@fabpot if you know another way of achieving this without making it more complex for the developer, I'm more than happy to write it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T11:29:49Z
+
+@iltar What about setting the default user checker argument in the config resource files to `null` and add a comment explaining that this will be replaced by a user check chain? This would add some clarification to the configuration.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-28T11:53:47Z
+
+@xabbuh You mean this bit?
+```php
+->arrayNode('user_checkers')
+    ->defaultValue(array('security.user_checker')) #this default?
+    ->info('A list of user checker service ids to use when authenticating users in this firewall.')
+    ->prototype('scalar')->end()
+->end()
+```
+
+If I set this to null by default, no checker is defined and I would have to set this as default if the array is empty and add it in the pass. I thought that was what the default value was for here, to save time in the extension/compiler pass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T12:00:05Z
+
+@iltar I mean places like https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/SecurityBundle/Resources/config/security_rememberme.xml#L31 which will be modified by the factories anyway.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-28T12:01:18Z
+
+That can be done, but what would be the benefit of this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T12:11:46Z
+
+Imo it would increase readability for everyone trying to read and understand the code (you do not get the wrong impression that a single user checker is injected, for example). This can be handy when you try to debug and issue with the security system.
+
+Anyway, I am :+1: for this change.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-28T12:51:17Z
+
+@xabbuh like this?
+@weaverryan I've updated Guard as well now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-28T14:06:45Z
+
+@iltar Yes, I think that's better.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-28T23:30:50Z
+
+I like this PR, and I've played around with the code.
+
+But the chain user checker is a tough one: this feature won't be used by many people, and it's easily implementable on your own using normal OO practices. @iltar had once told me that a bundle could now provider different user checkers that you could opt into. If that's the case, then I think *that* bundle could also provider the chain user checker and configuration for you to put whatever you want into it.
+
+@iltar I know you disagree with me, but I'm :+1: on this *without* the chain user checker.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-29T05:20:50Z
+
+@weaverryan This service is what's making it possible to provide an array of user-checkers, otherwise you would be limited to one checker. I can update the code to work without, but it would add a bit of extra work for developers who do want to implement it.
+
+(A): Allow only 1 user-checker per firewall to be configured and remove the chain-user checker
+(B): Leave as it
+
+If I implement (A), I will change back the `security.chain_user_checker` to `security.user_checker` and use that service as a default, change the option to allow only a scalar value and I will update the docs PR to show the examples simplified with one option.
+
+/cc @fabpot @weaverryan would this be an ok setup to complete this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T06:02:45Z
+
+If I follow, (A) would just be about making the user_checker service configurable, right?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-29T06:07:42Z
+
+@fabpot correct
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-29T06:09:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-29T06:51:43Z
+
+I currently have added `->treatNullLike('security.user_checker')`, but maybe in the future this could become nullable with a `NullUserChecker`.
+
+Instead of creating a `ChainUserChecker` with a service definition, it will now create a private alias which is referenced in the factories instead of the `security.chain_user_checker`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-30T23:27:56Z
+
+I agree with the `treatNullLike` thing.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-30T23:30:36Z
+
+And it looks like the test failures are unrelated and should be resolved with a rebase. So, a rebase might be good :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-10-01T05:14:31Z
+
+@weaverryan yeah there were some issues with some tests hence I didn't rebase yet, good that you reminded me of it. Lets see how this turns out.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-10-01T06:37:10Z
+
+Any clues what the error in travis might be? hhvm locally for me doesn't run stable enough (more errors than travis) and I don't have php7 to test with.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T08:31:18Z
+
+The failing tests are not related to your changes (they are already failing on the `2.8` branch).

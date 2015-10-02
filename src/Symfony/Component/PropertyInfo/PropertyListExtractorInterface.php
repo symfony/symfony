@@ -24,7 +24,7 @@ interface PropertyListExtractorInterface
      * @param string $class
      * @param array  $context
      *
-     * @return string[]|null
+     * @return string[]
      */
     public function getProperties($class, array $context = array());
 }

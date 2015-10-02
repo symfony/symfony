@@ -43,7 +43,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         try {
             $metadata = $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
-            return;
+            return array();
         }
 
         return array_merge($metadata->getFieldNames(), $metadata->getAssociationNames());
@@ -57,7 +57,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         try {
             $metadata = $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
-            return;
+            return array();
         }
 
         if ($metadata->hasAssociation($property)) {
@@ -107,6 +107,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     return array(new Type($this->getPhpType($typeOfField), $nullable));
             }
         }
+
+        return array();
     }
 
     /**

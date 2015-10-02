@@ -85,7 +85,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
-            return;
+            return array();
         }
 
         switch ($source) {
@@ -123,11 +123,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
         }
 
-        if (!isset($types[0])) {
-            return;
-        }
-
-        if (!in_array($prefix, ReflectionExtractor::$arrayMutatorPrefixes)) {
+        if (!isset($types[0]) || !in_array($prefix, ReflectionExtractor::$arrayMutatorPrefixes)) {
             return $types;
         }
 

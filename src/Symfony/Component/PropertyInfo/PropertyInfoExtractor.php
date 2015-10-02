@@ -57,7 +57,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getProperties($class, array $context = array())
     {
-        return $this->extract($this->listExtractors, 'getProperties', array($class, $context));
+        $properties = $this->extract($this->listExtractors, 'getProperties', array($class, $context));
+        if (null === $properties) {
+            return array();
+        }
+
+        return $properties;
     }
 
     /**
@@ -81,7 +86,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getTypes($class, $property, array $context = array())
     {
-        return $this->extract($this->typeExtractors, 'getTypes', array($class, $property, $context));
+        $types = $this->extract($this->typeExtractors, 'getTypes', array($class, $property, $context));
+        if (null === $types) {
+            return array();
+        }
+
+        return $types;
     }
 
     /**
@@ -89,7 +99,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function isReadable($class, $property, array $context = array())
     {
-        return $this->extract($this->accessExtractors, 'isReadable', array($class, $property, $context));
+        $readable = $this->extract($this->accessExtractors, 'isReadable', array($class, $property, $context));
+        if (null === $readable) {
+            return false;
+        }
+
+        return $readable;
     }
 
     /**
@@ -97,7 +112,12 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function isWritable($class, $property, array $context = array())
     {
-        return $this->extract($this->accessExtractors, 'isWritable', array($class, $property, $context));
+        $writable = $this->extract($this->accessExtractors, 'isWritable', array($class, $property, $context));
+        if (null === $writable) {
+            return false;
+        }
+
+        return $writable;
     }
 
     /**

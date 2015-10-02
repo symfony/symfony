@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-02T13:01:28Z
+
+Looks like this one is breaking the tests. @javiereguiluz Can you have a look?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-02T14:10:13Z
+
+Fixed tests (at least locally)

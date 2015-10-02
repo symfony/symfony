@@ -16,7 +16,7 @@
         </service>
 
         <service id="security.authentication.provider.rememberme" class="Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider" abstract="true" public="false">
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
         </service>
 
         <service id="security.rememberme.token.provider.in_memory" class="Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider" public="false" />

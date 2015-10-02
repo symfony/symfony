@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -100,16 +101,16 @@ class SecurityExtension extends Extension
 
         // add some required classes for compilation
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Security\\Http\\Firewall',
-            'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
-            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorage',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationChecker',
-            'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
-            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
-            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
-            'Symfony\\Component\\HttpFoundation\\RequestMatcher',
+            'Symfony\Component\Security\Http\Firewall',
+            'Symfony\Component\Security\Core\User\UserProviderInterface',
+            'Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager',
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage',
+            'Symfony\Component\Security\Core\Authorization\AccessDecisionManager',
+            'Symfony\Component\Security\Core\Authorization\AuthorizationChecker',
+            'Symfony\Component\Security\Core\Authorization\Voter\VoterInterface',
+            'Symfony\Bundle\SecurityBundle\Security\FirewallMap',
+            'Symfony\Bundle\SecurityBundle\Security\FirewallContext',
+            'Symfony\Component\HttpFoundation\RequestMatcher',
         ));
     }
 
@@ -369,6 +370,8 @@ class SecurityExtension extends Extension
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
+        $container->setAlias(new Alias('security.user_checker.'.$id, false), $firewall['user_checker']);
+
         return array($matcher, $listeners, $exceptionListener);
     }
 
@@ -577,6 +580,7 @@ class SecurityExtension extends Extension
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->replaceArgument(1, new Reference($userProvider));
+        $listener->replaceArgument(2, new Reference('security.user_checker.'.$id));
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(6, $config['parameter']);
         $listener->replaceArgument(7, $config['role']);

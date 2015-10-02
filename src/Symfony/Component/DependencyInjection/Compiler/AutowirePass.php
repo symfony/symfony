@@ -71,31 +71,41 @@ class AutowirePass implements CompilerPassInterface
 
         $arguments = $definition->getArguments();
         foreach ($constructor->getParameters() as $index => $parameter) {
-            if (!$typeHint = $parameter->getClass()) {
-                continue;
-            }
-
             $argumentExists = array_key_exists($index, $arguments);
             if ($argumentExists && '' !== $arguments[$index]) {
                 continue;
             }
 
-            if (null === $this->types) {
-                $this->populateAvailableTypes();
-            }
-
-            if (isset($this->types[$typeHint->name])) {
-                $value = new Reference($this->types[$typeHint->name]);
-            } else {
-                try {
-                    $value = $this->createAutowiredDefinition($typeHint, $id);
-                } catch (RuntimeException $e) {
-                    if (!$parameter->isDefaultValueAvailable()) {
-                        throw $e;
-                    }
-
-                    $value = $parameter->getDefaultValue();
+            try {
+                if (!$typeHint = $parameter->getClass()) {
+                    continue;
                 }
+
+                if (null === $this->types) {
+                    $this->populateAvailableTypes();
+                }
+
+                if (isset($this->types[$typeHint->name])) {
+                    $value = new Reference($this->types[$typeHint->name]);
+                } else {
+                    try {
+                        $value = $this->createAutowiredDefinition($typeHint, $id);
+                    } catch (RuntimeException $e) {
+                        if (!$parameter->isDefaultValueAvailable()) {
+                            throw $e;
+                        }
+
+                        $value = $parameter->getDefaultValue();
+                    }
+                }
+            } catch (\ReflectionException $reflectionException) {
+                // Typehint against a non-existing class
+
+                if (!$parameter->isDefaultValueAvailable()) {
+                    continue;
+                }
+
+                $value = $parameter->getDefaultValue();
             }
 
             if ($argumentExists) {

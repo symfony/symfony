@@ -52,7 +52,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionClass = new \ReflectionClass($class);
         } catch (\ReflectionException $reflectionException) {
-            return;
+            return [];
         }
 
         $properties = array();
@@ -75,13 +75,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes($class, $property, array $context = array())
     {
-        if ($fromMutator = $this->extractFromMutator($class, $property)) {
-            return $fromMutator;
+        if (null === ($types = $this->extractFromMutator($class, $property))) {
+            $types = $this->extractFromAccessor($class, $property);
         }
 
-        if ($fromAccessor = $this->extractFromAccessor($class, $property)) {
-            return $fromAccessor;
-        }
+        return null !== $types ? $types : array();
     }
 
     /**

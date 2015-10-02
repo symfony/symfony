@@ -64,11 +64,11 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
     public function typesProvider()
     {
         return array(
-            array('a', null),
+            array('a', array()),
             array('b', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy'))),
             array('c', array(new Type(Type::BUILTIN_TYPE_BOOL))),
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL))),
-            array('e', null),
+            array('e', array()),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')))),
         );
     }

@@ -25,7 +25,7 @@ interface PropertyAccessExtractorInterface
      * @param string $property
      * @param array  $context
      *
-     * @return bool|null
+     * @return bool
      */
     public function isReadable($class, $property, array $context = array());
 
@@ -36,7 +36,7 @@ interface PropertyAccessExtractorInterface
      * @param string $property
      * @param array  $context
      *
-     * @return bool|null
+     * @return bool
      */
     public function isWritable($class, $property, array $context = array());
 }

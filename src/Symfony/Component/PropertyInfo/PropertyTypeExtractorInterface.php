@@ -25,7 +25,7 @@ interface PropertyTypeExtractorInterface
      * @param string $property
      * @param array  $context
      *
-     * @return Type[]|null
+     * @return Type[]
      */
     public function getTypes($class, $property, array $context = array());
 }

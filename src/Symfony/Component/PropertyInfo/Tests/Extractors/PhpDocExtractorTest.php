@@ -42,13 +42,13 @@ class PhpDocExtractorTest extends \PHPUnit_Framework_TestCase
     public function typesProvider()
     {
         return array(
-            array('foo', null, 'Short description.', 'Long description.'),
+            array('foo', array(), 'Short description.', 'Long description.'),
             array('bar', array(new Type(Type::BUILTIN_TYPE_STRING)), 'This is bar.', null),
             array('baz', array(new Type(Type::BUILTIN_TYPE_INT)), 'Should be used.', null),
             array('foo2', array(new Type(Type::BUILTIN_TYPE_FLOAT)), null, null),
             array('foo3', array(new Type(Type::BUILTIN_TYPE_CALLABLE)), null, null),
             array('foo4', array(new Type(Type::BUILTIN_TYPE_NULL)), null, null),
-            array('foo5', null, null, null),
+            array('foo5', array(), null, null),
             array(
                 'files',
                 array(

@@ -121,7 +121,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         $locale = $catalogue->getLocale();
         if ($catalogue->defines($id, $domain)) {
             $state = self::MESSAGE_DEFINED;
-        } elseif ($catalogue->has($id, $domain)) {
+        } elseif ($catalogue->has($id, $domain) || is_numeric($translation)) {
             $state = self::MESSAGE_EQUALS_FALLBACK;
 
             $fallbackCatalogue = $catalogue->getFallBackCatalogue();

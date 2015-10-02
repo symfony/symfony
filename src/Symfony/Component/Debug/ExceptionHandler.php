@@ -39,6 +39,8 @@ class ExceptionHandler
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
         if (false !== strpos($charset, '%')) {
+            @trigger_error('Providing $fileLinkFormat as second argument to '.__METHOD__.' is deprecated since version 2.8 and will be unsupported in 3.0. Please provide it as third argument, after $charset.', E_USER_DEPRECATED);
+
             // Swap $charset and $fileLinkFormat for BC reasons
             $pivot = $fileLinkFormat;
             $fileLinkFormat = $charset;

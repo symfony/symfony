@@ -39,9 +39,7 @@ class Callback extends Constraint
         }
 
         if (is_array($options) && !isset($options['callback']) && !isset($options['groups'])) {
-            if (is_callable($options) || !$options) {
-                $options = array('callback' => $options);
-            }
+            $options = array('callback' => $options);
         }
 
         parent::__construct($options);

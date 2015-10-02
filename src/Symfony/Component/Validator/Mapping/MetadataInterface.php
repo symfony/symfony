@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * A container for validation metadata.

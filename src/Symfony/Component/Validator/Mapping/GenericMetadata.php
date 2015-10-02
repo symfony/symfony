@@ -14,9 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * A generic container of {@link Constraint} objects.
@@ -115,7 +113,7 @@ class GenericMetadata implements MetadataInterface
      * $traverse property of that constraint, the traversal strategy
      * will be set to one of the following:
      *
-     *  - {@link TraversalStrategy::IMPLICIT} if $traverse is enabled 
+     *  - {@link TraversalStrategy::IMPLICIT} if $traverse is enabled
      *  - {@link TraversalStrategy::NONE} if $traverse is disabled
      *
      * @param Constraint $constraint The constraint to add
@@ -139,7 +137,6 @@ class GenericMetadata implements MetadataInterface
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
             if ($constraint->traverse) {
-                // Traverse unless the value is not traversable
                 $this->traversalStrategy = TraversalStrategy::IMPLICIT;
             } else {
                 $this->traversalStrategy = TraversalStrategy::NONE;

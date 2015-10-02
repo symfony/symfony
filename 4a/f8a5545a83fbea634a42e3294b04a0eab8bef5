@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T23:36:25Z
+
+the failure with deps=low in the Security component seems related to a bug in PHPUnit 5.0
+
+Edit: reported as https://github.com/sebastianbergmann/phpunit/issues/1886
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T23:40:56Z
+
+and for deps=high, it is because 2.8 needs to be merged into master to add the new class
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-01T23:48:35Z
+
+Once this PR is merged, I will work on the update of the component for 3.0 to avoid using SplObjectStorage (I prefer waiting until this PR is merged to avoid useless conflicts)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-02T07:57:31Z
+
+@fabpot it would be great to merge 2.8 into master to fix the deps=high builds (this is painful because of the descriptor fixture changes btw)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-02T08:53:52Z
+
+@symfony/deciders this one is ready

@@ -41,6 +41,11 @@ class Crawler extends \SplObjectStorage
     private $baseHref;
 
     /**
+     * @var \DOMDocument|null
+     */
+    private $document;
+
+    /**
      * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
      *
      * @var bool
@@ -68,6 +73,7 @@ class Crawler extends \SplObjectStorage
     public function clear()
     {
         parent::removeAll($this);
+        $this->document = null;
     }
 
     /**
@@ -307,6 +313,14 @@ class Crawler extends \SplObjectStorage
      */
     public function addNode(\DOMNode $node)
     {
+        if (null !== $this->document && $this->document !== $node->ownerDocument) {
+            @trigger_error('Attaching DOM nodes from multiple documents in a Crawler is deprecated as of 2.8 and will be forbidden in 3.0.', E_USER_DEPRECATED);
+        }
+
+        if (null === $this->document) {
+            $this->document = $node->ownerDocument;
+        }
+
         if ($node instanceof \DOMDocument) {
             parent::attach($node->documentElement);
         } else {
@@ -1152,6 +1166,7 @@ class Crawler extends \SplObjectStorage
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;
+        $crawler->document = $this->document;
 
         return $crawler;
     }

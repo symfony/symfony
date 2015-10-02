@@ -61,39 +61,11 @@ class FormFactory implements FormFactoryInterface
      */
     public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
-        $name = null;
-        $typeName = null;
-
-        if ($type instanceof ResolvedFormTypeInterface) {
-            if (method_exists($type, 'getBlockPrefix')) {
-                // As of Symfony 3.0, the block prefix of the type is used as
-                // default name
-                $name = $type->getBlockPrefix();
-            } else {
-                // BC
-                $typeName = $type->getName();
-            }
-        } elseif ($type instanceof FormTypeInterface) {
-            // BC
-            $typeName = $type->getName();
-        } elseif (is_string($type)) {
-            // BC
-            $typeName = $type;
-        } else {
-            throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
+        if (!is_string($type)) {
+            throw new UnexpectedTypeException($type, 'string');
         }
 
-        if (null === $name) {
-            if (false === strpos($typeName, '\\')) {
-                // No FQCN - leave unchanged for BC
-                $name = $typeName;
-            } else {
-                // FQCN
-                $name = StringUtil::fqcnToBlockPrefix($typeName);
-            }
-        }
-
-        return $this->createNamedBuilder($name, $type, $data, $options);
+        return $this->createNamedBuilder(StringUtil::fqcnToBlockPrefix($type), $type, $data, $options);
     }
 
     /**

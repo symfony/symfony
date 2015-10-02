@@ -33,9 +33,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
      */
     private $violationMapper;
 
-    /**
-     * @param ValidatorInterface $validator
-     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;

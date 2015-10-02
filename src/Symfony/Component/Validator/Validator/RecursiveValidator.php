@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\GroupSequence;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -140,15 +138,5 @@ class RecursiveValidator implements ValidatorInterface
         return $this->startContext(is_object($objectOrClass) ? $objectOrClass : $value)
             ->validatePropertyValue($objectOrClass, $propertyName, $value, $groups)
             ->getViolations();
-    }
-
-    private static function testConstraints($constraints)
-    {
-        return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && (0 === count($constraints) || current($constraints) instanceof Constraint));
-    }
-
-    private static function testGroups($groups)
-    {
-        return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (0 === count($groups) || is_string(current($groups)) || current($groups) instanceof GroupSequence));
     }
 }

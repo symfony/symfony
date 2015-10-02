@@ -42,7 +42,7 @@ class ProjectServiceContainer extends Container
             'values' => array(
                 0 => true,
                 1 => false,
-                2 => NULL,
+                2 => null,
                 3 => 0,
                 4 => 1000.3,
                 5 => 'true',

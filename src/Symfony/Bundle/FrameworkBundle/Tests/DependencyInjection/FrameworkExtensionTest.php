@@ -197,7 +197,7 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
         $this->assertContains(
-            strtr(dirname(dirname($ref->getFileName())).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );

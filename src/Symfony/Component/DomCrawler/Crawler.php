@@ -322,10 +322,14 @@ class Crawler extends \SplObjectStorage
         }
 
         if ($node instanceof \DOMDocument) {
-            parent::attach($node->documentElement);
-        } else {
-            parent::attach($node);
+            $node = $node->documentElement;
         }
+
+        if (!$node instanceof \DOMElement) {
+            throw new \InvalidArgumentException(sprintf('Nodes set in a Crawler must be DOMElement or DOMDocument instances, "%s" given.', get_class($node)));
+        }
+
+        parent::attach($node);
     }
 
     // Serializing and unserializing a crawler creates DOM objects in a corrupted state. DOM elements are not properly serializable.
@@ -988,7 +992,12 @@ class Crawler extends \SplObjectStorage
 
         foreach ($this as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
-            $crawler->add($domxpath->query($xpath, $node));
+
+            foreach ($domxpath->query($xpath, $node) as $subNode) {
+                if ($subNode->nodeType === 1) {
+                    $crawler->add($subNode);
+                }
+            }
         }
 
         return $crawler;

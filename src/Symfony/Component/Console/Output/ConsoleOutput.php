@@ -125,7 +125,13 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function isRunningOS400()
     {
-        return 'OS400' === php_uname('s');
+        $checks = array(
+            function_exists('php_uname') ? php_uname('s') : '',
+            getenv('OSTYPE'),
+            PHP_OS,
+        );
+
+        return false !== stristr(implode(';', $checks), 'OS400');
     }
 
     /**

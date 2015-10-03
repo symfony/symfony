@@ -282,4 +282,41 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(true), $definition->getArguments());
         $this->assertEquals(array('manager' => array(array('alias' => 'user'))), $definition->getTags());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
+    public function testTypesNotArray()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_types1.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
+    public function testTypeNotString()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_types2.yml');
+    }
+
+    public function testTypes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services22.yml');
+
+        $this->assertEquals(array('Foo', 'Bar'), $container->getDefinition('foo_service')->getAutowiringTypes());
+        $this->assertEquals(array('Foo'), $container->getDefinition('baz_service')->getAutowiringTypes());
+    }
+
+    public function testAutowire()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services23.yml');
+
+        $this->assertTrue($container->getDefinition('bar_service')->isAutowired());
+    }
 }

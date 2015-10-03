@@ -910,7 +910,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * Shall be removed in 3.0
+     * Shall be removed in 3.0.
      */
     public function testSubmitForwardsToRequestHandlerUsingRequestArgument()
     {

@@ -758,6 +758,38 @@ UPGRADE FROM 2.x to 3.0
  * The `supportsAttribute()` and `supportsClass()` methods of classes `AuthenticatedVoter`, `ExpressionVoter`
    and `RoleVoter` have been removed.
 
+ * The `AbstractVoter::supports()` method signature have changed: second argument now is object instead of class name.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $class)
+       {
+           return 'EDIT' === $attribute && $this->isClassInstanceOf($class, 'Topic');
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $object)
+       {
+           return 'EDIT' === $attribute && $object instanceof Topic;
+       }
+
+       // ...
+   }
+   ```
+
+ * The `isClassInstanceOf()` method of classe `AbstractVoter` have been removed.
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of

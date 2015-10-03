@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Abstract Voter implementation that reduces boilerplate code required to create a custom Voter.
  *
  * @author Roman Marintšenko <inoryy@gmail.com>
+ * @author Konstantin Myakshin <koc-dp@yandex.ru>
  */
 abstract class AbstractVoter implements VoterInterface
 {
@@ -41,10 +42,9 @@ abstract class AbstractVoter implements VoterInterface
 
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
-        $class = get_class($object);
 
         foreach ($attributes as $attribute) {
-            if (!$this->supports($attribute, $class)) {
+            if (!$this->supports($attribute, $object)) {
                 continue;
             }
 
@@ -61,31 +61,14 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
-     * Determines if the attribute and class are supported by this voter.
-     *
-     * To determine if the passed class is instance of the supported class, the
-     * isClassInstanceOf() method can be used.
+     * Determines if the attribute and object are supported by this voter.
      *
      * @param string $attribute An attribute
-     * @param string $class     The fully qualified class name of the passed object
+     * @param object $object    The object to secure
      *
-     * @return bool True if the attribute and class is supported, false otherwise
+     * @return bool True if the attribute and object is supported, false otherwise
      */
-    abstract protected function supports($attribute, $class);
-
-    /**
-     * A helper method to test if the actual class is instanceof or equal
-     * to the expected class.
-     *
-     * @param string $actualClass   The actual class name
-     * @param string $expectedClass The expected class name
-     *
-     * @return bool
-     */
-    protected function isClassInstanceOf($actualClass, $expectedClass)
-    {
-        return $expectedClass === $actualClass || is_subclass_of($actualClass, $expectedClass);
-    }
+    abstract protected function supports($attribute, $object);
 
     /**
      * Perform a single access check operation on a given attribute, object and token.

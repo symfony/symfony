@@ -1,0 +1,1089 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-26T08:16:53Z
+
+There is a problem with invalid definitions intended to be removed later by removing passes. It's why tests of FrameworkBundle fail: `annotations.cached_reader` is not complete, `AutowiringPass` tries to complete it but fails an throws a `RuntimeException`.
+
+A solution is to explicitly mark with a tag definitions to autowire or to not autowire.
+
+IMO marking definitions to *not* autowire is more user friendly (it's an edge case) but it would be a (small) BC break. Bundles using black magic similar to what is done in `FrameworkBundle` will require to be updated.
+Alternatively, definitions to autowire can be marked explicitly. It will be BC but less user friendly (the final goal is to reduce the amount of config to write).
+
+Another possibility is to silently restore the initial definition if the autowiring fail. I think it would be less user friendly (no way to detect if the autowiring failed or not) but this approach is both BC and doesn't require to add specific tags.
+
+I suggest to require to mark services to autowire in 2.8 (BC) and to change the behavior in 3.0 by requiring to mark the service to *not* autowire (as it is just a tag, it's still possible to have a definition working for both 2.8 and 3.0 by adding the `not-autowired` tag, this tag will simply be ignored in 2.8).
+
+What do you think about that @stof @fabpot?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-27T06:48:35Z
+
+This introduces a lot of magic and complexity for developers.
+
+ - What if someone introduces another service with the same class, will everything (silently) break?
+ - How will people notice errors when they use `$this->get()` in an action that's hardly ever called?
+ - What kind of impact will this have on stability? People will start relying on "magic"
+
+I can certainly see benefits for this such as `request_stack`, `session*`, `security.*`, `router` etc. But most cases I encounter, that's just one of several dependencies injected. Does it mean it will still have to be verbose?
+
+If I understand it right, it will guess the dependency based on the class name. What if someone typehints an interface and decorates the dependency, will it create a reference to the decorated or decorator? Both are in the DIC and the `public: false` won't prevent injection.
+
+I personally like verbosity. Writing down a service definition is a minute of work, but you won't have to really bother with it anymore. I do a lot of refactoring because development never stops. One thing I always do, is check if a service is used somewhere, which works better than checking against an interface. This will be virtually impossible because you lost control of where it's injected.
+
+_It's a nice feature that certainly has potential, but at the moment I see far more downsides than benefits. Maybe you can open my eyes!_
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T09:02:16Z
+
+> This introduces a lot of magic and complexity for developers.
+
+It maybe introduces some "magic" but no complexity at all: this feature is fully optional and developers that don't like it can define their services as they have always done. IMO this feature simplify the use of the DI in the context of RAD (I'll get back to it).
+
+> What if someone introduces another service with the same class, will everything (silently) break?
+
+I'm not sure to understand exactly what you mean:
+
+```php
+class A {}
+class B { function __construct(A $a) {} }
+class C { function __construct(A $a) {} }
+```
+
+```yaml
+services:
+   b:
+       class: B
+    c:
+        class: C
+```
+
+It works without breaking anything.
+
+```php
+abstract class A {}
+class B extends A {}
+class C extends A {}
+class Foo { function __construct(A $a) {} }
+```
+
+```yaml
+services:
+    foo:
+        class: Foo
+```
+
+This is not possible to guess what to inject so it throws an explicit `RuntimeException` with the following message: `Unable to autowire argument of type "A" for the service "foo".`
+
+There is two solutions here:
+
+Using the classical (explicit) definition:
+
+```yaml
+   services:
+       b:
+           class: B
+       c:
+           class: C
+       foo:
+           class: Foo
+           arguments: [ @b ]
+```
+
+It's the same old config available from the beginning of Symfony.
+
+An alternative is to define a default service to use for a given type (it will always be injected for that type unless an explicit service is passed in argument).
+
+```yaml
+   services:
+       b:
+           class: B
+           types: [ A ]
+       c:
+           class: C
+       foo:
+           class: Foo
+```
+
+This is useful when a service must be injected 90% of the time (it can be autowired) but in some definitions another implementation (decorator, debug or performance optimized version...) is needed.
+
+> How will people notice errors when they use $this->get() in an action that's hardly ever called?
+
+Errors are raised at compile time (when `$container->compile()` is called: when doing a `cache:clear` in the full stack framework). It doesn't matter if the service is used or not.
+
+> What kind of impact will this have on stability? People will start relying on "magic"
+
+Basically, the autowiring system just complete service definitions during a compiler pass. After that, it's the same old system that is used. The impact in term of stability is minor and if an error occurs, it will occur during the container compilation and will be handled by the developper very early in the development process.
+
+> I can certainly see benefits for this such as request_stack, session*, security.*, router etc. But most cases I encounter, that's just one of several dependencies injected. Does it mean it will still have to be verbose?
+
+I'm not sure I understand what you mean. Can you give an example?
+
+> If I understand it right, it will guess the dependency based on the class name. What if someone typehints an interface and decorates the dependency, will it create a reference to the decorated or decorator? Both are in the DIC and the public: false won't prevent injection.
+
+The system is smarter than just using the class name. I've posted some examples using interfaces in the PR description.
+
+To sum up:
+* If the definition is explicit (the actual way of registering service): nothing change, the current behavior applies
+* If they are missing arguments in a service definition:
+    * the system guesses all types of existing services definition (including interface implementations and inherited types) and tries to fill the incomplete definition automatically with a service of the type required by the typehint (as explained previously, it works only if there is one implementation or if a `types` has been set explicitly)
+    * If the typehint is a class name, no existing service of this type exists and this class name is instantiable: a private service is automatically registered and injected
+
+> I personally like verbosity. [...]
+
+As previously said, the current behavior is not deprecated and can still be used. It's a layer on top of what is already existing that is fully optional.
+This is a high level RAD feature. It should be compared to existing similar features such as configuration annotations and conventions based features (controllers and entities auto-detection when they are in a specific folder...).
+
+Autowiring is a feature present in many DI systems (Spring, Laravel DI, PHP DI...). It's main advantage is to drastically reduce the configuration code needed to use DI (in many case, it allows to write no configuration all) and ease refactoring (when you add or remove a dependency to a class, you don't need to dive into all your service definitions to update the configuration, this is automatic).
+It helps when using controller as a service with the convenience of the DIC but without requiring it and reduce the amount of configuration code needed when using alternative patterns such as [ADR](https://github.com/pmjones/adr) (it's originally in the intent of implementing a generic and convenient ADR implementation for Symfony that I wrote this code).
+
+Personally, I always avoid using such things (autowiring, configuration annotations, even the DIC) for a large scale enterprise where maintainability matter and I know the code base will be huge. I prefer to be explicit and have chunks of code as independent and framework agnostic as possible.
+
+However I also often work on smaller projects where the goals are different: development as speed as possible with less line of code as possible. For such projects (prototypes, some micro services, weekend projects and some non-commercial projects...) I rely as much as possible on every feature that ease the devolvement and the refactoring including conventions, annotations and all that kind of "magic" (when you know how it works, there is not much magic). Autowiring is for that kind of projects.
+
+I hope it answers to your concerns. The summary:
+* It is fully optional and built on top of existing features
+* If should not break anything
+* It's especially intended for RAD (at least I designed it for that use)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-27T09:28:15Z
+
+@dunglas I agree 100% with the idea of this PR and I thank you for working on it.
+
+Regarding the "magic fear" expressed by @iltar, I have one question:
+
+  * Nowadays, when I don't configure a service properly, I see a nice error. Then I add some (verbose) config and that's it.
+  * With this autowire feature, if I don't configure that same service, everything will still work and I won't see the previous error message. The "magic" has silently fixed my wrong config.
+
+My question is: for those people who don't want this feature, how can they know that their configuration is wrong but it was "silently" fixed by the autowiring feature?
+
+---------------------------------------------------------------------------
+
+by gnugat at 2015-08-27T09:30:54Z
+
+@itar: autowiring only solves the simplest use cases, for the rest you can still configure explicitly the services.
+Also this isn't a brand new feature: laravel (framework), PHP DI (library) and JmsDiExtraBubdle (sf bundle) provide it. My point is that it's already proven itself.
+
+Now Symfony already has some history with auto wiring, but it didn't make it in the end: https://groups.google.com/forum/m/#!topic/symfony-devs/77GxWI8F8lU
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T09:31:32Z
+
+As this is mainly based on typehinting against implementations, which is a big no-go for services. I'm afraid this is actually promoting to typehint against an implementation instead of the interface, resulting in almost useless services...
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T09:43:17Z
+
+@javiereguiluz It's similar to what I've suggested here https://github.com/symfony/symfony/pull/15613#issuecomment-134893696. What to you think of the tag based approach?
+@WouterJ it works fine with interfaces too (and I mostly use it that way): see "Autocompletion of definition arguments" and "Explicit type definition " examples in the PR description.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-27T09:46:16Z
+
+The qiestion @javiereguiluz is asking, is one of the things that concerns me as well, hence:
+> What if someone introduces another service with the same class, will everything (silently) break?
+
+```php
+class A {}
+
+class FooBar {
+    public function __construct(A $a);
+}
+```
+```yml
+services:
+    a.foo:
+        class: A
+
+    a.bar:
+        class: A
+
+    foobar:
+        class: FooBar
+```
+
+>>I can certainly see benefits for this such as request_stack, session, security., router etc. But most cases I encounter, that's just one of several dependencies injected. Does it mean it will still have to be verbose?
+
+>I'm not sure I understand what you mean. Can you give an example?
+
+```php
+class A {
+    public function __construct(RequestStack $rs, AB $a, BB $b);
+}
+```
+```yml
+services:
+    ab.henk:
+        class: AB
+    ab.jan:
+        class: AB
+    bb:
+        class: BB
+    a.foo:
+        class A:
+        arguments:
+            # how do I wire the request stack in here?
+            - `@ab.henk` # cannot be autowired, 2x AB defined
+            # BB is autowired?
+
+```
+
+I agree with what WouterJ said. This is also what happens with the JMSDiExtraBundle, which is the exact reason I avoid it. Maybe this could be a RapidDevelopmentBundle though? It seems like very pluggable functionality, similar to the `lazy:` option.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-08-27T09:54:08Z
+
+I have only one question, similar to the one raised by @javiereguiluz : for some reasons, in a project I don't want to use auto-wiring at all, I want to completely defines all my services. But, sometimes, I failed and I forget some things. How can I completely disable auto-wiring in order to see my mistakes?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T09:57:01Z
+
+@iltar it's exactly the example I've given:
+
+```php
+class A {}
+
+class FooBar {
+    public function __construct(A $a);
+}
+```
+```yml
+services:
+    a.foo:
+        class: A
+
+    a.bar:
+        class: A
+
+    foobar:
+        class: FooBar
+```
+
+You'll get the following error (at compile time): `RuntimeException`. `Unable to autowire argument of type "A" for the service "foobar". `
+
+For such cases:
+* if you want the autowiring you must define a default implementation for the given type (using the new `types` keyword)
+* or fallback to the classical explicit definition
+
+For your second example, you can of course fallback to the explicit definition, but you can also use the following syntax (your snippet edited):
+
+```yml
+services:
+    ab.henk:
+        class: AB
+    ab.jan:
+        class: AB
+    bb:
+        class: BB
+    a.foo:
+        class A:
+        arguments:
+            - '' # As it is empty, the autowiring will be triggered for request stack. Looks better in XML (I prefer XML...): <argument/>
+            - `@ab.henk` # cannot be autowired, 2x AB defined => explicit definition is OK
+            # Yes, BB will be autowired
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T10:02:14Z
+
+@Nicofuma in https://github.com/symfony/symfony/pull/15613#issuecomment-134893696 I've proposed the following:
+* in 2.8, explicitly mark definitions to autowire with a `autowire` tag (BC) and do nothing if the tag is not present
+* in 3.0 (and can safely be added to 2.8 too) mark definitions to not autowire with the `no-autowire` tag
+
+It's not implemented yet and feedback will be very appreciated :)
+We can also add a flag to the container to globally disable the autowiring (but the tag system will still be necessary).
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-27T10:02:21Z
+
+@dunglas I start liking XML as well (for opensource). But the recommendation and easy going way for your app is still yml. This means you still have to register the argument (or omit it).
+
+>```yml
+services:
+    ab.henk:
+        class: AB
+    ab.jan:
+        class: AB
+    bb:
+        class: BB
+    a.foo:
+        class A:
+        arguments:
+            - '' # As it is empty, the autowiring will be triggered for request stack. Looks better in XML (I prefer XML...): <argument/>
+            - `@ab.henk` # cannot be autowired, 2x AB defined => explicit definition is OK
+            # Yes, BB will be autowired
+```
+
+What if I would want to add a 4th argument or my extension/compiler pass calls `addArgument()`, a 4th argument would be required. This effectively means that the definition has 3 arguments and the autowiring tries to resolve the 4th.
+
+The biggest problem is that if this is enabled, it will lead to weird constructions in service definitions and headaches for the developers. It doesn't feel intuitive at all to me. I can already see questions coming to `#symfony`.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-27T10:03:59Z
+
+@dunglas that error is exactly what @javiereguiluz and @iltar mean.
+
+assume you had this config:
+```yaml
+services:
+    a.foo:
+        class: A
+
+    foobar:
+        class: FooBar
+```
+
+Everything works nice! Now, one of your coworkers (or yourself) add a new service somewhere in a config file:
+```yaml
+services:
+    a.bar: { class: A }
+```
+
+Whoa, foobar service throws an exception now and the application breaks! (only because I added an, apperently totally unrelated, a.bar service).
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-08-27T10:04:59Z
+
+The tag could solve some issue. But I think we still need a global flag (I wouldn't have to add a tag to each of my xxx services)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T10:07:19Z
+
+@iltar
+
+> What if I would want to add a 4th argument or my extension/compiler pass calls addArgument(), a 4th argument would be required. This effectively means that the definition has 3 arguments and the autowiring tries to resolve the 4th.
+
+The autowiring pass always occurs after custom passes. So you must work in your compiler with the current definition. The autowiring pass will try to complete the definition after all your custom code (compiler pass, extensions...) has been executed.
+
+> The biggest problem is that if this is enabled, it will lead to weird constructions in service definitions and headaches for the developers. It doesn't feel intuitive at all to me. I can already see questions coming to #symfony.
+
+Maybe that some Symfony developers don't know yet that feature but this is something really common in other ecosystems such as Java and Laravel. I'm sure Symfony developers will easily learn how to leverage the autowiring they are not less competent than J2EE or Laravel devs :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-27T10:11:40Z
+
+Spring Framework disables autowiring by default and if enabled, it lets you choose the type of autowiring applied: http://springindepth.com/book/in-depth-ioc-autowiring.html I guess that @Nicofuma and others are asking for a similar approach.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T10:14:18Z
+
+@WouterJ
+
+> Whoa, foobar services throws an exception now and the application breaks! (only because I added an, apperently totally unrelated, a.bar service).
+
+It breaks at the next request/command/whatever with the following message: `RuntimeException`: `Unable to autowire argument of type "A" for the service "foobar".`
+Unless your coworker deploy code in prod without even running it 1 time it should not be a major problem. There is hundred of way to break existing code. I don't think that adding the autowiring feature will change anything significantly on that topic.
+
+Anyway, if necessary I can improve the error message like the following:
+`RuntimeException`: `Unable to autowire argument of type "A" for the service "foobar": both "a.bar" and "a.foo" are of type "A".`
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T10:16:15Z
+
+@javiereguiluz sounds good to have a flag. I'll add it. We can even disable it by default in the component but enable it in the standard edition trough a `config.yml` parameter.
+
+IMO it should be enabled by default in the RAD edition (Symfony standard edition) as annotations and other "magic" as well as in Laravel and PHP DI.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-27T10:39:20Z
+
+@dunglas I agree with that, sounds like a good compromise if this feature is really desired.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-27T21:39:54Z
+
+Just pushed some changes according to the discussion of this morning:
+* autowiring can now be disabled
+
+Using the standalone component:
+```php
+new ContainerBuilder(new ParameterBag(array('container.autowiring' => false)))
+```
+
+Using the full stack framework:
+```php
+// app/AppKernel.php
+
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Config\Loader\LoaderInterface;
+
+class AppKernel extends Kernel
+{
+    public function __construct($environment, $debug)
+    {
+        parent::__construct(environment, $debug);
+        $this->containerAutowiring = false;
+    }
+
+    // ...
+}
+```
+
+* I've also introduced a new `no_autowiring` that prevent the autowiring to be executed for a given service definition even if the autowiring is globally enabled.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-28T03:14:25Z
+
+I don't like having global settings like `container.autowiring`. The problem is that depending on the value, third-party bundles can break.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-08-28T05:31:03Z
+
+I don't think third-party bundles should use this in the first place.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T06:24:06Z
+
+@fabbot Do you prefer a simple constructor flag on `ContainerBuilder` and a getter to be able to know the current value?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-28T07:08:43Z
+
+@dunglas Fabien is talking about a global setting not being suited for this. E.g. if bundle X relies on autowiring, it'll not be usuable in a app that has globally switched off autowiring.
+
+Why not implement it exactly like the Spring framework: opt-in instead of opt-out?
+```yaml
+services:
+  app.my_service:
+    class: ...
+    autowire: byType
+```
+
+Or:
+```yaml
+services:
+  app.my_service:
+    class: ...
+    tags:
+      - { name: autowrite, type: byType }
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-08-28T07:15:04Z
+
+> E.g. if bundle X relies on autowiring, it'll not be usuable in a app that has globally switched off autowiring.
+
+But third-party bundles already rely on nothing, right? Autowiring would be one of the numerous things that third-party bundles can't use (like YAML format, the base controller, etc.)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T07:19:09Z
+
+@WouterJ opt out is already implemented (see the `no_autowiring` tag) but this doesn't solve @Nicofuma and @iltar request to totally disable this feature without having to add a tag on every service.
+Opt in is not convenient because it require to add specific tags to all services using the feature it's not in scope with the spirit of this feature. The setter method allow that.
+
+For (public) bundles I agree with @iltar: they shouldn't rely on this feature at all (and it will work even if it is enabled). But because this feature is on by default, if some bundles start to use this feature, it will break only applications where the autowiring has been explicitly disabled (this is already possible to break many bundles by tweaking some low level settings).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-28T07:19:45Z
+
+@WouterJ Correct. We limit the global settings to the bare minimum and adding new ones should be done cautiously.
+
+@javiereguiluz That's not the same at all. You can definitely use the base controller or the YAML format, it is just not recommended as a best practice, but that works. For a global setting, that's totally different as the third-party cannot do anything about it. The behavior is different depending on a flag it does not have access to.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-28T07:20:44Z
+
+@dunglas Can you tell me which "low-level settings" can break bundles?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T07:30:01Z
+
+@fabpot it can check if the feature is enable or not (`$container->isAutowiring` in an extension).
+I already got troubles making some bundle working when default `cache` and `log` path where changed (but bundles where bad written).
+
+Here it's the same, a bundle can test if the autowiring is disabled and throw an exception for instance.
+
+But I personally don't care to globally disable this feature (I'll never do that even in project I'll not use it). What do you suggest @fabpot? I can remove that flag is you think it's better but it will stop people wanting to explicitly disable that feature to do it.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-28T13:35:34Z
+
+> I can remove that flag is you think it's better but it will stop people wanting to explicitly disable that feature to do it.
+In all cases, this behavior should be "globaly" configurable or disabled by default: I don't want to be forced to disable it for each service I declare.
+
+@WouterJ proposal sounds good approach, what do you think @dunglas ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T14:12:55Z
+
+@mickaelandrieu it's similar to what is already implemented but this is currently an optout instead of an optin.
+
+The advantage of @WouterJ's approach is that it's fully BC (currently tests fail because of some edge case with existing services).
+The inconvenient that make the feature a bit more verbose than in Laravel and PHP DI (DX).
+
+I've no strong opinion even if I think that less config is better when speaking about RAD features.
+Enabling the optin approach is a matter of changing a few lines in this PR. If the majority here prefer the optin approach I'll update the PR tomorrow.
+
+What do you think?
+
+cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-28T14:25:50Z
+
+> It maybe introduces some "magic" but no complexity at all: this feature is fully optional and developers that don't like it can define their services as they have always done. IMO this feature simplify the use of the DI in the context of RAD (I'll get back to it).
+
+it is optional only if services have to opt in. you were suggesting to make it an opt-out feature in 3.0.
+And the issue with making it an opt-out is that third-party bundle will not know they are using this feature, unless they explicitly opt-out for all services (in which case they will either hate you or not do it): their service definition will be magically fixed by the auto-wiring when they make a mistake and they won't notice it because it will work for them.
+
+Regarding the feature, I'm wondering whether this needs to be in core. The only change you are doing in the Definition is adding the concept of types. This could be handled with a tag instead: ``<tag name="autowiring.type" type="Foobar" />``. this way, the whole logic would be implemented only a a compiler pass, which could live in its own package and have a third-party bundle registering the compiler pass. Btw, this would solve the case of disabling auto-wiring entirely (don't register the bundle) and the fact that third-party bundles should not depend on the feature (the feature will not be in core, so they will be tested without it)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-28T14:38:57Z
+
+> currently tests fail because of some edge case with existing services
+
+this precisely mean it is **not** BC. A backward compatible feature cannot make existing test fail, as this is precisely the definition of backward compatibility: old code keeps working without requiring any change
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-28T15:14:19Z
+
+> Regarding the feature, I'm wondering whether this needs to be in core.
+
+Same, but create a Bundle is not the solution because we will be happy to use it in Drupal or BackBee, maybe a "symfony/di-autowiring" suggested dependency to the component ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-28T15:17:28Z
+
+@mickaelandrieu note that I talked about a bundle **registering** the compiler pass. For the compiler pass itself, I said
+
+> which could live in its own package
+
+This package would be usable outside the fullstack framework.
+
+However, I'm not sure putting it as a suggestion in the component makes sense. We cannot list all packages extending the component there. In Symfony, we use suggestions to list packages necessary to unlock some extra features provided in the component itself
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-08-28T15:19:43Z
+
+>>    Regarding the feature, I'm wondering whether this needs to be in core.
+
+>Same, but create a Bundle is not the solution because we will be happy to use it in Drupal or BackBee, maybe a "symfony/di-autowiring" suggested dependency to the component ?
+
+You can still add the bundle to your composer.json and register the compiler pass yourself.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-28T15:21:41Z
+
+@stof Ok, I understand your point :) totaly agree.
+
+@Nicofuma yes, like the webdebug toolbar for Silex: it works but it sounds like a hack to me :/
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T20:11:47Z
+
+@stof I've tried to make a bundle at the beginning but there are some limitations:
+
+1/ Using a tag for type association looks good for a single association but becomes ugly for more:
+
+```php
+class Serializer implements NormalizerInterface, DenormalizerInterface {}
+```
+
+```xml
+<service id="serializer" class="Serializer">
+    <tag name="autowiring.types" types="NormalizerInterface, DenormalizerInterface" />
+</service>
+```
+
+(It's the best looking syntax I managed to get but it still looks more "hackish" than what we can do in core.)
+
+2/ Some optimization passes must run before the autowiring pass and others must run after and I didn't managed to get it working: https://github.com/symfony/symfony/pull/15613/files#diff-951ca6c937d7f2e6ab0b88822700a12cR59
+
+3/ From an adoption and marketing point of view (nothing technical here) an external bundle will prevent massive adoption for RAD project. This point can be whittled/avoided by using putting the bundle under the Symfony namespace (or maybe in SensioFrameworkExtraBundle) and/or integrating the bundle in the standard edition.
+
+About the BC break: putting this code in an external bundle/library won't help if it still break FrameworkBundle and SecurityBundle as it's currently the case. The only way is to fix it.
+More I think about it and more I think that enabling the autowiring only when a tag is added (option - the @WouterJ's approach) is the good way (even for 3.0): fully BC, more explicit and not requiring a global config flag (the issue raised by @fabpot).
+
+I'll try to update the PR tonight or tomorrow. It will be useful even if we find a way to make it an external bundle.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-28T20:40:29Z
+
+I've just updated the PR to reflect thoughts exposed in my previous comment:
+* autowiring must now be enabled manually using the new `autowiring` tag
+* the global config flag has been removed (this feature is now always enabled but the tag must be added to all autowired service)
+* consequently there is no more BC break and Travis is happy
+
+I've also updated the PR description to reflect the new syntax.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-28T22:20:02Z
+
+@dunglas multiple types using the tags can be implemented by multiple tags:
+```xml
+<service id="serializer" class="Serializer">
+    <tag name="autowiring.types" type="NormalizerInterface" />
+    <tag name="autowriring.types" type="DenormalizerInterface" />
+</service>
+```
+And marketing applies to every feature that's inside another bundle and not a good reason to just put everything into core.
+
+Btw, I don't have a very strong opinion about it being in Core or in a seperate bundle/library.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-28T22:56:15Z
+
+Multiple tags are what I had in mind, and it is much cleaner than trying to put multiple values in the same attribute IMO.
+
+> Some optimization passes must run before the autowiring pass and others must run after and I didn't managed to get it working
+
+the bundle can inject its pass in the middle of existing passes if it wants (it is more complex than just appending a pass at the end of a section, indeed, but it is possible)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-29T08:03:03Z
+
+@WouterJ I know we can use multiple tags but it's even more verbose than the way I suggested.
+
+```yaml
+services:
+   foo:
+       class: Foo
+       interfaces: [ A, B, C ]
+```
+
+```yaml
+services:
+   foo:
+       class: Bar
+       tags:
+           - { name: autowiring.type, type: A }
+           - { name: autowiring.type, type: B }
+           - { name: autowiring.type, type: C }
+```
+
+IMO the first one looks cleaner (but it's maybe a matter of taste) and is less verbose.
+
+@stof got it I've missed the `PassConfig::setOptimizationPasses()` method before thanks.
+
+The PR is now ready (if this feature stay in core). It is BC and tests pass. There is two advantages of having this feature in core:
+1. it will be available for everyone having Symfony >= 2.8 (component or full stack) without requiring any external dependency nor config.
+2. the `types` syntax is more straightforward (more explicit and less verbose)
+
+I can't see any disadvantage to have it in core now that it's an optin feature: it can't break anything anymore. Autowiring is IMO a feature that should be available natively. It is available directly in Spring, Laravel and PHP DI. Why not in Symfony?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-08-29T11:21:00Z
+
+:+1: convinced now. Great work @dunglas ! BackBee will be updated to Symfony 2.8 and will enjoy this new feature ;)
+
+---------------------------------------------------------------------------
+
+by gnugat at 2015-08-29T14:57:16Z
+
+Autowiring (A.K.A interface injection) was a feature of symfony but it has been removed for [the reasons summed up here](http://richardmiller.co.uk/2011/05/04/symfony2-dependency-injection-types-update/) by @richardmiller:
+
+> Interface injection has been removed from Symfony2 altogether so this is no longer a viable way of injecting dependencies. More information on why can be found by reading [this thread from the developers mailing list](https://groups.google.com/forum/#!topic/symfony-devs/77GxWI8F8lU).
+>
+> Essentially the problem appears to be that when configuring interface injection it is to easy to override the dependencies passed to any class that implements that interface in third party code. Preventing this from happening altogether would be straight forward but would completely remove the ability to override the dependency passed in cases where doing so is a desirable extension point to a third party bundle. Resolving this issue would prove to be more complicated in the internals of the DIC than is worth it to provide this infrequently used way of injecting dependencies. Someone please correct me if I have missed the point here.
+
+I'm not sure if this point still stand though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-08-29T15:16:21Z
+
+If I understood well, auto-wiring would encourage to type hinting against class names, not interfaces. But the more generic a code is, the less it should type hint against classes. The best practice is to type hint against interfaces. Of course, it would be possible to benefit from autowiring and still use interfaces hints, but this would go against the purpose of this PR (~less code to write services). To me, by encouraging classes hints, this PR creates a coupling between implementations (=classes) and the dic. Which means that these classes will be less reusable in a non-dic context (not as much as private properties injection would do, but still in that direction).
+At least that's my concern. How would you answer to this objection @dunglas ?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-08-29T15:42:18Z
+
+I think @richardmiller's point is a very valid one. Let's assume you have this setup:
+```yml
+services:
+    app.mailer:
+        class: AppBundle\Mailer\SwiftmailerMailer
+        type: MailerInterface
+
+    app.newsletter_manager:
+        class: AppBundle\Newsletter\NewsletterManager
+```
+with:
+```php
+class NewsletterManager
+{
+    // ...
+    public function __construct(MailerInterface $mailer)
+    { /* ... */ }
+}
+```
+
+How would I overwrite the mailer service, so that it uses `PhpMailer`? Adding `PhpMailer` as a ervice will give the "unable to resolve mailer" service. The only way is to change one of 2 definitions to change the class name or explicitely add the ervice to be injected.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-29T17:26:42Z
+
+@nicolas-grekas I've already talked a bit about that in https://github.com/symfony/symfony/pull/15613#issuecomment-135350619
+
+> The system is smarter than just using the class name. I've posted some examples using interfaces in the PR description.
+>
+> To sum up:
+>
+> If the definition is explicit (the actual way of registering service): nothing change, the current behavior applies
+> If they are missing arguments in a service definition:
+> the system guesses all types of existing services definition (including interface implementations and inherited types) and tries to fill the incomplete definition automatically with a service of the type required by the typehint (as explained previously, it works only if there is one implementation or if a types has been set explicitly)
+> If the typehint is a class name, no existing service of this type exists and this class name is instantiable: a private service is automatically registered and injected
+
+In the first version of this feature (before I opened the PR) there was no support at all for what I call "Automatic dependency registration" (typehint against concrete classes instead of interfaces).
+The only supported way was using interfaces (and it works only if there is one registered implementation of a given interface) and the new `types` keyword (works even if there is multiple implementation thanks to the new `type` keyword).
+
+After taking a look to features supported by Laravel and PHP DI, I figured that automatically registering concrete implementations would require only some minor code change in the compiler pass and I've done it.
+
+So the autowiring feature works well with interfaces and IMO it doesn't change anything to best practices. However, in a hurry and before adding interfaces in a refactoring (prototype, week-end project...) or for private and small projects where you're sure you'll not use different implementations and don't want to bother creating interfaces, this feature help to reduce the configuration needed to register dependencies.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-08-29T17:35:38Z
+
+@WouterJ I'm not sure to understand well your concern:
+
+As the feature must now be enabled on a per definition basis, your example will not work at all (it will use the exact same system as we currently have).
+
+You need to write:
+
+```yaml
+services:
+    app.mailer:
+        class: AppBundle\Mailer\SwiftmailerMailer
+        types: [ MailerInterface ]
+
+    app.newsletter_manager:
+        class: AppBundle\Newsletter\NewsletterManager
+        tags: { name: autowiring }
+```
+
+Now if you introduce another service (PHPMailer) like the following (?):
+
+```yaml
+services:
+   # services1.yml
+    app.mailer:
+        class: AppBundle\Mailer\SwiftmailerMailer
+        types: [ MailerInterface ]
+
+    # services2.yml
+    app.php_mailer:
+        class: AppBundle\Mailer\PhpMailer
+        types: [ MailerInterface ]
+
+    app.newsletter_manager:
+        class: AppBundle\Newsletter\NewsletterManager
+        tags: { name: autowiring }
+```
+
+The last definition associated with a type will take priority and previous associations will be discarded. Here PHPMailer will be inserted for all services typehinting against MailerInterface and using the autowiring. If you want to insert another instance, just add an explicit argument (here `app.mailer` as first argument, exactly as it must be done currently).
+
+For public bundles, the use of autowiring is discouraged (it will work, as the framework controller, YAML definitions and all other shortcuts work - but it will not be considered a best practice).
+
+---------------------------------------------------------------------------
+
+by lol768 at 2015-09-05T22:33:20Z
+
+Just want to add my support for this PR. I've used similar systems (Laravel's container, Google's guice, Autofac, Castle Windsor) and found them to be a great help while trying to follow best practices (SOLID design principles especially) and ensuring the controller isn't unnecessarily tied to the service container or a particular implementation of an interface.
+
+I also like having the ability to quickly and easily swap out implementations of an interface (e.g. if I wanted to change an `INotificationService` interface to make use of a new `IrcNotificationService` implementation) across my entire application.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-22T19:48:17Z
+
+ping @fabpot @symfony/deciders
+
+It would be great to have this PR merged in 2.8.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-22T22:20:02Z
+
+IMO this doesn't have priority since it doesn't deprecate or break things. So no need to make it for 2.8/3.0 necessarily. Considering there have been alternative proposals, we might want to ensure this is the way we want to go.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-23T06:41:22Z
+
+@Tobion I agree this is not top priority stuff but as you pointed out it doesn't deprecate nor break anything so it can be merged safely.
+It is another nice, new and modern feature and IMO it's more sexy to release a major version with some cool stuffs even if I fully agree that modernizing and cleaning the existing code base must be the top priority.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-23T12:47:58Z
+
+I'm not a big fan of the `type` name. `type` is a generic word that does not convey any meaningful idea. Can we find a better name (even if a bit longer)? Or is `type` used by some containers in PHP or other langauges?
+
+---------------------------------------------------------------------------
+
+by harikt at 2015-09-23T13:01:46Z
+
+Aura.Di uses types https://github.com/auraphp/Aura.Di/tree/2.2.3#explicitly-directing-auto-resolution-typehints . And autowiring sometimes looks nice, but also is a curse ;) . Care should be taken when bringing the functionality.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-23T13:04:21Z
+
+`type` was looking explicit to me (I wasn't aware that Aura.DI used the same name) but I'm not against changing it it if someone has a better idea.
+
+---------------------------------------------------------------------------
+
+by lol768 at 2015-09-23T13:25:58Z
+
+> I'm not a big fan of the type name. type is a generic word that does not convey any meaningful idea. Can we find a better name (even if a bit longer)? Or is type used by some containers in PHP or other langauges?
+
+Type seems pretty self-explanatory to me. Autofac uses a a [RegisterType](http://autofac.org/apidoc/html/B42A3DFD.htm) method which is called like so:
+
+```c#
+builder.RegisterType<EmailService>().As<IEmailService>();
+```
+
+In this case it's the concrete implementation that's supplied and then the contract.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-23T16:21:22Z
+
+The usage would look like this currently, correct?
+
+```php
+$definition->addType('Acme\Foo\ManagerInterface');
+```
+
+```yml
+services:
+    class: Acme\Foo\BarManager:
+    types:
+        - Acme\Foo\ManagerInterface
+```
+
+If so, might I suggest `autowiring_types`? Also, would it be better to allow these to be configured on the `ContainerBuilder` instead of the `Definition`? It feels like a property of the Container, not the Definition - just like aliases (though YAML/XML allow aliases to be set on the service level).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-23T16:51:02Z
+
+@weaverryan it is a property of the service, not of the container: these are the types for which this service will used.
+If you define it in the container, you will have to store a map of ``type => service`` or ``service => types``
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-23T16:55:29Z
+
+@stof Doesn't a map of `type => service` make the most sense? That's what part of what the `AutowiringPass:populateAvailableTypes()` does: it needs this exact map. It doesn't really matter - it just feels like knowing which type will map to which service is a global property of the entire container.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T06:56:00Z
+
+@weaverryan yes it's the intended usage. `type` and `autowiring_types` looks good to me I've no preference. What do you think @symfony/deciders?
+
+I think it's more intuitive and developper-friendly to specify the list of types associated by a given service in its definition instead of having a sort of top-level association list but I'm open to change that if necessary (it's details)!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T07:08:20Z
+
+`autowiring_types` looks much better to me.
+I understand @weaverryan point of view but adding another top-level entry sounds like too much for a feature that is optional.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T07:56:58Z
+
+Ok I'll change the name during the day.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-24T11:39:23Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-24T17:46:33Z
+
+Renaming done.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-25T09:42:35Z
+
+Travis failure unrelated.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-26T19:22:16Z
+
+I just pulled this down and played with it. It works really nicely. A few issues and suggestions:
+
+A) Activating this with a tag is not great (purely from a syntax standpoint): tags in YAML are the ugliest thing you come across. Anyways, if we do keep it as a tag `autowire` sounds better to me than `autowiring` (the first sounds like a command: "please autowire this service"). Other than cluttering up the Definition, I'd really like this to be a root key:
+
+```yaml
+services:
+    my_service:
+        class: Acme\Foo
+        autowire: true
+```
+
+B) When I update a class that's autowired, the container is not rebuilt. I think we need to add the class and all parent classes as DI resources. There will be a dev environment penalty for using this: that's unavoidable, and so it won't be usable by large projects (where rebuilding the container takes a lot of time).
+
+C) Look at the following setup:
+
+```yml
+services:
+    markdown:
+        class: AppBundle\Utils\Markdown
+        tags:
+            - { name: autowiring }
+
+    app.twig.app_extension:
+        public:    false
+        class:     AppBundle\Twig\AppExtension
+        tags:
+            - { name: twig.extension }
+            - { name: autowiring }
+```
+
+This works great - the cached container includes:
+
+```php
+$instance->addExtension(new \AppBundle\Twig\AppExtension($this->get('markdown')));
+```
+
+But if I add this service:
+
+```yml
+services:
+    # ...
+    markdown2:
+        class: AppBundle\Utils\Markdown
+        tags:
+            - { name: autowiring }
+```
+
+Suddenly, it inlines the service creation:
+
+```php
+$instance->addExtension(new \AppBundle\Twig\AppExtension(new \AppBundle\Utils\Markdown()));
+```
+
+That's obviously not right :). To minimize the WTF moments, why not throw an Exception if there's any question at all as to which service should be auto-wired somewhere?
+
+D) You mentioned earlier that if 2 services are set to have the same "type", the second one wins (and this i the behavior I saw). Like with (C), would an exception be better? (your original PR description mentions this was the original behavior).
+
+I certainly like the idea, and it's not a new idea for sure. But the Symfony way is to eliminate the magic. So if we accepted this, I'd want it to be opinionated and throw exceptions when it's not sure what to do (instead of just "working").
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-28T06:47:32Z
+
+Thank you for the review @weaverryan!
+
+I totally agree with you for A, B. I'll update the PR during the day.
+
+For C and D, I prefer to have the last definition to override previous ones: imagine you have 2 private bundles using autowiring `MyFeatureBundle` and `MyFeatureDebugBundle`. With the current behavior, you can override a `type` definition from the previous bundle in the second and replace the standard implementation by a debug one.
+
+If an exception is thrown, you're stuck, you cannot use autowiring at all.
+
+It's the exact same behavior for service definitions: if you have 2 definitions for the same service name, the last one takes priority. It doesn't look so magic to me: it's a common behavior in Symfony. For instance in the Router, route definitions can be override too.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-09-28T12:43:30Z
+
+@weaverryan C was a bug. In such case it must throw an exception (and it's what it does now). Thanks for finding it.
+
+* `autowiring` tag replaced by a new `autowire` keyword
+* bug found by @weaverryan fixed
+* PR description updated to reflect the new syntax
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-28T23:45:10Z
+
+This feature isn't to be taken lightly, but it gets a :+1: from me. You now need to opt-in to the feature on every service (with `autowire: true`), which I really like. It also throws an exception if it can't guess which service to use for a dependency (i.e. 2 services have the same class that you've type-hinted, and neither has explicitly set `autowiring_types` to that class).
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-29T05:22:26Z
+
+Opt-in and exception on failure, I like that. I don't see myself use this functionality just yet, but I can imagine a lot of other developers will.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-30T12:28:48Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-09-30T15:59:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T13:05:10Z
+
+Tests do not pass and that seems to be related with the changes from this PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-01T13:41:07Z
+
+It's strange because they pass locally. I take a deeper look.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-02T06:44:24Z
+
+Rebased, it looks OK now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-02T10:09:11Z
+
+@stof should be OK now

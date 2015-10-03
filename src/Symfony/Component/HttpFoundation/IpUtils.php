@@ -62,11 +62,11 @@ class IpUtils
     public static function checkIp4($requestIp, $ip)
     {
         if (false !== strpos($ip, '/')) {
-            if ('0.0.0.0/0' === $ip) {
+            list($address, $netmask) = explode('/', $ip, 2);
+
+            if ('0' === $netmask) {
                 return true;
             }
-
-            list($address, $netmask) = explode('/', $ip, 2);
 
             if ($netmask < 1 || $netmask > 32) {
                 return false;

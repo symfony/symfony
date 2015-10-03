@@ -89,7 +89,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
         $container->compile();
     }
 
-    public function testHttpKernelRegisterCommandsIngoreCommandAsAService()
+    public function testHttpKernelRegisterCommandsIgnoreCommandAsAService()
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());

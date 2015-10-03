@@ -113,7 +113,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
      */
     public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
     {
-        // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected excetion and not use the regex
+        // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected exception and not use the regex
         $resolver = $this->createControllerResolver();
         $this->setExpectedExceptionRegExp($exceptionName, $exceptionMessage);
 

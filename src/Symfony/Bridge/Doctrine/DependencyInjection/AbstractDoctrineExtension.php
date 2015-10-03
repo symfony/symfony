@@ -403,7 +403,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Returns a modified version of $managerConfigs.
      *
-     * The manager called $autoMappedManager will map all bundles that are not mepped by other managers.
+     * The manager called $autoMappedManager will map all bundles that are not mapped by other managers.
      *
      * @param array $managerConfigs
      * @param array $bundles

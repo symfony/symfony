@@ -90,13 +90,13 @@ class SetAclCommandTest extends WebTestCase
 
         try {
             $acl->isGranted($permissionMap->getMasks('OWNER', null), array($securityIdentity1));
-            $this->fail('NoAceFoundException not throwed');
+            $this->fail('NoAceFoundException not thrown');
         } catch (NoAceFoundException $e) {
         }
 
         try {
             $acl->isGranted($permissionMap->getMasks('OPERATOR', null), array($securityIdentity2));
-            $this->fail('NoAceFoundException not throwed');
+            $this->fail('NoAceFoundException not thrown');
         } catch (NoAceFoundException $e) {
         }
     }
@@ -133,13 +133,13 @@ class SetAclCommandTest extends WebTestCase
 
         try {
             $acl->isGranted($permissionMap->getMasks('VIEW', null), array($userSecurityIdentity));
-            $this->fail('NoAceFoundException not throwed');
+            $this->fail('NoAceFoundException not thrown');
         } catch (NoAceFoundException $e) {
         }
 
         try {
             $acl->isGranted($permissionMap->getMasks('OPERATOR', null), array($userSecurityIdentity));
-            $this->fail('NoAceFoundException not throwed');
+            $this->fail('NoAceFoundException not thrown');
         } catch (NoAceFoundException $e) {
         }
     }

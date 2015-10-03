@@ -340,6 +340,14 @@ EOF
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
     }
 
+    public function testIteration()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//li');
+
+        $this->assertInstanceOf('Traversable', $crawler);
+        $this->assertContainsOnlyInstancesOf('DOMElement', iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
+    }
+
     public function testSlice()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
@@ -469,6 +477,12 @@ EOF
 
         $crawler = $this->createTestCrawler();
         $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+    }
+
+    public function testFilterRemovesDuplicates()
+    {
+        $crawler = $this->createTestCrawler()->filter('html, body')->filter('li');
+        $this->assertCount(6, $crawler, 'The crawler removes duplicates when filtering.');
     }
 
     public function testFilterXPathWithDefaultNamespace()

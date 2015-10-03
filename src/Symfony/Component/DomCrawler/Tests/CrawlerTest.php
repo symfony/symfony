@@ -77,6 +77,16 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Attaching DOM nodes from multiple documents in the same crawler is forbidden.
+     */
+    public function testAddMultipleDocumentNode()
+    {
+        $crawler = $this->createTestCrawler();
+        $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
+    }
+
+    /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
      */
     public function testAddHtmlContent()

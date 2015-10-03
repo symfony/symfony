@@ -18,7 +18,7 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Crawler implements \Countable
+class Crawler implements \Countable, \IteratorAggregate
 {
     /**
      * @var string The current URI
@@ -46,7 +46,7 @@ class Crawler implements \Countable
     private $document;
 
     /**
-     * @var \DOMNode[]
+     * @var \DOMElement[]
      */
     private $nodes = array();
 
@@ -327,25 +327,19 @@ class Crawler implements \Countable
         }
 
         if (null !== $this->document && $this->document !== $node->ownerDocument) {
-            @trigger_error('Attaching DOM nodes from multiple documents in a Crawler is deprecated as of 2.8 and will be forbidden in 3.0.', E_USER_DEPRECATED);
+            throw new \InvalidArgumentException('Attaching DOM nodes from multiple documents in the same crawler is forbidden.');
         }
 
         if (null === $this->document) {
             $this->document = $node->ownerDocument;
         }
 
+        // Don't add duplicate nodes in the Crawler
+        if (in_array($node, $this->nodes, true)) {
+            return;
+        }
+
         $this->nodes[] = $node;
-    }
-
-    // Serializing and unserializing a crawler creates DOM objects in a corrupted state. DOM elements are not properly serializable.
-    public function unserialize($serialized)
-    {
-        throw new \BadMethodCallException('A Crawler cannot be serialized.');
-    }
-
-    public function serialize()
-    {
-        throw new \BadMethodCallException('A Crawler cannot be serialized.');
     }
 
     /**
@@ -964,6 +958,14 @@ class Crawler implements \Countable
     public function count()
     {
         return count($this->nodes);
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->nodes);
     }
 
     /**

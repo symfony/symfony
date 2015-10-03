@@ -218,11 +218,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    public function getTranslator($loader, $options = array(), $loaderFormat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
-        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat);
+        $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFormat);
 
-        if ('loader' === $loaderFomat) {
+        if ('loader' === $loaderFormat) {
             $translator->addResource('loader', 'foo', 'fr');
             $translator->addResource('loader', 'foo', 'en');
             $translator->addResource('loader', 'foo', 'es');
@@ -260,12 +260,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader')
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFormat = 'loader')
     {
         return new $translatorClass(
             $this->getContainer($loader),
             new MessageSelector(),
-            array($loaderFomat => array($loaderFomat)),
+            array($loaderFormat => array($loaderFormat)),
             $options
         );
     }

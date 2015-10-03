@@ -160,7 +160,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 $mergeStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
 
-                //Oracle has a bug that will intermitently happen if you
+                //Oracle has a bug that will intermittently happen if you
                 //have only 1 bind on a CLOB field for 2 different statements
                 //(INSERT and UPDATE in this case)
                 if ('oracle' == $this->con->getDatabasePlatform()->getName()) {

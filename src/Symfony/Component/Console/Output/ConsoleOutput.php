@@ -125,7 +125,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function isRunningOS400()
     {
-        return 'OS400' === PHP_OS;
+        return 'OS400' === php_uname('s');
     }
 
     /**

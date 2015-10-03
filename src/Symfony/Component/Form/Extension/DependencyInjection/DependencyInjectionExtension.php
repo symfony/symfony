@@ -25,9 +25,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
     private $guesser;
     private $guesserLoaded = false;
 
-    public function __construct(ContainerInterface $container,
-        array $typeServiceIds, array $typeExtensionServiceIds,
-        array $guesserServiceIds)
+    public function __construct(ContainerInterface $container, array $typeServiceIds, array $typeExtensionServiceIds, array $guesserServiceIds)
     {
         $this->container = $container;
         $this->typeServiceIds = $typeServiceIds;

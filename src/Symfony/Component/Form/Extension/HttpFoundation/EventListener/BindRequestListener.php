@@ -44,9 +44,6 @@ class BindRequestListener implements EventSubscriberInterface
 
         @trigger_error('The '.__CLASS__.' class is deprecated since version 2.3 and will be removed in 3.0. Pass the Request instance to the \Symfony\Component\Form\Form::handleRequest() method instead.', E_USER_DEPRECATED);
 
-        // Uncomment this as soon as the deprecation note should be shown
-        // @trigger_error('Passing a Request instance to Form::submit() is deprecated since version 2.3 and will be disabled in 3.0. Call Form::process($request) instead.', E_USER_DEPRECATED);
-
         $name = $form->getConfig()->getName();
         $default = $form->getConfig()->getCompound() ? array() : null;
 

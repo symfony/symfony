@@ -508,12 +508,12 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function submit($submittedData, $clearMissing = true)
     {
-        if ($submittedData instanceof Request) {
-            return $this->handleRequest($submittedData);
-        }
-
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
+        }
+
+        if ($submittedData instanceof Request) {
+            return $this->handleRequest($submittedData);
         }
 
         // Initialize errors in the very beginning so that we don't lose any

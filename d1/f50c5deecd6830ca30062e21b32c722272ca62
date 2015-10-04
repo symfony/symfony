@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-03T21:26:38Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-03T23:47:18Z
+
+For 2.3 the same would need to be applied in https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Process/ProcessPipes.php#L52
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-04T15:08:45Z
+
+Thanks @Tobion, I have created a new PR for 2.3 here: #16111

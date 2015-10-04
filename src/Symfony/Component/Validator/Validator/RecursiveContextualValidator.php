@@ -191,8 +191,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
-            // Cannot be UnsupportedMetadataException because of BC with
-            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
@@ -242,8 +240,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($objectOrClass);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
-            // Cannot be UnsupportedMetadataException because of BC with
-            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
@@ -404,7 +400,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             if (is_array($value)) {
                 // Arrays are always cascaded, independent of the specified
                 // traversal strategy
-                // (BC with Symfony < 2.5)
                 $this->validateEachObjectIn(
                     $value,
                     $propertyPath.'['.$key.']',
@@ -416,7 +411,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             // Scalar and null values in the collection are ignored
-            // (BC with Symfony < 2.5)
             if (is_object($value)) {
                 $this->validateObject(
                     $value,
@@ -615,8 +609,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         // If TRAVERSE, fail if we have no Traversable
         if (!$object instanceof \Traversable) {
-            // Must throw a ConstraintDefinitionException for backwards
-            // compatibility reasons with Symfony < 2.5
             throw new ConstraintDefinitionException(sprintf(
                 'Traversal was enabled for "%s", but this class '.
                 'does not implement "\Traversable".',
@@ -726,7 +718,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         if (is_array($value)) {
             // Arrays are always traversed, independent of the specified
             // traversal strategy
-            // (BC with Symfony < 2.5)
             $this->validateEachObjectIn(
                 $value,
                 $propertyPath,
@@ -739,7 +730,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         // If the value is a scalar, pass it anyway, because we want
         // a NoSuchMetadataException to be thrown in that case
-        // (BC with Symfony < 2.5)
         $this->validateObject(
             $value,
             $propertyPath,

@@ -268,7 +268,6 @@ class ProcessBuilder
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         if ($this->inheritEnv) {
-            // include $_ENV for BC purposes
             $env = array_replace($_ENV, $_SERVER, $this->env);
         } else {
             $env = $this->env;

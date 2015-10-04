@@ -446,7 +446,6 @@ EOF
 
         $this->assertCount(0, $crawler->filterXPath('/input'));
         $this->assertCount(0, $crawler->filterXPath('/body'));
-        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
         $this->assertCount(1, $crawler->filterXPath('./body'));
         $this->assertCount(1, $crawler->filterXPath('.//body'));
         $this->assertCount(5, $crawler->filterXPath('.//input'));
@@ -538,9 +537,18 @@ EOF
     {
         $crawler = $this->createTestCrawler();
         $this->assertCount(0, $crawler->filterXPath('.'), '->filterXPath() returns an empty result if the XPath references the fake root node');
-        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::*'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+    }
+
+    /** @group legacy */
+    public function testLegacyFilterXPathWithFakeRoot()
+    {
+        $crawler = $this->createTestCrawler();
+        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+
+        $crawler = $this->createTestCrawler()->filterXPath('//body');
+        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
     }
 
     public function testFilterXPathWithAncestorAxis()

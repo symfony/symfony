@@ -217,7 +217,7 @@ class Question
      *
      * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
      *
-     * @param string|\Closure $normalizer
+     * @param callable $normalizer
      *
      * @return Question The current instance
      */
@@ -233,7 +233,7 @@ class Question
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return string|\Closure
+     * @return callable
      */
     public function getNormalizer()
     {

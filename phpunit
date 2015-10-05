@@ -6,12 +6,26 @@ use Symfony\Component\Process\ProcessUtils;
 error_reporting(-1);
 require __DIR__.'/src/Symfony/Component/Process/ProcessUtils.php';
 
-$PHPUNIT_VERSION = '4.8';
-$PHPUNIT_DIR = __DIR__.'/.phpunit';
-
 // PHPUnit 4.8 does not support PHP 7, while 5.0 requires PHP 5.6+
-if (PHP_VERSION_ID >= 70000) {
-    $PHPUNIT_VERSION = '5.0';
+$PHPUNIT_VERSION = PHP_VERSION_ID >= 70000 ? '5.0' : '4.8';
+$PHPUNIT_DIR = __DIR__.'/.phpunit';
+$PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
+
+if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
+    $COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : (`which composer.phar` ?: `which composer`));
+    if (!file_exists($COMPOSER)) {
+        stream_copy_to_stream(
+            fopen('https://getcomposer.org/composer.phar', 'rb'),
+            fopen($COMPOSER = __DIR__.'/composer.phar', 'wb')
+        );
+    }
+}
+
+$PHP = ProcessUtils::escapeArgument($PHP);
+$COMPOSER = $PHP.' '.ProcessUtils::escapeArgument($COMPOSER);
+
+if (!(isset($argv[1]) && 'install' === $argv[1]) && !file_exists(__DIR__.'/vendor')) {
+    passthru("$COMPOSER update --no-progress --ansi");
 }
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
@@ -30,8 +44,8 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
     $zip->extractTo(getcwd());
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
-    passthru("composer remove --no-update symfony/yaml");
-    passthru("composer install --prefer-source --no-progress --ansi");
+    passthru("$COMPOSER remove --no-update symfony/yaml");
+    passthru("$COMPOSER install --prefer-source --no-progress --ansi");
     chdir($oldPwd);
 }
 
@@ -42,7 +56,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     array_shift($cmd);
 }
 
-$cmd[0] = "php $PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit --colors=always";
+$cmd[0] = sprintf('%s %s --colors=always', $PHP, ProcessUtils::escapeArgument("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit"));
 $cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
 
 $phpIniMatrix = isset($_SERVER['PHP_INI_MATRIX']) ? explode(' ', $_SERVER['PHP_INI_MATRIX']) : array();
@@ -52,7 +66,7 @@ if ($phpIniMatrix) {
         exit(1);
     }
 
-    $phpDir = dirname(`where.exe php`);
+    $phpDir = ProcessUtils::escapeArgument(dirname(`where.exe php`));
 
     $newCmd = 'cmd /v:on /d /c "(SET X=0';
     foreach ($phpIniMatrix as $iniFile) {

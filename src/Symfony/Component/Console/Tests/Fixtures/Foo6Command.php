@@ -7,7 +7,6 @@ class Foo6Command extends Command
 {
     protected function configure()
     {
-        $this->setName('<fg=blue>foo:bar</fg=blue>');
+        $this->setName('0foo:bar')->setDescription('0foo:bar command');
     }
-
 }

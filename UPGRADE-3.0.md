@@ -477,6 +477,8 @@ UPGRADE FROM 2.x to 3.0
    interface.
    The `security.csrf.token_manager` should be used instead.
 
+ * The `LoggerInterface` argument was removed from the `Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader` constructor.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in

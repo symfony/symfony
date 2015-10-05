@@ -1036,6 +1036,8 @@ class Crawler extends \SplObjectStorage
 
             // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
             if (0 === strpos($expression, '/_root/')) {
+                @trigger_error('XPath expressions referencing the fake root node are deprecated since version 2.8 and will be unsupported in 3.0. Please use "./" instead of "/_root/".', E_USER_DEPRECATED);
+
                 $expression = './'.substr($expression, 7);
             } elseif (0 === strpos($expression, 'self::*/')) {
                 $expression = './'.substr($expression, 8);
@@ -1182,20 +1184,20 @@ class Crawler extends \SplObjectStorage
 
     private function triggerDeprecation($methodName, $useTrace = false)
     {
-        $traces = array();
-        $caller = array();
-
         if ($useTrace || defined('HHVM_VERSION')) {
-            $traces = debug_backtrace();
-            $caller = $traces[2];
+            if (PHP_VERSION_ID >= 50400) {
+                $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+            } else {
+                $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            }
+
+            // The SplObjectStorage class performs calls to its own methods. These
+            // method calls must not lead to triggered deprecation notices.
+            if (isset($trace[2]['class']) && 'SplObjectStorage' === $trace[2]['class']) {
+                return;
+            }
         }
 
-        // The SplObjectStorage class performs calls to its own methods. These
-        // method calls must not lead to triggered deprecation notices.
-        if (isset($caller['class']) && 'SplObjectStorage' === $caller['class']) {
-            return;
-        }
-
-        @trigger_error('The '.$methodName.' method is deprecated as of 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.$methodName.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
     }
 }

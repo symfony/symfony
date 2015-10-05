@@ -96,7 +96,7 @@ class ProfilerController
         }
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
+            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token, 'request' => $request)), 200, array('Content-Type' => 'text/html'));
         }
 
         if (!$profile->hasCollector($panel)) {
@@ -140,13 +140,14 @@ class ProfilerController
     /**
      * Displays information page.
      *
-     * @param string $about The about message
+     * @param Request $request The current HTTP Request
+     * @param string  $about   The about message
      *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function infoAction($about)
+    public function infoAction(Request $request, $about)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -156,6 +157,7 @@ class ProfilerController
 
         return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
             'about' => $about,
+            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

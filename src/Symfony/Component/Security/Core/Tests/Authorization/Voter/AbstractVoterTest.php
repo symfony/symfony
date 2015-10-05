@@ -63,9 +63,8 @@ class AbstractVoterTest_Voter extends AbstractVoter
         return 'EDIT' === $attribute;
     }
 
-    protected function supports($attribute, $class)
+    protected function supports($attribute, $object)
     {
-        return $this->isClassInstanceOf($class, 'stdClass')
-            && in_array($attribute, array('EDIT', 'CREATE'));
+        return $object instanceof \stdClass && in_array($attribute, array('EDIT', 'CREATE'));
     }
 }

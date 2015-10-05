@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -332,42 +333,23 @@ class TextDescriptor extends Descriptor
     {
         $event = array_key_exists('event', $options) ? $options['event'] : null;
 
-        $label = 'Registered listeners';
         if (null !== $event) {
-            $label .= sprintf(' for event <info>%s</info>', $event);
+            $title = sprintf('Registered Listeners for "%s" Event', $event);
         } else {
-            $label .= ' by event';
+            $title = 'Registered Listeners Grouped by Event';
         }
 
-        $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
+        $options['output']->title($title);
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
 
         if (null !== $event) {
-            $this->writeText("\n");
-            $table = new Table($this->getOutput());
-            $table->getStyle()->setCellHeaderFormat('%s');
-            $table->setHeaders(array('Order', 'Callable'));
-
-            foreach ($registeredListeners as $order => $listener) {
-                $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
-            }
-
-            $table->render();
+            $this->renderEventListenerTable($registeredListeners, $options['output']);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
-                $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
-
-                $table = new Table($this->getOutput());
-                $table->getStyle()->setCellHeaderFormat('%s');
-                $table->setHeaders(array('Order', 'Callable'));
-
-                foreach ($eventListeners as $order => $eventListener) {
-                    $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
-                }
-
-                $table->render();
+                $options['output']->section(sprintf('"%s" event', $eventListened));
+                $this->renderEventListenerTable($eventListeners, $options['output']);
             }
         }
     }
@@ -383,21 +365,20 @@ class TextDescriptor extends Descriptor
     /**
      * @param array $array
      */
-    private function renderEventListenerTable(array $eventListeners)
+    private function renderEventListenerTable(array $eventListeners, SymfonyStyle $renderer)
     {
-        $table = new Table($this->getOutput());
-        $table->getStyle()->setCellHeaderFormat('%s');
-        $table->setHeaders(array('Order', 'Callable', 'Priority'));
+        $tableHeaders = array('Order', 'Callable', 'Priority');
+        $tableRows = array();
 
         krsort($eventListeners);
         $order = 1;
         foreach ($eventListeners as $priority => $listeners) {
             foreach ($listeners as $listener) {
-                $table->addRow(array(sprintf('#%d', $order++), $this->formatCallable($listener), $priority));
+                $tableRows[] = array(sprintf('#%d', $order++), $this->formatCallable($listener), $priority);
             }
         }
 
-        $table->render();
+        $renderer->table($tableHeaders, $tableRows);
     }
 
     /**

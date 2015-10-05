@@ -782,8 +782,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($classInList);
     }
+
+    public function testAutowiring()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $bDefinition = $container->register('b', __NAMESPACE__.'\B');
+        $bDefinition->setAutowired(true);
+
+        $container->compile();
+
+        $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+    }
 }
 
 class FooClass
 {
+}
+
+class A
+{
+}
+
+class B
+{
+    public function __construct(A $a)
+    {
+    }
 }

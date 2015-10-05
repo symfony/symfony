@@ -356,4 +356,25 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($def, $def->setProperty('foo', 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }
+
+    public function testAutowired()
+    {
+        $def = new Definition('stdClass');
+        $this->assertFalse($def->isAutowired());
+        $def->setAutowired(true);
+        $this->assertTrue($def->isAutowired());
+    }
+
+    public function testTypes()
+    {
+        $def = new Definition('stdClass');
+
+        $this->assertEquals(array(), $def->getAutowiringTypes());
+        $this->assertSame($def, $def->setAutowiringTypes(array('Foo')));
+        $this->assertEquals(array('Foo'), $def->getAutowiringTypes());
+        $this->assertSame($def, $def->addAutowiringType('Bar'));
+        $this->assertTrue($def->hasAutowiringType('Bar'));
+        $this->assertSame($def, $def->removeAutowiringType('Foo'));
+        $this->assertEquals(array('Bar'), $def->getAutowiringTypes());
+    }
 }

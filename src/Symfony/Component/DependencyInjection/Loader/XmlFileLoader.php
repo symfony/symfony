@@ -154,6 +154,10 @@ class XmlFileLoader extends FileLoader
             }
         }
 
+        if ($value = $service->getAttribute('autowire')) {
+            $definition->setAutowired(XmlUtils::phpize($value));
+        }
+
         if ($files = $this->getChildren($service, 'file')) {
             $definition->setFile($files[0]->nodeValue);
         }
@@ -222,6 +226,10 @@ class XmlFileLoader extends FileLoader
             }
 
             $definition->addTag($tag->getAttribute('name'), $parameters);
+        }
+
+        foreach ($this->getChildren($service, 'autowiring-type') as $type) {
+            $definition->addAutowiringType($type->textContent);
         }
 
         if ($value = $service->getAttribute('decorates')) {

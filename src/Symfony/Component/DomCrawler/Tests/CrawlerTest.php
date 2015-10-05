@@ -350,6 +350,14 @@ EOF
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
     }
 
+    public function testIteration()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//li');
+
+        $this->assertInstanceOf('Traversable', $crawler);
+        $this->assertContainsOnlyInstancesOf('DOMElement', iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
+    }
+
     public function testSlice()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
@@ -448,7 +456,6 @@ EOF
 
         $this->assertCount(0, $crawler->filterXPath('/input'));
         $this->assertCount(0, $crawler->filterXPath('/body'));
-        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
         $this->assertCount(1, $crawler->filterXPath('./body'));
         $this->assertCount(1, $crawler->filterXPath('.//body'));
         $this->assertCount(5, $crawler->filterXPath('.//input'));
@@ -479,6 +486,12 @@ EOF
 
         $crawler = $this->createTestCrawler();
         $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+    }
+
+    public function testFilterRemovesDuplicates()
+    {
+        $crawler = $this->createTestCrawler()->filter('html, body')->filter('li');
+        $this->assertCount(6, $crawler, 'The crawler removes duplicates when filtering.');
     }
 
     public function testFilterXPathWithDefaultNamespace()
@@ -534,9 +547,18 @@ EOF
     {
         $crawler = $this->createTestCrawler();
         $this->assertCount(0, $crawler->filterXPath('.'), '->filterXPath() returns an empty result if the XPath references the fake root node');
-        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::*'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+    }
+
+    /** @group legacy */
+    public function testLegacyFilterXPathWithFakeRoot()
+    {
+        $crawler = $this->createTestCrawler();
+        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+
+        $crawler = $this->createTestCrawler()->filterXPath('//body');
+        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
     }
 
     public function testFilterXPathWithAncestorAxis()

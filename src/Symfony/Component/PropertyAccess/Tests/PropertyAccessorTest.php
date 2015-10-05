@@ -130,6 +130,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('constant value', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'constantMagicProperty'));
     }
 
+    public function testGetValueNotModifyObject()
+    {
+        $object = new \stdClass();
+        $object->firstName = array('Bernhard');
+
+        $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
+        $this->assertSame(array('Bernhard'), $object->firstName);
+    }
+
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */

@@ -36,6 +36,8 @@ class Definition
     private $abstract = false;
     private $lazy = false;
     private $decoratedService;
+    private $autowired = false;
+    private $autowiringTypes = array();
 
     protected $arguments;
 
@@ -633,5 +635,97 @@ class Definition
     public function getConfigurator()
     {
         return $this->configurator;
+    }
+
+    /**
+     * Sets types that will default to this definition.
+     *
+     * @param string[] $types
+     *
+     * @return Definition The current instance
+     */
+    public function setAutowiringTypes(array $types)
+    {
+        $this->autowiringTypes = array();
+
+        foreach ($types as $type) {
+            $this->autowiringTypes[$type] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Is the definition autowired?
+     *
+     * @return bool
+     */
+    public function isAutowired()
+    {
+        return $this->autowired;
+    }
+
+    /**
+     * Sets autowired.
+     *
+     * @param $autowired
+     *
+     * @return Definition The current instance
+     */
+    public function setAutowired($autowired)
+    {
+        $this->autowired = $autowired;
+
+        return $this;
+    }
+
+    /**
+     * Gets autowiring types that will default to this definition.
+     *
+     * @return string[]
+     */
+    public function getAutowiringTypes()
+    {
+        return array_keys($this->autowiringTypes);
+    }
+
+    /**
+     * Adds a type that will default to this definition.
+     *
+     * @param string $type
+     *
+     * @return Definition The current instance
+     */
+    public function addAutowiringType($type)
+    {
+        $this->autowiringTypes[$type] = true;
+
+        return $this;
+    }
+
+    /**
+     * Removes a type.
+     *
+     * @param string $type
+     *
+     * @return Definition The current instance
+     */
+    public function removeAutowiringType($type)
+    {
+        unset($this->autowiringTypes[$type]);
+
+        return $this;
+    }
+
+    /**
+     * Will this definition default for the given type?
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function hasAutowiringType($type)
+    {
+        return isset($this->autowiringTypes[$type]);
     }
 }

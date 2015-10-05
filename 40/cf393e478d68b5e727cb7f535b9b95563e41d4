@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-06-08T11:10:04Z
+
+Tests are failing.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-06-09T08:27:51Z
+
+Looks like some indentation went wrong.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-06-09T08:30:06Z
+
+@xabbuh at the `ProcessFailedExceptionTest` you mean? Should be fixed now, let me know if a rebase is needed.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-06-16T08:23:57Z
+
+@jakzal you think this PR can be merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-08-01T14:18:56Z
+
+Any news?

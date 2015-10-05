@@ -20,11 +20,6 @@ use Symfony\Component\Validator\Validation;
  */
 class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new GreaterThanValidator();
@@ -33,6 +28,11 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
     protected function createConstraint(array $options)
     {
         return new GreaterThan($options);
+    }
+
+    protected function getErrorCode()
+    {
+        return GreaterThan::TOO_LOW_ERROR;
     }
 
     /**

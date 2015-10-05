@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
+2.8.0
+-----
+
+ * added option "choice_translation_domain" to DateType, TimeType and DateTimeType.
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
+ * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
+
 2.7.0
 -----
 

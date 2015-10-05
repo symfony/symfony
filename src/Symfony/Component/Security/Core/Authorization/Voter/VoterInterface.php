@@ -25,24 +25,6 @@ interface VoterInterface
     const ACCESS_DENIED = -1;
 
     /**
-     * Checks if the voter supports the given attribute.
-     *
-     * @param string $attribute An attribute
-     *
-     * @return bool true if this Voter supports the attribute, false otherwise
-     */
-    public function supportsAttribute($attribute);
-
-    /**
-     * Checks if the voter supports the given class.
-     *
-     * @param string $class A class name
-     *
-     * @return bool true if this Voter can process the class
-     */
-    public function supportsClass($class);
-
-    /**
      * Returns the vote for the given parameters.
      *
      * This method must return one of the following constants:

@@ -88,7 +88,13 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+* Parameters of `renderException()` method of the
+  `Symfony\Component\Console\Application` are type hinted.
+  You must add the type hint to your implementations.
+
 ### DependencyInjection
+
+ * The method `remove` was added to `Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface`.
 
  * The methods `Definition::setFactoryClass()`,
    `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
@@ -454,6 +460,8 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+ * The `createEsi` method of `Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache` was removed. Use `createSurrogate` instead.
+
  * The `templating.helper.router` service was moved to `templating_php.xml`. You
    have to ensure that the PHP templating engine is enabled to be able to use it:
 
@@ -601,10 +609,221 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Resources/` directory was moved to `Core/Resources/`
 
+ * The `key` settings of `anonymous` and `remember_me` are renamed to `secret`.
+
+   Before:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { key: "%secret%" }
+               remember_me:
+                   key: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous key="%secret%"/>
+           <remember-me key="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('key' => '%secret%'),
+           'remember_me' => array('key' => '%secret%'),
+       ),
+   ));
+   ```
+
+   After:
+
+   ```yaml
+   security:
+       # ...
+       firewalls:
+           default:
+               # ...
+               anonymous: { secret: "%secret%" }
+               remember_me:
+                   secret: "%secret%"
+   ```
+
+   ```xml
+   <!-- ... -->
+   <config>
+       <!-- ... -->
+
+       <firewall>
+           <!-- ... -->
+
+           <anonymous secret="%secret%"/>
+           <remember-me secret="%secret%"/>
+       </firewall>
+   </config>
+   ```
+
+   ```php
+   // ...
+   $container->loadFromExtension('security', array(
+       // ...
+       'firewalls' => array(
+           // ...
+           'anonymous' => array('secret' => '%secret%'),
+           'remember_me' => array('secret' => '%secret%'),
+       ),
+   ));
+  ```
+
+ * The `AbstractVoter::getSupportedAttributes()` and `AbstractVoter::getSupportedClasses()`
+   methods have been removed in favor of `AbstractVoter::supports()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function getSupportedAttributes()
+       {
+           return array('CREATE', 'EDIT');
+       }
+
+       protected function getSupportedClasses()
+       {
+           return array('AppBundle\Entity\Post');
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function supports($attribute, $object)
+       {
+           return $object instanceof Post && in_array($attribute, array('CREATE', 'EDIT'));
+       }
+
+       // ...
+   }
+   ```
+
+ * The `AbstractVoter::isGranted()` method have been replaced by `AbstractVoter::voteOnAttribute()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function isGranted($attribute, $object, $user = null)
+       {
+           return 'EDIT' === $attribute && $user === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+       {
+           return 'EDIT' === $attribute && $token->getUser() === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+ * The `supportsAttribute()` and `supportsClass()` methods of classes `AuthenticatedVoter`, `ExpressionVoter`
+   and `RoleVoter` have been removed.
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
    `Translator::setFallbackLocales()`.
+
+ * The visibility of the `locale` property has been changed from protected to private. Rely on `getLocale` and `setLocale`
+   instead.
+
+   Before:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->locale;
+
+           // update locale
+           $this->locale = $locale;
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomTranslator extends Translator
+    {
+        public function fooMethod()
+        {
+           // get locale
+           $locale = $this->getLocale();
+
+           // update locale
+           $this->setLocale($locale);
+       }
+    }
+   ```
+
+ * The method `FileDumper::format()` was removed. You should use
+   `FileDumper::formatCatalogue()` instead.
+
+   Before:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        protected function format(MessageCatalogue $messages, $domain)
+        {
+            ...
+        }
+    }
+   ```
+
+   After:
+
+   ```php
+    class CustomDumper extends FileDumper
+    {
+        public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+        {
+            ...
+        }
+    }
+   ```
 
 ### Twig Bridge
 
@@ -1122,3 +1341,25 @@ UPGRADE FROM 2.x to 3.0
  * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
    `Process::setInput()` and `Process::getInput()` that works the same way.
  * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+
+### Monolog Bridge
+
+ * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.
+
+### Swiftmailer Bridge
+
+ * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
+
+### HttpFoundation
+
+* `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+
+### Config
+
+ * `\Symfony\Component\Config\Resource\ResourceInterface::isFresh()` has been removed. Also,
+   cache validation through this method (which was still supported in 2.8 for BC) does no longer
+   work because the `\Symfony\Component\Config\Resource\BCResourceInterfaceChecker` helper class
+   has been removed as well.

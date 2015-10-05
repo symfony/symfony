@@ -78,61 +78,16 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns a parameter by name.
      *
-     * @param string $path    The key
+     * @param string $key     The key
      * @param mixed  $default The default value if the parameter key does not exist
-     * @param bool   $deep    If true, a path like foo[bar] will find deeper items
      *
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function get($path, $default = null, $deep = false)
+    public function get($key, $default = null)
     {
-        if (!$deep || false === $pos = strpos($path, '[')) {
-            return array_key_exists($path, $this->parameters) ? $this->parameters[$path] : $default;
-        }
-
-        $root = substr($path, 0, $pos);
-        if (!array_key_exists($root, $this->parameters)) {
-            return $default;
-        }
-
-        $value = $this->parameters[$root];
-        $currentKey = null;
-        for ($i = $pos, $c = strlen($path); $i < $c; ++$i) {
-            $char = $path[$i];
-
-            if ('[' === $char) {
-                if (null !== $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
-                }
-
-                $currentKey = '';
-            } elseif (']' === $char) {
-                if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
-                }
-
-                if (!is_array($value) || !array_key_exists($currentKey, $value)) {
-                    return $default;
-                }
-
-                $value = $value[$currentKey];
-                $currentKey = null;
-            } else {
-                if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
-                }
-
-                $currentKey .= $char;
-            }
-        }
-
-        if (null !== $currentKey) {
-            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
-        }
-
-        return $value;
+        return array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
     }
 
     /**

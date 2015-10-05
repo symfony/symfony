@@ -164,17 +164,12 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
-        if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
         }
 
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
-        }
-
-        if (isset($service['synchronized'])) {
-            @trigger_error(sprintf('The "synchronized" key of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
-            $definition->setSynchronized($service['synchronized'], 'request' !== $id);
         }
 
         if (isset($service['lazy'])) {
@@ -189,6 +184,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (array_key_exists('deprecated', $service)) {
+            $definition->setDeprecated(true, $service['deprecated']);
+        }
+
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
                 if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
@@ -200,21 +199,6 @@ class YamlFileLoader extends FileLoader
             } else {
                 $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
             }
-        }
-
-        if (isset($service['factory_class'])) {
-            @trigger_error(sprintf('The "factory_class" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            @trigger_error(sprintf('The "factory_method" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            @trigger_error(sprintf('The "factory_service" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {
@@ -284,7 +268,30 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['decorates'])) {
             $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $definition->setDecoratedService($service['decorates'], $renameId);
+            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+        }
+
+        if (isset($service['autowire'])) {
+            $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($service['autowiring_types'])) {
+            if (is_string($service['autowiring_types'])) {
+                $definition->addAutowiringType($service['autowiring_types']);
+            } else {
+                if (!is_array($service['autowiring_types'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+
+                foreach ($service['autowiring_types'] as $autowiringType) {
+                    if (!is_string($autowiringType)) {
+                        throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                    }
+
+                    $definition->addAutowiringType($autowiringType);
+                }
+            }
         }
 
         $this->container->setDefinition($id, $definition);

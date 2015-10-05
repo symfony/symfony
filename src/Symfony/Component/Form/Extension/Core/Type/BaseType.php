@@ -77,7 +77,7 @@ abstract class BaseType extends AbstractType
 
         $blockPrefixes = array();
         for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
-            array_unshift($blockPrefixes, $type->getName());
+            array_unshift($blockPrefixes, $type->getBlockPrefix());
         }
         $blockPrefixes[] = $uniqueBlockPrefix;
 
@@ -100,7 +100,7 @@ abstract class BaseType extends AbstractType
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
+            'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getBlockPrefix(),
         ));
     }
 

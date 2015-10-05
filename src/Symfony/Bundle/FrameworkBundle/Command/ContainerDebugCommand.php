@@ -16,10 +16,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * A console command for retrieving information about services.
@@ -40,9 +40,6 @@ class ContainerDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:container')
-            ->setAliases(array(
-                'container:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
@@ -94,10 +91,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.</comment>');
-        }
-
+        $output = new SymfonyStyle($input, $output);
         $this->validateInput($input);
 
         if ($input->getOption('parameters')) {
@@ -124,10 +118,11 @@ EOF
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
+        $options['output'] = $output;
         $helper->describe($output, $object, $options);
 
         if (!$input->getArgument('name') && $input->isInteractive()) {
-            $output->writeln('To search for a service, re-run this command with a search term. <comment>debug:container log</comment>');
+            $output->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
         }
     }
 
@@ -186,7 +181,7 @@ EOF
         return $this->containerBuilder = $container;
     }
 
-    private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)
+    private function findProperServiceName(InputInterface $input, SymfonyStyle $output, ContainerBuilder $builder, $name)
     {
         if ($builder->has($name) || !$input->isInteractive()) {
             return $name;
@@ -197,10 +192,7 @@ EOF
             throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
-        $question = new ChoiceQuestion('Choose a number for more information on the service', $matchingServices);
-        $question->setErrorMessage('Service %s is invalid.');
-
-        return $this->getHelper('question')->ask($input, $output, $question);
+        return $output->choice('Select one of the following services to display its information', $matchingServices);
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

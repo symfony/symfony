@@ -37,6 +37,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::SHORT,
     );
 
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -89,10 +94,13 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
+                $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
+                $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
+                $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
 
             // Append generic carry-along options
@@ -101,9 +109,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -175,12 +183,8 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
-        };
-
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
@@ -200,6 +204,23 @@ class DateType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('year' => $default, 'month' => $default, 'day' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'year' => $choiceTranslationDomain,
+                'month' => $choiceTranslationDomain,
+                'day' => $choiceTranslationDomain,
+            );
+        };
+
         $format = function (Options $options) {
             return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
@@ -213,8 +234,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -226,10 +246,11 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',
@@ -252,7 +273,7 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'date';
     }
@@ -262,11 +283,7 @@ class DateType extends AbstractType
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
-        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
-            $formatter->setTimeZone('UTC');
-        } else {
-            $formatter->setTimeZoneId('UTC');
-        }
+        $formatter->setTimeZone('UTC');
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
@@ -280,11 +297,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if ($setTimeZone) {
-            $formatter->setTimeZone($timezone);
-        } else {
-            $formatter->setTimeZoneId($timezone);
-        }
+        $formatter->setTimeZone($timezone);
 
         return $timestamps;
     }

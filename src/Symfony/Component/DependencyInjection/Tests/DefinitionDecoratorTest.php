@@ -49,32 +49,6 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider provideLegacyPropertyTests
-     * @group legacy
-     */
-    public function testLegacySetProperty($property, $changeKey)
-    {
-        $def = new DefinitionDecorator('foo');
-
-        $getter = 'get'.ucfirst($property);
-        $setter = 'set'.ucfirst($property);
-
-        $this->assertNull($def->$getter());
-        $this->assertSame($def, $def->$setter('foo'));
-        $this->assertEquals('foo', $def->$getter());
-        $this->assertEquals(array($changeKey => true), $def->getChanges());
-    }
-
-    public function provideLegacyPropertyTests()
-    {
-        return array(
-            array('factoryClass', 'factory_class'),
-            array('factoryMethod', 'factory_method'),
-            array('factoryService', 'factory_service'),
-        );
-    }
-
     public function testSetPublic()
     {
         $def = new DefinitionDecorator('foo');

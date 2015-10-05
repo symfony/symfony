@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -21,28 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class AbstractVoter implements VoterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        return in_array($attribute, $this->getSupportedAttributes());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        foreach ($this->getSupportedClasses() as $supportedClass) {
-            if ($supportedClass === $class || is_subclass_of($class, $supportedClass)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     /**
      * Iteratively check all given attributes by calling isGranted.
      *
@@ -58,7 +35,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$object || !$this->supportsClass(get_class($object))) {
+        if (!$object) {
             return self::ACCESS_ABSTAIN;
         }
 
@@ -66,14 +43,14 @@ abstract class AbstractVoter implements VoterInterface
         $vote = self::ACCESS_ABSTAIN;
 
         foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
+            if (!$this->supports($attribute, $object)) {
                 continue;
             }
 
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($this->isGranted($attribute, $object, $token->getUser())) {
+            if ($this->voteOnAttribute($attribute, $object, $token)) {
                 // grant access as soon as at least one voter returns a positive response
                 return self::ACCESS_GRANTED;
             }
@@ -83,31 +60,24 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
-     * Return an array of supported classes. This will be called by supportsClass.
+     * Determines if the attribute and object are supported by this voter.
      *
-     * @return array an array of supported classes, i.e. array('Acme\DemoBundle\Model\Product')
+     * @param string $attribute An attribute
+     * @param string $object    The object to secure
+     *
+     * @return bool True if the attribute and object is supported, false otherwise
      */
-    abstract protected function getSupportedClasses();
+    abstract protected function supports($attribute, $class);
 
     /**
-     * Return an array of supported attributes. This will be called by supportsAttribute.
+     * Perform a single access check operation on a given attribute, object and token.
+     * It is safe to assume that $attribute and $object's class pass supports method call.
      *
-     * @return array an array of supported attributes, i.e. array('CREATE', 'READ')
-     */
-    abstract protected function getSupportedAttributes();
-
-    /**
-     * Perform a single access check operation on a given attribute, object and (optionally) user
-     * It is safe to assume that $attribute and $object's class pass supportsAttribute/supportsClass
-     * $user can be one of the following:
-     *   a UserInterface object (fully authenticated user)
-     *   a string               (anonymously authenticated user).
-     *
-     * @param string               $attribute
-     * @param object               $object
-     * @param UserInterface|string $user
+     * @param string         $attribute
+     * @param object         $object
+     * @param TokenInterface $token
      *
      * @return bool
      */
-    abstract protected function isGranted($attribute, $object, $user = null);
+    abstract protected function voteOnAttribute($attribute, $object, TokenInterface $token);
 }

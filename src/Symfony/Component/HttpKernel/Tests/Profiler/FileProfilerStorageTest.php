@@ -14,49 +14,272 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
-class FileProfilerStorageTest extends AbstractProfilerStorageTest
+class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $tmpDir;
-    protected static $storage;
+    private $tmpDir;
+    private $storage;
 
-    protected static function cleanDir()
+    protected function setUp()
     {
-        $flags = \FilesystemIterator::SKIP_DOTS;
-        $iterator = new \RecursiveDirectoryIterator(self::$tmpDir, $flags);
-        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-        foreach ($iterator as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
-        }
-    }
-
-    public static function setUpBeforeClass()
-    {
-        self::$tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
-        if (is_dir(self::$tmpDir)) {
+        $this->tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
+        if (is_dir($this->tmpDir)) {
             self::cleanDir();
         }
-        self::$storage = new FileProfilerStorage('file:'.self::$tmpDir);
+        $this->storage = new FileProfilerStorage('file:'.$this->tmpDir);
+        $this->storage->purge();
     }
 
-    public static function tearDownAfterClass()
+    protected function tearDown()
     {
         self::cleanDir();
     }
 
-    protected function setUp()
+    public function testStore()
     {
-        self::$storage->purge();
+        for ($i = 0; $i < 10; ++$i) {
+            $profile = new Profile('token_'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://foo.bar');
+            $profile->setMethod('GET');
+            $this->storage->write($profile);
+        }
+        $this->assertCount(10, $this->storage->find('127.0.0.1', 'http://foo.bar', 20, 'GET'), '->write() stores data in the storage');
     }
 
-    /**
-     * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
-     */
-    protected function getStorage()
+    public function testChildren()
     {
-        return self::$storage;
+        $parentProfile = new Profile('token_parent');
+        $parentProfile->setIp('127.0.0.1');
+        $parentProfile->setUrl('http://foo.bar/parent');
+
+        $childProfile = new Profile('token_child');
+        $childProfile->setIp('127.0.0.1');
+        $childProfile->setUrl('http://foo.bar/child');
+
+        $parentProfile->addChild($childProfile);
+
+        $this->storage->write($parentProfile);
+        $this->storage->write($childProfile);
+
+        // Load them from storage
+        $parentProfile = $this->storage->read('token_parent');
+        $childProfile = $this->storage->read('token_child');
+
+        // Check child has link to parent
+        $this->assertNotNull($childProfile->getParent());
+        $this->assertEquals($parentProfile->getToken(), $childProfile->getParentToken());
+
+        // Check parent has child
+        $children = $parentProfile->getChildren();
+        $this->assertCount(1, $children);
+        $this->assertEquals($childProfile->getToken(), $children[0]->getToken());
+    }
+
+    public function testStoreSpecialCharsInUrl()
+    {
+        // The storage accepts special characters in URLs (Even though URLs are not
+        // supposed to contain them)
+        $profile = new Profile('simple_quote');
+        $profile->setUrl('http://foo.bar/\'');
+        $this->storage->write($profile);
+        $this->assertTrue(false !== $this->storage->read('simple_quote'), '->write() accepts single quotes in URL');
+
+        $profile = new Profile('double_quote');
+        $profile->setUrl('http://foo.bar/"');
+        $this->storage->write($profile);
+        $this->assertTrue(false !== $this->storage->read('double_quote'), '->write() accepts double quotes in URL');
+
+        $profile = new Profile('backslash');
+        $profile->setUrl('http://foo.bar/\\');
+        $this->storage->write($profile);
+        $this->assertTrue(false !== $this->storage->read('backslash'), '->write() accepts backslash in URL');
+
+        $profile = new Profile('comma');
+        $profile->setUrl('http://foo.bar/,');
+        $this->storage->write($profile);
+        $this->assertTrue(false !== $this->storage->read('comma'), '->write() accepts comma in URL');
+    }
+
+    public function testStoreDuplicateToken()
+    {
+        $profile = new Profile('token');
+        $profile->setUrl('http://example.com/');
+
+        $this->assertTrue($this->storage->write($profile), '->write() returns true when the token is unique');
+
+        $profile->setUrl('http://example.net/');
+
+        $this->assertTrue($this->storage->write($profile), '->write() returns true when the token is already present in the storage');
+        $this->assertEquals('http://example.net/', $this->storage->read('token')->getUrl(), '->write() overwrites the current profile data');
+
+        $this->assertCount(1, $this->storage->find('', '', 1000, ''), '->find() does not return the same profile twice');
+    }
+
+    public function testRetrieveByIp()
+    {
+        $profile = new Profile('token');
+        $profile->setIp('127.0.0.1');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $this->assertCount(1, $this->storage->find('127.0.0.1', '', 10, 'GET'), '->find() retrieve a record by IP');
+        $this->assertCount(0, $this->storage->find('127.0.%.1', '', 10, 'GET'), '->find() does not interpret a "%" as a wildcard in the IP');
+        $this->assertCount(0, $this->storage->find('127.0._.1', '', 10, 'GET'), '->find() does not interpret a "_" as a wildcard in the IP');
+    }
+
+    public function testRetrieveByUrl()
+    {
+        $profile = new Profile('simple_quote');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/\'');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $profile = new Profile('double_quote');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/"');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $profile = new Profile('backslash');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo\\bar/');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $profile = new Profile('percent');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/%');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $profile = new Profile('underscore');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/_');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $profile = new Profile('semicolon');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/;');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/\'', 10, 'GET'), '->find() accepts single quotes in URLs');
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/"', 10, 'GET'), '->find() accepts double quotes in URLs');
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo\\bar/', 10, 'GET'), '->find() accepts backslash in URLs');
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/;', 10, 'GET'), '->find() accepts semicolon in URLs');
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/%', 10, 'GET'), '->find() does not interpret a "%" as a wildcard in the URL');
+        $this->assertCount(1, $this->storage->find('127.0.0.1', 'http://foo.bar/_', 10, 'GET'), '->find() does not interpret a "_" as a wildcard in the URL');
+    }
+
+    public function testStoreTime()
+    {
+        $dt = new \DateTime('now');
+        $start = $dt->getTimestamp();
+
+        for ($i = 0; $i < 3; ++$i) {
+            $dt->modify('+1 minute');
+            $profile = new Profile('time_'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://foo.bar');
+            $profile->setTime($dt->getTimestamp());
+            $profile->setMethod('GET');
+            $this->storage->write($profile);
+        }
+
+        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 3 * 60);
+        $this->assertCount(3, $records, '->find() returns all previously added records');
+        $this->assertEquals($records[0]['token'], 'time_2', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[1]['token'], 'time_1', '->find() returns records ordered by time in descendant order');
+        $this->assertEquals($records[2]['token'], 'time_0', '->find() returns records ordered by time in descendant order');
+
+        $records = $this->storage->find('', '', 3, 'GET', $start, time() + 2 * 60);
+        $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
+    }
+
+    public function testRetrieveByEmptyUrlAndIp()
+    {
+        for ($i = 0; $i < 5; ++$i) {
+            $profile = new Profile('token_'.$i);
+            $profile->setMethod('GET');
+            $this->storage->write($profile);
+        }
+        $this->assertCount(5, $this->storage->find('', '', 10, 'GET'), '->find() returns all previously added records');
+        $this->storage->purge();
+    }
+
+    public function testRetrieveByMethodAndLimit()
+    {
+        foreach (array('POST', 'GET') as $method) {
+            for ($i = 0; $i < 5; ++$i) {
+                $profile = new Profile('token_'.$i.$method);
+                $profile->setMethod($method);
+                $this->storage->write($profile);
+            }
+        }
+
+        $this->assertCount(5, $this->storage->find('', '', 5, 'POST'));
+
+        $this->storage->purge();
+    }
+
+    public function testPurge()
+    {
+        $profile = new Profile('token1');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.com/');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $this->assertTrue(false !== $this->storage->read('token1'));
+        $this->assertCount(1, $this->storage->find('127.0.0.1', '', 10, 'GET'));
+
+        $profile = new Profile('token2');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.net/');
+        $profile->setMethod('GET');
+        $this->storage->write($profile);
+
+        $this->assertTrue(false !== $this->storage->read('token2'));
+        $this->assertCount(2, $this->storage->find('127.0.0.1', '', 10, 'GET'));
+
+        $this->storage->purge();
+
+        $this->assertEmpty($this->storage->read('token'), '->purge() removes all data stored by profiler');
+        $this->assertCount(0, $this->storage->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
+    }
+
+    public function testDuplicates()
+    {
+        for ($i = 1; $i <= 5; ++$i) {
+            $profile = new Profile('foo'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://example.net/');
+            $profile->setMethod('GET');
+
+            ///three duplicates
+            $this->storage->write($profile);
+            $this->storage->write($profile);
+            $this->storage->write($profile);
+        }
+        $this->assertCount(3, $this->storage->find('127.0.0.1', 'http://example.net/', 3, 'GET'), '->find() method returns incorrect number of entries');
+    }
+
+    public function testStatusCode()
+    {
+        $profile = new Profile('token1');
+        $profile->setStatusCode(200);
+        $this->storage->write($profile);
+
+        $profile = new Profile('token2');
+        $profile->setStatusCode(404);
+        $this->storage->write($profile);
+
+        $tokens = $this->storage->find('', '', 10, '');
+        $this->assertCount(2, $tokens);
+        $this->assertContains($tokens[0]['status_code'], array(200, 404));
+        $this->assertContains($tokens[1]['status_code'], array(200, 404));
     }
 
     public function testMultiRowIndexFile()
@@ -66,14 +289,13 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
             $profile = new Profile('token'.$i);
             $profile->setIp('127.0.0.'.$i);
             $profile->setUrl('http://foo.bar/'.$i);
-            $storage = $this->getStorage();
 
-            $storage->write($profile);
-            $storage->write($profile);
-            $storage->write($profile);
+            $this->storage->write($profile);
+            $this->storage->write($profile);
+            $this->storage->write($profile);
         }
 
-        $handle = fopen(self::$tmpDir.'/index.csv', 'r');
+        $handle = fopen($this->tmpDir.'/index.csv', 'r');
         for ($i = 0; $i < $iteration; ++$i) {
             $row = fgetcsv($handle);
             $this->assertEquals('token'.$i, $row[0]);
@@ -85,7 +307,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
 
     public function testReadLineFromFile()
     {
-        $r = new \ReflectionMethod(self::$storage, 'readLineFromFile');
+        $r = new \ReflectionMethod($this->storage, 'readLineFromFile');
 
         $r->setAccessible(true);
 
@@ -94,7 +316,20 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         fwrite($h, "line1\n\n\nline2\n");
         fseek($h, 0, SEEK_END);
 
-        $this->assertEquals('line2', $r->invoke(self::$storage, $h));
-        $this->assertEquals('line1', $r->invoke(self::$storage, $h));
+        $this->assertEquals('line2', $r->invoke($this->storage, $h));
+        $this->assertEquals('line1', $r->invoke($this->storage, $h));
+    }
+
+    protected function cleanDir()
+    {
+        $flags = \FilesystemIterator::SKIP_DOTS;
+        $iterator = new \RecursiveDirectoryIterator($this->tmpDir, $flags);
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 }

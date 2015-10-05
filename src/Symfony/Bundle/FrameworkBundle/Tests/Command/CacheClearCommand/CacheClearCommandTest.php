@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestAppKernel;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -56,15 +56,13 @@ class CacheClearCommandTest extends TestCase
         $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
         // simply check that cache is warmed up
         $this->assertGreaterThanOrEqual(1, count($metaFiles));
+        $configCacheFactory = new ConfigCacheFactory(true);
+        $that = $this;
+
         foreach ($metaFiles as $file) {
-            $configCache = new ConfigCache(substr($file, 0, -5), true);
-            $this->assertTrue(
-                $configCache->isFresh(),
-                sprintf(
-                    'Meta file "%s" is not fresh',
-                    (string) $file
-                )
-            );
+            $configCacheFactory->cache(substr($file, 0, -5), function () use ($that, $file) {
+                $that->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
+            });
         }
 
         // check that app kernel file present in meta file of container's cache

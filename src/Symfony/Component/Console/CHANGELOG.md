@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * use readline for user input in the question helper when available to allow
+   the use of arrow keys
+
 2.6.0
 -----
 

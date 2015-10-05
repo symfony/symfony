@@ -64,7 +64,7 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
         $commandTester->execute(array('command_name' => 'list', '--format' => 'xml'));
-        $this->assertContains('list [--xml] [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
+        $this->assertContains('list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
         $this->assertContains('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --format=xml is passed');
     }
 }

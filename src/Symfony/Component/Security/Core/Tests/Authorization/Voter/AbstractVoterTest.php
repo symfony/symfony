@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
@@ -57,18 +58,13 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 
 class AbstractVoterTest_Voter extends AbstractVoter
 {
-    protected function getSupportedClasses()
-    {
-        return array('stdClass');
-    }
-
-    protected function getSupportedAttributes()
-    {
-        return array('EDIT', 'CREATE');
-    }
-
-    protected function isGranted($attribute, $object, $user = null)
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
     {
         return 'EDIT' === $attribute;
+    }
+
+    protected function supports($attribute, $object)
+    {
+        return $object instanceof \stdClass && in_array($attribute, array('EDIT', 'CREATE'));
     }
 }

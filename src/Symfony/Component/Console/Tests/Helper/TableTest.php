@@ -554,6 +554,33 @@ TABLE;
         $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
+    public function testRenderMultiCalls()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table->setRows(array(
+            array(new TableCell('foo', array('colspan' => 2))),
+        ));
+        $table->render();
+        $table->render();
+        $table->render();
+
+        $expected =
+<<<TABLE
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

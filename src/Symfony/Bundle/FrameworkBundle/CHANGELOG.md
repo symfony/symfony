@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `validator.api` parameter
+ * removed `alias` option of the `form.type` tag
+
+2.8.0
+-----
+
+ * Deprecated the `alias` option of the `form.type_extension` tag in favor of the
+   `extended_type`/`extended-type` option
+ * Deprecated the `alias` option of the `form.type` tag
+ * Deprecated the Shell
+
 2.7.0
 -----
 

@@ -30,7 +30,7 @@ class EntityType extends DoctrineType
             if (is_callable($queryBuilder)) {
                 $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
 
-                if (!$queryBuilder instanceof QueryBuilder) {
+                if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
                 }
             }
@@ -53,10 +53,21 @@ class EntityType extends DoctrineType
      */
     public function getLoader(ObjectManager $manager, $queryBuilder, $class)
     {
-        return new ORMQueryBuilderLoader($queryBuilder, $manager, $class);
+        return new ORMQueryBuilderLoader($queryBuilder);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'entity';
     }
@@ -64,11 +75,11 @@ class EntityType extends DoctrineType
     /**
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
-     * 
+     *
      * @param QueryBuilder $queryBuilder
-     * 
+     *
      * @return array
-     * 
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +20,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = new Crawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
-        $crawler = new Crawler(new \DOMNode());
+        $doc = new \DOMDocument();
+        $node = $doc->createElement('test');
+
+        $crawler = new Crawler($node);
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
@@ -38,6 +40,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->add($this->createNodeList());
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
+        $list = array();
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -57,10 +60,30 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testAddInvalidNode()
+    public function testAddInvalidType()
     {
         $crawler = new Crawler();
         $crawler->add(1);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Nodes set in a Crawler must be DOMElement or DOMDocument instances, "DOMNode" given.
+     */
+    public function testAddInvalidNode()
+    {
+        $crawler = new Crawler();
+        $crawler->add(new \DOMNode());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Attaching DOM nodes from multiple documents in the same crawler is forbidden.
+     */
+    public function testAddMultipleDocumentNode()
+    {
+        $crawler = $this->createTestCrawler();
+        $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
     }
 
     /**
@@ -72,6 +95,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
+    public function testAddHtmlContentWithBaseTag()
+    {
+        $crawler = new Crawler();
 
         $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
 
@@ -268,6 +299,7 @@ EOF
      */
     public function testAddNodes()
     {
+        $list = array();
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -291,7 +323,10 @@ EOF
 
     public function testClear()
     {
-        $crawler = new Crawler(new \DOMNode());
+        $doc = new \DOMDocument();
+        $node = $doc->createElement('test');
+
+        $crawler = new Crawler($node);
         $crawler->clear();
         $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
     }
@@ -313,6 +348,14 @@ EOF
         });
 
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
+    }
+
+    public function testIteration()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//li');
+
+        $this->assertInstanceOf('Traversable', $crawler);
+        $this->assertContainsOnlyInstancesOf('DOMElement', iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
     }
 
     public function testSlice()
@@ -413,7 +456,6 @@ EOF
 
         $this->assertCount(0, $crawler->filterXPath('/input'));
         $this->assertCount(0, $crawler->filterXPath('/body'));
-        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
         $this->assertCount(1, $crawler->filterXPath('./body'));
         $this->assertCount(1, $crawler->filterXPath('.//body'));
         $this->assertCount(5, $crawler->filterXPath('.//input'));
@@ -444,6 +486,12 @@ EOF
 
         $crawler = $this->createTestCrawler();
         $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->parents(), '->filterXpath() preserves parents when chained');
+    }
+
+    public function testFilterRemovesDuplicates()
+    {
+        $crawler = $this->createTestCrawler()->filter('html, body')->filter('li');
+        $this->assertCount(6, $crawler, 'The crawler removes duplicates when filtering.');
     }
 
     public function testFilterXPathWithDefaultNamespace()
@@ -499,9 +547,18 @@ EOF
     {
         $crawler = $this->createTestCrawler();
         $this->assertCount(0, $crawler->filterXPath('.'), '->filterXPath() returns an empty result if the XPath references the fake root node');
-        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::*'), '->filterXPath() returns an empty result if the XPath references the fake root node');
         $this->assertCount(0, $crawler->filterXPath('self::_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+    }
+
+    /** @group legacy */
+    public function testLegacyFilterXPathWithFakeRoot()
+    {
+        $crawler = $this->createTestCrawler();
+        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+
+        $crawler = $this->createTestCrawler()->filterXPath('//body');
+        $this->assertCount(1, $crawler->filterXPath('/_root/body'));
     }
 
     public function testFilterXPathWithAncestorAxis()
@@ -527,7 +584,7 @@ EOF
 
     public function testFilterXPathWithAttributeAxisAfterElementAxis()
     {
-        $this->assertCount(3, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
+        $this->assertCount(0, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
     }
 
     public function testFilterXPathWithChildAxis()
@@ -618,16 +675,12 @@ EOF
 
     public function testFilterWithNamespace()
     {
-        CssSelector::disableHtmlExtension();
-
         $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
         $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
     }
 
     public function testFilterWithMultipleNamespaces()
     {
-        CssSelector::disableHtmlExtension();
-
         $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('widescreen', $crawler->text());

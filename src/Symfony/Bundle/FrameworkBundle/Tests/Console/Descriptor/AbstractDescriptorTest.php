@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -64,20 +66,6 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     public function getDescribeContainerBuilderTestData()
     {
         return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
-    }
-
-    /**
-     * @dataProvider provideLegacySynchronizedServiceDefinitionTestData
-     * @group legacy
-     */
-    public function testLegacyDescribeSynchronizedServiceDefinition(Definition $definition, $expectedDescription)
-    {
-        $this->assertDescription($expectedDescription, $definition);
-    }
-
-    public function provideLegacySynchronizedServiceDefinitionTestData()
-    {
-        return $this->getDescriptionTestData(ObjectsProvider::getLegacyContainerDefinitions());
     }
 
     /** @dataProvider getDescribeContainerDefinitionTestData */
@@ -146,12 +134,17 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     {
         $options['raw_output'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+
+        if ('txt' === $this->getFormat()) {
+            $options['output'] = new SymfonyStyle(new ArrayInput(array()), $output);
+        }
+
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {
             $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals($expectedDescription, $output->fetch());
         }
     }
 

@@ -33,13 +33,13 @@ class CountryType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'country';
     }

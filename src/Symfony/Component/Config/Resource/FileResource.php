@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements ResourceInterface, \Serializable
+class FileResource implements SelfCheckingResourceInterface, \Serializable
 {
     /**
      * @var string|false
@@ -44,7 +44,7 @@ class FileResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|false The canonicalized, absolute path to the resource or false if the resource does not exist.
      */
     public function getResource()
     {

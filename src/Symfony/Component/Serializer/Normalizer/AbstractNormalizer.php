@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -57,15 +57,21 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected $camelizedAttributes = array();
 
     /**
+     * @var PropertyInfoExtractor
+     */
+    protected $propertyInfoExtractor;
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
      * @param ClassMetadataFactoryInterface|null $classMetadataFactory
      * @param NameConverterInterface|null        $nameConverter
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyInfoExtractor $propertyInfoExtractor = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
+        $this->propertyInfoExtractor = $propertyInfoExtractor;
     }
 
     /**
@@ -141,37 +147,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
-     * Set attributes to be camelized on denormalize.
-     *
-     * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.
-     *
-     * @param array $camelizedAttributes
-     *
-     * @return self
-     *
-     * @throws LogicException
-     */
-    public function setCamelizedAttributes(array $camelizedAttributes)
-    {
-        @trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
-
-        if ($this->nameConverter && !$this->nameConverter instanceof CamelCaseToSnakeCaseNameConverter) {
-            throw new LogicException(sprintf('%s cannot be called if a custom Name Converter is defined.', __METHOD__));
-        }
-
-        $attributes = array();
-        foreach ($camelizedAttributes as $camelizedAttribute) {
-            $attributes[] = lcfirst(preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-            }, $camelizedAttribute));
-        }
-
-        $this->nameConverter = new CamelCaseToSnakeCaseNameConverter($attributes);
-
-        return $this;
-    }
-
-    /**
      * Detects if the configured circular reference limit is reached.
      *
      * @param object $object
@@ -219,22 +194,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
-    }
-
-    /**
-     * Format an attribute name, for example to convert a snake_case name to camelCase.
-     *
-     * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.
-     *
-     * @param string $attributeName
-     *
-     * @return string
-     */
-    protected function formatAttribute($attributeName)
-    {
-        @trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
     }
 
     /**
@@ -301,6 +260,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return $context['object_to_populate'];
         }
 
+        $format = null;
+        if (isset($context['format'])) {
+            $format = $context['format'];
+        }
+
         $constructor = $reflectionClass->getConstructor();
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
@@ -321,6 +285,26 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                    if ($this->propertyInfoExtractor) {
+                        /**
+                         * @var Type[] $types
+                         */
+                        $types = $this->propertyInfoExtractor->getTypes($class, $key);
+
+                        foreach ($types as $type) {
+                            if ($type && $type->getClassName() && (!empty($data[$key]) or !$type->isNullable())) {
+                                if (!$this->serializer instanceof DenormalizerInterface) {
+                                    throw new RuntimeException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $key));
+                                }
+
+                                $value = $data[$paramName];
+                                $data[$paramName] = $this->serializer->denormalize($value, $type->getClassName(), $format, $context);
+
+                                break;
+                            }
+                        }
+                    }
+
                     $params[] = $data[$key];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$key]);

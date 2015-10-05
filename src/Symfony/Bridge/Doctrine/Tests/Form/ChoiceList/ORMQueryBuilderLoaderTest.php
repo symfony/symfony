@@ -17,26 +17,6 @@ use Doctrine\DBAL\Connection;
 
 class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @group legacy
-     */
-    public function testItOnlyWorksWithQueryBuilderOrClosure()
-    {
-        new ORMQueryBuilderLoader(new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @group legacy
-     */
-    public function testClosureRequiresTheEntityManager()
-    {
-        $closure = function () {};
-
-        new ORMQueryBuilderLoader($closure);
-    }
-
     public function testIdentifierTypeIsStringArray()
     {
         $this->checkIdentifierType('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity', Connection::PARAM_STR_ARRAY);

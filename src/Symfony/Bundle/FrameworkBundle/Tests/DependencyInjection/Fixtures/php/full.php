@@ -5,14 +5,12 @@ $container->loadFromExtension('framework', array(
     'default_locale' => 'fr',
     'form' => array(
         'csrf_protection' => array(
+            'enabled' => true,
             'field_name' => '_csrf',
         ),
     ),
     'http_method_override' => false,
     'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
-    'csrf_protection' => array(
-        'enabled' => true,
-    ),
     'esi' => array(
         'enabled' => true,
     ),
@@ -32,7 +30,8 @@ $container->loadFromExtension('framework', array(
         'cookie_path' => '/',
         'cookie_domain' => 'example.com',
         'cookie_secure' => true,
-        'cookie_httponly' => true,
+        'cookie_httponly' => false,
+        'use_cookies' => true,
         'gc_maxlifetime' => 90000,
         'gc_divisor' => 108,
         'gc_probability' => 1,
@@ -47,9 +46,13 @@ $container->loadFromExtension('framework', array(
         ),
         'hinclude_default_template' => 'global_hinclude_template',
     ),
+    'assets' => array(
+        'version' => 'v1',
+    ),
     'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
+        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
     ),
     'validation' => array(
         'enabled' => true,
@@ -60,7 +63,12 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
-    'serializer' => array('enabled' => true),
+    'serializer' => array(
+        'enabled' => true,
+        'enable_annotations' => true,
+        'cache' => 'serializer.mapping.cache.apc',
+        'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
+    ),
     'ide' => 'file%%link%%format',
     'request' => array(
         'formats' => array(

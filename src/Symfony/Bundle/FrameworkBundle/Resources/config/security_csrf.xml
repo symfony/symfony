@@ -4,22 +4,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="security.csrf.token_generator.class">Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator</parameter>
-        <parameter key="security.csrf.token_storage.class">Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage</parameter>
-        <parameter key="security.csrf.token_manager.class">Symfony\Component\Security\Csrf\CsrfTokenManager</parameter>
-    </parameters>
-
     <services>
-        <service id="security.csrf.token_generator" class="%security.csrf.token_generator.class%" public="false">
+        <service id="security.csrf.token_generator" class="Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator" public="false">
             <argument type="service" id="security.secure_random" />
         </service>
 
-        <service id="security.csrf.token_storage" class="%security.csrf.token_storage.class%" public="false">
+        <service id="security.csrf.token_storage" class="Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage" public="false">
             <argument type="service" id="session" />
         </service>
 
-        <service id="security.csrf.token_manager" class="%security.csrf.token_manager.class%">
+        <service id="security.csrf.token_manager" class="Symfony\Component\Security\Csrf\CsrfTokenManager">
             <argument type="service" id="security.csrf.token_generator" />
             <argument type="service" id="security.csrf.token_storage" />
         </service>

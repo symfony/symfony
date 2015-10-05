@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\CssSelector\CssSelector;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Crawler eases navigation of a list of \DOMElement objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Crawler extends \SplObjectStorage
+class Crawler implements \Countable, \IteratorAggregate
 {
     /**
      * @var string The current URI
@@ -41,6 +41,23 @@ class Crawler extends \SplObjectStorage
     private $baseHref;
 
     /**
+     * @var \DOMDocument|null
+     */
+    private $document;
+
+    /**
+     * @var \DOMElement[]
+     */
+    private $nodes = array();
+
+    /**
+     * Whether the Crawler contains HTML or XML content (used when converting CSS to XPath).
+     *
+     * @var bool
+     */
+    private $isHtml = true;
+
+    /**
      * Constructor.
      *
      * @param mixed  $node       A Node to use as the base for the crawling
@@ -60,7 +77,8 @@ class Crawler extends \SplObjectStorage
      */
     public function clear()
     {
-        $this->removeAll($this);
+        $this->nodes = array();
+        $this->document = null;
     }
 
     /**
@@ -251,6 +269,8 @@ class Crawler extends \SplObjectStorage
         libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);
+
+        $this->isHtml = false;
     }
 
     /**
@@ -299,21 +319,27 @@ class Crawler extends \SplObjectStorage
     public function addNode(\DOMNode $node)
     {
         if ($node instanceof \DOMDocument) {
-            $this->attach($node->documentElement);
-        } else {
-            $this->attach($node);
+            $node = $node->documentElement;
         }
-    }
 
-    // Serializing and unserializing a crawler creates DOM objects in a corrupted state. DOM elements are not properly serializable.
-    public function unserialize($serialized)
-    {
-        throw new \BadMethodCallException('A Crawler cannot be serialized.');
-    }
+        if (!$node instanceof \DOMElement) {
+            throw new \InvalidArgumentException(sprintf('Nodes set in a Crawler must be DOMElement or DOMDocument instances, "%s" given.', get_class($node)));
+        }
 
-    public function serialize()
-    {
-        throw new \BadMethodCallException('A Crawler cannot be serialized.');
+        if (null !== $this->document && $this->document !== $node->ownerDocument) {
+            throw new \InvalidArgumentException('Attaching DOM nodes from multiple documents in the same crawler is forbidden.');
+        }
+
+        if (null === $this->document) {
+            $this->document = $node->ownerDocument;
+        }
+
+        // Don't add duplicate nodes in the Crawler
+        if (in_array($node, $this->nodes, true)) {
+            return;
+        }
+
+        $this->nodes[] = $node;
     }
 
     /**
@@ -325,10 +351,8 @@ class Crawler extends \SplObjectStorage
      */
     public function eq($position)
     {
-        foreach ($this as $i => $node) {
-            if ($i == $position) {
-                return $this->createSubCrawler($node);
-            }
+        if (isset($this->nodes[$position])) {
+            return $this->createSubCrawler($this->nodes[$position]);
         }
 
         return $this->createSubCrawler(null);
@@ -353,7 +377,7 @@ class Crawler extends \SplObjectStorage
     public function each(\Closure $closure)
     {
         $data = array();
-        foreach ($this as $i => $node) {
+        foreach ($this->nodes as $i => $node) {
             $data[] = $closure($this->createSubCrawler($node), $i);
         }
 
@@ -368,9 +392,9 @@ class Crawler extends \SplObjectStorage
      *
      * @return Crawler A Crawler instance with the sliced nodes
      */
-    public function slice($offset = 0, $length = -1)
+    public function slice($offset = 0, $length = null)
     {
-        return $this->createSubCrawler(iterator_to_array(new \LimitIterator($this, $offset, $length)));
+        return $this->createSubCrawler(array_slice($this->nodes, $offset, $length));
     }
 
     /**
@@ -385,7 +409,7 @@ class Crawler extends \SplObjectStorage
     public function reduce(\Closure $closure)
     {
         $nodes = array();
-        foreach ($this as $i => $node) {
+        foreach ($this->nodes as $i => $node) {
             if (false !== $closure($this->createSubCrawler($node), $i)) {
                 $nodes[] = $node;
             }
@@ -411,7 +435,7 @@ class Crawler extends \SplObjectStorage
      */
     public function last()
     {
-        return $this->eq(count($this) - 1);
+        return $this->eq(count($this->nodes) - 1);
     }
 
     /**
@@ -423,7 +447,7 @@ class Crawler extends \SplObjectStorage
      */
     public function siblings()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -439,7 +463,7 @@ class Crawler extends \SplObjectStorage
      */
     public function nextAll()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -455,7 +479,7 @@ class Crawler extends \SplObjectStorage
      */
     public function previousAll()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -471,7 +495,7 @@ class Crawler extends \SplObjectStorage
      */
     public function parents()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -496,7 +520,7 @@ class Crawler extends \SplObjectStorage
      */
     public function children()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -516,7 +540,7 @@ class Crawler extends \SplObjectStorage
      */
     public function attr($attribute)
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -534,7 +558,7 @@ class Crawler extends \SplObjectStorage
      */
     public function nodeName()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -550,7 +574,7 @@ class Crawler extends \SplObjectStorage
      */
     public function text()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -566,7 +590,7 @@ class Crawler extends \SplObjectStorage
      */
     public function html()
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -597,7 +621,7 @@ class Crawler extends \SplObjectStorage
         $count = count($attributes);
 
         $data = array();
-        foreach ($this as $node) {
+        foreach ($this->nodes as $node) {
             $elements = array();
             foreach ($attributes as $attribute) {
                 if ('_text' === $attribute) {
@@ -650,12 +674,14 @@ class Crawler extends \SplObjectStorage
      */
     public function filter($selector)
     {
-        if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
-            throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
+        if (!class_exists('Symfony\\Component\\CssSelector\\CssSelectorConverter')) {
+            throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector 2.8+ is not installed (you can use filterXPath instead).');
         }
 
+        $converter = new CssSelectorConverter($this->isHtml);
+
         // The CssSelector already prefixes the selector with descendant-or-self::
-        return $this->filterRelativeXPath(CssSelector::toXPath($selector));
+        return $this->filterRelativeXPath($converter->toXPath($selector));
     }
 
     /**
@@ -701,7 +727,7 @@ class Crawler extends \SplObjectStorage
      */
     public function link($method = 'get')
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -718,7 +744,7 @@ class Crawler extends \SplObjectStorage
     public function links()
     {
         $links = array();
-        foreach ($this as $node) {
+        foreach ($this->nodes as $node) {
             $links[] = new Link($node, $this->baseHref, 'get');
         }
 
@@ -737,7 +763,7 @@ class Crawler extends \SplObjectStorage
      */
     public function form(array $values = null, $method = null)
     {
-        if (!count($this)) {
+        if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -831,9 +857,14 @@ class Crawler extends \SplObjectStorage
 
         $crawler = $this->createSubCrawler(null);
 
-        foreach ($this as $node) {
+        foreach ($this->nodes as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
-            $crawler->add($domxpath->query($xpath, $node));
+
+            foreach ($domxpath->query($xpath, $node) as $subNode) {
+                if ($subNode->nodeType === 1) {
+                    $crawler->add($subNode);
+                }
+            }
         }
 
         return $crawler;
@@ -872,6 +903,8 @@ class Crawler extends \SplObjectStorage
 
             // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
             if (0 === strpos($expression, '/_root/')) {
+                @trigger_error('XPath expressions referencing the fake root node are deprecated since version 2.8 and will be unsupported in 3.0. Please use "./" instead of "/_root/".', E_USER_DEPRECATED);
+
                 $expression = './'.substr($expression, 7);
             } elseif (0 === strpos($expression, 'self::*/')) {
                 $expression = './'.substr($expression, 8);
@@ -916,11 +949,25 @@ class Crawler extends \SplObjectStorage
      */
     public function getNode($position)
     {
-        foreach ($this as $i => $node) {
-            if ($i == $position) {
-                return $node;
-            }
+        if (isset($this->nodes[$position])) {
+            return $this->nodes[$position];
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->nodes);
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->nodes);
     }
 
     /**
@@ -1010,6 +1057,8 @@ class Crawler extends \SplObjectStorage
     private function createSubCrawler($nodes)
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
+        $crawler->isHtml = $this->isHtml;
+        $crawler->document = $this->document;
 
         return $crawler;
     }

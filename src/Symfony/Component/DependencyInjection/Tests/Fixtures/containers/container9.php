@@ -28,12 +28,11 @@ $container
 $container
     ->register('bar', 'Bar\FooClass')
     ->setArguments(array('foo', new Reference('foo.baz'), new Parameter('foo_bar')))
-    ->setScope('container')
     ->setConfigurator(array(new Reference('foo.baz'), 'configure'))
 ;
 $container
     ->register('foo_bar', '%foo_class%')
-    ->setScope('prototype')
+    ->setShared(false)
 ;
 $container->getParameterBag()->clear();
 $container->getParameterBag()->add(array(
@@ -91,9 +90,12 @@ $container
     ->setDecoratedService('decorated', 'decorated.pif-pouf')
 ;
 $container
+    ->register('deprecated_service', 'stdClass')
+    ->setDeprecated(true)
+;
+$container
     ->register('new_factory', 'FactoryClass')
     ->setProperty('foo', 'bar')
-    ->setScope('container')
     ->setPublic(false)
 ;
 $container

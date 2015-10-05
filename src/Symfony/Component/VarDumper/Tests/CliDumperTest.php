@@ -42,17 +42,8 @@ class CliDumperTest extends VarDumperTestCase
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
-        $closure54 = '';
+
         $r = defined('HHVM_VERSION') ? '' : '#%d';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
-EOTXT;
-        }
-
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -83,14 +74,16 @@ array:24 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {{$r}{$closure54}
-    parameters: array:2 [
-      "\$a" => []
-      "&\$b" => array:2 [
-        "typeHint" => "PDO"
-        "default" => null
-      ]
-    ]
+  "closure" => Closure {{$r}
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
+    parameters: {
+      \$a: {}
+      &\$b: {
+        typeHint: "PDO"
+        default: null
+      }
+    }
     file: "{$var['file']}"
     line: "{$var['line']} to {$var['line']}"
   }
@@ -170,6 +163,9 @@ EOTXT
     {
         $out = fopen('php://memory', 'r+b');
 
+        require_once __DIR__.'/Fixtures/Twig.php';
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()));
+
         $dumper = new CliDumper();
         $dumper->setColors(false);
         $cloner = new VarCloner();
@@ -181,18 +177,34 @@ EOTXT
             },
         ));
         $cloner->addCasters(array(
-            ':stream' => function () {
-                throw new \Exception('Foobar');
-            },
+            ':stream' => eval('return function () use ($twig) {
+                try {
+                    $twig->render(array());
+                } catch (\Twig_Error_Runtime $e) {
+                    throw $e->getPrevious();
+                }
+            };'),
         ));
-        $line = __LINE__ - 3;
-        $file = __FILE__;
+        $line = __LINE__ - 2;
         $ref = (int) $out;
 
         $data = $cloner->cloneVar($out);
         $dumper->dump($data, $out);
         rewind($out);
         $out = stream_get_contents($out);
+
+        if (method_exists($twig, 'getSource')) {
+            $twig = <<<EOTXT
+          foo.twig:2: """
+            foo bar\\n
+                twig source\\n
+            \\n
+            """
+
+EOTXT;
+        } else {
+            $twig = '';
+        }
 
         $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
@@ -210,12 +222,53 @@ stream resource {@{$ref}
   options: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
-    trace: array:1 [
-      0 => array:2 [
-        "call" => "%slosure%s()"
-        "file" => "{$file}:{$line}"
-      ]
-    ]
+    -trace: {
+      %d. __TwigTemplate_VarDumperFixture_u75a09->doDisplay() ==> new Exception(): {
+        src: {
+          %sTwig.php:19: """
+                    // line 2\\n
+                    throw new \Exception('Foobar');\\n
+                }\\n
+            """
+{$twig}        }
+      }
+      %d. Twig_Template->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
+        src: {
+          %sTemplate.php:%d: """
+                    try {\\n
+                        \$this->doDisplay(\$context, \$blocks);\\n
+                    } catch (Twig_Error \$e) {\\n
+            """
+        }
+      }
+      %d. Twig_Template->display() ==> Twig_Template->displayWithErrorHandling(): {
+        src: {
+          %sTemplate.php:%d: """
+                {\\n
+                    \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));\\n
+                }\\n
+            """
+        }
+      }
+      %d. Twig_Template->render() ==> Twig_Template->display(): {
+        src: {
+          %sTemplate.php:%d: """
+                    try {\\n
+                        \$this->display(\$context);\\n
+                    } catch (Exception \$e) {\\n
+            """
+        }
+      }
+      %d. %slosure%s() ==> Twig_Template->render(): {
+        src: {
+          %sCliDumperTest.php:{$line}: """
+                            }\\n
+                        };'),\\n
+                    ));\\n
+            """
+        }
+      }
+    }
   }
 }
 

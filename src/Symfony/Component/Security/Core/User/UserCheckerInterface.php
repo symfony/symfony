@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
+
 /**
- * UserCheckerInterface checks user account when authentication occurs.
+ * Implement to throw AccountStatusException during the authentication process.
  *
- * This should not be used to make authentication decisions.
+ * Can be used when you want to check the account status, e.g when the account is
+ * disabled or blocked. This should not be used to make authentication decisions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,6 +27,8 @@ interface UserCheckerInterface
      * Checks the user account before authentication.
      *
      * @param UserInterface $user a UserInterface instance
+     *
+     * @throws AccountStatusException
      */
     public function checkPreAuth(UserInterface $user);
 
@@ -31,6 +36,8 @@ interface UserCheckerInterface
      * Checks the user account after authentication.
      *
      * @param UserInterface $user a UserInterface instance
+     *
+     * @throws AccountStatusException
      */
     public function checkPostAuth(UserInterface $user);
 }

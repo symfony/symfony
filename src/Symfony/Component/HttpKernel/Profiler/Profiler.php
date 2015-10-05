@@ -132,38 +132,6 @@ class Profiler
     }
 
     /**
-     * Exports the current profiler data.
-     *
-     * @param Profile $profile A Profile instance
-     *
-     * @return string The exported data
-     */
-    public function export(Profile $profile)
-    {
-        return base64_encode(serialize($profile));
-    }
-
-    /**
-     * Imports data into the profiler storage.
-     *
-     * @param string $data A data string as exported by the export() method
-     *
-     * @return Profile A Profile instance
-     */
-    public function import($data)
-    {
-        $profile = unserialize(base64_decode($data));
-
-        if ($this->storage->read($profile->getToken())) {
-            return false;
-        }
-
-        $this->saveProfile($profile);
-
-        return $profile;
-    }
-
-    /**
      * Finds profiler tokens for the given criteria.
      *
      * @param string $ip     The IP

@@ -20,20 +20,20 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
  */
 class AnonymousToken extends AbstractToken
 {
-    private $key;
+    private $secret;
 
     /**
      * Constructor.
      *
-     * @param string          $key   The key shared with the authentication provider
-     * @param string          $user  The user
-     * @param RoleInterface[] $roles An array of roles
+     * @param string          $secret A secret used to make sure the token is created by the app and not by a malicious client
+     * @param string          $user   The user
+     * @param RoleInterface[] $roles  An array of roles
      */
-    public function __construct($key, $user, array $roles = array())
+    public function __construct($secret, $user, array $roles = array())
     {
         parent::__construct($roles);
 
-        $this->key = $key;
+        $this->secret = $secret;
         $this->setUser($user);
         $this->setAuthenticated(true);
     }
@@ -47,13 +47,13 @@ class AnonymousToken extends AbstractToken
     }
 
     /**
-     * Returns the key.
+     * Returns the secret.
      *
-     * @return string The Key
+     * @return string
      */
-    public function getKey()
+    public function getSecret()
     {
-        return $this->key;
+        return $this->secret;
     }
 
     /**
@@ -61,7 +61,7 @@ class AnonymousToken extends AbstractToken
      */
     public function serialize()
     {
-        return serialize(array($this->key, parent::serialize()));
+        return serialize(array($this->secret, parent::serialize()));
     }
 
     /**
@@ -69,7 +69,7 @@ class AnonymousToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->key, $parentStr) = unserialize($serialized);
+        list($this->secret, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Ldap\Search\Query;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Charles Sarrazin <charles@sarraz.in>
  */
-class Ldap implements LdapInterface
+final class Ldap implements LdapInterface
 {
     private $connection;
 

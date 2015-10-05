@@ -33,7 +33,7 @@ class Result implements \IteratorAggregate
         $infos = ldap_get_entries($this->connection, $this->search);
 
         if (0 === $infos['count']) {
-            return [];
+            return array();
         }
 
         unset($infos['count']);

@@ -68,10 +68,9 @@ abstract class AbstractVoter implements VoterInterface
 
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
-        $class = get_class($object);
 
         foreach ($attributes as $attribute) {
-            if (!$this->supports($attribute, $class)) {
+            if (!$this->supports($attribute, $object)) {
                 continue;
             }
 
@@ -88,25 +87,22 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
-     * Determines if the attribute and class are supported by this voter.
-     *
-     * To determine if the passed class is instance of the supported class, the
-     * isClassInstanceOf() method can be used.
+     * Determines if the attribute and object are supported by this voter.
      *
      * This method will become abstract in 3.0.
      *
      * @param string $attribute An attribute
-     * @param string $class     The fully qualified class name of the passed object
+     * @param string $object    The object to secure
      *
-     * @return bool True if the attribute and class is supported, false otherwise
+     * @return bool True if the attribute and object is supported, false otherwise
      */
-    protected function supports($attribute, $class)
+    protected function supports($attribute, $object)
     {
         @trigger_error('The getSupportedClasses and getSupportedAttributes methods are deprecated since version 2.8 and will be removed in version 3.0. Overwrite supports instead.', E_USER_DEPRECATED);
 
         $classIsSupported = false;
         foreach ($this->getSupportedClasses() as $supportedClass) {
-            if ($this->isClassInstanceOf($class, $supportedClass)) {
+            if ($object instanceof $supportedClass) {
                 $classIsSupported = true;
                 break;
             }
@@ -121,20 +117,6 @@ abstract class AbstractVoter implements VoterInterface
         }
 
         return true;
-    }
-
-    /**
-     * A helper method to test if the actual class is instanceof or equal
-     * to the expected class.
-     *
-     * @param string $actualClass   The actual class name
-     * @param string $expectedClass The expected class name
-     *
-     * @return bool
-     */
-    protected function isClassInstanceOf($actualClass, $expectedClass)
-    {
-        return $expectedClass === $actualClass || is_subclass_of($actualClass, $expectedClass);
     }
 
     /**

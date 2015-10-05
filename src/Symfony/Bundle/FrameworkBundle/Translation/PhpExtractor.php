@@ -91,7 +91,7 @@ class PhpExtractor implements ExtractorInterface
     /**
      * Seeks to a non-whitespace token.
      */
-    private function seekToNextReleventToken(\Iterator $tokenIterator)
+    private function seekToNextRelevantToken(\Iterator $tokenIterator)
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
@@ -154,7 +154,7 @@ class PhpExtractor implements ExtractorInterface
                 $tokenIterator->seek($key);
 
                 foreach ($sequence as $item) {
-                    $this->seekToNextReleventToken($tokenIterator);
+                    $this->seekToNextRelevantToken($tokenIterator);
 
                     if ($this->normalizeToken($tokenIterator->current()) == $item) {
                         $tokenIterator->next();

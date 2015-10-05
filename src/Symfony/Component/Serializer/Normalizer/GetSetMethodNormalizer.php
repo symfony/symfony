@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -100,9 +101,10 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $subcontext = array_merge($context, array('encoding' => $format));
+        $subcontext = array_merge($context, array('format' => $format));
         $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
 
+        $classMethods = get_class_methods($object);
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
                 $attribute = $this->nameConverter->denormalize($attribute);
@@ -112,26 +114,27 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             $ignored = in_array($attribute, $this->ignoredAttributes);
             $setter = 'set'.ucfirst($attribute);
 
-            if ($allowed && !$ignored) {
-                if ($reflectionClass->hasMethod($setter)) {
-                    $setter = $reflectionClass->getMethod($setter);
+            if ($allowed && !$ignored && in_array($setter, $classMethods)) {
+                if ($this->propertyInfoExtractor) {
+                    /**
+                     * @var Type[] $types
+                     */
+                    $types = (array) $this->propertyInfoExtractor->getTypes($class, $attribute);
 
-                    if ($setter->isPublic()) {
-                        $params = $setter->getParameters();
-                        $param = $params[0];
-
-                        $paramClass = $param->getClass();
-                        if ($paramClass !== null and (!empty($value) or !$param->allowsNull())) {
+                    foreach ($types as $type) {
+                        if ($type and (!empty($value) or !$type->isNullable())) {
                             if (!$this->serializer instanceof DenormalizerInterface) {
-                                throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
+                                throw new RuntimeException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
                             }
 
-                            $value = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
-                        }
+                            $value = $this->serializer->denormalize($value, $type->getClassName(), $format, $context);
 
-                        $setter->invoke($object, $value);
+                            break;
+                        }
                     }
                 }
+
+                $object->$setter($value);
             }
         }
 

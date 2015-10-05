@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -480,12 +482,14 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalizeWithTypehint()
     {
         /* need a serializer that can recurse denormalization $normalizer */
-        $normalizer = new GetSetMethodNormalizer();
+        $normalizer = new GetSetMethodNormalizer(null, null, new PropertyInfoExtractor(array(), array(new ReflectionExtractor())));
         $serializer = new Serializer(array($normalizer));
         $normalizer->setSerializer($serializer);
 
         $obj = $normalizer->denormalize(
-            array('object' => array('foo' => 'foo', 'bar' => 'bar')),
+            array(
+                'object' => array('foo' => 'foo', 'bar' => 'bar'),
+            ),
             __NAMESPACE__.'\GetTypehintedDummy',
             'any'
         );
@@ -758,6 +762,7 @@ class GetTypehintDummy
         $this->bar = $bar;
     }
 }
+
 
 class ObjectConstructorArgsWithPrivateMutatorDummy
 {

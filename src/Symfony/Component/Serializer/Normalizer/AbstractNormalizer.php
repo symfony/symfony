@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -55,15 +57,21 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected $camelizedAttributes = array();
 
     /**
+     * @var PropertyInfoExtractor
+     */
+    protected $propertyInfoExtractor;
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
      * @param ClassMetadataFactoryInterface|null $classMetadataFactory
      * @param NameConverterInterface|null        $nameConverter
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyInfoExtractor $propertyInfoExtractor = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
+        $this->propertyInfoExtractor = $propertyInfoExtractor;
     }
 
     /**
@@ -277,15 +285,24 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    /* denormalizing based on type hinting */
-                    $paramClass = $constructorParameter->getClass();
-                    if ($paramClass !==  null and (!empty($value) or !$constructorParameter->allowsNull())) {
-                        if (!$this->serializer instanceof DenormalizerInterface) {
-                            throw new RuntimeException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
-                        }
+                    if ($this->propertyInfoExtractor) {
+                        /**
+                         * @var Type[] $types
+                         */
+                        $types = $this->propertyInfoExtractor->getTypes($class, $key);
 
-                        $value = $data[$paramName];
-                        $data[$paramName] = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
+                        foreach ($types as $type) {
+                            if ($type && $type->getClassName() && (!empty($data[$key]) or !$type->isNullable())) {
+                                if (!$this->serializer instanceof DenormalizerInterface) {
+                                    throw new RuntimeException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $key));
+                                }
+
+                                $value = $data[$paramName];
+                                $data[$paramName] = $this->serializer->denormalize($value, $type->getClassName(), $format, $context);
+
+                                break;
+                            }
+                        }
                     }
 
                     $params[] = $data[$key];

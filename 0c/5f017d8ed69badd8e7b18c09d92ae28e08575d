@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-05T09:40:17Z
+
+The rest of the changes from #16098 only applies to Symfony 2.7?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2015-10-05T09:44:05Z
+
+@xabbuh well it doesn't apply to 2.3, I guess I have to test manually each changes for next PRs
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-05T09:56:45Z
+
+@pborreli thanks
+
+:+1:
+
+Status: Reviewed

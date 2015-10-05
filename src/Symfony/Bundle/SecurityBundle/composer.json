@@ -32,7 +32,6 @@
         "symfony/http-foundation": "~2.3",
         "symfony/twig-bundle": "~2.2",
         "symfony/twig-bridge": "~2.2,>=2.2.6",
-        "symfony/form": "~2.3",
         "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.2",
         "symfony/yaml": "~2.0,>=2.0.5",

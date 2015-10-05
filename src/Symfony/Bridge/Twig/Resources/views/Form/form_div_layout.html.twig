@@ -176,6 +176,11 @@
     {{ block('form_widget_simple') }}
 {%- endblock email_widget -%}
 
+{%- block range_widget -%}
+    {% set type = type|default('range') %}
+    {{- block('form_widget_simple') -}}
+{%- endblock range_widget %}
+
 {%- block button_widget -%}
     {%- if label is empty -%}
         {%- if label_format is not empty -%}
@@ -282,10 +287,6 @@
     </form>
 {%- endblock form_end -%}
 
-{%- block form_enctype -%}
-    {% if multipart %}enctype="multipart/form-data"{% endif %}
-{%- endblock form_enctype -%}
-
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
     <ul>
@@ -314,7 +315,6 @@
 
 {%- block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"
-    {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
     {%- for attrname, attrvalue in attr -%}

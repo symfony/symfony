@@ -171,10 +171,6 @@ class YamlFileLoader extends FileLoader
             $definition->setSynthetic($service['synthetic']);
         }
 
-        if (isset($service['synchronized'])) {
-            $definition->setSynchronized($service['synchronized'], 'request' !== $id);
-        }
-
         if (isset($service['lazy'])) {
             $definition->setLazy($service['lazy']);
         }
@@ -198,18 +194,6 @@ class YamlFileLoader extends FileLoader
             } else {
                 $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
             }
-        }
-
-        if (isset($service['factory_class'])) {
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {

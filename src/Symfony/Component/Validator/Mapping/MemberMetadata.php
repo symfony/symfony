@@ -82,7 +82,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $visitor->visit($this, $value, $group, $propertyPath);
 
@@ -192,7 +192,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCascaded()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getCascadingStrategy() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getCascadingStrategy() method instead.', E_USER_DEPRECATED);
 
         return (bool) ($this->cascadingStrategy & CascadingStrategy::CASCADE);
     }
@@ -208,7 +208,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascaded()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
 
         return (bool) ($this->traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE));
     }
@@ -224,7 +224,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascadedDeeply()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
 
         return !($this->traversalStrategy & TraversalStrategy::STOP_RECURSION);
     }

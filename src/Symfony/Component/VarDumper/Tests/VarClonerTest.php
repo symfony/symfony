@@ -139,12 +139,12 @@ EOTXT;
     {
         $cloner = new VarCloner(array(
             '*' => function ($obj, $array) {
-                $array['foo'] = 123;
-
-                return $array;
+                return array('foo' => 123);
             },
             __CLASS__ => function ($obj, $array) {
-                return array();
+                ++$array['foo'];
+
+                return $array;
             },
         ));
         $clone = $cloner->cloneVar($this);
@@ -171,7 +171,7 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
             [1] => Array
                 (
-                    [foo] => 123
+                    [foo] => 124
                 )
 
         )

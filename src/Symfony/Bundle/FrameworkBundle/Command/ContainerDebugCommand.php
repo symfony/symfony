@@ -40,9 +40,6 @@ class ContainerDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:container')
-            ->setAliases(array(
-                'container:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
@@ -94,10 +91,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.</comment>');
-        }
-
         $this->validateInput($input);
 
         if ($input->getOption('parameters')) {

@@ -1,9 +1,11 @@
 [
     {
         "type": "function",
-        "name": "global_function"
+        "name": "global_function",
+        "priority": 255
     },
     {
-        "type": "closure"
+        "type": "closure",
+        "priority": -1
     }
 ]

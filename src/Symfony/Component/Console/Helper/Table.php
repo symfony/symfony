@@ -171,7 +171,7 @@ class Table
         if ($row instanceof TableSeparator) {
             $this->rows[] = $row;
 
-            return;
+            return $this;
         }
 
         if (!is_array($row)) {
@@ -385,7 +385,7 @@ class Table
         $unmergedRows = array();
         foreach ($rows[$line] as $column => $cell) {
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
-                $nbLines = $cell->getRowspan()-1;
+                $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
                 if (strstr($cell, "\n")) {
                     $lines = explode("\n", $cell);
@@ -412,7 +412,7 @@ class Table
                     array_splice($rows[$unmergedRowKey], $cellKey, 0, array($cell));
                 }
             } else {
-                $row = $this->copyRow($rows, $unmergedRowKey-1);
+                $row = $this->copyRow($rows, $unmergedRowKey - 1);
                 foreach ($unmergedRow as $column => $cell) {
                     if (!empty($cell)) {
                         $row[$column] = $unmergedRow[$column];
@@ -476,7 +476,7 @@ class Table
     {
         $columns = count($row);
         foreach ($row as $column) {
-            $columns += $column instanceof TableCell ? ($column->getColspan()-1) : 0;
+            $columns += $column instanceof TableCell ? ($column->getColspan() - 1) : 0;
         }
 
         return $columns;
@@ -491,11 +491,11 @@ class Table
      */
     private function getRowColumns($row)
     {
-        $columns = range(0, $this->numberOfColumns-1);
+        $columns = range(0, $this->numberOfColumns - 1);
         foreach ($row as $cellKey => $cell) {
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
                 // exclude grouped columns.
-                $columns = array_diff($columns, range($cellKey+1, $cellKey + $cell->getColspan()-1));
+                $columns = array_diff($columns, range($cellKey + 1, $cellKey + $cell->getColspan() - 1));
             }
         }
 
@@ -550,12 +550,13 @@ class Table
     {
         if (isset($row[$column])) {
             $cell = $row[$column];
+            $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
             if ($cell instanceof TableCell && $cell->getColspan() > 1) {
                 // we assume that cell value will be across more than one column.
-                $cell = substr($cell, 0, strlen($cell)/$cell->getColspan());
+                $cellWidth = $cellWidth / $cell->getColspan();
             }
 
-            return Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+            return $cellWidth;
         }
 
         return 0;

@@ -198,11 +198,9 @@ class Container implements IntrospectableContainerInterface
         $id = strtolower($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' is no longer a self-reference but always
-            // $this, so ignore this call.
-            // @todo Throw InvalidArgumentException in next major release.
-            return;
+            throw new InvalidArgumentException('You cannot set service "service_container".');
         }
+
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
                 throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
@@ -212,10 +210,6 @@ class Container implements IntrospectableContainerInterface
         }
 
         $this->services[$id] = $service;
-
-        if (method_exists($this, $method = 'synchronize'.strtr($id, $this->underscoreMap).'Service')) {
-            $this->$method();
-        }
 
         if (null === $service) {
             if (self::SCOPE_CONTAINER !== $scope) {
@@ -357,9 +351,7 @@ class Container implements IntrospectableContainerInterface
         $id = strtolower($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' was a synthetic service previously.
-            // @todo Change to false in next major release.
-            return true;
+            return false;
         }
 
         if (isset($this->aliases[$id])) {

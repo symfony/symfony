@@ -51,7 +51,7 @@ class FixUrlProtocolListener implements EventSubscriberInterface
      */
     public function onBind(FormEvent $event)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
 
         $this->onSubmit($event);
     }

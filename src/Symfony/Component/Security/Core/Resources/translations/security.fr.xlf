@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Les droits d'authentification n'ont pas pu être trouvés.</target>
+                <target>Les identifiants d'authentification n'ont pas pu être trouvés.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Droits invalides.</target>
+                <target>Identifiants invalides.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Pas de privilèges pour accéder à la ressource.</target>
+                <target>Privilèges insuffisants pour accéder à la ressource.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Pas de session disponible, celle-ci a expiré ou les cookies ne sont pas activés.</target>
+                <target>Aucune session disponible, celle-ci a expiré ou les cookies ne sont pas activés.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Le nom d'utilisateur ne peut pas être trouvé.</target>
+                <target>Le nom d'utilisateur n'a pas pu être trouvé.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Les droits ont expirés.</target>
+                <target>Les identifiants ont expiré.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>

@@ -45,8 +45,6 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyCollectWhenAuthenticationTokenIsNull()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $tokenStorage = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
         $collector->collect($this->getRequest(), $this->getResponse());

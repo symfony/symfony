@@ -4,20 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="security.authentication.provider.rememberme.class">Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider</parameter>
-
-        <parameter key="security.authentication.listener.rememberme.class">Symfony\Component\Security\Http\Firewall\RememberMeListener</parameter>
-        <parameter key="security.rememberme.token.provider.in_memory.class">Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider</parameter>
-
-        <parameter key="security.authentication.rememberme.services.persistent.class">Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices</parameter>
-        <parameter key="security.authentication.rememberme.services.simplehash.class">Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices</parameter>
-
-        <parameter key="security.rememberme.response_listener.class">Symfony\Component\Security\Http\RememberMe\ResponseListener</parameter>
-    </parameters>
-
     <services>
-        <service id="security.authentication.listener.rememberme" class="%security.authentication.listener.rememberme.class%" public="false" abstract="true">
+        <service id="security.authentication.listener.rememberme" class="Symfony\Component\Security\Http\Firewall\RememberMeListener" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.rememberme" />
@@ -27,11 +15,11 @@
             <argument /> <!-- Catch exception flag set in RememberMeFactory -->
         </service>
 
-        <service id="security.authentication.provider.rememberme" class="%security.authentication.provider.rememberme.class%" abstract="true" public="false">
+        <service id="security.authentication.provider.rememberme" class="Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider" abstract="true" public="false">
             <argument type="service" id="security.user_checker" />
         </service>
 
-        <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false" />
+        <service id="security.rememberme.token.provider.in_memory" class="Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider" public="false" />
 
         <service id="security.authentication.rememberme.services.abstract" abstract="true" public="false">
             <tag name="monolog.logger" channel="security" />
@@ -43,18 +31,18 @@
         </service>
 
         <service id="security.authentication.rememberme.services.persistent"
-                 class="%security.authentication.rememberme.services.persistent.class%"
+                 class="Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices"
                  parent="security.authentication.rememberme.services.abstract"
                  abstract="true">
             <argument type="service" id="security.secure_random" />
         </service>
 
         <service id="security.authentication.rememberme.services.simplehash"
-                 class="%security.authentication.rememberme.services.simplehash.class%"
+                 class="Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices"
                  parent="security.authentication.rememberme.services.abstract"
                  abstract="true" />
 
-        <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
+        <service id="security.rememberme.response_listener" class="Symfony\Component\Security\Http\RememberMe\ResponseListener">
             <tag name="kernel.event_subscriber" />
         </service>
     </services>

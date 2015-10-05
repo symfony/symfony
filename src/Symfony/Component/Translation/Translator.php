@@ -34,7 +34,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @var string
      */
-    protected $locale;
+    private $locale;
 
     /**
      * @var array
@@ -165,24 +165,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Sets the fallback locale(s).
-     *
-     * @param string|array $locales The fallback locale(s)
-     *
-     * @throws \InvalidArgumentException If a locale contains invalid characters
-     *
-     * @deprecated since version 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
-     *
-     * @api
-     */
-    public function setFallbackLocale($locales)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the setFallbackLocales() method instead.', E_USER_DEPRECATED);
-
-        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
-    }
-
-    /**
      * Sets the fallback locales.
      *
      * @param array $locales The fallback locales
@@ -289,9 +271,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string|null $locale Locale of translations, by default is current locale
      *
      * @return array[array] indexed by catalog
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.
      */
     public function getMessages($locale = null)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
+
         $catalogue = $this->getCatalogue($locale);
         $messages = $catalogue->all();
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
@@ -341,10 +327,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
         $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
-            function (ConfigCacheInterface $cache) use ($self, $locale) {
-                $self->dumpCatalogue($locale, $cache);
+            function (ConfigCacheInterface $cache) use ($locale) {
+                $this->dumpCatalogue($locale, $cache);
             }
         );
 
@@ -357,12 +342,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->catalogues[$locale] = include $cache->getPath();
     }
 
-    /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
-     *
-     * @internal
-     */
-    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    private function dumpCatalogue($locale, ConfigCacheInterface $cache)
     {
         $this->initializeCatalogue($locale);
         $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
@@ -419,12 +399,7 @@ EOF
 
     private function getCatalogueCachePath($locale)
     {
-        $catalogueHash = sha1(serialize(array(
-            'resources' => isset($this->resources[$locale]) ? $this->resources[$locale] : array(),
-            'fallback_locales' => $this->fallbackLocales,
-        )));
-
-        return $this->cacheDir.'/catalogue.'.$locale.'.'.$catalogueHash.'.php';
+        return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->fallbackLocales)).'.php';
     }
 
     private function doLoadCatalogue($locale)

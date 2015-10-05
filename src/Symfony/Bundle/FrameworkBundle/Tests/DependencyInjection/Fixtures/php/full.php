@@ -47,9 +47,13 @@ $container->loadFromExtension('framework', array(
         ),
         'hinclude_default_template' => 'global_hinclude_template',
     ),
+    'assets' => array(
+        'version' => 'v1',
+    ),
     'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
+        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
     ),
     'validation' => array(
         'enabled' => true,

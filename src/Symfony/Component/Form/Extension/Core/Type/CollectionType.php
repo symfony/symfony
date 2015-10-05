@@ -29,7 +29,9 @@ class CollectionType extends AbstractType
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
                 'label' => $options['prototype_name'].'label__',
-            ), $options['options']));
+            ), $options['options'], array(
+                'data' => $options['prototype_data'],
+            )));
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -84,6 +86,7 @@ class CollectionType extends AbstractType
             'allow_add' => false,
             'allow_delete' => false,
             'prototype' => true,
+            'prototype_data' => null,
             'prototype_name' => '__name__',
             'type' => 'text',
             'options' => array(),

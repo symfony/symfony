@@ -68,13 +68,13 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
         try {
             $user = $this->retrieveUser($username, $token);
-        } catch (UsernameNotFoundException $notFound) {
+        } catch (UsernameNotFoundException $e) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException('Bad credentials.', 0, $notFound);
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
-            $notFound->setUsername($username);
+            $e->setUsername($username);
 
-            throw $notFound;
+            throw $e;
         }
 
         if (!$user instanceof UserInterface) {

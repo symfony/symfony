@@ -27,13 +27,13 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
             $dateTime = clone $dateTime;
-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
         return preg_replace('/\+00:00$/', 'Z', $dateTime->format('c'));

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -49,13 +48,6 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false, RequestStack $requestStack = null)
     {
-        if (null === $requestStack) {
-            // Prevent the deprecation notice to be triggered all the time.
-            // The onKernelRequest() method fires some logic only when the
-            // RequestStack instance is not provided as a dependency.
-            trigger_error('Since version 2.4, the '.__METHOD__.' method must accept a RequestStack instance to get the request instead of using the '.__CLASS__.'::onKernelRequest method that will be removed in 3.0.', E_USER_DEPRECATED);
-        }
-
         $this->profiler = $profiler;
         $this->matcher = $matcher;
         $this->onlyException = (bool) $onlyException;
@@ -77,16 +69,6 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         $this->exception = $event->getException();
-    }
-
-    /**
-     * @deprecated since version 2.4, to be removed in 3.0.
-     */
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (null === $this->requestStack) {
-            $this->requests[] = $event->getRequest();
-        }
     }
 
     /**
@@ -154,9 +136,6 @@ class ProfilerListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            // kernel.request must be registered as early as possible to not break
-            // when an exception is thrown in any other kernel.request listener
-            KernelEvents::REQUEST => array('onKernelRequest', 1024),
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
             KernelEvents::EXCEPTION => 'onKernelException',
             KernelEvents::TERMINATE => array('onKernelTerminate', -1024),

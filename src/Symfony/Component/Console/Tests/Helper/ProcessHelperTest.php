@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
@@ -59,7 +58,7 @@ EOT;
 
 EOT;
         $successOutputDebugWithTags = <<<EOT
-  RUN  php -r "echo \"<info>42</info>\";"
+  RUN  php -r "echo '<info>42</info>';"
   OUT  <info>42</info>
   RES  Command ran successfully
 
@@ -92,7 +91,7 @@ EOT;
             array('', 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERBOSE, null),
             array($successOutputVerbose, 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERY_VERBOSE, null),
             array($successOutputDebug, 'php -r "echo 42;"', StreamOutput::VERBOSITY_DEBUG, null),
-            array($successOutputDebugWithTags, 'php -r "echo \"<info>42</info>\";"', StreamOutput::VERBOSITY_DEBUG, null),
+            array($successOutputDebugWithTags, 'php -r "echo \'<info>42</info>\';"', StreamOutput::VERBOSITY_DEBUG, null),
             array('', 'php -r "syntax error"', StreamOutput::VERBOSITY_VERBOSE, null),
             array($syntaxErrorOutputVerbose, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_VERY_VERBOSE, null),
             array($syntaxErrorOutputDebug, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_DEBUG, null),

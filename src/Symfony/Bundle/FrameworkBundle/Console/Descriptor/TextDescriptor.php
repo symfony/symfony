@@ -35,8 +35,8 @@ class TextDescriptor extends Descriptor
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+
+        $table = new Table($this->output);
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -70,9 +70,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         // fixme: values were originally written as raw
         $description = array(
             '<comment>Path</comment>         '.$route->getPath(),
@@ -83,7 +80,7 @@ class TextDescriptor extends Descriptor
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
             '<comment>Class</comment>        '.get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
-            '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
+            '<comment>Requirements</comment> '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'),
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
         );
 
@@ -100,8 +97,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -201,8 +197,7 @@ class TextDescriptor extends Descriptor
         $tagsCount = count($maxTags);
         $tagsNames = array_keys($maxTags);
 
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -212,7 +207,7 @@ class TextDescriptor extends Descriptor
                     foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = array();
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
                         }
                         if (0 === $key) {
                             $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getClass())));
@@ -225,10 +220,10 @@ class TextDescriptor extends Descriptor
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             } else {
                 // we have no information (happens with "service_container")
-                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             }
         }
 
@@ -245,7 +240,7 @@ class TextDescriptor extends Descriptor
             : array();
 
         $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
-        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
+        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: '-');
 
         $tags = $definition->getTags();
         if (count($tags)) {
@@ -265,25 +260,10 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
-        if (method_exists($definition, 'isSynchronized')) {
-            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized(false) ? 'yes' : 'no');
-        }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $description[] = sprintf('<comment>Factory Class</comment>    %s', $definition->getFactoryClass(false));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $description[] = sprintf('<comment>Factory Service</comment>  %s', $definition->getFactoryService(false));
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod(false));
         }
 
         if ($factory = $definition->getFactory()) {
@@ -336,33 +316,16 @@ class TextDescriptor extends Descriptor
 
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
 
         if (null !== $event) {
             $this->writeText("\n");
-            $table = new Table($this->getOutput());
-            $table->getStyle()->setCellHeaderFormat('%s');
-            $table->setHeaders(array('Order', 'Callable'));
-
-            foreach ($registeredListeners as $order => $listener) {
-                $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
-            }
-
-            $table->render();
+            $this->renderEventListenerTable($registeredListeners);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
-
-                $table = new Table($this->getOutput());
-                $table->getStyle()->setCellHeaderFormat('%s');
-                $table->setHeaders(array('Order', 'Callable'));
-
-                foreach ($eventListeners as $order => $eventListener) {
-                    $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
-                }
-
-                $table->render();
+                $this->renderEventListenerTable($eventListeners);
             }
         }
     }
@@ -373,6 +336,26 @@ class TextDescriptor extends Descriptor
     protected function describeCallable($callable, array $options = array())
     {
         $this->writeText($this->formatCallable($callable), $options);
+    }
+
+    /**
+     * @param array $array
+     */
+    private function renderEventListenerTable(array $eventListeners)
+    {
+        $table = new Table($this->getOutput());
+        $table->getStyle()->setCellHeaderFormat('%s');
+        $table->setHeaders(array('Order', 'Callable', 'Priority'));
+
+        krsort($eventListeners);
+        $order = 1;
+        foreach ($eventListeners as $priority => $listeners) {
+            foreach ($listeners as $listener) {
+                $table->addRow(array(sprintf('#%d', $order++), $this->formatCallable($listener), $priority));
+            }
+        }
+
+        $table->render();
     }
 
     /**

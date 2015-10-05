@@ -78,14 +78,6 @@ class HelperSet implements \IteratorAggregate
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 
-        if ('dialog' === $name && $this->helpers[$name] instanceof DialogHelper) {
-            trigger_error('"Symfony\Component\Console\Helper\DialogHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\QuestionHelper" instead.', E_USER_DEPRECATED);
-        } elseif ('progress' === $name && $this->helpers[$name] instanceof ProgressHelper) {
-            trigger_error('"Symfony\Component\Console\Helper\ProgressHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\ProgressBar" instead.', E_USER_DEPRECATED);
-        } elseif ('table' === $name && $this->helpers[$name] instanceof TableHelper) {
-            trigger_error('"Symfony\Component\Console\Helper\TableHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\Table" instead.', E_USER_DEPRECATED);
-        }
-
         return $this->helpers[$name];
     }
 

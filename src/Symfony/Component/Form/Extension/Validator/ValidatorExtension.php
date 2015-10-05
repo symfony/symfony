@@ -59,13 +59,13 @@ class ValidatorExtension extends AbstractExtension
 
     public function loadTypeGuesser()
     {
-        // 2.4 API
-        if ($this->validator instanceof LegacyValidatorInterface) {
-            return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+        // 2.5 API
+        if ($this->validator instanceof ValidatorInterface) {
+            return new ValidatorTypeGuesser($this->validator);
         }
 
-        // 2.5 API - ValidatorInterface extends MetadataFactoryInterface
-        return new ValidatorTypeGuesser($this->validator);
+        // 2.4 API
+        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
     }
 
     protected function loadTypeExtensions()

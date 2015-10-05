@@ -37,7 +37,7 @@ class CsrfTokenManagerAdapter implements CsrfProviderInterface
     public function getTokenManager($triggerDeprecationError = true)
     {
         if ($triggerDeprecationError) {
-            trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
         }
 
         return $this->tokenManager;
@@ -48,7 +48,7 @@ class CsrfTokenManagerAdapter implements CsrfProviderInterface
      */
     public function generateCsrfToken($intention)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
 
         return $this->tokenManager->getToken($intention)->getValue();
     }
@@ -58,7 +58,7 @@ class CsrfTokenManagerAdapter implements CsrfProviderInterface
      */
     public function isCsrfTokenValid($intention, $token)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
 
         return $this->tokenManager->isTokenValid(new CsrfToken($intention, $token));
     }

@@ -86,26 +86,21 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.
-     * @group legacy
-     */
-    public function testLegacyInvalidValueAssets()
+    public function testAssetsCanBeEnabled()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(
-            array(
-                'templating' => array(
-                    'engines' => null,
-                    'assets_base_urls' => '//example.com',
-                ),
-                'assets' => null,
-            ),
-        ));
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
     }
 
     protected static function getBundleDefaultConfig()
@@ -146,6 +141,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => false,
                 'fallbacks' => array('en'),
                 'logging' => true,
+                'paths' => array(),
             ),
             'validation' => array(
                 'enabled' => false,
@@ -166,13 +162,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'property_access' => array(
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
-            ),
-            'assets' => array(
-                'version' => null,
-                'version_format' => '%%s?%%s',
-                'base_path' => '',
-                'base_urls' => array(),
-                'packages' => array(),
             ),
         );
     }

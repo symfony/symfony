@@ -356,7 +356,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getVirtual()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::getInheritData() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::getInheritData() method instead.', E_USER_DEPRECATED);
 
         return $this->getInheritData();
     }
@@ -722,7 +722,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function setVirtual($inheritData)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::setInheritData() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the FormConfigBuilder::setInheritData() method instead.', E_USER_DEPRECATED);
 
         $this->setInheritData($inheritData);
     }

@@ -22,7 +22,7 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
     public function testDebugAllRoutes()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => null));
+        $ret = $tester->execute(array('name' => null), array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('[router] Current routes', $tester->getDisplay());
@@ -31,7 +31,7 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
     public function testDebugSingleRoute()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'foo'));
+        $ret = $tester->execute(array('name' => 'foo'), array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('[router] Route "foo"', $tester->getDisplay());

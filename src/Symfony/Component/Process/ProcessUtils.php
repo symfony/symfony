@@ -49,7 +49,7 @@ class ProcessUtils
 
             $escapedArgument = '';
             $quote = false;
-            foreach (preg_split('/(")/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
+            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
                 } elseif (self::isSurroundedBy($part, '%')) {
@@ -83,8 +83,6 @@ class ProcessUtils
      * @return string The validated input
      *
      * @throws InvalidArgumentException In case the input is not valid
-     *
-     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public static function validateInput($caller, $input)
     {
@@ -93,12 +91,6 @@ class ProcessUtils
                 return $input;
             }
             if (is_scalar($input)) {
-                return (string) $input;
-            }
-            // deprecated as of Symfony 2.5, to be removed in 3.0
-            if (is_object($input) && method_exists($input, '__toString')) {
-                trigger_error('Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
                 return (string) $input;
             }
 

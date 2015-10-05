@@ -88,10 +88,8 @@ class FullTransformer
      */
     public function format(\DateTime $dateTime)
     {
-        $that = $this;
-
-        $formatted = preg_replace_callback($this->regExp, function ($matches) use ($that, $dateTime) {
-            return $that->formatReplace($matches[0], $dateTime);
+        $formatted = preg_replace_callback($this->regExp, function ($matches) use ($dateTime) {
+            return $this->formatReplace($matches[0], $dateTime);
         }, $this->pattern);
 
         return $formatted;
@@ -176,24 +174,22 @@ class FullTransformer
      */
     public function getReverseMatchingRegExp($pattern)
     {
-        $that = $this;
-
         $escapedPattern = preg_quote($pattern, '/');
 
         // ICU 4.8 recognizes slash ("/") in a value to be parsed as a dash ("-") and vice-versa
         // when parsing a date/time value
         $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
 
-        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function ($matches) use ($that) {
+        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function ($matches) {
             $length = strlen($matches[0]);
             $transformerIndex = $matches[0][0];
 
             $dateChars = $matches[0];
-            if ($that->isQuoteMatch($dateChars)) {
-                return $that->replaceQuoteMatch($dateChars);
+            if ($this->isQuoteMatch($dateChars)) {
+                return $this->replaceQuoteMatch($dateChars);
             }
 
-            $transformers = $that->getTransformers();
+            $transformers = $this->getTransformers();
             if (isset($transformers[$transformerIndex])) {
                 $transformer = $transformers[$transformerIndex];
                 $captureName = str_repeat($transformerIndex, $length);

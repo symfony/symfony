@@ -93,7 +93,7 @@ class DigestAuthenticationListener implements ListenerInterface
             }
 
             $serverDigestMd5 = $digestAuth->calculateServerDigest($user->getPassword(), $request->getMethod());
-        } catch (UsernameNotFoundException $notFound) {
+        } catch (UsernameNotFoundException $e) {
             $this->fail($event, $request, new BadCredentialsException(sprintf('Username %s not found.', $digestAuth->getUsername())));
 
             return;

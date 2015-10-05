@@ -30,7 +30,7 @@ class ServerRunCommand extends ServerCommand
      */
     public function isEnabled()
     {
-        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
+        if (defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -44,7 +44,8 @@ class ServerRunCommand extends ServerCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
@@ -99,9 +100,7 @@ EOF
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
-
-            return 1;
+            $address = $address.':'.$input->getOption('port');
         }
 
         if ($this->isOtherServerProcessRunning($address)) {

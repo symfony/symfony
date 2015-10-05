@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
+2.8.0
+-----
+
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+
 2.7.0
 -----
 

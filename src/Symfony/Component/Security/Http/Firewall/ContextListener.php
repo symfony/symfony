@@ -101,7 +101,7 @@ class ContextListener implements ListenerInterface
     }
 
     /**
-     * Writes the SecurityContext to the session.
+     * Writes the security token into the session.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
@@ -120,10 +120,6 @@ class ContextListener implements ListenerInterface
 
         $request = $event->getRequest();
         $session = $request->getSession();
-
-        if (null === $session) {
-            return;
-        }
 
         if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
             if ($request->hasPreviousSession()) {
@@ -164,11 +160,11 @@ class ContextListener implements ListenerInterface
                 }
 
                 return $token;
-            } catch (UnsupportedUserException $unsupported) {
+            } catch (UnsupportedUserException $e) {
                 // let's try the next user provider
-            } catch (UsernameNotFoundException $notFound) {
+            } catch (UsernameNotFoundException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $notFound->getUsername(), 'provider' => get_class($provider)));
+                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => get_class($provider)));
                 }
 
                 return;

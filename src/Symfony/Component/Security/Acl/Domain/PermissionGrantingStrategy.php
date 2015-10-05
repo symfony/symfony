@@ -55,21 +55,21 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
-            } catch (NoAceFoundException $noObjectAce) {
+            } catch (NoAceFoundException $e) {
                 $aces = $acl->getClassAces();
 
                 if (!$aces) {
-                    throw $noObjectAce;
+                    throw $e;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
             }
-        } catch (NoAceFoundException $noClassAce) {
+        } catch (NoAceFoundException $e) {
             if ($acl->isEntriesInheriting() && null !== $parentAcl = $acl->getParentAcl()) {
                 return $parentAcl->isGranted($masks, $sids, $administrativeMode);
             }
 
-            throw $noClassAce;
+            throw $e;
         }
     }
 
@@ -86,20 +86,20 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
-            } catch (NoAceFoundException $noObjectAces) {
+            } catch (NoAceFoundException $e) {
                 $aces = $acl->getClassFieldAces($field);
                 if (!$aces) {
-                    throw $noObjectAces;
+                    throw $e;
                 }
 
                 return $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
             }
-        } catch (NoAceFoundException $noClassAces) {
+        } catch (NoAceFoundException $e) {
             if ($acl->isEntriesInheriting() && null !== $parentAcl = $acl->getParentAcl()) {
                 return $parentAcl->isFieldGranted($field, $masks, $sids, $administrativeMode);
             }
 
-            throw $noClassAces;
+            throw $e;
         }
     }
 

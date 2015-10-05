@@ -1556,10 +1556,10 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('A', 'a', 'a'),
-            new ChoiceView('B', 'b', 'b'),
-            new ChoiceView('C', 'c', 'c'),
-            new ChoiceView('D', 'd', 'd'),
+            new ChoiceView('a', 'a', 'A'),
+            new ChoiceView('b', 'b', 'B'),
+            new ChoiceView('c', 'c', 'C'),
+            new ChoiceView('d', 'd', 'D'),
         ), $view->vars['choices']);
     }
 
@@ -1573,12 +1573,12 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            0 => new ChoiceView('A', 'a', 'a'),
-            2 => new ChoiceView('C', 'c', 'c'),
+            0 => new ChoiceView('a', 'a', 'A'),
+            2 => new ChoiceView('c', 'c', 'C'),
         ), $view->vars['choices']);
         $this->assertEquals(array(
-            1 => new ChoiceView('B', 'b', 'b'),
-            3 => new ChoiceView('D', 'd', 'd'),
+            1 => new ChoiceView('b', 'b', 'B'),
+            3 => new ChoiceView('d', 'd', 'D'),
         ), $view->vars['preferred_choices']);
     }
 
@@ -1592,19 +1592,19 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertEquals(array(
             'Symfony' => new ChoiceGroupView('Symfony', array(
-                0 => new ChoiceView('Bernhard', 'a', 'a'),
-                2 => new ChoiceView('Kris', 'c', 'c'),
+                0 => new ChoiceView('a', 'a', 'Bernhard'),
+                2 => new ChoiceView('c', 'c', 'Kris'),
             )),
             'Doctrine' => new ChoiceGroupView('Doctrine', array(
-                4 => new ChoiceView('Roman', 'e', 'e'),
+                4 => new ChoiceView('e', 'e', 'Roman'),
             )),
         ), $view->vars['choices']);
         $this->assertEquals(array(
             'Symfony' => new ChoiceGroupView('Symfony', array(
-                1 => new ChoiceView('Fabien', 'b', 'b'),
+                1 => new ChoiceView('b', 'b', 'Fabien'),
             )),
             'Doctrine' => new ChoiceGroupView('Doctrine', array(
-                3 => new ChoiceView('Jon', 'd', 'd'),
+                3 => new ChoiceView('d', 'd', 'Jon'),
             )),
         ), $view->vars['preferred_choices']);
     }
@@ -1624,10 +1624,10 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('A', 'a', $obj1),
-            new ChoiceView('B', 'b', $obj2),
-            new ChoiceView('C', 'c', $obj3),
-            new ChoiceView('D', 'd', $obj4),
+            new ChoiceView($obj1, 'a', 'A'),
+            new ChoiceView($obj2, 'b', 'B'),
+            new ChoiceView($obj3, 'c', 'C'),
+            new ChoiceView($obj4, 'd', 'D'),
         ), $view->vars['choices']);
     }
 

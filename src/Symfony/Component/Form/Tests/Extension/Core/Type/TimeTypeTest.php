@@ -319,8 +319,8 @@ class TimeTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('06', '6', '6'),
-            new ChoiceView('07', '7', '7'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['hour']->vars['choices']);
     }
 
@@ -333,8 +333,8 @@ class TimeTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('06', '6', '6'),
-            new ChoiceView('07', '7', '7'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['minute']->vars['choices']);
     }
 
@@ -348,8 +348,8 @@ class TimeTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('06', '6', '6'),
-            new ChoiceView('07', '7', '7'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['second']->vars['choices']);
     }
 

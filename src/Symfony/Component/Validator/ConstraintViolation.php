@@ -147,7 +147,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessageParameters()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getParameters() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getParameters() method instead.', E_USER_DEPRECATED);
 
         return $this->parameters;
     }
@@ -168,7 +168,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessagePluralization()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getPlural() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getPlural() method instead.', E_USER_DEPRECATED);
 
         return $this->plural;
     }

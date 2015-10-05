@@ -300,7 +300,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
 
         if (null !== $this->validatorFactory) {
             throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
@@ -318,7 +318,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setApiVersion($apiVersion)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
             throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));

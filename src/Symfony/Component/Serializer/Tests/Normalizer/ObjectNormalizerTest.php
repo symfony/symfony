@@ -97,31 +97,6 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyDenormalizeOnCamelCaseFormat()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $this->normalizer->setCamelizedAttributes(array('camel_case'));
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\ObjectDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
-    public function testNameConverterSupport()
-    {
-        $this->normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
-        $obj = $this->normalizer->denormalize(
-            array('camel_case' => 'camelCase'),
-            __NAMESPACE__.'\ObjectDummy'
-        );
-        $this->assertEquals('camelCase', $obj->getCamelCase());
-    }
-
     public function testDenormalizeNull()
     {
         $this->assertEquals(new ObjectDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\ObjectDummy'));

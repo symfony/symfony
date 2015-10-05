@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* removed classes, methods and interfaces deprecated in 2.x
+
 2.7.0
 -----
 

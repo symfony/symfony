@@ -43,15 +43,6 @@ class CliDumperTest extends VarDumperTestCase
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
         $res2 = (int) $var[8];
-        $closure54 = '';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
-EOTXT;
-        }
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -65,10 +56,10 @@ array:25 [
   4 => INF
   5 => -INF
   6 => {$intMax}
-  "str" => "déjà"
-  7 => b"é@"
+  "str" => "déjà\\n"
+  7 => b"é\\x00"
   "[]" => []
-  "res" => :stream {@{$res1}
+  "res" => stream resource {@{$res1}
     wrapper_type: "plainfile"
     stream_type: "STDIO"
     mode: "r"
@@ -79,12 +70,14 @@ array:25 [
     eof: false
     options: []
   }
-  8 => :Unknown {@{$res2}}
+  8 => Unknown resource @{$res2}
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {#%d{$closure54}
+  "closure" => Closure {#%d
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
     parameters: array:2 [
       "\$a" => []
       "&\$b" => array:2 [
@@ -126,7 +119,7 @@ EOTXT
 
         $this->assertDumpEquals(
             <<<EOTXT
-:xml {
+xml resource {
   current_byte_index: 0
   current_column_number: 1
   current_line_number: 1
@@ -161,7 +154,7 @@ EOTXT
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
-:stream {@{$ref}
+stream resource {@{$ref}
   wrapper_type: "PHP"
   stream_type: "MEMORY"
   mode: "w+b"
@@ -192,7 +185,7 @@ EOTXT
     public function testRefsInProperties()
     {
         $var = (object) array('foo' => 'foo');
-        $var->bar =& $var->foo;
+        $var->bar = &$var->foo;
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -343,7 +336,7 @@ EOTXT
 
         $var = function &() {
             $var = array();
-            $var[] =& $var;
+            $var[] = &$var;
 
             return $var;
         };

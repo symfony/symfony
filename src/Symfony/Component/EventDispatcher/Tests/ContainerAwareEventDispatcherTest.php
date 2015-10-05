@@ -164,9 +164,6 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $event->setDispatcher($dispatcher);
-        $event->setName('onEvent');
-
         $service
             ->expects($this->once())
             ->method('onEvent')

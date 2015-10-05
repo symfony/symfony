@@ -180,10 +180,10 @@ TABLE
             array(
                 array('ISBN', 'Title', 'Author'),
                 array(
-                    array("99921-58-10-7", "Divine\nComedy", "Dante Alighieri"),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
+                    array('99921-58-10-7', "Divine\nComedy", 'Dante Alighieri'),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('960-425-059-0', 'The Lord of the Rings', "J. R. R.\nTolkien"),
                 ),
                 'default',
 <<<TABLE
@@ -550,6 +550,8 @@ TABLE;
 TABLE;
 
         $this->assertEquals($expected, $this->getOutputContent($output));
+
+        $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
     protected function getOutputStream()

@@ -23,6 +23,7 @@ abstract class AbstractCloner implements ClonerInterface
 {
     public static $defaultCasters = array(
         'Symfony\Component\VarDumper\Caster\CutStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
+        'Symfony\Component\VarDumper\Caster\CutArrayStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castCutArray',
         'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
 
         'Closure' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClosure',
@@ -64,6 +65,7 @@ abstract class AbstractCloner implements ClonerInterface
 
         'ErrorException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castErrorException',
         'Exception' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castException',
+        'Error' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castError',
         'Symfony\Component\DependencyInjection\ContainerInterface' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
 
@@ -78,6 +80,8 @@ abstract class AbstractCloner implements ClonerInterface
 
         'ArrayObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
         'SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
+        'SplFileInfo' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileInfo',
+        'SplFileObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileObject',
         'SplFixedArray' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFixedArray',
         'SplHeap' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
         'SplObjectStorage' => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',
@@ -166,8 +170,20 @@ abstract class AbstractCloner implements ClonerInterface
      */
     public function cloneVar($var, $filter = 0)
     {
+        $this->prevErrorHandler = set_error_handler(function($type, $msg, $file, $line, $context) {
+            if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
+                // Cloner never dies
+                throw new \ErrorException($msg, 0, $type, $file, $line);
+            }
+
+            if ($this->prevErrorHandler) {
+                return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+            }
+
+            return false;
+        });
         $this->filter = $filter;
-        $this->prevErrorHandler = set_error_handler(array($this, 'handleError'));
+
         try {
             if (!function_exists('iconv')) {
                 $this->maxString = -1;
@@ -214,7 +230,7 @@ abstract class AbstractCloner implements ClonerInterface
             $classInfo = array(
                 $class,
                 new \ReflectionClass($class),
-                array_reverse(array('*' => '*', $class => $class) + class_parents($class) + class_implements($class)),
+                array_reverse(array($class => $class) + class_parents($class) + class_implements($class) + array('*' => '*')),
             );
 
             $this->classInfo[$class] = $classInfo;
@@ -280,24 +296,5 @@ abstract class AbstractCloner implements ClonerInterface
         }
 
         return $a;
-    }
-
-    /**
-     * Special handling for errors: cloning must be fail-safe.
-     *
-     * @internal
-     */
-    public function handleError($type, $msg, $file, $line, $context)
-    {
-        if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
-            // Cloner never dies
-            throw new \ErrorException($msg, 0, $type, $file, $line);
-        }
-
-        if ($this->prevErrorHandler) {
-            return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
-        }
-
-        return false;
     }
 }

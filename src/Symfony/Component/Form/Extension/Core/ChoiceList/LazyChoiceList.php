@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-trigger_error('The '.__NAMESPACE__.'\LazyChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\LazyChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
@@ -115,7 +115,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
      */
     public function getIndicesForChoices(array $choices)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!$this->choiceList) {
             $this->load();
@@ -131,7 +131,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
      */
     public function getIndicesForValues(array $values)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!$this->choiceList) {
             $this->load();

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
@@ -35,6 +36,33 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
         // specific data is irrelevant
         $form->submit(array());
+    }
+
+    public function testValidConstraint()
+    {
+        $form = $this->createForm(array('constraints' => $valid = new Valid()));
+
+        $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCascadeValidationCanBeSetToTrue()
+    {
+        $form = $this->createForm(array('cascade_validation' => true));
+
+        $this->assertTrue($form->getConfig()->getOption('cascade_validation'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testCascadeValidationCanBeSetToFalse()
+    {
+        $form = $this->createForm(array('cascade_validation' => false));
+
+        $this->assertFalse($form->getConfig()->getOption('cascade_validation'));
     }
 
     public function testValidatorInterfaceSinceSymfony25()

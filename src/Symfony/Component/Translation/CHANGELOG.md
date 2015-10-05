@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Changed the visibility of the locale property in `Translator` from protected to private.
+
+2.8.0
+-----
+
+ * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
+ * added options 'as_tree', 'inline' to YamlFileDumper
+
 2.7.0
 -----
 

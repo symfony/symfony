@@ -24,7 +24,7 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
     public function testWithMatchPath()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('path_info' => '/foo', 'foo'));
+        $ret = $tester->execute(array('path_info' => '/foo', 'foo'), array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('[router] Route "foo"', $tester->getDisplay());
@@ -33,7 +33,7 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
     public function testWithNotMatchPath()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('path_info' => '/test', 'foo'));
+        $ret = $tester->execute(array('path_info' => '/test', 'foo'), array('decorated' => false));
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of failure');
         $this->assertContains('None of the routes match the path "/test"', $tester->getDisplay());

@@ -154,7 +154,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             try {
                 $strategy->isGranted($acl, array($requiredMask), array($sid));
                 $this->fail('The ACE is not supposed to match.');
-            } catch (NoAceFoundException $noAce) {
+            } catch (NoAceFoundException $e) {
             }
         } else {
             $this->assertTrue($strategy->isGranted($acl, array($requiredMask), array($sid)));

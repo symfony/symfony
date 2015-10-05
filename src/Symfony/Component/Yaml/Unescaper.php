@@ -20,15 +20,6 @@ namespace Symfony\Component\Yaml;
 class Unescaper
 {
     /**
-     * Parser and Inline assume UTF-8 encoding, so escaped Unicode characters
-     * must be converted to that encoding.
-     *
-     * @deprecated since version 2.5, to be removed in 3.0
-     * @internal
-     */
-    const ENCODING = 'UTF-8';
-
-    /**
      * Regex fragment that matches an escaped character in a double quoted string.
      */
     const REGEX_ESCAPED_CHARACTER = "\\\\([0abt\tnvfre \\\"\\/\\\\N_LP]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})";
@@ -54,9 +45,8 @@ class Unescaper
      */
     public function unescapeDoubleQuotedString($value)
     {
-        $self = $this;
-        $callback = function ($match) use ($self) {
-            return $self->unescapeCharacter($match[0]);
+        $callback = function ($match) {
+            return $this->unescapeCharacter($match[0]);
         };
 
         // evaluate the string

@@ -43,9 +43,6 @@ class EventDispatcher implements EventDispatcherInterface
             $event = new Event();
         }
 
-        $event->setDispatcher($this);
-        $event->setName($eventName);
-
         if (!isset($this->listeners[$eventName])) {
             return $event;
         }
@@ -58,8 +55,12 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @see EventDispatcherInterface::getListeners()
      */
-    public function getListeners($eventName = null)
+    public function getListeners($eventName = null, $withPriorities = false)
     {
+        if (true === $withPriorities) {
+            return $eventName ? $this->listeners[$eventName] : array_filter($this->listeners);
+        }
+
         if (null !== $eventName) {
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);

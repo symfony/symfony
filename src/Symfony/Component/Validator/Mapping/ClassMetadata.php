@@ -133,7 +133,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
                 && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
@@ -377,7 +377,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     protected function addMemberMetadata(MemberMetadata $metadata)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addPropertyMetadata() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addPropertyMetadata() method instead.', E_USER_DEPRECATED);
 
         $this->addPropertyMetadata($metadata);
     }
@@ -393,7 +393,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function hasMemberMetadatas($property)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasPropertyMetadata() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasPropertyMetadata() method instead.', E_USER_DEPRECATED);
 
         return $this->hasPropertyMetadata($property);
     }
@@ -409,7 +409,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function getMemberMetadatas($property)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getPropertyMetadata() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getPropertyMetadata() method instead.', E_USER_DEPRECATED);
 
         return $this->getPropertyMetadata($property);
     }

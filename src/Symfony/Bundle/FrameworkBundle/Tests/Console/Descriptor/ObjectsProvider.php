@@ -112,39 +112,6 @@ class ObjectsProvider
         );
     }
 
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0
-     * @internal
-     */
-    public static function getLegacyContainerDefinitions()
-    {
-        $definition1 = new Definition('Full\\Qualified\\Class1');
-        $definition2 = new Definition('Full\\Qualified\\Class2');
-
-        return array(
-            'legacy_synchronized_service_definition_1' => $definition1
-                ->setPublic(true)
-                ->setSynthetic(false)
-                ->setLazy(true)
-                ->setSynchronized(true)
-                ->setAbstract(true)
-                ->setFactoryClass('Full\\Qualified\\FactoryClass', 'get')
-                ->setFactoryMethod('get'),
-            'legacy_synchronized_service_definition_2' => $definition2
-                ->setPublic(false)
-                ->setSynthetic(true)
-                ->setFile('/path/to/file')
-                ->setLazy(false)
-                ->setSynchronized(false)
-                ->setAbstract(false)
-                ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
-                ->addTag('tag1', array('attr3' => 'val3'))
-                ->addTag('tag2')
-                ->setFactoryService('factory.service')
-                ->setFactoryMethod('get'),
-        );
-    }
-
     public static function getContainerAliases()
     {
         return array(
@@ -157,8 +124,8 @@ class ObjectsProvider
     {
         $eventDispatcher = new EventDispatcher();
 
-        $eventDispatcher->addListener('event1', 'global_function');
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; });
+        $eventDispatcher->addListener('event1', 'global_function', 255);
+        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return array('event_dispatcher_1' => $eventDispatcher);

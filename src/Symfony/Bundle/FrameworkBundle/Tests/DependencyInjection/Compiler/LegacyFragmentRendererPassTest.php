@@ -20,11 +20,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRenderer
  */
 class LegacyFragmentRendererPassTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-    }
-
     /**
      * Tests that content rendering not implementing FragmentRendererInterface
      * trigger an exception.

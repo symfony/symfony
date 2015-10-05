@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds extractors to the property_info_extractor service.
+ * Adds extractors to the property_info service.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -27,21 +27,21 @@ class PropertyInfoPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('property_info_extractor')) {
+        if (!$container->hasDefinition('property_info')) {
             return;
         }
 
-        $listExtractors = $this->findAndSortTaggedServices('property_info', $container);
-        $container->getDefinition('property_info_extractor')->replaceArgument(0, $listExtractors);
+        $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(0, $listExtractors);
 
-        $typeExtractors = $this->findAndSortTaggedServices('property_info', $container);
-        $container->getDefinition('property_info.type_extractor')->replaceArgument(1, $typeExtractors);
+        $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(1, $typeExtractors);
 
-        $descriptionExtractors = $this->findAndSortTaggedServices('property_info', $container);
-        $container->getDefinition('property_info.description_extractor')->replaceArgument(2, $descriptionExtractors);
+        $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(2, $descriptionExtractors);
 
-        $accessExtractors = $this->findAndSortTaggedServices('property_info', $container);
-        $container->getDefinition('property_info.access_extractor')->replaceArgument(3, $accessExtractors);
+        $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
+        $container->getDefinition('property_info')->replaceArgument(3, $accessExtractors);
     }
 
     /**

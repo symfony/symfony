@@ -12,7 +12,7 @@
         <service id="debug.debug_handlers_listener" class="Symfony\Component\HttpKernel\EventListener\DebugHandlersListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="php" />
-            <argument /><!-- Exception handler -->
+            <argument>null</argument><!-- Exception handler -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument>null</argument><!-- Log levels map for enabled error levels -->
             <argument>null</argument>

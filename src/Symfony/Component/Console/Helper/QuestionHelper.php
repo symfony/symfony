@@ -377,7 +377,7 @@ class QuestionHelper extends Helper
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
-    private function validateAttempts($interviewer, OutputInterface $output, Question $question)
+    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question)
     {
         $error = null;
         $attempts = $question->getMaxAttempts();

@@ -101,7 +101,7 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      *                                  the keys of the values or if any of the
      *                                  choices is not scalar
      */
-    public function __construct($choices, $value = null)
+    public function __construct($choices, callable $value = null)
     {
         // If no values are given, use the choices as values
         // Since the choices are stored in the collection keys, i.e. they are

@@ -29,12 +29,10 @@ class FilterControllerEvent extends KernelEvent
 {
     /**
      * The current controller.
-     *
-     * @var callable
      */
     private $controller;
 
-    public function __construct(HttpKernelInterface $kernel, $controller, Request $request, $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 

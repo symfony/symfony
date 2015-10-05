@@ -1015,7 +1015,7 @@ class Process
      *
      * @param callback|null $callback The user defined PHP callback
      *
-     * @return callback A PHP callable
+     * @return \Closure A PHP closure
      */
     protected function buildCallback($callback)
     {

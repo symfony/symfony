@@ -190,8 +190,8 @@ class PluralizationRules
     /**
      * Overrides the default plural rule for a given locale.
      *
-     * @param string $rule   A PHP callable
-     * @param string $locale The locale
+     * @param callable $rule   A PHP callable
+     * @param string   $locale The locale
      *
      * @throws \LogicException
      */

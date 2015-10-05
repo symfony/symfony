@@ -264,6 +264,10 @@ class NativeSessionStorage implements SessionStorageInterface
     public function registerBag(SessionBagInterface $bag)
     {
         $this->bags[$bag->getName()] = $bag;
+
+        if ($this->isStarted()) {
+            $this->loadSessionBag($bag);
+        }
     }
 
     /**
@@ -422,12 +426,28 @@ class NativeSessionStorage implements SessionStorageInterface
         $bags = array_merge($this->bags, array($this->metadataBag));
 
         foreach ($bags as $bag) {
-            $key = $bag->getStorageKey();
-            $session[$key] = isset($session[$key]) ? $session[$key] : array();
-            $bag->initialize($session[$key]);
+            $this->loadSessionBag($bag, $session);
         }
 
         $this->started = true;
         $this->closed = false;
+    }
+
+    /**
+     * Load and initialize the session for the given bag and pass the
+     * session variable into the bag.
+     *
+     * @param SessionBagInterface $bag
+     * @param array|null          $session
+     */
+    protected function loadSessionBag(SessionBagInterface $bag, array &$session = null)
+    {
+        if (null === $session) {
+            $session = &$_SESSION;
+        }
+
+        $key = $bag->getStorageKey();
+        $session[$key] = isset($session[$key]) ? $session[$key] : array();
+        $bag->initialize($session[$key]);
     }
 }

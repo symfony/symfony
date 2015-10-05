@@ -1,0 +1,17 @@
+# Gush configuration file, any comments will be lost.
+base: master
+issue_project_name: symfony
+issue_project_org: symfony
+issue_tracker: github
+meta-header: "This file is part of the Symfony package.\n\n(c) Fabien Potencier <fabien@symfony.com>\n\nFor the full copyright and license information, please view the LICENSE\nfile that was distributed with this source code."
+repo_adapter: github
+repo_name: symfony
+repo_org: symfony
+table-pr:
+  bug_fix: ['Bug fix?', 'no']
+  new_feature: ['New feature?', 'no']
+  bc_breaks: ['BC breaks?', 'no']
+  deprecations: ['Deprecations?', 'no']
+  tests_pass: ['Tests pass?', 'no']
+  license: ['License', 'MIT']
+  fixed_tickets: ['Doc PR', '']

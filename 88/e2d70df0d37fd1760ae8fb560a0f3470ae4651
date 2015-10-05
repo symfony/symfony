@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-04T00:36:46Z
+
+An alternative would be to deprecate `get` and instead introduce a new method like `getParam` with the new precedence. This way there would be an upgrade path.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-04T08:49:00Z
+
+@Tobion I think this PR is fine without introducing another method.
+
+:+1:

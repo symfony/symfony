@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T23:25:42Z
+
+:+1:  Looks good. But applying this in 2.7 will be tricky because we cannot just skip the last item as we also support throwing a `NoSuchIndexException` in https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/PropertyAccess/PropertyAccessor.php#L234
+
+@pierredup do you have an idea how to best solve it in 2.7?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-02T23:37:01Z
+
+I think the best is to just move the test within the outer if in 2.7
+```
+if ($i + 1 < $propertyPath->getLength()) {
+    $objectOrArray[$property] = array();
+}
+```
+
+And ensure we have a test covering this when using `throwExceptionOnInvalidIndex = true`
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-03T20:04:52Z
+
+@Tobion I've just tested this on the 2.7 branch, and it works by wrapping the assignment in the `if`.
+I've updated this PR to use that approach instead, to make the merging into 2.7 a bit easier.
+When this is merged then I'll create more tests to check for the `NoSuchIndexException`

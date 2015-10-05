@@ -32,26 +32,9 @@ interface ConnectionInterface
     public function bind($dn = null, $password = null);
 
     /**
-     * Checks whether the connection is active or not.
-     *
-     * @return bool
-     */
-    public function isConnected();
-
-    /**
      * Fetches the ldap connection resource.
      *
      * @return resource
      */
     public function getConnection();
-
-    /**
-     * Connects to the Ldap server using the configuration.
-     */
-    public function connect();
-
-    /**
-     * Disconnects from the Ldap server.
-     */
-    public function disconnect();
 }

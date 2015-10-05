@@ -82,17 +82,12 @@ class Connection implements ConnectionInterface
         $this->bound = true;
     }
 
-    public function isConnected()
-    {
-        return null !== $this->connection;
-    }
-
     public function getConnection()
     {
         return $this->connection;
     }
 
-    public function connect()
+    private function connect()
     {
         if (!$this->connection) {
             $host = $this->config['host'];
@@ -108,10 +103,10 @@ class Connection implements ConnectionInterface
         }
     }
 
-    public function disconnect()
+    private function disconnect()
     {
         if ($this->connection && is_resource($this->connection)) {
-            ldap_unbind($this->connection);
+            ldap_close($this->connection);
         }
 
         $this->connection = null;

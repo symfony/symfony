@@ -39,10 +39,6 @@ class Ldap implements LdapInterface
      */
     public function bind($dn = null, $password = null)
     {
-        if (!$this->connection->isConnected()) {
-            $this->connection->connect();
-        }
-
         $this->connection->bind($dn, $password);
     }
 

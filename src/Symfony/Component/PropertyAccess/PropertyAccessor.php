@@ -239,7 +239,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     ));
                 }
 
-                $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
+                if ($i + 1 < $propertyPath->getLength()) {
+                    $objectOrArray[$property] = array();
+                }
             }
 
             if ($isIndex) {

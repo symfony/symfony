@@ -74,8 +74,10 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getStrategiesWith2RolesTests
      */
-    public function testStrategiesWith2Roles($token, $strategy, $voter, $expected)
+    public function testStrategiesWith2Roles($strategy, $voter, $expected)
     {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
         $manager = new AccessDecisionManager(array($voter), $strategy);
 
         $this->assertSame($expected, $manager->decide($token, array('ROLE_FOO', 'ROLE_BAR')));
@@ -83,19 +85,17 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function getStrategiesWith2RolesTests()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
         return array(
-            array($token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_DENIED), false),
-            array($token, 'affirmative', $this->getVoter(VoterInterface::ACCESS_GRANTED), true),
+            array('affirmative', $this->getVoter(VoterInterface::ACCESS_DENIED), false),
+            array('affirmative', $this->getVoter(VoterInterface::ACCESS_GRANTED), true),
 
-            array($token, 'consensus', $this->getVoter(VoterInterface::ACCESS_DENIED), false),
-            array($token, 'consensus', $this->getVoter(VoterInterface::ACCESS_GRANTED), true),
+            array('consensus', $this->getVoter(VoterInterface::ACCESS_DENIED), false),
+            array('consensus', $this->getVoter(VoterInterface::ACCESS_GRANTED), true),
 
-            array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_DENIED), false),
-            array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED), false),
-            array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_DENIED), false),
-            array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_GRANTED), true),
+            array('unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_DENIED), false),
+            array('unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED), false),
+            array('unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_DENIED), false),
+            array('unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_GRANTED), true),
         );
     }
 

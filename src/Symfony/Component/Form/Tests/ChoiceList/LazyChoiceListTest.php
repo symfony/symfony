@@ -73,6 +73,36 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('RESULT', $this->list->getValues());
     }
 
+    public function testGetStructuredValuesLoadsInnerListOnFirstCall()
+    {
+        $this->loader->expects($this->once())
+            ->method('loadChoiceList')
+            ->with($this->value)
+            ->will($this->returnValue($this->innerList));
+
+        $this->innerList->expects($this->exactly(2))
+            ->method('getStructuredValues')
+            ->will($this->returnValue('RESULT'));
+
+        $this->assertSame('RESULT', $this->list->getStructuredValues());
+        $this->assertSame('RESULT', $this->list->getStructuredValues());
+    }
+
+    public function testGetOriginalKeysLoadsInnerListOnFirstCall()
+    {
+        $this->loader->expects($this->once())
+            ->method('loadChoiceList')
+            ->with($this->value)
+            ->will($this->returnValue($this->innerList));
+
+        $this->innerList->expects($this->exactly(2))
+            ->method('getOriginalKeys')
+            ->will($this->returnValue('RESULT'));
+
+        $this->assertSame('RESULT', $this->list->getOriginalKeys());
+        $this->assertSame('RESULT', $this->list->getOriginalKeys());
+    }
+
     public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
     {
         $this->loader->expects($this->exactly(2))

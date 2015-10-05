@@ -77,6 +77,8 @@ class TwigExtension extends Extension
             }
         }
 
+        $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
+
         // register bundles as Twig namespaces
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             $dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views';
@@ -86,7 +88,7 @@ class TwigExtension extends Extension
             $container->addResource(new FileExistenceResource($dir));
 
             $reflection = new \ReflectionClass($class);
-            $dir = dirname($reflection->getFilename()).'/Resources/views';
+            $dir = dirname($reflection->getFileName()).'/Resources/views';
             if (is_dir($dir)) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }

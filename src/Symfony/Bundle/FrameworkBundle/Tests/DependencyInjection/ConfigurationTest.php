@@ -27,6 +27,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDoNoDuplicateDefaultFormResources()
+    {
+        $input = array('templating' => array(
+            'form' => array('resources' => array('FrameworkBundle:Form')),
+            'engines' => array('php'),
+        ));
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), array($input));
+
+        $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
+    }
+
     /**
      * @dataProvider getTestValidTrustedProxiesData
      */
@@ -113,13 +126,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'form' => array(
                 'enabled' => false,
                 'csrf_protection' => array(
-                    'enabled' => null, // defaults to csrf_protection.enabled
-                    'field_name' => null,
+                    'enabled' => false,
+                    'field_name' => '_token',
                 ),
-            ),
-            'csrf_protection' => array(
-                'enabled' => false,
-                'field_name' => '_token',
             ),
             'esi' => array('enabled' => false),
             'ssi' => array('enabled' => false),
@@ -132,9 +141,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'only_exceptions' => false,
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
-                'username' => '',
-                'password' => '',
-                'lifetime' => 86400,
                 'collect' => true,
             ),
             'translator' => array(

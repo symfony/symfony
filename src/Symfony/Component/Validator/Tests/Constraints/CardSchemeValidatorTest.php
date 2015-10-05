@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Validation;
 
 class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new CardSchemeValidator();
@@ -97,8 +92,10 @@ class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
             array('LASER', '6771656738314582216'),
             array('MAESTRO', '6759744069209'),
             array('MAESTRO', '5020507657408074712'),
+            array('MAESTRO', '5612559223580173965'),
             array('MAESTRO', '6759744069209'),
             array('MAESTRO', '6759744069209'),
+            array('MAESTRO', '6594371785970435599'),
             array('MASTERCARD', '5555555555554444'),
             array('MASTERCARD', '5105105105105100'),
             array('VISA', '4111111111111111'),

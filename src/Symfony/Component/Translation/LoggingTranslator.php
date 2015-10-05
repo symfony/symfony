@@ -66,8 +66,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setLocale($locale)
     {
@@ -76,8 +74,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getLocale()
     {

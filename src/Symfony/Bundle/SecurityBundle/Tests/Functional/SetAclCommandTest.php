@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 /*
@@ -21,7 +30,7 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 /**
- * Tests SetAclCommand
+ * Tests SetAclCommand.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  */
@@ -29,6 +38,23 @@ class SetAclCommandTest extends WebTestCase
 {
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
+
+    protected function setUp()
+    {
+        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
+            self::markTestSkipped('This test requires SQLite support in your environment');
+        }
+        parent::setUp();
+
+        $this->deleteTmpDir('Acl');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('Acl');
+    }
 
     public function testSetAclUser()
     {
@@ -89,7 +115,7 @@ class SetAclCommandTest extends WebTestCase
         $setAclCommandTester = new CommandTester($setAclCommand);
         $setAclCommandTester->execute(array(
             'command' => 'acl:set',
-            'arguments' => array($grantedPermission, sprintf('%s:%s', strtr(self::OBJECT_CLASS, '\\', '/'), $objectId)),
+            'arguments' => array($grantedPermission, sprintf('%s:%s', str_replace('\\', '/', self::OBJECT_CLASS), $objectId)),
             '--role' => array($role),
         ));
 
@@ -149,20 +175,6 @@ class SetAclCommandTest extends WebTestCase
 
         $acl2 = $aclProvider->createAcl($objectIdentity2);
         $this->assertTrue($acl2->isGranted($permissionMap->getMasks($grantedPermission, null), array($roleSecurityIdentity)));
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->deleteTmpDir('Acl');
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->deleteTmpDir('Acl');
     }
 
     private function getApplication()

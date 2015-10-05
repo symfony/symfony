@@ -97,13 +97,9 @@ class FrameworkExtension extends Extension
             if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
-
-            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-                $config['csrf_protection']['enabled'] = true;
-            }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['form']['csrf_protection'], $container, $loader);
 
         if (isset($config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -200,20 +196,12 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (null === $config['form']['csrf_protection']['enabled']) {
-            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
-        }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-
-            if (null !== $config['form']['csrf_protection']['field_name']) {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
-            } else {
-                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
-            }
+            $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -302,26 +290,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);
 
         // Choose storage class based on the DSN
-        $supported = array(
-            'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql' => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file' => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
-            'memcache' => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
-            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
-            'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
-        );
         list($class) = explode(':', $config['dsn'], 2);
-        if (!isset($supported[$class])) {
+        if ('file' !== $class) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
-        $container->setParameter('profiler.storage.username', $config['username']);
-        $container->setParameter('profiler.storage.password', $config['password']);
-        $container->setParameter('profiler.storage.lifetime', $config['lifetime']);
-
-        $container->getDefinition('profiler.storage')->setClass($supported[$class]);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {
@@ -396,7 +370,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -444,7 +418,7 @@ class FrameworkExtension extends Extension
     /**
      * Loads the request configuration.
      *
-     * @param array            $config    A session configuration array
+     * @param array            $config    A request configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
@@ -471,14 +445,17 @@ class FrameworkExtension extends Extension
     {
         $loader->load('templating.xml');
 
-        $links = array(
-            'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-            'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-            'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-            'sublime' => 'subl://open?url=file://%%f&line=%%l',
-        );
+        if (!$container->hasParameter('templating.helper.code.file_link_format')) {
+            $links = array(
+                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                'sublime' => 'subl://open?url=file://%%f&line=%%l',
+            );
 
-        $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
+            $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+        }
+
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
         if ($container->getParameter('kernel.debug')) {
@@ -670,22 +647,22 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname($r->getFilename()).'/../Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
         }
         $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
                 $dirs[] = $dir;
             }
             if (is_dir($dir = sprintf($overridePath, $bundle))) {
@@ -786,12 +763,6 @@ class FrameworkExtension extends Extension
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
-
-        // You can use this parameter to check the API version in your own
-        // bundle extension classes
-        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
-        // @deprecated since version 2.7, to be removed in 3.0
-        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)
@@ -807,7 +778,7 @@ class FrameworkExtension extends Extension
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFilename());
+            $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
                 $files[0][] = realpath($file);
@@ -922,7 +893,7 @@ class FrameworkExtension extends Extension
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFilename());
+            $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
                 $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));
@@ -969,6 +940,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        }
+
+        if (isset($config['name_converter']) && $config['name_converter']) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
         }
     }
 

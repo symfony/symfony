@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Exception;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**

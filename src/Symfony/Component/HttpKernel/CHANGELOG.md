@@ -24,6 +24,13 @@ CHANGELOG
  * removed `Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategyInterface`
  * removed `Symfony\Component\HttpKernel\Log\LoggerInterface`
  * removed `Symfony\Component\HttpKernel\Log\NullLogger`
+ * removed `Symfony\Component\HttpKernel\Profiler::import()`
+ * removed `Symfony\Component\HttpKernel\Profiler::export()`
+
+2.8.0
+-----
+
+ * deprecated `Profiler::import` and `Profiler::export`
 
 2.7.0
 -----

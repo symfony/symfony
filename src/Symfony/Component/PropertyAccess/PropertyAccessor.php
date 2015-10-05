@@ -25,6 +25,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 {
     const VALUE = 0;
     const IS_REF = 1;
+    const IS_REF_CHAINED = 2;
 
     /**
      * @var bool
@@ -75,21 +76,42 @@ class PropertyAccessor implements PropertyAccessorInterface
         array_unshift($propertyValues, array(
             self::VALUE => &$objectOrArray,
             self::IS_REF => true,
+            self::IS_REF_CHAINED => true,
         ));
+        
+        $propertyMaxIndex = count($propertyValues) - 1;
 
-        for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
+        for ($i = $propertyMaxIndex; $i >= 0; --$i) {
             $objectOrArray = &$propertyValues[$i][self::VALUE];
 
             $property = $propertyPath->getElement($i);
 
-            if ($propertyPath->isIndex($i)) {
-                $this->writeIndex($objectOrArray, $property, $value);
-            } else {
-                $this->writeProperty($objectOrArray, $property, $value);
-            }
+            // You only need set value for current element if:
+            // 1. it's the parent of the last index element
+            // OR
+            // 2. its child is not passed by reference
+            //
+            // This may avoid uncessary value setting process for array elements.
+            // For example:
+            // '[a][b][c]' => 'old-value'
+            // If you want to change its value to 'new-value',
+            // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
+            //
+            if ($i === $propertyMaxIndex || !$propertyValues[$i + 1][self::IS_REF]) {
+                if ($propertyPath->isIndex($i)) {
+                    $this->writeIndex($objectOrArray, $property, $value);
+                } else {
+                    $this->writeProperty($objectOrArray, $property, $value);
+                }
 
-            if ($propertyValues[$i][self::IS_REF]) {
-                return;
+                // if current element is an object
+                // OR
+                // if current element's reference chain is not broken - current element
+                // as well as all its ancients in the property path are all passed by reference,
+                // then there is no need to continue the value setting process
+                if (is_object($propertyValues[$i][self::VALUE]) || $propertyValues[$i][self::IS_REF_CHAINED]) {
+                    return;
+                }
             }
 
             $value = &$objectOrArray;
@@ -132,6 +154,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             array_unshift($propertyValues, array(
                 self::VALUE => $objectOrArray,
                 self::IS_REF => true,
+                self::IS_REF_CHAINED => true,
             ));
 
             for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
@@ -149,7 +172,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
                 }
 
-                if ($propertyValues[$i][self::IS_REF]) {
+                if (is_object($propertyValues[$i][self::VALUE]) || $propertyValues[$i][self::IS_REF_CHAINED]) {
                     return true;
                 }
             }
@@ -216,7 +239,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     ));
                 }
 
-                $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
+                if ($i + 1 < $propertyPath->getLength()) {
+                    $objectOrArray[$property] = array();
+                }
             }
 
             if ($isIndex) {
@@ -229,8 +254,15 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // the final value of the path must not be validated
             if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i+1);
+                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i + 1);
             }
+
+            // Set the IS_REF_CHAINED flag to true if:
+            // current property is passed by reference and
+            // it is the first element in the property path or
+            // the IS_REF_CHAINED flag of its parent element is true
+            // Basically, this flag is true only when the reference chain from the top element to current element is not broken
+            $propertyValue[self::IS_REF_CHAINED] = $propertyValue[self::IS_REF] && (0 === $i || $propertyValues[$i - 1][self::IS_REF_CHAINED]);
 
             $propertyValues[] = &$propertyValue;
         }

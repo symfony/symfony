@@ -39,8 +39,8 @@
         "symfony/yaml": "",
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation",
-        "symfony/property-access": "For using the 2.4 Validator API",
-        "symfony/expression-language": "For using the 2.4 Expression validator"
+        "symfony/property-access": "For using the Expression validator",
+        "symfony/expression-language": "For using the Expression validator"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" }

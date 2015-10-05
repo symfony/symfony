@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Util\SecureRandom;
  * Generates CSRF tokens.
  *
  * @since  2.4
+ *
  * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface

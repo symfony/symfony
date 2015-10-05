@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -119,9 +120,9 @@ abstract class Controller extends ContainerAware
      * @param mixed $attributes The attributes
      * @param mixed $object     The object
      *
-     * @throws \LogicException
-     *
      * @return bool
+     *
+     * @throws \LogicException
      */
     protected function isGranted($attributes, $object = null)
     {
@@ -159,7 +160,15 @@ abstract class Controller extends ContainerAware
      */
     protected function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
     }
 
     /**
@@ -173,7 +182,21 @@ abstract class Controller extends ContainerAware
      */
     protected function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        if ($this->container->has('templating')) {
+            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
+        }
+
+        if (null === $response) {
+            $response = new Response();
+        }
+
+        $response->setContent($this->container->get('twig')->render($view, $parameters));
+
+        return $response;
     }
 
     /**
@@ -187,11 +210,21 @@ abstract class Controller extends ContainerAware
      */
     protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $templating = $this->container->get('templating');
+        if ($this->container->has('templating')) {
+            $templating = $this->container->get('templating');
 
-        $callback = function () use ($templating, $view, $parameters) {
-            $templating->stream($view, $parameters);
-        };
+            $callback = function () use ($templating, $view, $parameters) {
+                $templating->stream($view, $parameters);
+            };
+        } elseif ($this->container->has('twig')) {
+            $twig = $this->container->get('twig');
+
+            $callback = function () use ($twig, $view, $parameters) {
+                $twig->display($view, $parameters);
+            };
+        } else {
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if (null === $response) {
             return new StreamedResponse($callback);
@@ -231,7 +264,7 @@ abstract class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
-    protected function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -260,7 +293,7 @@ abstract class Controller extends ContainerAware
      */
     protected function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }
 
     /**
@@ -327,10 +360,6 @@ abstract class Controller extends ContainerAware
      */
     protected function get($id)
     {
-        if ('request' === $id) {
-            @trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
-        }
-
         return $this->container->get($id);
     }
 

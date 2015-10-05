@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -93,6 +92,13 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.anonymous.host',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.1',
+                'security.authentication.listener.basic.with_user_checker',
+                'security.authentication.listener.anonymous.with_user_checker',
+                'security.access_listener',
+            ),
         ), $listeners);
     }
 
@@ -134,8 +140,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         }
 
         $matcherIds = array();
-        foreach ($rules as $rule) {
-            list($matcherId, $attributes, $channel) = $rule;
+        foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));
@@ -231,6 +236,21 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $service = $container->getDefinition('security.authentication.listener.rememberme.main');
         $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
         $this->assertFalse($service->getArgument(5));
+    }
+
+    public function testUserCheckerConfig()
+    {
+        $this->assertEquals('app.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.with_user_checker'));
+    }
+
+    public function testUserCheckerConfigWithDefaultChecker()
+    {
+        $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.host'));
+    }
+
+    public function testUserCheckerConfigWithNoCheckers()
+    {
+        $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
     }
 
     protected function getContainer($file)

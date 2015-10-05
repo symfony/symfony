@@ -95,33 +95,30 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        $errorHandler = null;
-        $errorHandler = set_error_handler(function () use (&$errorHandler) {
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                return;
+        if (defined('HHVM_VERSION')) {
+            // HHVM does not trigger any warnings and let exceptions
+            // thrown from a JsonSerializable object pass through.
+            // If only PHP did the same...
+            $data = json_encode($data, $this->encodingOptions);
+        } else {
+            try {
+                // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
+                // objects in a new exception that needs to be removed.
+                // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
+                $data = json_encode($data, $this->encodingOptions);
+            } catch (\Exception $e) {
+                if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                    throw $e->getPrevious() ?: $e;
+                }
+                throw $e;
             }
-
-            if ($errorHandler) {
-                call_user_func_array($errorHandler, func_get_args());
-            }
-        });
-
-        try {
-            // Clear json_last_error()
-            json_encode(null);
-
-            $this->data = json_encode($data, $this->encodingOptions);
-
-            restore_error_handler();
-        } catch (\Exception $exception) {
-            restore_error_handler();
-
-            throw $exception;
         }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException(json_last_error_msg());
         }
+
+        $this->data = $data;
 
         return $this->update();
     }

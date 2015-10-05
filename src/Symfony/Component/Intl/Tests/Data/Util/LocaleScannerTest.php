@@ -33,7 +33,7 @@ class LocaleScannerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().'/LocaleScannerTest/'.rand(1000, 9999);
+        $this->directory = sys_get_temp_dir().'/LocaleScannerTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
         $this->scanner = new LocaleScanner();
 

@@ -31,17 +31,6 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testProcessDetectsSyntheticPrototypeDefinitions()
-    {
-        $container = new ContainerBuilder();
-        $container->register('a')->setSynthetic(true)->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-
-        $this->process($container);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     */
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
         $container = new ContainerBuilder();

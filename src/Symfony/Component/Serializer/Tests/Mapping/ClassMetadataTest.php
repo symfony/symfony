@@ -62,4 +62,21 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('a1' => $ac1), $classMetadata2->getAttributesMetadata());
     }
+
+    public function testSerialize()
+    {
+        $classMetadata = new ClassMetadata('a');
+
+        $a1 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a1->method('getName')->willReturn('b1');
+
+        $a2 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a2->method('getName')->willReturn('b2');
+
+        $classMetadata->addAttributeMetadata($a1);
+        $classMetadata->addAttributeMetadata($a2);
+
+        $serialized = serialize($classMetadata);
+        $this->assertEquals($classMetadata, unserialize($serialized));
+    }
 }

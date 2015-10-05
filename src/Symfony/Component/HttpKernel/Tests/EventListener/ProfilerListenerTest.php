@@ -44,7 +44,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subRequest =  $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+        $subRequest = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -56,7 +56,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
         $requestStack->push($masterRequest);
 
         $onlyException = true;
-        $listener = new ProfilerListener($profiler, null, $onlyException, false, $requestStack);
+        $listener = new ProfilerListener($profiler, $requestStack, null, $onlyException);
 
         // master request
         $listener->onKernelResponse(new FilterResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST, $response));

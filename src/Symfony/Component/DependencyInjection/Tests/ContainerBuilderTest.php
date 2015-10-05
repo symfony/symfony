@@ -20,11 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -61,6 +59,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
         }
+    }
+
+    public function testCreateDeprecatedService()
+    {
+        $definition = new Definition('stdClass');
+        $definition->setDeprecated(true);
+
+        $that = $this;
+        $wasTriggered = false;
+
+        set_error_handler(function ($errno, $errstr) use ($that, &$wasTriggered) {
+            $that->assertSame(E_USER_DEPRECATED, $errno);
+            $that->assertSame('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $errstr);
+            $wasTriggered = true;
+        });
+
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('deprecated_foo', $definition);
+        $builder->get('deprecated_foo');
+
+        restore_error_handler();
+
+        $this->assertTrue($wasTriggered);
     }
 
     /**
@@ -117,8 +138,19 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Circular reference detected for service "baz", path: "baz".', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
-        $builder->register('foobar', 'stdClass')->setScope('container');
         $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setShared
+     */
+    public function testNonSharedServicesReturnsDifferentInstances()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass')->setShared(false);
+
+        $this->assertNotSame($builder->get('bar'), $builder->get('bar'));
     }
 
     /**
@@ -139,27 +171,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         // we must also have the same RuntimeException here
         $builder->get('foo');
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
-     */
-    public function testGetReturnsNullOnInactiveScope()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('foo', 'stdClass')->setScope('request');
-
-        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
-     */
-    public function testGetReturnsNullOnInactiveScopeWhenServiceIsCreatedByAMethod()
-    {
-        $builder = new ProjectContainer();
-
-        $this->assertNull($builder->get('foobaz', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
     /**
@@ -493,6 +504,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
 
+    public function testFindUnusedTags()
+    {
+        $builder = new ContainerBuilder();
+        $builder
+            ->register('foo', 'Bar\FooClass')
+            ->addTag('kernel.event_listener', array('foo' => 'foo'))
+            ->addTag('kenrel.event_listener', array('bar' => 'bar'))
+        ;
+        $builder->findTaggedServiceIds('kernel.event_listener');
+        $this->assertEquals(array('kenrel.event_listener'), $builder->findUnusedTags(), '->findUnusedTags() returns an array with unused tags');
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::findDefinition
      */
@@ -759,16 +782,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($classInList);
     }
+
+    public function testAutowiring()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $bDefinition = $container->register('b', __NAMESPACE__.'\B');
+        $bDefinition->setAutowired(true);
+
+        $container->compile();
+
+        $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+    }
 }
 
 class FooClass
 {
 }
 
-class ProjectContainer extends ContainerBuilder
+class A
 {
-    public function getFoobazService()
+}
+
+class B
+{
+    public function __construct(A $a)
     {
-        throw new InactiveScopeException('foo', 'request');
     }
 }

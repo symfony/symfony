@@ -30,22 +30,4 @@ interface AccessDecisionManagerInterface
      * @return bool true if the access is granted, false otherwise
      */
     public function decide(TokenInterface $token, array $attributes, $object = null);
-
-    /**
-     * Checks if the access decision manager supports the given attribute.
-     *
-     * @param string $attribute An attribute
-     *
-     * @return bool true if this decision manager supports the attribute, false otherwise
-     */
-    public function supportsAttribute($attribute);
-
-    /**
-     * Checks if the access decision manager supports the given class.
-     *
-     * @param string $class A class name
-     *
-     * @return true if this decision manager can process the class
-     */
-    public function supportsClass($class);
 }

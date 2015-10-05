@@ -131,6 +131,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $ret = $command->setHelp('help1');
         $this->assertEquals($command, $ret, '->setHelp() implements a fluent interface');
         $this->assertEquals('help1', $command->getHelp(), '->setHelp() sets the help');
+        $command->setHelp('');
+        $this->assertEquals('', $command->getHelp(), '->getHelp() does not fall back to the description');
     }
 
     public function testGetProcessedHelp()
@@ -139,6 +141,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
         $this->assertContains('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly');
         $this->assertNotContains('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name%');
+
+        $command = new \TestCommand();
+        $command->setHelp('');
+        $this->assertContains('description', $command->getProcessedHelp(), '->getProcessedHelp() falls back to the description');
     }
 
     public function testGetSetAliases()
@@ -241,7 +247,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\InvalidOptionException
      * @expectedExceptionMessage The "--bar" option does not exist.
      */
     public function testRunWithInvalidOption()
@@ -263,6 +269,15 @@ class CommandTest extends \PHPUnit_Framework_TestCase
              ->will($this->returnValue('2.3'));
         $exitCode = $command->run(new StringInput(''), new NullOutput());
         $this->assertSame(2, $exitCode, '->run() returns integer exit code (casts numeric to int)');
+    }
+
+    public function testRunWithApplication()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(new Application());
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+
+        $this->assertSame(0, $exitCode, '->run() returns an integer exit code');
     }
 
     public function testRunReturnsAlwaysInteger()
@@ -295,10 +310,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     /** @dataProvider getSetCodeBindToClosureTests */
     public function testSetCodeBindToClosure($previouslyBound, $expected)
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
-        }
-
         $code = createClosure();
         if ($previouslyBound) {
             $code = $code->bindTo($this);
@@ -341,8 +352,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 // scope.
 function createClosure()
 {
-    return function(InputInterface $input, OutputInterface $output)
-    {
+    return function (InputInterface $input, OutputInterface $output) {
         $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
     };
 }

@@ -346,10 +346,12 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $serviceXML->setAttribute('scope', $definition->getScope());
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
+        if (method_exists($definition, 'isShared')) {
+            $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
+        }
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
@@ -445,8 +447,8 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param DOMElement $element
-     * @param array      $eventListeners
+     * @param \DOMElement $element
+     * @param array       $eventListeners
      */
     private function appendEventListenerDocument(\DOMElement $element, array $eventListeners)
     {

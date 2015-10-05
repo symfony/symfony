@@ -18,21 +18,9 @@ use Symfony\Component\Validator\Validation;
 
 class LanguageValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LanguageValidator();
-    }
-
-    protected function setUp()
-    {
-        IntlTestHelper::requireFullIntl($this);
-
-        parent::setUp();
     }
 
     public function testNullIsValid()
@@ -89,6 +77,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$language.'"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
             ->assertRaised();
     }
 
@@ -102,6 +91,8 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidateUsingCountrySpecificLocale()
     {
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('fr_FR');
         $existingLanguage = 'en';
 

@@ -17,7 +17,7 @@ class TimezoneTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testTimezonesAreSelectable()
     {
-        $form = $this->factory->create('timezone');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimezoneType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

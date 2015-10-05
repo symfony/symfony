@@ -110,12 +110,12 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider      getUndefinedControllers
-     * @expectedException \InvalidArgumentException
+     * @dataProvider getUndefinedControllers
      */
-    public function testGetControllerOnNonUndefinedFunction($controller)
+    public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
     {
         $resolver = $this->createControllerResolver();
+        $this->setExpectedException($exceptionName, $exceptionMessage);
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $controller);
@@ -125,10 +125,14 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     public function getUndefinedControllers()
     {
         return array(
-            array('foo'),
-            array('foo::bar'),
-            array('stdClass'),
-            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar'),
+            array(1, 'InvalidArgumentException', 'Unable to find controller "1".'),
+            array('foo', 'InvalidArgumentException', 'Unable to find controller "foo".'),
+            array('foo::bar', 'InvalidArgumentException', 'Class "foo" does not exist.'),
+            array('stdClass', 'InvalidArgumentException', 'Unable to find controller "stdClass".'),
+            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::staticsAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Expected method "staticsAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest", did you mean "staticAction"?'),
+            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::privateAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Method "privateAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'),
+            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::protectedAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Method "protectedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest" should be public and non-abstract'),
+            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerTest::undefinedAction', 'InvalidArgumentException', 'The controller for URI "/" is not callable. Expected method "undefinedAction" on class "Symfony\Component\HttpKernel\Tests\Controller\ControllerTest". Available methods: "publicAction", "staticAction"'),
         );
     }
 
@@ -235,4 +239,23 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
 function some_controller_function($foo, $foobar)
 {
+}
+
+class ControllerTest
+{
+    public function publicAction()
+    {
+    }
+
+    private function privateAction()
+    {
+    }
+
+    protected function protectedAction()
+    {
+    }
+
+    public static function staticAction()
+    {
+    }
 }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Config;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
- * Interface for ConfigCache
+ * Interface for ConfigCache.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */

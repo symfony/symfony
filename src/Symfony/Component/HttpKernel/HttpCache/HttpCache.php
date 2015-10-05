@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Cache provides HTTP caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
@@ -161,13 +159,15 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     public function getSurrogate()
     {
-        return $this->getEsi();
+        if (!$this->surrogate instanceof Esi) {
+            throw new \LogicException('This instance of HttpCache was not set up to use ESI as surrogate handler. You must overwrite and use createSurrogate');
+        }
+
+        return $this->surrogate;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -219,8 +219,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function terminate(Request $request, Response $response)
     {

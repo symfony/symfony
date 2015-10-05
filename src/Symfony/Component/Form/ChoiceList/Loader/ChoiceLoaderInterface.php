@@ -48,9 +48,9 @@ interface ChoiceLoaderInterface
      * The callable receives the choice as first and the array key as the second
      * argument.
      *
-     * @param string[] $values     An array of choice values. Non-existing
-     *                             values in this array are ignored
-     * @param null|callable $value The callable generating the choice values
+     * @param string[]      $values An array of choice values. Non-existing
+     *                              values in this array are ignored
+     * @param null|callable $value  The callable generating the choice values
      *
      * @return array An array of choices
      */
@@ -66,9 +66,9 @@ interface ChoiceLoaderInterface
      * The callable receives the choice as first and the array key as the second
      * argument.
      *
-     * @param array $choices       An array of choices. Non-existing choices in
-     *                             this array are ignored
-     * @param null|callable $value The callable generating the choice values
+     * @param array         $choices An array of choices. Non-existing choices in
+     *                               this array are ignored
+     * @param null|callable $value   The callable generating the choice values
      *
      * @return string[] An array of choice values
      */

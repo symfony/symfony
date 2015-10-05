@@ -40,7 +40,7 @@ final class PersistentToken implements PersistentTokenInterface
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');
         }
-        if (empty($username)) {
+        if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('$username must not be empty.');
         }
         if (empty($series)) {

@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Config\Loader\FileLoader;
 
@@ -22,8 +23,6 @@ use Symfony\Component\Config\Loader\FileLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class YamlFileLoader extends FileLoader
 {
@@ -41,8 +40,6 @@ class YamlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
-     *
-     * @api
      */
     public function load($file, $type = null)
     {
@@ -60,22 +57,26 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        $config = $this->yamlParser->parse(file_get_contents($path));
+        try {
+            $parsedConfig = $this->yamlParser->parse(file_get_contents($path));
+        } catch (ParseException $e) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
+        }
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
 
         // empty file
-        if (null === $config) {
+        if (null === $parsedConfig) {
             return $collection;
         }
 
         // not an array
-        if (!is_array($config)) {
+        if (!is_array($parsedConfig)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
-        foreach ($config as $name => $config) {
+        foreach ($parsedConfig as $name => $config) {
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {
@@ -90,8 +91,6 @@ class YamlFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {
@@ -115,24 +114,6 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
         $condition = isset($config['condition']) ? $config['condition'] : null;
-
-        if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
-                $methods = explode('|', $requirements['_method']);
-            }
-
-            unset($requirements['_method']);
-            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
-        }
-
-        if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
-                $schemes = explode('|', $requirements['_scheme']);
-            }
-
-            unset($requirements['_scheme']);
-            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
-        }
 
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 

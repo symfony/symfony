@@ -80,7 +80,7 @@
         {% if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        {{- form_widget(form.hour) }}:{{ form_widget(form.minute) }}{% if with_seconds %}:{{ form_widget(form.second) }}{% endif %}
+        {{- form_widget(form.hour) }}{% if with_minutes %}:{{ form_widget(form.minute) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second) }}{% endif %}
         {% if datetime is not defined or false == datetime -%}
             </div>
         {%- endif -%}
@@ -98,6 +98,7 @@
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    translation_domain: choice_translation_domain,
                 }) -}}
             {% endfor -%}
         </div>
@@ -106,6 +107,7 @@
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    translation_domain: choice_translation_domain,
                 }) -}}
             {% endfor -%}
         </div>
@@ -156,7 +158,7 @@
 {%- endblock radio_label %}
 
 {% block checkbox_radio_label %}
-    {# Do no display the label if widget is not defined in order to prevent double label rendering #}
+    {# Do not display the label if widget is not defined in order to prevent double label rendering #}
     {% if widget is defined %}
         {% if required %}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
@@ -164,12 +166,11 @@
         {% if parent_label_class is defined %}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) %}
         {% endif %}
-        {% if label is not sameas(false) and label is empty %}
+        {% if label is not same as(false) and label is empty %}
             {% set label = name|humanize %}
         {% endif %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {{- widget|raw -}}
-            {{- label is not sameas(false) ? label|trans({}, translation_domain) -}}
+            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
         </label>
     {% endif %}
 {% endblock checkbox_radio_label %}

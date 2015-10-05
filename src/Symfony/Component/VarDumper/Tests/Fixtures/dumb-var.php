@@ -13,8 +13,6 @@ $foo = new DumbFoo();
 $foo->bar = 'bar';
 
 $g = fopen(__FILE__, 'r');
-$h = fopen(__FILE__, 'r');
-fclose($h);
 
 $var = array(
     'number' => 1, null,
@@ -22,7 +20,6 @@ $var = array(
     'str' => "déjà\n", "\xE9\x00",
     '[]' => array(),
     'res' => $g,
-    $h,
     'obj' => $foo,
     'closure' => function ($a, \PDO &$b = null) {},
     'line' => __LINE__ - 1,
@@ -40,4 +37,4 @@ $var['snobj2'] = $var['nobj'][0];
 $var['file'] = __FILE__;
 $var["bin-key-\xE9"] = '';
 
-unset($g, $h, $r);
+unset($g, $r);

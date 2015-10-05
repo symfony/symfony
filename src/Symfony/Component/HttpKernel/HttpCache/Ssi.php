@@ -113,7 +113,6 @@ class Ssi implements SurrogateInterface
      */
     public function process(Request $request, Response $response)
     {
-        $this->request = $request;
         $type = $response->headers->get('Content-Type');
         if (empty($type)) {
             $type = 'text/html';

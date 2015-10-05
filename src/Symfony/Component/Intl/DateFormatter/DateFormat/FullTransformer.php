@@ -121,7 +121,7 @@ class FullTransformer
 
         // handle unimplemented characters
         if (false !== strpos($this->notImplementedChars, $dateChars[0])) {
-            throw new NotImplementedException(sprintf("Unimplemented date character '%s' in format '%s'", $dateChars[0], $this->pattern));
+            throw new NotImplementedException(sprintf('Unimplemented date character "%s" in format "%s"', $dateChars[0], $this->pattern));
         }
     }
 

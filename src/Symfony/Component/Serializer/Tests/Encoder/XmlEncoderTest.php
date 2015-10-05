@@ -471,13 +471,13 @@ XML;
             '@xmlns:media' => 'http://search.yahoo.com/mrss/',
             '@xmlns:gd' => 'http://schemas.google.com/g/2005',
             '@xmlns:yt' => 'http://gdata.youtube.com/schemas/2007',
-            'qux' => "1",
-            'app:foo' => "foo",
-            'yt:bar' => array("a", "b"),
+            'qux' => '1',
+            'app:foo' => 'foo',
+            'yt:bar' => array('a', 'b'),
             'media:baz' => array(
-                'media:key' => "val",
-                'media:key2' => "val",
-                'A B' => "bar",
+                'media:key' => 'val',
+                'media:key2' => 'val',
+                'A B' => 'bar',
                 'item' => array(
                     array(
                         'title' => 'title1',

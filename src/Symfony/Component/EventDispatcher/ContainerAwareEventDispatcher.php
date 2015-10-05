@@ -80,8 +80,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         $this->lazyLoad($eventName);
 
         if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $i => $args) {
-                list($serviceId, $method, $priority) = $args;
+            foreach ($this->listenerIds[$eventName] as $i => list($serviceId, $method, $priority)) {
                 $key = $serviceId.'.'.$method;
                 if (isset($this->listeners[$eventName][$key]) && $listener === array($this->listeners[$eventName][$key], $method)) {
                     unset($this->listeners[$eventName][$key]);
@@ -100,7 +99,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * @see EventDispatcherInterface::hasListeners()
+     * {@inheritdoc}
      */
     public function hasListeners($eventName = null)
     {
@@ -116,7 +115,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * @see EventDispatcherInterface::getListeners()
+     * {@inheritdoc}
      */
     public function getListeners($eventName = null, $withPriorities = false)
     {
@@ -152,21 +151,6 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Lazily loads listeners for this event from the dependency injection
-     * container.
-     *
-     * @throws \InvalidArgumentException if the service is not defined
-     */
-    public function dispatch($eventName, Event $event = null)
-    {
-        $this->lazyLoad($eventName);
-
-        return parent::dispatch($eventName, $event);
-    }
-
     public function getContainer()
     {
         return $this->container;
@@ -183,8 +167,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     protected function lazyLoad($eventName)
     {
         if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $args) {
-                list($serviceId, $method, $priority) = $args;
+            foreach ($this->listenerIds[$eventName] as list($serviceId, $method, $priority)) {
                 $listener = $this->container->get($serviceId);
 
                 $key = $serviceId.'.'.$method;

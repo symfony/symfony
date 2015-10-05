@@ -56,7 +56,7 @@ Symfony\Component\Debug\Exception\UndefinedFunctionException Object
     [message:protected] => Attempted to call function "notexist" from namespace "Symfony\Component\Debug".
     [string:Exception:private] => 
     [code:protected] => 0
-    [file:protected] => -
+    [file:protected] => %s
     [line:protected] => %d
     [trace:Exception:private] => Array
         (

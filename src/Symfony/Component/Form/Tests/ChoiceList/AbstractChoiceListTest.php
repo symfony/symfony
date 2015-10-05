@@ -32,6 +32,16 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
     protected $values;
 
     /**
+     * @var array
+     */
+    protected $structuredValues;
+
+    /**
+     * @var array
+     */
+    protected $keys;
+
+    /**
      * @var mixed
      */
     protected $choice1;
@@ -71,25 +81,52 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
      */
     protected $value4;
 
+    /**
+     * @var string
+     */
+    protected $key1;
+
+    /**
+     * @var string
+     */
+    protected $key2;
+
+    /**
+     * @var string
+     */
+    protected $key3;
+
+    /**
+     * @var string
+     */
+    protected $key4;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->list = $this->createChoiceList();
 
-        $this->choices = $this->getChoices();
+        $choices = $this->getChoices();
+
         $this->values = $this->getValues();
+        $this->structuredValues = array_combine(array_keys($choices), $this->values);
+        $this->choices = array_combine($this->values, $choices);
+        $this->keys = array_combine($this->values, array_keys($choices));
 
         // allow access to the individual entries without relying on their indices
         reset($this->choices);
         reset($this->values);
+        reset($this->keys);
 
         for ($i = 1; $i <= 4; ++$i) {
             $this->{'choice'.$i} = current($this->choices);
             $this->{'value'.$i} = current($this->values);
+            $this->{'key'.$i} = current($this->keys);
 
             next($this->choices);
             next($this->values);
+            next($this->keys);
         }
     }
 
@@ -101,6 +138,16 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
     public function testGetValues()
     {
         $this->assertSame($this->values, $this->list->getValues());
+    }
+
+    public function testGetStructuredValues()
+    {
+        $this->assertSame($this->values, $this->list->getStructuredValues());
+    }
+
+    public function testGetOriginalKeys()
+    {
+        $this->assertSame($this->keys, $this->list->getOriginalKeys());
     }
 
     public function testGetChoicesForValues()

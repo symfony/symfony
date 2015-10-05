@@ -30,11 +30,6 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
- * This listener works in 2 modes:
- *
- *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
- *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterListener implements EventSubscriberInterface
@@ -42,22 +37,19 @@ class RouterListener implements EventSubscriberInterface
     private $matcher;
     private $context;
     private $logger;
-    private $request;
     private $requestStack;
 
     /**
      * Constructor.
      *
-     * RequestStack will become required in 3.0.
-     *
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
+     * @param RequestStack                                $requestStack A RequestStack instance
      * @param RequestContext|null                         $context      The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param LoggerInterface|null                        $logger       The logger
-     * @param RequestStack|null                           $requestStack A RequestStack instance
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null, RequestStack $requestStack = null)
+    public function __construct($matcher, RequestStack $requestStack, RequestContext $context = null, LoggerInterface $logger = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -75,19 +67,19 @@ class RouterListener implements EventSubscriberInterface
 
     private function setCurrentRequest(Request $request = null)
     {
-        if (null !== $request && $this->request !== $request) {
+        if (null !== $request) {
             $this->context->fromRequest($request);
         }
-
-        $this->request = $request;
     }
 
+    /**
+     * After a sub-request is done, we need to reset the routing context to the parent request so that the URL generator
+     * operates on the correct context again.
+     *
+     * @param FinishRequestEvent $event
+     */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if (null === $this->requestStack) {
-            return; // removed when requestStack is required
-        }
-
         $this->setCurrentRequest($this->requestStack->getParentRequest());
     }
 
@@ -95,13 +87,7 @@ class RouterListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        // we call setCurrentRequest even if most of the time, it has already been done to keep compatibility
-        // with frameworks which do not use the Symfony service container
-        // when we have a RequestStack, no need to do it
-        if (null !== $this->requestStack) {
-            $this->setCurrentRequest($request);
-        }
+        $this->setCurrentRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -118,7 +104,7 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s".', $parameters['_route']), array(
+                $this->logger->info(sprintf('Matched route "%s".', isset($parameters['_route']) ? $parameters['_route'] : 'n/a'), array(
                     'route_parameters' => $parameters,
                     'request_uri' => $request->getUri(),
                 ));

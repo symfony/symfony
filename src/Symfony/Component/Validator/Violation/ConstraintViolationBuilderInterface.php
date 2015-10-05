@@ -20,6 +20,7 @@ namespace Symfony\Component\Validator\Violation;
  * execution context.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ConstraintViolationBuilderInterface
@@ -93,7 +94,7 @@ interface ConstraintViolationBuilderInterface
     /**
      * Sets the violation code.
      *
-     * @param int $code The violation code
+     * @param string|null $code The violation code
      *
      * @return ConstraintViolationBuilderInterface This builder
      */

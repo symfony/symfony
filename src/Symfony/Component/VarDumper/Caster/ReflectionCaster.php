@@ -40,15 +40,15 @@ class ReflectionCaster
         $a = static::castFunctionAbstract($c, $a, $stub, $isNested);
 
         if (isset($a[$prefix.'parameters'])) {
-            foreach ($a[$prefix.'parameters'] as &$v) {
+            foreach ($a[$prefix.'parameters']->value as &$v) {
                 $param = $v;
-                $v = array();
+                $v = new EnumStub(array());
                 foreach (static::castParameter($param, array(), $stub, true) as $k => $param) {
                     if ("\0" === $k[0]) {
-                        $v[substr($k, 3)] = $param;
+                        $v->value[substr($k, 3)] = $param;
                     }
                 }
-                unset($v['position'], $v['isVariadic'], $v['byReference'], $v);
+                unset($v->value['position'], $v->value['isVariadic'], $v->value['byReference'], $v);
             }
         }
 
@@ -98,6 +98,7 @@ class ReflectionCaster
 
         self::addMap($a, $c, array(
             'returnsReference' => 'returnsReference',
+            'returnType' => 'getReturnType',
             'class' => 'getClosureScopeClass',
             'this' => 'getClosureThis',
         ));
@@ -116,17 +117,24 @@ class ReflectionCaster
             }
             $a[$prefix.'parameters'][$k] = $v;
         }
+        if (isset($a[$prefix.'parameters'])) {
+            $a[$prefix.'parameters'] = new EnumStub($a[$prefix.'parameters']);
+        }
 
         if ($v = $c->getStaticVariables()) {
             foreach ($v as $k => &$v) {
-                $a[$prefix.'use']['$'.$k] =& $v;
+                $a[$prefix.'use']['$'.$k] = &$v;
             }
             unset($v);
+            $a[$prefix.'use'] = new EnumStub($a[$prefix.'use']);
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE) && !$isNested) {
             self::addExtra($a, $c);
         }
+
+        // Added by HHVM
+        unset($a[Caster::PREFIX_DYNAMIC.'static']);
 
         return $a;
     }
@@ -208,14 +216,18 @@ class ReflectionCaster
 
     private static function addExtra(&$a, \Reflector $c)
     {
-        $a =& $a[Caster::PREFIX_VIRTUAL.'extra'];
+        $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : array();
 
         if (method_exists($c, 'getFileName') && $m = $c->getFileName()) {
-            $a['file'] = $m;
-            $a['line'] = $c->getStartLine().' to '.$c->getEndLine();
+            $x['file'] = $m;
+            $x['line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 
-        self::addMap($a, $c, self::$extraMap, '');
+        self::addMap($x, $c, self::$extraMap, '');
+
+        if ($x) {
+            $a[Caster::PREFIX_VIRTUAL.'extra'] = new EnumStub($x);
+        }
     }
 
     private static function addMap(&$a, \Reflector $c, $map, $prefix = Caster::PREFIX_VIRTUAL)

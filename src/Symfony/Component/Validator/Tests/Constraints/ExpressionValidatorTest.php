@@ -19,11 +19,6 @@ use Symfony\Component\Validator\Validation;
 
 class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
@@ -40,6 +35,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -54,6 +50,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -87,6 +84,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'object')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -123,8 +121,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('data')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -167,14 +166,15 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('reference.data')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
     {
@@ -191,7 +191,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testFailingExpressionAtPropertyLevelWithoutRoot()
     {
@@ -207,8 +207,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 }

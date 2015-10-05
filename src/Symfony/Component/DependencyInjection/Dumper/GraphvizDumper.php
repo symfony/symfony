@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
@@ -166,14 +165,18 @@ class GraphvizDumper extends Dumper
         $container = $this->cloneContainer();
 
         foreach ($container->getDefinitions() as $id => $definition) {
-            $className = $definition->getClass();
+            $class = $definition->getClass();
+
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
+            }
 
             try {
-                $className = $this->container->getParameterBag()->resolveValue($className);
+                $class = $this->container->getParameterBag()->resolveValue($class);
             } catch (ParameterNotFoundException $e) {
             }
 
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $className), 'attributes' => array_merge($this->options['node.definition'], array('style' => ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope() ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
             $container->setDefinition($id, new Definition('stdClass'));
         }
 
@@ -201,9 +204,6 @@ class GraphvizDumper extends Dumper
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
         $container->setResources($this->container->getResources());
-        foreach ($this->container->getScopes() as $scope => $parentScope) {
-            $container->addScope(new Scope($scope, $parentScope));
-        }
         foreach ($this->container->getExtensions() as $extension) {
             $container->registerExtension($extension);
         }

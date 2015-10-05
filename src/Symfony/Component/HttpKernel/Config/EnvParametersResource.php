@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 /**
  * EnvParametersResource represents resources stored in prefixed environment variables.
  *
  * @author Chris Wilkinson <chriswilkinson84@gmail.com>
  */
-class EnvParametersResource implements ResourceInterface, \Serializable
+class EnvParametersResource implements SelfCheckingResourceInterface, \Serializable
 {
     /**
      * @var string
@@ -50,7 +50,7 @@ class EnvParametersResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @return array An array with two keys: 'prefix' for the prefix used and 'variables' containing all the variables watched by this resource
      */
     public function getResource()
     {

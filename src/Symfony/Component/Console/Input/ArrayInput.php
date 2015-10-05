@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
+
 /**
  * ArrayInput represents an input provided as an array.
  *
@@ -19,8 +22,6 @@ namespace Symfony\Component\Console\Input;
  *     $input = new ArrayInput(array('name' => 'foo', '--bar' => 'foobar'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ArrayInput extends Input
 {
@@ -31,8 +32,6 @@ class ArrayInput extends Input
      *
      * @param array           $parameters An array of parameters
      * @param InputDefinition $definition A InputDefinition instance
-     *
-     * @api
      */
     public function __construct(array $parameters, InputDefinition $definition = null)
     {
@@ -153,12 +152,12 @@ class ArrayInput extends Input
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidOptionException When option given doesn't exist
      */
     private function addShortOption($shortcut, $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
-            throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
+            throw new InvalidOptionException(sprintf('The "-%s" option does not exist.', $shortcut));
         }
 
         $this->addLongOption($this->definition->getOptionForShortcut($shortcut)->getName(), $value);
@@ -170,20 +169,20 @@ class ArrayInput extends Input
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
-     * @throws \InvalidArgumentException When a required value is missing
+     * @throws InvalidOptionException When option given doesn't exist
+     * @throws InvalidOptionException When a required value is missing
      */
     private function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
-            throw new \InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
+            throw new InvalidOptionException(sprintf('The "--%s" option does not exist.', $name));
         }
 
         $option = $this->definition->getOption($name);
 
         if (null === $value) {
             if ($option->isValueRequired()) {
-                throw new \InvalidArgumentException(sprintf('The "--%s" option requires a value.', $name));
+                throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $name));
             }
 
             $value = $option->isValueOptional() ? $option->getDefault() : true;
@@ -198,12 +197,12 @@ class ArrayInput extends Input
      * @param string $name  The argument name
      * @param mixed  $value The value for the argument
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     private function addArgument($name, $value)
     {
         if (!$this->definition->hasArgument($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
         $this->arguments[$name] = $value;

@@ -62,6 +62,8 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      * @return int|string The choice as PHP array key
      *
      * @throws InvalidArgumentException If the choice is not scalar
+     *
+     * @internal Must not be used outside this class
      */
     public static function toArrayKey($choice)
     {
@@ -89,23 +91,27 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      * If no values are given, the choices are cast to strings and used as
      * values.
      *
-     * @param array    $choices The selectable choices
-     * @param callable $value   The callable for creating the value for a
-     *                          choice. If `null` is passed, the choices are
-     *                          cast to strings and used as values
+     * @param array|\Traversable $choices The selectable choices
+     * @param callable           $value   The callable for creating the value
+     *                                    for a choice. If `null` is passed, the
+     *                                    choices are cast to strings and used
+     *                                    as values
      *
      * @throws InvalidArgumentException If the keys of the choices don't match
      *                                  the keys of the values or if any of the
      *                                  choices is not scalar
      */
-    public function __construct(array $choices, $value = null)
+    public function __construct($choices, $value = null)
     {
-        $choices = array_map(array(__CLASS__, 'toArrayKey'), $choices);
-
+        // If no values are given, use the choices as values
+        // Since the choices are stored in the collection keys, i.e. they are
+        // strings or integers, we are guaranteed to be able to convert them
+        // to strings
         if (null === $value) {
             $value = function ($choice) {
                 return (string) $choice;
             };
+
             $this->useChoicesAsValues = true;
         }
 
@@ -122,7 +128,7 @@ class ArrayKeyChoiceList extends ArrayChoiceList
 
             // If the values are identical to the choices, so we can just return
             // them to improve performance a little bit
-            return array_map(array(__CLASS__, 'toArrayKey'), array_intersect($values, $this->values));
+            return array_map(array(__CLASS__, 'toArrayKey'), array_intersect($values, array_keys($this->choices)));
         }
 
         return parent::getChoicesForValues($values);
@@ -142,5 +148,39 @@ class ArrayKeyChoiceList extends ArrayChoiceList
         }
 
         return parent::getValuesForChoices($choices);
+    }
+
+    /**
+     * Flattens and flips an array into the given output variable.
+     *
+     * @param array    $choices         The array to flatten
+     * @param callable $value           The callable for generating choice values
+     * @param array    $choicesByValues The flattened choices indexed by the
+     *                                  corresponding values
+     * @param array    $keysByValues    The original keys indexed by the
+     *                                  corresponding values
+     *
+     * @internal Must not be used by user-land code
+     */
+    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    {
+        if (null === $choicesByValues) {
+            $choicesByValues = array();
+            $keysByValues = array();
+            $structuredValues = array();
+        }
+
+        foreach ($choices as $choice => $key) {
+            if (is_array($key)) {
+                $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice]);
+
+                continue;
+            }
+
+            $choiceValue = (string) call_user_func($value, $choice);
+            $choicesByValues[$choiceValue] = $choice;
+            $keysByValues[$choiceValue] = $key;
+            $structuredValues[$key] = $choiceValue;
+        }
     }
 }

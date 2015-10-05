@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Validation;
 
 class BlankValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new BlankValidator();
@@ -54,6 +49,7 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
+            ->setCode(Blank::NOT_BLANK_ERROR)
             ->assertRaised();
     }
 

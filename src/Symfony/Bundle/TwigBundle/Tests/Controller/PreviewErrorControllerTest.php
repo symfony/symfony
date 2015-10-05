@@ -23,7 +23,7 @@ class PreviewErrorControllerTest extends TestCase
     public function testForwardRequestToConfiguredController()
     {
         $request = Request::create('whatever');
-        $response = new Response("");
+        $response = new Response('');
         $code = 123;
         $logicalControllerName = 'foo:bar:baz';
 

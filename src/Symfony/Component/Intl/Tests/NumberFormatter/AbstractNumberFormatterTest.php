@@ -56,8 +56,6 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyle($value, $currency, $expected)
     {
-        IntlTestHelper::requireFullIntl($this);
-
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
     }
@@ -84,8 +82,6 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
     {
-        IntlTestHelper::requireFullIntl($this);
-
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -104,8 +100,6 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleBrazilianRealRounding($value, $currency, $symbol, $expected)
     {
-        IntlTestHelper::requireFullIntl($this);
-
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -133,8 +127,6 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleSwissRounding($value, $currency, $symbol, $expected)
     {
-        IntlTestHelper::requireFullIntl($this);
-
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -610,10 +602,11 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse($value, $expected, $message, $expectedPosition)
+    public function testParse($value, $expected, $message, $expectedPosition, $groupingUsed = true)
     {
         $position = 0;
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::GROUPING_USED, $groupingUsed);
         $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_DOUBLE, $position);
         $this->assertSame($expected, $parsedValue, $message);
         $this->assertSame($expectedPosition, $position, $message);
@@ -639,6 +632,11 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             array('prefix1', false, '->parse() does not parse a number with a string prefix.', 0),
             array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
+            array('-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3),
+            array('-123,4', false, '->parse() does not parse when invalid grouping used.', 6),
+            array('-1234,567', false, '->parse() does not parse when invalid grouping used.', 5),
+            array('-123,,456', false, '->parse() does not parse when invalid grouping used.', 4),
+            array('-123,,456', -123.0, '->parse() parses when grouping is disabled.', 4, false),
         );
     }
 
@@ -685,9 +683,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2147483647, $parsedValue);
 
         $parsedValue = $formatter->parse('-2,147,483,648', NumberFormatter::TYPE_INT64);
-
         $this->assertInternalType('int', $parsedValue);
-
         $this->assertEquals(-2147483648, $parsedValue);
     }
 

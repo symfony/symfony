@@ -16,6 +16,8 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -126,6 +128,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetValueReadsMagicGetThatReturnsConstant()
     {
         $this->assertSame('constant value', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'constantMagicProperty'));
+    }
+
+    public function testGetValueNotModifyObject()
+    {
+        $object = new \stdClass();
+        $object->firstName = array('Bernhard');
+
+        $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
+        $this->assertSame(array('Bernhard'), $object->firstName);
     }
 
     /**
@@ -445,5 +456,43 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $obj->publicProperty = array('foo' => array('bar' => 'some_value'));
         $this->propertyAccessor->setValue($obj, 'publicProperty[foo][bar]', 'Updated');
         $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
+    }
+
+    public function getReferenceChainObjectsForSetValue()
+    {
+        return array(
+            array(array('a' => array('b' => array('c' => 'old-value'))), '[a][b][c]', 'new-value'),
+            array(new TestClassSetValue(new TestClassSetValue('old-value')), 'value.value', 'new-value'),
+            array(new TestClassSetValue(array('a' => array('b' => array('c' => new TestClassSetValue('old-value'))))), 'value[a][b][c].value', 'new-value'),
+            array(new TestClassSetValue(array('a' => array('b' => 'old-value'))), 'value[a][b]', 'new-value'),
+            array(new \ArrayIterator(array('a' => array('b' => array('c' => 'old-value')))), '[a][b][c]', 'new-value'),
+        );
+    }
+
+    /**
+     * @dataProvider getReferenceChainObjectsForSetValue
+     */
+    public function testSetValueForReferenceChainIssue($object, $path, $value)
+    {
+        $this->propertyAccessor->setValue($object, $path, $value);
+
+        $this->assertEquals($value, $this->propertyAccessor->getValue($object, $path));
+    }
+
+    public function getReferenceChainObjectsForIsWritable()
+    {
+        return array(
+            array(new TestClassIsWritable(array('a' => array('b' => 'old-value'))), 'value[a][b]', false),
+            array(new TestClassIsWritable(new \ArrayIterator(array('a' => array('b' => 'old-value')))), 'value[a][b]', true),
+            array(new TestClassIsWritable(array('a' => array('b' => array('c' => new TestClassSetValue('old-value'))))), 'value[a][b][c].value', true),
+        );
+    }
+
+    /**
+     * @dataProvider getReferenceChainObjectsForIsWritable
+     */
+    public function testIsWritableForReferenceChainIssue($object, $path, $value)
+    {
+        $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
     }
 }

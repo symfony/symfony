@@ -14,9 +14,22 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tests;
+
+require_once __DIR__.'/../ClockMock.php';
 
 class ProgressBarTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        Tests\with_clock_mock(true);
+    }
+
+    protected function tearDown()
+    {
+        Tests\with_clock_mock(false);
+    }
+
     public function testMultipleStart()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());
@@ -315,7 +328,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
         $bar->start();
 
-        for ($i = 0; $i < 200; $i++) {
+        for ($i = 0; $i < 200; ++$i) {
             $bar->advance();
         }
 
@@ -384,7 +397,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $output->write("\n");
         $bar3->start();
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             // up two lines
             $output->write("\033[2A");
             if ($i <= 2) {
@@ -492,6 +505,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testAnsiColorsAndEmojis()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);

@@ -32,7 +32,7 @@ class CodeExtension extends \Twig_Extension
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        $this->rootDir = str_replace('\\', '/', dirname($rootDir)).'/';
+        $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
         $this->charset = $charset;
     }
 
@@ -163,11 +163,11 @@ class CodeExtension extends \Twig_Extension
         $file = trim($file);
 
         if (null === $text) {
-            $text = str_replace('\\', '/', $file);
+            $text = str_replace('/', DIRECTORY_SEPARATOR, $file);
             if (0 === strpos($text, $this->rootDir)) {
                 $text = substr($text, strlen($this->rootDir));
-                $text = explode('/', $text, 2);
-                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? '/'.$text[1] : '');
+                $text = explode(DIRECTORY_SEPARATOR, $text, 2);
+                $text = sprintf('<abbr title="%s%2$s">%s</abbr>%s', $this->rootDir, $text[0], isset($text[1]) ? DIRECTORY_SEPARATOR.$text[1] : '');
             }
         }
 

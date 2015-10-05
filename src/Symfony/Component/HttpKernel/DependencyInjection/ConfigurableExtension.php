@@ -17,11 +17,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * This extension sub-class provides first-class integration with the
  * Config/Definition Component.
  *
- * You can use this as base class if you
+ * You can use this as base class if
  *
- *    a) use the Config/Definition component for configuration
- *    b) your configuration class is named "Configuration" and
- *    c) the configuration class resides in the DependencyInjection sub-folder
+ *    a) you use the Config/Definition component for configuration,
+ *    b) your configuration class is named "Configuration", and
+ *    c) the configuration class resides in the DependencyInjection sub-folder.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

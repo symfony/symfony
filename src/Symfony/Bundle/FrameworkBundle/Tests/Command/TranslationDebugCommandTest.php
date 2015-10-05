@@ -95,7 +95,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->fs = new Filesystem();
-        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation');
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
         $this->fs->mkdir($this->translationDir.'/Resources/views');
     }

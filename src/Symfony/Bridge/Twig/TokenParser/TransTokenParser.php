@@ -25,7 +25,7 @@ class TransTokenParser extends \Twig_TokenParser
      *
      * @param \Twig_Token $token A Twig_Token instance
      *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     * @return \Twig_Node A Twig_Node instance
      *
      * @throws \Twig_Error_Syntax
      */

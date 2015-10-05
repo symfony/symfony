@@ -38,12 +38,6 @@ class ExceptionHandler
 
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
-        if (false !== strpos($charset, '%') xor false === strpos($fileLinkFormat, '%')) {
-            // Swap $charset and $fileLinkFormat for BC reasons
-            $pivot = $fileLinkFormat;
-            $fileLinkFormat = $charset;
-            $charset = $pivot;
-        }
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
@@ -115,26 +109,25 @@ class ExceptionHandler
     public function handle(\Exception $exception)
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
-            $this->failSafeHandle($exception);
+            $this->sendPhpResponse($exception);
 
             return;
         }
 
         $caughtLength = $this->caughtLength = 0;
 
-        ob_start(function($buffer) {
+        ob_start(function ($buffer) {
             $this->caughtBuffer = $buffer;
 
             return '';
         });
 
-
-        $this->failSafeHandle($exception);
+        $this->sendPhpResponse($exception);
         while (null === $this->caughtBuffer && ob_end_flush()) {
             // Empty loop, everything is in the condition
         }
         if (isset($this->caughtBuffer[0])) {
-            ob_start(function($buffer) {
+            ob_start(function ($buffer) {
                 if ($this->caughtLength) {
                     // use substr_replace() instead of substr() for mbstring overloading resistance
                     $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
@@ -163,35 +156,12 @@ class ExceptionHandler
     }
 
     /**
-     * Sends a response for the given Exception.
-     *
-     * If you have the Symfony HttpFoundation component installed,
-     * this method will use it to create and send the response. If not,
-     * it will fallback to plain PHP functions.
-     *
-     * @param \Exception $exception An \Exception instance
-     *
-     * @see sendPhpResponse()
-     * @see createResponse()
-     */
-    private function failSafeHandle(\Exception $exception)
-    {
-        if (class_exists('Symfony\Component\HttpFoundation\Response', false)) {
-            $response = $this->createResponse($exception);
-            $response->sendHeaders();
-            $response->sendContent();
-        } else {
-            $this->sendPhpResponse($exception);
-        }
-    }
-
-    /**
      * Sends the error associated with the given Exception as a plain PHP response.
      *
      * This method uses plain PHP functions like header() and echo to output
      * the response.
      *
-     * @param \Exception|FlattenException $exception An \Exception instance
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      */
     public function sendPhpResponse($exception)
     {
@@ -211,19 +181,19 @@ class ExceptionHandler
     }
 
     /**
-     * Creates the error Response associated with the given Exception.
+     * Gets the full HTML content associated with the given exception.
      *
-     * @param \Exception|FlattenException $exception An \Exception instance
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      *
-     * @return Response A Response instance
+     * @return string The HTML content as a string
      */
-    public function createResponse($exception)
+    public function getHtml($exception)
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
         }
 
-        return Response::create($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);
+        return $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
     }
 
     /**

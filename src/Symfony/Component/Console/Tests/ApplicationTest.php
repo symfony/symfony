@@ -176,7 +176,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage The command "foofoo" does not exist.
      */
     public function testGetInvalidCommand()
@@ -212,7 +212,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage The namespace "f" is ambiguous (foo, foo1).
      */
     public function testFindAmbiguousNamespace()
@@ -225,7 +225,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage There are no commands defined in the "bar" namespace.
      */
     public function testFindInvalidNamespace()
@@ -235,7 +235,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage Command "foo1" is not defined
      */
     public function testFindUniqueNameButNamespaceName()
@@ -265,7 +265,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindWithAmbiguousAbbreviations($abbreviation, $expectedExceptionMessage)
     {
-        $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
+        $this->setExpectedException('Symfony\Component\Console\Exception\CommandNotFoundException', $expectedExceptionMessage);
 
         $application = new Application();
         $application->add(new \FooCommand());
@@ -313,7 +313,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider             provideInvalidCommandNamesSingle
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage Did you mean this
      */
     public function testFindAlternativeExceptionMessageSingle($name)
@@ -341,10 +341,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         // Command + plural
         try {
             $application->find('foo:baR');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->fail('->find() throws a CommandNotFoundException if command does not exist, with alternatives');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
             $this->assertRegExp('/foo1:bar/', $e->getMessage());
             $this->assertRegExp('/foo:bar/', $e->getMessage());
         }
@@ -352,10 +352,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         // Namespace + plural
         try {
             $application->find('foo2:bar');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->fail('->find() throws a CommandNotFoundException if command does not exist, with alternatives');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
             $this->assertRegExp('/foo1/', $e->getMessage());
         }
 
@@ -365,9 +365,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         // Subnamespace + plural
         try {
             $a = $application->find('foo3:');
-            $this->fail('->find() should throw an \InvalidArgumentException if a command is ambiguous because of a subnamespace, with alternatives');
+            $this->fail('->find() should throw an Symfony\Component\Console\Exception\CommandNotFoundException if a command is ambiguous because of a subnamespace, with alternatives');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e);
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e);
             $this->assertRegExp('/foo3:bar/', $e->getMessage());
             $this->assertRegExp('/foo3:bar:toh/', $e->getMessage());
         }
@@ -383,23 +383,25 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         try {
             $application->find($commandName = 'Unknown command');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if command does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
-            $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist');
+            $this->assertSame(array(), $e->getAlternatives());
+            $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without alternatives');
         }
 
-        // Test if "bar1" command throw an "\InvalidArgumentException" and does not contain
+        // Test if "bar1" command throw a "CommandNotFoundException" and does not contain
         // "foo:bar" as alternative because "bar1" is too far from "foo:bar"
         try {
             $application->find($commandName = 'bar1');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if command does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
-            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertRegExp('/afoobar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "afoobar1"');
-            $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar1"');
-            $this->assertNotRegExp('/foo:bar(?>!1)/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist');
+            $this->assertSame(array('afoobar1', 'foo:bar1'), $e->getAlternatives());
+            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertRegExp('/afoobar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "afoobar1"');
+            $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternative : "foo:bar1"');
+            $this->assertNotRegExp('/foo:bar(?>!1)/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, without "foo:bar" alternative');
         }
     }
 
@@ -427,21 +429,26 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         try {
             $application->find('Unknown-namespace:Unknown-command');
-            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
-            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, without alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->assertSame(array(), $e->getAlternatives());
+            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, without alternatives');
         }
 
         try {
             $application->find('foo2:command');
-            $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
-            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative');
-            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo"');
-            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo1"');
-            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, with alternative : "foo3"');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->assertCount(3, $e->getAlternatives());
+            $this->assertContains('foo', $e->getAlternatives());
+            $this->assertContains('foo1', $e->getAlternatives());
+            $this->assertContains('foo3', $e->getAlternatives());
+            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative');
+            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo"');
+            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo1"');
+            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo3"');
         }
     }
 
@@ -456,7 +463,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Console\Exception\CommandNotFoundException
      * @expectedExceptionMessage Command "foo::bar" is not defined.
      */
     public function testFindWithDoubleColonInNameThrowsException()
@@ -529,6 +536,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderExceptionWithDoubleWidthCharacters()
     {
+        if (!function_exists('mb_strwidth')) {
+            $this->markTestSkipped('The "mb_strwidth" function is not available');
+        }
+
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
         $application->setAutoExit(false);
         $application->expects($this->any())
@@ -854,7 +865,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertEquals('before.foo.after.', $tester->getDisplay());
+        $this->assertEquals('before.foo.after.'.PHP_EOL, $tester->getDisplay());
     }
 
     /**
@@ -890,7 +901,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.foo.after.caught.', $tester->getDisplay());
+        $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
     }
 
     public function testRunWithDispatcherSkippingCommand()
@@ -907,6 +918,63 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $exitCode = $tester->run(array('command' => 'foo'));
         $this->assertContains('before.after.', $tester->getDisplay());
         $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
+    }
+
+    public function testRunWithDispatcherAccessingInputOptions()
+    {
+        $noInteractionValue = null;
+        $quietValue = null;
+
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use (&$noInteractionValue, &$quietValue) {
+            $input = $event->getInput();
+
+            $noInteractionValue = $input->getOption('no-interaction');
+            $quietValue = $input->getOption('quiet');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--no-interaction' => true));
+
+        $this->assertTrue($noInteractionValue);
+        $this->assertFalse($quietValue);
+    }
+
+    public function testRunWithDispatcherAddingInputOptions()
+    {
+        $extraValue = null;
+
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use (&$extraValue) {
+            $definition = $event->getCommand()->getDefinition();
+            $input = $event->getInput();
+
+            $definition->addOption(new InputOption('extra', null, InputOption::VALUE_REQUIRED));
+            $input->bind($definition);
+
+            $extraValue = $input->getOption('extra');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo', '--extra' => 'some test value'));
+
+        $this->assertEquals('some test value', $extraValue);
     }
 
     public function testTerminalDimensions()
@@ -935,14 +1003,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             }
         });
         $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($skipCommand) {
-            $event->getOutput()->write('after.');
+            $event->getOutput()->writeln('after.');
 
             if (!$skipCommand) {
                 $event->setExitCode(113);
             }
         });
         $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
-            $event->getOutput()->writeln('caught.');
+            $event->getOutput()->write('caught.');
 
             $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
         });

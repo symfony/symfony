@@ -14,15 +14,12 @@ namespace Symfony\Component\Form\ChoiceList;
 /**
  * A list of choices that can be selected in a choice field.
  *
- * A choice list assigns string values to each of a list of choices. These
- * string values are displayed in the "value" attributes in HTML and submitted
- * back to the server.
+ * A choice list assigns unique string values to each of a list of choices.
+ * These string values are displayed in the "value" attributes in HTML and
+ * submitted back to the server.
  *
  * The acceptable data types for the choices depend on the implementation.
  * Values must always be strings and (within the list) free of duplicates.
- *
- * The choices returned by {@link getChoices()} and the values returned by
- * {@link getValues()} must have the same array indices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -31,22 +28,65 @@ interface ChoiceListInterface
     /**
      * Returns all selectable choices.
      *
-     * The keys of the choices correspond to the keys of the values returned by
-     * {@link getValues()}.
-     *
-     * @return array The selectable choices
+     * @return array The selectable choices indexed by the corresponding values
      */
     public function getChoices();
 
     /**
      * Returns the values for the choices.
      *
-     * The keys of the values correspond to the keys of the choices returned by
-     * {@link getChoices()}.
+     * The values are strings that do not contain duplicates.
      *
      * @return string[] The choice values
      */
     public function getValues();
+
+    /**
+     * Returns the values in the structure originally passed to the list.
+     *
+     * Contrary to {@link getValues()}, the result is indexed by the original
+     * keys of the choices. If the original array contained nested arrays, these
+     * nested arrays are represented here as well:
+     *
+     *     $form->add('field', 'choice', array(
+     *         'choices' => array(
+     *             'Decided' => array('Yes' => true, 'No' => false),
+     *             'Undecided' => array('Maybe' => null),
+     *         ),
+     *     ));
+     *
+     * In this example, the result of this method is:
+     *
+     *     array(
+     *         'Decided' => array('Yes' => '0', 'No' => '1'),
+     *         'Undecided' => array('Maybe' => '2'),
+     *     )
+     *
+     * @return string[] The choice values
+     */
+    public function getStructuredValues();
+
+    /**
+     * Returns the original keys of the choices.
+     *
+     * The original keys are the keys of the choice array that was passed in the
+     * "choice" option of the choice type. Note that this array may contain
+     * duplicates if the "choice" option contained choice groups:
+     *
+     *     $form->add('field', 'choice', array(
+     *         'choices' => array(
+     *             'Decided' => array(true, false),
+     *             'Undecided' => array(null),
+     *         ),
+     *     ));
+     *
+     * In this example, the original key 0 appears twice, once for `true` and
+     * once for `null`.
+     *
+     * @return int[]|string[] The original choice keys indexed by the
+     *                        corresponding choice values
+     */
+    public function getOriginalKeys();
 
     /**
      * Returns the choices corresponding to the given values.

@@ -172,9 +172,18 @@
 
         <service id="security.authentication.provider.dao" class="Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
+        </service>
+
+        <service id="security.authentication.provider.ldap_bind" class="Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider" public="false" abstract="true">
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- UserChecker -->
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- LDAP -->
+            <argument /> <!-- Base DN -->
             <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
 
@@ -186,7 +195,7 @@
 
         <service id="security.authentication.provider.pre_authenticated" class="Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
         </service>
 
         <service id="security.exception_listener" class="Symfony\Component\Security\Http\Firewall\ExceptionListener" public="false" abstract="true">
@@ -199,13 +208,14 @@
             <argument>%security.access.denied_url%</argument>
             <argument type="service" id="security.access.denied_handler" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>false</argument> <!-- Stateless -->
         </service>
 
         <service id="security.authentication.switchuser_listener" class="Symfony\Component\Security\Http\Firewall\SwitchUserListener" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
             <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />

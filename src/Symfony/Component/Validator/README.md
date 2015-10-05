@@ -109,7 +109,7 @@ Resources
 
 Silex integration:
 
-https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceProvider.php
+https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/ValidatorServiceProvider.php
 
 Documentation:
 

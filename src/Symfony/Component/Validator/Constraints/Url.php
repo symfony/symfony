@@ -18,11 +18,15 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Url extends Constraint
 {
+    const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
+
+    protected static $errorNames = array(
+        self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
+    );
+
     public $message = 'This value is not a valid URL.';
     public $dnsMessage = 'The host could not be resolved.';
     public $protocols = array('http', 'https');

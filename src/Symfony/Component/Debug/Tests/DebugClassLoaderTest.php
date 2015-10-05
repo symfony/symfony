@@ -108,21 +108,17 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             $this->fail('ContextErrorException expected');
         } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
-            restore_error_handler();
-            restore_exception_handler();
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             if (PHP_VERSION_ID < 70000) {
-                $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
+                $this->assertRegExp('/^Runtime Notice: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_STRICT, $exception->getSeverity());
             } else {
-                $this->assertRegexp('/^Warning: Declaration/', $exception->getMessage());
+                $this->assertRegExp('/^Warning: Declaration/', $exception->getMessage());
                 $this->assertEquals(E_WARNING, $exception->getSeverity());
             }
-        } catch (\Exception $exception) {
+        } finally {
             restore_error_handler();
             restore_exception_handler();
-
-            throw $exception;
         }
     }
 
@@ -136,7 +132,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Case mismatch between class and source file names
+     * @expectedExceptionMessage Case mismatch between class and real file names
      */
     public function testFileCaseMismatch()
     {

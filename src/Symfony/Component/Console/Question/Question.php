@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Question;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
+
 /**
  * Represents a Question.
  *
@@ -76,12 +79,12 @@ class Question
      *
      * @return Question The current instance
      *
-     * @throws \LogicException In case the autocompleter is also used
+     * @throws LogicException In case the autocompleter is also used
      */
     public function setHidden($hidden)
     {
         if ($this->autocompleterValues) {
-            throw new \LogicException('A hidden question cannot use the autocompleter.');
+            throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->hidden = (bool) $hidden;
@@ -130,8 +133,8 @@ class Question
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
     public function setAutocompleterValues($values)
     {
@@ -141,12 +144,12 @@ class Question
 
         if (null !== $values && !is_array($values)) {
             if (!$values instanceof \Traversable || $values instanceof \Countable) {
-                throw new \InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
+                throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
             }
         }
 
         if ($this->hidden) {
-            throw new \LogicException('A hidden question cannot use the autocompleter.');
+            throw new LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->autocompleterValues = $values;
@@ -187,12 +190,12 @@ class Question
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException In case the number of attempts is invalid.
+     * @throws InvalidArgumentException In case the number of attempts is invalid.
      */
     public function setMaxAttempts($attempts)
     {
         if (null !== $attempts && $attempts < 1) {
-            throw new \InvalidArgumentException('Maximum number of attempts must be a positive value.');
+            throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
 
         $this->attempts = $attempts;

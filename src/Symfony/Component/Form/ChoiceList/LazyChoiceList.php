@@ -44,13 +44,6 @@ class LazyChoiceList implements ChoiceListInterface
     private $value;
 
     /**
-     * Whether to use the value callback to compare choices.
-     *
-     * @var bool
-     */
-    private $compareByValue;
-
-    /**
      * @var ChoiceListInterface|null
      */
     private $loadedList;
@@ -66,11 +59,10 @@ class LazyChoiceList implements ChoiceListInterface
      * @param null|callable         $value  The callable generating the choice
      *                                      values
      */
-    public function __construct(ChoiceLoaderInterface $loader, $value = null, $compareByValue = false)
+    public function __construct(ChoiceLoaderInterface $loader, $value = null)
     {
         $this->loader = $loader;
         $this->value = $value;
-        $this->compareByValue = $compareByValue;
     }
 
     /**
@@ -95,6 +87,30 @@ class LazyChoiceList implements ChoiceListInterface
         }
 
         return $this->loadedList->getValues();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStructuredValues()
+    {
+        if (!$this->loadedList) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        }
+
+        return $this->loadedList->getStructuredValues();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOriginalKeys()
+    {
+        if (!$this->loadedList) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        }
+
+        return $this->loadedList->getOriginalKeys();
     }
 
     /**

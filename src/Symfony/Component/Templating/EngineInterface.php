@@ -14,7 +14,7 @@ namespace Symfony\Component\Templating;
 /**
  * EngineInterface is the interface each engine must implement.
  *
- * All methods relies on a template name. A template name is a
+ * All methods rely on a template name. A template name is a
  * "logical" name for the template, and as such it does not refer to
  * a path on the filesystem (in fact, the template can be stored
  * anywhere, like in a database).
@@ -27,8 +27,6 @@ namespace Symfony\Component\Templating;
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface EngineInterface
 {
@@ -41,8 +39,6 @@ interface EngineInterface
      * @return string The evaluated template as a string
      *
      * @throws \RuntimeException if the template cannot be rendered
-     *
-     * @api
      */
     public function render($name, array $parameters = array());
 
@@ -54,8 +50,6 @@ interface EngineInterface
      * @return bool true if the template exists, false otherwise
      *
      * @throws \RuntimeException if the engine cannot handle the template name
-     *
-     * @api
      */
     public function exists($name);
 
@@ -65,8 +59,6 @@ interface EngineInterface
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
      * @return bool true if this class supports the given template, false otherwise
-     *
-     * @api
      */
     public function supports($name);
 }

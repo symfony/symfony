@@ -21,8 +21,6 @@ namespace Symfony\Component\Debug;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @api
  */
 class DebugClassLoader
 {
@@ -31,13 +29,12 @@ class DebugClassLoader
     private static $caseCheck;
     private static $deprecated = array();
     private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
+    private static $darwinCache = array('/' => array('/', array()));
 
     /**
      * Constructor.
      *
      * @param callable $classLoader A class loader
-     *
-     * @api
      */
     public function __construct(callable $classLoader)
     {
@@ -129,13 +126,9 @@ class DebugClassLoader
                 call_user_func($this->classLoader, $class);
                 $file = false;
             }
-        } catch (\Exception $e) {
+        } finally {
             ErrorHandler::unstackErrors();
-
-            throw $e;
         }
-
-        ErrorHandler::unstackErrors();
 
         $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
@@ -193,35 +186,89 @@ class DebugClassLoader
 
                 throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
             }
-            if (self::$caseCheck && preg_match('#([/\\\\][a-zA-Z_\x7F-\xFF][a-zA-Z0-9_\x7F-\xFF]*)+\.(php|hh)$#D', $file, $tail)) {
-                $tail = $tail[0];
-                $real = $refl->getFilename();
+            if (self::$caseCheck) {
+                $real = explode('\\', $class.strrchr($file, '.'));
+                $tail = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $file));
+
+                $i = count($tail) - 1;
+                $j = count($real) - 1;
+
+                 while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
+                    --$i;
+                    --$j;
+                }
+
+                array_splice($tail, 0, $i + 1);
+            }
+            if (self::$caseCheck && $tail) {
+                $tail = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $tail);
+                $tailLen = strlen($tail);
+                $real = $refl->getFileName();
 
                 if (2 === self::$caseCheck) {
                     // realpath() on MacOSX doesn't normalize the case of characters
-                    $cwd = getcwd();
-                    $basename = strrpos($real, '/');
-                    chdir(substr($real, 0, $basename));
-                    $basename = substr($real, $basename + 1);
-                    // glob() patterns are case-sensitive even if the underlying fs is not
-                    if (!in_array($basename, glob($basename.'*', GLOB_NOSORT), true)) {
-                        $real = getcwd().'/';
-                        $h = opendir('.');
-                        while (false !== $f = readdir($h)) {
-                            if (0 === strcasecmp($f, $basename)) {
-                                $real .= $f;
-                                break;
+
+                    $i = 1 + strrpos($real, '/');
+                    $file = substr($real, $i);
+                    $real = substr($real, 0, $i);
+
+                    if (isset(self::$darwinCache[$real])) {
+                        $kDir = $real;
+                    } else {
+                        $kDir = strtolower($real);
+
+                        if (isset(self::$darwinCache[$kDir])) {
+                            $real = self::$darwinCache[$kDir][0];
+                        } else {
+                            $dir = getcwd();
+                            chdir($real);
+                            $real = getcwd().'/';
+                            chdir($dir);
+
+                            $dir = $real;
+                            $k = $kDir;
+                            $i = strlen($dir) - 1;
+                            while (!isset(self::$darwinCache[$k])) {
+                                self::$darwinCache[$k] = array($dir, array());
+                                self::$darwinCache[$dir] = &self::$darwinCache[$k];
+
+                                while ('/' !== $dir[--$i]) {
+                                }
+                                $k = substr($k, 0, ++$i);
+                                $dir = substr($dir, 0, $i--);
                             }
                         }
-                        closedir($h);
                     }
-                    chdir($cwd);
+
+                    $dirFiles = self::$darwinCache[$kDir][1];
+
+                    if (isset($dirFiles[$file])) {
+                        $kFile = $file;
+                    } else {
+                        $kFile = strtolower($file);
+
+                        if (!isset($dirFiles[$kFile])) {
+                            foreach (scandir($real, 2) as $f) {
+                                if ('.' !== $f[0]) {
+                                    $dirFiles[$f] = $f;
+                                    if ($f === $file) {
+                                        $kFile = $k = $file;
+                                    } elseif ($f !== $k = strtolower($f)) {
+                                        $dirFiles[$k] = $f;
+                                    }
+                                }
+                            }
+                            self::$darwinCache[$kDir][1] = $dirFiles;
+                        }
+                    }
+
+                    $real .= $dirFiles[$kFile];
                 }
 
-                if (0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
-                  && 0 !== substr_compare($real, $tail, -strlen($tail), strlen($tail), false)
+                if (0 === substr_compare($real, $tail, -$tailLen, $tailLen, true)
+                  && 0 !== substr_compare($real, $tail, -$tailLen, $tailLen, false)
                 ) {
-                    throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));
+                    throw new \RuntimeException(sprintf('Case mismatch between class and real file names: %s vs %s in %s', substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)));
                 }
             }
 

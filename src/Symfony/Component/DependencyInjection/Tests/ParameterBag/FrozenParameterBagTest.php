@@ -57,4 +57,13 @@ class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new FrozenParameterBag(array());
         $bag->add(array());
     }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testRemove()
+    {
+        $bag = new FrozenParameterBag(array('foo' => 'bar'));
+        $bag->remove('foo');
+    }
 }

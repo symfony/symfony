@@ -100,7 +100,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $subcontext = array_merge($context, array('format' => $format));
+        $subcontext = array_merge($context, array('encoding' => $format));
         $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
 
         foreach ($normalizedData as $attribute => $value) {
@@ -110,27 +110,27 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
+            $setter = 'set'.ucfirst($attribute);
 
             if ($allowed && !$ignored) {
-                $setter = 'set'.ucfirst($attribute);
-
-                /* denormalizing based on type hinting */
                 if ($reflectionClass->hasMethod($setter)) {
                     $setter = $reflectionClass->getMethod($setter);
 
-                    $params = $setter->getParameters();
-                    $param = $params[0];
+                    if ($setter->isPublic()) {
+                        $params = $setter->getParameters();
+                        $param = $params[0];
 
-                    $paramClass = $param->getClass();
-                    if ($paramClass !== null and (!empty($value) or !$param->allowsNull())) {
-                        if (!$this->serializer instanceof DenormalizerInterface) {
-                            throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
+                        $paramClass = $param->getClass();
+                        if ($paramClass !== null and (!empty($value) or !$param->allowsNull())) {
+                            if (!$this->serializer instanceof DenormalizerInterface) {
+                                throw new LogicException(sprintf('Cannot denormalize attribute "%s" because injected serializer is not a denormalizer', $attribute));
+                            }
+
+                            $value = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
                         }
 
-                        $value = $this->serializer->denormalize($value, $paramClass->getName(), $format, $context);
+                        $setter->invoke($object, $value);
                     }
-
-                    $setter->invoke($object, $value);
                 }
             }
         }

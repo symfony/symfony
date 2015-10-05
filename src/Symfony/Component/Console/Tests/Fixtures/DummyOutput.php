@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests\Fixtures;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
- * Dummy output
+ * Dummy output.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

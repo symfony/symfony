@@ -102,7 +102,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->iniSet('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
+        $this->iniSet('open_basedir', dirname(PHP_BINARY).(!defined('HHVM_VERSION') ? PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
@@ -125,7 +125,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->setPath('');
-        $this->iniSet('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
+        $this->iniSet('open_basedir', PHP_BINARY.(!defined('HHVM_VERSION') ? PATH_SEPARATOR.'/' : ''));
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);

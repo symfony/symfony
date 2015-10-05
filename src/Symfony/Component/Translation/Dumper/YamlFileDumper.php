@@ -25,7 +25,7 @@ class YamlFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {
             throw new \LogicException('Dumping translations in the YAML format requires the Symfony Yaml component.');
@@ -42,14 +42,6 @@ class YamlFileDumper extends FileDumper
         }
 
         return Yaml::dump($data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function format(MessageCatalogue $messages, $domain)
-    {
-        return $this->formatCatalogue($messages, $domain);
     }
 
     /**

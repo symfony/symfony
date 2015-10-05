@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -45,14 +44,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
     {
-        if (!preg_match('/^[a-z0-9_]*$/i', $innerType->getName())) {
-            throw new InvalidArgumentException(sprintf(
-                'The "%s" form type name ("%s") is not valid. Names must only contain letters, numbers, and "_".',
-                get_class($innerType),
-                $innerType->getName()
-            ));
-        }
-
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
                 throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
@@ -65,11 +56,13 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the prefix of the template block name for this type.
+     *
+     * @return string The prefix of the template block name
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return $this->innerType->getName();
+        return $this->innerType->getBlockPrefix();
     }
 
     /**

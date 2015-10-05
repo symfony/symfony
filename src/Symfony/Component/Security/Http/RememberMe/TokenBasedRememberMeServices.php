@@ -121,6 +121,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getKey());
+        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getSecret());
     }
 }

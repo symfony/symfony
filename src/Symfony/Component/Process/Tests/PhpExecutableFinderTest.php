@@ -53,10 +53,10 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
         $f = new PhpExecutableFinder();
 
-        $current = $f->find();
+        $current = getenv('PHP_BINARY') ?: PHP_BINARY;
 
-        $this->assertEquals($f->find(), $current.' --php', '::find() returns the executable PHP');
-        $this->assertEquals($f->find(false), $current, '::find() returns the executable PHP');
+        $this->assertEquals($current.' --php', $f->find(), '::find() returns the executable PHP');
+        $this->assertEquals($current, $f->find(false), '::find() returns the executable PHP');
     }
 
     /**

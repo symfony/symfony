@@ -969,6 +969,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(feof($retval));
     }
 
+    public function testGetContentReturnsResourceWhenContentSetInConstructor()
+    {
+        $req = new Request(array(), array(), array(), array(), array(), array(), 'MyContent');
+        $resource = $req->getContent(true);
+
+        $this->assertTrue(is_resource($resource));
+        $this->assertEquals('MyContent', stream_get_contents($resource));
+    }
+
+    public function testContentAsResource()
+    {
+        $resource = fopen('php://memory', 'r+');
+        fwrite($resource, 'My other content');
+        rewind($resource);
+
+        $req = new Request(array(), array(), array(), array(), array(), array(), $resource);
+        $this->assertEquals('My other content', stream_get_contents($req->getContent(true)));
+        $this->assertEquals('My other content', $req->getContent());
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
@@ -985,7 +1005,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCanBeCalledTwiceWithResources($first, $second)
@@ -1014,7 +1033,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return array(
             'Resource then fetch' => array(true, false),
             'Resource then resource' => array(true, true),
-            'Fetch then resource' => array(false, true),
         );
     }
 
@@ -1203,6 +1221,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/path%20test/info', $request->getPathInfo());
     }
 
+    public function testGetParameterPrecedence()
+    {
+        $request = new Request();
+        $request->attributes->set('foo', 'attr');
+        $request->query->set('foo', 'query');
+        $request->request->set('foo', 'body');
+
+        $this->assertSame('attr', $request->get('foo'));
+
+        $request->attributes->remove('foo');
+        $this->assertSame('query', $request->get('foo'));
+
+        $request->query->remove('foo');
+        $this->assertSame('body', $request->get('foo'));
+
+        $request->request->remove('foo');
+        $this->assertNull($request->get('foo'));
+    }
+
     public function testGetPreferredLanguage()
     {
         $request = new Request();
@@ -1345,6 +1382,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
+
+	    $request = new Request(array('_format' => 'foo'));
+	    $this->assertEquals('html', $request->getRequestFormat());
     }
 
     public function testHasSession()

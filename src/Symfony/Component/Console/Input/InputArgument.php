@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
+
 /**
  * Represents a command line argument.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class InputArgument
 {
@@ -37,16 +38,14 @@ class InputArgument
      * @param string $description A description text
      * @param mixed  $default     The default value (for self::OPTIONAL mode only)
      *
-     * @throws \InvalidArgumentException When argument mode is not valid
-     *
-     * @api
+     * @throws InvalidArgumentException When argument mode is not valid
      */
     public function __construct($name, $mode = null, $description = '', $default = null)
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
         } elseif (!is_int($mode) || $mode > 7 || $mode < 1) {
-            throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
+            throw new InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
         $this->name = $name;
@@ -91,19 +90,19 @@ class InputArgument
      *
      * @param mixed $default The default value
      *
-     * @throws \LogicException When incorrect default value is given
+     * @throws LogicException When incorrect default value is given
      */
     public function setDefault($default = null)
     {
         if (self::REQUIRED === $this->mode && null !== $default) {
-            throw new \LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
+            throw new LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         }
 
         if ($this->isArray()) {
             if (null === $default) {
                 $default = array();
             } elseif (!is_array($default)) {
-                throw new \LogicException('A default value for an array argument must be an array.');
+                throw new LogicException('A default value for an array argument must be an array.');
             }
         }
 

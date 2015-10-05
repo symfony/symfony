@@ -78,18 +78,7 @@ interface FormTypeInterface
     /**
      * Returns the name of the parent type.
      *
-     * You can also return a type instance from this method, although doing so
-     * is discouraged because it leads to a performance penalty. The support
-     * for returning type instances may be dropped from future releases.
-     *
-     * @return string|null|FormTypeInterface The name of the parent type if any, null otherwise.
+     * @return string|null The name of the parent type if any, null otherwise
      */
     public function getParent();
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName();
 }

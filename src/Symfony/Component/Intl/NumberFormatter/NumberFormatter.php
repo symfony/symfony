@@ -263,7 +263,7 @@ class NumberFormatter
     /**
      * Constructor.
      *
-     * @param string $locale  The locale code. The only currently supported locale is "en".
+     * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en").
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
@@ -275,13 +275,13 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
     public function __construct($locale = 'en', $style = null, $pattern = null)
     {
-        if ('en' != $locale) {
+        if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
@@ -300,7 +300,7 @@ class NumberFormatter
     /**
      * Static constructor.
      *
-     * @param string $locale  The locale code. The only supported locale is "en".
+     * @param string $locale  The locale code. The only supported locale is "en" (or null using the default locale, i.e. "en").
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only currently supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
@@ -314,7 +314,7 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
@@ -538,22 +538,30 @@ class NumberFormatter
             return false;
         }
 
-        preg_match('/^([^0-9\-\.]{0,})(.*)/', $value, $matches);
+        $groupSep = $this->getAttribute(self::GROUPING_USED) ? ',' : '';
 
         // Any string before the numeric value causes error in the parsing
-        if (isset($matches[1]) && !empty($matches[1])) {
+        if (preg_match("/^-?(?:\.\d++|([\d{$groupSep}]++)(?:\.\d++)?)/", $value, $matches)) {
+            $value = $matches[0];
+            $position = strlen($value);
+            if ($error = $groupSep && isset($matches[1]) && !preg_match('/^\d{1,3}+(?:(?:,\d{3})++|\d*+)$/', $matches[1])) {
+                $position -= strlen(preg_replace('/^\d{1,3}+(?:(?:,\d++)++|\d*+)/', '', $matches[1]));
+            }
+        } else {
+            $error = 1;
+            $position = 0;
+        }
+
+        if ($error) {
             IntlGlobals::setError(IntlGlobals::U_PARSE_ERROR, 'Number parsing failed');
             $this->errorCode = IntlGlobals::getErrorCode();
             $this->errorMessage = IntlGlobals::getErrorMessage();
-            $position = 0;
 
             return false;
         }
 
-        preg_match('/^[0-9\-\.\,]*/', $value, $matches);
-        $value = preg_replace('/[^0-9\.\-]/', '', $matches[0]);
+        $value = str_replace(',', '', $value);
         $value = $this->convertValueDataType($value, $type);
-        $position = strlen($matches[0]);
 
         // behave like the intl extension
         $this->resetError();
@@ -803,7 +811,7 @@ class NumberFormatter
      * @param mixed $value The value to be converted
      * @param int   $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
      *
-     * @return int|float The converted value
+     * @return int|float|false The converted value
      */
     private function convertValueDataType($value, $type)
     {
@@ -823,7 +831,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
-     * @return int The converted value
+     * @return int|false The converted value
      */
     private function getInt32Value($value)
     {
@@ -839,12 +847,18 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
-     * @return int|false The converted value
+     * @return int|float|false The converted value
+     *
+     * @see https://bugs.php.net/bug.php?id=59597 Bug #59597
      */
     private function getInt64Value($value)
     {
         if ($value > self::$int64Range['positive'] || $value < self::$int64Range['negative']) {
             return false;
+        }
+
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative'])) {
+            return (float) $value;
         }
 
         return (int) $value;

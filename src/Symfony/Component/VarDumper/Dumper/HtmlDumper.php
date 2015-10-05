@@ -50,7 +50,7 @@ class HtmlDumper extends CliDumper
      */
     public function __construct($output = null, $charset = null)
     {
-        parent::__construct($output, $charset);
+        AbstractDumper::__construct($output, $charset);
         $this->dumpId = 'sf-dump-'.mt_rand();
     }
 
@@ -129,7 +129,7 @@ var refStyle = doc.createElement('style'),
         e.addEventListener(n, cb, false);
     };
 
-doc.documentElement.firstChild.appendChild(refStyle);
+(doc.documentElement.firstElementChild || doc.documentElement.children[0]).appendChild(refStyle);
 
 if (!doc.addEventListener) {
     addEventListener = function (element, eventName, callback) {

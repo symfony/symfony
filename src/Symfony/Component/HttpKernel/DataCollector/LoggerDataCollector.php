@@ -97,15 +97,46 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function sanitizeLogs($logs)
     {
-        foreach ($logs as $i => $log) {
+        $errorContextById = array();
+        $sanitizedLogs = array();
+
+        foreach ($logs as $log) {
             $context = $this->sanitizeContext($log['context']);
-            if (isset($context['type'], $context['level']) && !($context['type'] & $context['level'])) {
-                $context['scream'] = true;
+
+            if (isset($context['type'], $context['file'], $context['line'], $context['level'])) {
+                $errorId = md5("{$context['type']}/{$context['line']}/{$context['file']}\x00{$log['message']}", true);
+                $silenced = !($context['type'] & $context['level']);
+
+                if (isset($errorContextById[$errorId])) {
+                    if (isset($errorContextById[$errorId]['errorCount'])) {
+                        ++$errorContextById[$errorId]['errorCount'];
+                    } else {
+                        $errorContextById[$errorId]['errorCount'] = 2;
+                    }
+
+                    if (!$silenced && isset($errorContextById[$errorId]['scream'])) {
+                        unset($errorContextById[$errorId]['scream']);
+                        $errorContextById[$errorId]['level'] = $context['level'];
+                    }
+
+                    continue;
+                }
+
+                $errorContextById[$errorId] = &$context;
+                if ($silenced) {
+                    $context['scream'] = true;
+                }
+
+                $log['context'] = &$context;
+                unset($context);
+            } else {
+                $log['context'] = $context;
             }
-            $logs[$i]['context'] = $context;
+
+            $sanitizedLogs[] = $log;
         }
 
-        return $logs;
+        return $sanitizedLogs;
     }
 
     private function sanitizeContext($context)

@@ -26,40 +26,53 @@ class ReflectionCasterTest extends VarDumperTestCase
             <<<'EOTXT'
 ReflectionClass {
   +name: "ReflectionClass"
-  implements: array:1 [
+%Aimplements: array:%d [
     0 => "Reflector"
-  ]
+%A]
   constants: array:3 [
     "IS_IMPLICIT_ABSTRACT" => 16
     "IS_EXPLICIT_ABSTRACT" => 32
-    "IS_FINAL" => 64
+    "IS_FINAL" => %d
   ]
-  properties: array:1 [
+  properties: array:%d [
     "name" => ReflectionProperty {
-      +name: "name"
+%A    +name: "name"
       +class: "ReflectionClass"
-      modifiers: "public"
-      extra: null
+%A    modifiers: "public"
     }
-  ]
+%A]
   methods: array:%d [
 %A
     "export" => ReflectionMethod {
       +name: "export"
       +class: "ReflectionClass"
-      parameters: array:2 [
-        "$argument" => ReflectionParameter {
-          +name: "argument"
-          position: 0
-        }
-        "$return" => ReflectionParameter {
-          +name: "return"
-          position: 1
-        }
-      ]
-      modifiers: "public static"
-    }
+      parameters: {
+        $%s: ReflectionParameter {
+%A         position: 0
 %A
+}
+EOTXT
+            , $var
+        );
+    }
+
+    public function testClosureCaster()
+    {
+        $a = $b = 123;
+        $var = function ($x) use ($a, &$b) {};
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure {
+%Aparameters: {
+    \$x: {}
+  }
+  use: {
+    \$a: 123
+    \$b: & 123
+  }
+  file: "%sReflectionCasterTest.php"
+  line: "62 to 62"
 }
 EOTXT
             , $var

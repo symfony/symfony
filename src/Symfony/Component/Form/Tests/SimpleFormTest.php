@@ -732,16 +732,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame($view, $form->createView($parentView));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetErrorsAsString()
-    {
-        $this->form->addError(new FormError('Error!'));
-
-        $this->assertEquals("ERROR: Error!\n", $this->form->getErrorsAsString());
-    }
-
     public function testFormCanHaveEmptyName()
     {
         $form = $this->getBuilder('')->getForm();

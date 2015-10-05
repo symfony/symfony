@@ -73,34 +73,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsAttribute($attribute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsClass($class)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Grants access if any voter returns an affirmative response.
      *
      * If all voters abstained from voting, the decision will be based on the
@@ -150,7 +122,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $grant = 0;
         $deny = 0;
-        $abstain = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
 
@@ -164,11 +135,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     ++$deny;
 
                     break;
-
-                default:
-                    ++$abstain;
-
-                    break;
             }
         }
 
@@ -180,7 +146,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             return false;
         }
 
-        if ($grant == $deny && $grant != 0) {
+        if ($grant > 0) {
             return $this->allowIfEqualGrantedDeniedDecisions;
         }
 

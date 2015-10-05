@@ -25,6 +25,7 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\VarDumper\Caster\CutStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
         'Symfony\Component\VarDumper\Caster\CutArrayStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castCutArray',
         'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
+        'Symfony\Component\VarDumper\Caster\EnumStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castEnum',
 
         'Closure' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClosure',
         'ReflectionClass' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClass',
@@ -68,6 +69,12 @@ abstract class AbstractCloner implements ClonerInterface
         'Error' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castError',
         'Symfony\Component\DependencyInjection\ContainerInterface' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
+        'Symfony\Component\VarDumper\Caster\TraceStub' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castTraceStub',
+        'Symfony\Component\VarDumper\Caster\FrameStub' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castFrameStub',
+
+        'PHPUnit_Framework_MockObject_MockObject' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
+        'Prophecy\Prophecy\ProphecySubjectInterface' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
+        'Mockery\MockInterface' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
 
         'PDO' => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdo',
         'PDOStatement' => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdoStatement',
@@ -86,6 +93,7 @@ abstract class AbstractCloner implements ClonerInterface
         'SplHeap' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
         'SplObjectStorage' => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',
         'SplPriorityQueue' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
+        'OuterIterator' => 'Symfony\Component\VarDumper\Caster\SplCaster::castOuterIterator',
 
         'MongoCursorInterface' => 'Symfony\Component\VarDumper\Caster\MongoCaster::castCursor',
 
@@ -94,6 +102,10 @@ abstract class AbstractCloner implements ClonerInterface
         ':dba persistent' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
         ':gd' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castGd',
         ':mysql link' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castMysqlLink',
+        ':pgsql large object' => 'Symfony\Component\VarDumper\Caster\PgSqlCaster::castLargeObject',
+        ':pgsql link' => 'Symfony\Component\VarDumper\Caster\PgSqlCaster::castLink',
+        ':pgsql link persistent' => 'Symfony\Component\VarDumper\Caster\PgSqlCaster::castLink',
+        ':pgsql result' => 'Symfony\Component\VarDumper\Caster\PgSqlCaster::castResult',
         ':process' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castProcess',
         ':stream' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStream',
         ':stream-context' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStreamContext',
@@ -170,7 +182,7 @@ abstract class AbstractCloner implements ClonerInterface
      */
     public function cloneVar($var, $filter = 0)
     {
-        $this->prevErrorHandler = set_error_handler(function($type, $msg, $file, $line, $context) {
+        $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) {
             if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
                 // Cloner never dies
                 throw new \ErrorException($msg, 0, $type, $file, $line);

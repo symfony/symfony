@@ -60,6 +60,12 @@ class CollatorTest extends AbstractCollatorTest
         $this->assertEquals('en', $collator->getLocale());
     }
 
+    public function testConstructWithoutLocale()
+    {
+        $collator = $this->getCollator(null);
+        $this->assertInstanceOf('\Symfony\Component\Intl\Collator\Collator', $collator);
+    }
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
      */

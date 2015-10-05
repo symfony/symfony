@@ -39,7 +39,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
-        $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.php';
+        $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.'.$this->getName().'.php';
         @unlink($this->testTmpFilepath);
     }
 

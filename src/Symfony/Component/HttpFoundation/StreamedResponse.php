@@ -23,8 +23,6 @@ namespace Symfony\Component\HttpFoundation;
  * @see flush()
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class StreamedResponse extends Response
 {
@@ -37,8 +35,6 @@ class StreamedResponse extends Response
      * @param callable|null $callback A valid PHP callback or null to set it later
      * @param int           $status   The response status code
      * @param array         $headers  An array of response headers
-     *
-     * @api
      */
     public function __construct($callback = null, $status = 200, $headers = array())
     {
@@ -51,7 +47,7 @@ class StreamedResponse extends Response
     }
 
     /**
-     * Factory method for chainability
+     * Factory method for chainability.
      *
      * @param callable|null $callback A valid PHP callback or null to set it later
      * @param int           $status   The response status code

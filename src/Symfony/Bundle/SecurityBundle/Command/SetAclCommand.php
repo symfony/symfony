@@ -24,7 +24,7 @@ use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
 
 /**
- * Sets ACL for objects
+ * Sets ACL for objects.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  */
@@ -162,7 +162,7 @@ EOF
     }
 
     /**
-     * Gets the mask builder
+     * Gets the mask builder.
      *
      * @return MaskBuilder
      */

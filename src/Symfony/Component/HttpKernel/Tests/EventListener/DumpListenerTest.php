@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
- * DumpListenerTest
+ * DumpListenerTest.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

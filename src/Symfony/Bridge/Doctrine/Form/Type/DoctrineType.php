@@ -87,19 +87,19 @@ abstract class DoctrineType extends AbstractType
      */
     public static function createChoiceName($choice, $key, $value)
     {
-        return (string) $value;
+        return str_replace('-', '_', (string) $value);
     }
 
     /**
      * Gets important parts from QueryBuilder that will allow to cache its results.
      * For instance in ORM two query builders with an equal SQL string and
      * equal parameters are considered to be equal.
-     * 
+     *
      * @param object $queryBuilder
-     * 
+     *
      * @return array|false Array with important QueryBuilder parts or false if
      *                     they can't be determined
-     * 
+     *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
@@ -129,7 +129,6 @@ abstract class DoctrineType extends AbstractType
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-
                 $hash = null;
                 $qbParts = null;
 
@@ -137,12 +136,10 @@ abstract class DoctrineType extends AbstractType
                 // also if concrete Type can return important QueryBuilder parts to generate
                 // hash key we go for it as well
                 if (!$options['query_builder'] || false !== ($qbParts = $this->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
-
                     $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
                         $options['class'],
                         $qbParts,
-                        $options['loader'],
                     ));
 
                     if (isset($this->choiceLoaders[$hash])) {
@@ -150,9 +147,7 @@ abstract class DoctrineType extends AbstractType
                     }
                 }
 
-                if ($options['loader']) {
-                    $entityLoader = $options['loader'];
-                } elseif (null !== $options['query_builder']) {
+                if (null !== $options['query_builder']) {
                     $entityLoader = $this->getLoader($options['em'], $options['query_builder'], $options['class']);
                 } else {
                     $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
@@ -173,16 +168,6 @@ abstract class DoctrineType extends AbstractType
 
                 return $doctrineChoiceLoader;
             }
-        };
-
-        $choiceLabel = function (Options $options) {
-            // BC with the "property" option
-            if ($options['property']) {
-                return $options['property'];
-            }
-
-            // BC: use __toString() by default
-            return array(__CLASS__, 'createChoiceLabel');
         };
 
         $choiceName = function (Options $options) {
@@ -238,15 +223,6 @@ abstract class DoctrineType extends AbstractType
             return $em;
         };
 
-        // deprecation note
-        $propertyNormalizer = function (Options $options, $propertyName) {
-            if ($propertyName) {
-                @trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
-            }
-
-            return $propertyName;
-        };
-
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
@@ -255,15 +231,6 @@ abstract class DoctrineType extends AbstractType
             }
 
             return $queryBuilder;
-        };
-
-        // deprecation note
-        $loaderNormalizer = function (Options $options, $loader) {
-            if ($loader) {
-                @trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
-            }
-
-            return $loader;
         };
 
         // Set the "id_reader" option via the normalizer. This option is not
@@ -290,13 +257,11 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setDefaults(array(
             'em' => null,
-            'property' => null, // deprecated, use "choice_label"
             'query_builder' => null,
-            'loader' => null, // deprecated, use "choice_loader"
             'choices' => null,
             'choices_as_values' => true,
             'choice_loader' => $choiceLoader,
-            'choice_label' => $choiceLabel,
+            'choice_label' => array(__CLASS__, 'createChoiceLabel'),
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
             'id_reader' => null, // internal
@@ -306,13 +271,10 @@ abstract class DoctrineType extends AbstractType
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('em', $emNormalizer);
-        $resolver->setNormalizer('property', $propertyNormalizer);
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setNormalizer('loader', $loaderNormalizer);
         $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
-        $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
     }
 
     /**
@@ -328,6 +290,6 @@ abstract class DoctrineType extends AbstractType
 
     public function getParent()
     {
-        return 'choice';
+        return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
 }

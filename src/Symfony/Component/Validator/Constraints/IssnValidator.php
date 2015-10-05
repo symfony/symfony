@@ -156,8 +156,9 @@ class IssnValidator extends ConstraintValidator
         }
 
         // Calculate a checksum. "X" equals 10.
-        $checkSum = 'X' === $canonical{7} || 'x' === $canonical{7}
-            ? 10
+        $checkSum = 'X' === $canonical{7}
+        || 'x' === $canonical{7}
+        ? 10
             : $canonical{7};
 
         for ($i = 0; $i < 7; ++$i) {

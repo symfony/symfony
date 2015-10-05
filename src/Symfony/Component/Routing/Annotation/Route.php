@@ -48,7 +48,7 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, get_class($this)));
             }
             $this->$method($value);
         }
@@ -86,22 +86,6 @@ class Route
 
     public function setRequirements($requirements)
     {
-        if (isset($requirements['_method'])) {
-            if (0 === count($this->methods)) {
-                $this->methods = explode('|', $requirements['_method']);
-            }
-
-            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', E_USER_DEPRECATED);
-        }
-
-        if (isset($requirements['_scheme'])) {
-            if (0 === count($this->schemes)) {
-                $this->schemes = explode('|', $requirements['_scheme']);
-            }
-
-            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', E_USER_DEPRECATED);
-        }
-
         $this->requirements = $requirements;
     }
 

@@ -84,7 +84,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function finalizeValue($value)
     {
-        if (!$this->allowEmptyValue && empty($value)) {
+        if (!$this->allowEmptyValue && $this->isValueEmpty($value)) {
             $ex = new InvalidConfigurationException(sprintf(
                 'The path "%s" cannot contain an empty value, but got %s.',
                 $this->getPath(),
@@ -115,5 +115,21 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     protected function mergeValues($leftSide, $rightSide)
     {
         return $rightSide;
+    }
+
+    /**
+     * Evaluates if the given value is to be treated as empty.
+     *
+     * By default, PHP's empty() function is used to test for emptiness. This
+     * method may be overridden by subtypes to better match their understanding
+     * of empty data.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    protected function isValueEmpty($value)
+    {
+        return empty($value);
     }
 }

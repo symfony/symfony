@@ -247,7 +247,7 @@ class CliDumper extends AbstractDumper
             $class = $this->utf8Encode($class);
         }
         if (Cursor::HASH_OBJECT === $type) {
-            $prefix = 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
+            $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
         } elseif (Cursor::HASH_RESOURCE === $type) {
             $prefix = $this->style('note', $class.' resource').($hasChild ? ' {' : ' ');
         } else {
@@ -448,7 +448,7 @@ class CliDumper extends AbstractDumper
         }
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            static::$defaultColors = @(false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI'));
+            static::$defaultColors = @(false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI') || 'xterm' === getenv('TERM'));
         } elseif (function_exists('posix_isatty')) {
             $h = stream_get_meta_data($this->outputStream) + array('wrapper_type' => null);
             $h = 'Output' === $h['stream_type'] && 'PHP' === $h['wrapper_type'] ? fopen('php://stdout', 'wb') : $this->outputStream;

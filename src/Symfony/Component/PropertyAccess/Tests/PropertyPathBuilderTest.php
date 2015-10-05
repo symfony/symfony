@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is new3 of the Symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *

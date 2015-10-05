@@ -32,7 +32,6 @@ class ProfilerListener implements EventSubscriberInterface
     protected $onlyException;
     protected $onlyMasterRequests;
     protected $exception;
-    protected $requests = array();
     protected $profiles;
     protected $requestStack;
     protected $parents;
@@ -41,12 +40,12 @@ class ProfilerListener implements EventSubscriberInterface
      * Constructor.
      *
      * @param Profiler                     $profiler           A Profiler instance
+     * @param RequestStack                 $requestStack       A RequestStack instance
      * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance
      * @param bool                         $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
      * @param bool                         $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
-     * @param RequestStack|null            $requestStack       A RequestStack instance
      */
-    public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false, RequestStack $requestStack = null)
+    public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {
         $this->profiler = $profiler;
         $this->matcher = $matcher;
@@ -101,14 +100,7 @@ class ProfilerListener implements EventSubscriberInterface
 
         $this->profiles[$request] = $profile;
 
-        if (null !== $this->requestStack) {
-            $this->parents[$request] = $this->requestStack->getParentRequest();
-        } elseif (!$master) {
-            // to be removed when requestStack is required
-            array_pop($this->requests);
-
-            $this->parents[$request] = end($this->requests);
-        }
+        $this->parents[$request] = $this->requestStack->getParentRequest();
     }
 
     public function onKernelTerminate(PostResponseEvent $event)
@@ -130,7 +122,6 @@ class ProfilerListener implements EventSubscriberInterface
 
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
-        $this->requests = array();
     }
 
     public static function getSubscribedEvents()

@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
-use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 
@@ -43,6 +43,16 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @var ExecutionContextInterface
      */
     private $context;
+
+    /**
+     * @var string
+     */
+    private $defaultPropertyPath;
+
+    /**
+     * @var array
+     */
+    private $defaultGroups;
 
     /**
      * @var MetadataFactoryInterface
@@ -157,7 +167,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $value,
                 $this->defaultPropertyPath,
                 $groups,
-                true,
                 $this->context
             );
 
@@ -368,7 +377,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $object,
                 $propertyPath,
                 $groups,
-                $traversalStrategy & TraversalStrategy::STOP_RECURSION,
                 $context
             );
         }
@@ -382,26 +390,16 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * objects are iterated as well. Nested arrays are always iterated,
      * regardless of the value of $recursive.
      *
-     * @param array|\Traversable        $collection    The collection
-     * @param string                    $propertyPath  The current property path
-     * @param string[]                  $groups        The validated groups
-     * @param bool                      $stopRecursion Whether to disable
-     *                                                 recursive iteration. For
-     *                                                 backwards compatibility
-     *                                                 with Symfony < 2.5.
-     * @param ExecutionContextInterface $context       The current execution context
+     * @param array|\Traversable        $collection   The collection
+     * @param string                    $propertyPath The current property path
+     * @param string[]                  $groups       The validated groups
+     * @param ExecutionContextInterface $context      The current execution context
      *
      * @see ClassNode
      * @see CollectionNode
      */
-    private function validateEachObjectIn($collection, $propertyPath, array $groups, $stopRecursion, ExecutionContextInterface $context)
+    private function validateEachObjectIn($collection, $propertyPath, array $groups, ExecutionContextInterface $context)
     {
-        if ($stopRecursion) {
-            $traversalStrategy = TraversalStrategy::NONE;
-        } else {
-            $traversalStrategy = TraversalStrategy::IMPLICIT;
-        }
-
         foreach ($collection as $key => $value) {
             if (is_array($value)) {
                 // Arrays are always cascaded, independent of the specified
@@ -411,7 +409,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $value,
                     $propertyPath.'['.$key.']',
                     $groups,
-                    $stopRecursion,
                     $context
                 );
 
@@ -425,7 +422,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $value,
                     $propertyPath.'['.$key.']',
                     $groups,
-                    $traversalStrategy,
+                    TraversalStrategy::IMPLICIT,
                     $context
                 );
             }
@@ -603,9 +600,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // If no specific traversal strategy was requested when this method
         // was called, use the traversal strategy of the class' metadata
         if ($traversalStrategy & TraversalStrategy::IMPLICIT) {
-            // Keep the STOP_RECURSION flag, if it was set
-            $traversalStrategy = $metadata->getTraversalStrategy()
-                | ($traversalStrategy & TraversalStrategy::STOP_RECURSION);
+            $traversalStrategy = $metadata->getTraversalStrategy();
         }
 
         // Traverse only if IMPLICIT or TRAVERSE
@@ -633,7 +628,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $object,
             $propertyPath,
             $groups,
-            $traversalStrategy & TraversalStrategy::STOP_RECURSION,
             $context
         );
     }
@@ -719,9 +713,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // If no specific traversal strategy was requested when this method
         // was called, use the traversal strategy of the node's metadata
         if ($traversalStrategy & TraversalStrategy::IMPLICIT) {
-            // Keep the STOP_RECURSION flag, if it was set
-            $traversalStrategy = $metadata->getTraversalStrategy()
-                | ($traversalStrategy & TraversalStrategy::STOP_RECURSION);
+            $traversalStrategy = $metadata->getTraversalStrategy();
         }
 
         // The $cascadedGroups property is set, if the "Default" group is
@@ -739,7 +731,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $value,
                 $propertyPath,
                 $cascadedGroups,
-                $traversalStrategy & TraversalStrategy::STOP_RECURSION,
                 $context
             );
 

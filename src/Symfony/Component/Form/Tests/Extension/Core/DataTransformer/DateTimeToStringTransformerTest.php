@@ -97,10 +97,6 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
     public function testTransformDateTimeImmutable()
     {
-        if (PHP_VERSION_ID < 50500) {
-            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
-        }
-
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
 
         $input = new \DateTimeImmutable('2010-02-03 12:05:06 America/New_York');

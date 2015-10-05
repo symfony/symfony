@@ -18,10 +18,14 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class IsFalse extends Constraint
 {
+    const NOT_FALSE_ERROR = 'd53a91b0-def3-426a-83d7-269da7ab4200';
+
+    protected static $errorNames = array(
+        self::NOT_FALSE_ERROR => 'NOT_FALSE_ERROR',
+    );
+
     public $message = 'This value should be false.';
 }

@@ -779,10 +779,13 @@ class OptionsResolver implements Options
             // dependency
             // BEGIN
             $this->calling[$option] = true;
-            foreach ($this->lazy[$option] as $closure) {
-                $value = $closure($this, $value);
+            try {
+                foreach ($this->lazy[$option] as $closure) {
+                    $value = $closure($this, $value);
+                }
+            } finally {
+                unset($this->calling[$option]);
             }
-            unset($this->calling[$option]);
             // END
         }
 
@@ -878,8 +881,11 @@ class OptionsResolver implements Options
             // dependency
             // BEGIN
             $this->calling[$option] = true;
-            $value = $normalizer($this, $value);
-            unset($this->calling[$option]);
+            try {
+                $value = $normalizer($this, $value);
+            } finally {
+                unset($this->calling[$option]);
+            }
             // END
         }
 

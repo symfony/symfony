@@ -34,6 +34,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $clonesIndex = 0;
     private $rootRefs;
     private $charset;
+    private $requestStack;
     private $dumper;
     private $dumperIsInjected;
 
@@ -93,9 +94,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                     } elseif (isset($trace[$i]['object']) && $trace[$i]['object'] instanceof \Twig_Template) {
                         $info = $trace[$i]['object'];
                         $name = $info->getTemplateName();
-                        $src = $info->getEnvironment()->getLoader()->getSource($name);
+                        $src = method_exists($info, 'getSource') ? $info->getSource() : $info->getEnvironment()->getLoader()->getSource($name);
                         $info = $info->getDebugInfo();
-                        if (isset($info[$trace[$i - 1]['line']])) {
+                        if (null !== $src && isset($info[$trace[$i - 1]['line']])) {
                             $file = false;
                             $line = $info[$trace[$i - 1]['line']];
                             $src = explode("\n", $src);
@@ -115,7 +116,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
 
         if (false === $name) {
-            $name = strtr($file, '\\', '/');
+            $name = str_replace('\\', '/', $file);
             $name = substr($name, strrpos($name, '/') + 1);
         }
 
@@ -247,7 +248,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     private function doDump($data, $name, $file, $line)
     {
-        if (PHP_VERSION_ID >= 50400 && $this->dumper instanceof CliDumper) {
+        if ($this->dumper instanceof CliDumper) {
             $contextDumper = function ($name, $file, $line, $fileLinkFormat) {
                 if ($this instanceof HtmlDumper) {
                     if ('' !== $file) {

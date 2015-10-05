@@ -138,7 +138,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerialCorrelation($secureRandom)
     {
-        $shift = rand(1, 5000);
+        $shift = mt_rand(1, 5000);
         $b = $this->getBitSequence($secureRandom, 20000);
 
         $Z = 0;

@@ -54,4 +54,14 @@ class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
     }
+
+    public function testSerialize()
+    {
+        $attributeMetadata = new AttributeMetadata('attribute');
+        $attributeMetadata->addGroup('a');
+        $attributeMetadata->addGroup('b');
+
+        $serialized = serialize($attributeMetadata);
+        $this->assertEquals($attributeMetadata, unserialize($serialized));
+    }
 }

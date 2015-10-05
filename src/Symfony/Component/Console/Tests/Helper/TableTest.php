@@ -427,7 +427,7 @@ TABLE
                 array('ISBN', 'Author'),
                 array(
                     array(
-                        new TableCell("9971-5-0210-0", array('rowspan' => 3, 'colspan' => 1)),
+                        new TableCell('9971-5-0210-0', array('rowspan' => 3, 'colspan' => 1)),
                         'Dante Alighieri',
                     ),
                     array(new TableSeparator()),
@@ -552,6 +552,33 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
 
         $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
+    }
+
+    public function testRenderMultiCalls()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table->setRows(array(
+            array(new TableCell('foo', array('colspan' => 2))),
+        ));
+        $table->render();
+        $table->render();
+        $table->render();
+
+        $expected =
+<<<TABLE
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
++---+--+
+| foo  |
++---+--+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
     protected function getOutputStream()

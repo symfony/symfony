@@ -20,11 +20,6 @@ use Symfony\Component\Validator\Validation;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new NotIdenticalToValidator();
@@ -33,6 +28,11 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     protected function createConstraint(array $options)
     {
         return new NotIdenticalTo($options);
+    }
+
+    protected function getErrorCode()
+    {
+        return NotIdenticalTo::IS_IDENTICAL_ERROR;
     }
 
     /**
@@ -81,9 +81,6 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array($date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array($object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'),
         );
-
-        $immutableDate = new \DateTimeImmutable('2000-01-01');
-        $comparisons[] = array($immutableDate, 'Jan 1, 2000, 12:00 AM', $immutableDate, 'Jan 1, 2000, 12:00 AM', 'DateTime');
 
         return $comparisons;
     }

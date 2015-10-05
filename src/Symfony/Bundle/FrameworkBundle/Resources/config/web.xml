@@ -28,9 +28,9 @@
 
         <service id="locale_listener" class="Symfony\Component\HttpKernel\EventListener\LocaleListener">
             <tag name="kernel.event_subscriber" />
+            <argument type="service" id="request_stack" />
             <argument>%kernel.default_locale%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
-            <argument type="service" id="request_stack" />
         </service>
 
         <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">

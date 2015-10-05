@@ -24,8 +24,6 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  * UrlMatcher matches URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 {
@@ -61,8 +59,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
-     *
-     * @api
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {

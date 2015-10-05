@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpFoundation;
  * Represents a cookie.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 class Cookie
 {
@@ -40,8 +38,6 @@ class Cookie
      * @param bool                 $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      *
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
@@ -116,8 +112,6 @@ class Cookie
      * Gets the name of the cookie.
      *
      * @return string
-     *
-     * @api
      */
     public function getName()
     {
@@ -128,8 +122,6 @@ class Cookie
      * Gets the value of the cookie.
      *
      * @return string
-     *
-     * @api
      */
     public function getValue()
     {
@@ -140,8 +132,6 @@ class Cookie
      * Gets the domain that the cookie is available to.
      *
      * @return string
-     *
-     * @api
      */
     public function getDomain()
     {
@@ -152,8 +142,6 @@ class Cookie
      * Gets the time the cookie expires.
      *
      * @return int
-     *
-     * @api
      */
     public function getExpiresTime()
     {
@@ -164,8 +152,6 @@ class Cookie
      * Gets the path on the server in which the cookie will be available on.
      *
      * @return string
-     *
-     * @api
      */
     public function getPath()
     {
@@ -176,8 +162,6 @@ class Cookie
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
      *
      * @return bool
-     *
-     * @api
      */
     public function isSecure()
     {
@@ -188,8 +172,6 @@ class Cookie
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
      *
      * @return bool
-     *
-     * @api
      */
     public function isHttpOnly()
     {
@@ -200,8 +182,6 @@ class Cookie
      * Whether this cookie is about to be cleared.
      *
      * @return bool
-     *
-     * @api
      */
     public function isCleared()
     {

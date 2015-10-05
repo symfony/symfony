@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -100,120 +99,117 @@ EOF
         $kernel = $this->getContainer()->get('kernel');
 
         // Define Root Path to App folder
-        $rootPaths = array($kernel->getRootDir());
+        $transPaths = array($kernel->getRootDir().'/Resources/');
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
             try {
-                $rootPaths = array($kernel->getBundle($input->getArgument('bundle'))->getPath());
+                $bundle = $kernel->getBundle($input->getArgument('bundle'));
+                $transPaths = array(
+                    $bundle->getPath().'/Resources/',
+                    sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName()),
+                );
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $rootPaths = array($input->getArgument('bundle'));
+                $transPaths = array($input->getArgument('bundle').'/Resources/');
 
-                if (!is_dir($rootPaths[0])) {
-                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.</error>', $rootPaths[0]));
+                if (!is_dir($transPaths[0])) {
+                    throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
                 }
             }
         } elseif ($input->getOption('all')) {
             foreach ($kernel->getBundles() as $bundle) {
-                $rootPaths[] = $bundle->getPath();
+                $transPaths[] = $bundle->getPath().'/Resources/';
+                $transPaths[] = sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName());
             }
         }
 
-        foreach ($rootPaths as $rootPath) {
-            // get bundle directory
-            $translationsPath = $rootPath.'/Resources/translations';
+        // Extract used messages
+        $extractedCatalogue = $this->extractMessages($locale, $transPaths);
 
-            $output->writeln(sprintf('Translations in <info>%s</info>', $translationsPath));
+        // Load defined messages
+        $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths, $loader);
 
-            // Extract used messages
-            $extractedCatalogue = $this->extractMessages($locale, $rootPath);
+        // Merge defined and extracted messages to get all message ids
+        $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
+        $allMessages = $mergeOperation->getResult()->all($domain);
+        if (null !== $domain) {
+            $allMessages = array($domain => $allMessages);
+        }
 
-            // Load defined messages
-            $currentCatalogue = $this->loadCurrentMessages($locale, $translationsPath, $loader);
+        // No defined or extracted messages
+        if (empty($allMessages) || null !== $domain && empty($allMessages[$domain])) {
+            $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
 
-            // Merge defined and extracted messages to get all message ids
-            $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
-            $allMessages    = $mergeOperation->getResult()->all($domain);
             if (null !== $domain) {
-                $allMessages = array($domain => $allMessages);
+                $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            // No defined or extracted messages
-            if (empty($allMessages) || null !== $domain && empty($allMessages[$domain])) {
-                $outputMessage = sprintf('<info>No defined or extracted messages for locale "%s"</info>', $locale);
+            $output->warning($outputMessage);
 
-                if (null !== $domain) {
-                    $outputMessage .= sprintf(' <info>and domain "%s"</info>', $domain);
-                }
-
-                $output->writeln($outputMessage);
-
-                continue;
-            }
-
-            // Load the fallback catalogues
-            $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $translationsPath, $loader);
-
-            // Display header line
-            $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
-            foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
-            }
-
-            // Iterate all message ids and determine their state
-            $rows = array();
-            foreach ($allMessages as $domain => $messages) {
-                foreach (array_keys($messages) as $messageId) {
-                    $value  = $currentCatalogue->get($messageId, $domain);
-                    $states = array();
-
-                    if ($extractedCatalogue->defines($messageId, $domain)) {
-                        if (!$currentCatalogue->defines($messageId, $domain)) {
-                            $states[] = self::MESSAGE_MISSING;
-                        }
-                    } elseif ($currentCatalogue->defines($messageId, $domain)) {
-                        $states[] = self::MESSAGE_UNUSED;
-                    }
-
-                    if (!in_array(self::MESSAGE_UNUSED, $states) && true === $input->getOption('only-unused')
-                        || !in_array(self::MESSAGE_MISSING, $states) && true === $input->getOption('only-missing')) {
-                        continue;
-                    }
-
-                    foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                        if ($fallbackCatalogue->defines($messageId, $domain) && $value === $fallbackCatalogue->get($messageId, $domain)) {
-                            $states[] = self::MESSAGE_EQUALS_FALLBACK;
-
-                            break;
-                        }
-                    }
-
-                    $row = array($this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value));
-                    foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                        $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
-                    }
-
-                    $rows[] = $row;
-                }
-            }
-
-            $output->table($headers, $rows);
+            return;
         }
+
+        // Load the fallback catalogues
+        $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths, $loader);
+
+        // Display header line
+        $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
+        foreach ($fallbackCatalogues as $fallbackCatalogue) {
+            $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
+        }
+        $rows = array();
+        // Iterate all message ids and determine their state
+        foreach ($allMessages as $domain => $messages) {
+            foreach (array_keys($messages) as $messageId) {
+                $value = $currentCatalogue->get($messageId, $domain);
+                $states = array();
+
+                if ($extractedCatalogue->defines($messageId, $domain)) {
+                    if (!$currentCatalogue->defines($messageId, $domain)) {
+                        $states[] = self::MESSAGE_MISSING;
+                    }
+                } elseif ($currentCatalogue->defines($messageId, $domain)) {
+                    $states[] = self::MESSAGE_UNUSED;
+                }
+
+                if (!in_array(self::MESSAGE_UNUSED, $states) && true === $input->getOption('only-unused')
+                    || !in_array(self::MESSAGE_MISSING, $states) && true === $input->getOption('only-missing')) {
+                    continue;
+                }
+
+                foreach ($fallbackCatalogues as $fallbackCatalogue) {
+                    if ($fallbackCatalogue->defines($messageId, $domain) && $value === $fallbackCatalogue->get($messageId, $domain)) {
+                        $states[] = self::MESSAGE_EQUALS_FALLBACK;
+
+                        break;
+                    }
+                }
+
+                $row = array($this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value));
+                foreach ($fallbackCatalogues as $fallbackCatalogue) {
+                    $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
+                }
+
+                $rows[] = $row;
+            }
+        }
+
+        $output->table($headers, $rows);
     }
 
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<error>missing</error>';
+            return '<error> missing </error>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<comment>unused</comment>';
+            return '<comment> unused </comment>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<info>fallback</info>';
+            return '<info> fallback </info>';
         }
 
         return $state;
@@ -231,7 +227,7 @@ EOF
 
     private function formatId($id)
     {
-        return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
+        return sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
     private function sanitizeString($string, $length = 40)
@@ -251,15 +247,18 @@ EOF
 
     /**
      * @param string $locale
-     * @param string $rootPath
+     * @param array  $transPaths
      *
      * @return MessageCatalogue
      */
-    private function extractMessages($locale, $rootPath)
+    private function extractMessages($locale, $transPaths)
     {
         $extractedCatalogue = new MessageCatalogue($locale);
-        if (is_dir($rootPath.'/Resources/views')) {
-            $this->getContainer()->get('translation.extractor')->extract($rootPath.'/Resources/views', $extractedCatalogue);
+        foreach ($transPaths as $path) {
+            $path = $path.'views';
+            if (is_dir($path)) {
+                $this->getContainer()->get('translation.extractor')->extract($path, $extractedCatalogue);
+            }
         }
 
         return $extractedCatalogue;
@@ -267,16 +266,19 @@ EOF
 
     /**
      * @param string            $locale
-     * @param string            $translationsPath
+     * @param array             $transPaths
      * @param TranslationLoader $loader
      *
      * @return MessageCatalogue
      */
-    private function loadCurrentMessages($locale, $translationsPath, TranslationLoader $loader)
+    private function loadCurrentMessages($locale, $transPaths, TranslationLoader $loader)
     {
         $currentCatalogue = new MessageCatalogue($locale);
-        if (is_dir($translationsPath)) {
-            $loader->loadMessages($translationsPath, $currentCatalogue);
+        foreach ($transPaths as $path) {
+            $path = $path.'translations';
+            if (is_dir($path)) {
+                $loader->loadMessages($path, $currentCatalogue);
+            }
         }
 
         return $currentCatalogue;
@@ -284,12 +286,12 @@ EOF
 
     /**
      * @param string            $locale
-     * @param string            $translationsPath
+     * @param array             $transPaths
      * @param TranslationLoader $loader
      *
      * @return MessageCatalogue[]
      */
-    private function loadFallbackCatalogues($locale, $translationsPath, TranslationLoader $loader)
+    private function loadFallbackCatalogues($locale, $transPaths, TranslationLoader $loader)
     {
         $fallbackCatalogues = array();
         $translator = $this->getContainer()->get('translator');
@@ -300,7 +302,12 @@ EOF
                 }
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-                $loader->loadMessages($translationsPath, $fallbackCatalogue);
+                foreach ($transPaths as $path) {
+                    $path = $path.'translations';
+                    if (is_dir($path)) {
+                        $loader->loadMessages($path, $fallbackCatalogue);
+                    }
+                }
                 $fallbackCatalogues[] = $fallbackCatalogue;
             }
         }

@@ -19,14 +19,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class EmailValidator extends ConstraintValidator
 {
     /**
-     * isStrict
-     *
      * @var bool
      */
     private $isStrict;
@@ -81,7 +77,7 @@ class EmailValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!preg_match('/.+\@.+\..+/', $value)) {
+        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))

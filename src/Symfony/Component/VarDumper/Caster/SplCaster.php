@@ -193,4 +193,11 @@ class SplCaster
 
         return $a;
     }
+
+    public static function castOuterIterator(\OuterIterator $c, array $a, Stub $stub, $isNested)
+    {
+        $a[Caster::PREFIX_VIRTUAL.'innerIterator'] = $c->getInnerIterator();
+
+        return $a;
+    }
 }

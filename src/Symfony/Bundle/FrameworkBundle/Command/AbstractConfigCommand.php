@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -26,7 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
-    protected function listBundles(OutputInterface $output)
+    protected function listBundles($output)
     {
         $headers = array('Bundle name', 'Extension alias');
         $rows = array();
@@ -35,12 +34,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
             $rows[] = array($bundle->getName(), $extension ? $extension->getAlias() : '');
         }
 
-        $message = 'Available registered bundles with their extension alias if available:';
         if ($output instanceof StyleInterface) {
-            $output->writeln(' '.$message);
             $output->table($headers, $rows);
         } else {
-            $output->writeln($message);
+            $output->writeln('Available registered bundles with their extension alias if available:');
             $table = new Table($output);
             $table->setHeaders($headers)->setRows($rows)->render($output);
         }

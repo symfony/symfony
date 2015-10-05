@@ -22,11 +22,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Initializes the locale based on the current request.
  *
- * This listener works in 2 modes:
- *
- *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
- *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LocaleListener implements EventSubscriberInterface
@@ -36,9 +31,13 @@ class LocaleListener implements EventSubscriberInterface
     private $requestStack;
 
     /**
-     * RequestStack will become required in 3.0.
+     * Constructor.
+     *
+     * @param RequestStack                      $requestStack  A RequestStack instance
+     * @param string                            $defaultLocale The default locale
+     * @param RequestContextAwareInterface|null $router        The router
      */
-    public function __construct($defaultLocale = 'en', RequestContextAwareInterface $router = null, RequestStack $requestStack = null)
+    public function __construct(RequestStack $requestStack, $defaultLocale = 'en', RequestContextAwareInterface $router = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->requestStack = $requestStack;
@@ -56,10 +55,6 @@ class LocaleListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if (null === $this->requestStack) {
-            return; // removed when requestStack is required
-        }
-
         if (null !== $parentRequest = $this->requestStack->getParentRequest()) {
             $this->setRouterContext($parentRequest);
         }

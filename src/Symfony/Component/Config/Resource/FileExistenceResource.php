@@ -19,7 +19,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Charles-Henri Bruyand <charleshenri.bruyand@gmail.com>
  */
-class FileExistenceResource implements ResourceInterface, \Serializable
+class FileExistenceResource implements SelfCheckingResourceInterface, \Serializable
 {
     private $resource;
 
@@ -45,7 +45,7 @@ class FileExistenceResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @return string The file path to the resource
      */
     public function getResource()
     {

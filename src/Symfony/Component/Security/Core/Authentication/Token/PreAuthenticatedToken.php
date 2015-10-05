@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\Role\RoleInterface;
+
 /**
  * PreAuthenticatedToken implements a pre-authenticated token.
  *
@@ -23,6 +25,11 @@ class PreAuthenticatedToken extends AbstractToken
 
     /**
      * Constructor.
+     *
+     * @param string|object            $user        The user
+     * @param mixed                    $credentials The user credentials
+     * @param string                   $providerKey The provider key
+     * @param RoleInterface[]|string[] $roles       An array of roles
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())
     {

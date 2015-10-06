@@ -32,10 +32,11 @@ use Psr\Log\LoggerInterface;
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     private $tokenProvider;
-    private $secureRandom;
 
     /**
      * Constructor.
+     *
+     * Note: The $secureRandom parameter is deprecated since version 2.8 and will be removed in 3.0.
      *
      * @param array                 $userProviders
      * @param string                $secret
@@ -44,11 +45,13 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param LoggerInterface       $logger
      * @param SecureRandomInterface $secureRandom
      */
-    public function __construct(array $userProviders, $secret, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
+    public function __construct(array $userProviders, $secret, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom = null)
     {
-        parent::__construct($userProviders, $secret, $providerKey, $options, $logger);
+        if (null !== $secureRandom) {
+            @trigger_error('The $secureRandom parameter in '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
 
-        $this->secureRandom = $secureRandom;
+        parent::__construct($userProviders, $secret, $providerKey, $options, $logger);
     }
 
     /**
@@ -98,7 +101,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
+        $tokenValue = base64_encode(random_bytes(64));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,
             new Cookie(
@@ -120,8 +123,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        $series = base64_encode($this->secureRandom->nextBytes(64));
-        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
+        $series = base64_encode(random_bytes(64));
+        $tokenValue = base64_encode(random_bytes(64));
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(

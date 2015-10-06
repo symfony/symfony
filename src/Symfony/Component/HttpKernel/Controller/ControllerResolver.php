@@ -145,7 +145,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @param string $controller A Controller string
      *
-     * @return mixed A PHP callable
+     * @return callable A PHP callable
      *
      * @throws \InvalidArgumentException
      */

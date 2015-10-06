@@ -354,8 +354,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Adds an escaper for the given context.
      *
-     * @param string $context The escaper context (html, js, ...)
-     * @param mixed  $escaper A PHP callable
+     * @param string   $context The escaper context (html, js, ...)
+     * @param callable $escaper A PHP callable
      */
     public function setEscaper($context, $escaper)
     {
@@ -368,7 +368,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $context The context name
      *
-     * @return mixed $escaper A PHP callable
+     * @return callable $escaper A PHP callable
      *
      * @throws \InvalidArgumentException
      */

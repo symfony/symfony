@@ -196,8 +196,12 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
+        $ref = dirname($ref->getFileName());
+        if (!file_exists($ref.'/composer.json')) {
+            $ref = dirname($ref);
+        }
         $this->assertContains(
-            strtr(dirname(dirname($ref->getFileName())).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr($ref.'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );

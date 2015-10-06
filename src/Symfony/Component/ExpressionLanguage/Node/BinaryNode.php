@@ -40,6 +40,18 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
 
+        if ('contains' == $operator) {
+            $compiler
+                ->raw('false !== strpos(')
+                ->compile($this->nodes['left'])
+                ->raw(', ')
+                ->compile($this->nodes['right'])
+                ->raw(')')
+            ;
+
+            return;
+        }
+        
         if ('matches' == $operator) {
             $compiler
                 ->raw('preg_match(')
@@ -147,6 +159,8 @@ class BinaryNode extends Node
                 return $left % $right;
             case 'matches':
                 return preg_match($right, $left);
+            case 'contains':
+                return false !== strpos($left, $right);
         }
     }
 }

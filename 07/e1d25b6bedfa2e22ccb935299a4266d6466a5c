@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-06-27T07:16:25Z
+
+Shouldn't this be applied on 2.3?
+
+---------------------------------------------------------------------------
+
+by danepowell at 2015-06-27T16:39:50Z
+
+This issue first appears in 2.5, but since 2.5 is EOL I think this should be fixed in 2.6.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T08:47:37Z
+
+wouldn't this cause issues if the mirrored files is a relative symlink to a file which is *not* mirrored to have an equivalent in the new location ?
+
+---------------------------------------------------------------------------
+
+by danepowell at 2015-07-01T13:30:43Z
+
+Sure, in that case the symlink would break, but I'd argue that you're also using it wrong :) If the symlink needs to be to an absolute location (i.e. one that will not be mirrored), it should be absolute in the first place. What doesn't make sense (at least to me) is for symfony to make that decision for you and convert a relative symlink into an absolute one with no choice or warning.

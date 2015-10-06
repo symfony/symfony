@@ -553,16 +553,16 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $legacyTranslationsDir = dirname($r->getFilename()).'/../../Resources/translations';
+            // with Symfony 2.4, the Security component was split into several subpackages
+            // and the translations have been moved to the symfony/security-core package
+            $translationsDir = dirname($r->getFilename()).'/../Resources/translations';
 
-            if (file_exists($legacyTranslationsDir)) {
+            if (!file_exists($translationsDir) && file_exists($dir = dirname($r->getFilename()).'/../../Resources/translations')) {
                 // in Symfony 2.3, translations are located in the symfony/security package
-                $dirs[] = $legacyTranslationsDir;
-            } else {
-                // with Symfony 2.4, the Security component was split into several subpackages
-                // and the translations have been moved to the symfony/security-core package
-                $dirs[] = dirname($r->getFilename()).'/../Resources/translations';
+                $translationsDir = $dir;
             }
+
+            $dirs[] = $translationsDir;
         }
         $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {

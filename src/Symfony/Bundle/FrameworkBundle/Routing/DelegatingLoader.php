@@ -47,7 +47,7 @@ class DelegatingLoader extends BaseDelegatingLoader
             $this->logger = $resolver;
             $resolver = $r;
 
-            @trigger_error('Passing a LoggerInterface instance a second argument of the '.__METHOD__.' method is deprecated since version 2.8 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('Passing a LoggerInterface instance as the second argument of the '.__METHOD__.' method is deprecated since version 2.8 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         }
 
         parent::__construct($resolver);

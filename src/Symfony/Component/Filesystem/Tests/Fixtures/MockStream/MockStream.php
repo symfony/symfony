@@ -1,29 +1,23 @@
 <?php
 
-/**
+/*
  * This file is part of the Symfony package.
- * (c) Fabien Potencier <fabien@symfony.com>.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * This class is based on VariableStream from the PHP Manual, which is licenced
- * under Creative Commons Attribution 3.0 Licence copyright (c) the PHP
- * Documentation Group
- *
- * @url http://php.net/manual/en/stream.streamwrapper.example-1.php
- * @url http://php.net/license/
- * @url http://creativecommons.org/licenses/by/3.0/legalcode
  */
+
 namespace MockStream;
 
 /**
  * Mock stream class to be used with stream_wrapper_register.
- *
- * stream_wrapper_register('mock', 'MockStream\MockStream')
+ * stream_wrapper_register('mock', 'MockStream\MockStream').
  */
-class MockStream {
-    private $str_overloaded;
+class MockStream
+{
+    private $strOverloaded;
     private $content;
     private $position;
     private $atime;
@@ -37,13 +31,16 @@ class MockStream {
      * @param string $path        Specifies the URL that was passed to the original function
      * @param string $mode        The mode used to open the file, as detailed for fopen()
      * @param int    $options     Holds additional flags set by the streams API
-     * @param string $opened_path If the path is opened successfully, and STREAM_USE_PATH is set in options, opened_path should be set to the full path of the file/resource that was actually opened
+     * @param string $opened_path If the path is opened successfully, and STREAM_USE_PATH is set in options,
+     *                            opened_path should be set to the full path of the file/resource that was actually
+     *                            opened
      *
      * @return bool
      */
-    public function stream_open($path, $mode, $options, &$opened_path) {
+    public function stream_open($path, $mode, $options, &$opened_path)
+    {
         // Is mbstring.func_overload applied to string functions (bit 2 set)
-        $this->str_overloaded = (bool) (ini_get('mbstring.func_overload') & (1 << 2));
+        $this->strOverloaded = (bool) (ini_get('mbstring.func_overload') & (1 << 2));
         $this->path = $path;
         $this->content = '';
         $this->position = 0;
@@ -60,8 +57,9 @@ class MockStream {
      *
      * @return string The data
      */
-    public function stream_read($count) {
-        $ret = $this->substr($this->varname, $this->position, $count);
+    public function stream_read($count)
+    {
+        $ret = $this->substr($this->content, $this->position, $count);
         $this->position += $this->strlen($ret);
         $this->atime = time();
 
@@ -75,7 +73,8 @@ class MockStream {
      *
      * @return int Number of bytes that were successfully stored, or 0 if none could be stored
      */
-    public function stream_write($data) {
+    public function stream_write($data)
+    {
         $left = $this->substr($this->content, 0, $this->position);
         $right = $this->substr($this->content, $this->position + $this->strlen($data));
         $this->content = $left.$data.$right;
@@ -91,50 +90,54 @@ class MockStream {
      *
      * @return int The current position of the stream
      */
-    public function stream_tell() {
+    public function stream_tell()
+    {
         return $this->position;
     }
 
     /**
      * Tests for end-of-file on a file pointer.
      *
-     * @return bool Return true if the read/write position is at the end of the stream and if no more data is available to be read, or false otherwise
+     * @return bool Return true if the read/write position is at the end of the stream and if no more data is available
+     *              to be read, or false otherwise
      */
-    public function stream_eof() {
+    public function stream_eof()
+    {
         return $this->position >= $this->strlen($this->content);
     }
 
     /**
      * Seeks to specific location in a stream.
      *
-     * @param string $offset The stream offset to seek to
-     * @param int    $whence Set position based on value
+     * @param int $offset The stream offset to seek to
+     * @param int $whence Set position based on value
      *
      * @return bool Return true if the position was updated, false otherwise
      */
-    public function stream_seek($offset, $whence) {
+    public function stream_seek($offset, $whence)
+    {
         switch ($whence) {
             case SEEK_SET:
                 if ($offset < $this->strlen($this->content) && 0 <= $offset) {
-                     $this->position = $offset;
+                    $this->position = $offset;
 
-                     return true;
+                    return true;
                 }
                 break;
 
             case SEEK_CUR:
                 if (0 <= $offset) {
-                     $this->position += $offset;
+                    $this->position += $offset;
 
-                     return true;
+                    return true;
                 }
                 break;
 
             case SEEK_END:
                 if (0 <= $this->strlen($this->content) + $offset) {
-                     $this->position = $this->strlen($this->content) + $offset;
+                    $this->position = $this->strlen($this->content) + $offset;
 
-                     return true;
+                    return true;
                 }
                 break;
         }
@@ -151,7 +154,8 @@ class MockStream {
      *
      * @return bool Return true on success or fale on failure or if option is not implemented
      */
-    public function stream_metadata($path, $option, $value) {
+    public function stream_metadata($path, $option, $value)
+    {
         if (STREAM_META_TOUCH === $option) {
             $now = array_key_exists(0, $value) ? $value[0] : time();
             $this->atime = array_key_exists(1, $value) ? $value[1] : $now;
@@ -169,7 +173,8 @@ class MockStream {
      *
      * @return array Stream stats
      */
-    public function stream_stat() {
+    public function stream_stat()
+    {
         return array(
             'dev' => 0,
             'ino' => 0,
@@ -195,7 +200,8 @@ class MockStream {
      *
      * @return array File stats
      */
-    public function url_stat($path, $flags) {
+    public function url_stat($path, $flags)
+    {
         return $this->stream_stat();
     }
 
@@ -206,21 +212,22 @@ class MockStream {
      *
      * @return int The number of bytes in the string on success, and 0 if the string is empty
      */
-    protected function strlen($string) {
-        return function_exists('mb_strlen') && $this->str_overloaded ? mb_strlen($string, '8bit') : strlen($string);
+    protected function strlen($string)
+    {
+        return function_exists('mb_strlen') && $this->strOverloaded ? mb_strlen($string, '8bit') : strlen($string);
     }
 
     /**
      * Returns the portion of string specified by the start and length parameters even when substr is overloaded to mb_substr.
      *
      * @param string $string The input string which must be one character or longer
-     * @param start  $int    Starting position in bytes
-     * @param length $int    Length in bytes which if omitted or NULL is passed, extracts all bytes to the end of the string
+     * @param int    $start  Starting position in bytes
+     * @param int    $length Length in bytes which if omitted or NULL is passed, extracts all bytes to the end of the string
      *
      * @return string
      */
-    protected function substr($string, $start, $length = null) {
-        return function_exists('mb_substr') && $this->str_overloaded ? mb_substr($string, $start, $length, '8bit') : substr($string, $start, $length);
+    protected function substr($string, $start, $length = null)
+    {
+        return function_exists('mb_substr') && $this->strOverloaded ? mb_substr($string, $start, $length, '8bit') : substr($string, $start, $length);
     }
-
 }

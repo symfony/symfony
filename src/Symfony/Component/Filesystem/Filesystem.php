@@ -468,14 +468,24 @@ class Filesystem
 
         // If no scheme or scheme is "file" create temp file in local filesystem
         if (null === $scheme || 'file' === $scheme) {
+
             $tmpFile = tempnam($hierarchy, $prefix);
 
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
-            return false === $tmpFile || null === $scheme ? $tmpFile : $scheme.'://'.$tmpFile;
+
+            if (null !== $scheme) {
+                return $scheme.'://'.$tmpFile;
+            }
+
+            if (false !== $tmpFile) {
+                return $tmpFile;
+            }
+
+            throw new IOException('A temporary file could not be created');
         }
 
         // Loop until we create a valid temp file or have reached $limit attempts
-        for ($i = 0; $i < $limit; $i++) {
+        for ($i = 0; $i < $limit; ++$i) {
 
             // Create a unique filename
             $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
@@ -560,7 +570,7 @@ class Filesystem
     {
         $components = explode('://', $filename, 2);
 
-        return count($components) >= 2 ? array($components[0], $components[1]) : array(null, $components[0]);
+        return count($components) === 2 ? array($components[0], $components[1]) : array(null, $components[0]);
     }
 
 }

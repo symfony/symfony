@@ -89,4 +89,9 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
         $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertSame($token, $context->getToken());
     }
+
+    public function testTranslationsAreNotInCore()
+    {
+        $this->assertFalse(file_exists(__DIR__.'/../../Core/Resources/translations/'));
+    }
 }

@@ -543,29 +543,29 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Validator\Validator')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+            $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            if (file_exists(dirname($r->getFilename()).'/../composer.json')) {
+            if (file_exists(dirname($r->getFileName()).'/../composer.json')) {
                 // with Symfony 2.4, the Security component was split into several subpackages
                 // and the translations have been moved to the symfony/security-core package
-                $dirs[] = dirname($r->getFilename()).'/../Resources/translations';
+                $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
             } else {
                 // in Symfony 2.3, translations are located in the symfony/security package
-                $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+                $dirs[] = dirname($r->getFileName()).'/../../Resources/translations';
             }
         }
         $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
                 $dirs[] = $dir;
             }
             if (is_dir($dir = sprintf($overridePath, $bundle))) {
@@ -645,7 +645,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+            if (is_file($file = dirname($reflection->getFileName()).'/Resources/config/validation.xml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
@@ -660,7 +660,7 @@ class FrameworkExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+            if (is_file($file = dirname($reflection->getFileName()).'/Resources/config/validation.yml')) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

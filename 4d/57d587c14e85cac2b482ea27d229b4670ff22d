@@ -1,0 +1,192 @@
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-04-28T07:41:57Z
+
+Apparently this build fails on Jenkins, but it appears to be on some unrelated tests.
+All tests did succeed locally.
+
+Any ideas how to proceed here?
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-22T13:42:44Z
+
+So all checks passed this time, not sure what the next steps are.
+cc @fabpot
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-22T17:55:43Z
+
+Can you add some tests to prevent future breakage?
+See #14843 for an example.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-22T17:59:30Z
+
+@sstok I'll look in to it.
+When I did this, should I remove the needs work label myself, so somebody takes another look at it?
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-23T14:03:02Z
+
+@sstok test has been added.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-24T09:23:42Z
+
+Apply the Fabbot  patch and this should be good http://fabbot.io/report/symfony/symfony/14491/78eb0fd7b5cd9554943c610e315441715c3b629f#patchcs
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-24T09:27:25Z
+
+@sstok yeah sorry about the standards, it's applied, redoing tests.
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-24T09:29:29Z
+
+What will be the necessary steps to get this on the newer versions of Symfony? (2.7, 2.8)
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-24T10:43:13Z
+
+Any idea why this happened? https://ci.appveyor.com/project/fabpot/symfony/build/1.0.1172/job/itg8ut8oqr82912s
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-09-24T10:45:28Z
+
+The 2.3 branch is merged into the 2.7 and eventually 2.8 and master on a weekly basis.
+Appveyor failure is unrelated.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-09-30T07:00:19Z
+
+@sstok can you fill me in on what the next steps are? Do I just wait until it gets merged in, or do I have to do something else myself?
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T06:58:07Z
+
+So apparently this one got merged instead: https://github.com/symfony/symfony/pull/14842
+
+Kind of weird my solution was overlooked @sstok @fabpot .
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T07:57:48Z
+
+@klaascuvelier I am sorry that your pull request has been overlooked. However, your solution has the advantage that it does not fail when one of the new options is omitted. Would you mind rebasing your PR on the latest `2.3` branch to modify the existing behaviour such that these options will be ignored when not passed?
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T10:03:03Z
+
+@xabbuh it appears my tests are failing due to the merge of #16139
+I see in that ticket a remark like "oops I merged this too soon". How is this possible?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T12:50:54Z
+
+@klaascuvelier Imho you ignore those failures for the moment and just rebase your changes on the latest commit of the `2.3` branch.
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T12:53:41Z
+
+@xabbuh, I actually did that, if I do `git fetch upstream && git merge upstream/2.3` again it tells me `Already up-to-date.` so doing another rebase seems pointless to me, no?
+
+I might wait for this one to get merged and do another rebase? https://github.com/symfony/symfony/pull/16141
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T12:59:26Z
+
+#16141 has been merged now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T13:02:24Z
+
+@klaascuvelier Well, it looks a bit strange that your PR contains the commit made by @nicolas-grekas. However, the diff looks right. Could you please also revert the changes to the test classes made in #14842 where the default values are set for the options?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T13:03:24Z
+
+That's because you did a merge, not a rebase. We need a rebase to keep the history clean.
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T13:04:30Z
+
+I did a rebase from 2.3, like described here: http://symfony.com/doc/current/contributing/code/patches.html#step-3-submit-your-patch
+but with `2.3` instead of `master`
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T13:06:37Z
+
+Can you tell me what exactly you want me to do, to fix this mess-up?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T13:07:12Z
+
+This should work:
+
+```
+git fetch upstream
+git rebase upstream/2.3
+```
+
+From your branch.
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T13:23:58Z
+
+Okay, I did a new rebase, PR looks better now.
+The reason the other commit came in was probably because I did a `git push origin SECURE_COOKIE`, with `--force`, it failed, I git pulled and repushed. I noticed now the info on the contributing page explicitly states to use `--force`, which I did now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T13:24:17Z
+
+This looks better. Could you also modify the test classes as described in https://github.com/symfony/symfony/pull/14491#issuecomment-145849933?
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T13:28:59Z
+
+Alright, fixed both of your remarks as well.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T13:39:22Z
+
+They should be revert in `PersistentTokenBasedRememberMeServicesTest` and `TokenBasedRememberMeServicesTest` too.
+
+---------------------------------------------------------------------------
+
+by klaascuvelier at 2015-10-06T14:24:14Z
+
+Anything I can do about the failing tests?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T14:27:52Z
+
+Nope, they're going to be fixed by other PRs.

@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-06T10:15:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-10-06T10:18:27Z
+
+Another solution is to load `Security/Core/Resources/translations` only if the `Security/Core/composer.json` file exists (since 2.4).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-06T12:12:25Z
+
+You should not load both folders in the translator IMO. this would create more work for the loader by loading security translations twice, while the second one will be overwritten.
+
+What we should have to avoid missing translations in the new location is a unit test checking that both files are in sync in 2.4+ (actually 2.7+ because of maintained branches)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-10-06T12:31:12Z
+
+Ok. I've just updated the PR. If the `Security/Core/composer.json` file exists, that means the installed version of the `symfony/security-core` is 2.4 since it only exists as a subpackage since 2.4.
+Then, we'll only load `Security/Core/Resources/translations`.
+
+Otherwise, use `Security/Resources/translations`.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-06T12:45:24Z
+
+:+1: for this.
+
+@nicolas-grekas be careful when merging. the removal of the 2 translation files should be reverted when propagating the merge to newer branches
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T12:46:11Z
+
+:+1:
+
+Status: Reviewed

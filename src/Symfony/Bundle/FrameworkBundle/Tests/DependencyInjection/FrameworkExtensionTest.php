@@ -320,8 +320,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
-        $this->assertInstanceOf('Doctrine\Common\Annotations\FileCacheReader', $container->get('annotation_reader'));
+        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.php_file_cache')->getArgument(0));
+        $this->assertSame('annotations.cached_reader', (string) $container->getAlias('annotation_reader'));
+        $this->assertSame('annotations.php_file_cache', (string) $container->getDefinition('annotations.cached_reader')->getArgument(1));
     }
 
     public function testFileLinkFormat()

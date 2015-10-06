@@ -53,8 +53,8 @@
                             </li>
                         </ul>
                     {% endif %}
-                    {{ render(path('_profiler_search_bar')) }}
-                    {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': token } only %}
+                    {{ render(path('_profiler_search_bar', request.query.all)) }}
+                    {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': token} only %}
                 </div>
             </div>
         </div>

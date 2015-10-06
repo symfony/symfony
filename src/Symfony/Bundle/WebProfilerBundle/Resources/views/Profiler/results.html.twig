@@ -4,7 +4,7 @@
     <h2>Search Results</h2>
 
     {% if tokens %}
-        <table>
+        <table id="sf-search-results">
             <thead>
                 <tr>
                     <th scope="col">Token</th>
@@ -19,9 +19,30 @@
                 {% for elements in tokens %}
                     <tr>
                         <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
-                        <td>{{ elements.ip }}</td>
-                        <td>{{ elements.method }}</td>
-                        <td>{{ elements.url }}</td>
+                        <td>
+                            {{ elements.ip }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'ip': elements.ip, 'token': elements.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ elements.method }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'method': elements.method, 'token': elements.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ elements.url }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'url': elements.url, 'token': elements.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
                         <td>{{ elements.time|date('r') }}</td>
                         <td>
                         {% if elements.status_code is defined and elements.status_code %}

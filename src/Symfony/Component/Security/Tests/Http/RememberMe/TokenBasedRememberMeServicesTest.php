@@ -266,13 +266,6 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             $userProvider = $this->getProvider();
         }
 
-        if (!isset($options['secure'])) {
-            $options['secure'] = false;
-        }
-        if (!isset($options['httponly'])) {
-            $options['httponly'] = true;
-        }
-
         $service = new TokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger);
 
         return $service;

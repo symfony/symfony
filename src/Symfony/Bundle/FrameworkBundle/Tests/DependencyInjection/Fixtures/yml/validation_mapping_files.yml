@@ -1,0 +1,5 @@
+framework:
+  validation:
+    mapping:
+      files:
+        - "%kernel.root_dir%/Fixtures/TestBundle/Resources/config/validation.yml"

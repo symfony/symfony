@@ -383,6 +383,29 @@ abstract class FrameworkExtensionTest extends TestCase
         // no cache, no annotations, no static methods
     }
 
+    public function testValidationMappingFiles()
+    {
+        $container = $this->createContainerFromFile('validation_mapping_files');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertSame('addYamlMappings', $calls[4][0]);
+        $this->assertCount(1, $calls[4][1][0]);
+    }
+
+    public function testValidationMappingDirs()
+    {
+        $container = $this->createContainerFromFile('validation_mapping_dirs');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertCount(2, $calls[3][1][0]);
+
+        $this->assertSame('addYamlMappings', $calls[4][0]);
+        $this->assertCount(1, $calls[4][1][0]);
+    }
+
     public function testFormsCanBeEnabledWithoutCsrfProtection()
     {
         $container = $this->createContainerFromFile('form_no_csrf');

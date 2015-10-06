@@ -91,11 +91,8 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $response = new Response();
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
         $service->logout($request, $response, $token);
-
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
-
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie);
         $this->assertTrue($cookie->isCleared());
         $this->assertSame($options['name'], $cookie->getName());
@@ -284,13 +281,6 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         if (null === $userProvider) {
             $userProvider = $this->getProvider();
-        }
-
-        if (!isset($options['secure'])) {
-            $options['secure'] = false;
-        }
-        if (!isset($options['httponly'])) {
-            $options['httponly'] = true;
         }
 
         return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(

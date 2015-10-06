@@ -29,7 +29,7 @@ abstract class VarDumperTestCase extends \PHPUnit_Framework_TestCase
         $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data), $message);
     }
 
-    private function getDump($data)
+    protected function getDump($data)
     {
         $h = fopen('php://memory', 'r+b');
         $cloner = new VarCloner();

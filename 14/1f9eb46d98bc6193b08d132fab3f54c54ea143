@@ -1,0 +1,190 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-24T08:07:59Z
+
+This implementation is broken: the Symfony codebase still use the deprecated function, meaning it triggers deprecation warnings for everyone (and this is why the testsuite is failing)
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-24T08:18:25Z
+
+@stof What would be the best way to deprecate this class then? Should the dependency on `paragonie/random_compat` be added here already, with all the instances that use the `SecureRandom` class be updated to use the function instead? That way the class and interface can be deprecated with all the internal code using the new function. Or is there a better way to do the deprecation?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-24T08:27:20Z
+
+@pierredup yes, this is the way it should be done. A deprecated API should not be used anymore. If you cannot avoid using it, it cannot be a deprecated API.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-09-24T13:03:30Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-25T09:29:30Z
+
+I think this PR is ready /cc @stof @fabpot
+
+The travis failures seems unrelated
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-25T10:18:54Z
+
+I would like to see our testsuite being fixed and then rerunning the builds for this PR, to ensure things work properly though.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-09-29T10:55:37Z
+
+Can the build for this be re-run? Or should I do a push to trigger new builds?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-29T12:23:43Z
+
+@pierredup there are conflicts preventing the merge, so this needs a rebase anyway. After pushing the rebased version, a new build with run.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T21:12:00Z
+
+@pierredup Can you finish this PR in the next few days?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-02T21:44:13Z
+
+@fabpot done
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-02T21:45:02Z
+
+The tests are a bit weird, it seems it didn't run the tests at all for PHP 5.4 and 5.5. Not sure if you want to re-run the tests?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-10-02T22:50:39Z
+
+`paragonie/random_compat` is now a dependency, ensuring that the `random_bytes()` function always exists. In this case, the old `SecureRandom` class contains a lot of dead code:
+
+```php
+public function nextBytes($nbBytes)
+{
+    if (function_exists('random_bytes')) {
+        return random_bytes($nbBytes);
+    }
+
+    // try OpenSSL
+    if ($this->useOpenSsl) {
+        // ...
+    }
+    // ...
+```
+
+We will now always take the early exit, so anything below that `if` block will never be executed. That means, that the `SecureRandom` class boils down to this:
+
+```php
+final class SecureRandom implements SecureRandomInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function nextBytes($nbBytes)
+    {
+        return random_bytes($nbBytes);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-02T23:06:41Z
+
+Thanks @derrabus, I have removed the unused logic
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-03T00:34:46Z
+
+> The tests are a bit weird, it seems it didn't run the tests at all for PHP 5.4 and 5.5. Not sure if you want to re-run the tests?
+
+That's expected. We don't run them on 5.4 and 5.5 anymore for pull requests, because we can only have 5 concurrent jobs per organization on Travis. This allows us to make build run faster.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-03T17:21:54Z
+
+Thanks for the info @stof
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-03T17:22:08Z
+
+All comments have been addressed
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-10-04T11:19:49Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-04T16:57:20Z
+
+@pierredup You also have to update the `SecureRandomTest` class. The `getSecureRandoms()` data provider tries to modify the `useOpenSsl` property which no longer exists.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-04T16:57:49Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-04T17:07:04Z
+
+Thanks @xabbuh. Is it still necessary for the test, since the SecureRandom class is now basically only a wrapper for the `random_bytes` function? Can I remove the test, or do you prefer I just update it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-04T17:16:23Z
+
+Imo you can simply drop the OpenSSL related part of that test.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-10-05T08:19:48Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-05T14:55:12Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-05T22:13:22Z
+
+:+1: apart from the above comments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T06:21:47Z
+
+should also be rebased to resolve conflict.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2015-10-06T18:09:58Z
+
+Done

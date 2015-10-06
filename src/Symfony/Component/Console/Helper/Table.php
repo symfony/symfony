@@ -20,6 +20,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Саша Стаменковић <umpirsky@gmail.com>
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ * @author Max Grigorian <maxakawizard@gmail.com>
  */
 class Table
 {
@@ -60,6 +61,11 @@ class Table
      * @var TableStyle
      */
     private $style;
+
+    /**
+     * @var array
+     */
+    private $columnStyles = array();
 
     private static $styles;
 
@@ -137,6 +143,47 @@ class Table
     public function getStyle()
     {
         return $this->style;
+    }
+
+    /**
+     * Sets table column style.
+     *
+     * @param int               $columnIndex Column index
+     * @param TableStyle|string $name        The style name or a TableStyle instance
+     *
+     * @return Table
+     */
+    public function setColumnStyle($columnIndex, $name)
+    {
+        $columnIndex = intval($columnIndex);
+
+        if ($name instanceof TableStyle) {
+            $this->columnStyles[$columnIndex] = $name;
+        } elseif (isset(self::$styles[$name])) {
+            $this->columnStyles[$columnIndex] = self::$styles[$name];
+        } else {
+            throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the current style for a column.
+     *
+     * If style was not set, it returns the global table style.
+     *
+     * @param int $columnIndex Column index
+     *
+     * @return TableStyle
+     */
+    public function getColumnStyle($columnIndex)
+    {
+        if (isset($this->columnStyles[$columnIndex])) {
+            return $this->columnStyles[$columnIndex];
+        }
+
+        return $this->getStyle();
     }
 
     public function setHeaders(array $headers)
@@ -308,12 +355,14 @@ class Table
             $width += strlen($cell) - mb_strwidth($cell, $encoding);
         }
 
+        $style = $this->getColumnStyle($column);
+
         if ($cell instanceof TableSeparator) {
-            $this->output->write(sprintf($this->style->getBorderFormat(), str_repeat($this->style->getHorizontalBorderChar(), $width)));
+            $this->output->write(sprintf($style->getBorderFormat(), str_repeat($style->getHorizontalBorderChar(), $width)));
         } else {
             $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
-            $content = sprintf($this->style->getCellRowContentFormat(), $cell);
-            $this->output->write(sprintf($cellFormat, str_pad($content, $width, $this->style->getPaddingChar(), $this->style->getPadType())));
+            $content = sprintf($style->getCellRowContentFormat(), $cell);
+            $this->output->write(sprintf($cellFormat, str_pad($content, $width, $style->getPaddingChar(), $style->getPadType())));
         }
     }
 

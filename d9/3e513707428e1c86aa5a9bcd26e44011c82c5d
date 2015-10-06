@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-05T21:53:51Z
+
+We should throw exceptions when the variables do not have the expected type after the evaluation (it's not enforced by type hints anymore).
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-10-05T21:55:08Z
+
+> We should throw exceptions when the variables do not have the expected type after the evaluation (it's not enforced by type hints anymore).
+
+This is enforced by the parent constructor for the `$resolver`. But this check might be indeed good for the `$logger`.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-06T15:39:49Z
+
+:+1:
+
+Status: reviewed

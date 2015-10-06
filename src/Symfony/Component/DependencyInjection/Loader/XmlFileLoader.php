@@ -221,7 +221,7 @@ class XmlFileLoader extends FileLoader
                 if (false !== strpos($name, '-') && false === strpos($name, '_') && !array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
                     $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
                 }
-                // keep not normalized key for BC too
+                // keep not normalized key
                 $parameters[$name] = XmlUtils::phpize($node->nodeValue);
             }
 

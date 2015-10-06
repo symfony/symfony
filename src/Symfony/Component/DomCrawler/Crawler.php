@@ -901,12 +901,7 @@ class Crawler implements \Countable, \IteratorAggregate
                 $expression = substr($expression, strlen($parenthesis));
             }
 
-            // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
-            if (0 === strpos($expression, '/_root/')) {
-                @trigger_error('XPath expressions referencing the fake root node are deprecated since version 2.8 and will be unsupported in 3.0. Please use "./" instead of "/_root/".', E_USER_DEPRECATED);
-
-                $expression = './'.substr($expression, 7);
-            } elseif (0 === strpos($expression, 'self::*/')) {
+            if (0 === strpos($expression, 'self::*/')) {
                 $expression = './'.substr($expression, 8);
             }
 
@@ -921,12 +916,7 @@ class Crawler implements \Countable, \IteratorAggregate
                 $expression = 'self::'.substr($expression, 2);
             } elseif (0 === strpos($expression, 'child::')) {
                 $expression = 'self::'.substr($expression, 7);
-            } elseif ('/' === $expression[0] || 0 === strpos($expression, 'self::')) {
-                // the only direct child in Symfony 2.4 and lower is _root, which is already handled previously
-                // so let's drop the expression entirely
-                $expression = $nonMatchingExpression;
-            } elseif ('.' === $expression[0]) {
-                // '.' is the fake root element in Symfony 2.4 and lower, which is excluded from results
+            } elseif ('/' === $expression[0] || '.' === $expression[0] || 0 === strpos($expression, 'self::')) {
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, 'descendant::')) {
                 $expression = 'descendant-or-self::'.substr($expression, strlen('descendant::'));

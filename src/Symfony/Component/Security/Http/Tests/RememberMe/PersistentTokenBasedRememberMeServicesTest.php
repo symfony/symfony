@@ -313,13 +313,6 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
             $userProvider = $this->getProvider();
         }
 
-        if (!isset($options['secure'])) {
-            $options['secure'] = false;
-        }
-        if (!isset($options['httponly'])) {
-            $options['httponly'] = true;
-        }
-
         return new PersistentTokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger, new SecureRandom(sys_get_temp_dir().'/_sf2.seed'));
     }
 

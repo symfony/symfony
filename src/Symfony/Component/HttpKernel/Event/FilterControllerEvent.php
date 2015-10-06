@@ -29,8 +29,6 @@ class FilterControllerEvent extends KernelEvent
 {
     /**
      * The current controller.
-     *
-     * @var callable
      */
     private $controller;
 

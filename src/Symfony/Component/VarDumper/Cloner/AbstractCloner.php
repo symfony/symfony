@@ -304,7 +304,7 @@ abstract class AbstractCloner implements ClonerInterface
                 $a = $cast;
             }
         } catch (\Exception $e) {
-            $a[(Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠'] = new ThrowingCasterException($callback, $e);
+            $a[(Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠'] = new ThrowingCasterException($e);
         }
 
         return $a;

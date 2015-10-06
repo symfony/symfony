@@ -273,12 +273,8 @@ class Command
      *
      * @see execute()
      */
-    public function setCode($code)
+    public function setCode(callable $code)
     {
-        if (!is_callable($code)) {
-            throw new InvalidArgumentException('Invalid callable provided to Command::setCode.');
-        }
-
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {

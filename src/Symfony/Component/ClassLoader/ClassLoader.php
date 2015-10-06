@@ -96,7 +96,7 @@ class ClassLoader
                     $this->prefixes[$prefix],
                     $paths
                 ));
-            } else if (!in_array($paths, $this->prefixes[$prefix])) {
+            } elseif (!in_array($paths, $this->prefixes[$prefix])) {
                  $this->prefixes[$prefix][] = $paths;
             }
         } else {

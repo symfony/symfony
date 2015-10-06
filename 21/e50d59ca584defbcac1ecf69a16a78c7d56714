@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-03-26T19:59:52Z
+
+@fabpot Any thoughts?
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-04-07T13:00:07Z
+
+@fabpot Any chances to have this in 2.7?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-07T13:55:50Z
+
+@MAXakaWIZARD Why do we provide a style for columns and not rows? Would it make sense as well?
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-04-07T14:09:02Z
+
+@fabpot Well, I described it in first comment. It is useful for numeric data, for example.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-05T14:25:12Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-05T15:13:00Z
+
+:+1: looks very nice. If we also wanted row styling, we could add that later.
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-10-05T15:40:40Z
+
+@fabpot Should this PR target version  `2.8`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T13:04:29Z
+
+2.7 is fine. I will merge it automatically in the 2.8 branch anyway, no need to rebase on current 2.8.
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-10-06T14:41:12Z
+
+@fabpot @stof I've made changes to the code regarding your comments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T14:45:26Z
+
+Apart from my small phpdoc comment, :+1:
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-10-06T14:48:59Z
+
+@fabpot Done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T14:50:11Z
+
+Can you keep the dots as in my original proposal?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T14:51:01Z
+
+In fact, I still prefer my version than yours.
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-10-06T14:55:35Z
+
+@fabpot Sorry. Is it OK now?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T15:14:32Z
+
+Looks good now. Can you rebase on current 2.7 to get rid of the merge commit? A simple `git fetch origin && git rebase origin/2.7` from your branch should be enough. Thanks for your patience.
+
+---------------------------------------------------------------------------
+
+by MAXakaWIZARD at 2015-10-06T15:20:15Z
+
+@fabpot Done. It's only one commit finally.

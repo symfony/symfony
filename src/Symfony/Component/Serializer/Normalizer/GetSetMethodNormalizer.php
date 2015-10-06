@@ -38,6 +38,66 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
+     */
+    public function denormalize($data, $class, $format = null, array $context = array())
+    {
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
+        $normalizedData = $this->prepareForDenormalization($data);
+
+        $reflectionClass = new \ReflectionClass($class);
+        $subcontext = array_merge($context, array('format' => $format));
+        $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
+
+        $classMethods = get_class_methods($object);
+        foreach ($normalizedData as $attribute => $value) {
+            if ($this->nameConverter) {
+                $attribute = $this->nameConverter->denormalize($attribute);
+            }
+
+            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
+            $ignored = in_array($attribute, $this->ignoredAttributes);
+
+            if ($allowed && !$ignored) {
+                $setter = 'set'.ucfirst($attribute);
+                if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
+                    if ($this->propertyInfoExtractor) {
+                        $types = (array) $this->propertyInfoExtractor->getTypes($class, $attribute);
+
+                        foreach ($types as $type) {
+                            if ($type && (!empty($value) || !$type->isNullable())) {
+                                if (!$this->serializer instanceof DenormalizerInterface) {
+                                    throw new RuntimeException(
+                                        sprintf(
+                                            'Cannot denormalize attribute "%s" because injected serializer is not a denormalizer',
+                                            $attribute
+                                        )
+                                    );
+                                }
+
+                                $value = $this->serializer->denormalize(
+                                    $value,
+                                    $type->getClassName(),
+                                    $format,
+                                    $context
+                                );
+
+                                break;
+                            }
+                        }
+                    }
+
+                    $object->$setter($value);
+                }
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {

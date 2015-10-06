@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-05T15:37:42Z
+
+This is the same BC break as in ##14330. You get a warning for overwritten method that the signature is not the same: https://3v4l.org/ruPcK
+
+But I'm :+1: to add callable typehints.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-05T16:07:36Z
+
+@Tobion in this PR, it is OK:
+
+- constructors don't need to have a matching signature
+- most other classes are not meant to be extended (the only case I see is ``Command``, and you won't override ``setCode`` in such case but ``execute``)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-05T16:23:41Z
+
+@nicolas-grekas ``HttpKernelTest::testHandleWhenTheControllerIsNotACallable`` is broken here
+
+and it would be great to fix the deps=low tests of the Translation component
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-05T16:55:06Z
+
+I added more callable type hints that should all qualify as constructors or methods not meant to be extended.
+@stof I'll look at deps=low tests if you look at #16097 ;-)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-05T22:29:21Z
+
+:+1:
+
+Status: Reviewed

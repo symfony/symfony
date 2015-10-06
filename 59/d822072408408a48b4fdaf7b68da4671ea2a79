@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-06T08:06:57Z
+
+@nicolas-grekas IMO, we should refactor the tests to avoid creating mocks in the data provider. In my experience, mocks created in data providers create weird edge cases and issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-06T08:09:43Z
+
+The issue with them is sebastianbergmann/phpunit#1821, which is fixed in phpunit 5.0.
+The data provider is fine, this is just what's required to get 2.3 green again, I'd like to merge it now in fact.

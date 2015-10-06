@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-29T13:56:30Z
+
+this should also be triggered when dumping the container rather than instantiating things from the ContainerBuilder directly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-29T14:26:28Z
+
+If we trigger these notices when dumping the container, we will autoload all service classes (since we need to load the class definition to get the annotation). Is this an issue at all or not?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2015-09-29T14:33:42Z
+
+I'm not quite sure we should trigger these warning if there is a `@deprecated` tag on a class (specially in the Container). I think when a class is deprecated, it should trigger this warning by itself like it is done currently, so that when the class is loaded, the warning is triggered, rather than forcing the hand of the container builder
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-29T14:38:37Z
+
+@Taluu your argument could be used against you own PR (#15491) but in fact knowing which service definition triggered some class deprecation notice is really valuable and is a time saver for devs.
+I see the same benefit here: more contextual info lead to faster resolution, contributing to higher Sf 3.0 adoption rate.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-29T15:38:34Z
+
+@nicolas-grekas they should not be triggered at dump-time. They should be triggered at runtime. So IMO, the right solution would be to trigger the deprecation in doctrine itself, as we do in Symfony.
+In a fullstack project, you will never get a service from the ContainerBuilder directly (if you do it, it means you are getting it before the container is fully built, which is an unsupported use case). Your code would allow to have the feature only for people using the ContainerBuilder directly at runtime (Behat for instance). I think you catched it in FrameworkBundle only because the FrameworkBundle testsuite also contains such usage of the container (it gets services from it without dumping the container and using the dumped one when testing the DI extension)
+
+https://github.com/symfony/symfony/pull/15491 is there to support the case where we want to deprecate using a class as service instead of deprecating the class itself (perfect example: the ``request`` service).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-09-30T07:59:12Z
+
+I spent a bit more time on this: I think that doing the check at runtime is not possible because of the overhead it would add. We could also do the check in `setDefinition` in the container builder but this would trigger autoloading for all service classes at build time, which would be also a big overhead.
+
+Which means that I don't have any better idea than this PR. Even if it won't catch much cases since as stof said nobody (but tests) uses the builder directly to get services, it still helped find the issue with this deprecated doctrine class. For this reason, I'd propose to merge this PR asis.
+
+@stof btw, the #14307 issue targetted by #15491 is not only about "the case where we want to deprecate using a class as service instead of deprecating the class itself". If you read the issue description, it's also clearly about triggering more useful messages, and I fully support this use case!

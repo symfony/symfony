@@ -283,13 +283,6 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
             $userProvider = $this->getProvider();
         }
 
-        if (!isset($options['secure'])) {
-            $options['secure'] = false;
-        }
-        if (!isset($options['httponly'])) {
-            $options['httponly'] = true;
-        }
-
         return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
             array($userProvider), 'fookey', 'fookey', $options, $logger,
         ));

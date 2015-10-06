@@ -29,7 +29,7 @@ trait VarDumperTestTrait
         $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data), $message);
     }
 
-    public function getDump($data)
+    protected function getDump($data)
     {
         $h = fopen('php://memory', 'r+b');
         $cloner = new VarCloner();

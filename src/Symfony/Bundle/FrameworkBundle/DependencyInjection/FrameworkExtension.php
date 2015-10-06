@@ -832,8 +832,8 @@ class FrameworkExtension extends Extension
     /**
      * Search for validation files in directory.
      *
-     * @param string           $dir       The directory that contains the validation files
-     * @param array            $files     A array reference of validation files
+     * @param string $dir   The directory that contains the validation files
+     * @param array  $files A array reference of validation files
      */
     private function getValidatorMappingFilesFromDir($dir, array &$files)
     {
@@ -845,8 +845,8 @@ class FrameworkExtension extends Extension
     /**
      * Get all validation files from config.
      *
-     * @param array            $config    A validation configuration array
-     * @param array            $files     A array reference of validation files
+     * @param array $config A validation configuration array
+     * @param array $files  A array reference of validation files
      */
     private function getValidatorMappingFilesFromConfig(array $config, array &$files)
     {

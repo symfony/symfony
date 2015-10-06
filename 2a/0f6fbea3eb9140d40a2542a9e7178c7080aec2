@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T12:11:00Z
+
+Which features are not provided by the ClassLoader ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T12:16:16Z
+
+regarding the explanations in your blog post, the difference between namespace prefix and class prefix for non-namespaced classes was an unnecessary complexity in the UniversalClassLoader. In both cases, it is just a prefix of the class name. this is why Composer dropped this distinction and then we dropped it also in our new implementation.
+and for PSR-4 support, this is implemented by the Psr4ClassLoader in Symfony. The ClassLoader is only about PSR-0 (Composer decided to use a single class for both, with different setters instead)
+
+---------------------------------------------------------------------------
+
+by remicollet at 2015-07-01T12:21:09Z
+
+> Which features are not provided by the ClassLoader ?
+
+With UniversalClassLoader, last call to registerNamespace() have prioritty, while with ClassLoader first call to addPrefix() have priority. This is a really different behavior (Adding vs Setting)
+
+With UniversalClassLoader we have different registration for namsepace and prefix.
+So an additional trailing  \\ is needed when using ClassLoader::addPrefix en ensure correct behavior.
+
+And with UniversalClassLoader no duplicated path is possible, while with ClassLoader  you can add various time the same prefix with the path (the reason of this PR)
+
+P.S. I don't ask to drop deprecation of UniversalClassLoader, we can live with ClassLoader (once the differences are understood), I just like to fix this duplicate path / perf issue.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-07-01T12:24:53Z
+
+@remicollet technically, UniversalClassLoader still allows to have several times the same path for a prefix. It just does not care about it. The difference is that it overwrites the existing paths each time, so each call has to pass all paths for a given prefix rather than being able to add new ones without knowing the current state
+
+---------------------------------------------------------------------------
+
+by remicollet at 2015-07-04T08:41:57Z
+
+@stof, so we agree UniversalClassLoader and ClassLoader  are different. And this is not the goal of this PR to change this.
+
+Any feedback on this PR ?

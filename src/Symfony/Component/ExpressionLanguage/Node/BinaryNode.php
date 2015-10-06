@@ -51,7 +51,7 @@ class BinaryNode extends Node
 
             return;
         }
-        
+
         if ('matches' == $operator) {
             $compiler
                 ->raw('preg_match(')

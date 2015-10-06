@@ -41,7 +41,7 @@ class UrlValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value) {
+        if (null === $value) {
             return;
         }
 
@@ -50,6 +50,10 @@ class UrlValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        if ('' === $value) {
+            return;
+        }
+
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {

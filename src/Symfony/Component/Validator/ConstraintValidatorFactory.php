@@ -41,7 +41,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         $className = $constraint->validatedBy();
 
         if (!isset($this->validators[$className])) {
-            $this->validators[$className] = 'validator.expression' === $className
+            $this->validators[$className] = 'Symfony\Component\Validator\Constraints\ExpressionValidator' === $className
                 ? new ExpressionValidator($this->propertyAccessor)
                 : new $className();
         }

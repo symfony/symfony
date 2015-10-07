@@ -54,12 +54,4 @@ class Expression extends Constraint
     {
         return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return 'validator.expression';
-    }
 }

@@ -57,7 +57,7 @@
 
         <service id="validator.expression" class="%validator.expression.class%">
             <argument type="service" id="property_accessor" />
-            <tag name="validator.constraint_validator" alias="validator.expression" />
+            <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\ExpressionValidator" />
         </service>
 
         <service id="validator.email" class="%validator.email.class%">

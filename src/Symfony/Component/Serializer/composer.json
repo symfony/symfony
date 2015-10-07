@@ -32,7 +32,8 @@
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
-        "symfony/property-access": "For using the ObjectNormalizer."
+        "symfony/property-access": "For using the ObjectNormalizer.",
+        "symfony/property-info": "For using recursive denormalizations"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" }

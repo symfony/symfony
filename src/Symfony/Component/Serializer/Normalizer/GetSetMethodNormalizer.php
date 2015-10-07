@@ -112,40 +112,18 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
-            if ($allowed && !$ignored) {
-                $setter = 'set'.ucfirst($attribute);
-
-                if (in_array($setter, $classMethods)) {
-
-                    if ($this->propertyInfoExtractor) {
-                        $types = (array) $this->propertyInfoExtractor->getTypes($class, $attribute);
-
-                        foreach ($types as $type) {
-                            if ($type && (!empty($value) || !$type->isNullable())) {
-                                if (!$this->serializer instanceof DenormalizerInterface) {
-                                    throw new RuntimeException(
-                                        sprintf(
-                                            'Cannot denormalize attribute "%s" because injected serializer is not a denormalizer',
-                                            $attribute
-                                        )
-                                    );
-                                }
-
-                                $value = $this->serializer->denormalize(
-                                    $value,
-                                    $type->getClassName(),
-                                    $format,
-                                    $context
-                                );
-
-                                break;
-                            }
-                        }
-                    }
-
-                    $object->$setter($value);
-                }
+            if (!$allowed || $ignored) {
+                continue;
             }
+
+            $setter = 'set'.ucfirst($attribute);
+            if (!in_array($setter, $classMethods)) {
+                continue;
+            }
+
+            $value = $this->denormalizeProperty($value, $class, $attribute, $format, $context);
+
+            $object->$setter($value);
         }
 
         return $object;

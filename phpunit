@@ -24,10 +24,6 @@ if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
 $PHP = ProcessUtils::escapeArgument($PHP);
 $COMPOSER = $PHP.' '.ProcessUtils::escapeArgument($COMPOSER);
 
-if (!(isset($argv[1]) && 'install' === $argv[1]) && !file_exists(__DIR__.'/vendor')) {
-    passthru("$COMPOSER update --no-progress --ansi");
-}
-
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
     // Build a standalone phpunit without symfony/yaml
 

@@ -438,6 +438,9 @@ FrameworkBundle
        session:
            cookie_httponly: false
    ```
+ 
+ * The ability to pass a `LoggerInterface` instance as the second argument of the `DelegatingLoader` 
+   constructor was deprecated and will be removed in Symfony 3.0.
 
 Security
 --------

@@ -161,7 +161,7 @@ class Router extends BaseRouter implements WarmableInterface
                 'must be a %s, but it is of type %s.',
                 $match[1],
                 $value,
-                'string or numeric' . ($acceptArrayParameters ? ' or an array' : ''),
+                'string or numeric'.($acceptArrayParameters ? ' or an array' : ''),
                 gettype($resolved)
                 )
             );

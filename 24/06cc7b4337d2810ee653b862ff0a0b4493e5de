@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by johnkary at 2015-10-03T03:31:31Z
+
+@dosten Thank you for the quick review. I have made the changes you suggested.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-03T08:06:21Z
+
+@johnkary Thank you for the review. On http://www.volubis.fr/php/ibmdemo/showsource.php?filename=checkauth.inc I found this check:
+
+```php
+// If we report the OS as AIX or OS400, assume we're running under PASE
+$isPase = (PHP_OS == "AIX" || PHP_OS == "OS400");
+```
+
+Should we do it similarly here?
+
+---------------------------------------------------------------------------
+
+by johnkary at 2015-10-03T19:18:24Z
+
+@xabbuh Thank you for the reference link.
+
+According to [php_uname() docs](http://php.net/manual/en/function.php-uname.php) `PHP_OS constant will contain the operating system PHP was _built_ on.` Is it possible the system that built PHP is not necessarily the system where it is running?
+
+I'm not an IBM expert, nor do I admin IBM servers. I can only offer evidence from the 1 server I have access to. PHP_OS constant returns "AIX" on that server. Maybe AIX is the deciding factor when we should redirect output, instead of OS400? I'm willing to rework the PR if others think that is a better approach.

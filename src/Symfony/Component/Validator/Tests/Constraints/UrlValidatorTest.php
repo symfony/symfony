@@ -36,6 +36,13 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
+    public function testEmptyStringFromObjectIsValid()
+    {
+        $this->validator->validate(new EmailProvider(), new Url());
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -171,5 +178,13 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('file://127.0.0.1'),
             array('git://[::1]/'),
         );
+    }
+}
+
+class EmailProvider
+{
+    public function __toString()
+    {
+        return '';
     }
 }

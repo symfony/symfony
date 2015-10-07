@@ -33,9 +33,7 @@
         <service id="security.authentication.rememberme.services.persistent"
                  class="Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices"
                  parent="security.authentication.rememberme.services.abstract"
-                 abstract="true">
-            <argument type="service" id="security.secure_random" />
-        </service>
+                 abstract="true" />
 
         <service id="security.authentication.rememberme.services.simplehash"
                  class="Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices"

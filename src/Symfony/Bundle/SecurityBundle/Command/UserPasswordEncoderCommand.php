@@ -164,6 +164,6 @@ EOF
 
     private function generateSalt()
     {
-        return base64_encode($this->getContainer()->get('security.secure_random')->nextBytes(30));
+        return base64_encode(random_bytes(30));
     }
 }

@@ -87,8 +87,6 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
-        $loader->load('security.xml');
-
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
@@ -809,22 +807,22 @@ class FrameworkExtension extends Extension
     {
         $loader->load('annotations.xml');
 
-        if ('file' === $config['cache']) {
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+        if ('none' !== $config['cache']) {
+            if ('file' === $config['cache']) {
+                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+                }
+
+                $container
+                    ->getDefinition('annotations.php_file_cache')
+                    ->replaceArgument(0, $cacheDir)
+                ;
             }
 
             $container
-                ->getDefinition('annotations.file_cache_reader')
-                ->replaceArgument(1, $cacheDir)
-                ->replaceArgument(2, $config['debug'])
-            ;
-            $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
-        } elseif ('none' !== $config['cache']) {
-            $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference($config['cache']))
+                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.php_file_cache'))
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');

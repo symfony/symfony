@@ -13,7 +13,7 @@ init:
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET PHP=1
     - SET ANSICON=121x90 (121x90)
-    - SET PHP_INI_MATRIX=php.ini-min-ext php.ini-max-ext
+    - SET PHP_INI_MATRIX=php.ini-min php.ini-max
 
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
@@ -21,19 +21,19 @@ install:
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.5.9-nts-Win32-VC11-x86.zip
     - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y > 7z.log
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
-    - IF %PHP%==1 copy /Y php.ini-development php.ini-min-ext
-    - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min-ext
-    - IF %PHP%==1 echo extension_dir=ext >> php.ini-min-ext
-    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min-ext
-    - IF %PHP%==1 copy /Y php.ini-min-ext php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_apc.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max-ext
-    - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max-ext
+    - IF %PHP%==1 copy /Y php.ini-development php.ini-min
+    - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min
+    - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
+    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
+    - IF %PHP%==1 copy /Y php.ini-min php.ini-max
+    - IF %PHP%==1 echo extension=php_apc.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max
     - appveyor DownloadFile https://getcomposer.org/composer.phar
-    - copy /Y php.ini-max-ext php.ini
+    - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)

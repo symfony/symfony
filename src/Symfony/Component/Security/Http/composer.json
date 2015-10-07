@@ -21,7 +21,8 @@
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
-        "symfony/property-access": "~2.8|~3.0.0"
+        "symfony/property-access": "~2.8|~3.0",
+        "paragonie/random_compat" : "~1.0"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.8|~3.0",

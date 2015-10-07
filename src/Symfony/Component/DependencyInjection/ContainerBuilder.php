@@ -845,10 +845,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             $service = call_user_func_array($factory, $arguments);
+
+            if (!$definition->isDeprecated() && is_array($factory) && is_string($factory[0])) {
+                $r = new \ReflectionClass($factory[0]);
+
+                if (0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
+                    @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" factory class. It should either be deprecated or its factory upgraded.', $id, $r->name), E_USER_DEPRECATED);
+                }
+            }
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+
+            if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
+                @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name), E_USER_DEPRECATED);
+            }
         }
 
         if ($tryProxy || !$definition->isLazy()) {

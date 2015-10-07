@@ -13,10 +13,8 @@
             <argument /><!-- Debug-Flag -->
         </service>
 
-        <service id="annotations.file_cache_reader" class="Doctrine\Common\Annotations\FileCacheReader" public="false">
-            <argument type="service" id="annotations.reader" />
+        <service id="annotations.php_file_cache" class="Doctrine\Common\Cache\PhpFileCache" public="false">
             <argument /><!-- Cache-Directory -->
-            <argument /><!-- Debug Flag -->
         </service>
 
         <service id="annotation_reader" alias="annotations.reader" />

@@ -35,7 +35,10 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     const COOKIE_DELIMITER = ':';
 
     protected $logger;
-    protected $options;
+    protected $options = array(
+        'secure' => false,
+        'httponly' => true,
+    );
     private $providerKey;
     private $secret;
     private $userProviders;
@@ -66,7 +69,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         $this->userProviders = $userProviders;
         $this->secret = $secret;
         $this->providerKey = $providerKey;
-        $this->options = $options;
+        $this->options = array_merge($this->options, $options);
         $this->logger = $logger;
     }
 

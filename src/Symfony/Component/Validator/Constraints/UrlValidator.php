@@ -46,7 +46,7 @@ class UrlValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Url');
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value) {
             return;
         }
 
@@ -55,6 +55,10 @@ class UrlValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        if ('' === $value) {
+            return;
+        }
+
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {

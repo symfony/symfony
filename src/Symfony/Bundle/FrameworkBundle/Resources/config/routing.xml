@@ -47,9 +47,7 @@
         </service>
 
         <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader">
-            <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
-            <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />
         </service>
 

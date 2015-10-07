@@ -68,7 +68,8 @@
         "monolog/monolog": "~1.3",
         "propel/propel1": "~1.6",
         "ircmaxell/password-compat": "~1.0",
-        "ocramius/proxy-manager": "~0.3.1"
+        "ocramius/proxy-manager": "~0.3.1",
+        "hmlb/phpunit-vw": "dev-master"
     },
     "autoload": {
         "psr-0": { "Symfony\\": "src/" },

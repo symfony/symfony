@@ -41,4 +41,8 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="HMLB\PHPUnit\Listener\VWListener" />
+    </listeners>
 </phpunit>

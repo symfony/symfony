@@ -82,7 +82,7 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileInfo');
 
         $this->assertInstanceOf('SplFileInfo', $file);
-        $this->assertEquals(new \SplFileObject(self::TEST_TXT_DATA), $file);
+        $this->assertSame(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
     public function testDenormalizeSplFileObject()
@@ -90,7 +90,7 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileObject');
 
         $this->assertInstanceOf('SplFileObject', $file);
-        $this->assertEquals(new \SplFileObject(self::TEST_TXT_DATA), $file);
+        $this->assertEquals(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
     public function testDenormalizeHttpFoundationFile()
@@ -98,6 +98,33 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $file = $this->normalizer->denormalize(self::TEST_GIF_DATA, 'Symfony\Component\HttpFoundation\File\File');
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $file);
-        $this->assertEquals(new File(self::TEST_TXT_DATA, false), $file);
+        $this->assertSame(file_get_contents(self::TEST_GIF_DATA), $this->getContent($file->openFile()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @expectedExceptionMessage The provided "data:" URI is not valid.
+     */
+    public function testGiveNotAccessToLocalFiles()
+    {
+        $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testInvalidData()
+    {
+        $this->normalizer->denormalize('data:this,isInvalid', 'SplFileObject');
+    }
+
+    private function getContent(\SplFileObject $file)
+    {
+        $buffer = '';
+        while (!$file->eof()) {
+            $buffer .= $file->fgets();
+        }
+
+        return $buffer;
     }
 }

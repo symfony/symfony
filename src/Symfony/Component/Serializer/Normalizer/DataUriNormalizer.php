@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Normalizes a {@see \SplFileInfo} object to a data URI.
@@ -80,14 +81,24 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws UnexpectedValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        if ('Symfony\Component\HttpFoundation\File\File' === $class) {
-            return new File($data, false);
+        if (!preg_match('/^data:(.*),(.*)/', $data)) {
+            throw new UnexpectedValueException('The provided "data:" URI is not valid.');
         }
 
-        return new \SplFileObject($data);
+        try {
+            if ('Symfony\Component\HttpFoundation\File\File' === $class) {
+                return new File($data, false);
+            }
+
+            return new \SplFileObject($data);
+        } catch (\RuntimeException $exception) {
+            throw new UnexpectedValueException($exception->getMessage(), $exception->getCode(), $exception);
+        }
     }
 
     /**

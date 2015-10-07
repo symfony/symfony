@@ -140,9 +140,18 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                         }
                     }
 
-                    $object->$setter($value);
-                }
+            if (!$allowed || $ignored) {
+                continue;
             }
+
+            $setter = 'set'.ucfirst($attribute);
+            if (!in_array($setter, $classMethods)) {
+                continue;
+            }
+
+            $value = $this->denormalizeProperty($value, $class, $attribute, $format, $context);
+
+            $object->$setter($value);
         }
 
         return $object;

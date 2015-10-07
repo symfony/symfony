@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-09-14T16:39:27Z
+
+the current implementation is buggy.
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by superdav42 at 2015-09-14T17:38:11Z
+
+@stof New revision should work in all cases. Also added test case mentioned to tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-26T08:22:38Z
+
+@superdav42 Any news?
+
+---------------------------------------------------------------------------
+
+by superdav42 at 2015-10-07T02:57:00Z
+
+@fabpot Updated to use preg_match, now works for all test cases.
+At first I thought I'd avoid the overhead of regexes turns out they are simpler and faster.

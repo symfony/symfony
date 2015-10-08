@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
 /**
  * @group legacy
+ * @requires extensin pdo_sqlite
  */
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 {
@@ -23,10 +24,6 @@ class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 
     protected function setUp()
     {
-        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
-            $this->markTestSkipped('This test requires SQLite support in your environment');
-        }
-
         $this->dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_storage');
         if (file_exists($this->dbFile)) {
             @unlink($this->dbFile);

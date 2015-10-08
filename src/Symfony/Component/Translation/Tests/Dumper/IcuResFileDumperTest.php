@@ -16,6 +16,9 @@ use Symfony\Component\Translation\Dumper\IcuResFileDumper;
 
 class IcuResFileDumperTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @requires extension mbstring
+     */
     public function testFormatCatalogue()
     {
         if (!function_exists('mb_convert_encoding')) {

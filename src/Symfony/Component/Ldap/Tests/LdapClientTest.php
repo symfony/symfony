@@ -13,15 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use Symfony\Component\Ldap\LdapClient;
 
+/**
+ * @requires extension ldap
+ */
 class LdapClientTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!extension_loaded('ldap')) {
-            $this->markTestSkipped('The ldap extension is not available');
-        }
-    }
-
     /**
      * @dataProvider provideLdapEscapeValues
      */

@@ -307,13 +307,12 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /** @dataProvider getSetCodeBindToClosureTests */
+    /**
+     * @dataProvider getSetCodeBindToClosureTests
+     * @requires PHP 5.4
+     */
     public function testSetCodeBindToClosure($previouslyBound, $expected)
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
-        }
-
         $code = createClosure();
         if ($previouslyBound) {
             $code = $code->bindTo($this);

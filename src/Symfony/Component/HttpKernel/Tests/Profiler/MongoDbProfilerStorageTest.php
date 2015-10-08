@@ -41,6 +41,7 @@ class MongoDbProfilerStorageTestDataCollector extends DataCollector
 
 /**
  * @group legacy
+ * @requires extension mongo
  */
 class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 {
@@ -131,10 +132,6 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 
     protected function setUp()
     {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('MongoDbProfilerStorageTest requires the mongo PHP extension and a MongoDB server on localhost');
-        }
-
         $this->storage = new MongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
         $m = new \ReflectionMethod($this->storage, 'getMongo');
         $m->setAccessible(true);

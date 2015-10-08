@@ -205,13 +205,10 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage This error is expected
+     * @requires PHP 5.4
      */
     public function testSetContentJsonSerializeError()
     {
-        if (!interface_exists('JsonSerializable')) {
-            $this->markTestSkipped('Interface JsonSerializable is available in PHP 5.4+');
-        }
-
         $serializable = new JsonSerializableObject();
 
         JsonResponse::create($serializable);

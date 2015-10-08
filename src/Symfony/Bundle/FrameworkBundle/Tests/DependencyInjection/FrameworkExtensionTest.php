@@ -291,13 +291,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
+     * @requires extension apc
      */
     public function testLegacyFullyConfiguredValidationService()
     {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('The apc extension is not available.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));

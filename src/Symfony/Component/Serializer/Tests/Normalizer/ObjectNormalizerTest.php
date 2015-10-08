@@ -155,11 +155,13 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
     }
 
+    /**
+     * @see https://bugs.php.net/62715
+     *
+     * @requires PHP 5.3.17
+     */
     public function testConstructorDenormalizeWithOptionalDefaultArgument()
     {
-        if (PHP_VERSION_ID <= 50316) {
-            $this->markTestSkipped('See https://bugs.php.net/62715');
-        }
         $obj = $this->normalizer->denormalize(
             array('bar' => 'test'),
             __NAMESPACE__.'\ObjectConstructorArgsWithDefaultValueDummy', 'any');

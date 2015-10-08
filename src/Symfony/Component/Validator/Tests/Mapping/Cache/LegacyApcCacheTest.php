@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
 /**
  * @group legacy
+ * @requires extension apc
  */
 class LegacyApcCacheTest extends \PHPUnit_Framework_TestCase
 {

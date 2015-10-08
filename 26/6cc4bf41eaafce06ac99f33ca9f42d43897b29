@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by DZunke at 2015-10-08T17:19:00Z
+
+Thanks @nicolas-grekas ! The fix is working for me. The only problem is that i got a error for a security voter which could not call "isClassInstanceOf" anymore if i use your branch. Maybe the branch is from and older version of 2.8.x-dev ?
+
+The Method should be located at Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter
+
+---------------------------------------------------------------------------
+
+by DZunke at 2015-10-08T18:14:49Z
+
+Ah ok. I see. The Method was removed 3 days ago! Missed that. In this case all is working right. :+1:
+
+Status: reviewed

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Phar;
 /**
  * Test class for Filesystem.
  */
@@ -953,7 +952,6 @@ class FilesystemTest extends FilesystemTestCase
 
         $filename = $this->filesystem->tempnam($dirname, 'foo');
 
-        $this->assertNotFalse($filename);
         $this->assertFileExists($filename);
     }
 
@@ -964,39 +962,34 @@ class FilesystemTest extends FilesystemTestCase
 
         $filename = $this->filesystem->tempnam($dirname, 'foo');
 
-        $this->assertNotFalse($filename);
         $this->assertStringStartsWith($scheme, $filename);
         $this->assertFileExists($filename);
     }
 
     public function testTempnamWithMockScheme()
     {
-        // We avoid autoloading via ClassLoader as stream_wrapper_register creates the object
-        if (!@include __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'MockStream'.DIRECTORY_SEPARATOR.'MockStream.php') {
-            $this->markTestSkipped('Unable to load mock:// stream.');
-        }
-
-        stream_wrapper_register('mock', 'MockStream\MockStream');
+        stream_wrapper_register('mock', 'Symfony\Component\Filesystem\Tests\Fixtures\MockStream\MockStream');
 
         $scheme = 'mock://';
         $dirname = $scheme.$this->workspace;
 
         $filename = $this->filesystem->tempnam($dirname, 'foo');
 
-        $this->assertNotFalse($filename);
         $this->assertStringStartsWith($scheme, $filename);
         $this->assertFileExists($filename);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
     public function testTempnamWithZlibSchemeFails()
     {
         $scheme = 'compress.zlib://';
         $dirname = $scheme.$this->workspace;
 
-        $filename = $this->filesystem->tempnam($dirname, 'bar');
-
         // The compress.zlib:// stream does not support mode x: creates the file, errors "failed to open stream: operation failed" and returns false
-        $this->assertFalse($filename);
+        $this->filesystem->tempnam($dirname, 'bar');
+
     }
 
     public function testTempnamWithPHPTempSchemeFails()
@@ -1006,17 +999,19 @@ class FilesystemTest extends FilesystemTestCase
 
         $filename = $this->filesystem->tempnam($dirname, 'bar');
 
-        $this->assertNotFalse($filename);
         $this->assertStringStartsWith($scheme, $filename);
 
         // The php://temp stream deletes the file after close
         $this->assertFileNotExists($filename);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
     public function testTempnamWithPharSchemeFails()
     {
         // Skip test if Phar disabled phar.readonly must be 0 in php.ini
-        if (!Phar::canWrite()) {
+        if (!\Phar::canWrite()) {
             $this->markTestSkipped('This test cannot run when phar.readonly is 1.');
         }
 
@@ -1024,22 +1019,21 @@ class FilesystemTest extends FilesystemTestCase
         $dirname = $scheme.$this->workspace;
         $pharname = 'foo.phar';
 
-        $p = new Phar($this->workspace.'/'.$pharname, 0, $pharname);
-        $filename = $this->filesystem->tempnam($dirname, $pharname.'/bar');
-
+        new \Phar($this->workspace.'/'.$pharname, 0, $pharname);
         // The phar:// stream does not support mode x: fails to create file, errors "failed to open stream: phar error: "$filename" is not a file in phar "$pharname"" and returns false
-        $this->assertFalse($filename);
+        $this->filesystem->tempnam($dirname, $pharname.'/bar');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
     public function testTempnamWithHTTPSchemeFails()
     {
         $scheme = 'http://';
         $dirname = $scheme.$this->workspace;
 
-        $filename = $this->filesystem->tempnam($dirname, 'bar');
-
         // The http:// scheme is read-only
-        $this->assertFalse($filename);
+        $this->filesystem->tempnam($dirname, 'bar');
     }
 
     public function testTempnamOnUnwritableFallsBackToSysTmp()
@@ -1049,7 +1043,6 @@ class FilesystemTest extends FilesystemTestCase
 
         $filename = $this->filesystem->tempnam($dirname, 'bar');
 
-        $this->assertNotFalse($filename);
         $this->assertStringStartsWith(rtrim($scheme.sys_get_temp_dir(), DIRECTORY_SEPARATOR), $filename);
         $this->assertFileExists($filename);
 

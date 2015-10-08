@@ -459,34 +459,30 @@ class Filesystem
      * @param string $prefix The prefix of the generated temporary filename.
      *                       Note: Windows uses only the first three characters of prefix.
      *
-     * @return string The new temporary filename (with path), or false on failure.
+     * @return string The new temporary filename (with path), or throw an exception on failure.
      */
     public function tempnam($dir, $prefix)
     {
-        $limit = 10;
         list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
 
         // If no scheme or scheme is "file" create temp file in local filesystem
         if (null === $scheme || 'file' === $scheme) {
-
             $tmpFile = tempnam($hierarchy, $prefix);
 
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
-
-            if (null !== $scheme) {
-                return $scheme.'://'.$tmpFile;
-            }
-
             if (false !== $tmpFile) {
+                if (null !== $scheme) {
+                    return $scheme.'://'.$tmpFile;
+                }
+
                 return $tmpFile;
             }
 
-            throw new IOException('A temporary file could not be created');
+            throw new IOException('A temporary file could not be created.');
         }
 
-        // Loop until we create a valid temp file or have reached $limit attempts
-        for ($i = 0; $i < $limit; ++$i) {
-
+        // Loop until we create a valid temp file or have reached 10 attempts
+        for ($i = 0; $i < 10; ++$i) {
             // Create a unique filename
             $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
 
@@ -503,10 +499,9 @@ class Filesystem
             @fclose($handle);
 
             return $tmpFile;
-
         }
 
-        return false;
+        throw new IOException('A temporary file could not be created.');
     }
 
     /**
@@ -570,7 +565,6 @@ class Filesystem
     {
         $components = explode('://', $filename, 2);
 
-        return count($components) === 2 ? array($components[0], $components[1]) : array(null, $components[0]);
+        return  2 === count($components) ? array($components[0], $components[1]) : array(null, $components[0]);
     }
-
 }

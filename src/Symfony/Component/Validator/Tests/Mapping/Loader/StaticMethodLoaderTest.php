@@ -94,10 +94,6 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
         // strict standards error
         error_reporting(0);
 
-        if (0 !== error_reporting()) {
-            $this->markTestSkipped('Could not disable error reporting');
-        }
-
         $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractStaticMethodLoader');
 
         $loader = new StaticMethodLoader('loadMetadata');

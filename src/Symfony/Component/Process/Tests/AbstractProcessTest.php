@@ -71,10 +71,11 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($p->getTimeout());
     }
 
+    /**
+     * @requires extension pcntl
+     */
     public function testStopWithTimeoutIsActuallyWorking()
     {
-        $this->verifyPosixIsEnabled();
-
         // exec is mandatory here since we send a signal to the process
         // see https://github.com/symfony/symfony/issues/5030 about prepending
         // command with exec
@@ -623,16 +624,11 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($termSignal, $process->getTermSignal());
     }
 
+    /**
+     * @requires function posix_kill
+     */
     public function testProcessThrowsExceptionWhenExternallySignaled()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
-        }
-
-        if (!function_exists('posix_kill')) {
-            $this->markTestSkipped('posix_kill is required for this test');
-        }
-
         $termSignal = defined('SIGKILL') ? SIGKILL : 9;
 
         $process = $this->getProcess('exec php -r "while (true) {}"');
@@ -768,10 +764,11 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($process->getPid());
     }
 
+    /**
+     * @requires extension pcntl
+     */
     public function testSignal()
     {
-        $this->verifyPosixIsEnabled();
-
         $process = $this->getProcess('exec php -f '.__DIR__.'/SignalListener.php');
         $process->start();
         usleep(500000);
@@ -784,10 +781,11 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
     }
 
+    /**
+     * @requires extension pcntl
+     */
     public function testExitCodeIsAvailableAfterSignal()
     {
-        $this->verifyPosixIsEnabled();
-
         $process = $this->getProcess('sleep 4');
         $process->start();
         $process->signal(SIGKILL);
@@ -804,10 +802,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @requires extension pcntl
      */
     public function testSignalProcessNotRunning()
     {
-        $this->verifyPosixIsEnabled();
         $process = $this->getProcess(self::$phpBin.' -v');
         $process->signal(SIGHUP);
     }
@@ -859,16 +857,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             array('hasBeenStopped'),
             array('getStopSignal'),
         );
-    }
-
-    private function verifyPosixIsEnabled()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('POSIX signals do not work on Windows');
-        }
-        if (!defined('SIGUSR1')) {
-            $this->markTestSkipped('The pcntl extension is not enabled');
-        }
     }
 
     /**

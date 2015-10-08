@@ -106,6 +106,27 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFormatWhenMaxInConstructAndInStart()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar->start();
+        $bar->advance(10);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $maxInConstruct = stream_get_contents($output->getStream());
+
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start(10);
+        $bar->advance(10);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $maxInStart = stream_get_contents($output->getStream());
+
+        $this->assertEquals($maxInStart, $maxInConstruct);
+    }
+
     public function testCustomizations()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 10);

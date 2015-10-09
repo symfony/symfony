@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-09T15:34:30Z
+
+catching ErrorException is the wrong implementation. Warnings are not turned into exceptions in production
+
+---------------------------------------------------------------------------
+
+by cbj4074 at 2015-10-09T15:57:28Z
+
+@stof Okay; my apologies. I am not at all familiar with the Symfony code-base, nor the methodologies that it employs. As much as I would love to read-up and offer a more appropriate solution, I simply lack the time. Perhaps you or another contributor is able to discern the problem and fix it correctly.
+
+@nicolas-grekas From what I'm able to determine, PHP's `is_dir()` method triggers the exception. The behavior results from a confirmed bug in PHP (see PR description for link to issue).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-09T21:13:24Z
+
+:+1: thanks
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-09T21:16:41Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cbj4074 at 2015-10-09T21:46:07Z
+
+Thanks for the quick turnaround! :beers:

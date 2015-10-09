@@ -24,6 +24,8 @@ class ProgressIndicator
     private $message = null;
     private $indicatorValues = array('-', '\\', '|', '/');
     private $indicatorCurrent = 0;
+    private $indicatorChangeInterval = 100;
+    private $indicatorUpdateTime;
     private $lastMessagesLength = 0;
 
     private static $formatters;
@@ -46,6 +48,14 @@ class ProgressIndicator
     public function setFormat($format)
     {
         $this->format = self::getFormatDefinition($format);
+    }
+
+    /**
+     * @param int $milliseconds
+     */
+    public function setIndicatorChangeInterval($milliseconds)
+    {
+        $this->indicatorChangeInterval = $milliseconds;
     }
 
     /**
@@ -102,6 +112,7 @@ class ProgressIndicator
     {
         $this->message = $message;
         $this->startTime = time();
+        $this->indicatorUpdateTime = $this->getCurrentTimeInMilliseconds() + $this->indicatorChangeInterval;
         $this->indicatorCurrent = 0;
 
         $this->display();
@@ -109,11 +120,20 @@ class ProgressIndicator
 
     public function advance()
     {
+        if (!$this->output->isDecorated()) {
+            return;
+        }
+
+        $currentTime = $this->getCurrentTimeInMilliseconds();
+
+        if ($currentTime < $this->indicatorUpdateTime) {
+            return;
+        }
+
+        $this->indicatorUpdateTime = $currentTime + $this->indicatorChangeInterval;
         ++$this->indicatorCurrent;
 
-        if ($this->output->isDecorated()) {
-            $this->display();
-        }
+        $this->display();
     }
 
     public function finish($message)
@@ -231,6 +251,11 @@ class ProgressIndicator
         if ($len > $this->lastMessagesLength) {
             $this->lastMessagesLength = $len;
         }
+    }
+
+    private function getCurrentTimeInMilliseconds()
+    {
+        return round(microtime(true) * 1000);
     }
 
     private static function initPlaceholderFormatters()

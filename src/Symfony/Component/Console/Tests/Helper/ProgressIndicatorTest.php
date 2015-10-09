@@ -11,11 +11,17 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream());
         $bar->start('Starting...');
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->setMessage('Advancing...');
         $bar->advance();
         $bar->finish('Done...');
@@ -65,8 +71,11 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
         $bar->setIndicatorValues(array('a', 'b', 'c'));
 
         $bar->start('Starting...');
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
+        usleep(101000);
         $bar->advance();
 
         rewind($output->getStream());

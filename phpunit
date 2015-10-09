@@ -28,7 +28,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
     // Build a standalone phpunit without symfony/yaml
 
     $oldPwd = getcwd();
-    mkdir($PHPUNIT_DIR);
+    @mkdir($PHPUNIT_DIR);
     chdir($PHPUNIT_DIR);
     if (extension_loaded('openssl') && ini_get('allow_url_fopen')) {
         stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
@@ -41,7 +41,9 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit")) {
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update symfony/yaml");
+    passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
     passthru("$COMPOSER install --prefer-source --no-progress --ansi");
+    symlink(realpath('../../src/Symfony/Bridge/PhpUnit/SkippedTestsListener.php'), './vendor/symfony/phpunit-bridge/SkippedTestsListener.php');
     chdir($oldPwd);
 }
 
@@ -76,10 +78,13 @@ if ($phpIniMatrix) {
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
     // Find Symfony components in plain php for Windows portability
 
-    $finder = new RecursiveDirectoryIterator(__DIR__.'/src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+    $oldPwd = getcwd();
+    chdir(__DIR__);
+    $finder = new RecursiveDirectoryIterator('src/Symfony', FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
     $finder = new RecursiveIteratorIterator($finder);
     $finder->setMaxDepth(3);
 
+    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
     $runningProcs = array();
 
     foreach ($finder as $file => $fileInfo) {
@@ -87,6 +92,10 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
             $component = dirname($fileInfo->getPathname());
 
             // Run phpunit tests in parallel
+
+            if ($skippedTests) {
+                putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
+            }
 
             $c = ProcessUtils::escapeArgument($component);
 
@@ -98,6 +107,7 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
             }
         }
     }
+    chdir($oldPwd);
 
     // Fixes for colors support on appveyor
     // See https://github.com/appveyor/ci/issues/373
@@ -138,6 +148,9 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
                     readfile($file);
                 }
                 unlink($file);
+            }
+            if ($skippedTests) {
+                @unlink("$component/$skippedTests");
             }
 
             if ($procStatus) {

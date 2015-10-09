@@ -56,19 +56,12 @@ class ExecutableFinder
             $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));
             $dirs = array();
             foreach ($searchPath as $path) {
-                try {
-                    if (is_dir($path)) {
-                        $dirs[] = $path;
-                    } else {
-                        if (basename($path) == $name && is_executable($path)) {
-                            return $path;
-                        }
+                if (@is_dir($path)) {
+                    $dirs[] = $path;
+                } else {
+                    if (basename($path) == $name && is_executable($path)) {
+                        return $path;
                     }
-                }
-                catch (\ErrorException $e) {
-                    //There is a bug in PHP that causes an exception to be
-                    //thrown when the directory does not exist.
-                    //See: https://bugs.php.net/bug.php?id=69240
                 }
             }
         } else {

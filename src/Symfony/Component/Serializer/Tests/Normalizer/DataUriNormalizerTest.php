@@ -112,10 +112,51 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @dataProvider invalidUriProvider
      */
-    public function testInvalidData()
+    public function testInvalidData($uri)
     {
-        $this->normalizer->denormalize('data:this,isInvalid', 'SplFileObject');
+        $this->normalizer->denormalize($uri, 'SplFileObject');
+    }
+
+    public function invalidUriProvider()
+    {
+        return array(
+            array('dataxbase64'),
+            array('data:HelloWorld'),
+            array('data:text/html;charset=,%3Ch1%3EHello!%3C%2Fh1%3E'),
+            array('data:text/html;charset,%3Ch1%3EHello!%3C%2Fh1%3E'),
+            array('data:base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC'),
+            array(''),
+            array('http://wikipedia.org'),
+            array('base64'),
+            array('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC'),
+            array(' data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC'),
+            array('   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC'),
+        );
+    }
+
+    /**
+     * @dataProvider validUriProvider
+     */
+    public function testValidData($uri)
+    {
+        $this->assertInstanceOf('SplFileObject', $this->normalizer->denormalize($uri, 'SplFileObject'));
+    }
+
+    public function validUriProvider()
+    {
+        return array(
+            array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC'),
+            array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC'),
+            array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC   '),
+            array('data:,Hello%2C%20World!'),
+            array('data:,Hello World!'),
+            array('data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D'),
+            array('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E'),
+            array('data:,A%20brief%20note'),
+            array('data:text/html;charset=US-ASCII,%3Ch1%3EHello!%3C%2Fh1%3E'),
+        );
     }
 
     private function getContent(\SplFileObject $file)

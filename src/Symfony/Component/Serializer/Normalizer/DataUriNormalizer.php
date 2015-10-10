@@ -82,15 +82,15 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      *
-     * Regex taken from Brian Grinstead code.
+     * Regex adapted from Brian Grinstead code.
      *
-     * @see https://gist.githubusercontent.com/bgrins/6194623/raw/2ace3be86fa54b72b2c10e013cbc37d79b222bd7/detectDataURL.js
+     * @see https://gist.github.com/bgrins/6194623
      *
      * @throws UnexpectedValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        if (!preg_match('/^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
+        if (!preg_match('/^data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw new UnexpectedValueException('The provided "data:" URI is not valid.');
         }
 

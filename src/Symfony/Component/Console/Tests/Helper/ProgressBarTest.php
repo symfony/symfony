@@ -270,12 +270,11 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar->advance(1);
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testMultiByteSupport()
     {
-        if (!function_exists('mb_strlen') || (false === $encoding = mb_detect_encoding('■'))) {
-            $this->markTestSkipped('The mbstring extension is needed for multi-byte support');
-        }
-
         $bar = new ProgressBar($output = $this->getOutputStream());
         $bar->start();
         $bar->setBarCharacter('■');

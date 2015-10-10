@@ -25,7 +25,6 @@
         "paragonie/random_compat": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.8|~3.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/security-csrf": "~2.8|~3.0",
         "psr/log": "~1.0"

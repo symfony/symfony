@@ -108,12 +108,11 @@ EOTXT
         );
     }
 
+    /**
+     * @requires extension xml
+     */
     public function testXmlResource()
     {
-        if (!extension_loaded('xml')) {
-            $this->markTestSkipped('xml extension is required');
-        }
-
         $var = xml_parser_create();
 
         $this->assertDumpMatchesFormat(
@@ -310,13 +309,10 @@ EOTXT
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
+     * @requires PHP 5.6
      */
     public function testSpecialVars56()
     {
-        if (PHP_VERSION_ID < 50600) {
-            $this->markTestSkipped('PHP 5.6 is required');
-        }
-
         $var = $this->getSpecialVars();
 
         $this->assertDumpEquals(

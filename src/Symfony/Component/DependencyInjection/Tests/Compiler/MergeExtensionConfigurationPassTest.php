@@ -19,10 +19,6 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testExpressionLanguageProviderForwarding()
     {
-        if (true !== class_exists('Symfony\\Component\\ExpressionLanguage\\ExpressionLanguage')) {
-            $this->markTestSkipped('The ExpressionLanguage component isn\'t available!');
-        }
-
         $tmpProviders = array();
 
         $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');

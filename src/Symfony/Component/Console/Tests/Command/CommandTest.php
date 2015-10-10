@@ -307,7 +307,9 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /** @dataProvider getSetCodeBindToClosureTests */
+    /**
+     * @dataProvider getSetCodeBindToClosureTests
+     */
     public function testSetCodeBindToClosure($previouslyBound, $expected)
     {
         $code = createClosure();

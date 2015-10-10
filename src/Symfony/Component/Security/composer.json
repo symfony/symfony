@@ -31,7 +31,6 @@
     },
     "require-dev": {
         "symfony/finder": "~2.8|~3.0",
-        "symfony/phpunit-bridge": "~2.8|~3.0",
         "symfony/intl": "~2.8|~3.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",

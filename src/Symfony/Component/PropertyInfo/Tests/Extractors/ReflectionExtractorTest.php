@@ -75,13 +75,10 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider php7TypesProvider
+     * @requires PHP 7.0
      */
     public function testExtractPhp7Type($property, array $type = null)
     {
-        if (!method_exists('\ReflectionMethod', 'getReturnType')) {
-            $this->markTestSkipped('Available only with PHP 7 and superior.');
-        }
-
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy', $property, array()));
     }
 

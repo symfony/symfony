@@ -13,7 +13,7 @@
             <argument /><!-- Debug-Flag -->
         </service>
 
-        <service id="annotations.php_file_cache" class="Doctrine\Common\Cache\PhpFileCache" public="false">
+        <service id="annotations.filesystem_cache" class="Doctrine\Common\Cache\FilesystemCache" public="false">
             <argument /><!-- Cache-Directory -->
         </service>
 

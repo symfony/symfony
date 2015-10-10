@@ -369,10 +369,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithIntlTimeZone()
     {
-        if (!class_exists('IntlTimeZone')) {
-            $this->markTestSkipped('This test requires the IntlTimeZone class from the Intl extension.');
-        }
-
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
 
         $this->assertEquals('GMT+03:00', $formatter->format(0));

@@ -815,14 +815,14 @@ class FrameworkExtension extends Extension
                 }
 
                 $container
-                    ->getDefinition('annotations.php_file_cache')
+                    ->getDefinition('annotations.filesystem_cache')
                     ->replaceArgument(0, $cacheDir)
                 ;
             }
 
             $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.php_file_cache'))
+                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');

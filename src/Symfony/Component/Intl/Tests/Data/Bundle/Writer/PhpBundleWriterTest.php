@@ -64,13 +64,11 @@ class PhpBundleWriterTest extends \PHPUnit_Framework_TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.php', $this->directory.'/en.php');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testWriteResourceBundle()
     {
-        // We only run tests if the intl extension is loaded...
-        if (!Intl::isExtensionLoaded()) {
-            $this->markTestSkipped('The intl extension is not available.');
-        }
-
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 
         $this->writer->write($this->directory, 'en', $bundle);

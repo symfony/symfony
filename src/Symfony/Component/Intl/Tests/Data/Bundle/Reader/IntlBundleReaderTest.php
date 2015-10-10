@@ -16,6 +16,7 @@ use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @requires extension intl
  */
 class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,11 +27,6 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        // We only run tests if the intl extension is loaded...
-        if (!Intl::isExtensionLoaded()) {
-            $this->markTestSkipped('The intl extension is not available.');
-        }
-
         $this->reader = new IntlBundleReader();
     }
 

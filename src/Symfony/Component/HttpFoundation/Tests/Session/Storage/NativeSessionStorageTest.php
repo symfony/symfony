@@ -205,12 +205,11 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
     }
 
+    /**
+     * @requires PHP 5.4
+     */
     public function testSetSaveHandler54()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
-        }
-
         $this->iniSet('session.save_handler', 'files');
         $storage = $this->getStorage();
         $storage->setSaveHandler();

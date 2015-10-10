@@ -7,6 +7,16 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.11 (2015-07-26)
+
+ * bug #15361 [Yaml] throw a ParseException on invalid data type (xabbuh)
+ * bug #15330 [Console] Fix console output with closed stdout (jakzal)
+ * bug #15326 [Security] fix check for empty usernames (xabbuh)
+ * bug #15291 [HttpFoundation] Fix Response::closeOutputBuffers() for HHVM 3.3 (nicolas-grekas)
+ * bug #15249 [HttpFoundation] [PSR-7] Allow to use resources as content body and to return resources from string content (dunglas)
+ * bug #15282 [HttpFoundation] Behaviour change in PHP7 for substr (Nicofuma)
+ * bug #15250 [PropertyAccess] BC Break since 2.6.5 (Nicolas Macherey)
+
 * 2.6.10 (2015-07-13)
 
  * bug #15248 Added 'default' color (jaytaph)

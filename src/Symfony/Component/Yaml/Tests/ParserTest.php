@@ -552,6 +552,21 @@ EOF
     }
 
     /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage missing colon
+     */
+    public function testScalarInSequence()
+    {
+        Yaml::parse(<<<EOF
+foo:
+    - bar
+"missing colon"
+    foo: bar
+EOF
+        );
+    }
+
+    /**
      * > It is an error for two equal keys to appear in the same mapping node.
      * > In such a case the YAML processor may continue, ignoring the second
      * > `key: value` pair and issuing an appropriate warning. This strategy

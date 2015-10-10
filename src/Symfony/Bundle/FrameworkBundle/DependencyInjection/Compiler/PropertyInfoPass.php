@@ -64,7 +64,7 @@ class PropertyInfoPass implements CompilerPassInterface
             }
         }
 
-        if (0 === count($sortedServices)) {
+        if (empty($sortedServices)) {
             return array();
         }
 

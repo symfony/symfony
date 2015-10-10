@@ -19,12 +19,11 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class PdoCasterTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @requires extension pdo_sqlite
+     */
     public function testCastPdo()
     {
-        if (!extension_loaded('pdo_sqlite')) {
-            $this->markTestSkipped('pdo_sqlite extension is required');
-        }
-
         $pdo = new \PDO('sqlite::memory:');
         $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array($pdo)));
 

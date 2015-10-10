@@ -95,25 +95,25 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     protected function markAsSkippedIfSymlinkIsMissing()
     {
         if (!function_exists('symlink')) {
-            $this->markTestSkipped('symlink is not supported');
+            $this->markTestSkipped('Function symlink is required.');
         }
 
         if ('\\' === DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
-            $this->markTestSkipped('symlink requires "Create symbolic links" privilege on windows');
+            $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }
     }
 
     protected function markAsSkippedIfChmodIsMissing()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('chmod is not supported on windows');
+            $this->markTestSkipped('chmod is not supported on Windows');
         }
     }
 
     protected function markAsSkippedIfPosixIsMissing()
     {
-        if ('\\' === DIRECTORY_SEPARATOR || !function_exists('posix_isatty')) {
-            $this->markTestSkipped('Posix is not supported');
+        if (!function_exists('posix_isatty')) {
+            $this->markTestSkipped('Function posix_isatty is required.');
         }
     }
 }

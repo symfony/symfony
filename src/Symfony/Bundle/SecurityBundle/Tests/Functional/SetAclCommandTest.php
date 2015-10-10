@@ -33,6 +33,7 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
  * Tests SetAclCommand.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
+ * @requires extension pdo_sqlite
  */
 class SetAclCommandTest extends WebTestCase
 {
@@ -41,9 +42,6 @@ class SetAclCommandTest extends WebTestCase
 
     protected function setUp()
     {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            self::markTestSkipped('This test requires SQLite support in your environment');
-        }
         parent::setUp();
 
         $this->deleteTmpDir('Acl');

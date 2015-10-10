@@ -1001,12 +1001,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
+    /**
+     * @requires function posix_isatty
+     */
     public function testCanCheckIfTerminalIsInteractive()
     {
-        if (!function_exists('posix_isatty')) {
-            $this->markTestSkipped('posix_isatty function is required');
-        }
-
         $application = new CustomDefaultCommandApplication();
         $application->setAutoExit(false);
 

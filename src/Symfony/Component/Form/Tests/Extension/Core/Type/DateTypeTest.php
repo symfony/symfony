@@ -933,8 +933,7 @@ class DateTypeTest extends TestCase
     public function testYearsFor32BitsMachines()
     {
         if (4 !== PHP_INT_SIZE) {
-            $this->markTestSkipped(
-                'PHP must be compiled in 32 bit mode to run this test');
+            $this->markTestSkipped('PHP 32 bit is required.');
         }
 
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(

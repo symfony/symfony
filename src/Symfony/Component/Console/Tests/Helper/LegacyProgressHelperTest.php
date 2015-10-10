@@ -167,12 +167,11 @@ class LegacyProgressHelperTest extends \PHPUnit_Framework_TestCase
         $progress->advance(1);
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testMultiByteSupport()
     {
-        if (!function_exists('mb_strlen') || (false === $encoding = mb_detect_encoding('■'))) {
-            $this->markTestSkipped('The mbstring extension is needed for multi-byte support');
-        }
-
         $progress = new ProgressHelper();
         $progress->start($output = $this->getOutputStream());
         $progress->setBarCharacter('■');

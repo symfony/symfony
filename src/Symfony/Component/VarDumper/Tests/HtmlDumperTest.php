@@ -120,11 +120,11 @@ EOTXT
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function testCharset()
     {
-        if (!extension_loaded('mbstring')) {
-            $this->markTestSkipped('This test requires mbstring.');
-        }
         $var = mb_convert_encoding('Словарь', 'CP1251', 'UTF-8');
 
         $dumper = new HtmlDumper('php://output', 'CP1251');

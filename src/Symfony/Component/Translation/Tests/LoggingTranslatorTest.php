@@ -17,13 +17,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!interface_exists('Psr\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "LoggerInterface" is not available');
-        }
-    }
-
     public function testTransWithNoTranslationIsLogged()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');

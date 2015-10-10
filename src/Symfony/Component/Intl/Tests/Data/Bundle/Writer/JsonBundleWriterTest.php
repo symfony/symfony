@@ -17,6 +17,7 @@ use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @requires PHP 5.4
  */
 class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,10 +35,6 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('This test requires at least PHP 5.4.0.');
-        }
-
         $this->writer = new JsonBundleWriter();
         $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
@@ -72,13 +69,11 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.json', $this->directory.'/en.json');
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testWriteResourceBundle()
     {
-        // We only run tests if the intl extension is loaded...
-        if (!Intl::isExtensionLoaded()) {
-            $this->markTestSkipped('The intl extension is not available.');
-        }
-
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 
         $this->writer->write($this->directory, 'en', $bundle);

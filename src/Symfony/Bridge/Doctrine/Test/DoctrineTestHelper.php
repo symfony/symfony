@@ -29,8 +29,8 @@ class DoctrineTestHelper
      */
     public static function createTestEntityManager()
     {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            \PHPUnit_Framework_TestCase::markTestSkipped('This test requires SQLite support in your environment');
+        if (!extension_loaded('pdo_sqlite')) {
+            \PHPUnit_Framework_TestCase::markTestSkipped('Extension pdo_sqlite is required.');
         }
 
         $config = new \Doctrine\ORM\Configuration();

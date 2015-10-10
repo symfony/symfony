@@ -21,7 +21,6 @@
         "symfony/security-http": "~2.7|~3.0.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.8|~3.0.0",
         "psr/log": "~1.0"
     },
     "autoload": {

@@ -17,12 +17,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
-            $this->markTestSkipped('The "DataCollector" is not available');
-        }
-    }
     public function testCollectMessages()
     {
         $collector = $this->createCollector();

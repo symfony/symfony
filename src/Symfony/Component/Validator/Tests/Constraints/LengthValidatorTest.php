@@ -87,12 +87,11 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
+    /**
+     * @requires extension mbstring
+     */
     public function getOneCharset()
     {
-        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
-            $this->markTestSkipped('Mbstring or iconv is required for this test.');
-        }
-
         return array(
             array('é', 'utf8', true),
             array("\xE9", 'CP1252', true),

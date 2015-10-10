@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler;
+use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * @group legacy

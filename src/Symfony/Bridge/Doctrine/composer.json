@@ -39,7 +39,8 @@
         "symfony/validator": "",
         "doctrine/data-fixtures": "",
         "doctrine/dbal": "",
-        "doctrine/orm": ""
+        "doctrine/orm": "",
+        "symfony/property-access": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }

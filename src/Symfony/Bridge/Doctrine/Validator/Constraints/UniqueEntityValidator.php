@@ -138,6 +138,11 @@ class UniqueEntityValidator extends ConstraintValidator
         $vars = array();
 
         if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/i', $constraint->message, $vars) > 0) {
+
+            if (!class_exists('Symfony\\Component\\PropertyAccess\\PropertyAccess')) {
+                throw new \RuntimeException('Unable to access entity property as the Symfony PropertyAccess is not installed.');
+            }
+
             $accessor = PropertyAccess::createPropertyAccessor();
 
             foreach ($vars[1] as $var) {

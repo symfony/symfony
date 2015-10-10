@@ -146,17 +146,22 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function validUriProvider()
     {
-        return array(
+        $data = array(
             array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC'),
             array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC'),
             array('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIBAMAAAA2IaO4AAAAFVBMVEXk5OTn5+ft7e319fX29vb5+fn///++GUmVAAAALUlEQVQIHWNICnYLZnALTgpmMGYIFWYIZTA2ZFAzTTFlSDFVMwVyQhmAwsYMAKDaBy0axX/iAAAAAElFTkSuQmCC   '),
             array('data:,Hello%2C%20World!'),
-            array('data:,Hello World!'),
-            array('data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D'),
             array('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E'),
             array('data:,A%20brief%20note'),
             array('data:text/html;charset=US-ASCII,%3Ch1%3EHello!%3C%2Fh1%3E'),
         );
+
+        if (!defined('HHVM_VERSION')) {
+            // See https://github.com/facebook/hhvm/issues/6354
+            $data[] = array('data:text/plain;charset=utf-8;base64,SGVsbG8gV29ybGQh');
+        }
+
+        return $data;
     }
 
     private function getContent(\SplFileObject $file)

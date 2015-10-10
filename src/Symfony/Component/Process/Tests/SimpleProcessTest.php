@@ -121,9 +121,12 @@ class SimpleProcessTest extends AbstractProcessTest
         parent::testExitCodeIsAvailableAfterSignal();
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Can not send signal on a non running process.
+     */
     public function testSignalProcessNotRunning()
     {
-        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Can not send signal on a non running process.');
         parent::testSignalProcessNotRunning();
     }
 

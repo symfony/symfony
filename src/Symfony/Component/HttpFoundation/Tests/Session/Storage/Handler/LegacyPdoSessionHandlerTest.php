@@ -17,12 +17,13 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHan
  * @group legacy
  * @requires extension pdo_sqlite
  */
-class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
+class LegacyPdoSessionHandlerTest extends ClockMockTestCase
 {
     private $pdo;
 
     protected function setUp()
     {
+        parent::setUp();
         $this->pdo = new \PDO('sqlite::memory:');
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)';

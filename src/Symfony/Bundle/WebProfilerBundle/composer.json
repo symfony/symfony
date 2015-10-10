@@ -22,7 +22,6 @@
         "symfony/twig-bridge": "~2.7"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.2",
         "symfony/console": "~2.3",
         "symfony/dependency-injection": "~2.2",

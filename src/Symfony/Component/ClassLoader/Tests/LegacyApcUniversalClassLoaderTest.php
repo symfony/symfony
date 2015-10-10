@@ -15,15 +15,12 @@ use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 
 /**
  * @group legacy
+ * @requires extension apc
  */
 class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('The apc extension is not available.');
-        }
-
         if (!(ini_get('apc.enabled') && ini_get('apc.enable_cli'))) {
             $this->markTestSkipped('The apc extension is available, but not enabled.');
         } else {

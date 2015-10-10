@@ -19,7 +19,6 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
         "symfony/yaml": "~2.1",
         "symfony/config": "~2.2",
         "symfony/expression-language": "~2.6"

@@ -19,7 +19,6 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
         "symfony/dependency-injection": "~2.6",
         "symfony/expression-language": "~2.6",
         "symfony/config": "~2.0,>=2.0.5",

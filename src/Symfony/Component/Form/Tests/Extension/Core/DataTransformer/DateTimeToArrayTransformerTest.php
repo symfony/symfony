@@ -116,12 +116,11 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
+    /**
+     * @requires PHP 5.5
+     */
     public function testTransformDateTimeImmutable()
     {
-        if (PHP_VERSION_ID < 50500) {
-            $this->markTestSkipped('DateTimeImmutable was introduced in PHP 5.5.0');
-        }
-
         $transformer = new DateTimeToArrayTransformer('America/New_York', 'Asia/Hong_Kong');
 
         $input = new \DateTimeImmutable('2010-02-03 04:05:06 America/New_York');

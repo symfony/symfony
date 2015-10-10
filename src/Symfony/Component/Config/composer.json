@@ -19,9 +19,6 @@
         "php": ">=5.3.9",
         "symfony/filesystem": "~2.3"
     },
-    "require-dev": {
-        "symfony/phpunit-bridge": "~2.7"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" }
     },

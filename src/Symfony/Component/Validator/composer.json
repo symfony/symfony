@@ -20,7 +20,7 @@
         "symfony/translation": "~2.4"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
+        "doctrine/common": "~2.3",
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.4",
         "symfony/yaml": "~2.0,>=2.0.5",

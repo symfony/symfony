@@ -23,7 +23,6 @@
         "symfony/property-access": "~2.3"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
         "doctrine/collections": "~1.0",
         "symfony/validator": "~2.6,>=2.6.8",
         "symfony/http-foundation": "~2.2",

@@ -20,8 +20,8 @@ class LegacyApcCacheTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!extension_loaded('apc') || !ini_get('apc.enable_cli')) {
-            $this->markTestSkipped('APC is not loaded.');
+        if (!ini_get('apc.enable') || !ini_get('apc.enable_cli')) {
+            $this->markTestSkipped('APC is not enabled.');
         }
     }
 

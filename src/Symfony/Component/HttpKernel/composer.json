@@ -23,7 +23,6 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
         "symfony/browser-kit": "~2.3",
         "symfony/class-loader": "~2.1",
         "symfony/config": "~2.7",

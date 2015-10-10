@@ -48,13 +48,12 @@ class LegacyDefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
     }
 
+    /**
+     * @requires PHP 5.4
+     */
     public function testGenerateCsrfTokenOnUnstartedSession()
     {
         session_id('touti');
-
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('This test requires PHP >= 5.4');
-        }
 
         $this->assertSame(PHP_SESSION_NONE, session_status());
 

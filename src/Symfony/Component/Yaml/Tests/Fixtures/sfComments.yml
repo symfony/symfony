@@ -7,8 +7,11 @@ yaml: |
     ex2: "foo # bar" # comment
     ex3: 'foo # bar' # comment
     ex4: foo # comment
+    ex5: foo	#	comment with tab before  
+    ex6: foo#foo # comment here
+    ex7: foo 	# ignore me # and me
 php: |
-    array('ex1' => 'foo # bar', 'ex2' => 'foo # bar', 'ex3' => 'foo # bar', 'ex4' => 'foo')
+    array('ex1' => 'foo # bar', 'ex2' => 'foo # bar', 'ex3' => 'foo # bar', 'ex4' => 'foo', 'ex5' => 'foo', 'ex6' => 'foo#foo', 'ex7' => 'foo')
 ---
 test: Comments in the middle
 brief: >

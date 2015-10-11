@@ -44,6 +44,7 @@ class ProgressBar
     private $formatLineCount;
     private $messages;
     private $overwrite = true;
+    private $formatSetByUser = false;
 
     private static $formatters;
     private static $formats;
@@ -73,7 +74,7 @@ class ProgressBar
             }
         }
 
-        $this->setFormat($this->determineBestFormat());
+        $this->setFormatInternal($this->determineBestFormat());
 
         $this->startTime = time();
     }
@@ -311,16 +312,8 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        // try to use the _nomax variant if available
-        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
-            $this->format = self::getFormatDefinition($format.'_nomax');
-        } elseif (null !== self::getFormatDefinition($format)) {
-            $this->format = self::getFormatDefinition($format);
-        } else {
-            $this->format = $format;
-        }
-
-        $this->formatLineCount = substr_count($this->format, "\n");
+        $this->formatSetByUser = true;
+        $this->setFormatInternal($format);
     }
 
     /**
@@ -346,6 +339,10 @@ class ProgressBar
 
         if (null !== $max) {
             $this->setMaxSteps($max);
+
+            if (!$this->formatSetByUser) {
+                $this->setFormatInternal($this->determineBestFormat());
+            }
         }
 
         $this->display();
@@ -477,6 +474,25 @@ class ProgressBar
         }
 
         $this->overwrite(str_repeat("\n", $this->formatLineCount));
+    }
+
+    /**
+     * Sets the progress bar format.
+     *
+     * @param string $format The format
+     */
+    private function setFormatInternal($format)
+    {
+        // try to use the _nomax variant if available
+        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
+            $this->format = self::getFormatDefinition($format.'_nomax');
+        } elseif (null !== self::getFormatDefinition($format)) {
+            $this->format = self::getFormatDefinition($format);
+        } else {
+            $this->format = $format;
+        }
+
+        $this->formatLineCount = substr_count($this->format, "\n");
     }
 
     /**

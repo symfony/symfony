@@ -18,7 +18,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class SkippedTestsListener extends \PHPUnit_Framework_BaseTestListener
+class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 {
     private $state = -1;
     private $skippedFile = false;

@@ -52,16 +52,8 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners($eventName = null, $withPriorities = false)
+    public function getListeners($eventName = null)
     {
-        if (true === $withPriorities) {
-            if (null !== $eventName) {
-                return isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : array();
-            }
-
-            return array_filter($this->listeners);
-        }
-
         if (null !== $eventName) {
             if (!isset($this->listeners[$eventName])) {
                 return array();
@@ -81,6 +73,29 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         return array_filter($this->sorted);
+    }
+
+    /**
+     * Gets the listener priority for a specific event.
+     *
+     * Returns null if the event or the listener does not exist.
+     *
+     * @param string   $eventName The name of the event
+     * @param callable $listener  The listener to remove
+     *
+     * @return int|null The event listener priority
+     */
+    public function getListenerPriority($eventName, $listener)
+    {
+        if (!isset($this->listeners[$eventName])) {
+            return;
+        }
+
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            if (false !== ($key = array_search($listener, $listeners, true))) {
+                return $priority;
+            }
+        }
     }
 
     /**
@@ -177,8 +192,6 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function sortListeners($eventName)
     {
-        $this->sorted[$eventName] = array();
-
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
     }

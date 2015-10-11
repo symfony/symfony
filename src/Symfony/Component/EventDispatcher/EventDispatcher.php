@@ -55,7 +55,11 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null, $withPriorities = false)
     {
         if (true === $withPriorities) {
-            return $eventName ? $this->listeners[$eventName] : array_filter($this->listeners);
+            if (null !== $eventName) {
+                return isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : array();
+            }
+
+            return array_filter($this->listeners);
         }
 
         if (null !== $eventName) {

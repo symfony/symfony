@@ -134,6 +134,8 @@ class RememberMeFactory implements SecurityFactoryInterface
                     $v['secret'] = $v['key'];
 
                     unset($v['key']);
+
+                    return $v;
                 })
                 ->end()
             ->children();

@@ -150,7 +150,7 @@ class UniqueEntityValidator extends ConstraintValidator
                 $paramaters[sprintf('{{ %s }}', $var)] = $accessor->getValue($entity, $var);
             }
         }
-        
+
         $this->buildViolation($constraint->message, $paramaters)
             ->atPath($errorPath)
             ->setInvalidValue($invalidValue)

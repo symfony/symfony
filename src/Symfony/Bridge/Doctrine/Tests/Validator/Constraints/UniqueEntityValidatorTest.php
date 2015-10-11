@@ -481,7 +481,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($entity2, $constraint);
 
         $this->buildViolation('An entity with name "{{ name }}" already exists.')
-            ->setParameters(array("{{ name }}" => "Foo"))
+            ->setParameters(array('{{ name }}' => 'Foo'))
             ->atPath('property.path.name')
             ->setInvalidValue('Foo')
             ->assertRaised();
@@ -513,7 +513,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($entity2, $constraint);
 
         $this->buildViolation('An entity with name1 "{{ name }}" and name2 "{{ name2 }}" already exists.')
-            ->setParameters(array("{{ name }}" => "Foo", "{{ name2 }}" => "Bar"))
+            ->setParameters(array('{{ name }}' => 'Foo', '{{ name2 }}' => 'Bar'))
             ->atPath('property.path.name2')
             ->setInvalidValue('Bar')
             ->assertRaised();

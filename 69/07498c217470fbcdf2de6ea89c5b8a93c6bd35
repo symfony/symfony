@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-06-18T16:17:57Z
+
+We need a few legacy tests using the old option names
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-05T14:52:21Z
+
+@WouterJ We need to finish this one this week if we want to include it in 2.8.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-10T10:09:28Z
+
+@fabpot I'm sorry for the delay. fixed all comments & added some legacy tests. Should be ready to merge now
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-10T10:57:48Z
+
+I cannot relate any of the build failures to changes in this PR

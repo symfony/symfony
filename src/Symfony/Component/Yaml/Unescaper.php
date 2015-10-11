@@ -32,7 +32,7 @@ class Unescaper
     /**
      * Regex fragment that matches an escaped character in a double quoted string.
      */
-    const REGEX_ESCAPED_CHARACTER = "\\\\([0abt\tnvfre \\\"\\/\\\\N_LP]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})";
+    const REGEX_ESCAPED_CHARACTER = "\\\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)";
 
     /**
      * Unescapes a single quoted string.
@@ -70,10 +70,13 @@ class Unescaper
      * @param string $value An escaped character
      *
      * @return string The unescaped character
+     *
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code. Should be changed in 3.0.
      */
     public function unescapeCharacter($value)
     {
-        switch ($value{1}) {
+        switch ($value[1]) {
             case '0':
                 return "\x0";
             case 'a':
@@ -120,6 +123,10 @@ class Unescaper
                 return self::utf8chr(hexdec(substr($value, 2, 4)));
             case 'U':
                 return self::utf8chr(hexdec(substr($value, 2, 8)));
+            default:
+                @trigger_error('Not escaping a backslash in a double-quoted string is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', E_USER_DEPRECATED);
+
+                return $value;
         }
     }
 

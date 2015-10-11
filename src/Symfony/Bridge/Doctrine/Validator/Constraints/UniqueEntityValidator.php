@@ -136,6 +136,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
         $vars = array();
+        $paramaters = array();
 
         if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/', $constraint->message, $vars) > 0) {
 
@@ -146,11 +147,11 @@ class UniqueEntityValidator extends ConstraintValidator
             $accessor = PropertyAccess::createPropertyAccessor();
 
             foreach ($vars[1] as $var) {
-                $constraint->message = str_replace(sprintf('{{ %s }}', $var), $accessor->getValue($entity, $var), $constraint->message);
+                $paramaters[sprintf('{{ %s }}', $var)] = $accessor->getValue($entity, $var);
             }
         }
-
-        $this->buildViolation($constraint->message)
+        
+        $this->buildViolation($constraint->message, $paramaters)
             ->atPath($errorPath)
             ->setInvalidValue($invalidValue)
             ->addViolation();

@@ -91,7 +91,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         if (false === $file || null === $file) {
             list($namespace, $name) = $this->parseName($logicalName);
             $paths = $this->getPaths($namespace);
-            array_walk($paths, function (&$path) use ($name) { $path .= '/' . $name; });
+            array_walk($paths, function (&$path) use ($name) { $path .= '/'.$name; });
             throw new \Twig_Error_Loader(sprintf('Unable to find template "%s" (tried: %s).', $name, implode(', ', $paths)), -1, null, $previous);
         }
 

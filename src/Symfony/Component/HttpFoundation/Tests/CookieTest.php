@@ -18,8 +18,10 @@ use Symfony\Component\HttpFoundation\Cookie;
  *
  * @author John Kary <john@johnkary.net>
  * @author Hugo Hamon <hugo.hamon@sensio.com>
+ *
+ * @group time-sensitive
  */
-class CookieTest extends ClockMockTestCase
+class CookieTest extends \PHPUnit_Framework_TestCase
 {
     public function invalidNames()
     {

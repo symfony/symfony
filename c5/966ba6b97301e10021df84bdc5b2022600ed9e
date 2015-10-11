@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-03T21:40:48Z
+
+Note to merger: This must be merged for Symfony 2.7.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-03T22:58:42Z
+
+The translations in the Security Core need to be updated equally.
+
+---------------------------------------------------------------------------
+
+by micheleorselli at 2015-10-04T08:42:13Z
+
+@Tobion I can also work on those, do you prefer a separate PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-04T08:44:04Z
+
+same PR is better, thanks
+
+---------------------------------------------------------------------------
+
+by micheleorselli at 2015-10-04T09:21:55Z
+
+It seems to me translations in Security Core are up to date since https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Security/Core/Resources/translations/security.it.xlf contains all the messages defined in https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Security/Core/Resources/translations/security.en.xlf or am I missing something?

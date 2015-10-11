@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-18T17:04:40Z
+
+The whole `withPriorities` logic is very fragile as this parameter is not part of the interface.
+But all descriptors are typehinted against the interface but rely on the fact that the `withPriorities` is understood. Otherwise the descriptors will fail. So what is the plan for 3.0? Add the paramter to the interface? Or maybe its better to create a dedicated method for that. Currently the return structure depends on the paramters which is usually really bad.
+
+But something needs to be added for #11742

@@ -47,6 +47,15 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     passthru("$COMPOSER remove --no-update symfony/yaml");
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
     passthru("$COMPOSER install --prefer-source --no-progress --ansi");
+    file_put_contents('phpunit', <<<EOPHP
+<?php
+
+define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
+require PHPUNIT_COMPOSER_INSTALL;
+Symfony\Bridge\PhpUnit\TextUI\Command::main();
+
+EOPHP
+    );
     chdir('..');
     if (file_exists('../src/Symfony/Bridge/PhpUnit') && `git diff --name-only HEAD^ -- ../src/Symfony/Bridge/PhpUnit`) {
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'del /S /F /Q %s & rmdir %1$s >nul 2>&1': 'rm -rf %s', str_replace('/', DIRECTORY_SEPARATOR, "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge")));

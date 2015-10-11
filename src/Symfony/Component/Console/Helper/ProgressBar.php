@@ -27,7 +27,8 @@ class ProgressBar
     private $barChar;
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format = null;
+    private $format;
+    private $internalFormat;
     private $redrawFreq = 1;
 
     /**
@@ -43,7 +44,6 @@ class ProgressBar
     private $formatLineCount;
     private $messages;
     private $overwrite = true;
-    private $formatSetByUser = false;
 
     private static $formatters;
     private static $formats;
@@ -72,8 +72,6 @@ class ProgressBar
                 $this->setRedrawFrequency($max / 10);
             }
         }
-
-        $this->setFormatInternal($this->determineBestFormat());
 
         $this->startTime = time();
     }
@@ -311,8 +309,8 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        $this->formatSetByUser = true;
-        $this->setFormatInternal($format);
+        $this->format = null;
+        $this->internalFormat = $format;
     }
 
     /**
@@ -338,10 +336,6 @@ class ProgressBar
 
         if (null !== $max) {
             $this->setMaxSteps($max);
-
-            if (!$this->formatSetByUser) {
-                $this->setFormatInternal($this->determineBestFormat());
-            }
         }
 
         $this->display();
@@ -438,6 +432,10 @@ class ProgressBar
             return;
         }
 
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
         // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
         $self = $this;
         $output = $this->output;
@@ -472,6 +470,10 @@ class ProgressBar
             return;
         }
 
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
         $this->overwrite(str_repeat("\n", $this->formatLineCount));
     }
 
@@ -480,7 +482,7 @@ class ProgressBar
      *
      * @param string $format The format
      */
-    private function setFormatInternal($format)
+    private function setRealFormat($format)
     {
         // try to use the _nomax variant if available
         if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {

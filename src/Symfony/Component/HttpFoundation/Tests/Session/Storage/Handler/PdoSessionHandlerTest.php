@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
-use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * @requires extension pdo_sqlite
+ * @group time-sensitive
  */
-class PdoSessionHandlerTest extends ClockMockTestCase
+class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $dbFile;
 

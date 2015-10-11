@@ -28,8 +28,4 @@
             </exclude>
         </whitelist>
     </filter>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SkippedTestsListener" />
-    </listeners>
 </phpunit>

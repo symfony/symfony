@@ -71,12 +71,12 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     * @expectedException        \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Found unknown escape character "\V".
      */
     public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
     {
-        $this->assertSame('Foo\Var', Inline::parse('"Foo\Var"'));
+        Inline::parse('"Foo\Var"');
     }
 
     /**

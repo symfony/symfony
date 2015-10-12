@@ -13,11 +13,14 @@ namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
 use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
+/**
+ * @requires extension apc
+ */
 class ApcCacheTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!ini_get('apc.enable') || !ini_get('apc.enable_cli')) {
+        if (!ini_get('apc.enabled') || !ini_get('apc.enable_cli')) {
             $this->markTestSkipped('APC is not enabled.');
         }
     }

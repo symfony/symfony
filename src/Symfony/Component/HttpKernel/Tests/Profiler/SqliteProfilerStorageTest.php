@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
+/**
+ * @requires extension pdo_sqlite
+ */
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $dbFile;
@@ -34,9 +37,6 @@ class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 
     protected function setUp()
     {
-        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
-            $this->markTestSkipped('This test requires SQLite support in your environment');
-        }
         self::$storage->purge();
     }
 

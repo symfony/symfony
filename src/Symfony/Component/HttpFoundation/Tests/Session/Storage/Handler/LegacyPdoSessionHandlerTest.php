@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler;
-use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * @group legacy
+ * @group time-sensitive
  * @requires extension pdo_sqlite
  */
-class LegacyPdoSessionHandlerTest extends ClockMockTestCase
+class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $pdo;
 

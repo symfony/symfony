@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-10-12T11:28:35Z
+
+From experience it's very nice to make classes final, especially for internal classes, as long as they extend or implement something which you can mock/prophesize or what ever.
+
+Internal stuff shouldn't be relied upon from the outside world so making it final is a good addition imo.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-12T11:47:50Z
+
+Adding final on 2.8 would be a BC break.
+:+1: asis
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-12T12:54:06Z
+
+:+1: on this (and I would agree on making them final in 3.0)

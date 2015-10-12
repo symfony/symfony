@@ -145,3 +145,11 @@ php: |
     array(
         'double' => "some value\n \"some quoted string\" and 'some single quotes one'"
     )
+---
+test: Backslashes
+yaml: |
+    { single: 'foo\Var', no-quotes: foo\Var, double: "foo\\Var" }
+php: |
+    array(
+        'single' => 'foo\Var', 'no-quotes' => 'foo\Var', 'double' => 'foo\Var'
+    )

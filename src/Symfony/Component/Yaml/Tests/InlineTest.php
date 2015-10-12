@@ -73,6 +73,23 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
+    {
+        $this->assertSame('Foo\Var', Inline::parse('"Foo\Var"'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseScalarWithNonEscapedBlackslashAtTheEndShouldThrowException()
+    {
+        Inline::parse('"Foo\\"');
+    }
+
+    /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()

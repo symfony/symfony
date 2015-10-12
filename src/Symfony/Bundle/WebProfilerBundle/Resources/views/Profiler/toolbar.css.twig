@@ -172,7 +172,7 @@
 }
 
 .sf-toolbar-block .sf-toolbar-status-green {
-    background-color: #759e1a;
+    background-color: #5e8014;
 }
 
 .sf-toolbar-block .sf-toolbar-status-red {
@@ -323,6 +323,21 @@
     -moz-animation: sf-blink .5s ease-in-out infinite;
     animation: sf-blink .5s ease-in-out infinite;
 }
+.sf-profiler-hidden-accessible {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px, 1px, 1px, 1px);
+    outline: none !important; /* Remove dotted outline in IE */
+}
+.sf-profiler-offleft-block {
+    position: absolute !important;
+    text-indent: -9999px;
+    display: block;
+    top: 0;
+}
 @-webkit-keyframes sf-blink {
     0% { color: black; }
     50% { color: #bbb; }
@@ -385,6 +400,7 @@
         margin-top: 0;
         margin-bottom: -1px;
     }
+
 {% endif %}
 
 {% if not floatable %}

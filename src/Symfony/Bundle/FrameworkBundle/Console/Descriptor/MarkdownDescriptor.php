@@ -273,30 +273,23 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(sprintf('# %s', $title)."\n");
 
-        $registeredListeners = $eventDispatcher->getListeners($event, true);
+        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
-            krsort($registeredListeners);
-            $order = 1;
-            foreach ($registeredListeners as $priority => $listeners) {
-                foreach ($listeners as $listener) {
-                    $this->write("\n".sprintf('## Listener %d', $order++)."\n");
-                    $this->describeCallable($listener);
-                    $this->write(sprintf('- Priority: `%d`', $priority)."\n");
-                }
+            foreach ($registeredListeners as $order => $listener) {
+                $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");
+                $this->describeCallable($listener);
+                $this->write(sprintf('- Priority: `%d`', $eventDispatcher->getListenerPriority($event, $listener))."\n");
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->write("\n".sprintf('## %s', $eventListened)."\n");
-                krsort($eventListeners);
-                $order = 1;
-                foreach ($eventListeners as $priority => $listeners) {
-                    foreach ($listeners as $listener) {
-                        $this->write("\n".sprintf('### Listener %d', $order++)."\n");
-                        $this->describeCallable($listener);
-                        $this->write(sprintf('- Priority: `%d`', $priority)."\n");
-                    }
+
+                foreach ($eventListeners as $order => $eventListener) {
+                    $this->write("\n".sprintf('### Listener %d', $order + 1)."\n");
+                    $this->describeCallable($eventListener);
+                    $this->write(sprintf('- Priority: `%d`', $eventDispatcher->getListenerPriority($eventListened, $eventListener))."\n");
                 }
             }
         }

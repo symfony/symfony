@@ -341,15 +341,14 @@ class TextDescriptor extends Descriptor
 
         $options['output']->title($title);
 
-        $registeredListeners = $eventDispatcher->getListeners($event, true);
-
+        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
-            $this->renderEventListenerTable($registeredListeners, $options['output']);
+            $this->renderEventListenerTable($eventDispatcher, $event, $registeredListeners, $options['output']);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $options['output']->section(sprintf('"%s" event', $eventListened));
-                $this->renderEventListenerTable($eventListeners, $options['output']);
+                $this->renderEventListenerTable($eventDispatcher, $eventListened, $eventListeners, $options['output']);
             }
         }
     }
@@ -365,17 +364,14 @@ class TextDescriptor extends Descriptor
     /**
      * @param array $array
      */
-    private function renderEventListenerTable(array $eventListeners, SymfonyStyle $renderer)
+    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, $event, array $eventListeners, SymfonyStyle $renderer)
     {
         $tableHeaders = array('Order', 'Callable', 'Priority');
         $tableRows = array();
 
-        krsort($eventListeners);
         $order = 1;
-        foreach ($eventListeners as $priority => $listeners) {
-            foreach ($listeners as $listener) {
-                $tableRows[] = array(sprintf('#%d', $order++), $this->formatCallable($listener), $priority);
-            }
+        foreach ($eventListeners as $order => $listener) {
+            $tableRows[] = array(sprintf('#%d', $order + 1), $this->formatCallable($listener), $eventDispatcher->getListenerPriority($event, $listener));
         }
 
         $renderer->table($tableHeaders, $tableRows);

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * Deprecated non-escaped \ in double-quoted strings when parsing Yaml
+   ("Foo\Var" is not valid whereas "Foo\\Var" is)
+
 2.1.0
 -----
 

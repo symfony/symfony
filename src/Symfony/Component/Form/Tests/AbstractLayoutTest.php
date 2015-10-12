@@ -577,12 +577,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
-            'choice_attr' => array('Choice&B' => array('class' => 'foo&bar', 'child-attr' =>'child')),
+            'choice_attr' => array('Choice&B' => array('class' => 'foo&bar', 'child-attr' => 'child')),
             'multiple' => false,
             'expanded' => false,
-            'attr'     => array(
-                'parent-attr' => 'parent'
-            )
+            'attr' => array(
+                'parent-attr' => 'parent',
+            ),
 
         ));
 

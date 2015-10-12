@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-11T09:28:52Z
+
+Doing `git diff 2.7...fabpot/event-listener-priorities src/Symfony/Component/EventDispatcher` locally can help see the difference between what we have in 2.7 and what we will have in 2.8.
+
+See https://gist.github.com/fabpot/4a32cb5b961a3f454d89

@@ -17,6 +17,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\DBAL\DriverManager;
 
+/**
+ * @requires extension pdo_sqlite
+ */
 class AclProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $con;
@@ -141,10 +144,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            self::markTestSkipped('This test requires SQLite support in your environment');
-        }
-
         $this->con = DriverManager::getConnection(array(
             'driver' => 'pdo_sqlite',
             'memory' => true,

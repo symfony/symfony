@@ -47,19 +47,20 @@ class MongoDbProfilerStorageTestDataCollector extends DataCollector
     }
 }
 
+/**
+ * @requires extension mongo
+ */
 class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;
 
     public static function setUpBeforeClass()
     {
-        if (extension_loaded('mongo')) {
-            self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
-            try {
-                self::$storage->getMongo();
-            } catch (\MongoConnectionException $e) {
-                self::$storage = null;
-            }
+        self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
+        try {
+            self::$storage->getMongo();
+        } catch (\MongoConnectionException $e) {
+            self::$storage = null;
         }
     }
 
@@ -159,7 +160,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         if (self::$storage) {
             self::$storage->purge();
         } else {
-            $this->markTestSkipped('MongoDbProfilerStorageTest requires the mongo PHP extension and a MongoDB server on localhost');
+            $this->markTestSkipped('A MongoDB server on localhost is required.');
         }
     }
 }

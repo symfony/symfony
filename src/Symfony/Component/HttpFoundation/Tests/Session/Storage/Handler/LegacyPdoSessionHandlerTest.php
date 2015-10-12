@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHan
 
 /**
  * @group legacy
- * @requires extension pdo_sqlite
  * @group time-sensitive
+ * @requires extension pdo_sqlite
  */
 class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {

@@ -28,7 +28,6 @@ install:
     - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
     - IF %PHP%==1 copy /Y php.ini-min php.ini-max
-    - IF %PHP%==1 echo extension=php_apc.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max

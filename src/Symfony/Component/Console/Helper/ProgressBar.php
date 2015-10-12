@@ -28,7 +28,8 @@ class ProgressBar
     private $barChar;
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format = null;
+    private $format;
+    private $internalFormat;
     private $redrawFreq = 1;
 
     /**
@@ -72,8 +73,6 @@ class ProgressBar
                 $this->setRedrawFrequency($max / 10);
             }
         }
-
-        $this->setFormat($this->determineBestFormat());
 
         $this->startTime = time();
     }
@@ -295,16 +294,8 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        // try to use the _nomax variant if available
-        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
-            $this->format = self::getFormatDefinition($format.'_nomax');
-        } elseif (null !== self::getFormatDefinition($format)) {
-            $this->format = self::getFormatDefinition($format);
-        } else {
-            $this->format = $format;
-        }
-
-        $this->formatLineCount = substr_count($this->format, "\n");
+        $this->format = null;
+        $this->internalFormat = $format;
     }
 
     /**
@@ -410,6 +401,10 @@ class ProgressBar
             return;
         }
 
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
         $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
             if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
                 $text = call_user_func($formatter, $this, $this->output);
@@ -440,7 +435,30 @@ class ProgressBar
             return;
         }
 
+        if (null === $this->format) {
+            $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
+        }
+
         $this->overwrite(str_repeat("\n", $this->formatLineCount));
+    }
+
+    /**
+     * Sets the progress bar format.
+     *
+     * @param string $format The format
+     */
+    private function setRealFormat($format)
+    {
+        // try to use the _nomax variant if available
+        if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
+            $this->format = self::getFormatDefinition($format.'_nomax');
+        } elseif (null !== self::getFormatDefinition($format)) {
+            $this->format = self::getFormatDefinition($format);
+        } else {
+            $this->format = $format;
+        }
+
+        $this->formatLineCount = substr_count($this->format, "\n");
     }
 
     /**

@@ -347,8 +347,8 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     {
         $prototypeView = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
-                'type' => __CLASS__.'_ChildType',
-                'options' => array(
+                'entry_type' => __CLASS__.'_ChildType',
+                'entry_options' => array(
                     'csrf_field_name' => 'csrf',
                 ),
                 'prototype' => true,

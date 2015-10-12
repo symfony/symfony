@@ -24,6 +24,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $skippedFile = false;
     private $wasSkipped = array();
     private $isSkipped = array();
+    private $testsStack = array();
 
     public function __destruct()
     {
@@ -80,6 +81,29 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             }
 
             $this->isSkipped[$class][$method] = 1;
+        }
+    }
+
+    public function startTest(\PHPUnit_Framework_Test $test)
+    {
+        if ($test instanceof \PHPUnit_Framework_TestCase) {
+            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName());
+
+            if (in_array('time-sensitive', $groups, true)) {
+                ClockMock::register(get_class($test));
+                ClockMock::withClockMock(true);
+            }
+        }
+    }
+
+    public function endTest(\PHPUnit_Framework_Test $test, $time)
+    {
+        if ($test instanceof \PHPUnit_Framework_TestCase) {
+            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName());
+
+            if (in_array('time-sensitive', $groups, true)) {
+                ClockMock::withClockMock(false);
+            }
         }
     }
 }

@@ -12,12 +12,12 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
-use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * @requires extension memcache
+ * @group time-sensitive
  */
-class MemcacheSessionHandlerTest extends ClockMockTestCase
+class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     const PREFIX = 'prefix_';
     const TTL = 1000;

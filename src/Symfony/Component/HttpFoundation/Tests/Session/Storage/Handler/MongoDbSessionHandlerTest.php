@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
-use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  * @requires extension mongo
+ * @group time-sensitive
  */
-class MongoDbSessionHandlerTest extends ClockMockTestCase
+class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

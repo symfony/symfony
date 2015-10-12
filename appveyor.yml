@@ -40,6 +40,7 @@ install:
     - IF %PHP%==1 copy /Y php.ini-min php.ini-max
     - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
     - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
+    - IF %PHP%==1 echo extension=php_memcache.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max

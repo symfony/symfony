@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
 /**
  * @group legacy
- * @requires extensin pdo_sqlite
+ * @requires extension pdo_sqlite
  */
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 {

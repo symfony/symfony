@@ -138,7 +138,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         try {
             $m->invoke($this->storage);
         } catch (\MongoConnectionException $e) {
-            $this->storage = null;
+            $this->markTestSkipped('A MongoDB server on localhost is required.');
         }
 
         $this->storage->purge();
@@ -146,8 +146,6 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 
     protected function tearDown()
     {
-        if ($this->storage) {
-            $this->storage->purge();
-        }
+        $this->storage->purge();
     }
 }

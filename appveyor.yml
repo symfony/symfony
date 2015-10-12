@@ -26,8 +26,8 @@ install:
     - IF %PHP%==1 cd ext
     - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/php_intl-3.0.0-5.3-nts-vc9-x86.zip
     - IF %PHP%==1 7z x php_intl-3.0.0-5.3-nts-vc9-x86.zip -y > 7z.log
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apc/3.1.13/php_apc-3.1.13-5.3-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_apc-3.1.13-5.3-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.7/php_apcu-4.0.7-5.3-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_apcu-4.0.7-5.3-nts-vc9-x86.zip -y > 7z.log
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.3-nts-vc9-x86.zip
     - IF %PHP%==1 7z x php_memcache-3.0.8-5.3-nts-vc9-x86.zip -y > 7z.log
     - IF %PHP%==1 cd ..
@@ -38,7 +38,8 @@ install:
     - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
     - IF %PHP%==1 copy /Y php.ini-min php.ini-max
-    - IF %PHP%==1 echo extension=php_apc.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
+    - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
     - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max

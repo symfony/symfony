@@ -279,6 +279,37 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testSingleChoiceAttributesWithoutParentAttributes()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'choice_attr' => array('Choice&B' => array('class' => 'foo&bar', 'child-attr' => 'child')),
+            'multiple' => false,
+            'expanded' => false,
+            'attr' => array(
+                'parent-attr' => 'parent',
+            ),
+
+        ));
+
+        $choiceAttrPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"][@child-attr="child"]' : '';
+        $ignoreParentAttrPart = '[not(@id)][not(@name)][not(@required)][not(@parent-attr)]';
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+            '/select
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@parent-attr="parent"]
+    [not(@required)]
+    [
+        ./option[@value="&a"][@selected="selected"]'.$ignoreParentAttrPart.'[.="[trans]Choice&A[/trans]"]
+        /following-sibling::option[@value="&b"]'.$choiceAttrPart.$ignoreParentAttrPart.'[.="[trans]Choice&B[/trans]"]
+    ]
+    [count(./option)=2]
+'
+        );
+    }
+
     public function testSingleChoiceWithPreferred()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(

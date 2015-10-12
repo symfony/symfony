@@ -75,7 +75,7 @@ class TemplateReference implements TemplateReferenceInterface
      */
     public function getPath()
     {
-        return 'views/' . $this->parameters['name'];
+        return 'views/'.$this->parameters['name'];
     }
 
     /**

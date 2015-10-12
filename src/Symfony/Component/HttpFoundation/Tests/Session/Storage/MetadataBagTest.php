@@ -12,12 +12,13 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
-use Symfony\Component\HttpFoundation\Tests\ClockMockTestCase;
 
 /**
  * Test class for MetadataBag.
+ *
+ * @group time-sensitive
  */
-class MetadataBagTest extends ClockMockTestCase
+class MetadataBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var MetadataBag

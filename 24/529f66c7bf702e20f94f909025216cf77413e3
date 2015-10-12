@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-10T20:27:52Z
+
+Thinking a bit more about this, I'm going to replace the test case by an annotation.
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-11T12:42:39Z
+
+Updated to use `@group clockMock` annotations
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-11T14:34:42Z
+
+The phpunit-bridge dev requirement in all these packages needs to be upgraded as it relies on the new feature
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-12T08:00:27Z
+
+@stof in fact I removed all of them in 4032c88a216e45913287af3ea59e7aed2ea935b2: now that our phpunit wrapper requires phpunit-bridge, they are not required anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-12T08:09:16Z
+
+Updated to use `@group time-sensitive` annotations. OK for you?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-12T10:06:13Z
+
+:+1:

@@ -1047,7 +1047,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
 
         // Tear down
-        unlink($filename);
+        @unlink($filename);
     }
 
     public function testDumpFile()
@@ -1106,6 +1106,10 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testDumpFileWithFileScheme()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM does not handle the file:// scheme correctly');
+        }
+
         $scheme = 'file://';
         $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 

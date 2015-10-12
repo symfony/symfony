@@ -565,6 +565,6 @@ class Filesystem
     {
         $components = explode('://', $filename, 2);
 
-        return  2 === count($components) ? array($components[0], $components[1]) : array(null, $components[0]);
+        return 2 === count($components) ? array($components[0], $components[1]) : array(null, $components[0]);
     }
 }

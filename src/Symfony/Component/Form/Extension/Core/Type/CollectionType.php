@@ -92,6 +92,8 @@ class CollectionType extends AbstractType
             if (null !== $value) {
                 @trigger_error('The form option "type" is deprecated since version 2.8 and will be removed in 3.0. Use "entry_type" instead.', E_USER_DEPRECATED);
             }
+
+            return $value;
         };
         $entryType = function (Options $options) {
             if (null !== $options['type']) {

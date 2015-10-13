@@ -18,6 +18,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * YAML strings.
  *
  * @author Matthew Lewinski <matthew@lewinski.org>
+ *
+ * @internal
  */
 class Unescaper
 {

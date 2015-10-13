@@ -52,7 +52,8 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                     $this->state = 2;
 
                     if (!$this->wasSkipped = require $this->skippedFile) {
-                        exit("All tests already ran successfully.\n");
+                        echo "All tests already ran successfully.\n";
+                        $suite->setTests(array());
                     }
                 }
             }

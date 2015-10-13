@@ -204,6 +204,8 @@ class Inline
      * @return string A YAML string
      *
      * @throws ParseException When malformed inline YAML string is parsed
+     *
+     * @internal
      */
     public static function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true, $references = array())
     {

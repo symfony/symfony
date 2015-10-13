@@ -705,7 +705,6 @@ class DateTypeTest extends TestCase
         $this->assertSame('single_text', $view->vars['widget']);
     }
 
-    // Bug fix
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set

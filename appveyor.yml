@@ -13,19 +13,20 @@ init:
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET PHP=1
     - SET ANSICON=121x90 (121x90)
-    - SET PHP_INI_MATRIX=php.ini-min php.ini-max
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
 
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.5.9-nts-Win32-VC11-x86.zip
-    - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 cd ext
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.7/php_apcu-4.0.7-5.5-nts-vc11-x86.zip
-    - IF %PHP%==1 7z x php_apcu-4.0.7-5.5-nts-vc11-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php_apcu-4.0.7-5.5-nts-vc11-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.5-nts-vc11-x86.zip
-    - IF %PHP%==1 7z x php_memcache-3.0.8-5.5-nts-vc11-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php_memcache-3.0.8-5.5-nts-vc11-x86.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 cd ..
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - IF %PHP%==1 copy /Y php.ini-development php.ini-min
@@ -51,4 +52,9 @@ install:
 
 test_script:
     - cd c:\projects\symfony
-    - php phpunit symfony --exclude-group benchmark,intl-data
+    - SET X=0
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - copy /Y c:\php\php.ini-max c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - exit %X%

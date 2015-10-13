@@ -325,7 +325,7 @@ class Response
         }
 
         if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime());
+            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
 
         // status
@@ -608,7 +608,7 @@ class Response
     public function getDate()
     {
         if (!$this->headers->has('Date')) {
-            $this->setDate(new \DateTime());
+            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
 
         return $this->headers->getDate('Date');

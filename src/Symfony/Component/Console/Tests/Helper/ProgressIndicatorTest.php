@@ -25,6 +25,10 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
         $bar->setMessage('Advancing...');
         $bar->advance();
         $bar->finish('Done...');
+        $bar->start('Starting Again...');
+        usleep(101000);
+        $bar->advance();
+        $bar->finish('Done Again...');
 
         rewind($output->getStream());
 
@@ -38,6 +42,10 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' \\ Advancing...').
             $this->generateOutput(' | Advancing...').
             $this->generateOutput(' | Done...     ').
+            "\n".
+            $this->generateOutput(' - Starting Again...').
+            $this->generateOutput(' \\ Starting Again...').
+            $this->generateOutput(' \\ Done Again...    ').
             "\n",
             stream_get_contents($output->getStream())
         );
@@ -86,6 +94,46 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' a Starting...'),
             stream_get_contents($output->getStream())
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Must have at least 2 indicator value characters.
+     */
+    public function testCannotSetInvalidIndicatorCharacters()
+    {
+        $bar = new ProgressIndicator($this->getOutputStream(), null, 100, array('1'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Progress indicator already started.
+     */
+    public function testCannotStartAlreadyStartedIndicator()
+    {
+        $bar = new ProgressIndicator($this->getOutputStream());
+        $bar->start('Starting...');
+        $bar->start('Starting Again.');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Progress indicator has not yet been started.
+     */
+    public function testCannotAdvanceUnstartedIndicator()
+    {
+        $bar = new ProgressIndicator($this->getOutputStream());
+        $bar->advance();
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Progress indicator has not yet been started.
+     */
+    public function testCannotFinishUnstartedIndicator()
+    {
+        $bar = new ProgressIndicator($this->getOutputStream());
+        $bar->finish('Finished');
     }
 
     /**

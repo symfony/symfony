@@ -26,7 +26,8 @@ class ProgressIndicator
     private $indicatorCurrent;
     private $indicatorChangeInterval;
     private $indicatorUpdateTime;
-    private $lastMessagesLength = 0;
+    private $lastMessagesLength;
+    private $started = false;
 
     private static $formatters;
     private static $formats;
@@ -114,7 +115,13 @@ class ProgressIndicator
      */
     public function start($message)
     {
+        if ($this->started) {
+            throw new \LogicException('Progress indicator already started.');
+        }
+
         $this->message = $message;
+        $this->started = true;
+        $this->lastMessagesLength = 0;
         $this->startTime = time();
         $this->indicatorUpdateTime = $this->getCurrentTimeInMilliseconds() + $this->indicatorChangeInterval;
         $this->indicatorCurrent = 0;
@@ -127,6 +134,10 @@ class ProgressIndicator
      */
     public function advance()
     {
+        if (!$this->started) {
+            throw new \LogicException('Progress indicator has not yet been started.');
+        }
+
         if (!$this->output->isDecorated()) {
             return;
         }
@@ -150,9 +161,14 @@ class ProgressIndicator
      */
     public function finish($message)
     {
+        if (!$this->started) {
+            throw new \LogicException('Progress indicator has not yet been started.');
+        }
+
         $this->message = $message;
         $this->display();
         $this->output->writeln('');
+        $this->started = false;
     }
 
     /**

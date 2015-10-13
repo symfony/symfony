@@ -21,42 +21,44 @@ class ProgressIndicator
     private $output;
     private $startTime;
     private $format;
-    private $message = null;
-    private $indicatorValues = array('-', '\\', '|', '/');
-    private $indicatorCurrent = 0;
-    private $indicatorChangeInterval = 100;
+    private $message;
+    private $indicatorValues;
+    private $indicatorCurrent;
+    private $indicatorChangeInterval;
     private $indicatorUpdateTime;
     private $lastMessagesLength = 0;
 
     private static $formatters;
     private static $formats;
 
-    public function __construct(OutputInterface $output)
+    /**
+     * @param OutputInterface $output
+     * @param string|null     $format                  Indicator format
+     * @param int             $indicatorChangeInterval Change interval in milliseconds
+     * @param array|null      $indicatorValues         Animated indicator characters
+     */
+    public function __construct(OutputInterface $output, $format = null, $indicatorChangeInterval = 100, $indicatorValues = null)
     {
         $this->output = $output;
-        $this->startTime = time();
 
-        $this->setFormat($this->determineBestFormat());
-    }
+        if (null === $format) {
+            $format = $this->determineBestFormat();
+        }
 
-    /**
-     * Sets the progress indicator format.
-     *
-     * @param string $format
-     */
-    public function setFormat($format)
-    {
+        if (null === $indicatorValues) {
+            $indicatorValues = array('-', '\\', '|', '/');
+        }
+
+        $indicatorValues = array_values($indicatorValues);
+
+        if (2 > count($indicatorValues)) {
+            throw new \InvalidArgumentException('Must have at least 2 indicator value characters.');
+        }
+
         $this->format = self::getFormatDefinition($format);
-    }
-
-    /**
-     * Sets the indicator change interval in milliseconds.
-     *
-     * @param int $milliseconds
-     */
-    public function setIndicatorChangeInterval($milliseconds)
-    {
-        $this->indicatorChangeInterval = $milliseconds;
+        $this->indicatorChangeInterval = $indicatorChangeInterval;
+        $this->indicatorValues = $indicatorValues;
+        $this->startTime = time();
     }
 
     /**
@@ -79,22 +81,6 @@ class ProgressIndicator
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * Sets the animated indicator characters.
-     *
-     * @param array $values
-     */
-    public function setIndicatorValues(array $values)
-    {
-        $values = array_values($values);
-
-        if (2 > count($values)) {
-            throw new \InvalidArgumentException('Must have at least 2 values.');
-        }
-
-        $this->indicatorValues = $values;
     }
 
     /**

@@ -67,8 +67,7 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
 
     public function testCustomIndicatorValues()
     {
-        $bar = new ProgressIndicator($output = $this->getOutputStream());
-        $bar->setIndicatorValues(array('a', 'b', 'c'));
+        $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, array('a', 'b', 'c'));
 
         $bar->start('Starting...');
         usleep(101000);
@@ -94,8 +93,7 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormats($format)
     {
-        $bar = new ProgressIndicator($output = $this->getOutputStream());
-        $bar->setFormat($format);
+        $bar = new ProgressIndicator($output = $this->getOutputStream(), $format);
         $bar->start('Starting...');
         $bar->advance();
 

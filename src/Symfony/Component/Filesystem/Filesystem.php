@@ -331,7 +331,7 @@ class Filesystem
         $depth = count($startPathArr) - $index;
 
         // When we need to traverse from the start, and we are starting from a root path, don't add '../'
-        if ($startPath[0] == '/' && $index == 0 && $depth == 1) {
+        if ('/' === $startPath[0] && 0 === $index && 1 === $depth) {
             $traverser = '';
         } else {
             // Repeated "../" for each level need to reach the common path

@@ -78,6 +78,8 @@ class ProgressIndicator
      * Gets the current indicator message.
      *
      * @return string|null
+     *
+     * @internal for PHP 5.3 compatibility
      */
     public function getMessage()
     {

@@ -148,6 +148,8 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         try {
             $propertyAccessor->getValue($object, 'firstName[1]');
+
+            $this->fail('Expected an exception to be thrown when accessing an invalid element.');
         } catch (NoSuchIndexException $e) {
         }
 

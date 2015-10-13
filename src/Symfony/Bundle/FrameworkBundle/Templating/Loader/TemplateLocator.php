@@ -22,20 +22,23 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 class TemplateLocator implements FileLocatorInterface
 {
     protected $locator;
-    protected $cache;
+    protected $rootDir;
+    public $cache;
 
     /**
      * Constructor.
      *
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
+     * @param string               $rootDir The root path
      * @param string               $cacheDir The cache path
      */
-    public function __construct(FileLocatorInterface $locator, $cacheDir = null)
+    public function __construct(FileLocatorInterface $locator, $rootDir, $cacheDir = null)
     {
         if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
             $this->cache = require $cache;
         }
 
+        $this->rootDir = dirname($rootDir);
         $this->locator = $locator;
     }
 
@@ -72,11 +75,11 @@ class TemplateLocator implements FileLocatorInterface
         $key = $this->getCacheKey($template);
 
         if (isset($this->cache[$key])) {
-            return $this->cache[$key];
+            return $this->rootDir.$this->cache[$key];
         }
 
         try {
-            return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);
+            return $this->rootDir.($this->cache[$key] = substr($this->locator->locate($template->getPath(), $currentPath), strlen($this->rootDir)));
         } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException(sprintf('Unable to find template "%s" : "%s".', $template, $e->getMessage()), 0, $e);
         }

@@ -13,7 +13,6 @@ init:
     - SET SYMFONY_DEPRECATIONS_HELPER=weak
     - SET PHP=1
     - SET ANSICON=121x90 (121x90)
-    - SET PHP_INI_MATRIX=php.ini-min php.ini-max
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
 
 install:
@@ -56,4 +55,9 @@ install:
 
 test_script:
     - cd c:\projects\symfony
-    - php phpunit symfony --exclude-group benchmark,intl-data
+    - SET X=0
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - copy /Y c:\php\php.ini-max c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - exit %X%

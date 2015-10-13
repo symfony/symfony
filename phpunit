@@ -76,22 +76,10 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
 $cmd[0] = sprintf('%s %s --colors=always', $PHP, ProcessUtils::escapeArgument("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit"));
 $cmd = str_replace('%', '%%', implode(' ', $cmd)).' %1$s';
 
-$phpIniMatrix = isset($_SERVER['PHP_INI_MATRIX']) ? explode(' ', $_SERVER['PHP_INI_MATRIX']) : array();
-if ($phpIniMatrix) {
-    if ('\\' !== DIRECTORY_SEPARATOR) {
-        echo "Error: PHP_INI_MATRIX is a Windows-only feature.\n";
-        exit(1);
-    }
-
-    $phpDir = ProcessUtils::escapeArgument(dirname(`where.exe php`));
-
-    $newCmd = 'cmd /v:on /d /c "(SET X=0';
-    foreach ($phpIniMatrix as $iniFile) {
-        $newCmd .= " & copy /Y $phpDir\\$iniFile $phpDir\\php.ini & echo. & echo Running tests with $iniFile: & ($cmd || SET X=1)";
-    }
-    $cmd = $newCmd .= ' & exit !X!)%2$s"';
+if ('\\' === DIRECTORY_SEPARATOR) {
+    $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
 } else {
-    $cmd .= ' %2$s';
+    $cmd .= '%2$s';
 }
 
 if (isset($argv[1]) && 'symfony' === $argv[1]) {
@@ -167,9 +155,6 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
                     readfile($file);
                 }
                 unlink($file);
-            }
-            if ($skippedTests) {
-                @unlink("$component/$skippedTests");
             }
 
             if ($procStatus) {

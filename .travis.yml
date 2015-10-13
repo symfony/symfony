@@ -7,6 +7,10 @@ addons:
         - parallel
         - language-pack-fr-base
 
+cache:
+    directories:
+        - .phpunit
+
 matrix:
     include:
         - php: hhvm

@@ -31,9 +31,6 @@ class ProgressIndicator
     private static $formatters;
     private static $formats;
 
-    /**
-     * @param OutputInterface $output
-     */
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
@@ -43,6 +40,8 @@ class ProgressIndicator
     }
 
     /**
+     * Sets the progress indicator format.
+     *
      * @param string $format
      */
     public function setFormat($format)
@@ -51,6 +50,8 @@ class ProgressIndicator
     }
 
     /**
+     * Sets the indicator change interval in milliseconds.
+     *
      * @param int $milliseconds
      */
     public function setIndicatorChangeInterval($milliseconds)
@@ -59,6 +60,8 @@ class ProgressIndicator
     }
 
     /**
+     * Sets the current indicator message.
+     *
      * @param string|null $message
      */
     public function setMessage($message)
@@ -69,6 +72,8 @@ class ProgressIndicator
     }
 
     /**
+     * Gets the current indicator message.
+     *
      * @return string|null
      */
     public function getMessage()
@@ -77,14 +82,16 @@ class ProgressIndicator
     }
 
     /**
+     * Sets the animated indicator characters.
+     *
      * @param array $values
      */
     public function setIndicatorValues(array $values)
     {
         $values = array_values($values);
 
-        if (empty($values)) {
-            throw new \InvalidArgumentException('Must have at least 1 value.');
+        if (2 > count($values)) {
+            throw new \InvalidArgumentException('Must have at least 2 values.');
         }
 
         $this->indicatorValues = $values;
@@ -101,6 +108,8 @@ class ProgressIndicator
     }
 
     /**
+     * Gets the current animated indicator character.
+     *
      * @return string
      */
     public function getCurrentValue()
@@ -108,6 +117,11 @@ class ProgressIndicator
         return $this->indicatorValues[$this->indicatorCurrent % count($this->indicatorValues)];
     }
 
+    /**
+     * Starts the indicator output.
+     *
+     * @param $message
+     */
     public function start($message)
     {
         $this->message = $message;
@@ -118,6 +132,9 @@ class ProgressIndicator
         $this->display();
     }
 
+    /**
+     * Advances the indicator.
+     */
     public function advance()
     {
         if (!$this->output->isDecorated()) {
@@ -136,6 +153,11 @@ class ProgressIndicator
         $this->display();
     }
 
+    /**
+     * Finish the indicator with message.
+     *
+     * @param $message
+     */
     public function finish($message)
     {
         $this->message = $message;

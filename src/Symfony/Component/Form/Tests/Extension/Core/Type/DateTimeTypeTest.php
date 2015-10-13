@@ -262,7 +262,6 @@ class DateTimeTypeTest extends TestCase
         $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
-    // Bug fix
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set

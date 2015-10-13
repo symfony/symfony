@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -32,6 +33,9 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (class_exists('Symfony\Bridge\PhpUnit\ClockMock')) {
+            ClockMock::register('Symfony\Component\HttpFoundation\Request');
+        }
         $this->kernel = null;
 
         $this->cache = null;

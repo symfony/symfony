@@ -24,14 +24,14 @@ if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
 $PHP = ProcessUtils::escapeArgument($PHP);
 $COMPOSER = $PHP.' '.ProcessUtils::escapeArgument($COMPOSER);
 
-if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.md5") || (isset($argv[1]) && 'install' === $argv[1])) {
+if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.md5")) {
     // Build a standalone phpunit without symfony/yaml
 
     $oldPwd = getcwd();
     @mkdir($PHPUNIT_DIR);
     chdir($PHPUNIT_DIR);
     if (file_exists("phpunit-$PHPUNIT_VERSION")) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'del /S /F /Q %s & rmdir %1$s >nul 2>&1': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
     }
     if (extension_loaded('openssl') && ini_get('allow_url_fopen')) {
         stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
@@ -58,7 +58,7 @@ EOPHP
     );
     chdir('..');
     if (file_exists('../src/Symfony/Bridge/PhpUnit') && `git diff --name-only HEAD^ -- ../src/Symfony/Bridge/PhpUnit`) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? 'del /S /F /Q %s & rmdir %1$s >nul 2>&1': 'rm -rf %s', str_replace('/', DIRECTORY_SEPARATOR, "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge")));
+        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', str_replace('/', DIRECTORY_SEPARATOR, "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge")));
         symlink(realpath('../src/Symfony/Bridge/PhpUnit'), "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge");
     }
     file_put_contents('.md5', md5_file(__FILE__));

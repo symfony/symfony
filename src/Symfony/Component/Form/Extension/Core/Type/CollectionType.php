@@ -123,6 +123,7 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
         ));
 
+        $resolver->setNormalizer('type', $typeNormalizer);
         $resolver->setNormalizer('options', $optionsNormalizer);
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
     }

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-13T14:35:16Z
+
+So, no more trick to run only the skipped tests with ini-max ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-13T14:39:23Z
+
+The skipped persistence is still there, triggered by the SYMFONY_PHPUNIT_SKIPPED_TESTS env var.
+But appveyor kills the build on the first failing line, which is annoying. I'm going to fix that now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-13T15:40:17Z
+
+Ready, should also reduce test transiency

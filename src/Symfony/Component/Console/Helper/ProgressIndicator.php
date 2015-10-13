@@ -87,6 +87,8 @@ class ProgressIndicator
      * Gets the progress bar start time.
      *
      * @return int The progress bar start time
+     *
+     * @internal for PHP 5.3 compatibility
      */
     public function getStartTime()
     {
@@ -97,6 +99,8 @@ class ProgressIndicator
      * Gets the current animated indicator character.
      *
      * @return string
+     *
+     * @internal for PHP 5.3 compatibility
      */
     public function getCurrentValue()
     {

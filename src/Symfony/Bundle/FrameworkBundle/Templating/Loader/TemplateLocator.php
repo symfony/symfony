@@ -29,7 +29,7 @@ class TemplateLocator implements FileLocatorInterface
      * Constructor.
      *
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
-     * @param string               $rootDir The root path
+     * @param string               $rootDir  The root path
      * @param string               $cacheDir The cache path
      */
     public function __construct(FileLocatorInterface $locator, $rootDir, $cacheDir = null)

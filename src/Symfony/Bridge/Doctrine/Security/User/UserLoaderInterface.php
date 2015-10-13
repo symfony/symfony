@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Security\User;
 
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
  * Represents a class that loads UserInterface objects from Doctrine source for the authentication system.
@@ -30,16 +29,11 @@ interface UserLoaderInterface
     /**
      * Loads the user for the given username.
      *
-     * This method must throw UsernameNotFoundException if the user is not
-     * found.
+     * This method must return null if the user is not found.
      *
      * @param string $username The username
      *
-     * @return UserInterface
-     *
-     * @see UsernameNotFoundException
-     *
-     * @throws UsernameNotFoundException if the user is not found
+     * @return UserInterface|null
      */
     public function loadUserByUsername($username);
 }

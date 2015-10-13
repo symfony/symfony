@@ -467,7 +467,6 @@ class TimeTypeTest extends TestCase
         $this->assertTrue($form->isPartiallyFilled());
     }
 
-    // Bug fix
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set

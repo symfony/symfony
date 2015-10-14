@@ -341,7 +341,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         foreach ($types as $type) {
-            if (empty($data) && !$type->isNullable()) {
+            if ($data === null && $type->isNullable()) {
                 return $data;
             }
 

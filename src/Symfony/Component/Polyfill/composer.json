@@ -1,0 +1,38 @@
+{
+    "name": "symfony/polyfill",
+    "type": "library",
+    "description": "Symfony polyfills backporting features to lower PHP versions",
+    "keywords": ["polyfill", "shim", "compat", "compatibility"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9"
+    },
+    "autoload": {
+        "files": [ "bootstrap.php" ],
+        "psr-4": { "Symfony\\Component\\Polyfill\\": "" },
+        "classmap": [ "Resources/stubs" ]
+    },
+    "suggests": {
+        "ext-intl": "For best performance",
+        "ext-iconv": "For best performance",
+        "ext-mbstring": "For best performance",
+        "symfony/intl": "For polyfilling intl's ICU-related data and classes"
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8-dev"
+        }
+    }
+}

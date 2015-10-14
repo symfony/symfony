@@ -48,6 +48,7 @@
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
+        "symfony/polyfill": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
@@ -96,10 +97,10 @@
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
-            "src/Symfony/Component/HttpFoundation/Resources/stubs",
+            "src/Symfony/Component/Polyfill/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
-        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "files": [ "src/Symfony/Component/Polyfill/bootstrap.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

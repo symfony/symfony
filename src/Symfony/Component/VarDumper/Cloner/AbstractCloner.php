@@ -185,9 +185,6 @@ abstract class AbstractCloner implements ClonerInterface
         $this->filter = $filter;
         $this->prevErrorHandler = set_error_handler(array($this, 'handleError'));
         try {
-            if (!function_exists('iconv')) {
-                $this->maxString = -1;
-            }
             $data = $this->doClone($var);
         } catch (\Exception $e) {
         }

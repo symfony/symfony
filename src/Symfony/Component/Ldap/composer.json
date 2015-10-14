@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
+        "symfony/polyfill": "~2.8|~3.0.0",
         "ext-ldap": "*"
     },
     "autoload": {

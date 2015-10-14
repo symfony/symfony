@@ -91,9 +91,7 @@ class CliDumper extends AbstractDumper
      */
     public function setMaxStringWidth($maxStringWidth)
     {
-        if (function_exists('iconv')) {
-            $this->maxStringWidth = (int) $maxStringWidth;
-        }
+        $this->maxStringWidth = (int) $maxStringWidth;
     }
 
     /**
@@ -171,7 +169,7 @@ class CliDumper extends AbstractDumper
             $this->dumpLine($cursor->depth, true);
         } else {
             $attr = array(
-                'length' => 0 <= $cut && function_exists('iconv_strlen') ? iconv_strlen($str, 'UTF-8') + $cut : 0,
+                'length' => 0 <= $cut ? iconv_strlen($str, 'UTF-8') + $cut : 0,
                 'binary' => $bin,
             );
             $str = explode("\n", $str);

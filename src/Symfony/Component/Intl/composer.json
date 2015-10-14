@@ -24,7 +24,9 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/polyfill-php54": "~1.0"
     },
     "require-dev": {
         "symfony/filesystem": "~2.1|~3.0.0"
@@ -34,8 +36,7 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },
-        "classmap": [ "Resources/stubs" ],
-        "files": [ "Resources/stubs/functions.php" ]
+        "classmap": [ "Resources/stubs" ]
     },
     "minimum-stability": "dev",
     "extra": {

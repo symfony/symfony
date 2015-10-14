@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Util\StringUtils;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
@@ -54,7 +53,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
         }
 
-        if (true !== StringUtils::equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
+        if (true !== hash_equals($this->generateCookieHash($class, $username, $expires, $user->getPassword()), $hash)) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 

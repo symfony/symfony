@@ -21,7 +21,13 @@
         "twig/twig": "~1.20|~2.0",
         "psr/log": "~1.0",
         "symfony/security-acl": "~2.7",
-        "paragonie/random_compat": "~1.0"
+        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php54": "~1.0",
+        "symfony/polyfill-php55": "~1.0",
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
+        "symfony/polyfill-util": "~1.0"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -77,7 +83,6 @@
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
-        "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2",
         "phpdocumentor/reflection": "^1.0.7"
@@ -96,10 +101,8 @@
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
-            "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
-        ],
-        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/security-core": "~2.4|~3.0.0",
-        "paragonie/random_compat": "~1.0"
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/security-core": "~2.4|~3.0.0"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.1|~3.0.0"

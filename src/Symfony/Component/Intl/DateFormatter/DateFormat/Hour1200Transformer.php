@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for 12 hour format (0-11).
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class Hour1200Transformer extends HourTransformer
 {

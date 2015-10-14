@@ -83,9 +83,9 @@ class TemplateLocator implements FileLocatorInterface
             throw new \InvalidArgumentException(sprintf('Unable to find template "%s" : "%s".', $template, $e->getMessage()), 0, $e);
         }
     }
-    
+
     /**
-     * Returns the current cache
+     * Returns the current cache.
      *
      * @return array
      */

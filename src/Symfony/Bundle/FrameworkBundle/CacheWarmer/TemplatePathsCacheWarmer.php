@@ -46,7 +46,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         foreach ($this->finder->findAllTemplates() as $template) {
             $this->locator->locate($template);
         }
-        $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($this->locator->cache, true)));
+        $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($this->locator->getCache(), true)));
     }
 
     /**

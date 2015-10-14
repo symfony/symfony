@@ -32,7 +32,6 @@
 
         <service id="templating.locator" class="%templating.locator.class%" public="false">
             <argument type="service" id="file_locator" />
-            <argument>%kernel.root_dir%</argument>
             <argument>%kernel.cache_dir%</argument>
         </service>
 

@@ -311,7 +311,7 @@ class ConfigDataCollector extends DataCollector
 
             $bundleVersion = null;
             foreach ($installedPackages as $packageName => $packageVersion) {
-                if (preg_match(sprintf('~.*/vendor/%s~', preg_quote($packageName)), $bundlePath)) {
+                if (strpos($bundlePath, '/vendor/'.$packageName)) {
                     $bundleVersion = $packageVersion;
 
                     break;

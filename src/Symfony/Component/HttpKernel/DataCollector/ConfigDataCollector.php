@@ -301,36 +301,37 @@ class ConfigDataCollector extends DataCollector
             $composerLock = json_decode(file_get_contents($composerLockPath), true);
 
             foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $dependency) {
-                $dependencyNameParts = explode('/', $dependency['name']);
-                $installedDependencies[$dependencyNameParts[1]] = $dependency['version'];
+                $installedDependencies[$dependency['name']] = $dependency['version'];
             }
         } catch (\Exception $e) {
             $installedDependencies = array();
         }
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            // Transform bundle name into dependency name: 'DoctrineFixturesBundle' -> 'doctrine-fixtures-bundle'
-            $dependencyName = strtolower(preg_replace('/(?<=\\w)([A-Z])/', '-$1', $name));
-            // Sensio bundles have irregular names: 'sensio-generator-bundle' -> 'generator-bundle'
-            $dependencyName = preg_replace('/^sensio\-(.*)$/', '$1', $dependencyName);
+            $bundlePath = $bundle->getPath();
 
-            if (isset($installedDependencies[$dependencyName])) {
-                $bundleVersion = $installedDependencies[$dependencyName];
-            } elseif (preg_match('~.*/src/Symfony/Bundle/.*~', $bundle->getPath())) {
-                // this is a built-in Symfony bundle; its version is the same as Symfony
-                $bundleVersion = Kernel::VERSION;
-            } else {
-                $bundleVersion = null;
+            $bundleVersion = null;
+            foreach ($installedDependencies as $packageName => $packageVersion) {
+                if (preg_match(sprintf('~.*/vendor/%s~', $packageName), $bundlePath)) {
+                    $bundleVersion = $packageVersion;
+
+                    break;
+                } elseif (preg_match('~.*/src/Symfony/Bundle/.*~', $bundlePath)) {
+                    // this is a built-in Symfony bundle; its version is the same as Symfony
+                    $bundleVersion = Kernel::VERSION;
+
+                    break;
+                }
             }
 
             $bundles[$name] = array(
                 'name' => $name,
-                'path' => $bundle->getPath(),
+                'path' => $bundlePath,
                 'version' => $bundleVersion,
             );
-
-            ksort($bundles);
         }
+
+        ksort($bundles);
 
         return $bundles;
     }

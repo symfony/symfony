@@ -299,6 +299,7 @@ class ConfigDataCollector extends DataCollector
         try {
             $composerLockPath = $this->kernel->getRootDir().'/../composer.lock';
             $composerLock = json_decode(file_get_contents($composerLockPath), true);
+
             foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $dependency) {
                 $dependencyNameParts = explode('/', $dependency['name']);
                 $installedDependencies[$dependencyNameParts[1]] = $dependency['version'];
@@ -312,7 +313,15 @@ class ConfigDataCollector extends DataCollector
             $dependencyName = strtolower(preg_replace('/(?<=\\w)([A-Z])/', '-$1', $name));
             // Sensio bundles have irregular names: 'sensio-generator-bundle' -> 'generator-bundle'
             $dependencyName = preg_replace('/^sensio\-(.*)$/', '$1', $dependencyName);
-            $bundleVersion = isset($installedDependencies[$dependencyName]) ? $installedDependencies[$dependencyName] : null;
+
+            if (isset($installedDependencies[$dependencyName])) {
+                $bundleVersion = $installedDependencies[$dependencyName];
+            } elseif (preg_match('~.*/src/Symfony/Bundle/.*~', $bundle->getPath())) {
+                // this is a built-in Symfony bundle; its version is the same as Symfony
+                $bundleVersion = Kernel::VERSION;
+            } else {
+                $bundleVersion = null;
+            }
 
             $bundles[$name] = array(
                 'name' => $name,

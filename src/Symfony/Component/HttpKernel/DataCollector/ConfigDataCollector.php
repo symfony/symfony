@@ -79,10 +79,7 @@ class ConfigDataCollector extends DataCollector
         );
 
         if (isset($this->kernel)) {
-            foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = $bundle->getPath();
-            }
-
+            $this->data['bundles'] = $this->getBundleData();
             $this->data['symfony_state'] = $this->determineSymfonyState();
         }
     }
@@ -287,5 +284,45 @@ class ConfigDataCollector extends DataCollector
         }
 
         return $versionState;
+    }
+
+    /**
+     * Gets the names, paths and installed versions of the bundles enabled in
+     * the application.
+     *
+     * @return array
+     */
+    private function getBundleData()
+    {
+        $bundles = array();
+
+        try {
+            $composerLockPath = $this->kernel->getRootDir().'/../composer.lock';
+            $composerLock = json_decode(file_get_contents($composerLockPath), true);
+            foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $dependency) {
+                $dependencyNameParts = explode('/', $dependency['name']);
+                $installedDependencies[$dependencyNameParts[1]] = $dependency['version'];
+            }
+        } catch (\Exception $e) {
+            $installedDependencies = array();
+        }
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            // Transform bundle name into dependency name: 'DoctrineFixturesBundle' -> 'doctrine-fixtures-bundle'
+            $dependencyName = strtolower(preg_replace('/(?<=\\w)([A-Z])/', '-$1', $name));
+            // Sensio bundles have irregular names: 'sensio-generator-bundle' -> 'generator-bundle'
+            $dependencyName = preg_replace('/^sensio\-(.*)$/', '$1', $dependencyName);
+            $bundleVersion = isset($installedDependencies[$dependencyName]) ? $installedDependencies[$dependencyName] : null;
+
+            $bundles[$name] = array(
+                'name' => $name,
+                'path' => $bundle->getPath(),
+                'version' => $bundleVersion,
+            );
+
+            ksort($bundles);
+        }
+
+        return $bundles;
     }
 }

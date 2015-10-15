@@ -296,22 +296,21 @@ class ConfigDataCollector extends DataCollector
     {
         $bundles = array();
 
-        try {
-            $composerLockPath = $this->kernel->getRootDir().'/../composer.lock';
+        $composerLockPath = $this->kernel->getRootDir().'/../composer.lock';
+        if (!file_exists($composerLockPath)) {
+            $installedPackages = array();
+        } else {
             $composerLock = json_decode(file_get_contents($composerLockPath), true);
-
-            foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $dependency) {
-                $installedDependencies[$dependency['name']] = $dependency['version'];
+            foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $package) {
+                $installedPackages[$package['name']] = $package['version'];
             }
-        } catch (\Exception $e) {
-            $installedDependencies = array();
         }
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
             $bundlePath = $bundle->getPath();
 
             $bundleVersion = null;
-            foreach ($installedDependencies as $packageName => $packageVersion) {
+            foreach ($installedPackages as $packageName => $packageVersion) {
                 if (preg_match(sprintf('~.*/vendor/%s~', $packageName), $bundlePath)) {
                     $bundleVersion = $packageVersion;
 

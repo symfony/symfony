@@ -22,9 +22,10 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
             $profile->setMethod('GET');
+            $profile->setStatusCode(200);
             $this->getStorage()->write($profile);
         }
-        $this->assertCount(10, $this->getStorage()->find('127.0.0.1', 'http://foo.bar', 20, 'GET'), '->write() stores data in the storage');
+        $this->assertCount(10, $this->getStorage()->find('127.0.0.1', 'http://foo.bar', 20, 'GET', null, null, 200), '->write() stores data in the storage');
     }
 
     public function testChildren()
@@ -205,6 +206,22 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->getStorage()->purge();
     }
 
+    public function testRetrieveByStatusCode()
+    {
+        foreach (array(200, 400) as $statusCode) {
+            for ($i = 0; $i < 5; ++$i) {
+                $profile = new Profile('token_'.$i.$statusCode);
+                $profile->setStatusCode($statusCode);
+                $this->getStorage()->write($profile);
+            }
+        }
+
+        $this->assertCount(5, $this->getStorage()->find('', '', 5, '', null, null, 200));
+        $this->assertCount(5, $this->getStorage()->find('', '', 5, '', null, null, 400));
+
+        $this->getStorage()->purge();
+    }
+
     public function testPurge()
     {
         $profile = new Profile('token1');
@@ -261,6 +278,11 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $tokens);
         $this->assertContains($tokens[0]['status_code'], array(200, 404));
         $this->assertContains($tokens[1]['status_code'], array(200, 404));
+
+        foreach(array(200, 404) as $statusCode) {
+            $token = $this->getStorage()->find('', '', 10, '', null, null, $statusCode);
+            $this->assertCount(1, $token);
+        }
     }
 
     /**

@@ -49,7 +49,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
     {
         if (null === $start) {
             $start = 0;
@@ -59,7 +59,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
             $end = time();
         }
 
-        list($criteria, $args) = $this->buildCriteria($ip, $url, $start, $end, $limit, $method);
+        list($criteria, $args) = $this->buildCriteria($ip, $url, $start, $end, $limit, $method, $statusCode);
 
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
 
@@ -77,7 +77,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     {
         $db = $this->initDb();
         $args = array(':token' => $token);
-        $data = $this->fetch($db, 'SELECT data, parent, ip, method, url, time FROM sf_profiler_data WHERE token = :token LIMIT 1', $args);
+        $data = $this->fetch($db, 'SELECT data, parent, ip, method, url, time, status_code FROM sf_profiler_data WHERE token = :token LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
             return $this->createProfileFromData($token, $data[0]);
@@ -132,16 +132,17 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     /**
      * Build SQL criteria to fetch records by ip and url.
      *
-     * @param string $ip     The IP
-     * @param string $url    The URL
-     * @param string $start  The start period to search from
-     * @param string $end    The end period to search to
-     * @param string $limit  The maximum number of tokens to return
-     * @param string $method The request method
+     * @param string $ip         The IP
+     * @param string $url        The URL
+     * @param string $start      The start period to search from
+     * @param string $end        The end period to search to
+     * @param string $limit      The maximum number of tokens to return
+     * @param string $method     The request method
+     * @param int    $statusCode The request method
      *
      * @return array An array with (criteria, args)
      */
-    abstract protected function buildCriteria($ip, $url, $start, $end, $limit, $method);
+    abstract protected function buildCriteria($ip, $url, $start, $end, $limit, $method, $statusCode);
 
     /**
      * Initializes the database.
@@ -209,6 +210,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
+        $profile->setStatusCode($data['status_code']);
         $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
         if (!$parent && !empty($data['parent'])) {
@@ -235,7 +237,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     protected function readChildren($token, $parent)
     {
         $db = $this->initDb();
-        $data = $this->fetch($db, 'SELECT token, data, ip, method, url, time FROM sf_profiler_data WHERE parent = :token', array(':token' => $token));
+        $data = $this->fetch($db, 'SELECT token, data, ip, method, url, time, status_code FROM sf_profiler_data WHERE parent = :token', array(':token' => $token));
         $this->close($db);
 
         if (!$data) {

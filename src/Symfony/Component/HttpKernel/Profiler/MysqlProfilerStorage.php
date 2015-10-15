@@ -49,7 +49,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method, $statusCode)
     {
         $criteria = array();
         $args = array();
@@ -67,6 +67,11 @@ class MysqlProfilerStorage extends PdoProfilerStorage
         if ($method) {
             $criteria[] = 'method = :method';
             $args[':method'] = $method;
+        }
+
+        if ($statusCode) {
+            $criteria[] = 'status_code = :status_code';
+            $args[':status_code'] = $statusCode;
         }
 
         if (!empty($start)) {

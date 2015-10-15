@@ -311,11 +311,11 @@ class ConfigDataCollector extends DataCollector
 
             $bundleVersion = null;
             foreach ($installedPackages as $packageName => $packageVersion) {
-                if (preg_match(sprintf('~.*/vendor/%s~', $packageName), $bundlePath)) {
+                if (preg_match(sprintf('~.*/vendor/%s~', preg_quote($packageName)), $bundlePath)) {
                     $bundleVersion = $packageVersion;
 
                     break;
-                } elseif (preg_match('~.*/src/Symfony/Bundle/.*~', $bundlePath)) {
+                } elseif (strpos($bundlePath, 'symfony/symfony/src/Symfony/Bundle')) {
                     // this is a built-in Symfony bundle; its version is the same as Symfony
                     $bundleVersion = Kernel::VERSION;
 
@@ -323,11 +323,7 @@ class ConfigDataCollector extends DataCollector
                 }
             }
 
-            $bundles[$name] = array(
-                'name' => $name,
-                'path' => $bundlePath,
-                'version' => $bundleVersion,
-            );
+            $bundles[$name] = array('name' => $name, 'path' => $bundlePath, 'version' => $bundleVersion);
         }
 
         ksort($bundles);

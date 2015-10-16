@@ -110,8 +110,8 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $tdispatcher->addListener('foo', $listener1 = function () {});
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->at(0))->method('debug')->with('Notified event "foo" to listener "closure".');
-        $logger->expects($this->at(1))->method('debug')->with('Notified event "foo" to listener "closure".');
+        $logger->expects($this->at(0))->method('debug')->with('Notified event "{event}" to listener "{listener}".', array('event' => 'foo', 'listener' => 'closure'));
+        $logger->expects($this->at(1))->method('debug')->with('Notified event "{event}" to listener "{listener}".', array('event' => 'foo', 'listener' => 'closure'));
 
         $tdispatcher->dispatch('foo');
     }
@@ -125,9 +125,9 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $tdispatcher->addListener('foo', $listener1 = function (Event $event) { $event->stopPropagation(); });
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
-        $logger->expects($this->at(0))->method('debug')->with('Notified event "foo" to listener "closure".');
-        $logger->expects($this->at(1))->method('debug')->with('Listener "closure" stopped propagation of the event "foo".');
-        $logger->expects($this->at(2))->method('debug')->with('Listener "closure" was not called for event "foo".');
+        $logger->expects($this->at(0))->method('debug')->with('Notified event "{event}" to listener "{listener}".', array('event' => 'foo', 'listener' => 'closure'));
+        $logger->expects($this->at(1))->method('debug')->with('Listener "{listener}" stopped propagation of the event "{event}".', array('event' => 'foo', 'listener' => 'closure'));
+        $logger->expects($this->at(2))->method('debug')->with('Listener "{listener}" was not called for event "{event}".', array('event' => 'foo', 'listener' => 'closure'));
 
         $tdispatcher->dispatch('foo');
     }

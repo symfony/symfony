@@ -132,7 +132,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getLoggingParameterData
      */
-    public function testLoggingParameter($parameter, $log)
+    public function testLoggingParameter($parameter, $log, $parameters)
     {
         $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
         $requestMatcher->expects($this->once())
@@ -142,7 +142,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
           ->method('info')
-          ->with($this->equalTo($log));
+          ->with($this->equalTo($log), $this->equalTo($parameters));
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $request = Request::create('http://localhost/');
@@ -154,8 +154,8 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     public function getLoggingParameterData()
     {
         return array(
-            array(array('_route' => 'foo'), 'Matched route "foo".'),
-            array(array(), 'Matched route "n/a".'),
+            array(array('_route' => 'foo'), 'Matched route "{route}".', array('route' => 'foo', 'route_parameters' => array('_route' => 'foo'), 'request_uri' => 'http://localhost/')),
+            array(array(), 'Matched route "{route}".', array('route' => 'n/a', 'route_parameters' => array(), 'request_uri' => 'http://localhost/')),
         );
     }
 }

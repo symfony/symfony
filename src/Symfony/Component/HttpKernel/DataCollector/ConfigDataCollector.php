@@ -358,7 +358,7 @@ class ConfigDataCollector extends DataCollector
         $longestCommonPrefix = array_reduce($paths, function ($prefix, $path) {
             $length = min(strlen($prefix), strlen($path));
             while (substr($prefix, 0, $length) !== substr($path, 0, $length)) {
-                $length--;
+                --$length;
             }
 
             return substr($prefix, 0, $length);

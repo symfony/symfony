@@ -295,23 +295,14 @@ class ConfigDataCollector extends DataCollector
     private function getBundleData()
     {
         $bundles = array();
-
-        $composerLockPath = $this->kernel->getRootDir().'/../composer.lock';
-        if (!file_exists($composerLockPath)) {
-            $installedPackages = array();
-        } else {
-            $composerLock = json_decode(file_get_contents($composerLockPath), true);
-            foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $package) {
-                $installedPackages[$package['name']] = $package['version'];
-            }
-        }
+        $installedPackages = $this->getInstalledPackages();
 
         foreach ($this->kernel->getBundles() as $name => $bundle) {
             $bundlePath = $bundle->getPath();
-
             $bundleVersion = null;
+
             foreach ($installedPackages as $packageName => $packageVersion) {
-                if (strpos($bundlePath, '/vendor/'.$packageName)) {
+                if (strpos($bundlePath.'/', '/vendor/'.$packageName.'/')) {
                     $bundleVersion = $packageVersion;
 
                     break;
@@ -329,5 +320,73 @@ class ConfigDataCollector extends DataCollector
         ksort($bundles);
 
         return $bundles;
+    }
+
+    /**
+     * Finds the path of the 'composer.lock' file starting from the current
+     * kernel dir and going up recursively up until the project root dir.
+     *
+     * @return string
+     */
+    private function findComposerLockPath()
+    {
+        $path = $this->kernel->getRootDir();
+        $projectRootDirectory = $this->findProjectRootDirectory();
+
+        while ($path !== $projectRootDirectory) {
+            if (file_exists($composerLockPath = $path.'/composer.lock')) {
+                return $composerLockPath;
+            }
+
+            $path = realpath($path.'/..');
+        }
+    }
+
+    /**
+     * It returns the absolute path of the root directory of the Symfony project.
+     * This is usually the directory above the kernel directory, but in complex
+     * setups it can be different.
+     *
+     * @return string
+     */
+    private function findProjectRootDirectory()
+    {
+        // The project root directory is calculated as the longest prefix
+        // intersection between the kernel directory and the current file path
+        $paths = array($this->kernel->getRootDir(), __DIR__);
+
+        $longestCommonPrefix = array_reduce($paths, function ($prefix, $path) {
+            $length = min(strlen($prefix), strlen($path));
+            while (substr($prefix, 0, $length) !== substr($path, 0, $length)) {
+                $length--;
+            }
+
+            return substr($prefix, 0, $length);
+        });
+
+        return rtrim($longestCommonPrefix, '/');
+    }
+
+    /**
+     * Returns an array with the names and versions of the installed Composer
+     * packages for the current project.
+     *
+     * @return array
+     */
+    private function getInstalledPackages()
+    {
+        $installedPackages = array();
+
+        if (!file_exists($composerLockPath = $this->findComposerLockPath())) {
+            return $installedPackages;
+        }
+
+        $composerLock = json_decode(file_get_contents($composerLockPath), true);
+        $packages = isset($composerLock['packages-dev']) ? array_merge($composerLock['packages'], $composerLock['packages-dev']) : $composerLock['packages'];
+        foreach ($packages as $package) {
+            $installedPackages[$package['name']] = $package['version'];
+        }
+
+        return $installedPackages;
     }
 }

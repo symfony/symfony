@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-13T20:10:14Z
+
+Cool, many thanks!
+You may have to raise a few lowest versions in composer.json files isn't it?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-13T20:49:25Z
+
+Afaics, all dependencies are correct. Something seems wrong if we set `type` instead of `entry_type` (`entry_type` will get the normal default value instead of inheriting the one from `type`). I'm not sure why occurs in HHVM and PHP 5.3 and 7...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-14T07:36:15Z
+
+@WouterJ this is because the type normalizer is broken. It misses the return statement, meaning it always return ``null`` for the option
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-14T07:37:28Z
+
+and the reason why only these jobs are broken is clear:
+
+- 5.4 and 5.5 are not running tests for PRs to make builds faster
+- 5.6 is running deps=high, which does not run legacy tests, and the issue is in a legacy test
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-15T11:45:06Z
+
+Thanks @stof for the explanation.
+
+Tests pass now (appveyor failure seems to be unrelated).

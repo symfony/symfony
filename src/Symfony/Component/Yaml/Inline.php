@@ -156,9 +156,14 @@ class Inline
      */
     private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
     {
-        // array
         $keys = array_keys($value);
         $keysCount = count($keys);
+
+        if (0 === $keysCount) {
+            return '[]';
+        }
+
+        // sequence   
         if ((1 === $keysCount && '0' == $keys[0])
             || ($keysCount > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) === $keysCount * ($keysCount - 1) / 2)
         ) {

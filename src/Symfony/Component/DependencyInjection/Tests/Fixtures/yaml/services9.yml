@@ -15,7 +15,7 @@ services:
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
             - [setBar, ['@bar']]
-            - [initialize, {  }]
+            - [initialize, []]
 
         configurator: sc_configure
     bar:

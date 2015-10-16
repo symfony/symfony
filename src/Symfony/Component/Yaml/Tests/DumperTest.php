@@ -57,7 +57,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $expected = <<<EOF
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+'foo''bar': []
 bar:
        - 1
        - foo
@@ -102,28 +102,38 @@ EOF;
         }
     }
 
-    public function testInlineLevel()
+    /**
+     * @dataProvider getInlineLevelTests
+     */
+    public function testInlineLevel($expected, $levels)
     {
-        $expected = <<<EOF
-{ '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
+        $levels = (array) $levels;
 
-        $expected = <<<EOF
+        foreach ($levels as $level) {
+            $this->assertEquals($expected, $this->dumper->dump($this->array, $level), '->dump() takes an inline level argument');
+        }
+    }
+
+    public function getInlineLevelTests()
+    {
+        return array(
+            array(<<<EOF
+{ '': bar, foo: '#bar', 'foo''bar': [], bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
+EOF
+            , array(-10, 0)),
+            array(<<<EOF
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+'foo''bar': []
 bar: [1, foo]
 foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
-
-        $expected = <<<EOF
+EOF
+            , 1),
+            array(<<<EOF
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+'foo''bar': []
 bar:
     - 1
     - foo
@@ -132,13 +142,12 @@ foobar:
     bar: [1, foo]
     foobar: { foo: bar, bar: [1, foo] }
 
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
-
-        $expected = <<<EOF
+EOF
+            , 2),
+            array(<<<EOF
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+'foo''bar': []
 bar:
     - 1
     - foo
@@ -151,13 +160,12 @@ foobar:
         foo: bar
         bar: [1, foo]
 
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
-
-        $expected = <<<EOF
+EOF
+            , 3),
+            array(<<<EOF
 '': bar
 foo: '#bar'
-'foo''bar': {  }
+'foo''bar': []
 bar:
     - 1
     - foo
@@ -172,9 +180,9 @@ foobar:
             - 1
             - foo
 
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 4), '->dump() takes an inline level argument');
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 10), '->dump() takes an inline level argument');
+EOF
+            , array(4, 10)),
+        );
     }
 
     public function testObjectSupportEnabled()

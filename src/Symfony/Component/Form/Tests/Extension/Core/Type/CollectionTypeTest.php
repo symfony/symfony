@@ -19,7 +19,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
         $this->assertCount(0, $form);
@@ -293,10 +293,10 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPrototypeData()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
             'allow_add' => true,
             'prototype' => true,
             'prototype_data' => 'foo',
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
             'entry_options' => array(
                 'data' => 'bar',
             ),

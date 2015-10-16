@@ -91,11 +91,13 @@ class AutowirePass implements CompilerPassInterface
                     try {
                         $value = $this->createAutowiredDefinition($typeHint, $id);
                     } catch (RuntimeException $e) {
-                        if (!$parameter->isDefaultValueAvailable()) {
+                        if ($parameter->allowsNull()) {
+                            $value = null;
+                        } elseif ($parameter->isDefaultValueAvailable()) {
+                            $value = $parameter->getDefaultValue();
+                        } else {
                             throw $e;
                         }
-
-                        $value = $parameter->getDefaultValue();
                     }
                 }
             } catch (\ReflectionException $reflectionException) {

@@ -195,7 +195,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testCollection()
     {
         $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array('a', 'b'), array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -213,7 +213,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testEmptyCollection()
     {
         $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),

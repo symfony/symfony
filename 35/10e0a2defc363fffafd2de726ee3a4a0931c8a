@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-04T18:38:49Z
+
+Doesn't this also affect Symfony 2.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-04T18:40:00Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by s12v at 2015-10-10T08:59:32Z
+
+>Doesn't this also affect Symfony 2.3?
+
+@xabbuh, looks like it does, would it be better to create a PR for 2.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-10T09:10:13Z
+
+@s12v If I did not overlook anything the switch can be done when merging. So there's no need to create a new pull request.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T15:36:21Z
+
+:+1: for merge in 2.3.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-16T07:56:37Z
+
+:+1:

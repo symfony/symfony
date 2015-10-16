@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-27T23:21:53Z
+
+There's also logic down in `refreshUser` that that can call out to the entity repository, and it feels a little inconsistent to have a new interface for just the `loadUserByUsername()` method. But, in practice, that's the only of the 3 that needs to be overridden. So I think it's ok.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-09-28T05:41:06Z
+
+Maybe we can bring up this issue as a discussion again: https://github.com/symfony/symfony/issues/5678
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T12:31:56Z
+
+@weaverryan the whole point is that you should not change the way the user is refreshed. Refreshing is done by primary key on purpose, to avoid a security issue in case your username is mutable. this is precisely why we provide a dedicated new way
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-28T12:32:25Z
+
+This should go in the 2.8 branch when merging though. It is a new feature.
+
+---------------------------------------------------------------------------
+
+by mtrojanowski at 2015-09-28T21:36:17Z
+
+@stof If it's not a problem I will close this PR and open another one for the `2.8` branch once we decide that all the changes here are ok.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-29T08:46:20Z
+
+@mtrojanowski not really needed as we can switch branch with our merging tool
+
+---------------------------------------------------------------------------
+
+by mtrojanowski at 2015-09-29T20:36:46Z
+
+@stof Great :) Do you think anything else need to be fixed here?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-07T12:53:50Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-11T11:38:37Z
+
+@mtrojanowski Can you add some tests?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T07:51:45Z
+
+@mtrojanowski Looks good now, can you add some tests for this new feature?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T07:53:59Z
+
+You should also add a note in the CHANGELOG file of the Doctrine Bridge.
+
+---------------------------------------------------------------------------
+
+by mtrojanowski at 2015-10-13T07:57:53Z
+
+@fabpot I added some tests for the EntityUserProvider that check if proper interface is being used. I will also add a note to CHANGELOG.

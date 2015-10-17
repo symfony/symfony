@@ -229,6 +229,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function getInt($key, $default = 0, $deep = false)
     {
         $value = $this->get($key, $default, $deep);
+
         return $value === $default ? $value : (int) $value;
     }
 

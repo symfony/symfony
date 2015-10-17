@@ -33,7 +33,7 @@ class UrlValidator extends ConstraintValidator
                 \]  # a IPv6 address
             )
             (:[0-9]+)?                              # a port (optional)
-            (/?|/\S+)                               # a /, nothing or a / with something
+            (/?|/\S+|\?|\#)                         # a /, nothing, a / with something, a query or a fragment
         $~ixu';
 
     /**

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-16T19:35:42Z
+
+What I don't get is why are templates not beeing warmed if the templating component is not used? I mean we have the goal to use twig without templating, but the warmup should still compile all templates ideally, or not?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-17T13:11:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-17T13:12:37Z
+
+@Tobion That's not the purpose of this PR but to answer your question: simply because nobody ever implemented it. In the past, it was not really needed as the templating component was mandatory. Now that it's not anymore, we need another cache warmer (I will submit a PR this week-end to fill the gap).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-17T13:29:15Z
+
+:+1:

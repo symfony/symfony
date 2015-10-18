@@ -407,9 +407,12 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('GMT+03:00', $formatter->format(0));
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testFormatWithIntlTimeZone()
     {
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (PHP_VERSION_ID < 50500 && !method_exists('IntlDateFormatter', 'setTimeZone')) {
             $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
         }
 

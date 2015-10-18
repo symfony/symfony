@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Tests\Http;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
@@ -43,7 +44,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $urlGenerator
             ->expects($this->any())
             ->method('generate')
-            ->with('foobar', array(), true)
+            ->with('foobar', array(), UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
         $urlGenerator

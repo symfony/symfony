@@ -15,6 +15,7 @@
         <service id="serializer" class="%serializer.class%">
             <argument type="collection" />
             <argument type="collection" />
+            <argument type="collection" />
         </service>
 
         <service id="serializer.property_accessor" alias="property_accessor" public="false" />

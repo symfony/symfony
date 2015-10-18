@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\PostNormalizerInterface;
 
 /**
  * Serializer serializes and deserializes data.
@@ -57,8 +58,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var array
      */
     protected $denormalizerCache = array();
+    /**
+     * @var PostNormalizerInterface[]
+     */
+    private $postNormalizers = array();
 
-    public function __construct(array $normalizers = array(), array $encoders = array())
+    public function __construct(array $normalizers = array(), array $encoders = array(), array $postNormalizers = array())
     {
         foreach ($normalizers as $normalizer) {
             if ($normalizer instanceof SerializerAwareInterface) {
@@ -66,6 +71,13 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             }
         }
         $this->normalizers = $normalizers;
+
+        foreach ($postNormalizers as $postNormalizer) {
+            if ($postNormalizer instanceof SerializerAwareInterface) {
+                $postNormalizer->setSerializer($this);
+            }
+        }
+        $this->postNormalizers = $postNormalizers;
 
         $decoders = array();
         $realEncoders = array();
@@ -117,7 +129,20 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = array())
+    {
+        $data = $this->doNormalize($object, $format, $context);
+
+        foreach ($this->postNormalizers as $postNormalizer) {
+            if ($postNormalizer->supportsPostNormalization($object, $data, $format)) {
+                $data = $postNormalizer->postNormalize($object, $data, $format, $context);
+            }
+        }
+
+        return $data;
+    }
+
+    private function doNormalize($data, $format = null, array $context = array())
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format)) {

@@ -36,13 +36,17 @@ class SerializerPass implements CompilerPassInterface
         // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
         $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
+
+        // Looks for all the services tagged "serializer.post_normalizer" and adds them to the Serializer service
+        $encoders = $this->findAndSortTaggedServices('serializer.post_normalizer', $container, false);
+        $container->getDefinition('serializer')->replaceArgument(2, $encoders);
     }
 
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
+    private function findAndSortTaggedServices($tagName, ContainerBuilder $container, $notEmpty = true)
     {
         $services = $container->findTaggedServiceIds($tagName);
 
-        if (empty($services)) {
+        if ($notEmpty && empty($services)) {
             throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
         }
 

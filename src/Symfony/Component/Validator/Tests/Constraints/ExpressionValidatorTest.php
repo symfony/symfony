@@ -217,4 +217,28 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
+
+    public function testExpressionLanguageUsage()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'false',
+        ));
+
+        $expressionLanguage = $this->getMock('Symfony\Component\ExpressionLanguage\ExpressionLanguage');
+
+        $used = false;
+
+        $expressionLanguage->method('evaluate')
+            ->will($this->returnCallback(function () use (&$used) {
+                $used = true;
+
+                return true;
+            }));
+
+        $validator = new ExpressionValidator(null, $expressionLanguage);
+        $validator->initialize($this->createContext());
+        $validator->validate(null, $constraint);
+
+        $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+    }
 }

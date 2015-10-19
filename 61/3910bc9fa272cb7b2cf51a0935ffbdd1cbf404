@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ultrafez at 2015-10-09T16:34:08Z
+
+The AppVeyor build seems to have failed for reasons unrelated to this pull request - the Travis build passed which includes the unit tests I updated. Do all of the checks need to pass before the pull request can be merged, even if unrelated to this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-11T07:46:53Z
+
+Don't we have the same issue for the IPv6 check?

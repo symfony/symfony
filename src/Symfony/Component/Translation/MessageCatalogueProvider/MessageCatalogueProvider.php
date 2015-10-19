@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Translator;
  *
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class ResourceMessageCatalogueProvider implements MessageCatalogueProviderInterface
+class MessageCatalogueProvider implements MessageCatalogueProviderInterface
 {
     /**
      * @var array

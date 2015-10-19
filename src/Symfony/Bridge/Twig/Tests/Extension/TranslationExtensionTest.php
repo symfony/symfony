@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -203,6 +203,6 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 
     private function getTranslator($locale, $loaders = array(), $resources = array())
     {
-        return new Translator($locale, new ResourceMessageCatalogueProvider($loaders, $resources));
+        return new Translator($locale, new MessageCatalogueProvider($loaders, $resources));
     }
 }

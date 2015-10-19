@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class ContainerAwareResourceMessageCatalogueProvider extends ResourceMessageCatalogueProvider
+class ContainerAwareMessageCatalogueProvider extends MessageCatalogueProvider
 {
     /**
      * @var ContainerInterface

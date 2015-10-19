@@ -4,7 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProviderInterface;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 use Symfony\Component\Translation\MessageCatalogueProvider\CachedMessageCatalogueProvider;
 
 class WarmableMessageCatalogueProvider implements MessageCatalogueProviderInterface, WarmableInterface
@@ -15,11 +15,11 @@ class WarmableMessageCatalogueProvider implements MessageCatalogueProviderInterf
     private $messageCatalogueProvider;
 
     /**
-     * @var ResourceMessageCatalogueProvider
+     * @var MessageCatalogueProvider
      */
     private $resourceMessageCatalogueProvider;
 
-    public function __construct(MessageCatalogueProviderInterface $messageCatalogueProvider, ResourceMessageCatalogueProvider $resourceMessageCatalogueProvider)
+    public function __construct(MessageCatalogueProviderInterface $messageCatalogueProvider, MessageCatalogueProvider $resourceMessageCatalogueProvider)
     {
         $this->messageCatalogueProvider = $messageCatalogueProvider;
         $this->resourceMessageCatalogueProvider = $resourceMessageCatalogueProvider;

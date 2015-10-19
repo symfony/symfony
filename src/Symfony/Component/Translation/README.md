@@ -9,7 +9,7 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-$resourceCatalogue = new ResourceMessageCatalogueProvider();
+$resourceCatalogue = new MessageCatalogueProvider();
 $resourceCatalogue->addLoader('array', new ArrayLoader());
 $resourceCatalogue->addResource('array', array(
     'Hello World!' => 'Bonjour',

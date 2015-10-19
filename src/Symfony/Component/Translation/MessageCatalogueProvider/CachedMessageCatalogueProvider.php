@@ -187,7 +187,7 @@ EOF
      */
     public function getCatalogueCachePath($locale)
     {
-        if ($this->messageCatalogueProvider instanceof ResourceMessageCatalogueProvider) {
+        if ($this->messageCatalogueProvider instanceof MessageCatalogueProvider) {
             return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->messageCatalogueProvider->getFallbackLocales())).'.php';
         }
 

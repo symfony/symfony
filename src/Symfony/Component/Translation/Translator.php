@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProviderInterface;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 use Symfony\Component\Translation\MessageCatalogueProvider\CachedMessageCatalogueProvider;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -59,7 +59,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $messageCatalogueProvider;
 
     /**
-     * @var ResourceMessageCatalogueProvider
+     * @var MessageCatalogueProvider
      */
     private $resourceMessageCatalogueProvider;
 
@@ -124,11 +124,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use ResourceMessageCatalogueProvider::addLoader instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::addLoader instead.
      */
     public function addLoader($format, LoaderInterface $loader)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use ResourceMessageCatalogueProvider::addLoader instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::addLoader instead.', E_USER_DEPRECATED);
 
         $this->getResourceMessageCatalogueProvider()->addLoader($format, $loader);
     }
@@ -143,11 +143,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use ResourceMessageCatalogueProvider::addResource instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::addResource instead.
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use ResourceMessageCatalogueProvider::addResource instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::addResource instead.', E_USER_DEPRECATED);
 
         $this->getResourceMessageCatalogueProvider()->addResource($format, $resource, $locale, $domain);
     }
@@ -192,11 +192,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use ResourceMessageCatalogueProvider::setFallbackLocales instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::setFallbackLocales instead.
      */
     public function setFallbackLocales(array $locales)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use ResourceMessageCatalogueProvider::setFallbackLocales instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::setFallbackLocales instead.', E_USER_DEPRECATED);
 
         $this->getResourceMessageCatalogueProvider()->setFallbackLocales($locales);
     }
@@ -206,11 +206,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array $locales The fallback locales
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use ResourceMessageCatalogueProvider::getFallbackLocales instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::getFallbackLocales instead.
      */
     public function getFallbackLocales()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use ResourceMessageCatalogueProvider::getFallbackLocales instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::getFallbackLocales instead.', E_USER_DEPRECATED);
 
         return $this->getResourceMessageCatalogueProvider()->getFallbackLocales();
     }
@@ -273,7 +273,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             }
 
             if ($this->isMethodOverwritten('getLoaders')) {
-                @trigger_error('The Translator::getLoaders method is deprecated since version 2.8 and will be removed in 3.0. Rely on ResourceMessageCatalogueProvider::getLoaders instead.', E_USER_DEPRECATED);
+                @trigger_error('The Translator::getLoaders method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProvider::getLoaders instead.', E_USER_DEPRECATED);
             }
 
             $this->loadCatalogue($locale);
@@ -289,7 +289,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array LoaderInterface[]
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Rely on ResourceMessageCatalogueProvider::getLoaders instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProvider::getLoaders instead.
      */
     protected function getLoaders()
     {
@@ -303,11 +303,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array[array] indexed by catalog
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use ResourceMessageCatalogueProviderInterface::getCatalogue() method instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProviderInterface::getCatalogue() method instead.
      */
     public function getMessages($locale = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use ResourceMessageCatalogueProviderInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProviderInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
 
         $catalogue = $this->getCatalogue($locale);
         $messages = $catalogue->all();
@@ -346,7 +346,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->assertValidLocale($locale);
 
         if ($this->isMethodOverwritten('computeFallbackLocales')) {
-            @trigger_error('The Translator::computeFallbackLocales method is deprecated since version 2.8 and will be removed in 3.0. Rely on ResourceMessageCatalogueProvider instead.', E_USER_DEPRECATED);
+            @trigger_error('The Translator::computeFallbackLocales method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProvider instead.', E_USER_DEPRECATED);
         }
 
         try {
@@ -407,7 +407,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * @deprecated since version 2.8, to be removed in 3.0. Rely on ResourceMessageCatalogueProvider instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProvider instead.
      */
     protected function computeFallbackLocales($locale)
     {
@@ -455,15 +455,23 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     private function getResourceMessageCatalogueProvider()
     {
+        if ($this->messageCatalogueProvider instanceof MessageCatalogueProvider) {
+            return $this->messageCatalogueProvider;
+        }
+
         if ($this->resourceMessageCatalogueProvider) {
             return $this->resourceMessageCatalogueProvider;
         }
 
-        return $this->resourceMessageCatalogueProvider = new ResourceMessageCatalogueProvider();
+        return $this->resourceMessageCatalogueProvider = new MessageCatalogueProvider();
     }
 
     private function getCachedMessageCatalogueProvider()
     {
+        if ($this->messageCatalogueProvider instanceof CachedMessageCatalogueProvider) {
+            return $this->messageCatalogueProvider;
+        }
+
         if ($this->cacheMessageCatalogueProvider) {
             return $this->cacheMessageCatalogueProvider;
         }

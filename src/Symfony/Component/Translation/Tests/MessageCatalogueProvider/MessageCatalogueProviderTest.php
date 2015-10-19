@@ -12,10 +12,10 @@
 namespace Symfony\Component\Translation\MessageCatalogueProvider\Tests;
 
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-class ResourceMessageCatalogueProviderTest extends \PHPUnit_Framework_TestCase
+class MessageCatalogueProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider      getInvalidLocalesTests
@@ -123,7 +123,7 @@ class ResourceMessageCatalogueProviderTest extends \PHPUnit_Framework_TestCase
 
     private function getMessageCatalogueProvider($loaders = array(), $resources = array(), $fallbacklocales = array())
     {
-        return new ResourceMessageCatalogueProvider($loaders, $resources, $fallbacklocales);
+        return new MessageCatalogueProvider($loaders, $resources, $fallbacklocales);
     }
 
     public function getInvalidLocalesTests()

@@ -223,8 +223,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
         $this->assertTrue($container->hasDefinition('translation.translator'), '->registerTranslatorConfiguration() loads translation.xml');
         $this->assertEquals('translation.translator', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
-        $resources = $container->getDefinition('translation.message_catalogue_provider.resource')->getArgument(2);
 
+        $resources = $container->getDefinition('translation.message_catalogue_provider.resource')->getArgument(2);
         $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(

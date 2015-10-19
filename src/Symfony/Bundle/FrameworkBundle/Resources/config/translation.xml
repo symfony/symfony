@@ -173,7 +173,7 @@
             <argument type="service" id="translation.message_catalogue_provider.resource" />
         </service>
 
-        <service id="translation.message_catalogue_provider.resource" class="Symfony\Component\Translation\MessageCatalogueProvider\ContainerAwareResourceMessageCatalogueProvider" public="false">
+        <service id="translation.message_catalogue_provider.resource" class="Symfony\Component\Translation\MessageCatalogueProvider\ContainerAwareMessageCatalogueProvider" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" /> <!-- translation loaders -->
             <argument type="collection" /> <!-- translation resources -->

@@ -15,7 +15,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueProvider\CachedMessageCatalogueProvider;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 use Symfony\Component\Config\ConfigCacheFactory;
 
 class CachedMessageCatalogueProviderTest extends \PHPUnit_Framework_TestCase
@@ -166,7 +166,7 @@ class CachedMessageCatalogueProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getMessageCatalogueProvider($debug, $loaders = array(), $resources = array(), $fallbackLocales = array())
     {
-        $resourceCatalogue = new ResourceMessageCatalogueProvider($loaders, $resources, $fallbackLocales);
+        $resourceCatalogue = new MessageCatalogueProvider($loaders, $resources, $fallbackLocales);
 
         return new CachedMessageCatalogueProvider($resourceCatalogue, new ConfigCacheFactory($debug), $this->tmpDir);
     }

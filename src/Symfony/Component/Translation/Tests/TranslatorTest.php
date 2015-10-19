@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageCatalogueProvider\ResourceMessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -321,7 +321,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getTranslator($locale, $loaders = array(), $resources = array(), $fallbackLocales = array())
     {
-        $resourceCatalogue = new ResourceMessageCatalogueProvider($loaders, $resources, $fallbackLocales);
+        $resourceCatalogue = new MessageCatalogueProvider($loaders, $resources, $fallbackLocales);
 
         return new Translator($locale, $resourceCatalogue);
     }

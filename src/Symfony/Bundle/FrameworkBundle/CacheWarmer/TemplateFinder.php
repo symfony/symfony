@@ -45,7 +45,7 @@ class TemplateFinder implements TemplateFinderInterface
     /**
      * Find all the templates in the bundle and in the kernel Resources folder.
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     public function findAllTemplates()
     {
@@ -69,7 +69,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @param string $dir The folder where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     private function findTemplatesInFolder($dir)
     {
@@ -93,7 +93,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @param BundleInterface $bundle The bundle where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return TemplateReferenceInterface[]
      */
     private function findTemplatesInBundle(BundleInterface $bundle)
     {

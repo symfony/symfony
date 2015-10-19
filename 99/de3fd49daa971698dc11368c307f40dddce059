@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-10-05T10:56:30Z
+
+It could be helpfull
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T08:00:48Z
+
+@kbond Still willing to finish this one? I think this is indeed a good idea.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-09-14T14:17:17Z
+
+@fabpot sure, I rebased and fixed some CS issues.
+
+One thing I noticed with the animation is it sometimes looks strange - you can see it in the above gif after the "Half way..." message it just alternates between `/` and `\` only. I wonder if we should use some kind of timer to ensure the animation is smooth...?
+
+Anyway, anything that needs to be changed/fixed, let me know.
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-09-23T16:28:01Z
+
+Tests fail on Windows: https://ci.appveyor.com/project/fabpot/symfony/build/1.0.846/job/vcf2cxf0l2wxw52s#L550 , could you help with that?
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-09-23T16:41:15Z
+
+It can't be from the PR - I haven't added any tests yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-06T16:00:17Z
+
+@kbond Can you add some tests?
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-06T18:49:43Z
+
+@fabpot added.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-09T14:05:41Z
+
+I rebased to master. The console component's tests are failing but is unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-09T17:07:42Z
+
+I added a speed trap so the indicator doesn't change more than once per 100 (default) milliseconds.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-13T12:47:32Z
+
+To make the indicator immutable, should I remove some public setters? `setFormat`, `setIndicatorChangeInterval`, `setIndicatorValues` could be moved to the constructor. The user could potentially change these values during rendering and that could cause problems.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T14:37:04Z
+
+:+1: for making it immutable; if the list of arguments on the constructor is too large, you can also keep the setter but throw an exception when used after the indicator is started.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-13T14:50:18Z
+
+I agree with @fabpot. changing the display in the middle does not make much sense to me (and could even cause issues).
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-13T15:11:45Z
+
+Ok, I made it immutable and ensured it can be used multiple times per instance.
+
+Unless there are any other changes, this is good to go.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T15:42:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-19T12:18:02Z
+
+@kbond Looks like the tests on Windows do not pass.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-19T12:23:42Z
+
+Damn, ok I will have a look. It's hard to see what the problem is from the output.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-10-19T19:21:10Z
+
+Tests on Windows are passing now!

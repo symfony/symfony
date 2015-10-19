@@ -487,8 +487,8 @@ class Filesystem
             $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
 
             // Use fopen instead of file_exists as some streams do not support stat
-            // Use mode 'x' to atomically check existence and create to avoid a TOCTOU vulnerability
-            $handle = @fopen($tmpFile, 'x');
+            // Use mode 'x+' to atomically check existence and create to avoid a TOCTOU vulnerability
+            $handle = @fopen($tmpFile, 'x+');
 
             // If unsuccessful restart the loop
             if (false === $handle) {

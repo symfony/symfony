@@ -60,4 +60,25 @@ EOTXT
             , $var
         );
     }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testReturnType()
+    {
+        $f = eval('return function ():int {};');
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+Closure {
+  returnType: "int"
+  class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
+  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
+  file: "%sReflectionCasterTest.php(69) : eval()'d code"
+  line: "1 to 1"
+}
+EOTXT
+            , $f
+        );
+    }
 }

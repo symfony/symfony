@@ -114,6 +114,9 @@ class ReflectionCaster
             'this' => 'getClosureThis',
         ));
 
+        if (isset($a[$prefix.'returnType'])) {
+            $a[$prefix.'returnType'] = (string) $a[$prefix.'returnType'];
+        }
         if (isset($a[$prefix.'this'])) {
             $a[$prefix.'this'] = new CutStub($a[$prefix.'this']);
         }

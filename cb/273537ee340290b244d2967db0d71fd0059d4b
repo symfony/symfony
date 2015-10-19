@@ -1,0 +1,203 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-07T08:53:54Z
+
+We may have a test that expects the UnexpectedTypeException. If yes, it should be removed (I didn't check for it).
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-07T08:54:58Z
+
+@nicolas-grekas If there is such test Travis is going to fail so I'll just wait for that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-07T09:13:24Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-07T09:19:53Z
+
+IMO, we should have a test ensuring that the ExpressionLanguage passed as argument is actually used, to avoid regressions
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-07T09:30:05Z
+
+@stof Sounds reasonable (although there is no such test for propertyAccessor argument). I'm just not sure how to write it - I'd use Mockery for such tests, but symfony doesn't use it. Can you point me to a similar test in symfony?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-07T09:36:37Z
+
+@enumag there are lots of tests in Symfony using PHPUnit mocks. look for any usage of ``getMock`` in the testsuite
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-07T10:28:39Z
+
+@stof Can you give me some advice how to run symfony tests locally? The guide from http://symfony.com/doc/current/contributing/code/tests.html doesn't work at all.
+
+I run `composer update` and then:
+
+`php ./phpunit symfony` throws many errors, last of which is `Warning: unlink(E:\Git\Symfony/src/Symfony/Component/Yaml/phpunit.stderr): No such file or directory in E:\Git\Symfony\phpunit on line 140`.
+
+`php ./phpunit src/Symfony/Component/Validator` complains about a wrong path (without telling me what the path is - or maybe it means the "src/Symfony/Component/Validator" is wrong, which it obviously isn't, I've triple-checked for typos).
+
+The only thing that sorf of worked was this. It let me know about some parse errors I've made and then failed:
+
+```
+E:\Git\Symfony>php .\.phpunit\phpunit-4.8\phpunit src\Symfony\Component\Validator
+
+Fatal error: Class 'Doctrine\Tests\Common\Annotations\Fixtures\AnnotationTargetAll' not found in E:\Git\Symfony\src\Symfony\C
+omponent\Validator\vendor\doctrine\annotations\tests\Doctrine\Tests\Common\Annotations\DocParserTest.php on line 1351
+```
+
+I'm on Windows 7 and I installed msysgit with unix tools.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-10T06:20:37Z
+
+@enumag can you please post the full output so that we can figure out what's wrong with the tests?
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-10T10:29:13Z
+
+I've checked the output and there is nothing that points to the cause. However it seems there is some kind of problem with arguments escaping. When I hack `Symfony\Component\Process\ProcessUtils::escapeArgument($argument)` to just return the argument without any change, the tests suddenly work, although some of them fail.
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-10T10:45:54Z
+
+Can't figure out the arguments escaping problem but I now know why some of the tests were failing for me. The reason is autocrlf setting in git. My default is
+
+```
+git config --global core.autocrlf true
+```
+
+You should add a .gitattributes file to fix this.
+
+There are still some other tests failing. In case of Validator see this:
+
+```
+E:\Git\Symfony>php .\phpunit src/Symfony/Component/Validator
+PHPUnit 4.8.10 by Sebastian Bergmann and contributors.
+
+............................................................   60 / 2185 (  2%)
+............................................................  120 / 2185 (  5%)
+............................................................  180 / 2185 (  8%)
+............................................................  240 / 2185 ( 10%)
+...........................................................S  300 / 2185 ( 13%)
+........SSSSS...............................................  360 / 2185 ( 16%)
+..........SSS.SSS...........................................  420 / 2185 ( 19%)
+............................................................  480 / 2185 ( 21%)
+.................F..........................................  540 / 2185 ( 24%)
+.......................F....................SSS.SSS.........  600 / 2185 ( 27%)
+....SSSSSS....SSSSSS........................................  660 / 2185 ( 30%)
+............................................................  720 / 2185 ( 32%)
+............................................................  780 / 2185 ( 35%)
+............................................................  840 / 2185 ( 38%)
+............................................................  900 / 2185 ( 41%)
+................................SS.SS.......................  960 / 2185 ( 43%)
+............................................................ 1020 / 2185 ( 46%)
+............................................................ 1080 / 2185 ( 49%)
+............................................................ 1140 / 2185 ( 52%)
+............................................................ 1200 / 2185 ( 54%)
+............................................................ 1260 / 2185 ( 57%)
+...................................................S........ 1320 / 2185 ( 60%)
+............................................................ 1380 / 2185 ( 63%)
+.............SSS..SSS.............SSSSSS...SSSSSS........... 1440 / 2185 ( 65%)
+....................................................SSS.SSS. 1500 / 2185 ( 68%)
+..................S......................................... 1560 / 2185 ( 71%)
+........................SSSSSSSSSSSSSSSS.................... 1620 / 2185 ( 74%)
+............................................................ 1680 / 2185 ( 76%)
+............................................................ 1740 / 2185 ( 79%)
+............................................................ 1800 / 2185 ( 82%)
+............................................................ 1860 / 2185 ( 85%)
+................................................SSS......... 1920 / 2185 ( 87%)
+............................................................ 1980 / 2185 ( 90%)
+............................................................ 2040 / 2185 ( 93%)
+............................................................ 2100 / 2185 ( 96%)
+............................................................ 2160 / 2185 ( 98%)
+.........................
+
+Time: 24.67 seconds, Memory: 63.75Mb
+
+There were 2 failures:
+
+1) Symfony\Component\Validator\Tests\Constraints\FileValidatorObjectTest::testUploadedFileError with data set #8 (1, 'uploadIniSizeErrorMessage', array(1000, 'MiB'), '1000M')
+Failed asserting that two objects are equal.
+--- Expected
++++ Actual
+@@ @@
+ Symfony\Component\Validator\ConstraintViolation Object (
+     'message' => null
+     'messageTemplate' => 'myMessage'
+     'parameters' => Array (
+-        '{{ limit }}' => 1000
+-        '{{ suffix }}' => 'MiB'
++        '{{ limit }}' => '1000'
++        '{{ suffix }}' => 'MB'
+     )
+     'plural' => null
+     'root' => 'root'
+     'propertyPath' => 'property.path'
+     'invalidValue' => 'InvalidValue'
+     'constraint' => Symfony\Component\Validator\Constraints\NotNull Object (...)
+     'code' => 1
+     'cause' => null
+ )
+
+E:\Git\Symfony\src\Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest.php:421
+E:\Git\Symfony\src\Symfony\Component\Validator\Tests\Constraints\FileValidatorTest.php:431
+
+2) Symfony\Component\Validator\Tests\Constraints\FileValidatorPathTest::testUploadedFileError with data set #8 (1, 'uploadIniSizeErrorMessage', array(1000, 'MiB'), '1000M')
+Failed asserting that two objects are equal.
+--- Expected
++++ Actual
+@@ @@
+ Symfony\Component\Validator\ConstraintViolation Object (
+     'message' => null
+     'messageTemplate' => 'myMessage'
+     'parameters' => Array (
+-        '{{ limit }}' => 1000
+-        '{{ suffix }}' => 'MiB'
++        '{{ limit }}' => '1000'
++        '{{ suffix }}' => 'MB'
+     )
+     'plural' => null
+     'root' => 'root'
+     'propertyPath' => 'property.path'
+     'invalidValue' => 'InvalidValue'
+     'constraint' => Symfony\Component\Validator\Constraints\NotNull Object (...)
+     'code' => 1
+     'cause' => null
+ )
+
+E:\Git\Symfony\src\Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest.php:421
+E:\Git\Symfony\src\Symfony\Component\Validator\Tests\Constraints\FileValidatorTest.php:431
+
+FAILURES!
+Tests: 2185, Assertions: 4557, Failures: 2, Skipped: 79.
+
+Legacy deprecation notices (276)
+KO src/Symfony/Component/Validator
+
+```
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-10T11:37:56Z
+
+Arguments escaping problem is caused by https://bugs.php.net/bug.php?id=49139. Adding additional double quotes into both proc_open calls in https://github.com/symfony/symfony/blob/2.8/phpunit fixed my problem. The second suggested workaround with bypass_shell option only works for one of the calls.
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-10T12:26:44Z
+
+@stof I've added the requested test. Not sure if this is the correct way to write such test though.

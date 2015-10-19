@@ -9,13 +9,13 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-$translator = new Translator('fr_FR', new MessageSelector());
-$translator->setFallbackLocales(array('fr'));
-$translator->addLoader('array', new ArrayLoader());
-$translator->addResource('array', array(
+$resourceCatalogue = new ResourceMessageCatalogueProvider();
+$resourceCatalogue->addLoader('array', new ArrayLoader());
+$resourceCatalogue->addResource('array', array(
     'Hello World!' => 'Bonjour',
 ), 'fr');
 
+$translator = new Translator('fr', $resourceCatalogue);
 echo $translator->trans('Hello World!')."\n";
 ```
 

@@ -79,5 +79,4 @@ class TargetOperationTest extends AbstractOperationTest
     {
         return new TargetOperation($source, $target);
     }
-
 }

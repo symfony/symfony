@@ -16,6 +16,9 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
 
+/**
+ * @group legacy
+ */
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $tmpDir;
@@ -92,16 +95,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
-    }
-
-    public function testTransWithCachingWithInvalidLocale()
-    {
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
-        $translator->setLocale('invalid locale');
-
-        $this->setExpectedException('\InvalidArgumentException');
-        $translator->trans('foo');
     }
 
     public function testLoadResourcesWithoutCaching()
@@ -267,16 +260,5 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array($loaderFomat => array($loaderFomat)),
             $options
         );
-    }
-}
-
-class TranslatorWithInvalidLocale extends Translator
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
     }
 }

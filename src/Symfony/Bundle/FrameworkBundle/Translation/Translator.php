@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
+@trigger_error('The '.__NAMESPACE__.'\Translator class is deprecated since version 2.8 and will be removed in 3.0. Use directly the Symfony\Component\Translation\Translator class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
@@ -20,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use the Symfony\Component\Translation\Translator instead.
  */
 class Translator extends BaseTranslator implements WarmableInterface
 {
@@ -65,11 +69,11 @@ class Translator extends BaseTranslator implements WarmableInterface
 
         $this->options = array_merge($this->options, $options);
         $this->resourceLocales = array_keys($this->options['resource_files']);
+
+        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
         if (null !== $this->options['cache_dir'] && $this->options['debug']) {
             $this->loadResources();
         }
-
-        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

@@ -121,7 +121,7 @@ class Process
      *
      * @param string         $commandline The command line to run
      * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env         The environment variables or null to inherit
+     * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
      * @param string|null    $stdin       The STDIN content
      * @param int|float|null $timeout     The timeout in seconds or null to disable
      * @param array          $options     An array of options for proc_open
@@ -851,7 +851,7 @@ class Process
 
         $this->env = array();
         foreach ($env as $key => $value) {
-            $this->env[(binary) $key] = (binary) $value;
+            $this->env[$key] = (string) $value;
         }
 
         return $this;

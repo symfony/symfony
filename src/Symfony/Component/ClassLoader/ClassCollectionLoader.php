@@ -283,7 +283,7 @@ class ClassCollectionLoader
 
         $traits = array();
 
-        if (function_exists('get_declared_traits')) {
+        if (method_exists('ReflectionClass', 'getTraits')) {
             foreach ($classes as $c) {
                 foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
                     if ($trait !== $c) {

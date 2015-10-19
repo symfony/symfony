@@ -42,11 +42,11 @@ class ProgressIndicatorTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' \\ Advancing...').
             $this->generateOutput(' | Advancing...').
             $this->generateOutput(' | Done...     ').
-            "\n".
+            PHP_EOL.
             $this->generateOutput(' - Starting Again...').
             $this->generateOutput(' \\ Starting Again...').
             $this->generateOutput(' \\ Done Again...    ').
-            "\n",
+            PHP_EOL,
             stream_get_contents($output->getStream())
         );
     }

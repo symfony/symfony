@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -57,15 +58,21 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected $camelizedAttributes = array();
 
     /**
+     * @var PropertyInfoExtractor
+     */
+    protected $propertyInfoExtractor;
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
      * @param ClassMetadataFactoryInterface|null $classMetadataFactory
      * @param NameConverterInterface|null        $nameConverter
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyInfoExtractor $propertyInfoExtractor = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
+        $this->propertyInfoExtractor = $propertyInfoExtractor;
     }
 
     /**
@@ -301,45 +308,98 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return $context['object_to_populate'];
         }
 
-        $constructor = $reflectionClass->getConstructor();
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
-
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
-                    if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                        if (!is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
-                        }
-
-                        $params = array_merge($params, $data[$paramName]);
-                    }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $params[] = $data[$key];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$key]);
-                } elseif ($constructorParameter->isDefaultValueAvailable()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new RuntimeException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
-                }
-            }
-
-            return $reflectionClass->newInstanceArgs($params);
+        $format = null;
+        if (isset($context['format'])) {
+            $format = $context['format'];
         }
 
-        return new $class();
+        $constructor = $reflectionClass->getConstructor();
+        if (!$constructor) {
+            return new $class();
+        }
+
+        $constructorParameters = $constructor->getParameters();
+
+        $params = array();
+        foreach ($constructorParameters as $constructorParameter) {
+            $paramName = $constructorParameter->name;
+            $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+
+            $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+            $ignored = in_array($paramName, $this->ignoredAttributes);
+
+            if (!$allowed || $ignored) {
+                continue;
+            }
+
+            $missing = !isset($data[$key]) && !array_key_exists($key, $data);
+            $variadic = method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic();
+
+            if ($variadic && !$missing && !is_array($data[$paramName])) {
+                $message = 'Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.';
+                throw new RuntimeException(sprintf($message, $class, $constructorParameter->name));
+            }
+
+            if ($variadic && !$missing) {
+                $params = array_merge($params, $data[$paramName]);
+
+                continue;
+            }
+
+            if ($missing && !$variadic && !$constructorParameter->isDefaultValueAvailable()) {
+                $message = 'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.';
+                throw new RuntimeException(sprintf($message, $class, $constructorParameter->name));
+            }
+
+            if ($missing && $constructorParameter->isDefaultValueAvailable()) {
+                $params[] = $constructorParameter->getDefaultValue();
+
+                continue;
+            }
+
+            if (!$missing) {
+                $params[] = $this->denormalizeProperty($data[$key], $class, $key, $format, $context);
+
+                unset($data[$key]);
+            }
+        }
+
+        return $reflectionClass->newInstanceArgs($params);
+    }
+
+    /**
+     * @param mixed  $data
+     * @param string $class
+     * @param string $name
+     * @param string $format
+     * @param array  $context
+     *
+     * @return mixed|object
+     */
+    protected function denormalizeProperty($data, $class, $name, $format = null, array $context = array())
+    {
+        if (!$this->propertyInfoExtractor) {
+            return $data;
+        }
+
+        $types = $this->propertyInfoExtractor->getTypes($class, $name);
+
+        if (empty($types)) {
+            return $data;
+        }
+
+        foreach ($types as $type) {
+            if ($data === null && $type->isNullable()) {
+                return $data;
+            }
+
+            if (!$this->serializer instanceof DenormalizerInterface) {
+                $message = 'Cannot denormalize attribute "%s" because injected serializer is not a denormalizer';
+                throw new RuntimeException(sprintf($message, $name));
+            }
+
+            return $this->serializer->denormalize($data, $type->getClassName(), $format, $context);
+        }
+
     }
 }

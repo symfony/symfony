@@ -100,7 +100,8 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
+        $subcontext = array_merge($context, array('format' => $format));
+        $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
 
         $classMethods = get_class_methods($object);
         foreach ($normalizedData as $attribute => $value) {
@@ -111,13 +112,18 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
-            if ($allowed && !$ignored) {
-                $setter = 'set'.ucfirst($attribute);
-
-                if (in_array($setter, $classMethods)) {
-                    $object->$setter($value);
-                }
+            if (!$allowed || $ignored) {
+                continue;
             }
+
+            $setter = 'set'.ucfirst($attribute);
+            if (!in_array($setter, $classMethods)) {
+                continue;
+            }
+
+            $value = $this->denormalizeProperty($value, $class, $attribute, $format, $context);
+
+            $object->$setter($value);
         }
 
         return $object;

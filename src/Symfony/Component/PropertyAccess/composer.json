@@ -18,12 +18,6 @@
     "require": {
         "php": ">=5.3.3"
     },
-    "require-dev": {
-        "doctrine/cache": "~2.4"
-    },
-    "suggest": {
-        "doctrine/cache": "To cache access methods"
-    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\PropertyAccess\\": "" }
     },

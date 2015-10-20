@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess;
 
-use Doctrine\Common\Cache\Cache;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
@@ -35,8 +34,6 @@ class PropertyAccessor implements PropertyAccessorInterface
     const ACCESS_TYPE_NOT_FOUND = 3;
 
     private $magicCall;
-    private $cache;
-    private $propertyPathCache = array();
     private $readPropertyCache = array();
     private $writePropertyCache = array();
 
@@ -44,10 +41,9 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct($magicCall = false, Cache $cache = null)
+    public function __construct($magicCall = false)
     {
         $this->magicCall = $magicCall;
-        $this->cache = $cache;
     }
 
     /**
@@ -55,7 +51,10 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        $propertyPath = $this->getPropertyPath($propertyPath);
+        if (!$propertyPath instanceof PropertyPathInterface) {
+            $propertyPath = new PropertyPath($propertyPath);
+        }
+
         $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
@@ -66,7 +65,10 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        $propertyPath = $this->getPropertyPath($propertyPath);
+        if (!$propertyPath instanceof PropertyPathInterface) {
+            $propertyPath = new PropertyPath($propertyPath);
+        }
+
         $propertyValues = &$this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
         $overwrite = true;
 
@@ -215,7 +217,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (isset($this->readPropertyCache[$key])) {
             $access = $this->readPropertyCache[$key];
-        } elseif (!$this->cache || !$access = $this->cache->fetch('read'.$key)) {
+        } else {
             $camelProp = $this->camelize($property);
             $reflClass = new \ReflectionClass($object);
             $getter = 'get' . $camelProp;
@@ -276,9 +278,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $this->readPropertyCache[$key] = $access;
-            if ($this->cache) {
-                $this->cache->save('read'.$key, $access);
-            }
         }
 
         switch ($access[self::ACCESS_TYPE]) {
@@ -348,7 +347,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (isset($this->writePropertyCache[$key])) {
             $access = $this->writePropertyCache[$key];
-        } elseif (!$this->cache || !$access = $this->cache->fetch('write'.$key)) {
+        } else {
             $access = array();
             $reflClass = new \ReflectionClass($object);
             $plural = $this->camelize($property);
@@ -411,9 +410,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $this->writePropertyCache[$key] = $access;
-            if ($this->cache) {
-                $this->cache->save('write'.$key, $access);
-            }
         }
 
         switch ($access[self::ACCESS_TYPE]) {
@@ -534,24 +530,5 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param  PropertyPathInterface|string $propertyPath
-     *
-     * @return PropertyPath
-     */
-    private function getPropertyPath($propertyPath)
-    {
-        if ($propertyPath instanceof PropertyPathInterface) {
-            return $propertyPath;
-        }
-
-        if (isset($this->propertyPathCache[$propertyPath])) {
-            return $this->propertyPathCache[$propertyPath];
-        }
-
-        $this->propertyPathCache[$propertyPath] = new PropertyPath($propertyPath);
-        return $this->propertyPathCache[$propertyPath];
     }
 }

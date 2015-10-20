@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-19T15:19:39Z
+
+I suggest adding a test covering this for PHP 7+
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-19T17:17:14Z
+
+test added
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-19T18:11:28Z
+
+This PR now also fixes dumping PHP7 anonymous classes.

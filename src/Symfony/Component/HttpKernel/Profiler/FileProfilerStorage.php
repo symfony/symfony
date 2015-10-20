@@ -10,7 +10,6 @@
  */
 
 namespace Symfony\Component\HttpKernel\Profiler;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Storage for profiler using files.
@@ -34,7 +33,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * @param string $dsn The DSN
      *
      * @throws \RuntimeException
-     * @throws IOException
      */
     public function __construct($dsn)
     {
@@ -45,7 +43,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         if (!is_dir($this->folder)) {
             if (false === @mkdir($this->folder, 0777, true) && !is_dir($this->folder)) {
-                throw new IOException(sprintf('Unable to create the storage directory (%s).', $this->folder));
+                throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $this->folder));
             }
         }
     }
@@ -132,6 +130,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     * @throws \RuntimeException
      */
     public function write(Profile $profile)
     {
@@ -142,7 +141,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
             // Create directory
             $dir = dirname($file);
             if (!is_dir($dir)) {
-                mkdir($dir, 0777, true);
+                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                    throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $dir));
+                }
             }
         }
 

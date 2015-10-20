@@ -12,8 +12,9 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
@@ -95,7 +96,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
         // Check whether the field exists and is nullable or not
         if ($classMetadata->hasField($property)) {
-            if (!$classMetadata->isNullable($property)) {
+            if (!$classMetadata->isNullable($property) && Type::BOOLEAN !== $classMetadata->getTypeOfField($property)) {
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
             }
 

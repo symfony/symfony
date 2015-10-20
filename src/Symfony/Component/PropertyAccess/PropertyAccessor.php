@@ -211,7 +211,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
 
-        $key = spl_object_hash($object).'::'.$property;
+        $key = get_class($object).'::'.$property;
 
         if (isset($this->readPropertyCache[$key])) {
             $access = $this->readPropertyCache[$key];
@@ -344,7 +344,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
 
-        $key = spl_object_hash($object).'::'.$property;
+        $key = get_class($object).'::'.$property;
 
         if (isset($this->writePropertyCache[$key])) {
             $access = $this->writePropertyCache[$key];

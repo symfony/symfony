@@ -164,7 +164,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function success($message)
     {
-        $this->block($message, 'OK', 'fg=white;bg=green', ' ', true);
+        $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
 
     /**

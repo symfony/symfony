@@ -73,14 +73,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Gets the listener priority for a specific event.
-     *
-     * Returns null if the event or the listener does not exist.
-     *
-     * @param string   $eventName The name of the event
-     * @param callable $listener  The listener to remove
-     *
-     * @return int|null The event listener priority
+     * {@inheritdoc}
      */
     public function getListenerPriority($eventName, $listener)
     {

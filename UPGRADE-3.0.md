@@ -107,6 +107,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### EventDispatcher
 
+ * The method `getListenerPriority($eventName, $listener)` has been added to the
+   `EventDispatcherInterface`.
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`
    extends `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
 

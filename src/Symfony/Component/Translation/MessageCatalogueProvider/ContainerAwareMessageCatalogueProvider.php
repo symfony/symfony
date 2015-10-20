@@ -65,7 +65,7 @@ class ContainerAwareMessageCatalogueProvider extends MessageCatalogueProvider
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getResources()
     {

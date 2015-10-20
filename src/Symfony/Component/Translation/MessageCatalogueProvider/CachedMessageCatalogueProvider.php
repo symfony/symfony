@@ -180,12 +180,7 @@ EOF
         return $fallbackContent;
     }
 
-    /**
-     * This method is public because it is needed in the Translator for BC. It should be made private in 3.0.
-     *
-     * @internal
-     */
-    public function getCatalogueCachePath($locale)
+    private function getCatalogueCachePath($locale)
     {
         if ($this->messageCatalogueProvider instanceof MessageCatalogueProvider) {
             return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->messageCatalogueProvider->getFallbackLocales())).'.php';

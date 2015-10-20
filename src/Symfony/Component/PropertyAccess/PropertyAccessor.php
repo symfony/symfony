@@ -23,15 +23,17 @@ class PropertyAccessor implements PropertyAccessorInterface
 {
     const VALUE = 0;
     const IS_REF = 1;
-    const ACCESS_TYPE = 0;
-    const ACCESS_NAME = 1;
-    const ACCESS_REF = 2;
-    const ACCESS_ADDER = 3;
-    const ACCESS_REMOVER = 4;
+    const ACCESS_REFLECTION_CLASS = 0;
+    const ACCESS_TYPE = 1;
+    const ACCESS_NAME = 2;
+    const ACCESS_REF = 3;
+    const ACCESS_ADDER = 4;
+    const ACCESS_REMOVER = 5;
     const ACCESS_TYPE_METHOD = 0;
     const ACCESS_TYPE_PROPERTY = 1;
-    const ACCESS_TYPE_ADDER_AND_REMOVER = 2;
-    const ACCESS_TYPE_NOT_FOUND = 3;
+    const ACCESS_TYPE_MAGIC = 2;
+    const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
+    const ACCESS_TYPE_NOT_FOUND = 4;
 
     private $magicCall;
     private $readPropertyCache = array();
@@ -218,14 +220,14 @@ class PropertyAccessor implements PropertyAccessorInterface
         if (isset($this->readPropertyCache[$key])) {
             $access = $this->readPropertyCache[$key];
         } else {
-            $camelProp = $this->camelize($property);
-            $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.$camelProp;
-            $isser = 'is'.$camelProp;
-            $hasser = 'has'.$camelProp;
-            $classHasProperty = $reflClass->hasProperty($property);
-
             $access = array();
+
+            $access[self::ACCESS_REFLECTION_CLASS] = $reflClass = new \ReflectionClass($object);
+            $camelProp = $this->camelize($property);
+            $getter = 'get' . $camelProp;
+            $isser = 'is' . $camelProp;
+            $hasser = 'has' . $camelProp;
+            $classHasProperty = $reflClass->hasProperty($property);
 
             if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
@@ -249,7 +251,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $result[self::IS_REF] = true;
             } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
                 // we call the getter and hope the __call do the job
-                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
                 $access[self::ACCESS_NAME] = $getter;
             } else {
                 $methods = array($getter, $isser, $hasser, '__get');
@@ -259,7 +261,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                 $access[self::ACCESS_NAME] = sprintf(
-                    'Neither the property "%s" nor one of the methods "%s()" '.
+                    'Neither the property "%s" nor one of the methods "%s()" ' .
                     'exist and have public access in class "%s".',
                     $property,
                     implode('()", "', $methods),
@@ -270,36 +272,29 @@ class PropertyAccessor implements PropertyAccessorInterface
             $this->readPropertyCache[$key] = $access;
         }
 
-        switch ($access[self::ACCESS_TYPE]) {
-            case self::ACCESS_TYPE_METHOD:
-                $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
-                break;
+        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+        } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+            if ($access[self::ACCESS_REF]) {
+                $result[self::VALUE] = &$object->{$access[self::ACCESS_NAME]};
+                $result[self::IS_REF] = true;
+            } else {
+                $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
+            }
+        } elseif (!$access[self::ACCESS_REFLECTION_CLASS]->hasProperty($property) && property_exists($object, $property)) {
+            // Needed to support \stdClass instances. We need to explicitly
+            // exclude $classHasProperty, otherwise if in the previous clause
+            // a *protected* property was found on the class, property_exists()
+            // returns true, consequently the following line will result in a
+            // fatal error.
 
-            case self::ACCESS_TYPE_PROPERTY:
-                if ($access[self::ACCESS_REF]) {
-                    $result[self::VALUE] = &$object->{$access[self::ACCESS_NAME]};
-                    $result[self::IS_REF] = true;
-                } else {
-                    $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]};
-                }
-                break;
-
-            default:
-                $reflClass = new \ReflectionClass($object);
-
-                if (!$reflClass->hasProperty($property) && property_exists($object, $property)) {
-                    // Needed to support \stdClass instances. We need to explicitly
-                    // exclude $classHasProperty, otherwise if in the previous clause
-                    // a *protected* property was found on the class, property_exists()
-                    // returns true, consequently the following line will result in a
-                    // fatal error.
-
-                    $result[self::VALUE] = &$object->$property;
-                    $result[self::IS_REF] = true;
-                } else {
-                    throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
-                }
-            break;
+            $result[self::VALUE] = &$object->$property;
+            $result[self::IS_REF] = true;
+        } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
+            // we call the getter and hope the __call do the job
+            $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
+        } else {
+            throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
 
         // Objects are always passed around by reference
@@ -353,11 +348,12 @@ class PropertyAccessor implements PropertyAccessorInterface
             $access = $this->writePropertyCache[$key];
         } else {
             $access = array();
-            $reflClass = new \ReflectionClass($object);
+
+            $access[self::ACCESS_REFLECTION_CLASS] = $reflClass = new \ReflectionClass($object);
             $plural = $this->camelize($property);
 
             // Any of the two methods is required, but not yet known
-            $singulars = null !== $singular ? array($singular) : (array) StringUtil::singularify($plural);
+            $singulars = null !== $singular ? array($singular) : (array)StringUtil::singularify($plural);
 
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
@@ -367,7 +363,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     // message. If the user implements the adder but not the remover,
                     // an exception will be thrown in findAdderAndRemover() that
                     // the remover has to be implemented as well.
-                    $guessedAdders = '"add'.implode('()", "add', $singulars).'()", ';
+                    $guessedAdders = '"add' . implode('()", "add', $singulars) . '()", ';
                 } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
                     $access[self::ACCESS_ADDER] = $methods[0];
@@ -376,7 +372,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             if (!isset($access[self::ACCESS_TYPE])) {
-                $setter = 'set'.$this->camelize($property);
+                $setter = 'set' . $this->camelize($property);
                 $classHasProperty = $reflClass->hasProperty($property);
 
                 if ($reflClass->hasMethod($setter) && $reflClass->getMethod($setter)->isPublic()) {
@@ -388,22 +384,14 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
                     $access[self::ACCESS_NAME] = $property;
-                } elseif (!$classHasProperty && property_exists($object, $property)) {
-                    // Needed to support \stdClass instances. We need to explicitly
-                    // exclude $classHasProperty, otherwise if in the previous clause
-                    // a *protected* property was found on the class, property_exists()
-                    // returns true, consequently the following line will result in a
-                    // fatal error.
-                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
-                    $access[self::ACCESS_NAME] = $property;
                 } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
                     // we call the getter and hope the __call do the job
-                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
+                    $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
                     $access[self::ACCESS_NAME] = $setter;
                 } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                     $access[self::ACCESS_NAME] = sprintf(
-                        'Neither the property "%s" nor one of the methods %s"%s()", '.
+                        'Neither the property "%s" nor one of the methods %s"%s()", ' .
                         '"__set()" or "__call()" exist and have public access in class "%s".',
                         $property,
                         $guessedAdders,
@@ -416,54 +404,57 @@ class PropertyAccessor implements PropertyAccessorInterface
             $this->writePropertyCache[$key] = $access;
         }
 
-        switch ($access[self::ACCESS_TYPE]) {
-            case self::ACCESS_TYPE_METHOD:
-                $object->{$access[self::ACCESS_NAME]}($value);
-            break;
+        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]}($value);
+        } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]} = $value;
+        } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
+            // At this point the add and remove methods have been found
+            // Use iterator_to_array() instead of clone in order to prevent side effects
+            // see https://github.com/symfony/symfony/issues/4670
+            $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
+            $itemToRemove = array();
+            $propertyValue = &$this->readProperty($object, $property);
+            $previousValue = $propertyValue[self::VALUE];
+            // remove reference to avoid modifications
+            unset($propertyValue);
 
-            case self::ACCESS_TYPE_PROPERTY:
-                $object->{$access[self::ACCESS_NAME]} = $value;
-            break;
+            if (is_array($previousValue) || $previousValue instanceof \Traversable) {
+                foreach ($previousValue as $previousItem) {
+                    foreach ($value as $key => $item) {
+                        if ($item === $previousItem) {
+                            // Item found, don't add
+                            unset($itemsToAdd[$key]);
 
-            case self::ACCESS_TYPE_ADDER_AND_REMOVER:
-                // At this point the add and remove methods have been found
-                // Use iterator_to_array() instead of clone in order to prevent side effects
-                // see https://github.com/symfony/symfony/issues/4670
-                $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
-                $itemToRemove = array();
-                $propertyValue = &$this->readProperty($object, $property);
-                $previousValue = $propertyValue[self::VALUE];
-                // remove reference to avoid modifications
-                unset($propertyValue);
-
-                if (is_array($previousValue) || $previousValue instanceof \Traversable) {
-                    foreach ($previousValue as $previousItem) {
-                        foreach ($value as $key => $item) {
-                            if ($item === $previousItem) {
-                                // Item found, don't add
-                                unset($itemsToAdd[$key]);
-
-                                // Next $previousItem
-                                continue 2;
-                            }
+                            // Next $previousItem
+                            continue 2;
                         }
-
-                        // Item not found, add to remove list
-                        $itemToRemove[] = $previousItem;
                     }
-                }
 
-                foreach ($itemToRemove as $item) {
-                    call_user_func(array($object, $access[self::ACCESS_REMOVER]), $item);
+                    // Item not found, add to remove list
+                    $itemToRemove[] = $previousItem;
                 }
+            }
 
-                foreach ($itemsToAdd as $item) {
-                    call_user_func(array($object, $access[self::ACCESS_ADDER]), $item);
-                }
-                break;
+            foreach ($itemToRemove as $item) {
+                call_user_func(array($object, $access[self::ACCESS_REMOVER]), $item);
+            }
 
-            default:
-                throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+            foreach ($itemsToAdd as $item) {
+                call_user_func(array($object, $access[self::ACCESS_ADDER]), $item);
+            }
+        } elseif (!$access[self::ACCESS_REFLECTION_CLASS]->hasProperty($property) && property_exists($object, $property)) {
+            // Needed to support \stdClass instances. We need to explicitly
+            // exclude $classHasProperty, otherwise if in the previous clause
+            // a *protected* property was found on the class, property_exists()
+            // returns true, consequently the following line will result in a
+            // fatal error.
+
+            $object->{$access[self::ACCESS_NAME]} = $value;
+        } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
+            $object->{$access[self::ACCESS_NAME]}($value);
+        } else {
+            throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
     }
 

@@ -224,9 +224,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $access[self::ACCESS_REFLECTION_CLASS] = $reflClass = new \ReflectionClass($object);
             $camelProp = $this->camelize($property);
-            $getter = 'get' . $camelProp;
-            $isser = 'is' . $camelProp;
-            $hasser = 'has' . $camelProp;
+            $getter = 'get'.$camelProp;
+            $isser = 'is'.$camelProp;
+            $hasser = 'has'.$camelProp;
             $classHasProperty = $reflClass->hasProperty($property);
 
             if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
@@ -261,7 +261,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                 $access[self::ACCESS_NAME] = sprintf(
-                    'Neither the property "%s" nor one of the methods "%s()" ' .
+                    'Neither the property "%s" nor one of the methods "%s()" '.
                     'exist and have public access in class "%s".',
                     $property,
                     implode('()", "', $methods),
@@ -353,7 +353,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $plural = $this->camelize($property);
 
             // Any of the two methods is required, but not yet known
-            $singulars = null !== $singular ? array($singular) : (array)StringUtil::singularify($plural);
+            $singulars = null !== $singular ? array($singular) : (array) StringUtil::singularify($plural);
 
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
@@ -363,7 +363,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     // message. If the user implements the adder but not the remover,
                     // an exception will be thrown in findAdderAndRemover() that
                     // the remover has to be implemented as well.
-                    $guessedAdders = '"add' . implode('()", "add', $singulars) . '()", ';
+                    $guessedAdders = '"add'.implode('()", "add', $singulars).'()", ';
                 } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
                     $access[self::ACCESS_ADDER] = $methods[0];
@@ -372,7 +372,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             if (!isset($access[self::ACCESS_TYPE])) {
-                $setter = 'set' . $this->camelize($property);
+                $setter = 'set'.$this->camelize($property);
                 $classHasProperty = $reflClass->hasProperty($property);
 
                 if ($reflClass->hasMethod($setter) && $reflClass->getMethod($setter)->isPublic()) {
@@ -391,7 +391,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                     $access[self::ACCESS_NAME] = sprintf(
-                        'Neither the property "%s" nor one of the methods %s"%s()", ' .
+                        'Neither the property "%s" nor one of the methods %s"%s()", '.
                         '"__set()" or "__call()" exist and have public access in class "%s".',
                         $property,
                         $guessedAdders,

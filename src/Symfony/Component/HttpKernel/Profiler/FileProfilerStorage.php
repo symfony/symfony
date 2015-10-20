@@ -130,6 +130,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws \RuntimeException
      */
     public function write(Profile $profile)

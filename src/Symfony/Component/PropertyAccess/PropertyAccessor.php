@@ -247,16 +247,6 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 $result[self::VALUE] = &$object->$property;
                 $result[self::IS_REF] = true;
-            } elseif (!$classHasProperty && property_exists($object, $property)) {
-                // Needed to support \stdClass instances. We need to explicitly
-                // exclude $classHasProperty, otherwise if in the previous clause
-                // a *protected* property was found on the class, property_exists()
-                // returns true, consequently the following line will result in a
-                // fatal error.
-
-                $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_PROPERTY;
-                $access[self::ACCESS_NAME] = $property;
-                $access[self::ACCESS_REF] = true;
             } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
                 // we call the getter and hope the __call do the job
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
@@ -295,7 +285,21 @@ class PropertyAccessor implements PropertyAccessorInterface
                 break;
 
             default:
-                throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+                $reflClass = new \ReflectionClass($object);
+
+                if (!$reflClass->hasProperty($property) && property_exists($object, $property)) {
+                    // Needed to support \stdClass instances. We need to explicitly
+                    // exclude $classHasProperty, otherwise if in the previous clause
+                    // a *protected* property was found on the class, property_exists()
+                    // returns true, consequently the following line will result in a
+                    // fatal error.
+
+                    $result[self::VALUE] = &$object->$property;
+                    $result[self::IS_REF] = true;
+                } else {
+                    throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+                }
+            break;
         }
 
         // Objects are always passed around by reference
@@ -456,7 +460,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 foreach ($itemsToAdd as $item) {
                     call_user_func(array($object, $access[self::ACCESS_ADDER]), $item);
                 }
-            break;
+                break;
 
             default:
                 throw new NoSuchPropertyException($access[self::ACCESS_NAME]);

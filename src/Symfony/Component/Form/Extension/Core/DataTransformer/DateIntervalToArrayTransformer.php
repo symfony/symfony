@@ -21,16 +21,24 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateIntervalToArrayTransformer implements DataTransformerInterface
 {
-    private $fields;
-    private $availableFields = array(
-        'years' => 'y',
-        'months' => 'm',
-        'days' => 'd',
-        'hours' => 'h',
-        'minutes' => 'i',
-        'seconds' => 's',
-        'invert' => 'r',
+    const YEARS = 'years';
+    const MONTHS = 'months';
+    const DAYS = 'days';
+    const HOURS = 'hours';
+    const MINUTES = 'minutes';
+    const SECONDS = 'seconds';
+    const INVERT = 'invert';
+
+    private static $availableFields = array(
+        self::YEARS => 'y',
+        self::MONTHS => 'm',
+        self::DAYS => 'd',
+        self::HOURS => 'h',
+        self::MINUTES => 'i',
+        self::SECONDS => 's',
+        self::INVERT => 'r',
     );
+    private $fields;
 
     /**
      * Constructor.
@@ -77,7 +85,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a \DateInterval.');
         }
         $result = array();
-        foreach ($this->availableFields as $field => $char) {
+        foreach (self::$availableFields as $field => $char) {
             $result[$field] = $dateInterval->format('%'.($this->pad ? strtoupper($char) : $char));
         }
         if (in_array('weeks', $this->fields, true)) {
@@ -131,7 +139,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         if (isset($value['invert']) && !is_bool($value['invert'])) {
             throw new TransformationFailedException('The value of "invert" must be boolean');
         }
-        foreach ($this->availableFields as $field => $char) {
+        foreach (self::$availableFields as $field => $char) {
             if ($field !== 'invert' && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
                 throw new TransformationFailedException(sprintf('This amount of "%s" is invalid', $field));
             }

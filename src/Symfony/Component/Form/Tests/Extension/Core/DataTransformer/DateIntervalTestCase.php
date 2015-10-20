@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-class DateIntervalTestCase extends \PHPUnit_Framework_TestCase
+abstract class DateIntervalTestCase extends \PHPUnit_Framework_TestCase
 {
     public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
     {

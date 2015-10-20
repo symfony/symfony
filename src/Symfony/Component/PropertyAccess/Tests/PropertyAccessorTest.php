@@ -232,7 +232,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValueWhenArrayValueIsNull()
     {
-        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->propertyAccessor = new PropertyAccessor(false);
         $this->assertNull($this->propertyAccessor->getValue(array('index' => array('nullable' => null)), '[index][nullable]'));
     }
 

@@ -134,8 +134,8 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array('foobar', 'numeric', '"foobar"'),
             array('foobar', 'boolean', '"foobar"'),
-            array('0', 'integer', '"0"'),
-            array('1.5', 'float', '"1.5"'),
+            array('0', 'integer', '0'),
+            array('1.5', 'float', '1.5'),
             array(12345, 'string', '12345'),
             array($object, 'boolean', 'object'),
             array($object, 'numeric', 'object'),

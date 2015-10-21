@@ -147,7 +147,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -180,7 +180,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -207,7 +207,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -234,7 +234,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -257,7 +257,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -294,7 +294,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -321,7 +321,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -347,7 +347,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -370,7 +370,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -393,7 +393,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -416,7 +416,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }
@@ -439,7 +439,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setParameter('{{ value }}', is_numeric($ip) ? $ip : '"'.$ip.'"')
             ->setCode(Ip::INVALID_IP_ERROR)
             ->assertRaised();
     }

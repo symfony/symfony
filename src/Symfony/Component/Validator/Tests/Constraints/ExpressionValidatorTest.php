@@ -122,7 +122,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('data')
-            ->setParameter('{{ value }}', '"2"')
+            ->setParameter('{{ value }}', '2')
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
@@ -167,7 +167,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('reference.data')
-            ->setParameter('{{ value }}', '"2"')
+            ->setParameter('{{ value }}', '2')
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
@@ -208,7 +208,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('')
-            ->setParameter('{{ value }}', '"2"')
+            ->setParameter('{{ value }}', '2')
             ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }

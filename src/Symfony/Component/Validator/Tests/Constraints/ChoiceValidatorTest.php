@@ -261,7 +261,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
+            ->setParameter('{{ value }}', '2')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
@@ -291,7 +291,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate(array(2, '3'), $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"3"')
+            ->setParameter('{{ value }}', '3')
             ->setInvalidValue('3')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();

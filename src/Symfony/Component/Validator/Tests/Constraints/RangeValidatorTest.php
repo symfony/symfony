@@ -48,7 +48,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         return array(
             array(9.99999, '9.99999'),
-            array('9.99999', '"9.99999"'),
+            array('9.99999', '9.99999'),
             array(5, '5'),
             array(1.0, '1.0'),
         );
@@ -58,7 +58,7 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
     {
         return array(
             array(20.000001, '20.000001'),
-            array('20.000001', '"20.000001"'),
+            array('20.000001', '20.000001'),
             array(21, '21'),
             array(30.0, '30.0'),
         );

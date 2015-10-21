@@ -128,7 +128,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($issn, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setParameter('{{ value }}', is_numeric($issn) ? $issn : '"'.$issn.'"')
             ->setCode(Issn::INVALID_CASE_ERROR)
             ->assertRaised();
     }
@@ -146,7 +146,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($issn, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setParameter('{{ value }}', is_numeric($issn) ? $issn : '"'.$issn.'"')
             ->setCode(Issn::MISSING_HYPHEN_ERROR)
             ->assertRaised();
     }
@@ -175,7 +175,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($issn, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setParameter('{{ value }}', is_numeric($issn) ? $issn : '"'.$issn.'"')
             ->setCode($code)
             ->assertRaised();
     }

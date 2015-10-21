@@ -141,7 +141,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ value }}', is_numeric($value) ? $value : '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -162,7 +162,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ value }}', is_numeric($value) ? $value : '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -184,7 +184,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ value }}', is_numeric($value) ? $value : '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -206,7 +206,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ value }}', is_numeric($value) ? $value : '"'.$value.'"')
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
@@ -232,7 +232,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             $this->assertNoViolation();
         } else {
             $this->buildViolation('myMessage')
-                ->setParameter('{{ value }}', '"'.$value.'"')
+                ->setParameter('{{ value }}', is_numeric($value) ? $value : '"'.$value.'"')
                 ->setParameter('{{ charset }}', $charset)
                 ->setInvalidValue($value)
                 ->setCode(Length::INVALID_CHARACTERS_ERROR)

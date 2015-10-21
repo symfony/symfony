@@ -426,7 +426,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($iban, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$iban.'"')
+            ->setParameter('{{ value }}', is_numeric($iban) ? $iban : '"'.$iban.'"')
             ->setCode($code)
             ->assertRaised();
     }

@@ -173,7 +173,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($isbn, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->setParameter('{{ value }}', is_numeric($isbn) ? $isbn : '"'.$isbn.'"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -203,7 +203,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($isbn, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->setParameter('{{ value }}', is_numeric($isbn) ? $isbn : '"'.$isbn.'"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -237,7 +237,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
         }
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->setParameter('{{ value }}', is_numeric($isbn) ? $isbn : '"'.$isbn.'"')
             ->setCode($code)
             ->assertRaised();
     }
@@ -259,7 +259,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
         }
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->setParameter('{{ value }}', is_numeric($isbn) ? $isbn : '"'.$isbn.'"')
             ->setCode($code)
             ->assertRaised();
     }

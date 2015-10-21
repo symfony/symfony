@@ -290,8 +290,8 @@ class ResponseHeaderBag extends HeaderBag
         }
 
         $header = $this->getCacheControlHeader();
-        // private, if s-maxage is not defined, public/private is not set, and this is not "no-cache"
-        if (!isset($this->cacheControl['s-maxage']) && !isset($this->cacheControl['public']) && !isset($this->cacheControl['private']) && !isset($this->cacheControl['no-cache'])) {
+        // private, if public/private is not set, and this is not "no-cache", and s-maxage is not defined,
+        if (!isset($this->cacheControl['public']) && !isset($this->cacheControl['private']) && !isset($this->cacheControl['no-cache']) && !isset($this->cacheControl['s-maxage'])) {
             return $header.', private';
         }
 

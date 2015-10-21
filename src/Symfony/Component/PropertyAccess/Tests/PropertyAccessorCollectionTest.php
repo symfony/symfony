@@ -46,21 +46,6 @@ class PropertyAccessorCollectionTest_Car
     }
 }
 
-class PropertyAccessorCollectionTest_CarCustomSingular
-{
-    public function addFoo($axis)
-    {
-    }
-
-    public function removeFoo($axis)
-    {
-    }
-
-    public function getAxes()
-    {
-    }
-}
-
 class PropertyAccessorCollectionTest_Engine
 {
 }
@@ -235,30 +220,6 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
             ->with('third');
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
-    }
-
-    public function testSetValueCallsCustomAdderAndRemover()
-    {
-        $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
-
-        $car = $this->getMock(__CLASS__.'_CarCustomSingular');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $car->expects($this->at(0))
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-        $car->expects($this->at(1))
-            ->method('removeFoo')
-            ->with('fourth');
-        $car->expects($this->at(2))
-            ->method('addFoo')
-            ->with('first');
-        $car->expects($this->at(3))
-            ->method('addFoo')
-            ->with('third');
-
-        $this->propertyAccessor->setValue($car, 'axes|foo', $axesAfter);
     }
 
     /**

@@ -43,4 +43,8 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Component\Polyfill\Tests\FunctionsTestListener" />
+    </listeners>
 </phpunit>

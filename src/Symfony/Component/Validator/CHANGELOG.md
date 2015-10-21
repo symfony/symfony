@@ -97,6 +97,7 @@ CHANGELOG
 ------
 
  * fixed compatibility with PHP7 and up by introducing new constraints (IsNull, IsTrue, IsFalse) and related validators (IsNullValidator, IsTrueValidator, IsFalseValidator)
+ * ConstraintValidator::formatValue() don't surround numeric value by double quotes anymore
 
 2.3.0
 -----

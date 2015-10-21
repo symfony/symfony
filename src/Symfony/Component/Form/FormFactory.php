@@ -130,32 +130,4 @@ class FormFactory implements FormFactoryInterface
 
         return $this->createNamedBuilder($property, $type, $data, $options);
     }
-
-    /**
-     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
-     * it with its parent type.
-     *
-     * @param FormTypeInterface $type The type to resolve.
-     *
-     * @return ResolvedFormTypeInterface The resolved type.
-     */
-    private function resolveType(FormTypeInterface $type)
-    {
-        $parentType = $type->getParent();
-
-        if ($parentType instanceof FormTypeInterface) {
-            $parentType = $this->resolveType($parentType);
-        } elseif (null !== $parentType) {
-            $parentType = $this->registry->getType($parentType);
-        }
-
-        return $this->resolvedTypeFactory->createResolvedType(
-            $type,
-            // Type extensions are not supported for unregistered type instances,
-            // i.e. type instances that are passed to the FormFactory directly,
-            // nor for their parents, if getParent() also returns a type instance.
-            array(),
-            $parentType
-        );
-    }
 }

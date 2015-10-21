@@ -84,6 +84,22 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($explainable, $collected_queries['default'][0]['explainable']);
     }
 
+    public function testCollectQueryWithNoParams()
+    {
+        $queries = array(
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
+            array('sql' => 'SELECT * FROM table1', 'params' => null, 'types' => null, 'executionMS' => 1),
+        );
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+
+        $collected_queries = $c->getQueries();
+        $this->assertEquals(array(), $collected_queries['default'][0]['params']);
+        $this->assertTrue($collected_queries['default'][0]['explainable']);
+        $this->assertEquals(array(), $collected_queries['default'][1]['params']);
+        $this->assertTrue($collected_queries['default'][1]['explainable']);
+    }
+
     /**
      * @dataProvider paramProvider
      */

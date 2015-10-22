@@ -107,7 +107,7 @@ class Store implements StoreInterface
     public function isLocked(Request $request)
     {
         $path = $this->getPath($this->getCacheKey($request).'.lck');
-        clearstatcache($path);
+        clearstatcache(true, $path);
 
         return is_file($path);
     }

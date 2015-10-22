@@ -274,6 +274,14 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
     }
 
+    public function testEquality()
+    {
+        $headers = new ResponseHeaderBag();
+        $anotherHeaders = new ResponseHeaderBag($headers->allPreserveCase());
+
+        $this->assertEquals($headers->allPreserveCase(), $anotherHeaders->allPreserveCase());
+    }
+
     public function provideMakeDisposition()
     {
         return array(

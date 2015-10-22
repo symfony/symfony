@@ -108,6 +108,7 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($this->getCacheKey($request).'.lck');
         clearstatcache($path);
+        
         return is_file($path);
     }
 

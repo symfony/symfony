@@ -112,15 +112,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('Bernhard'), $object->firstName);
     }
 
-    public function testGetValueIgnoresSingular()
-    {
-        $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
-
-        $object = (object) array('children' => 'Many');
-
-        $this->assertEquals('Many', $this->propertyAccessor->getValue($object, 'children|child'));
-    }
-
     public function testGetValueReadsPropertyWithSpecialCharsExceptDot()
     {
         $array = (object) array('%!@$§' => 'Bernhard');

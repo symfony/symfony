@@ -81,7 +81,7 @@ class EventDispatcher implements EventDispatcherInterface
      * Returns null if the event or the listener does not exist.
      *
      * @param string   $eventName The name of the event
-     * @param callable $listener  The listener to remove
+     * @param callable $listener  The listener
      *
      * @return int|null The event listener priority
      */

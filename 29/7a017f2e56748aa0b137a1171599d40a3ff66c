@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-19T15:10:26Z
+
+See https://github.com/paragonie/random_compat/issues/68 and https://bugs.php.net/70742 for reasons why this is important.
+
+---------------------------------------------------------------------------
+
+by paragonie-scott at 2015-10-19T16:47:12Z
+
+https://travis-ci.org/symfony/symfony/jobs/86205193#L2539 Hmm.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-19T16:54:38Z
+
+@paragonie-scott this is a version issue for the inter-package dependencies
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-23T12:14:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-23T12:14:12Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-23T12:20:54Z
+
+:+1:

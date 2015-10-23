@@ -78,8 +78,6 @@ abstract class ObjectRouteLoader extends Loader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {

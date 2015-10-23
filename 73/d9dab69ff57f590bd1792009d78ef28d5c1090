@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-20T21:53:45Z
+
+Currently boolean fields of Doctrine entities are correctly guessed as checkboxes but incorrectly guessed as required.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-22T20:45:36Z
+
+Please also refactor guessType to use DBAL constants.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-22T20:56:31Z
+
+:+1: Should be merged in 2.3 by merger!
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by enumag at 2015-10-22T21:25:08Z
+
+@Tobion Thanks! I refactored guessPattern and guessMaxLength to use the constants as well.

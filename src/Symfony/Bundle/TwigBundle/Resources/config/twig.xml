@@ -29,6 +29,18 @@
             <argument type="collection" /> <!-- Twig paths -->
         </service>
 
+        <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator" public="false">
+            <argument type="service" id="kernel" />
+            <argument>%kernel.root_dir%</argument>
+            <argument type="collection" /> <!-- Twig paths -->
+        </service>
+
+        <service id="twig.template_cache_warmer" class="Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="twig.template_iterator" />
+        </service>
+
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
             <argument type="collection" />
         </service>

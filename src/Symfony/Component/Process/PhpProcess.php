@@ -27,13 +27,13 @@ class PhpProcess extends Process
     /**
      * Constructor.
      *
-     * @param string $script  The PHP script to run (as a string)
-     * @param string $cwd     The working directory
-     * @param array  $env     The environment variables
-     * @param int    $timeout The timeout in seconds
-     * @param array  $options An array of options for proc_open
+     * @param string      $script  The PHP script to run (as a string)
+     * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
+     * @param int         $timeout The timeout in seconds
+     * @param array       $options An array of options for proc_open
      */
-    public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
+    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = array())
     {
         $executableFinder = new PhpExecutableFinder();
         if (false === $php = $executableFinder->find()) {

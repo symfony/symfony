@@ -22,6 +22,10 @@
             <argument type="collection" />
         </service>
 
+        <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
+            <tag name="kernel.cache_warmer" />
+        </service>
+
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
             <argument type="collection" />
         </service>

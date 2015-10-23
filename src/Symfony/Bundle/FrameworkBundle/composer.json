@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/asset": "~2.8|~3.0",
+        "symfony/class-loader": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
@@ -42,11 +43,12 @@
         "symfony/intl": "~2.8|~3.0",
         "symfony/security": "~2.8|~3.0",
         "symfony/form": "~2.8|~3.0",
-        "symfony/class-loader": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "symfony/validator": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0"
+        "symfony/property-info": "~2.8|~3.0",
+        "phpdocumentor/reflection": "^1.0.7"
     },
     "suggest": {
         "symfony/console": "For using the console commands",
@@ -54,7 +56,8 @@
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
-        "symfony/yaml": "For using the debug:config and lint:yaml commands"
+        "symfony/yaml": "For using the debug:config and lint:yaml commands",
+        "symfony/property-info": "For using the property_info_extractor service"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

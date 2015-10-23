@@ -169,6 +169,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
             ),
+            'property_info' => array(
+                'enabled' => false,
+            ),
         );
     }
 }

@@ -1,0 +1,11 @@
+services:
+    service_with_anonymous_services:
+        class: FooClass
+        arguments: [{type: service, class: BazClass}]
+    another_service_with_anonymous_services:
+        class: FooClass
+        arguments:
+            - type: service
+              class: BazClass
+            - type: service
+              class: BarClass

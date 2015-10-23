@@ -26,8 +26,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 /**
  * YamlFileLoader loads YAML files service definitions.
  *
- * The YAML format does not support anonymous services (cf. the XML loader).
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlFileLoader extends FileLoader
@@ -49,6 +47,9 @@ class YamlFileLoader extends FileLoader
         if (null === $content) {
             return;
         }
+
+        // anonymous services
+        $this->processAnonymousServices($content, $path);
 
         // imports
         $this->parseImports($content, $path);
@@ -358,6 +359,63 @@ class YamlFileLoader extends FileLoader
         }
 
         return $this->validate($configuration, $file);
+    }
+
+    /**
+     * Processes anonymous services.
+     *
+     * @param array  $content
+     * @param string $path
+     */
+    private function processAnonymousServices(array &$content, $path)
+    {
+        $definitions = array();
+        $count = 0;
+
+        if (false === array_key_exists('services', $content) || false === is_array($content['services']))
+        {
+            return;
+        }
+
+        foreach ($content['services'] as $id => &$service)
+        {
+            if (false === is_array($service))
+            {
+                continue;
+            }
+
+            // TODO covert "properties" key also
+            if (false === array_key_exists('arguments', (array) $service))
+            {
+                continue;
+            }
+
+            foreach ($service['arguments'] as &$argument)
+            {
+                if (false === is_array($argument))
+                {
+                    continue;
+                }
+
+                if (false === array_key_exists('type', $argument) || 'service' !== $argument['type'])
+                {
+                    continue;
+                }
+
+                $id = sprintf('%s_%d', hash('sha256', $path), ++$count);
+                $argument['id'] = $id;
+                $definitions[$id] = array(&$argument, $path);
+            }
+        }
+
+        // resolve definitions
+        ksort($definitions);
+        foreach ($definitions as $id => $def) {
+            $serviceDef = &$def[0];
+            $serviceDef['public'] = false;
+            $this->parseDefinition($id, (array) $def[0], $def[1]);
+            $serviceDef = '@'.$id;
+        }
     }
 
     /**

@@ -177,6 +177,24 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('decorated', 'decorated.pif-pouf', 5), $services['decorator_service_with_name_and_priority']->getDecoratedService());
     }
 
+    public function testAnonymousServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('anonymous_services.yml');
+        $services = $container->getDefinitions();
+        $arguments = $services['service_with_anonymous_services']->getArguments();
+        $arguments2 = $services['another_service_with_anonymous_services']->getArguments();
+        $this->assertCount(1, $arguments);
+        $this->assertCount(2, $arguments2);
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $arguments2[0]);
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $arguments2[1]);
+        $this->assertEquals('BazClass', $services[(string) $arguments[0]]->getClass());
+        $this->assertEquals('BazClass', $services[(string) $arguments2[0]]->getClass());
+        $this->assertEquals('BarClass', $services[(string) $arguments2[1]]->getClass());
+    }
+
     public function testLoadFactoryShortSyntax()
     {
         $container = new ContainerBuilder();

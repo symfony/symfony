@@ -123,6 +123,7 @@
 
         <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine" public="false">
             <argument>%twig.form.resources%</argument>
+            <argument type="service" id="twig" />
         </service>
 
         <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer" public="false">

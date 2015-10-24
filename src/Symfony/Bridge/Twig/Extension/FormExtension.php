@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
+use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 /**
@@ -21,27 +21,19 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
+class FormExtension extends \Twig_Extension
 {
     /**
      * This property is public so that it can be accessed directly from compiled
      * templates without having to call a getter, which slightly decreases performance.
      *
-     * @var TwigRendererInterface
+     * @var TwigRenderer
      */
     public $renderer;
 
-    public function __construct(TwigRendererInterface $renderer)
+    public function __construct(TwigRenderer $renderer)
     {
         $this->renderer = $renderer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        $this->renderer->setEnvironment($environment);
     }
 
     /**

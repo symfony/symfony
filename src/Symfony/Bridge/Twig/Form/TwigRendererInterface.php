@@ -15,6 +15,8 @@ use Symfony\Component\Form\FormRendererInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated in 2.8, to be removed in 3.0.
  */
 interface TwigRendererInterface extends FormRendererInterface
 {

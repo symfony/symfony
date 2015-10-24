@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Ldap\Search;
 
+use Symfony\Component\Ldap\Connection\ConnectionInterface;
+
+/**
+ * @author Charles Sarrazin <charles@sarraz.in>
+ */
 class ResultIterator implements \Iterator
 {
     private $connection;
@@ -18,42 +23,63 @@ class ResultIterator implements \Iterator
     private $current;
     private $key;
 
-    public function __construct($connection, $search)
+    /**
+     * Constructor.
+     *
+     * @param ConnectionInterface $connection
+     * @param QueryInterface $search
+     */
+    public function __construct(ConnectionInterface $connection, QueryInterface $search)
     {
-        $this->connection = $connection;
-        $this->search = $search;
+        $this->connection = $connection->getResource();
+        $this->search = $search->getResource();
     }
 
+    /**
+     * Fetches the current entry
+     *
+     * @return Entry
+     */
     public function current()
     {
         $attributes = ldap_get_attributes($this->connection, $this->current);
-        $count = $attributes['count'];
         $dn = ldap_get_dn($this->connection, $this->current);
-        unset($attributes['count']);
 
-        return array(
-            'dn' => $dn,
-            'count' => $count,
-            'attributes' => $attributes,
-        );
+        return new Entry($dn, $attributes);
     }
 
+    /**
+     * Sets the cursor to the next entry
+     */
     public function next()
     {
         $this->current = ldap_next_entry($this->connection, $this->current);
         ++$this->key;
     }
 
+    /**
+     * Returns the current key
+     *
+     * @return int
+     */
     public function key()
     {
         return $this->key;
     }
 
+    /**
+     * Checks whether the current entry is valid or not
+     *
+     * @return bool
+     */
     public function valid()
     {
         return false !== $this->current;
     }
 
+    /**
+     * Rewinds the iterator to the first entry
+     */
     public function rewind()
     {
         $this->current = ldap_first_entry($this->connection, $this->search);

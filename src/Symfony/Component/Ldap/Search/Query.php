@@ -12,16 +12,29 @@
 namespace Symfony\Component\Ldap\Search;
 
 use Symfony\Component\Ldap\Connection\ConnectionInterface;
+use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class Query
+/**
+ * @author Charles Sarrazin <charles@sarraz.in>
+ */
+class Query implements QueryInterface
 {
     private $connection;
     private $dn;
     private $query;
     private $options;
+    private $search;
 
+    /**
+     * Constructor.
+     *
+     * @param ConnectionInterface $connection
+     * @param $dn
+     * @param $query
+     * @param array $options
+     */
     public function __construct(ConnectionInterface $connection, $dn, $query, array $options = array())
     {
         $resolver = new OptionsResolver();
@@ -43,15 +56,26 @@ class Query
         $this->options = $resolver->resolve($options);
     }
 
-    public function getResult()
+    /**
+     * @inheritdoc
+     */
+    public function execute()
     {
         // If the connection is not bound, then we try an anonymous bind.
         if (!$this->connection->isBound()) {
             $this->connection->bind();
         }
 
-        $con = $this->connection->getConnection();
+        $con = $this->connection->getResource();
+        if (!$this->search = ldap_search($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $this->options['maxItems'], $this->options['timeout'], $this->options['deref'])) {
+            throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s"', $dn, $query, implode(',', $options['filter'])));
+        };
 
-        return new Result($con, $this->dn, $this->query, $this->options);
+        return new Collection($this->connection, $this);
+    }
+
+    public function getResource()
+    {
+        return $this->search;
     }
 }

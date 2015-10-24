@@ -36,5 +36,5 @@ interface ConnectionInterface
      *
      * @return resource
      */
-    public function getConnection();
+    public function getResource();
 }

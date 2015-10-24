@@ -28,7 +28,7 @@ class Connection implements ConnectionInterface
     /**
      * Constructor.
      *
-     * @param array $options
+     * @param array $config
      */
     public function __construct(array $config = array())
     {
@@ -82,7 +82,7 @@ class Connection implements ConnectionInterface
         $this->bound = true;
     }
 
-    public function getConnection()
+    public function getResource()
     {
         return $this->connection;
     }

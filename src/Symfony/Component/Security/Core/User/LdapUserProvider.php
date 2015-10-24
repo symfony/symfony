@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Ldap\Search\Entry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Ldap\Exception\ConnectionException;
@@ -64,7 +65,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username), 0, $e);
         }
 
-        $entries = $search->all();
+        $entries = $search->execute();
         $count = count($entries);
 
         if (!$count) {
@@ -75,18 +76,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException('More than one user found');
         }
 
-        $user = $entries[0];
-
-        return $this->loadUser($username, $user);
-    }
-
-    public function loadUser($username, $user)
-    {
-        $password = isset($user['userpassword']) ? $user['userpassword'] : null;
-
-        $roles = $this->defaultRoles;
-
-        return new User($username, $password, $roles);
+        return $this->loadUser($username, $entries[0]);
     }
 
     /**
@@ -109,4 +99,8 @@ class LdapUserProvider implements UserProviderInterface
         return $class === 'Symfony\Component\Security\Core\User\User';
     }
 
+    private function loadUser($username, Entry $entry)
+    {
+        return new User($username, $entry->getAttribute('userpassword'), $this->defaultRoles);
+    }
 }

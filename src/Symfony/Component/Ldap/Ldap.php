@@ -47,9 +47,7 @@ final class Ldap implements LdapInterface
      */
     public function query($dn, $query, array $options = array())
     {
-        $search = new Query($this->connection, $dn, $query, $options);
-
-        return $search->getResult();
+        return new Query($this->connection, $dn, $query, $options);
     }
 
     /**

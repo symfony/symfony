@@ -46,7 +46,7 @@
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "symfony/validator": "~2.8|~3.0",
-        "symfony/yaml": "~2.8|~3.0"
+        "symfony/yaml": "~2.8|~3.0",
         "symfony/property-info": "~2.8|~3.0",
         "phpdocumentor/reflection": "^1.0.7"
     },

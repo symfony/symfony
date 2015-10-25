@@ -53,4 +53,46 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     {
         $this->container = $container;
     }
+
+    /**
+     * Returns true if the service id is defined.
+     *
+     * @param string $id The service id
+     *
+     * @return bool true if the service id is defined, false otherwise
+     *
+     * @throws \LogicException
+     */
+    protected function has($id)
+    {
+        return $this->getContainer()->has($id);
+    }
+
+    /**
+     * Gets a container service by its id.
+     *
+     * @param string $id The service id
+     *
+     * @return object The service
+     *
+     * @throws \LogicException
+     */
+    protected function get($id)
+    {
+        return $this->getContainer()->get($id);
+    }
+
+    /**
+     * Gets a container configuration parameter by its name.
+     *
+     * @param string $name The parameter name
+     *
+     * @return mixed
+     *
+     * @throws \LogicException
+     */
+    protected function getParameter($name)
+    {
+        return $this->getContainer()->getParameter($name);
+    }
 }

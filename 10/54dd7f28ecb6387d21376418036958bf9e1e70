@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2015-10-22T19:46:54Z
+
+ping @nicolas-grekas , this fixes what we discussed earlier
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2015-10-23T09:42:59Z
+
+Actually as discussed IRL with @nicolas-grekas this morning, previous cache could still lead to a require of a current `classes.php`, the safest is just to return early if the `classes.php` already exists.

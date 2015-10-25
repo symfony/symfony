@@ -18,18 +18,5 @@ namespace Symfony\Component\DependencyInjection;
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * Sets the Container associated with this Controller.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
 }

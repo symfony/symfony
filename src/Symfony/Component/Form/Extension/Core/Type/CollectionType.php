@@ -81,34 +81,6 @@ class CollectionType extends AbstractType
 
             return $value;
         };
-        $optionsNormalizer = function (Options $options, $value) use ($entryOptionsNormalizer) {
-            if (null !== $value) {
-                @trigger_error('The form option "options" is deprecated since version 2.8 and will be removed in 3.0. Use "entry_options" instead.', E_USER_DEPRECATED);
-            }
-
-            return $entryOptionsNormalizer($options, $value);
-        };
-        $typeNormalizer = function (Options $options, $value) {
-            if (null !== $value) {
-                @trigger_error('The form option "type" is deprecated since version 2.8 and will be removed in 3.0. Use "entry_type" instead.', E_USER_DEPRECATED);
-            }
-
-            return $value;
-        };
-        $entryType = function (Options $options) {
-            if (null !== $options['type']) {
-                return $options['type'];
-            }
-
-            return __NAMESPACE__.'\TextType';
-        };
-        $entryOptions = function (Options $options) {
-            if (1 === count($options['options']) && isset($options['block_name'])) {
-                return array();
-            }
-
-            return $options['options'];
-        };
 
         $resolver->setDefaults(array(
             'allow_add' => false,
@@ -116,17 +88,11 @@ class CollectionType extends AbstractType
             'prototype' => true,
             'prototype_data' => null,
             'prototype_name' => '__name__',
-            // deprecated as of Symfony 2.8, to be removed in Symfony 3.0. Use entry_type instead
-            'type' => null,
-            // deprecated as of Symfony 2.8, to be removed in Symfony 3.0. Use entry_options instead
-            'options' => null,
-            'entry_type' => $entryType,
-            'entry_options' => $entryOptions,
+            'entry_type' => __NAMESPACE__.'\TextType',
+            'entry_options' => array(),
             'delete_empty' => false,
         ));
 
-        $resolver->setNormalizer('type', $typeNormalizer);
-        $resolver->setNormalizer('options', $optionsNormalizer);
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
     }
 

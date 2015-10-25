@@ -48,7 +48,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             $multiple = $metadata->isCollectionValuedAssociation($property);
             $mapping = $metadata->getAssociationMapping($property);
 
-            return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\EntityType', array('em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
+            return new TypeGuess('Symfony\Bridge\Doctrine\Form\Type\EntityType', array('em' => $name, 'class' => $mapping['targetEntity'], 'multiple' => $multiple), Guess::HIGH_CONFIDENCE);
         }
 
         switch ($metadata->getTypeOfField($property)) {

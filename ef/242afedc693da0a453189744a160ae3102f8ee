@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-10-24T12:58:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-10-24T23:41:59Z
+
+Totally agree with changes, but... if they weren't internal they were public, so wouldn't changing them to internal be a BC break?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-25T08:17:30Z
+
+@keradus we haven't changed them here, so if you really use them, we don't break your code. But I fail to imagine a use case where they could be useful for someone, as they are about internal details anyway.
+And I'm not even sure we considered BC for these classes previously.
+
+So :+1: from me

@@ -14,7 +14,6 @@ namespace Symfony\Component\Routing\Matcher;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -67,7 +66,7 @@ class RequestMatcher implements RequestMatcherInterface
 
         throw $this->allow
             ? new MethodNotAllowedException(array_unique($this->allow))
-            : new ResourceNotFoundException(sprintf('No routes found for request "%s %s".', $request->getMethod(), $request->getPathInfo()));
+            : new ResourceNotFoundException(sprintf('No route found for request "%s %s".', $request->getMethod(), $request->getPathInfo()));
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -110,6 +109,10 @@ class RequestMatcher implements RequestMatcherInterface
                 continue;
             }
 
+            if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), array('request' => $request))) {
+                continue;
+            }
+
             if ($requiredMethods = $route->getMethods()) {
                 // HEAD and GET are equivalent as per RFC
                 if ('HEAD' === $method = $request->getMethod()) {
@@ -124,10 +127,6 @@ class RequestMatcher implements RequestMatcherInterface
             }
 
             if ($route->getSchemes() && !in_array($scheme, $route->getSchemes())) {
-                continue;
-            }
-
-            if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), array('request' => $request))) {
                 continue;
             }
 

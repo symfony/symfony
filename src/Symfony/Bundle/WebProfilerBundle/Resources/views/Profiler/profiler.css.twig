@@ -365,6 +365,32 @@ tr.status-warning td {
 .highlight .number    { color: #F5871F; font-weight: bold; }
 .highlight .error     { color: #C82829; }
 
+{# Icons
+   ========================================================================= #}
+.sf-icon {
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+.sf-icon svg {
+    width: 16px;
+    height: 16px;
+}
+.sf-icon.sf-medium,
+.sf-icon.sf-medium svg {
+    width: 24px;
+    height: 24px;
+}
+.sf-icon.sf-large,
+.sf-icon.sf-large svg {
+    width: 32px;
+    height: 32px;
+}
+
+
 {# Layout
    ========================================================================= #}
 .container {
@@ -847,6 +873,14 @@ table.logs .metadata strong {
 #search-results td {
     {{ mixins.sans_serif_font|raw }}
     vertical-align: middle;
+}
+
+#search-results .sf-search {
+    visibility: hidden;
+    margin-left: 2px;
+}
+#search-results tr:hover .sf-search {
+    visibility: visible;
 }
 
 {# Small screens

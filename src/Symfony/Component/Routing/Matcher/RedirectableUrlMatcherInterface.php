@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+@trigger_error('The '.__NAMESPACE__.'\RedirectableUrlMatcherInterface is deprecated since version 2.8 and will be removed in 3.0. Extend RedirectableRequestMatcher instead.', E_USER_DEPRECATED);
+
 /**
  * RedirectableUrlMatcherInterface knows how to redirect the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Extend {@link Symfony\Component\Routing\Matcher\RedirectableRequestMatcher} instead.
  */
 interface RedirectableUrlMatcherInterface
 {

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-24T21:49:34Z
+
+You forgot https://github.com/hiddewie/symfony/blob/typeGuesser/src/Symfony/Bridge/Doctrine/Form/DoctrineOrmTypeGuesser.php#L51 and please also update the test in https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Form/Tests/FormFactoryTest.php#L588 and https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Form/Tests/FormFactoryTest.php#L597
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2015-10-24T22:31:04Z
+
+Excuse me, I had overlooked those lines.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-26T10:54:42Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-26T14:10:49Z
+
+:+1:

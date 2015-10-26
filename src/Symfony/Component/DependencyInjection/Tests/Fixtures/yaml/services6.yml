@@ -6,7 +6,7 @@ services:
     scope.prototype: { class: FooClass, scope: prototype }
     constructor: { class: FooClass, factory_method: getInstance }
     file: { class: FooClass, file: %path%/foo.php }
-    arguments: { class: FooClass, arguments: [foo, @foo, [true, false]] }
+    arguments: { class: FooClass, arguments: [foo, '@foo', [true, false]] }
     configurator1: { class: FooClass, configurator: sc_configure }
     configurator2: { class: FooClass, configurator: [@baz, configure] }
     configurator3: { class: FooClass, configurator: [BazClass, configureStatic] }
@@ -18,8 +18,8 @@ services:
     method_call2:
         class: FooClass
         calls:
-            - [ setBar, [ foo, @foo, [true, false] ] ]
-    alias_for_foo: @foo
+            - [ setBar, [ foo, '@foo', [true, false] ] ]
+    alias_for_foo: '@foo'
     another_alias_for_foo:
         alias: foo
         public: false

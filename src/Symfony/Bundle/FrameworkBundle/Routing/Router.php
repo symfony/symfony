@@ -86,7 +86,7 @@ class Router extends BaseRouter implements WarmableInterface
      */
     private function resolveParameters(RouteCollection $collection)
     {
-        foreach ($collection as $route) {
+        foreach ($collection as $routeName => $route) {
             foreach ($route->getDefaults() as $name => $value) {
                 $route->setDefault($name, $this->resolve($value));
             }
@@ -97,6 +97,18 @@ class Router extends BaseRouter implements WarmableInterface
                 }
 
                 $route->setRequirement($name, $this->resolve($value));
+                $default = $route->getDefault($name);
+                $requirement = $route->getRequirement($name);
+
+                if (null !== $default && 1 !== preg_match('#'.$requirement.'#', $default)) {
+                    throw new RuntimeException(sprintf(
+                        'Default value "%s" for "%s" does not match requirement "%s" in "%s" route.',
+                        $default,
+                        $name,
+                        $requirement,
+                        $routeName
+                    ));
+                }
             }
 
             $route->setPath($this->resolve($route->getPath()));

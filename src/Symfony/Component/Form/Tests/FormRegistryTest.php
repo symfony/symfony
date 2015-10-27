@@ -277,14 +277,6 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->getType('bar');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testGetTypeThrowsExceptionIfNoString()
-    {
-        $this->registry->getType(array());
-    }
-
     public function testHasTypeAfterLoadingFromExtension()
     {
         $type = new FooType();

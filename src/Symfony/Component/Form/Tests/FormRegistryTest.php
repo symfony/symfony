@@ -246,30 +246,6 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testGetTypeThrowsExceptionIfParentNotFound()
-    {
-        $type = new FooSubType();
-
-        $this->extension1->addType($type);
-
-        $this->registry->getType($type);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testLegacyGetTypeThrowsExceptionIfParentNotFound()
-    {
-        $type = new LegacyFooSubType();
-
-        $this->extension1->addType($type);
-
-        $this->registry->getType($type);
-    }
-
-    /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
     public function testGetTypeThrowsExceptionIfTypeNotFound()

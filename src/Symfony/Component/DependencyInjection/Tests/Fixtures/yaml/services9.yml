@@ -90,5 +90,5 @@ services:
     service_from_static_method:
         class: Bar\FooClass
         factory: [Bar\FooClass, getInstance]
-    alias_for_foo: @foo
-    alias_for_alias: @foo
+    alias_for_foo: '@foo'
+    alias_for_alias: '@foo'

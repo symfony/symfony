@@ -386,7 +386,7 @@ class TableHelper extends Helper
         $width = $this->getColumnWidth($column);
 
         // str_pad won't work properly with multi-byte strings, we need to fix the padding
-        if (function_exists('mb_strwidth') && false !== $encoding = mb_detect_encoding($cell)) {
+        if (function_exists('mb_strwidth') && false !== $encoding = mb_detect_encoding($cell, null, true)) {
             $width += strlen($cell) - mb_strwidth($cell, $encoding);
         }
 

@@ -209,14 +209,12 @@ abstract class AbstractCloner implements ClonerInterface
         $class = $stub->class;
 
         if (isset($class[15]) && "\0" === $class[15] && 0 === strpos($class, "class@anonymous\x00")) {
-            $class = get_parent_class($class);
-            $stub->class = 'anonymous-'.$class;
+            $stub->class = get_parent_class($class).'@anonymous';
         }
         if (isset($this->classInfo[$class])) {
             $classInfo = $this->classInfo[$class];
         } else {
             $classInfo = array(
-                $class,
                 new \ReflectionClass($class),
                 array_reverse(array($class => $class) + class_parents($class) + class_implements($class) + array('*' => '*')),
             );
@@ -224,9 +222,9 @@ abstract class AbstractCloner implements ClonerInterface
             $this->classInfo[$class] = $classInfo;
         }
 
-        $a = $this->callCaster('Symfony\Component\VarDumper\Caster\Caster::castObject', $obj, $classInfo[1], null, $isNested);
+        $a = $this->callCaster('Symfony\Component\VarDumper\Caster\Caster::castObject', $obj, $classInfo[0], null, $isNested);
 
-        foreach ($classInfo[2] as $p) {
+        foreach ($classInfo[1] as $p) {
             if (!empty($this->casters[$p = strtolower($p)])) {
                 foreach ($this->casters[$p] as $p) {
                     $a = $this->callCaster($p, $obj, $a, $stub, $isNested);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\SchemeNotAllowedException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,9 +28,14 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 class RequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $allow = array();
+    private $allowedMethods = array();
+
+    /**
+     * @var string[]
+     */
+    private $allowedSchemes = array();
 
     /**
      * @var RouteCollection
@@ -58,15 +64,32 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchRequest(Request $request)
     {
-        $this->allow = array();
+        $this->allowedMethods = array();
+        $this->allowedSchemes = array();
 
         if ($ret = $this->matchCollection($request, $this->routes)) {
             return $ret;
         }
 
-        throw $this->allow
-            ? new MethodNotAllowedException(array_unique($this->allow))
-            : new ResourceNotFoundException(sprintf('No route found for request "%s %s".', $request->getMethod(), $request->getPathInfo()));
+        if ($this->allowedMethods) {
+            $this->allowedMethods = array_unique($this->allowedMethods);
+
+            throw new MethodNotAllowedException(
+                $this->allowedMethods,
+                sprintf('No route found for request "%s %s": Method Not Allowed (Allowed: %s)', $request->getMethod(), $request->getPathInfo(), implode(', ', $this->allowedMethods))
+            );
+        }
+
+        if ($this->allowedSchemes) {
+            $this->allowedSchemes = array_unique($this->allowedSchemes);
+
+            throw new SchemeNotAllowedException(
+                $this->allowedSchemes,
+                sprintf('No route found for request "%s %s": Scheme Not Allowed (Allowed: %s)', $request->getMethod(), $request->getUri(), implode(', ', $this->allowedSchemes))
+            );
+        }
+
+        throw new ResourceNotFoundException(sprintf('No route found for request "%s %s".', $request->getMethod(), $request->getPathInfo()));
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
@@ -90,6 +113,11 @@ class RequestMatcher implements RequestMatcherInterface
         $path = rawurldecode($request->getPathInfo());
         $host = $request->getHost();
         $scheme = $request->getScheme();
+        $method = $request->getMethod();
+        // HEAD and GET are equivalent as per RFC
+        if ('HEAD' === $method) {
+            $method = 'GET';
+        }
 
         foreach ($routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
@@ -113,20 +141,15 @@ class RequestMatcher implements RequestMatcherInterface
                 continue;
             }
 
-            if ($requiredMethods = $route->getMethods()) {
-                // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $request->getMethod()) {
-                    $method = 'GET';
-                }
+            if ($route->getMethods() && !in_array($method, $route->getMethods())) {
+                $this->allowedMethods = array_merge($this->allowedMethods, $route->getMethods());
 
-                if (!in_array($method, $requiredMethods)) {
-                    $this->allow = array_merge($this->allow, $requiredMethods);
-
-                    continue;
-                }
+                continue;
             }
 
             if ($route->getSchemes() && !in_array($scheme, $route->getSchemes())) {
+                $this->allowedSchemes = array_merge($this->allowedSchemes, $route->getSchemes());
+
                 continue;
             }
 

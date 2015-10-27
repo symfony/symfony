@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\ExceptionInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\SchemeNotAllowedException;
 
 /**
  * @author Tobias Schultze <http://tobion.de>
@@ -27,17 +29,10 @@ abstract class RedirectableRequestMatcher extends RequestMatcher
         try {
             $parameters = parent::matchRequest($request);
         } catch (ResourceNotFoundException $e) {
-            $newScheme = 'http' === $request->getScheme() ? 'https' : 'http';
-            $newRequest = clone $request;
-            // TODO: This is not available. Another idea is to have a specialized ResourceNotFoundException
-            //$newRequest->setScheme($newScheme);
+            if ($e instanceof SchemeNotAllowedException) {
+                $allowedSchemes = $e->getAllowedSchemes();
 
-            try {
-                parent::matchRequest($newRequest);
-
-                return $this->redirect($request->getPathInfo(), null, $newScheme);
-            } catch (ResourceNotFoundException $e2) {
-                throw $e;
+                return $this->redirect($request->getPathInfo(), null, current($allowedSchemes));
             }
 
             if ('/' === substr($request->getPathInfo(), -1) || !in_array($request->getMethod(), array('HEAD', 'GET'))) {
@@ -51,8 +46,9 @@ abstract class RedirectableRequestMatcher extends RequestMatcher
                 parent::matchRequest($newRequest);
 
                 return $this->redirect($newRequest->getPathInfo(), null);
-            } catch (ResourceNotFoundException $e2) {
-                // TODO: MethodNotAllowedException is not handled
+            } catch (ExceptionInterface $e2) {
+                // When the request path with a trailing slash does not match either (could also be a MethodNotAllowedException),
+                // we rethrow the original failure.
                 throw $e;
             }
         }

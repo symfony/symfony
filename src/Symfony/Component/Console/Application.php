@@ -1089,7 +1089,7 @@ class Application
             return strlen($string);
         }
 
-        if (false === $encoding = mb_detect_encoding($string)) {
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return strlen($string);
         }
 
@@ -1106,7 +1106,7 @@ class Application
             return str_split($string, $width);
         }
 
-        if (false === $encoding = mb_detect_encoding($string)) {
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return str_split($string, $width);
         }
 

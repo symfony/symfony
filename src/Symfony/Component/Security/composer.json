@@ -39,6 +39,11 @@
         "ircmaxell/password-compat": "~1.0",
         "symfony/expression-language": "~2.6"
     },
+    "replace": {
+      "symfony/security-acl": "self.version",
+      "symfony/security-core": "self.version",
+      "symfony/security-http": "self.version"
+    },
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",
         "symfony/finder": "For using the ACL generateSql script",

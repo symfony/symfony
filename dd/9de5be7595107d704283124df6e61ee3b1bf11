@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-06T13:06:15Z
+
+Another solution would be to have ``replace`` rules for them, saying that we have the equivalent of ``security-core 2.3`` when having this component.
+
+Btw, this is needed at the root too, not only in the component
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-06T13:37:38Z
+
+@stof Which solution is more effective for Composer (i.e. what requires less work for the dependency resolver)? Using `replace` or `conflict`?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-07T13:56:22Z
+
+I removed the CSRF component and duplicated the config into the root `composer.json`.
+
+I also talked to @alcohol who pointed my to composer/composer#3754. Isn't that a reason we should use conflict rules here?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-07T14:16:04Z
+
+@xabbuh the advantage of ``replace`` is that it would allow people to depend on ``symfony/security-core`` even if they support Symfony 2.3, which is the LTS (even though they cannot get this package alone in a 2.3 setup but will always need a replacer package).
+
+If you want to workaround the bug of composer, you would have to use a conflict rule with ``!= self.version`` for each replacement rule. But I'm not sure it would work fine: this is exactly what replace is doing but optimizations applied in composer broke it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-07T14:39:50Z
+
+Well, my goal of this pull request was to forbid to use a `composer.json` file like I showed in the description. With the bug being present in Composer a replace rule would not help at all in this case.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-07T14:42:04Z
+
+@xabbuh even without the bug, Composer would not forbid it: ``symfony/symfony`` 2.3 does not know anything about ``symfony/security-core``.
+and ``symfony/security-core`` does not know it should conflict with ``symfony/symfony`` (the replace rule is doing things the other way)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-07T14:49:22Z
+
+@stof I seem to be missing something. When we add the conflict rule for `symfony/security-core` to the `symfony/symfony` package, Composer would forbid to install any version of the Security Core component together with the complete package.
+
+On the other hand, when we tell the full package to replace `symfony/security-core` Composer should not install both packages as the full package already provides the Security Core package or it should forbid installation when there is a version mismatch (given that the bug did not exist).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-07T15:03:30Z
+
+@xabbuh assuming that the bug does not exist, it should forbid installing any version of the replaced package when the replacer is installed.
+But your example above would still not be forbidden without change in Symfony, as ``symfony/symfony`` 2.3 is *not* replacing ``symfony/security-core``
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-07T15:10:36Z
+
+Sure, that's why I suggest to make this change (once the conflict rule is added, the above described scenario would not install anymore). Or we could add a replace rule like you suggest which requires a fix in Composer to have an effect.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-13T14:29:35Z
+
+Is this one mergeable as is?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-15T11:07:13Z
+
+I think yes, but we can change the `conflict` rule to `replace` if that's something the other @symfony/deciders prefer.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-15T12:34:08Z
+
+@xabbuh I think `replace` is more semantically correct.
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-10-16T08:38:21Z
+
+I would use a replace for self.version and a conflict for !self.version, I think.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-16T08:47:02Z
+
+@alcohol the conflict for ``!self.version`` should not be necessary. this should already be done in Composer itself, as it is the meaning of ``replace`` (it conflicts with *all* versions of the replaced package). But one of the solver optimization broke this (and the test submitted to Composer was changed by @Seldaek to make it pass with the buggy code instead of solving the issue)
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-10-16T09:01:58Z
+
+Ideally, it should not, no. But right now it does. Hence why I suggest it. It's harmless to add it yourself, and I doubt the odd behaviour in Composer will get fixed any time soon.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-10-21T11:56:36Z
+
+You can't easily conflict with !self.version though AFAIK, so I would rather people not attempt to fix composer stuff from the outside. replace is used for everything else in symfony subtree splits, so I don't see why not continuing in that line for this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-27T20:58:01Z
+
+I updated the PR to use `replace` instead.

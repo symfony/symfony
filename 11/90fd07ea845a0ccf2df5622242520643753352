@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-26T09:58:39Z
+
+My only concern is how we display the "search icon":
+
+![profiler_results_before](https://cloud.githubusercontent.com/assets/73419/10726013/66d55a68-7bd0-11e5-89fc-50793f787b6d.gif)
+
+A quick test removing the `float: right` and just adding a `margin-left: 2px` would look like this:
+
+![profiler_results_after](https://cloud.githubusercontent.com/assets/73419/10726022/74bfa282-7bd0-11e5-9f9a-8c3e63f367fd.gif)
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-26T10:04:00Z
+
+@javiereguiluz like you also mentioned in https://github.com/symfony/symfony/pull/14110#issuecomment-145558918 ? Think someone just has to make a choice about this, the current implementation seemed to fit your concern quite well back then.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-26T10:07:41Z
+
+@Rvanlaak the most recent comment is only about the location of the icons.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-28T02:21:51Z
+
+I find the @Rvanlaak better. With your proposal @javiereguiluz, you might not see the icon as it is near the text.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-28T08:14:34Z
+
+Let me know if I still need to change anything.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-28T10:10:29Z
+
+Hmm, I agree with @javiereguiluz on the location of the search icon.
+
+As we use a borderless table, you would expect everything that belongs to one cell to be somewhat close to eachother. With the `float:right;`, it's unclear whether the search icon belongs to the information on the left or the right of the icon. As it's closer to the right, I would expect it belongs to the information on the right, but it appears to belong to the info on the left.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-28T10:12:38Z
+
+I would agree with @WouterJ in the case "As we use a borderless table". But the profiler doesn't, right?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-28T10:14:21Z
+
+I didn't check this PR out locally, so I gave feedback based on @javiereguiluz's screenshot and it appears to be borderless in those screenshots. If it isn't, I agree that floating right is nicer.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-28T10:21:10Z
+
+@WouterJ this is how both proposals look on my computer (I've forced all icons to be displayed to get the whole picture):
+
+@Rvanlaak's proposal:
+
+![proposal1](https://cloud.githubusercontent.com/assets/73419/10785672/f1e8ecb4-7d65-11e5-9003-59c084966ff2.png)
+
+My proposal:
+
+![proposal2](https://cloud.githubusercontent.com/assets/73419/10785676/f5625e98-7d65-11e5-8df2-10d6afc5d27d.png)
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-28T10:29:56Z
+
+Oh, I did remember to have vertical lines while developing it as well but that probably still was the `2.7` branch. Removing the float in this case seems like the best solution. Your latest comment doesn't include the hover @javiereguiluz , you mean your proposal as in https://github.com/symfony/symfony/pull/16344#issuecomment-151086998 ?
+
+So two options:
+
+1. Remove the float from the icon
+2. Let the vertical table borders return, and keep the right float so it is a bit more clear if near text (as @fabpot mentions)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-28T10:36:41Z
+
+@Rvanlaak in the new profiler design, columns don't have vertical borders (only rows have horizontal borders). I'd prefer not to change this design feature (it would take us a lot of time to tweak everything and other projects are already using this design. Example: https://github.com/sensiolabs-de/deprecation-detector/pull/58#discussion_r42782905).
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-28T10:38:58Z
+
+I'm fine with any of the options, but I don't think I should make the decision about it. :+1: So shall we get rid of the float?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-28T14:45:51Z
+
+I now agree with @javiereguiluz reasoning, let's do that.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-10-28T15:48:17Z
+
+Fixed :+1:

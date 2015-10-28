@@ -105,7 +105,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         $profile = new Profile('utf8_test_profile');
 
         $data = 'HЁʃʃϿ, ϢorЃd!';
-        $nonUtf8Data = mb_convert_encoding($data, 'UCS-2');
+        $nonUtf8Data = iconv('UTF-8', 'UCS-2', $data);
 
         $collector = new MongoDbProfilerStorageTestDataCollector();
         $collector->setData($nonUtf8Data);

@@ -24,7 +24,6 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $skippedFile = false;
     private $wasSkipped = array();
     private $isSkipped = array();
-    private $testsStack = array();
 
     public function __destruct()
     {

@@ -7,6 +7,38 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.34 (2015-10-27)
+
+ * bug #16288 [Process] Inherit env vars by default in PhpProcess (nicolas-grekas)
+ * bug #16302 [DoctrineBridge] Fix required guess of boolean fields (enumag)
+ * bug #16177 [HttpFoundation] Fixes /0 subnet handling in IpUtils (ultrafez)
+ * bug #16259 [Validator] Allow an empty path in a URL with only a fragment or a query (jakzal)
+ * bug #16226 [filesystem] makeRelativePath does not work correctly from root (jaytaph, fabpot)
+ * bug #16182 [Process] Workaround buggy PHP warning (cbj4074)
+ * bug #16095 [Console] Add additional ways to detect OS400 platform (johnkary)
+ * bug #15793 [Yaml] Allow tabs before comments at the end of a line (superdav42)
+ * bug #16152 Fix URL validator failure with empty string (fabpot, bocharsky-bw)
+ * bug #15121 fixed #15118 [Filesystem] mirroring a symlink copies absolute file path (danepowell)
+ * bug #15161 avoid duplicated path with addPrefix (remicollet)
+ * bug #16133 compatibility with Security component split (xabbuh)
+ * bug #16123 Command list ordering fix (spdionis, fabpot)
+ * bug #14842 [Security][bugfix] "Remember me" cookie cleared on logout with custom "secure"/"httponly" config options  (MacDada)
+ * bug #13627 [Security] InMemoryUserProvider now concerns whether user's password is changed when refreshing (issei-m)
+ * bug #16090 Fix PropertyAccessor modifying array in object when array key does no… (pierredup)
+ * bug #16111 Throw exception if tempnam returns false in ProcessPipes (pierredup)
+ * bug #16053 [Console] use PHP_OS instead of php_uname('s') (xabbuh)
+ * bug #15860 [Yaml] Fix improper comments removal (ogizanagi)
+ * bug #16050 [TwigBundle] fix useless and failing test (Tobion)
+ * bug #15482 [Yaml] Improve newline handling in folded scalar blocks (teohhanhui)
+ * bug #15976 [Console] do not make the getHelp() method smart (xabbuh)
+ * bug #15799 [HttpFoundation] NativeSessionStorage `regenerate` method wrongly sets storage as started (iambrosi)
+ * bug #15533 [Console] Fix input validation when required arguments are missing (jakzal)
+ * bug #15915 Detect Mintty for color support on Windows (stof)
+ * bug #15906 Forbid serializing a Crawler (stof)
+ * bug #15682 [Form] Added exception when setAutoInitialize() is called when locked (jaytaph)
+ * bug #15846 [FrameworkBundle] Advanced search templates of bundles (yethee)
+ * bug #15895 [Security] Allow user providers to be defined in many files (lyrixx)
+
 * 2.3.33 (2015-09-25)
 
  * bug #15821 [EventDispatcher] fix memory leak in getListeners (Tobion)

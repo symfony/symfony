@@ -1089,7 +1089,6 @@ class Application
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
         // additionally, array_slice() is not enough as some character has doubled width.
         // we need a function to split string not by character count but by string width
-
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return str_split($string, $width);
         }

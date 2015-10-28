@@ -19,6 +19,7 @@
         "php": ">=5.3.9",
         "symfony/polyfill-php55": "~1.0",
         "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
         "symfony/polyfill-util": "~1.0"
     },
     "require-dev": {

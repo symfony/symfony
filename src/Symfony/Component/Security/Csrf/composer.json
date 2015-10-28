@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
         "symfony/security-core": "~2.4|~3.0.0"
     },
     "require-dev": {

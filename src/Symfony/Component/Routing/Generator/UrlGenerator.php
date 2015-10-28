@@ -16,6 +16,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -29,23 +30,39 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 {
     /**
      * @var RouteCollection
+     *
+     * @deprecated since version 2.8, will be made private in 3.0.
      */
     protected $routes;
 
     /**
      * @var RequestContext
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     protected $context;
 
     /**
      * @var bool|null
+     *
+     * @deprecated since version 2.8, will be made private in 3.0. Use the public setter/isser instead.
      */
     protected $strictRequirements = true;
 
     /**
      * @var LoggerInterface|null
+     *
+     * @deprecated since version 2.8, will be made private in 3.0.
      */
     protected $logger;
+
+    private $defaultParameters = array();
+    private $scheme = 'http';
+    private $host = 'localhost';
+    private $path = '/';
+    private $httpPort = 80;
+    private $httpsPort = 443;
+    private $scriptName = '';
 
     /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
@@ -78,27 +95,111 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * Constructor.
      *
-     * @param RouteCollection      $routes  A RouteCollection instance
-     * @param RequestContext       $context The context
-     * @param LoggerInterface|null $logger  A logger instance
+     * @param RouteCollection      $routes    A RouteCollection instance
+     * @param string|UriInterface  $baseUri   The base URI as string or PSR-7 UriInterface implementation
+     * @param LoggerInterface|null $logger    A logger instance
+     * @param int                  $httpPort  The HTTP port
+     * @param int                  $httpsPort The HTTPS port
      */
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
+    public function __construct(RouteCollection $routes, $baseUri = 'http://localhost/', LoggerInterface $logger = null, $httpPort = 80, $httpsPort = 443)
     {
         $this->routes = $routes;
-        $this->context = $context;
         $this->logger = $logger;
+        if ($baseUri instanceof RequestContext) {
+            $this->setContext($baseUri);
+        } else {
+            $this->setBaseUri($baseUri);
+        }
+        $this->httpPort = $httpPort;
+        $this->httpsPort = $httpsPort;
+    }
+
+    /**
+     * Sets the base URI to use for generating references.
+     *
+     * The base URI is usually the current URI of the request. With it the generator knows how to construct relative references
+     * to the target route. So it's purpose is comparable to the <base href> HTML tag. The information in the base URI will also
+     * be used when generating an absolute URI for a route without specific scheme or host requirement. The default base URI
+     * before calling this method is "http://localhost/".
+     *
+     * @param string|UriInterface $uri The base URI as string or PSR-7 UriInterface implementation
+     */
+    public function setBaseUri($uri)
+    {
+        if ($uri instanceof UriInterface) {
+            $this->scheme = $uri->getScheme() ?: $this->scheme;
+            $this->host = $uri->getHost() ?: $this->host;
+            $this->path = $uri->getPath() ?: $this->path;
+            $port = $uri->getPort();
+        } else {
+            $uriComponents = parse_url($uri);
+
+            if (false === $uriComponents) {
+                throw new \InvalidArgumentException('The base URI string appears to be malformed.');
+            }
+
+            $this->scheme = isset($uriComponents['scheme']) ? strtolower($uriComponents['scheme']) : $this->scheme;
+            $this->host = isset($uriComponents['host']) ? strtolower($uriComponents['host']) : $this->host;
+            $this->path = isset($uriComponents['path']) ? $uriComponents['path'] : $this->path;
+            $port = isset($uriComponents['port']) ? $uriComponents['port'] : null;
+        }
+
+        if (null !== $port) {
+            if ('http' === $this->scheme) {
+                $this->httpPort = $port;
+            } elseif ('https' === $this->scheme) {
+                $this->httpsPort = $port;
+            }
+        }
+    }
+
+    /**
+     * Sets the script path used as path prefix for generated URIs.
+     *
+     * This is usually the front controller path, e.g. "/app_dev.php", that all paths should start with. It should be empty,
+     * which is the default, when URI rewriting is used or the URI should not contain the script. The naming is based on
+     * SCRIPT_NAME in the CGI spec which is also available in the $_SERVER global in PHP.
+     *
+     * @param string $scriptName The URL encoded script name
+     */
+    public function setScriptName($scriptName)
+    {
+        $this->scriptName = $scriptName;
+    }
+
+    /**
+     * Sets a parameter value.
+     *
+     * @param string           $name  A parameter name
+     * @param string|int|float $value The parameter value
+     */
+    public function setDefaultParameter($name, $value)
+    {
+        $this->defaultParameters[$name] = $value;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use setBaseUri, setScriptName instead.
      */
     public function setContext(RequestContext $context)
     {
         $this->context = $context;
+
+        $this->scheme = $this->context->getScheme();
+        $this->host = $this->context->getHost();
+        $this->path = $this->context->getPathInfo();
+        $this->scriptName = $this->context->getBaseUrl();
+        $this->httpPort = $this->context->getHttpPort();
+        $this->httpsPort = $this->context->getHttpsPort();
+        $this->defaultParameters = $this->context->getParameters();
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function getContext()
     {
@@ -158,7 +259,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $variables = array_flip($variables);
-        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
+        $mergedParams = array_replace($defaults, $this->defaultParameters, $parameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
@@ -198,7 +299,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = '/';
         }
 
-        // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
         $url = strtr(rawurlencode($url), $this->decodedChars);
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
@@ -212,8 +312,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $schemeAuthority = '';
-        if ($host = $this->context->getHost()) {
-            $scheme = $this->context->getScheme();
+        if ($host = $this->host) {
+            $scheme = $this->scheme;
 
             if ($requiredSchemes) {
                 $schemeMatched = false;
@@ -269,10 +369,10 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
             if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
                 $port = '';
-                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+                if ('http' === $scheme && 80 != $this->httpPort) {
+                    $port = ':'.$this->httpPort;
+                } elseif ('https' === $scheme && 443 != $this->httpsPort) {
+                    $port = ':'.$this->httpsPort;
                 }
 
                 $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
@@ -281,9 +381,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if (self::RELATIVE_PATH === $referenceType) {
-            $url = self::getRelativePath($this->context->getPathInfo(), $url);
+            $url = self::getRelativePath($this->path, $url);
         } else {
-            $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+            $url = $schemeAuthority.$this->scriptName.$url;
         }
 
         // add a query string if needed

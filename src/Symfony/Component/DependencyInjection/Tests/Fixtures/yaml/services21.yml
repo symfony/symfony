@@ -6,7 +6,7 @@ services:
         calls:
           - method: setLogger
             arguments:
-              - @logger
+              - '@logger'
           - method: setClass
             arguments:
               - User

@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-22T20:30:30Z
+
+The DoctrineBridge needs an update of the `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-22T20:42:12Z
+
+@xabbuh not sure: iconv is an implicit requirement now (same as ext-json)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-22T20:45:14Z
+
+@nicolas-grekas Is iconv even available on Windows by default?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-22T20:48:22Z
+
+@xabbuh yes, it's bundled on Windows without adding any dll, at least in the binaries provided on windows.php.net
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-22T21:36:51Z
+
+Is the idea also to move the Intl component to Polyfill? Isn't the Intl component not basically a Polyfill or does it do more?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-23T08:23:48Z
+
+@Tobion there where a few missing require for symfony/polyfill-intl-icu that I fixed. I looked at symfony/intl and it's both a shim and a utility component. I added `@internal` tags to the shim-related classes. Moving the code to polyfill-intl-icu could be useful as a cleanup but it's a bigger work and it won't provide much practical value so I'd like to postpone it for later if we want it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-25T17:57:28Z
+
+Tests are green! (appveyor failure is a transient test)
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-25T21:08:27Z
+
+:+1:
+
+Status: Reviewed

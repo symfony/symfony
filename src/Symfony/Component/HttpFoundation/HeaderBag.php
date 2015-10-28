@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Header\CacheControl;
+
 /**
  * HeaderBag is a container for HTTP headers.
  *
@@ -20,6 +22,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
 {
     protected $headers = array();
     protected $cacheControl = array();
+    protected $cacheControlObject;
 
     /**
      * Constructor.
@@ -28,6 +31,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function __construct(array $headers = array())
     {
+        $this->cacheControlObject = new CacheControl();
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
         }
@@ -148,7 +152,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ('cache-control' === $key) {
-            $this->cacheControl = $this->parseCacheControl($values[0]);
+            $this->cacheControlObject = CacheControl::fromString($values[0]);
+            $this->syncCacheControl();
         }
     }
 
@@ -189,7 +194,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
         unset($this->headers[$key]);
 
         if ('cache-control' === $key) {
-            $this->cacheControl = array();
+            $this->cacheControlObject = new CacheControl();
+            $this->syncCacheControl();
         }
     }
 
@@ -224,9 +230,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function addCacheControlDirective($key, $value = true)
     {
-        $this->cacheControl[$key] = $value;
+        $this->cacheControlObject->addDirective($key, $value);
+        $this->syncCacheControl();
 
-        $this->set('Cache-Control', $this->getCacheControlHeader());
+        $this->set('Cache-Control', (string) $this->cacheControlObject);
     }
 
     /**
@@ -238,7 +245,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function hasCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl);
+        return $this->cacheControlObject->hasDirective($key);
     }
 
     /**
@@ -250,7 +257,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function getCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
+        return $this->cacheControlObject->getDirective($key);
     }
 
     /**
@@ -260,9 +267,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function removeCacheControlDirective($key)
     {
-        unset($this->cacheControl[$key]);
+        $this->cacheControlObject->removeDirective($key);
+        $this->syncCacheControl();
 
-        $this->set('Cache-Control', $this->getCacheControlHeader());
+        $this->set('Cache-Control', (string) $this->cacheControlObject);
     }
 
     /**
@@ -285,40 +293,8 @@ class HeaderBag implements \IteratorAggregate, \Countable
         return count($this->headers);
     }
 
-    protected function getCacheControlHeader()
+    protected function syncCacheControl()
     {
-        $parts = array();
-        ksort($this->cacheControl);
-        foreach ($this->cacheControl as $key => $value) {
-            if (true === $value) {
-                $parts[] = $key;
-            } else {
-                if (preg_match('#[^a-zA-Z0-9._-]#', $value)) {
-                    $value = '"'.$value.'"';
-                }
-
-                $parts[] = "$key=$value";
-            }
-        }
-
-        return implode(', ', $parts);
-    }
-
-    /**
-     * Parses a Cache-Control HTTP header.
-     *
-     * @param string $header The value of the Cache-Control HTTP header
-     *
-     * @return array An array representing the attribute values
-     */
-    protected function parseCacheControl($header)
-    {
-        $cacheControl = array();
-        preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            $cacheControl[strtolower($match[1])] = isset($match[3]) ? $match[3] : (isset($match[2]) ? $match[2] : true);
-        }
-
-        return $cacheControl;
+        $this->cacheControl = $this->cacheControlObject->allDirectives();
     }
 }

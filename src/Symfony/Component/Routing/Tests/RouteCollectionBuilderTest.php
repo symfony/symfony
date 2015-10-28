@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -29,6 +30,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $originalRoute = new Route('/foo/path');
         $expectedCollection = new RouteCollection();
         $expectedCollection->add('one_test_route', $originalRoute);
+        $expectedCollection->addResource(new FileResource('file_resource.yml'));
 
         $resolvedLoader
             ->expects($this->once())
@@ -52,6 +54,8 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $addedCollection = $importedRoutes->build();
         $route = $addedCollection->get('one_test_route');
         $this->assertSame($originalRoute, $route);
+        // should return file_resource.yml, which is in the original collection
+        $this->assertCount(1, $addedCollection->getResources());
     }
 
     /**

@@ -238,7 +238,7 @@ class RouteCollectionBuilder
     }
 
     /**
-     * Creates the final ArrayCollection, returns it, and clears everything.
+     * Creates the final RouteCollection and returns it.
      *
      * @return RouteCollection
      */

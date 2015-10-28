@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-19T09:57:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-19T10:49:49Z
+
+I'm not sure it's worth to remove the `@` functionality considering the high impact as said in https://github.com/symfony/symfony/issues/16234#issuecomment-148901538
+
+I assume there will be ALOT of bundles that are affected that all would not be compatible with 3.0 without adjustments. And adding quotes `arguments: - "@my_other_service"` also doesn't look that nice. So maybe we should only do this change for "`" but live with the fact that @ is not according to spec.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-19T10:51:38Z
+
+@Tobion we must be as compliant as possible as people use other languages (like Ruby and Python) in their stack. As adding quotes is easy enough and BC for everyone, I think we need to do this now; it's indeed going to be a bit painful but I think it's worth it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-20T06:12:17Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T06:23:37Z
+
+:+1: I agree we should do it now. However, as it will affect almost all bundles and docs out right now it would be nice to provide a rock-solid `sed` command to do automatically the change in the `UPGRADE` file.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-20T09:08:15Z
+
+:+1:
+
+I see another case (the usage of `%` at the beginning of an unquoted string) where I think we should deprecate.
+```yml
+services:
+    foo.baz:
+        class: %baz_class%
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-20T09:12:30Z
+
+@aitboudad Afaik there is nothing special with the `%` character in scalars (there was in YAML 1.1 IIRC though).
+
+Edit: Revoked my +1 because of the failing tests (see below).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-20T09:13:50Z
+
+It seems that we have some fixture files that need an update.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-20T09:32:50Z
+
+@xabbuh you're right, I tested with `1.2`
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T09:54:53Z
+
+@aitboudad the reason why we had to quote them in the documentation is because Pygments implemented its Yaml syntax highlighter based on Yaml 1.1, and has not updated it for 1.2. But it is indeed not an issue.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-10-22T14:28:00Z
+
+:+1: @dunglas , such ``sed`` command would be great :smile:

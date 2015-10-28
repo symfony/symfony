@@ -4,6 +4,7 @@ CHANGELOG
 2.8.0
 -----
 
+ * Deprecated usage of @ and ` at the beginning of an unquoted string
  * Deprecated non-escaped \ in double-quoted strings when parsing Yaml
    ("Foo\Var" is not valid whereas "Foo\\Var" is)
 

@@ -236,6 +236,14 @@ class Inline
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
 
+            // a non-quoted string cannot start with @ or ` (reserved)
+            if ($output && ('@' === $output[0] || '`' === $output[0])) {
+                @trigger_error(sprintf('Not quoting a scalar starting with "%s" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $output[0]), E_USER_DEPRECATED);
+
+                // to be thrown in 3.0
+                // throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));
+            }
+
             if ($evaluate) {
                 $output = self::evaluateScalar($output, $references);
             }

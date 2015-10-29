@@ -23,6 +23,9 @@ class Url extends Constraint
 {
     public $message = 'This value is not a valid URL.';
     public $dnsMessage = 'The host could not be resolved.';
+    public $failMessage = 'The URL response has a non valid http code';    
     public $protocols = array('http', 'https');
     public $checkDNS = false;
+    public $checkStatusCode = false;
+    public $validCodes = array(200);
 }

@@ -113,6 +113,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $data = $this->getDescriptionTestData(ObjectsProvider::getContainerParameter());
 
         $data[0][] = array('parameter' => 'database_name');
+        $data[1][] = array('parameter' => 'twig.form.resources');
 
         return $data;
     }

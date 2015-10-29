@@ -27,5 +27,5 @@ class Url extends Constraint
     public $protocols = array('http', 'https');
     public $checkDNS = false;
     public $checkStatusCode = false;
-    public $validCodes = array(200);
+    public $validCodes = array(200, 201, 202, 203, 204, 205, 206, 207, 208);
 }

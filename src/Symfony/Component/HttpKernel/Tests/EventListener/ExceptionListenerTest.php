@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Tests\Logger;
  * ExceptionListenerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
+ *
+ * @group time-sensitive
  */
 class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {

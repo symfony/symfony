@@ -5,7 +5,7 @@ services:
     csrf_form_login.form.type:
         class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType
         arguments:
-            - @request_stack
+            - '@request_stack'
         tags:
             - { name: form.type }
 

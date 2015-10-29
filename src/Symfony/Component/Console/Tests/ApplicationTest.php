@@ -534,9 +534,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $tester->getDisplay(true), '->renderException() wraps messages when they are bigger than the terminal');
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testRenderExceptionWithDoubleWidthCharacters()
     {
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));

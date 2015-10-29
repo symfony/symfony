@@ -52,7 +52,7 @@ class Inline
             return '';
         }
 
-        if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
+        if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('ASCII');
         }
@@ -234,6 +234,14 @@ class Inline
                 $i += strlen($output);
             } else {
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
+            }
+
+            // a non-quoted string cannot start with @ or ` (reserved)
+            if ($output && ('@' === $output[0] || '`' === $output[0])) {
+                @trigger_error(sprintf('Not quoting a scalar starting with "%s" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $output[0]), E_USER_DEPRECATED);
+
+                // to be thrown in 3.0
+                // throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));
             }
 
             if ($evaluate) {

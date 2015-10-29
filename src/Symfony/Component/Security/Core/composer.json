@@ -17,15 +17,18 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "paragonie/random_compat": "~1.0"
+        "symfony/polyfill-php55": "~1.0",
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
+        "symfony/polyfill-util": "~1.0"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/ldap": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
         "symfony/validator": "~2.8|~3.0",
-        "symfony/ldap": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {

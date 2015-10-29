@@ -112,7 +112,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     * @requires extension mbstring
      */
     public function testAddHtmlContentCharset()
     {
@@ -147,7 +146,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     * @requires extension mbstring
      */
     public function testAddHtmlContentCharsetGbk()
     {

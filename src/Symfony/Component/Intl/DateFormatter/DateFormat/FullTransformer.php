@@ -18,6 +18,8 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
  * Parser and formatter for date formats.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class FullTransformer
 {

@@ -1,2 +1,2 @@
 _csrf_form_login_bundle:
-    resource: @CsrfFormLoginBundle/Resources/config/routing.yml
+    resource: '@CsrfFormLoginBundle/Resources/config/routing.yml'

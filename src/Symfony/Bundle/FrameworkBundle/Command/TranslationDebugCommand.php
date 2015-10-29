@@ -234,7 +234,7 @@ EOF
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
-        if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
+        if (false !== $encoding = mb_detect_encoding($string, null, true)) {
             if (mb_strlen($string, $encoding) > $length) {
                 return mb_substr($string, 0, $length - 3, $encoding).'...';
             }

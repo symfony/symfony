@@ -171,6 +171,8 @@
                             var text = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
                             infoSpan.textContent = text;
                         }
+
+                        ajaxToolbarPanel.style.display = 'block';
                     } else {
                         ajaxToolbarPanel.style.display = 'none';
                     }

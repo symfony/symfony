@@ -307,9 +307,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar->advance(1);
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testMultiByteSupport()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());
@@ -541,9 +538,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testAnsiColorsAndEmojis()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);

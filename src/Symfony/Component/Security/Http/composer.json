@@ -21,8 +21,9 @@
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
-        "symfony/property-access": "~2.8|~3.0",
-        "paragonie/random_compat": "~1.0"
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
+        "symfony/property-access": "~2.8|~3.0"
     },
     "require-dev": {
         "symfony/routing": "~2.8|~3.0",

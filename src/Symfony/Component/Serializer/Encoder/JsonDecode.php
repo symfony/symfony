@@ -88,7 +88,7 @@ class JsonDecode implements DecoderInterface
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
         if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
-            throw new UnexpectedValueException(JsonEncoder::getLastErrorMessage());
+            throw new UnexpectedValueException(json_last_error_message());
         }
 
         return $decodedData;

@@ -31,9 +31,30 @@
                         <td class="text-center">
                             <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
                         </td>
-                        <td class="nowrap">{{ result.ip }}</td>
-                        <td>{{ result.method }}</td>
-                        <td class="break-long-words">{{ result.url }}</td>
+                        <td>
+                            <span class="nowrap">{{ result.ip }}</span>
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'ip': result.ip, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ result.method }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'method': result.method, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="break-long-words">
+                            {{ result.url }}
+                            {% if request.session is not null %}
+                                <a href="{{ path('_profiler_search_results', request.query.all|merge({'url': result.url, 'token': result.token})) }}" title="Search">
+                                    <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>
+                                </a>
+                            {% endif %}
+                        </td>
                         <td class="text-small">
                             <span class="nowrap">{{ result.time|date('d-M-Y') }}</span>
                             <span class="nowrap newline">{{ result.time|date('H:i:s') }}</span>

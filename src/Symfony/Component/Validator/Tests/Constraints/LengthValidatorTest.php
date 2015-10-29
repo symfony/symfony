@@ -82,9 +82,6 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function getOneCharset()
     {
         return array(

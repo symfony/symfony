@@ -188,6 +188,21 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         Inline::parse('{ foo: * #foo }');
     }
 
+    /**
+     * @group legacy
+     * @dataProvider getReservedIndicators
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
+    {
+        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+    }
+
+    public function getReservedIndicators()
+    {
+        return array(array('@'), array('`'));
+    }
+
     public function getTestsForParse()
     {
         return array(

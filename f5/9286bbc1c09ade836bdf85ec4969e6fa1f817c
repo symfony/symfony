@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-28T22:43:44Z
+
+Actually, we should probably change the type for the other `get*()` methods too. What do you think?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-29T09:56:47Z
+
+Yes getDigits, getAlnum and getAlpha must be changed to string.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-29T18:47:58Z
+
+Updated those three methods as well.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-29T19:22:06Z
+
+:+1:
+
+Status: Reviewed

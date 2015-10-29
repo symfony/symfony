@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/polyfill-php54": "~1.0"
+        "symfony/polyfill-php55": "~1.0"
     },
     "require-dev": {
         "symfony/yaml": "~2.8|~3.0",

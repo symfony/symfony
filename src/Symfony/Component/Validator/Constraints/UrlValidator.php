@@ -102,7 +102,7 @@ class UrlValidator extends ConstraintValidator
             $statusCode = (int) substr($headers[0], 9, 3);
 
             if ( !in_array($statusCode, $constraint->validCodes ) ) {
-                $this->context->buildViolation($constraint->failMessage)
+                $this->context->buildViolation($constraint->httpStatusCodeMessage)
                      ->addViolation();
             }
         }

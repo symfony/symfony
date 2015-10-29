@@ -90,5 +90,21 @@ class UrlValidator extends ConstraintValidator
                 }
             }
         }
+
+        if ($constraint->checkStatusCode) {
+
+            $headers = @get_headers($value);
+
+            if ( !is_array($headers) ) {
+                 return; 
+            }
+
+            $statusCode = (int) substr($headers[0], 9, 3);
+
+            if ( !in_array($statusCode, $constraint->validCodes ) ) {
+                $this->context->buildViolation($constraint->httpStatusCodeMessage)
+                     ->addViolation();
+            }
+        }
     }
 }

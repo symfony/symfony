@@ -12,14 +12,14 @@
 namespace Symfony\Component\Routing;
 
 /**
- * RouteCompilerInterface is the interface that all RouteCompiler classes must implement.
+ * Interface to compile Route instances to CompiledRoute instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface RouteCompilerInterface
 {
     /**
-     * Compiles the current route instance.
+     * Compiles the given route instance.
      *
      * @param Route $route A Route instance
      *

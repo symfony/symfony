@@ -2,13 +2,17 @@
     "name": "symfony/routing",
     "type": "library",
     "description": "Symfony Routing Component",
-    "keywords": ["routing", "router", "URL", "URI"],
+    "keywords": ["route", "router", "URL", "URI", "PSR-7", "request", "matching"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
             "name": "Fabien Potencier",
             "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Tobias Schultze",
+            "homepage": "http://tobion.de"
         },
         {
             "name": "Symfony Community",

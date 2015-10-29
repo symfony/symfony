@@ -11,28 +11,28 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
- * Routing matcher interface to find route parameters based on a Symfony HttpFoundation Request.
+ * Routing matcher interface to find route parameters based on a PSR-7 RequestInterface.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
-interface RequestMatcherInterface
+interface PsrRequestMatcherInterface
 {
     /**
      * Returns the routing parameters of the route that matches the given request.
      *
      * If no route matches, one of the exceptions documented below must be thrown.
      *
-     * @param Request $request The request to match against
+     * @param RequestInterface $request The request to match against
      *
      * @return array An array of parameters
      *
      * @throws ResourceNotFoundException If no matching resource could be found
      * @throws MethodNotAllowedException If a matching resource was found but the request method is not allowed
      */
-    public function matchRequest(Request $request);
+    public function matchPsrRequest(RequestInterface $request);
 }

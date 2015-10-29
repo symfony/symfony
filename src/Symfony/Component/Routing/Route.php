@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing;
 
 /**
- * A Route describes a route and its parameters.
+ * A route describes how a web resource is addressable and its parameters via path/host placeholders and defaults.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Routing;
 
 /**
- * CompiledRoutes are returned by the RouteCompiler class.
+ * A CompiledRoute is the compiled version of a Route that has the regular expression computed for matching against the path/host.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

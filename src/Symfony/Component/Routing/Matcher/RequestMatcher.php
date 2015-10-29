@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\SchemeNotAllowedException;
@@ -25,7 +26,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * @author Tobias Schultze <http://tobion.de>
  */
-class RequestMatcher implements RequestMatcherInterface
+class RequestMatcher implements RequestMatcherInterface, PsrRequestMatcherInterface
 {
     /**
      * @var string[]
@@ -90,6 +91,14 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         throw new ResourceNotFoundException(sprintf('No route found for request "%s %s".', $request->getMethod(), $request->getPathInfo()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function matchPsrRequest(RequestInterface $request)
+    {
+        // TODO
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)

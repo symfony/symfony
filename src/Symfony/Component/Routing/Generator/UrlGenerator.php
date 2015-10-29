@@ -168,7 +168,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * Sets a parameter value.
+     * Sets a parameter value that will be used for placeholders by default.
+     *
+     * This placeholder parameter will be used if none has not been provided explicitly in the generate() method.
      *
      * @param string           $name  A parameter name
      * @param string|int|float $value The parameter value
@@ -181,10 +183,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * {@inheritdoc}
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use setBaseUri, setScriptName instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use setBaseUri and setScriptName instead.
      */
     public function setContext(RequestContext $context)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use setBaseUri and setScriptName instead.', E_USER_DEPRECATED);
+
         $this->context = $context;
 
         $this->scheme = $this->context->getScheme();
@@ -203,6 +207,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function getContext()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        if (null === $this->context) {
+            $this->context = new RequestContext();
+        }
+
         return $this->context;
     }
 

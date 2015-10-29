@@ -41,7 +41,7 @@ class PhpGeneratorDumper extends GeneratorDumper
         return <<<EOF
 <?php
 
-use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Log\LoggerInterface;
 
@@ -58,10 +58,9 @@ class {$options['class']} extends {$options['base_class']}
     /**
      * Constructor.
      */
-    public function __construct(RequestContext \$context, LoggerInterface \$logger = null)
+    public function __construct(\$baseUri = 'http://localhost/', LoggerInterface \$logger = null, \$httpPort = 80, \$httpsPort = 443)
     {
-        \$this->context = \$context;
-        \$this->logger = \$logger;
+        parent::__construct(new RouteCollection(), \$baseUri, \$logger, \$httpPort, \$httpsPort);
     }
 
 {$this->generateGenerateMethod()}

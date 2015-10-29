@@ -26,6 +26,9 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * less technical. Generating URIs, i.e. representation-independent resource identifiers,
  * is also possible.
  *
+ * In Symfony 3.0 the methods UrlGenerator::setBaseUri, UrlGenerator::setScriptName, UrlGenerator::setDefaultParameter
+ * will be added to the interface.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */

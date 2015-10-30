@@ -1,0 +1,141 @@
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-10-20T09:07:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T09:22:06Z
+
+Using the object hash in the cache key can cause issues if your object is garbage collected and the same hash is reused (which is possible as it is based on the memory location of the object, which is available for reuse).
+
+Btw, your benchmark is not relevant for the API platform use case: you are getting the values thousands of times on the same instance. Your API platform loop would be looping over objects, and so use separate instances. And most of your cache would not be usable in this case, because the object hash would be different and so the cache key would be different. Only the PropertyPath cache would enter into effect. I suggest you to update your benchmark.
+
+What about caching only the logic relying on the class definition instead of caching the logic depending on the object ? This means that you would only need to check dynamic properties each time (and do it before calling the magic methods to respect the existing order of checks). But most cases would still benefit from the cache, and it would be shareable between all objects of the same class, making it much more likely to be reused (and making it shareable across requests too)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T09:22:39Z
+
+@stof I just changed the strategy (updated the PR) before you posted.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T09:24:06Z
+
+@dunglas I suggest you to split this PR in 2 separate PRs:
+
+- one caching the PropertyPath instances, which can be ready quickly
+- another one caching the access resolution
+
+You really have 2 independent optimizations here
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-20T09:26:38Z
+
+IMO this should be considered as new feature ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T09:28:31Z
+
+Benchmark and Blackfire profile updated.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T09:30:46Z
+
+@stof I'll move the `PropertyPath` caching in another PR but it's a bit annoying because I plan to use Doctrine cache for `PropertyPath` too.
+
+---------------------------------------------------------------------------
+
+by sescandell at 2015-10-20T10:03:02Z
+
+Hi,
+
+IMO, your benchmarks is not exhaustive. What about performance impact on "non-similar" objects?
+
+If I remember well, form component is mainly based on PropertyPath one.
+Assuming a very long form (I remember a PR about form performance improvement in that situation) with many fields, what would be the impact of these changes caching objects for "nothing"?
+
+Your benchmark perfectly feet for scenarios you described (Serialization), but PropertyPath might be used somewhere else.
+
+Maybe it has no impact (or improving it), just guessing.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T10:14:24Z
+
+@sescandell the impact on form would be increased memory usage (because of the cache being kept), but the only difference in the code is an array key lookup each time, which is O(1), and much faster than all the reflection-based logic.
+
+And if we store the cache in a persistent cache to reuse it across requests, forms would also benefit from it, as a previous request might have warmed up the cache.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T10:16:44Z
+
+@dunglas your Doctrine cache integration is broken currently anyway: it cannot be merged as is as it would break BC due to the second argument being used already in newer branches.
+And the Doctrine cache integration should be considered as a new feature and done in 2.8 IMO. Caching things internally in 2.3 is fine, because it is purely internal, but changing the signature in patch releases looks weird.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T10:33:12Z
+
+Btw, I'm not sure that the PropertyAccessor is the right place to put the PropertyPath caching. We have many places instantiating a PropertyPath outside it (for instance the Form and Validator components always create the instance externally and passes it to the PropertyAccessor).
+
+We may want to introduce a PropertyPathFactory in 2.8, with several implementations:
+
+- a base implementation instantiating the PropertyPath
+- a caching implementation wrapping another implementation and caching it in memory
+- a doctrine cache implementation (in the bridge) using a persistent cache (this also assumes that we make the PropertyPath class serializable, as we will need to serialize it in the cache)
+
+This is already what we do for the ChoiceListFactory in 2.7+ for instance.
+
+Then, any place needing to create a PropertyPath would rely on the factory (making it an optional argument for BC, and creating a ``new CachingPropertyPathFactory(new PropertyPathFactory())`` by default for instance). This would be BC because ``new PropertyPath()`` still works (but you won't get caching if you use it). This would allow to optimize other places using the PropertyPath too.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T10:33:17Z
+
+Btw, looking at the code of the PropertyPath constructor, I found a simpler optimization: the regex used in it can be optimized simply. I will send a PR for it. Then we will see whether your property path cache is still worth it or no.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T11:53:58Z
+
+@stof OK with your proposal.
+
+* Removed Doctrine cache support from this PR (I'll open a new PR against 2.8 or master if it's too late for 2.8)
+* Removed PropertyPatch caching (I'll open another PR if the regex optim isn't enough)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T15:45:32Z
+
+@stof problems you raised should be fixed now
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-20T16:09:58Z
+
+AppVeyor errors not related.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-10-21T08:53:51Z
+
+@dunglas to make the code more readable, the cache building may be extracted to separate private methods
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-25T22:19:40Z
+
+@stof done. Did you have the time to take a look at the PropertyPath regex?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-29T12:48:08Z
+
+ping @symfony/deciders

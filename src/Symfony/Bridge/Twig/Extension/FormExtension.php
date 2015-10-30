@@ -21,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormExtension extends \Twig_Extension
+class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
     /**
      * This property is public so that it can be accessed directly from compiled

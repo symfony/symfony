@@ -14,6 +14,7 @@
       <argument type="collection">
         <argument key="%foo%">foo is %foo%</argument>
         <argument key="foobar">%foo%</argument>
+        <argument key="foo_env">$FOO$</argument>
       </argument>
       <argument>true</argument>
       <argument type="service" id="service_container"/>
@@ -38,6 +39,7 @@
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument>%foo_bar%</argument>
+      <argument>$FOO$</argument>
       <configurator service="foo.baz" method="configure"/>
     </service>
     <service id="foo_bar" class="%foo_class%" shared="false"/>

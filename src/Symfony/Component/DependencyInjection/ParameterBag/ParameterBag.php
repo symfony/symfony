@@ -214,6 +214,10 @@ class ParameterBag implements ParameterBagInterface
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
+        if (preg_match('/^\$([^\$\s]+)\$$/', $value, $match)) {
+            return getenv($match[1]);
+        }
+
         $self = $this;
 
         return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {

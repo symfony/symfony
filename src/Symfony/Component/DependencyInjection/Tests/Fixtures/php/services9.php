@@ -64,7 +64,7 @@ class ProjectServiceContainer extends Container
     {
         $a = $this->get('foo.baz');
 
-        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
+        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'), getenv('FOO'));
 
         $a->configure($instance);
 
@@ -186,7 +186,7 @@ class ProjectServiceContainer extends Container
     {
         $a = $this->get('foo.baz');
 
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'), 'foo_env' => getenv('FOO')), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();

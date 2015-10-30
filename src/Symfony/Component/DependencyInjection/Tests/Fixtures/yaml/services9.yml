@@ -9,7 +9,7 @@ services:
         tags:
             - { name: foo, foo: foo }
             - { name: foo, bar: bar, baz: baz }
-        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
+        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%', foo_env: $FOO$ }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
             - [setBar, ['@bar']]
@@ -23,7 +23,7 @@ services:
         configurator: ['%baz_class%', configureStatic1]
     bar:
         class: Bar\FooClass
-        arguments: [foo, '@foo.baz', '%foo_bar%']
+        arguments: [foo, '@foo.baz', '%foo_bar%', $FOO$]
         configurator: ['@foo.baz', configure]
     foo_bar:
         class: %foo_class%

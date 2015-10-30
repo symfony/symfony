@@ -27,7 +27,10 @@
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Propel1\\": "" }
+        "psr-0": { "Symfony\\Bridge\\Propel1\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Bridge/Propel1",
     "minimum-stability": "dev",

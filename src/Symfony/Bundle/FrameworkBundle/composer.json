@@ -51,7 +51,10 @@
         "symfony/serializer": "For using the serializer service"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
+        "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Bundle/FrameworkBundle",
     "minimum-stability": "dev",

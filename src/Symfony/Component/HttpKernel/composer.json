@@ -45,7 +45,10 @@
         "symfony/finder": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }
+        "psr-0": { "Symfony\\Component\\HttpKernel\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/HttpKernel",
     "minimum-stability": "dev",

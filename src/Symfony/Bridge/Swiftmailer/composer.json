@@ -23,7 +23,10 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" }
+        "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Bridge/Swiftmailer",
     "minimum-stability": "dev",

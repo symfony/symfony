@@ -20,7 +20,10 @@
         "symfony/filesystem": "~2.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Config\\": "" }
+        "psr-0": { "Symfony\\Component\\Config\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Config",
     "minimum-stability": "dev",

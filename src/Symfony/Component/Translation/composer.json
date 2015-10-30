@@ -28,7 +28,10 @@
         "symfony/yaml": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Translation\\": "" }
+        "psr-0": { "Symfony\\Component\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Translation",
     "minimum-stability": "dev",

@@ -127,7 +127,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the alphabetic characters of the parameter value.
      *
      * @param string $key     The parameter key
-     * @param mixed  $default The default value if the parameter key does not exist
+     * @param string $default The default value if the parameter key does not exist
      * @param bool   $deep    If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
@@ -141,7 +141,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the alphabetic characters and digits of the parameter value.
      *
      * @param string $key     The parameter key
-     * @param mixed  $default The default value if the parameter key does not exist
+     * @param string $default The default value if the parameter key does not exist
      * @param bool   $deep    If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
@@ -155,7 +155,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the digits of the parameter value.
      *
      * @param string $key     The parameter key
-     * @param mixed  $default The default value if the parameter key does not exist
+     * @param string $default The default value if the parameter key does not exist
      * @param bool   $deep    If true, a path like foo[bar] will find deeper items
      *
      * @return string The filtered value
@@ -170,7 +170,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * Returns the parameter value converted to integer.
      *
      * @param string $key     The parameter key
-     * @param mixed  $default The default value if the parameter key does not exist
+     * @param int    $default The default value if the parameter key does not exist
      * @param bool   $deep    If true, a path like foo[bar] will find deeper items
      *
      * @return int The filtered value

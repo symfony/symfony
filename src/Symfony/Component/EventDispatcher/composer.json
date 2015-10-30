@@ -30,7 +30,10 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" }
+        "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

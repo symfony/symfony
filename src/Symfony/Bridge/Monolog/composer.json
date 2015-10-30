@@ -30,7 +30,10 @@
         "symfony/event-dispatcher": "Needed when using log messages in console commands."
      },
     "autoload": {
-        "psr-4": { "Symfony\\Bridge\\Monolog\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Monolog\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

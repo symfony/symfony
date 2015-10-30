@@ -25,7 +25,10 @@
         "psr/log": "For using debug logging in loaders"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Templating\\": "" }
+        "psr-4": { "Symfony\\Component\\Templating\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

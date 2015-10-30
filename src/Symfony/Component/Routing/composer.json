@@ -38,7 +38,10 @@
         "symfony/dependency-injection": "For loading routes from a service"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Routing\\": "" }
+        "psr-4": { "Symfony\\Component\\Routing\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

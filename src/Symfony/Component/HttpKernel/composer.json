@@ -52,7 +52,10 @@
         "symfony/var-dumper": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\HttpKernel\\": "" }
+        "psr-4": { "Symfony\\Component\\HttpKernel\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

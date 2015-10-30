@@ -54,14 +54,14 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThanOrEqual(time(), $bag1->getCreated());
         $this->assertEquals($bag1->getCreated(), $bag1->getLastUsed());
 
-        sleep(1);
+        sleep(2);
         $bag2 = new MetadataBag();
         $bag2->initialize($sessionMetadata);
         $this->assertEquals($bag1->getCreated(), $bag2->getCreated());
         $this->assertEquals($bag1->getLastUsed(), $bag2->getLastUsed());
         $this->assertEquals($bag2->getCreated(), $bag2->getLastUsed());
 
-        sleep(1);
+        sleep(2);
         $bag3 = new MetadataBag();
         $bag3->initialize($sessionMetadata);
         $this->assertEquals($bag1->getCreated(), $bag3->getCreated());

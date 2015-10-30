@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-24T14:33:38Z
+
+I can see two other options:
+
+ * Deprecate `initRuntime` in Twig 2.1 but that means waiting for Twig 3.0 to implement the performance optimization :(
+
+ * Adding a new interface in Twig 1.x for the `initRuntime` method that needs to be implemented to avoid the deprecation notice. We would then deprecate this new interface in Twig 2.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-24T14:54:25Z
+
+I don't know if it's relevant here (I read quickly), but we didn't try to avoid deprecation notices in 2.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-24T20:26:52Z
+
+Totally new implementation where I just implement the new interface from twigphp/twig#1886. Another PR for 2.8 does the other changes (see #16333).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-29T23:01:09Z
+
+:+1:
+
+Status: Reviewed
+
+Can we merge here to make Travis builds pass again?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-29T23:01:53Z
+
+I need to release Twig 1.23 first.

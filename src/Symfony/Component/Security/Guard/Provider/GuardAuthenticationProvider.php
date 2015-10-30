@@ -124,8 +124,8 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
         $this->userChecker->checkPreAuth($user);
         if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
-            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true', get_class($guardAuthenticator)));
-        };
+            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', get_class($guardAuthenticator)));
+        }
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface

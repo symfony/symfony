@@ -73,7 +73,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
     public function getUser($credentials, UserProviderInterface $userProvider);
 
     /**
-     * Return true if the credentials are valid.
+     * Returns true if the credentials are valid.
      *
      * If any value other than true is returned, authentication will
      * fail. You may also throw an AuthenticationException if you wish

@@ -33,7 +33,10 @@
         "psr/log": "To use logging capability in translator"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Translation\\": "" }
+        "psr-4": { "Symfony\\Component\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

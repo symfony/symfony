@@ -24,7 +24,10 @@
         "symfony/config": "~2.3"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" }
+        "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

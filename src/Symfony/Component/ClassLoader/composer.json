@@ -23,7 +23,10 @@
         "symfony/finder": "~2.0,>=2.0.5"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\ClassLoader\\": "" }
+        "psr-4": { "Symfony\\Component\\ClassLoader\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "extra": {
         "branch-alias": {

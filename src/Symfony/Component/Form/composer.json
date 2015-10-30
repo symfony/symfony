@@ -42,7 +42,10 @@
         "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Form\\": "" }
+        "psr-4": { "Symfony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

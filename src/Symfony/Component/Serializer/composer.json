@@ -33,7 +33,10 @@
         "symfony/property-access": "For using the ObjectNormalizer."
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Serializer\\": "" }
+        "psr-4": { "Symfony\\Component\\Serializer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

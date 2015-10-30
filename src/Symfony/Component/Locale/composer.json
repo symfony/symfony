@@ -20,7 +20,10 @@
         "symfony/intl": "~2.7"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Locale\\": "" }
+        "psr-4": { "Symfony\\Component\\Locale\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

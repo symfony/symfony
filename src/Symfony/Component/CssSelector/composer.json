@@ -23,7 +23,10 @@
         "php": ">=5.3.9"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\CssSelector\\": "" }
+        "psr-4": { "Symfony\\Component\\CssSelector\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

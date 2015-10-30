@@ -31,7 +31,10 @@
         "symfony/dependency-injection": "For using as a service from the container"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

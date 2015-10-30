@@ -79,7 +79,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   </samp>}
   "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {{$r}<samp>
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="48 characters">Symfony\Component\VarDumper\Tests\HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {{$r} &#8230;}
+    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {{$r} &%s;}
     <span class=sf-dump-meta>parameters</span>: {<samp>
       <span class=sf-dump-meta>\$a</span>: {}
       <span class=sf-dump-meta>&amp;\$b</span>: {<samp>

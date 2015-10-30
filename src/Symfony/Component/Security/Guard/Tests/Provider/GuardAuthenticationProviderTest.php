@@ -60,7 +60,9 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         // checkCredentials is called
         $authenticatorB->expects($this->once())
             ->method('checkCredentials')
-            ->with($enteredCredentials, $mockedUser);
+            ->with($enteredCredentials, $mockedUser)
+            // authentication works!
+            ->will($this->returnValue(true));
         $authedToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $authenticatorB->expects($this->once())
             ->method('createAuthenticatedToken')
@@ -78,6 +80,39 @@ class GuardAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = new GuardAuthenticationProvider($authenticators, $this->userProvider, $providerKey, $this->userChecker);
         $actualAuthedToken = $provider->authenticate($this->preAuthenticationToken);
         $this->assertSame($authedToken, $actualAuthedToken);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testCheckCredentialsReturningNonTrueFailsAuthentication()
+    {
+        $providerKey = 'my_uncool_firewall';
+
+        $authenticator = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+
+        // make sure the authenticator is used
+        $this->preAuthenticationToken->expects($this->any())
+            ->method('getGuardProviderKey')
+            // the 0 index, to match the only authenticator
+            ->will($this->returnValue('my_uncool_firewall_0'));
+
+        $this->preAuthenticationToken->expects($this->atLeastOnce())
+            ->method('getCredentials')
+            ->will($this->returnValue('non-null-value'));
+
+        $mockedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $authenticator->expects($this->once())
+            ->method('getUser')
+            ->will($this->returnValue($mockedUser));
+        // checkCredentials is called
+        $authenticator->expects($this->once())
+            ->method('checkCredentials')
+            // authentication fails :(
+            ->will($this->returnValue(null));
+
+        $provider = new GuardAuthenticationProvider(array($authenticator), $this->userProvider, $providerKey, $this->userChecker);
+        $provider->authenticate($this->preAuthenticationToken);
     }
 
     /**

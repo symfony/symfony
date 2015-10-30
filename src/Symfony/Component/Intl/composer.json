@@ -25,8 +25,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/polyfill-php54": "~1.0"
+        "symfony/polyfill-intl-icu": "~1.0"
     },
     "require-dev": {
         "symfony/filesystem": "~2.8|~3.0"

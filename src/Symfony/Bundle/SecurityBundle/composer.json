@@ -37,7 +37,10 @@
         "twig/twig": "~1.23|~2.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }
+        "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Bundle/SecurityBundle",
     "minimum-stability": "dev",

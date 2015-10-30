@@ -25,7 +25,10 @@
         "symfony/css-selector": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
+        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/DomCrawler",
     "minimum-stability": "dev",

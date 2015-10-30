@@ -25,7 +25,10 @@
         "symfony/event-dispatcher": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Console\\": "" }
+        "psr-0": { "Symfony\\Component\\Console\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Console",
     "minimum-stability": "dev",

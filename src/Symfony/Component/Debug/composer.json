@@ -31,7 +31,10 @@
         "symfony/class-loader": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Debug\\": "" }
+        "psr-0": { "Symfony\\Component\\Debug\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Debug",
     "minimum-stability": "dev",

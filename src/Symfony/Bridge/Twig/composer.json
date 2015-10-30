@@ -42,7 +42,10 @@
         "symfony/security": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
+        "psr-0": { "Symfony\\Bridge\\Twig\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Bridge/Twig",
     "minimum-stability": "dev",

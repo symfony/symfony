@@ -47,7 +47,10 @@
         "paragonie/random_compat": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\": "" }
+        "psr-0": { "Symfony\\Component\\Security\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Security",
     "minimum-stability": "dev",

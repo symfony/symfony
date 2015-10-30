@@ -33,7 +33,10 @@
         "symfony/http-foundation": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form\\": "" }
+        "psr-0": { "Symfony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",

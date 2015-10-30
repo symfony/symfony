@@ -34,7 +34,10 @@
         "symfony/config": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator\\": "" }
+        "psr-0": { "Symfony\\Component\\Validator\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "target-dir": "Symfony/Component/Validator",
     "minimum-stability": "dev",

@@ -81,7 +81,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),
@@ -115,7 +114,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(
@@ -150,7 +148,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),
@@ -190,7 +187,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'grandParent_parent_name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),

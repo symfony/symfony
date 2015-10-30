@@ -52,28 +52,12 @@ class ExpressionVoter implements VoterInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsAttribute($attribute)
-    {
-        return $attribute instanceof Expression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $variables = null;
         foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
+            if (!$attribute instanceof Expression) {
                 continue;
             }
 

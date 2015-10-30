@@ -45,7 +45,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param bool                 $scream           Enables/disables screaming mode, where even silenced errors are logged
      * @param string               $fileLinkFormat   The format for links to source files
      */
-    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $throwAt = -1, $scream = true, $fileLinkFormat = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = null, $throwAt = -1, $scream = true, $fileLinkFormat = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;

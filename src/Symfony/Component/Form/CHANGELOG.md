@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
 2.8.0
 -----
 

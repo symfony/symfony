@@ -1,15 +1,15 @@
----------------- ----------------------------- 
+ ---------------- ----------------------------- 
   [32mOption[39m           [32mValue[39m                        
  ---------------- ----------------------------- 
   Service ID       -                            
   Class            Full\Qualified\Class1        
   Tags             -                            
-  Scope            container                    
   Public           yes                          
   Synthetic        no                           
   Lazy             yes                          
-  Synchronized     no                           
+  Shared           yes                          
   Abstract         yes                          
   Factory Class    Full\Qualified\FactoryClass  
   Factory Method   get                          
- ---------------- -----------------------------
+ ---------------- ----------------------------- 
+

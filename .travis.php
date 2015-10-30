@@ -30,7 +30,7 @@ foreach ($dirs as $dir) {
     file_put_contents($dir.'/composer.json', $json);
     passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    $package->version = $branch.'.x-dev';
+    $package->version = 'master' !== $branch ? $branch.'.x-dev' : 'dev-master';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.__DIR__."/$dir/package.tar";
 

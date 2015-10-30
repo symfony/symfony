@@ -479,24 +479,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * Convert a string from one encoding to another.
-     *
-     * @param string $string The string to convert
-     * @param string $to     The input encoding
-     * @param string $from   The output encoding
-     *
-     * @return string The string with the new encoding
-     *
-     * @deprecated since 2.8, to be removed in 3.0. Use iconv() instead.
-     */
-    public function convertEncoding($string, $to, $from)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use iconv() instead.', E_USER_DEPRECATED);
-
-        return iconv($from, $to, $string);
-    }
-
-    /**
      * Gets the loader associated with this engine.
      *
      * @return LoaderInterface A LoaderInterface instance

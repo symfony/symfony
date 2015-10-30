@@ -34,6 +34,11 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
      */
     private $testTmpFilepath;
 
+    /**
+     * @var string
+     */
+    private $largeTestTmpFilepath;
+
     protected function setUp()
     {
         parent::setUp();
@@ -41,7 +46,9 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection = new RouteCollection();
         $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
         $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.'.$this->getName().'.php';
+        $this->largeTestTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.'.$this->getName().'.large.php';
         @unlink($this->testTmpFilepath);
+        @unlink($this->largeTestTmpFilepath);
     }
 
     protected function tearDown()
@@ -64,6 +71,33 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         include $this->testTmpFilepath;
 
         $projectUrlGenerator = new \ProjectUrlGenerator(new RequestContext('/app.php'));
+
+        $absoluteUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_URL);
+        $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), UrlGeneratorInterface::ABSOLUTE_URL);
+        $relativeUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_PATH);
+        $relativeUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals($absoluteUrlWithParameter, 'http://localhost/app.php/testing/bar');
+        $this->assertEquals($absoluteUrlWithoutParameter, 'http://localhost/app.php/testing2');
+        $this->assertEquals($relativeUrlWithParameter, '/app.php/testing/bar');
+        $this->assertEquals($relativeUrlWithoutParameter, '/app.php/testing2');
+    }
+
+    public function testDumpWithTooManyRoutes()
+    {
+        $this->routeCollection->add('Test', new Route('/testing/{foo}'));
+        for ( $i = 0; $i < 32769; ++$i ) {
+            $this->routeCollection->add('route_'.$i, new Route('/route_'.$i));
+        }
+        $this->routeCollection->add('Test2', new Route('/testing2'));
+
+        $data = $this->generatorDumper->dump(array(
+            'class' => 'ProjectLargeUrlGenerator',
+        ));
+        file_put_contents($this->largeTestTmpFilepath, $data);
+        include $this->largeTestTmpFilepath;
+
+        $projectUrlGenerator = new \ProjectLargeUrlGenerator(new RequestContext('/app.php'));
 
         $absoluteUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_URL);
         $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), UrlGeneratorInterface::ABSOLUTE_URL);

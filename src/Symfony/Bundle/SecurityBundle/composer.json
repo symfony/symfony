@@ -34,7 +34,7 @@
         "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.2",
         "symfony/yaml": "~2.0,>=2.0.5",
-        "twig/twig": "~1.20|~2.0"
+        "twig/twig": "~1.20"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

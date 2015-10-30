@@ -25,7 +25,10 @@
         "symfony/http-foundation": "~2.4"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Asset\\": "" }
+        "psr-4": { "Symfony\\Component\\Asset\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

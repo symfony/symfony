@@ -23,7 +23,10 @@
         "symfony/expression-language": "~2.4|~3.0.0"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" }
+        "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

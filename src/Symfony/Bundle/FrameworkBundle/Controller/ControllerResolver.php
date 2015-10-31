@@ -63,8 +63,18 @@ class ControllerResolver extends BaseControllerResolver
                 list($service, $method) = explode(':', $controller, 2);
 
                 return array($this->container->get($service), $method);
-            } elseif ($this->container->has($controller) && method_exists($service = $this->container->get($controller), '__invoke')) {
-                return $service;
+            } elseif ($this->container->has($controller)) {
+                $controllerInstance = $this->container->get($controller);
+                if (!method_exists($controllerInstance, '__invoke')) {
+                    $exceptionMessage = sprintf(
+                        'The class "%s" specified as controller service "%s" must define an __invoke method, but does not.',
+                        get_class($controllerInstance),
+                        $controller
+                    );
+                    throw new \LogicException($exceptionMessage);
+                }
+
+                return $controllerInstance;
             } else {
                 throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
             }

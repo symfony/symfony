@@ -33,6 +33,7 @@ like us, you think that Symfony can help speed up your development and take
 the quality of your work to the next level, read the official
 [Symfony documentation][2].
 
+
 Contributing
 ------------
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
+use Symfony\Component\DependencyInjection\EnvVariable;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -167,12 +168,12 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem.
      */
-    public function resolveValue($value, array $resolving = array())
+    public function resolveValue($value, array $resolving = array(), $protectEnvVariables = false)
     {
         if (is_array($value)) {
             $args = array();
             foreach ($value as $k => $v) {
-                $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
+                $args[$this->resolveValue($k, $resolving, $protectEnvVariables)] = $this->resolveValue($v, $resolving, $protectEnvVariables);
             }
 
             return $args;
@@ -182,7 +183,7 @@ class ParameterBag implements ParameterBagInterface
             return $value;
         }
 
-        return $this->resolveString($value, $resolving);
+        return $this->resolveString($value, $resolving, $protectEnvVariables);
     }
 
     /**
@@ -197,7 +198,7 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem.
      */
-    public function resolveString($value, array $resolving = array())
+    public function resolveString($value, array $resolving = array(), $protectEnvVariables = false)
     {
         // we do this to deal with non string values (Boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying
@@ -211,16 +212,20 @@ class ParameterBag implements ParameterBagInterface
 
             $resolving[$key] = true;
 
-            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
+            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving, $protectEnvVariables);
         }
 
         if (preg_match('/^\$([^\$\s]+)\$$/', $value, $match)) {
+            if ($protectEnvVariables) {
+                return new EnvVariable($match[1]);
+            }
+
             return getenv($match[1]);
         }
 
         $self = $this;
 
-        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
+        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value, $protectEnvVariables) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
@@ -240,7 +245,7 @@ class ParameterBag implements ParameterBagInterface
             $resolved = (string) $resolved;
             $resolving[$key] = true;
 
-            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
+            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving, $protectEnvVariables);
         }, $value);
     }
 

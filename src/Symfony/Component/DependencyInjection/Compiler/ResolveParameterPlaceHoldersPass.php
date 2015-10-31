@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\EnvVariable;
 
 /**
  * Resolves all parameter placeholders "%somevalue%" to their real values.
@@ -36,7 +37,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
             try {
                 $definition->setClass($parameterBag->resolveValue($definition->getClass()));
                 $definition->setFile($parameterBag->resolveValue($definition->getFile()));
-                $definition->setArguments($parameterBag->resolveValue($definition->getArguments()));
+                $definition->setArguments($parameterBag->resolveValue($definition->getArguments(), array(), true));
                 if ($definition->getFactoryClass(false)) {
                     $definition->setFactoryClass($parameterBag->resolveValue($definition->getFactoryClass(false)));
                 }
@@ -50,11 +51,11 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 
                 $calls = array();
                 foreach ($definition->getMethodCalls() as $name => $arguments) {
-                    $calls[$parameterBag->resolveValue($name)] = $parameterBag->resolveValue($arguments);
+                    $calls[$parameterBag->resolveValue($name)] = $parameterBag->resolveValue($arguments, array(), true);
                 }
                 $definition->setMethodCalls($calls);
 
-                $definition->setProperties($parameterBag->resolveValue($definition->getProperties()));
+                $definition->setProperties($parameterBag->resolveValue($definition->getProperties(), array(), true));
             } catch (ParameterNotFoundException $e) {
                 $e->setSourceId($id);
 

@@ -143,7 +143,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setShared
      */
     public function testNonSharedServicesReturnsDifferentInstances()
     {

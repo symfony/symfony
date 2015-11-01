@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
@@ -572,6 +573,55 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertGroupedView($view);
+    }
+
+    public function testCreateViewDuplicateArrayKeyChoiceListValues()
+    {
+        $list = new ArrayKeyChoiceList(
+            array(
+                'A' => 'a',
+                'AA' => 'a',
+                'Group 1' => array(
+                    'E' => 'e',
+                    'EE' => 'e',
+                    'A' => 'abc'
+                ),
+                'Group 2' => array(
+                    'B' => 'b',
+                    'E' => 'e'
+                ),
+                'AAA' => 'a'
+            )
+        );
+
+        $view = $this->factory->createView($list);
+
+        $this->assertEquals(
+            new ChoiceListView(
+                array(
+                    0 => new ChoiceView('A', 'A', 'a'),
+                    1 => new ChoiceView('AA', 'AA', 'a'),
+                    'Group 1' => new ChoiceGroupView(
+                        'Group 1',
+                        array(
+                            2 => new ChoiceView('E', 'E', 'e'),
+                            3 => new ChoiceView('EE', 'EE', 'e'),
+                            4 => new ChoiceView('A', 'A', 'abc')
+                        )
+                    ),
+                    'Group 2' => new ChoiceGroupView(
+                        'Group 2',
+                        array(
+                            5 => new ChoiceView('B', 'B', 'b'),
+                            6 => new ChoiceView('E', 'E', 'e')
+                        )
+                    ),
+                    7 => new ChoiceView('AAA', 'AAA', 'a')
+                ),
+                array()
+            ),
+            $view
+        );
     }
 
     public function testCreateViewFlatGroupByEmpty()

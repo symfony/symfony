@@ -198,7 +198,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
      * @covers Symfony\Component\DependencyInjection\Definition::isDeprecated
-     * @covers Symfony\Component\DependencyInjection\Definition::hasCustomDeprecationTemplate
      * @covers Symfony\Component\DependencyInjection\Definition::getDeprecationMessage
      */
     public function testSetIsDeprecated()

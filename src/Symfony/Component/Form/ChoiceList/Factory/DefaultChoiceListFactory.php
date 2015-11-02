@@ -108,7 +108,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $choice,
                     (string) $value,
                     $label,
-                    $keys,
+                    $keys[(string) $value],
                     $index,
                     $attr,
                     $preferredChoices,
@@ -148,11 +148,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceView($choice, $value, $label, $key, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
-        $key = $keys[$value];
         $nextIndex = is_int($index) ? $index++ : call_user_func($index, $choice, $key, $value);
 
         $view = new ChoiceView(
@@ -213,7 +212,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $choices[$value],
                 $value,
                 $label,
-                $keys,
+                $keys[$value],
                 $index,
                 $attr,
                 $isPreferred,
@@ -223,9 +222,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $key, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        $groupLabel = call_user_func($groupBy, $choice, $keys[$value], $value);
+        $groupLabel = call_user_func($groupBy, $choice, $key, $value);
 
         if (null === $groupLabel) {
             // If the callable returns null, don't group the choice
@@ -233,7 +232,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $choice,
                 $value,
                 $label,
-                $keys,
+                $key,
                 $index,
                 $attr,
                 $isPreferred,
@@ -257,7 +256,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $choice,
             $value,
             $label,
-            $keys,
+            $key,
             $index,
             $attr,
             $isPreferred,

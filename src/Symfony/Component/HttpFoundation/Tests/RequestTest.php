@@ -17,17 +17,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::__construct
-     */
     public function testConstructor()
     {
         $this->testInitialize();
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::initialize
-     */
     public function testInitialize()
     {
         $request = new Request();
@@ -94,9 +88,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('pl', $locale);
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::create
-     */
     public function testCreate()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
@@ -240,9 +231,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::create
-     */
     public function testCreateCheckPrecedence()
     {
         // server is used by default
@@ -311,8 +299,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\HttpFoundation\Request::getFormat
-     * @covers Symfony\Component\HttpFoundation\Request::setFormat
      * @dataProvider getFormatToMimeTypeMapProvider
      */
     public function testGetFormatFromMimeType($format, $mimeTypes)
@@ -327,9 +313,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getFormat
-     */
     public function testGetFormatFromMimeTypeWithParameters()
     {
         $request = new Request();
@@ -337,7 +320,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\HttpFoundation\Request::getMimeType
      * @dataProvider getFormatToMimeTypeMapProvider
      */
     public function testGetMimeTypeFromFormat($format, $mimeTypes)
@@ -362,9 +344,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getUri
-     */
     public function testGetUri()
     {
         $server = array();
@@ -480,9 +459,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://host:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getUriForPath
-     */
     public function testGetUriForPath()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
@@ -610,9 +586,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getUserInfo
-     */
     public function testGetUserInfo()
     {
         $request = new Request();
@@ -630,9 +603,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0:0', $request->getUserInfo());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getSchemeAndHttpHost
-     */
     public function testGetSchemeAndHttpHost()
     {
         $request = new Request();
@@ -657,8 +627,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\HttpFoundation\Request::getQueryString
-     * @covers Symfony\Component\HttpFoundation\Request::normalizeQueryString
      * @dataProvider getQueryStringNormalizationData
      */
     public function testGetQueryString($query, $expectedQuery, $msg)
@@ -794,10 +762,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->getHost();
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::setMethod
-     * @covers Symfony\Component\HttpFoundation\Request::getMethod
-     */
     public function testGetSetMethod()
     {
         $request = new Request();

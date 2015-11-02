@@ -118,7 +118,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             }
         } else {
             // Otherwise use the original structure of the choices
-            self::addChoiceViewsGroupedBy(
+            self::addStructuredChoiceViews(
                 $list->getStructuredValues(),
                 $label,
                 $choices,
@@ -172,9 +172,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addStructuredChoiceViews($structuredValues, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        foreach ($groupBy as $key => $value) {
+        foreach ($structuredValues as $key => $value) {
             if (null === $value) {
                 continue;
             }
@@ -184,7 +184,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $preferredViewsForGroup = array();
                 $otherViewsForGroup = array();
 
-                self::addChoiceViewsGroupedBy(
+                self::addStructuredChoiceViews(
                     $value,
                     $label,
                     $choices,

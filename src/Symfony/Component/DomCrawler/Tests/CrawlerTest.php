@@ -81,9 +81,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     */
     public function testAddHtmlContentWithBaseTag()
     {
         $crawler = new Crawler();

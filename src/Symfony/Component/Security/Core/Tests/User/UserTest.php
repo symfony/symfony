@@ -93,9 +93,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('superpass', $user->getPassword());
     }
 
-    /**
-     * @covers Symfony\Component\Security\Core\User\User::__toString
-     */
     public function testToString()
     {
         $user = new User('fabien', 'superpass');

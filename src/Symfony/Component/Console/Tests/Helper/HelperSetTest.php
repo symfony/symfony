@@ -93,9 +93,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::getIterator
-     */
     public function testIteration()
     {
         $helperset = new HelperSet();

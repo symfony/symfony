@@ -212,9 +212,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($parameters), count($bag));
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getBoolean
-     */
     public function testGetBoolean()
     {
         $parameters = array('string_true' => 'true', 'string_false' => 'false');

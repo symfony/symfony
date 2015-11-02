@@ -27,9 +27,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::add
-     */
     public function testAdd()
     {
         $crawler = new Crawler();
@@ -76,9 +73,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->add(new \DOMNode());
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     */
     public function testAddHtmlContent()
     {
         $crawler = new Crawler();
@@ -101,7 +95,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharset()
     {
@@ -111,9 +105,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     */
     public function testAddHtmlContentInvalidBaseTag()
     {
         $crawler = new Crawler(null, 'http://symfony.com');
@@ -123,9 +114,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://symfony.com/contact', current($crawler->filterXPath('//a')->links())->getUri(), '->addHtmlContent() correctly handles a non-existent base tag href attribute');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     */
     public function testAddHtmlContentUnsupportedCharset()
     {
         $crawler = new Crawler();
@@ -135,7 +123,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     * @requires extension mbstring
      */
     public function testAddHtmlContentCharsetGbk()
     {
@@ -146,9 +134,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('中文', $crawler->filterXPath('//p')->text());
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
-     */
     public function testAddHtmlContentWithErrors()
     {
         $internalErrors = libxml_use_internal_errors(true);
@@ -174,9 +159,6 @@ EOF
         libxml_use_internal_errors($internalErrors);
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
-     */
     public function testAddXmlContent()
     {
         $crawler = new Crawler();
@@ -185,9 +167,6 @@ EOF
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
-     */
     public function testAddXmlContentCharset()
     {
         $crawler = new Crawler();
@@ -196,9 +175,6 @@ EOF
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
-     */
     public function testAddXmlContentWithErrors()
     {
         $internalErrors = libxml_use_internal_errors(true);
@@ -222,9 +198,6 @@ EOF
         libxml_use_internal_errors($internalErrors);
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addContent
-     */
     public function testAddContent()
     {
         $crawler = new Crawler();
@@ -260,9 +233,6 @@ EOF
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addDocument
-     */
     public function testAddDocument()
     {
         $crawler = new Crawler();
@@ -271,9 +241,6 @@ EOF
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addNodeList
-     */
     public function testAddNodeList()
     {
         $crawler = new Crawler();
@@ -282,9 +249,6 @@ EOF
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addNodes
-     */
     public function testAddNodes()
     {
         $list = array();
@@ -298,9 +262,6 @@ EOF
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodes() adds nodes from an array of nodes');
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::addNode
-     */
     public function testAddNode()
     {
         $crawler = new Crawler();
@@ -460,9 +421,6 @@ EOF
         $this->assertCount(7, $crawler->filterXPath('( ( //a | //div )//img | //ul )'));
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::filterXPath
-     */
     public function testFilterXPath()
     {
         $crawler = $this->createTestCrawler();
@@ -640,9 +598,6 @@ EOF
         $this->assertCount(9, $crawler->filterXPath('self::*/a'));
     }
 
-    /**
-     * @covers Symfony\Component\DomCrawler\Crawler::filter
-     */
     public function testFilter()
     {
         $crawler = $this->createTestCrawler();

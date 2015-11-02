@@ -58,7 +58,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      * Otherwise the template is located using the locator from the twig library.
      *
      * @param string|TemplateReferenceInterface $template The template
-     * @param Boolean $throw This parameter is here only for matching the parent signature
+     * @param Boolean $throw This parameter is only here for matching the parent signature
      *
      * @return string The path to the template file
      *

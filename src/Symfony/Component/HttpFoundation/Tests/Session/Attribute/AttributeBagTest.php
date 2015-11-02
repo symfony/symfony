@@ -169,9 +169,6 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag::getIterator
-     */
     public function testGetIterator()
     {
         $i = 0;
@@ -183,9 +180,6 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($this->array), $i);
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag::count
-     */
     public function testCount()
     {
         $this->assertEquals(count($this->array), count($this->bag));

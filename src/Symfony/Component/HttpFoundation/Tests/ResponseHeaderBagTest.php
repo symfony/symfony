@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Component\HttpFoundation\ResponseHeaderBag::allPreserveCase
      * @dataProvider provideAllPreserveCase
      */
     public function testAllPreserveCase($headers, $expected)

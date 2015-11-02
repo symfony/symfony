@@ -15,9 +15,6 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class LoaderResolverTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\Config\Loader\LoaderResolver::__construct
-     */
     public function testConstructor()
     {
         $resolver = new LoaderResolver(array(
@@ -27,9 +24,6 @@ class LoaderResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($loader), $resolver->getLoaders(), '__construct() takes an array of loaders as its first argument');
     }
 
-    /**
-     * @covers Symfony\Component\Config\Loader\LoaderResolver::resolve
-     */
     public function testResolve()
     {
         $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
@@ -42,10 +36,6 @@ class LoaderResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($loader, $resolver->resolve(function () {}), '->resolve() returns the loader for the given resource');
     }
 
-    /**
-     * @covers Symfony\Component\Config\Loader\LoaderResolver::getLoaders
-     * @covers Symfony\Component\Config\Loader\LoaderResolver::addLoader
-     */
     public function testLoaders()
     {
         $resolver = new LoaderResolver();

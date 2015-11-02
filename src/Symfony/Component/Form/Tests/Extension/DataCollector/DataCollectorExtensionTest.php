@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
 use Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension;
 
-/**
- * @covers Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension
- */
 class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**

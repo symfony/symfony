@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @covers \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper
  */
 class ProxyDumperTest extends \PHPUnit_Framework_TestCase
 {

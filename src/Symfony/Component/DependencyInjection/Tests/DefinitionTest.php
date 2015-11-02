@@ -16,9 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::__construct
-     */
     public function testConstructor()
     {
         $def = new Definition('stdClass');
@@ -28,10 +25,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo'), $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setFactory
-     * @covers Symfony\Component\DependencyInjection\Definition::getFactory
-     */
     public function testSetGetFactory()
     {
         $def = new Definition('stdClass');
@@ -43,10 +36,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Foo', 'bar'), $def->getFactory(), '->setFactory() converts string static method call to the array');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setClass
-     * @covers Symfony\Component\DependencyInjection\Definition::getClass
-     */
     public function testSetGetClass()
     {
         $def = new Definition('stdClass');
@@ -81,11 +70,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def->setDecoratedService('foo', 'foo');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setArguments
-     * @covers Symfony\Component\DependencyInjection\Definition::getArguments
-     * @covers Symfony\Component\DependencyInjection\Definition::addArgument
-     */
     public function testArguments()
     {
         $def = new Definition('stdClass');
@@ -95,12 +79,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo', 'bar'), $def->getArguments(), '->addArgument() adds an argument');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setMethodCalls
-     * @covers Symfony\Component\DependencyInjection\Definition::addMethodCall
-     * @covers Symfony\Component\DependencyInjection\Definition::hasMethodCall
-     * @covers Symfony\Component\DependencyInjection\Definition::removeMethodCall
-     */
     public function testMethodCalls()
     {
         $def = new Definition('stdClass');
@@ -124,10 +102,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def->addMethodCall('');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setFile
-     * @covers Symfony\Component\DependencyInjection\Definition::getFile
-     */
     public function testSetGetFile()
     {
         $def = new Definition('stdClass');
@@ -135,10 +109,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getFile(), '->getFile() returns the file to include');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setShared
-     * @covers Symfony\Component\DependencyInjection\Definition::isShared
-     */
     public function testSetIsShared()
     {
         $def = new Definition('stdClass');
@@ -147,10 +117,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setPublic
-     * @covers Symfony\Component\DependencyInjection\Definition::isPublic
-     */
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
@@ -159,10 +125,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setSynthetic
-     * @covers Symfony\Component\DependencyInjection\Definition::isSynthetic
-     */
     public function testSetIsSynthetic()
     {
         $def = new Definition('stdClass');
@@ -171,10 +133,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the service is synthetic.');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setLazy
-     * @covers Symfony\Component\DependencyInjection\Definition::isLazy
-     */
     public function testSetIsLazy()
     {
         $def = new Definition('stdClass');
@@ -183,10 +141,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->isLazy(), '->isLazy() returns true if the service is lazy.');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setAbstract
-     * @covers Symfony\Component\DependencyInjection\Definition::isAbstract
-     */
     public function testSetIsAbstract()
     {
         $def = new Definition('stdClass');
@@ -195,12 +149,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->isAbstract(), '->isAbstract() returns true if the instance must not be public.');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
-     * @covers Symfony\Component\DependencyInjection\Definition::isDeprecated
-     * @covers Symfony\Component\DependencyInjection\Definition::hasCustomDeprecationTemplate
-     * @covers Symfony\Component\DependencyInjection\Definition::getDeprecationMessage
-     */
     public function testSetIsDeprecated()
     {
         $def = new Definition('stdClass');
@@ -212,7 +160,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidDeprecationMessageProvider
-     * @covers Symfony\Component\DependencyInjection\Definition::setDeprecated
      * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
@@ -231,10 +178,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setConfigurator
-     * @covers Symfony\Component\DependencyInjection\Definition::getConfigurator
-     */
     public function testSetGetConfigurator()
     {
         $def = new Definition('stdClass');
@@ -242,9 +185,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getConfigurator(), '->getConfigurator() returns the configurator');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::clearTags
-     */
     public function testClearTags()
     {
         $def = new Definition('stdClass');
@@ -254,9 +194,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $def->getTags(), '->clearTags() removes all current tags');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::clearTags
-     */
     public function testClearTag()
     {
         $def = new Definition('stdClass');
@@ -273,12 +210,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->hasTag('3foo3'));
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::addTag
-     * @covers Symfony\Component\DependencyInjection\Definition::getTag
-     * @covers Symfony\Component\DependencyInjection\Definition::getTags
-     * @covers Symfony\Component\DependencyInjection\Definition::hasTag
-     */
     public function testTags()
     {
         $def = new Definition('stdClass');
@@ -296,9 +227,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         ), '->getTags() returns all tags');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Definition::replaceArgument
-     */
     public function testSetArgument()
     {
         $def = new Definition('stdClass');

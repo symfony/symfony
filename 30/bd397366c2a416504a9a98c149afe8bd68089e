@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-11-01T22:31:39Z
+
++1
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-11-02T07:03:57Z
+
+Is this for method level only? IMO it doesn't make sense to "cover methods". It does make sense to cover the class (unit) you're testing. In one glance it also makes it possible to see which units are affected by the tests if multiple classes are used.
+
+If nothing is done with the coverage, it doesn't really make sense to use them though. It will require xdebug to be ran and is extremely slow. I once did a coverage run on `symfony/symfony` and it took me almost an hour to test + render the coverage report (html) on php 5.5.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-02T18:05:07Z
+
+The main issue is that we've not been using @covers during the last few years. The existing ones do not add any values.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-02T18:12:27Z
+
+:+1:

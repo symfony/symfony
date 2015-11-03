@@ -22,7 +22,7 @@ interface CommandResolverInterface
      * @param Command $command
      */
     public function add(Command $command);
-  
+
     /**
      * Check if command exist.
      * 
@@ -31,7 +31,7 @@ interface CommandResolverInterface
      * @return bool
      */
     public function has($name);
-  
+
     /**
      * Get command by name or alias.
      * 
@@ -40,14 +40,14 @@ interface CommandResolverInterface
      * @return Command|null
      */
     public function get($name);
-  
+
     /**         
      * Return all available commands related to this application.
      * 
      * @return Command[]
      */
     public function getAll();
-  
+
     /**
      * Return all command names and aliases.
      * 

@@ -26,13 +26,13 @@ class CommandResolver implements CommandResolverInterface
     public function add(Command $command)
     {
         $this->commands[$command->getName()] = $command;
-  
+
         foreach ($command->getAliases() as $alias) {
             $this->commands[$alias] = $command;
         }
-  
+
     }
-  
+
     /**
      * {@inheritdoc}
      */
@@ -40,7 +40,7 @@ class CommandResolver implements CommandResolverInterface
     {
         return !empty($this->commands[$name]);
     }
-  
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +48,7 @@ class CommandResolver implements CommandResolverInterface
     {
         return !empty($this->commands[$name]) ? $this->commands[$name] : null;
     }
-  
+
     /**
      * {@inheritdoc}
      */
@@ -56,7 +56,7 @@ class CommandResolver implements CommandResolverInterface
     {
         return $this->commands;
     }
-  
+
     /**
      * {@inheritdoc}
      */

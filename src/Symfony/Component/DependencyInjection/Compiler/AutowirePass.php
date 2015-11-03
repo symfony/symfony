@@ -138,13 +138,13 @@ class AutowirePass implements CompilerPassInterface
      */
     private function populateAvailableType($id, Definition $definition)
     {
-        if (!$definition->getClass()) {
-            return;
-        }
-
         foreach ($definition->getAutowiringTypes() as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
+        }
+
+        if (!$definition->getClass()) {
+            return;
         }
 
         if ($reflectionClass = $this->getReflectionClass($id, $definition)) {

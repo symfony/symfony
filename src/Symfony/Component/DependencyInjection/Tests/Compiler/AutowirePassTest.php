@@ -189,7 +189,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $definition->getArgument(2));
     }
 
-    public function testDontTriggeruAutowiring()
+    public function testDontTriggerAutowiring()
     {
         $container = new ContainerBuilder();
 

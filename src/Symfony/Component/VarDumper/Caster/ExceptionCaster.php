@@ -21,6 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ExceptionCaster
 {
+    public static $srcContext = 1;
     public static $traceArgs = true;
     public static $errorTypes = array(
         E_DEPRECATED => 'E_DEPRECATED',
@@ -71,7 +72,7 @@ class ExceptionCaster
                 'file' => $b[$prefix.'file'],
                 'line' => $b[$prefix.'line'],
             ));
-            $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], 1, false, 0, -1 - count($a[$xPrefix.'trace']->value));
+            $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 
         unset($a[$xPrefix.'previous'], $a[$prefix.'code'], $a[$prefix.'file'], $a[$prefix.'line']);
@@ -90,7 +91,7 @@ class ExceptionCaster
 
         $a = array();
         $j = count($frames);
-        if (0 > $i = $trace->offset) {
+        if (0 > $i = $trace->sliceOffset) {
             $i = max(0, $j + $i);
         }
         if (!isset($trace->value[$i])) {
@@ -98,7 +99,7 @@ class ExceptionCaster
         }
         $lastCall = isset($frames[$i]['function']) ? ' ==> '.(isset($frames[$i]['class']) ? $frames[0]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '';
 
-        for ($j -= $i++; isset($frames[$i]); ++$i, --$j) {
+        for ($j += $trace->numberingOffset - $i++; isset($frames[$i]); ++$i, --$j) {
             $call = isset($frames[$i]['function']) ? (isset($frames[$i]['class']) ? $frames[$i]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '???';
 
             $a[Caster::PREFIX_VIRTUAL.$j.'. '.$call.$lastCall] = new FrameStub(
@@ -108,7 +109,6 @@ class ExceptionCaster
                     'type' => isset($frames[$i]['type']) ? $frames[$i]['type'] : null,
                     'function' => isset($frames[$i]['function']) ? $frames[$i]['function'] : null,
                 ) + $frames[$i - 1],
-                $trace->srcContext,
                 $trace->keepArgs,
                 true
             );
@@ -122,12 +122,11 @@ class ExceptionCaster
                 'type' => null,
                 'function' => '{main}',
             ) + $frames[$i - 1],
-            $trace->srcContext,
             $trace->keepArgs,
             true
         );
-        if (null !== $trace->length) {
-            $a = array_slice($a, 0, $trace->length, true);
+        if (null !== $trace->sliceLength) {
+            $a = array_slice($a, 0, $trace->sliceLength, true);
         }
 
         return $a;
@@ -146,8 +145,8 @@ class ExceptionCaster
                 $f['file'] = substr($f['file'], 0, -strlen($match[0]));
                 $f['line'] = (int) $match[1];
             }
-            if (file_exists($f['file']) && 0 <= $frame->srcContext) {
-                $src[$f['file'].':'.$f['line']] = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], $frame->srcContext);
+            if (file_exists($f['file']) && 0 <= self::$srcContext) {
+                $src[$f['file'].':'.$f['line']] = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], self::$srcContext);
 
                 if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
                     $template = isset($f['object']) ? $f['object'] : new $f['class'](new \Twig_Environment(new \Twig_Loader_Filesystem()));
@@ -157,7 +156,7 @@ class ExceptionCaster
                         $templateSrc = explode("\n", method_exists($template, 'getSource') ? $template->getSource() : $template->getEnvironment()->getLoader()->getSource($templateName));
                         $templateInfo = $template->getDebugInfo();
                         if (isset($templateInfo[$f['line']])) {
-                            $src[$templateName.':'.$templateInfo[$f['line']]] = self::extractSource($templateSrc, $templateInfo[$f['line']], $frame->srcContext);
+                            $src[$templateName.':'.$templateInfo[$f['line']]] = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext);
                         }
                     } catch (\Twig_Error_Loader $e) {
                     }
@@ -211,15 +210,29 @@ class ExceptionCaster
 
     private static function extractSource(array $srcArray, $line, $srcContext)
     {
-        $src = '';
+        $src = array();
 
         for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
-            $src .= (isset($srcArray[$i]) ? $srcArray[$i] : '')."\n";
-        }
-        if (!$srcContext) {
-            $src = trim($src);
+            $src[] = (isset($srcArray[$i]) ? $srcArray[$i] : '')."\n";
         }
 
-        return $src;
+        $ltrim = 0;
+        while (' ' === $src[0][$ltrim] || "\t" === $src[0][$ltrim]) {
+            $i = $srcContext << 1;
+            while ($i > 0 && $src[0][$ltrim] === $src[$i][$ltrim]) {
+                --$i;
+            }
+            if ($i) {
+                break;
+            }
+            ++$ltrim;
+        }
+        if ($ltrim) {
+            foreach ($src as $i => $line) {
+                $src[$i] = substr($line, $ltrim);
+            }
+        }
+
+        return implode('', $src);
     }
 }

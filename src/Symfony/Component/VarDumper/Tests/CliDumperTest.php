@@ -225,45 +225,45 @@ stream resource {@{$ref}
       %d. __TwigTemplate_VarDumperFixture_u75a09->doDisplay() ==> new Exception(): {
         src: {
           %sTwig.php:19: """
-                    // line 2\\n
-                    throw new \Exception('Foobar');\\n
-                }\\n
+                // line 2\\n
+                throw new \Exception('Foobar');\\n
+            }\\n
             """
 {$twig}        }
       }
       %d. Twig_Template->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
         src: {
           %sTemplate.php:%d: """
-                    try {\\n
-                        \$this->doDisplay(\$context, \$blocks);\\n
-                    } catch (Twig_Error \$e) {\\n
+            try {\\n
+                \$this->doDisplay(\$context, \$blocks);\\n
+            } catch (Twig_Error \$e) {\\n
             """
         }
       }
       %d. Twig_Template->display() ==> Twig_Template->displayWithErrorHandling(): {
         src: {
           %sTemplate.php:%d: """
-                {\\n
-                    \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));\\n
-                }\\n
+            {\\n
+                \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));\\n
+            }\\n
             """
         }
       }
       %d. Twig_Template->render() ==> Twig_Template->display(): {
         src: {
           %sTemplate.php:%d: """
-                    try {\\n
-                        \$this->display(\$context);\\n
-                    } catch (Exception \$e) {\\n
+            try {\\n
+                \$this->display(\$context);\\n
+            } catch (Exception \$e) {\\n
             """
         }
       }
       %d. %slosure%s() ==> Twig_Template->render(): {
         src: {
           %sCliDumperTest.php:{$line}: """
-                            }\\n
-                        };'),\\n
-                    ));\\n
+                    }\\n
+                };'),\\n
+            ));\\n
             """
         }
       }

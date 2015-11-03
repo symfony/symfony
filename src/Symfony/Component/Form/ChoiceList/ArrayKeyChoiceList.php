@@ -160,21 +160,26 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      * @param array    $keysByValues    The original keys indexed by the
      *                                  corresponding values
      *
+     * @param $structuredValues
+     * @param $rawChoices
+     * @param $rawChoiceValues
+     * @param $rawKeys
      * @internal Must not be used by user-land code
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$rawChoices, &$keysByValues, &$rawKeys, &$rawLabels, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues, &$rawChoices, &$rawChoiceValues, &$rawKeys)
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();
             $keysByValues = array();
             $structuredValues = array();
             $rawChoices = array();
+            $rawChoiceValues = array();
             $rawKeys = array();
         }
 
         foreach ($choices as $choice => $key) {
             if (is_array($key)) {
-                $this->flatten($key, $value, $choicesByValues, $rawChoices[$choice], $keysByValues, $rawKeys[$choice], $rawLabels[$choice], $structuredValues[$choice]);
+                $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice], $rawChoices[$choice], $rawChoiceValues[$choice], $rawKeys[$choice]);
 
                 continue;
             }
@@ -182,10 +187,10 @@ class ArrayKeyChoiceList extends ArrayChoiceList
             $choiceValue = (string) call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
-            $rawChoices[$choice] = $choiceValue;
-            $rawKeys[$choice] = $choiceValue;
-            $rawLabels[$choice] = $key;
             $structuredValues[$key] = $choiceValue;
+            $rawChoices[$choice] = $choiceValue;
+            $rawChoiceValues[$choice] = $choiceValue;
+            $rawKeys[$choice] = $key;
         }
     }
 }

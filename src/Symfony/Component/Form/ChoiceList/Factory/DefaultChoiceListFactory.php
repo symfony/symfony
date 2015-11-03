@@ -118,12 +118,11 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             }
         } else {
             // Otherwise use the original structure of the choices
-            self::addStructuredChoiceViews(
+            self::addChoiceViews(
                 $list->getRawChoices(),
+                $list->getRawChoiceValues(),
                 $label,
-                $choices,
                 $list->getRawKeys(),
-                $list->getRawLabels(),
                 $index,
                 $attr,
                 $preferredChoices,
@@ -173,9 +172,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addStructuredChoiceViews($structuredValues, $labelCallback, $choices, $keys, $labels, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViews($dataValues, $values, $labelCallback, $labels, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        foreach ($structuredValues as $key => $data) {
+        foreach ($dataValues as $key => $data) {
             if (null === $data) {
                 continue;
             }
@@ -185,11 +184,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $preferredViewsForGroup = array();
                 $otherViewsForGroup = array();
 
-                self::addStructuredChoiceViews(
+                self::addChoiceViews(
                     $data,
+                    $values[$key],
                     $labelCallback,
-                    $choices,
-                    $keys[$key],
                     $labels[$key],
                     $index,
                     $attr,
@@ -212,7 +210,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             // Add ungrouped items directly
             self::addChoiceView(
                 $data,
-                $keys[$key],
+                $values[$key],
                 $labelCallback,
                 $labels[$key],
                 $index,
@@ -224,17 +222,17 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $key, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewGroupedBy($groupBy, $data, $value, $labelCallback, $label, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        $groupLabel = call_user_func($groupBy, $choice, $key, $value);
+        $groupLabel = call_user_func($groupBy, $data, $label, $value);
 
         if (null === $groupLabel) {
             // If the callable returns null, don't group the choice
             self::addChoiceView(
-                $choice,
+                $data,
                 $value,
+                $labelCallback,
                 $label,
-                $key,
                 $index,
                 $attr,
                 $isPreferred,
@@ -255,10 +253,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
 
         self::addChoiceView(
-            $choice,
+            $data,
             $value,
+            $labelCallback,
             $label,
-            $key,
             $index,
             $attr,
             $isPreferred,

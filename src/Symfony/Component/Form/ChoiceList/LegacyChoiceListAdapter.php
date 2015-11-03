@@ -104,6 +104,30 @@ class LegacyChoiceListAdapter implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
+    public function getRawChoices()
+    {
+        throw new \BadMethodCallException('Raw choices not support by LegacyChoiceList');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawChoiceValues()
+    {
+        throw new \BadMethodCallException('Raw choice values not support by LegacyChoiceList');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawKeys()
+    {
+        throw new \BadMethodCallException('Raw keys not support by LegacyChoiceList');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getChoicesForValues(array $values)
     {
         return $this->adaptedList->getChoicesForValues($values);

@@ -89,6 +89,21 @@ interface ChoiceListInterface
     public function getOriginalKeys();
 
     /**
+     * Returns the raw choices.
+     */
+    public function getRawChoices();
+
+    /**
+     * Returns the raw choice values.
+     */
+    public function getRawChoiceValues();
+
+    /**
+     * Returns the raw keys.
+     */
+    public function getRawKeys();
+
+    /**
      * Returns the choices corresponding to the given values.
      *
      * The choices are returned with the same keys and in the same order as the

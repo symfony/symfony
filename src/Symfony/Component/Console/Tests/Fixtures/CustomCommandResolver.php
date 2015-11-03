@@ -19,7 +19,7 @@ use Symfony\Component\Console\CommandsResolver\CommandResolverInterface;
  */
 class CustomCommandResolver implements CommandResolverInterface
 {
-    /**
+  /**
    * Cache commands.
    *
    * @var array

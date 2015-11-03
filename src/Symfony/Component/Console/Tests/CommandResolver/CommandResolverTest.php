@@ -16,8 +16,8 @@ use Symfony\Component\Console\Tests\Fixtures\CustomCommandResolver;
 use Symfony\Component\Console\Tests\Fixtures\LazyTestCommand;
 
 /**
-* @author Ivan Shcherbak <dev@funivan.com>
-*/
+ * @author Ivan Shcherbak <dev@funivan.com>
+ */
 class CommandResolverTest extends \PHPUnit_Framework_TestCase
 {
   public function testLazyCommandResolver()

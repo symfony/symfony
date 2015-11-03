@@ -18,7 +18,6 @@ use Symfony\Component\Console\Command\Command;
  */
 interface CommandResolverInterface
 {
-
   /**
    * @param Command $command
    *

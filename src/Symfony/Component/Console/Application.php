@@ -62,10 +62,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
-
-  /**
-   * @var CommandResolverInterface
-   */
+    /**
+     * @var CommandResolverInterface
+     */
     private $commands;
     private $wantHelps = false;
     private $runningCommand;

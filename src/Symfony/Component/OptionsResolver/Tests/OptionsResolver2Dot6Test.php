@@ -1557,4 +1557,41 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
         count($this->resolver);
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".
+     */
+    public function testFormatValueObject()
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', 'string');
+
+        $this->resolver->resolve(array('option' => $this->resolver));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "option" with value array is expected to be of type "string", but is of type "array".
+     */
+    public function testFormatValueArray()
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', 'string');
+
+        $this->resolver->resolve(array('option' => []));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "option" with value resource is expected to be of type "string", but is of type "resource".
+     */
+    public function testFormatValueResource()
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', 'string');
+        $handle = fopen(__FILE__, "r");
+
+        $this->resolver->resolve(array('option' => $handle));
+    }
 }

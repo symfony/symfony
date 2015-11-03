@@ -20,11 +20,6 @@ use Symfony\Component\OptionsResolver\Options;
 class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ReflectionMethod
-     */
-    private $reflectionMethod;
-
-    /**
      * @var OptionsResolver
      */
     private $resolver;
@@ -32,10 +27,6 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->resolver = new OptionsResolver();
-
-        $reflectionClass = new \ReflectionClass($this->resolver);
-        $this->reflectionMethod = $reflectionClass->getMethod('formatValue');
-        $this->reflectionMethod->setAccessible(true);
     }
 
     public function testResolve()
@@ -738,21 +729,5 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver->overload('foo', 'bar');
 
         $this->assertSame(array('foo' => 'bar'), $this->resolver->resolve());
-    }
-
-    public function testFormatValueObject()
-    {
-        $this->assertEquals("Symfony\Component\OptionsResolver\OptionsResolver", $this->reflectionMethod->invoke($this->resolver, $this->resolver));
-    }
-
-    public function testFormatValueArray()
-    {
-        $this->assertEquals("array", $this->reflectionMethod->invoke($this->resolver, []));
-    }
-
-    public function testFormatValueResource()
-    {
-        $handle = fopen(__FILE__, "r");
-        $this->assertEquals("resource", $this->reflectionMethod->invoke($this->resolver, $handle));
     }
 }

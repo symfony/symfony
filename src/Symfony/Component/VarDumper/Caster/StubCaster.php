@@ -54,6 +54,7 @@ class StubCaster
         if ($isNested) {
             $stub->class = '';
             $stub->handle = 0;
+            $stub->value = null;
 
             $a = array();
 

@@ -149,7 +149,7 @@ class VarCloner extends AbstractCloner
                             $stub->handle = $h;
                             $a = $this->castObject($stub, 0 < $i);
                             if ($v !== $stub->value) {
-                                if (Stub::TYPE_OBJECT !== $stub->type) {
+                                if (Stub::TYPE_OBJECT !== $stub->type || null === $stub->value) {
                                     break;
                                 }
                                 if ($useExt) {

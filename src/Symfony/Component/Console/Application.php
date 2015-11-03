@@ -65,7 +65,7 @@ class Application
     /**
      * @var CommandResolverInterface
      */
-    private $commands;
+    private $commandResolver;
     private $wantHelps = false;
     private $runningCommand;
     private $name;
@@ -93,7 +93,7 @@ class Application
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
-        $this->commands = !empty($commandResolver) ? $commandResolver : new CommandResolver();
+        $this->commandResolver = ($commandResolver !== null) ? $commandResolver : new CommandResolver();
 
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
@@ -374,7 +374,7 @@ class Application
             throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
-        $this->commands->add($command);
+        $this->commandResolver->add($command);
 
         return $command;
     }
@@ -390,9 +390,9 @@ class Application
      */
     public function get($name)
     {
-        $command = $this->commands->get($name);
+        $command = $this->commandResolver->get($name);
 
-        if (!isset($command)) {
+        if (!$command) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
 
@@ -417,7 +417,7 @@ class Application
      */
     public function has($name)
     {
-        return $this->commands->has($name);
+        return $this->commandResolver->has($name);
     }
 
     /**
@@ -430,7 +430,7 @@ class Application
     public function getNamespaces()
     {
         $namespaces = array();
-        foreach ($this->commands->getAllNames() as $command) {
+        foreach ($this->commandResolver->getAllNames() as $command) {
             $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command));
         }
 
@@ -490,7 +490,7 @@ class Application
      */
     public function find($name)
     {
-        $allCommands = $this->commands->getAllNames();
+        $allCommands = $this->commandResolver->getAllNames();
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 
@@ -516,7 +516,7 @@ class Application
 
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
-            $resolver = $this->commands; 
+            $resolver = $this->commandResolver; 
             $commands = array_filter($commands, function ($nameOrAlias) use ($resolver, $commands) {
                 $commandName = $resolver->get($nameOrAlias)->getName();
 
@@ -546,13 +546,13 @@ class Application
     public function all($namespace = null)
     {
         if (null === $namespace) {
-            return $this->commands->getAll();
+            return $this->commandResolver->getAll();
         }
 
         $commands = array();
-        foreach ($this->commands->getAllNames() as $name) {
+        foreach ($this->commandResolver->getAllNames() as $name) {
             if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
-                $commands[$name] = $this->commands->get($name);
+                $commands[$name] = $this->commandResolver->get($name);
             }
         }
 

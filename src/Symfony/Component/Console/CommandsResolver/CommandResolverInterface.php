@@ -18,42 +18,40 @@ use Symfony\Component\Console\Command\Command;
  */
 interface CommandResolverInterface
 {
-  /**
-   * @param Command $command
-   *
-   * @return $this
-   */
-  public function add(Command $command);
-
-  /**
-   * Check if command exist.
-   * 
-   * @param string $name
-   *
-   * @return bool
-   */
-  public function has($name);
-
-  /**
-   * Get command by name or alias.
-   * 
-   * @param string $name
-   *
-   * @return Command|null
-   */
-  public function get($name);
-
-  /**         
-   * Return all available commands related to this application.
-   * 
-   * @return Command[]
-   */
-  public function getAll();
-
-  /**
-   * Return all command names and aliases.
-   * 
-   * @return array
-   */
-  public function getAllNames();
+    /**
+     * @param Command $command
+     */
+    public function add(Command $command);
+  
+    /**
+     * Check if command exist.
+     * 
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has($name);
+  
+    /**
+     * Get command by name or alias.
+     * 
+     * @param string $name
+     *
+     * @return Command|null
+     */
+    public function get($name);
+  
+    /**         
+     * Return all available commands related to this application.
+     * 
+     * @return Command[]
+     */
+    public function getAll();
+  
+    /**
+     * Return all command names and aliases.
+     * 
+     * @return array
+     */
+    public function getAllNames();
 }

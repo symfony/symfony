@@ -20,49 +20,48 @@ class CommandResolver implements CommandResolverInterface
 {
     private $commands = array();
 
-  /**
-   * {@inheritdoc}
-   */
-  public function add(Command $command)
-  {
-      $this->commands[$command->getName()] = $command;
-
-      foreach ($command->getAliases() as $alias) {
-          $this->commands[$alias] = $command;
-      }
-
-      return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function has($name)
-  {
-      return !empty($this->commands[$name]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function get($name)
-  {
-      return !empty($this->commands[$name]) ? $this->commands[$name] : null;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAll()
-  {
-      return $this->commands;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAllNames()
-  {
-      return array_keys($this->commands);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function add(Command $command)
+    {
+        $this->commands[$command->getName()] = $command;
+  
+        foreach ($command->getAliases() as $alias) {
+            $this->commands[$alias] = $command;
+        }
+  
+    }
+  
+    /**
+     * {@inheritdoc}
+     */
+    public function has($name)
+    {
+        return !empty($this->commands[$name]);
+    }
+  
+    /**
+     * {@inheritdoc}
+     */
+    public function get($name)
+    {
+        return !empty($this->commands[$name]) ? $this->commands[$name] : null;
+    }
+  
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll()
+    {
+        return $this->commands;
+    }
+  
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllNames()
+    {
+        return array_keys($this->commands);
+    }
 }

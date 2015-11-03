@@ -204,6 +204,17 @@ class XmlDumper extends Dumper
             $service->appendChild($deprecated);
         }
 
+        if ($definition->isAutowired()) {
+            $service->setAttribute('autowire', 'true');
+        }
+
+        foreach ($definition->getAutowiringTypes() as $autowiringTypeValue) {
+            $autowiringType = $this->document->createElement('autowiring-type');
+            $autowiringType->appendChild($this->document->createTextNode($autowiringTypeValue));
+
+            $service->appendChild($autowiringType);
+        }
+
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
 

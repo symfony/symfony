@@ -119,10 +119,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         } else {
             // Otherwise use the original structure of the choices
             self::addStructuredChoiceViews(
-                $list->getStructuredValues(),
+                $list->getRawChoices(),
                 $label,
                 $choices,
-                $keys,
+                $list->getRawKeys(),
                 $index,
                 $attr,
                 $preferredChoices,
@@ -188,7 +188,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $value,
                     $label,
                     $choices,
-                    $keys,
+                    $keys[$key],
                     $index,
                     $attr,
                     $isPreferred,
@@ -209,10 +209,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add ungrouped items directly
             self::addChoiceView(
-                $choices[$value],
+                $choices[$structuredValues[$key]],
                 $value,
                 $label,
-                $keys[$value],
+                $key,
                 $index,
                 $attr,
                 $isPreferred,

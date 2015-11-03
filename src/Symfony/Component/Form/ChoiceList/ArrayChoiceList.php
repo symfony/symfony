@@ -53,6 +53,11 @@ class ArrayChoiceList implements ChoiceListInterface
      */
     protected $valueCallback;
 
+    protected $rawChoices;
+
+    protected $rawKeys;
+
+
     /**
      * Creates a list with the given choices and values.
      *
@@ -88,10 +93,12 @@ class ArrayChoiceList implements ChoiceListInterface
         // If the choices are given as recursive array (i.e. with explicit
         // choice groups), flatten the array. The grouping information is needed
         // in the view only.
-        $this->flatten($choices, $value, $choicesByValues, $keysByValues, $structuredValues);
+        $this->flatten($choices, $value, $choicesByValues, $rawChoices, $keysByValues, $rawKeys, $structuredValues);
 
         $this->choices = $choicesByValues;
+        $this->rawChoices = $rawChoices;
         $this->originalKeys = $keysByValues;
+        $this->rawKeys = $rawKeys;
         $this->structuredValues = $structuredValues;
     }
 
@@ -125,6 +132,16 @@ class ArrayChoiceList implements ChoiceListInterface
     public function getOriginalKeys()
     {
         return $this->originalKeys;
+    }
+
+    public function getRawChoices()
+    {
+        return $this->rawChoices;
+    }
+
+    public function getRawKeys()
+    {
+        return $this->rawKeys;
     }
 
     /**
@@ -186,7 +203,7 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * @internal Must not be used by user-land code
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$rawChoices, &$keysByValues, &$rawKeys, &$structuredValues)
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();
@@ -196,14 +213,16 @@ class ArrayChoiceList implements ChoiceListInterface
 
         foreach ($choices as $key => $choice) {
             if (is_array($choice)) {
-                $this->flatten($choice, $value, $choicesByValues, $keysByValues, $structuredValues[$key]);
+                $this->flatten($choice, $value, $choicesByValues, $rawChoices[$key], $keysByValues, $rawKeys[$key], $structuredValues[$key]);
 
                 continue;
             }
 
             $choiceValue = (string) call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
+            $rawChoices[$key] = $choiceValue;
             $keysByValues[$choiceValue] = $key;
+            $rawKeys[$key] = $key;
             $structuredValues[$key] = $choiceValue;
         }
     }

@@ -162,24 +162,28 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      *
      * @internal Must not be used by user-land code
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$rawChoices, &$keysByValues, &$rawKeys, &$structuredValues)
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();
             $keysByValues = array();
             $structuredValues = array();
+            $rawChoices = array();
+            $rawKeys = array();
         }
 
         foreach ($choices as $choice => $key) {
             if (is_array($key)) {
-                $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice]);
+                $this->flatten($key, $value, $choicesByValues, $rawChoices[$choice], $keysByValues, $rawKeys[$choice], $structuredValues[$choice]);
 
                 continue;
             }
 
             $choiceValue = (string) call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
+            $rawChoices[$choiceValue] = $key;
             $keysByValues[$choiceValue] = $key;
+            $rawKeys[$choiceValue] = $choiceValue;
             $structuredValues[$key] = $choiceValue;
         }
     }

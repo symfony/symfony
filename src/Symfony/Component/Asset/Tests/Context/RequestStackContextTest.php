@@ -15,15 +15,6 @@ use Symfony\Component\Asset\Context\RequestStackContext;
 
 class RequestStackContextTest extends \PHPUnit_Framework_TestCase
 {
-    public function testItIsAContext()
-    {
-        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')
-            ->getMock();
-        $requestStackContext = new RequestStackContext($requestStack);
-
-        $this->assertInstanceOf('Symfony\Component\Asset\Context\ContextInterface', $requestStackContext);
-    }
-
     public function testGetBasePathEmpty()
     {
         $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');

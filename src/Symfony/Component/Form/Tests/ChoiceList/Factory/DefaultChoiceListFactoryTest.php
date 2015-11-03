@@ -575,6 +575,58 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertGroupedView($view);
     }
 
+    public function testCreateViewDuplicateArrayChoiceListValues()
+    {
+        $list = new ArrayChoiceList(
+            array(
+                'A' => 'a',
+                'AA' => 'a',
+                'Group 1' => array(
+                    'E' => 'e',
+                    'EE' => 'e',
+                    'A' => 'abc'
+                ),
+                'Group 2' => array(
+                    'B' => 'b',
+                    'E' => 'e'
+                ),
+                'AAA' => 'a'
+            ),
+            function ($choice) {
+                return $choice;
+            }
+        );
+
+        $view = $this->factory->createView($list);
+
+        $this->assertEquals(
+            new ChoiceListView(
+                array(
+                    0 => new ChoiceView('a', 'a', 'A'),
+                    1 => new ChoiceView('a', 'a', 'AA'),
+                    'Group 1' => new ChoiceGroupView(
+                            'Group 1',
+                            array(
+                                2 => new ChoiceView('e', 'e', 'E'),
+                                3 => new ChoiceView('e', 'e', 'EE'),
+                                4 => new ChoiceView('abc', 'abc', 'A')
+                            )
+                        ),
+                    'Group 2' => new ChoiceGroupView(
+                            'Group 2',
+                            array(
+                                5 => new ChoiceView('b', 'b', 'B'),
+                                6 => new ChoiceView('e', 'e', 'E')
+                            )
+                        ),
+                    7 => new ChoiceView('a', 'a', 'AAA')
+                ),
+                array()
+            ),
+            $view
+        );
+    }
+
     public function testCreateViewDuplicateArrayKeyChoiceListValues()
     {
         $list = new ArrayKeyChoiceList(

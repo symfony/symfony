@@ -516,8 +516,9 @@ class Application
 
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
-            $commands = array_filter($commands, function ($nameOrAlias) use ($commands) {
-                $commandName = $this->commands->get($nameOrAlias)->getName();
+            $resolver = $this->commands; 
+            $commands = array_filter($commands, function ($nameOrAlias) use ($resolver, $commands) {
+                $commandName = $resolver->get($nameOrAlias)->getName();
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);
             });

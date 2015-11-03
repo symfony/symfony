@@ -149,45 +149,45 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($data, $value, $label, $key, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceView($data, $value, $labelCallback, $label, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
-        $nextIndex = is_int($index) ? $index++ : call_user_func($index, $data, $key, $value);
+        $nextIndex = is_int($index) ? $index++ : call_user_func($index, $data, $label, $value);
 
         $view = new ChoiceView(
             $data,
             $value,
             // If the labels are null, use the original choice key by default
-            null === $label ? (string) $key : (string) call_user_func($label, $data, $key, $value),
+            null === $labelCallback ? (string) $label : (string) call_user_func($labelCallback, $data, $label, $value),
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
-            is_callable($attr) ? call_user_func($attr, $data, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
+            is_callable($attr) ? call_user_func($attr, $data, $label, $value) : (isset($attr[$label]) ? $attr[$label] : array())
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && call_user_func($isPreferred, $data, $key, $value)) {
+        if ($isPreferred && call_user_func($isPreferred, $data, $label, $value)) {
             $preferredViews[$nextIndex] = $view;
         } else {
             $otherViews[$nextIndex] = $view;
         }
     }
 
-    private static function addStructuredChoiceViews($structuredValues, $label, $choices, $keys, $labels, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addStructuredChoiceViews($structuredValues, $labelCallback, $choices, $keys, $labels, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        foreach ($structuredValues as $key => $value) {
-            if (null === $value) {
+        foreach ($structuredValues as $key => $data) {
+            if (null === $data) {
                 continue;
             }
 
             // Add the contents of groups to new ChoiceGroupView instances
-            if (is_array($value)) {
+            if (is_array($data)) {
                 $preferredViewsForGroup = array();
                 $otherViewsForGroup = array();
 
                 self::addStructuredChoiceViews(
-                    $value,
-                    $label,
+                    $data,
+                    $labelCallback,
                     $choices,
                     $keys[$key],
                     $labels[$key],
@@ -211,9 +211,9 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add ungrouped items directly
             self::addChoiceView(
-                $value,
+                $data,
                 $keys[$key],
-                $label,
+                $labelCallback,
                 $labels[$key],
                 $index,
                 $attr,

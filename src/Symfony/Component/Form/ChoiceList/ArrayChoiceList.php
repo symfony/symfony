@@ -227,8 +227,8 @@ class ArrayChoiceList implements ChoiceListInterface
 
             $choiceValue = (string) call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
-            $rawChoices[$key] = $choice;
             $keysByValues[$choiceValue] = $key;
+            $rawChoices[$key] = $choice;
             $rawKeys[$key] = $choiceValue;
             $rawLabels[$key] = $key;
             $structuredValues[$key] = $choiceValue;

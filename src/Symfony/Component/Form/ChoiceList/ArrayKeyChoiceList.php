@@ -181,8 +181,8 @@ class ArrayKeyChoiceList extends ArrayChoiceList
 
             $choiceValue = (string) call_user_func($value, $choice);
             $choicesByValues[$choiceValue] = $choice;
-            $rawChoices[$choice] = $choiceValue;
             $keysByValues[$choiceValue] = $key;
+            $rawChoices[$choice] = $choiceValue;
             $rawKeys[$choice] = $choiceValue;
             $rawLabels[$choice] = $key;
             $structuredValues[$key] = $choiceValue;

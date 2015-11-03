@@ -73,7 +73,11 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
     public function getUser($credentials, UserProviderInterface $userProvider);
 
     /**
-     * Throw an AuthenticationException if the credentials are invalid.
+     * Returns true if the credentials are valid.
+     *
+     * If any value other than true is returned, authentication will
+     * fail. You may also throw an AuthenticationException if you wish
+     * to cause authentication to fail.
      *
      * The *credentials* are the return value from getCredentials()
      *

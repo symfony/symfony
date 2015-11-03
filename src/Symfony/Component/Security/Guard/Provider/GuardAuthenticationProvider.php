@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
@@ -122,7 +123,9 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         $this->userChecker->checkPreAuth($user);
-        $guardAuthenticator->checkCredentials($token->getCredentials(), $user);
+        if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
+            throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', get_class($guardAuthenticator)));
+        }
         $this->userChecker->checkPostAuth($user);
 
         // turn the UserInterface into a TokenInterface

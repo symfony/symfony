@@ -36,7 +36,10 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },
-        "classmap": [ "Resources/stubs" ]
+        "classmap": [ "Resources/stubs" ],
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

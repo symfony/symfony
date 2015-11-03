@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @covers \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator
  */
 class RuntimeInstantiatorTest extends \PHPUnit_Framework_TestCase
 {

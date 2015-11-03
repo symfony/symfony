@@ -15,17 +15,11 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::__construct
-     */
     public function testConstructor()
     {
         $this->testAll();
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::all
-     */
     public function testAll()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -54,9 +48,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $bag->all());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::replace
-     */
     public function testReplace()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -66,9 +57,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::get
-     */
     public function testGet()
     {
         $bag = new ParameterBag(array('foo' => 'bar', 'null' => null));
@@ -120,9 +108,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('default', $bag->get('bar[moo][foo]', 'default', true));
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::set
-     */
     public function testSet()
     {
         $bag = new ParameterBag(array());
@@ -134,9 +119,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::has
-     */
     public function testHas()
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
@@ -145,9 +127,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getAlpha
-     */
     public function testGetAlpha()
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
@@ -156,9 +135,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $bag->getAlpha('unknown'), '->getAlpha() returns empty string if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getAlnum
-     */
     public function testGetAlnum()
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
@@ -167,9 +143,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $bag->getAlnum('unknown'), '->getAlnum() returns empty string if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getDigits
-     */
     public function testGetDigits()
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
@@ -178,9 +151,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $bag->getDigits('unknown'), '->getDigits() returns empty string if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getInt
-     */
     public function testGetInt()
     {
         $bag = new ParameterBag(array('digits' => '0123'));
@@ -189,9 +159,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::filter
-     */
     public function testFilter()
     {
         $bag = new ParameterBag(array(
@@ -227,9 +194,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getIterator
-     */
     public function testGetIterator()
     {
         $parameters = array('foo' => 'bar', 'hello' => 'world');
@@ -244,9 +208,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($parameters), $i);
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::count
-     */
     public function testCount()
     {
         $parameters = array('foo' => 'bar', 'hello' => 'world');
@@ -255,9 +216,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($parameters), count($bag));
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\ParameterBag::getBoolean
-     */
     public function testGetBoolean()
     {
         $parameters = array('string_true' => 'true', 'string_false' => 'false');

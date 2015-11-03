@@ -27,7 +27,10 @@
         "symfony/process": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\BrowserKit\\": "" }
+        "psr-4": { "Symfony\\Component\\BrowserKit\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

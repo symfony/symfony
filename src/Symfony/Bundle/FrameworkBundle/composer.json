@@ -61,7 +61,10 @@
         "symfony/property-info": "For using the property_info_extractor service"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

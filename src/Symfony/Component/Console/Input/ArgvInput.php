@@ -326,12 +326,7 @@ class ArgvInput extends Input
                         return substr($token, $pos + 1);
                     }
 
-                    $next = array_shift($tokens);
-                    if (0 === strpos($next, '-')) {
-                        return true;
-                    }
-
-                    return $next === null ? true : $next;
+                    return array_shift($tokens);
                 }
             }
         }

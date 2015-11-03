@@ -101,7 +101,7 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
                 '->parse() parses short options',
             ),
             array(
-                array('--', '-f' => 'bar'),
+                array('--' => null, '-f' => 'bar'),
                 array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
                 array('foo' => 'default'),
                 '->parse() does not parse opts after an end of options signal',

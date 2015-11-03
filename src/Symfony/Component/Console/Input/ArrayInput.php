@@ -146,10 +146,6 @@ class ArrayInput extends Input
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
-            if (is_int($key)) {
-                $key = $value;
-                $value = null;
-            }
             if ($key === '--') {
                 return;
             }

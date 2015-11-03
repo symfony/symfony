@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-10-27T15:28:55Z
+
+`composer validate` is now used to display a detailed error message in case an invalid composer.json file is found. E.g.:
+```
+  "src/Symfony/Component/HttpKernel//composer.json" does not contain valid JSON
+  Parse error on line 37:
+  ...ating": "~2.2",    },    "suggest": {
+  ---------------------^
+  Expected: 'STRING' - It appears you have an extra trailing comma
+```
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2015-10-27T15:31:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-28T11:20:07Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-10-30T10:21:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-02T13:33:09Z
+
+:+1:

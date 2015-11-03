@@ -103,12 +103,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // choice is not added to any group
         if (is_callable($groupBy)) {
             foreach ($choices as $value => $choice) {
+                $stringValue = (string) $value;
+
                 self::addChoiceViewGroupedBy(
                     $groupBy,
                     $choice,
-                    (string) $value,
+                    $stringValue,
                     $label,
-                    $keys[(string) $value],
+                    $keys[$stringValue],
                     $index,
                     $attr,
                     $preferredChoices,

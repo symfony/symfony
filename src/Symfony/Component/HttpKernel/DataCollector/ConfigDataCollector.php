@@ -292,15 +292,13 @@ class ConfigDataCollector extends DataCollector
      *
      * @return array
      */
-    private function getBundleData()
+    public function getBundleData()
     {
         $bundles = array();
         $installedPackages = $this->getInstalledPackages();
+        $enabledBundles = $this->getEnabledBundles();
 
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $bundlePath = $bundle->getPath();
-            $bundleVersion = null;
-
+        foreach ($this->getEnabledBundles() as $bundleName => $bundlePath) {
             foreach ($installedPackages as $packageName => $packageVersion) {
                 if (strpos($bundlePath.'/', '/vendor/'.$packageName.'/')) {
                     $bundleVersion = $packageVersion;
@@ -312,9 +310,11 @@ class ConfigDataCollector extends DataCollector
 
                     break;
                 }
+
+                $bundleVersion = null;
             }
 
-            $bundles[$name] = array('name' => $name, 'path' => $bundlePath, 'version' => $bundleVersion);
+            $bundles[$bundleName] = array('name' => $bundleName, 'path' => $bundlePath, 'version' => $bundleVersion);
         }
 
         ksort($bundles);
@@ -388,5 +388,21 @@ class ConfigDataCollector extends DataCollector
         }
 
         return $installedPackages;
+    }
+
+    /**
+     * Returns the names and paths of the bundles enabled in the current kernel.
+     *
+     * @return array
+     */
+    private function getEnabledBundles()
+    {
+        $enabledBundles = array();
+
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            $enabledBundles[$name] = $bundle->getPath();
+        }
+
+        return $enabledBundles;
     }
 }

@@ -57,6 +57,86 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($c->hasAccelerator());
         }
     }
+
+    /**
+     * @dataProvider getBundleData()
+     */
+    public function testBundleData($installedPackages, $enabledBundles, $expectedResult)
+    {
+        $collector = $this->getMockBuilder('Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector')
+            ->setMethods(array('getInstalledPackages', 'getEnabledBundles'))
+            ->getMock()
+        ;
+
+        $collector
+            ->expects($this->once())
+            ->method('getInstalledPackages')
+            ->with($this->anything())
+            ->will($this->returnValue($installedPackages))
+        ;
+        $collector
+            ->expects($this->once())
+            ->method('getEnabledBundles')
+            ->with($this->anything())
+            ->will($this->returnValue($enabledBundles))
+        ;
+
+        $this->assertEquals($expectedResult, $collector->getBundleData());
+    }
+
+    public function getBundleData()
+    {
+        return array(
+            array(
+                array(
+                    "doctrine/doctrine-fixtures-bundle" => "v2.2.0",
+                    "sensio/framework-extra-bundle" => "v3.0.10",
+                    "symfony/monolog-bundle" => "v2.7.1",
+                    "sensio/generator-bundle" => "v2.5.3",
+                ),
+                array(
+                    "SecurityBundle" => "/Users/fabien/project/vendor/symfony/symfony/src/Symfony/Bundle/SecurityBundle",
+                    "MonologBundle" => "/Users/fabien/project/vendor/symfony/monolog-bundle",
+                    "SensioFrameworkExtraBundle" => "/Users/fabien/project/vendor/sensio/framework-extra-bundle",
+                    "DoctrineFixturesBundle" => "/Users/fabien/project/vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle",
+                    "AppBundle" => "/Users/fabien/project/src/AppBundle",
+                    "SensioGeneratorBundle" => "/Users/fabien/project/vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle",
+                ),
+                array(
+                    "AppBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/src/AppBundle",
+                        "version" => null,
+                    ),
+                    "DoctrineFixturesBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/vendor/doctrine/doctrine-fixtures-bundle/Doctrine/Bundle/FixturesBundle",
+                        "version" => "v2.2.0",
+                    ),
+                    "MonologBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/vendor/symfony/monolog-bundle",
+                        "version" => "v2.7.1",
+                    ),
+                    "SecurityBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/vendor/symfony/symfony/src/Symfony/Bundle/SecurityBundle",
+                        "version" => "2.8.0-DEV",
+                    ),
+                    "SensioFrameworkExtraBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/vendor/sensio/framework-extra-bundle",
+                        "version" => "v3.0.10",
+                    ),
+                    "SensioGeneratorBundle" => array(
+                        "name" => "AppBundle",
+                        "path" => "/Users/fabien/project/vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle",
+                        "version" => "v2.5.3",
+                    ),
+                )
+            )
+        );
+    }
 }
 
 class KernelForTest extends Kernel

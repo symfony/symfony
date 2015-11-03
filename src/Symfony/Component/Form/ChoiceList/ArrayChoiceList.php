@@ -233,11 +233,11 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                  corresponding values
      * @param array    $keysByValues    The original keys indexed by the
      *                                  corresponding values
-     *
      * @param $structuredValues
      * @param $rawChoices
      * @param $rawChoiceValues
      * @param $rawKeys
+     *
      * @internal Must not be used by user-land code
      */
     protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues, &$rawChoices, &$rawChoiceValues, &$rawKeys)

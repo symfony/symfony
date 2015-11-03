@@ -584,13 +584,13 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                 'Group 1' => array(
                     'E' => 'e',
                     'EE' => 'e',
-                    'A' => 'abc'
+                    'A' => 'abc',
                 ),
                 'Group 2' => array(
                     'B' => 'b',
-                    'E' => 'e'
+                    'E' => 'e',
                 ),
-                'AAA' => 'a'
+                'AAA' => 'a',
             ),
             function ($choice) {
                 return $choice;
@@ -609,17 +609,17 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                             array(
                                 2 => new ChoiceView('e', 'e', 'E'),
                                 3 => new ChoiceView('e', 'e', 'EE'),
-                                4 => new ChoiceView('abc', 'abc', 'A')
+                                4 => new ChoiceView('abc', 'abc', 'A'),
                             )
                         ),
                     'Group 2' => new ChoiceGroupView(
                             'Group 2',
                             array(
                                 5 => new ChoiceView('b', 'b', 'B'),
-                                6 => new ChoiceView('e', 'e', 'E')
+                                6 => new ChoiceView('e', 'e', 'E'),
                             )
                         ),
-                    7 => new ChoiceView('a', 'a', 'AAA')
+                    7 => new ChoiceView('a', 'a', 'AAA'),
                 ),
                 array()
             ),
@@ -636,13 +636,13 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                 'Group 1' => array(
                     'E' => 'e',
                     'EE' => 'e',
-                    'A' => 'abc'
+                    'A' => 'abc',
                 ),
                 'Group 2' => array(
                     'B' => 'b',
-                    'E' => 'e'
+                    'E' => 'e',
                 ),
-                'AAA' => 'a'
+                'AAA' => 'a',
             )
         );
 
@@ -658,17 +658,17 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                         array(
                             2 => new ChoiceView('E', 'E', 'e'),
                             3 => new ChoiceView('EE', 'EE', 'e'),
-                            4 => new ChoiceView('A', 'A', 'abc')
+                            4 => new ChoiceView('A', 'A', 'abc'),
                         )
                     ),
                     'Group 2' => new ChoiceGroupView(
                         'Group 2',
                         array(
                             5 => new ChoiceView('B', 'B', 'b'),
-                            6 => new ChoiceView('E', 'E', 'e')
+                            6 => new ChoiceView('E', 'E', 'e'),
                         )
                     ),
-                    7 => new ChoiceView('AAA', 'AAA', 'a')
+                    7 => new ChoiceView('AAA', 'AAA', 'a'),
                 ),
                 array()
             ),

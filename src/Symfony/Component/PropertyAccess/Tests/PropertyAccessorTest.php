@@ -375,4 +375,32 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foobar', $object->getProperty());
     }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testSetValue($objectOrArray, $path)
+    {
+        $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
+
+        $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    public function getValidPropertyPaths()
+    {
+        return array(
+            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
+            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
+            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
+            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
+            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
+            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
+            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
+            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+
+            // Missing indices
+            array(array('index' => array()), '[index][firstName]', null),
+            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
+        );
+    }
 }

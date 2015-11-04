@@ -13,13 +13,15 @@ namespace Symfony\Component\VarDumper\Tests;
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CliDumperTest extends VarDumperTestCase
+class CliDumperTest extends \PHPUnit_Framework_TestCase
 {
+    use VarDumperTestTrait;
+
     public function testGet()
     {
         require __DIR__.'/Fixtures/dumb-var.php';

@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ReflectionCasterTest extends VarDumperTestCase
+class ReflectionCasterTest extends \PHPUnit_Framework_TestCase
 {
+    use VarDumperTestTrait;
+
     public function testReflectionCaster()
     {
         $var = new \ReflectionClass('ReflectionClass');

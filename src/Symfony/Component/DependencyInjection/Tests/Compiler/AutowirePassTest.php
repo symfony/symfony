@@ -216,6 +216,21 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass = new AutowirePass();
         $pass->process($container);
     }
+
+    public function testDontUseAbstractServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('abstract_foo', __NAMESPACE__.'\Foo')->setAbstract(true);
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('bar', __NAMESPACE__.'\Bar')->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $arguments = $container->getDefinition('bar')->getArguments();
+        $this->assertSame('foo', (string) $arguments[0]);
+    }
 }
 
 class Foo

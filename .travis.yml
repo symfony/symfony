@@ -32,15 +32,17 @@ env:
 
 before_install:
     - if [[ "$deps" = "no" ]] && [[ "$TRAVIS_PHP_VERSION" =~ 5.[45] ]] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then export deps=skip; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi;
+    - echo "memory_limit = -1" >> $INI_FILE
+    - echo "session.gc_probability = 0" >> $INI_FILE
     - if [ "$deps" != "skip" ]; then composer self-update; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "memory_limit = -1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then phpenv config-rm xdebug.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.7 && echo "apc.enable_cli = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without apcu extension"; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = mongo.so" >> $INI_FILE; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = memcache.so" >> $INI_FILE; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.7 && echo "apc.enable_cli = 1" >> $INI_FILE) || echo "Let's continue without apcu extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then pecl install -f memcached-2.1.0 || echo "Let's continue without memcached extension"; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]] && [ "$deps" = "no" ]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini); fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]] && [ "$deps" = "no" ]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> $INI_FILE); fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi;
     - if [ "$deps" != "skip" ]; then ./phpunit install; fi;
     - export PHPUNIT="$(readlink -f ./phpunit)"
 

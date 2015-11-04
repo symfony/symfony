@@ -20,18 +20,18 @@ use Symfony\Component\Console\Tests\Fixtures\LazyTestCommand;
  */
 class CommandResolverTest extends \PHPUnit_Framework_TestCase
 {
-  public function testLazyCommandResolver()
-  {
-      $resolver = new CustomCommandResolver();
-      $names = $resolver->getAllNames();
-      $this->assertEquals(array('lazyTest'), $names);
-  }
+    public function testLazyCommandResolver()
+    {
+        $resolver = new CustomCommandResolver();
+        $names = $resolver->getAllNames();
+        $this->assertEquals(array('lazyTest'), $names);
+    }
 
-  public function testLazyLoadingCommands()
-  {
-      $application = new Application('foo', 'bar', new CustomCommandResolver());
-      $command = $application->get('lazyTest');
-      $this->assertNotEmpty($command);
-      $this->assertTrue($command instanceof LazyTestCommand);
-  }
+    public function testLazyLoadingCommands()
+    {
+        $application = new Application('foo', 'bar', new CustomCommandResolver());
+        $command = $application->get('lazyTest');
+        $this->assertNotEmpty($command);
+        $this->assertTrue($command instanceof LazyTestCommand);
+    }
 }

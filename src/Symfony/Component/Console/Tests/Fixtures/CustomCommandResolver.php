@@ -60,7 +60,7 @@ class CustomCommandResolver implements CommandResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function add(Command $command)
     {
@@ -68,7 +68,7 @@ class CustomCommandResolver implements CommandResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function has($name)
     {
@@ -80,7 +80,7 @@ class CustomCommandResolver implements CommandResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function get($name)
     {
@@ -97,7 +97,7 @@ class CustomCommandResolver implements CommandResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAll()
     {
@@ -110,7 +110,7 @@ class CustomCommandResolver implements CommandResolverInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAllNames()
     {

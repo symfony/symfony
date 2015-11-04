@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-03T17:50:58Z
+
+So saving and fetching session files works on HHVM, but GC doesn't? Or why does GC fail?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-03T17:54:17Z
+
+I really don't know... Yet, builds fail transiently with this error...
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-03T18:12:02Z
+
+Could be https://www.leaseweb.com/labs/2012/08/ps_files_cleanup_dir-permission-denied/ or https://github.com/facebook/hhvm/issues/6302
+
+Anyway, it doesn't hurt to set gc probability to 0 for tests. So :+1:

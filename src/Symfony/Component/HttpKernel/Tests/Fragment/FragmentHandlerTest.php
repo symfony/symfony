@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Fragment;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 /**
  * @group time-sensitive
@@ -24,6 +25,9 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (class_exists('Symfony\Bridge\PhpUnit\ClockMock')) {
+            ClockMock::register('Symfony\Component\HttpFoundation\Request');
+        }
         $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()
             ->getMock()

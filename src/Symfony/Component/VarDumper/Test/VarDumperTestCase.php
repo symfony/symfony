@@ -16,6 +16,8 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0. Use the VarDumperTestTrait instead.
  */
 abstract class VarDumperTestCase extends \PHPUnit_Framework_TestCase
 {

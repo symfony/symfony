@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  * Command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0. Use the ContainerAwareTrait instead.
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {

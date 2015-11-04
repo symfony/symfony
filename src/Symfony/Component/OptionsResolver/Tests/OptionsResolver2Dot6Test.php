@@ -1579,7 +1579,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefined('option');
         $this->resolver->setAllowedTypes('option', 'string');
 
-        $this->resolver->resolve(array('option' => []));
+        $this->resolver->resolve(array('option' => array()));
     }
 
     /**
@@ -1593,5 +1593,17 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $handle = fopen(__FILE__, "r");
 
         $this->resolver->resolve(array('option' => $handle));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "option" with value true is expected to be of type "string", but is of type "boolean".
+     */
+    public function testFormatValueTrue()
+    {
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', 'string');
+
+        $this->resolver->resolve(array('option' => true));
     }
 }

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-02T22:25:37Z
+
+Why is it a KernelEvent? It's not triggered from the Kernel.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-02T22:28:30Z
+
+Well, it is dispatched from the [`HttpKernel::terminate()` method](https://github.com/symfony/http-kernel/blob/8712724038f8e1c53da6f3a904d3511895232d5e/HttpKernel.php#L79).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-02T22:33:54Z
+
+True. But as discussed in #16342, the terminate event is always for master requests only. So exposing a `getRequestType` might just create more confusion. But for consistency I can see the value in this approach.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-03T07:57:01Z
+
+What do you think about overriding `getRequestType()` in `PostResponsEvent`, always return `HttpKernelInterface::MASTER_REQUEST` there and add a comment explaining the reasons? This way we will hopefully avoid confusion for people wondering why there is a `getRequestType()` method for this event.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-03T08:21:21Z
+
+@xabbuh the request type is set in the constructor. I don't think there's need to override `getRequestType()`.
+
+I don't see how this could be confusing really.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-03T10:22:28Z
+
+Î suggest to add a phpdoc at the class level explaining that it always returns MASTER_REQUEST
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-03T16:51:34Z
+
+@Tobion done
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-03T17:21:29Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-03T17:52:04Z
+
+:+1: (the comment in the class docblock really is enough)

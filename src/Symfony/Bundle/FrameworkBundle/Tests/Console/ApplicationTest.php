@@ -59,6 +59,19 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
+    public function testBundleImplementingBundleInterfaceAndRegisterCommandInterfaceShouldRegisterCommands()
+    {
+        $bundle = $this->getMock('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\CommandRegistryBundle');
+        $bundle
+            ->expects($this->once())
+            ->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+    }
+
     private function getKernel(array $bundles)
     {
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

@@ -173,7 +173,7 @@ class QuestionHelper extends Helper
             $message = $question->getPrompt();
         }
 
-        if ($this->inputStream == STDIN && function_exists('readline')) {
+        if ($this->inputStream === STDIN && function_exists('readline')) {
             $this->readlinePrompt = $message;
         } else {
             $output->write($message);

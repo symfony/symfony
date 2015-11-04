@@ -38,7 +38,7 @@ class CommandResolver implements CommandResolverInterface
      */
     public function has($name)
     {
-        return !empty($this->commands[$name]);
+        return isset($this->commands[$name]);
     }
 
     /**
@@ -46,7 +46,7 @@ class CommandResolver implements CommandResolverInterface
      */
     public function get($name)
     {
-        return !empty($this->commands[$name]) ? $this->commands[$name] : null;
+        return isset($this->commands[$name]) ? $this->commands[$name] : null;
     }
 
     /**

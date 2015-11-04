@@ -93,7 +93,7 @@ class Application
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
-        $this->commandResolver = ($commandResolver !== null) ? $commandResolver : new CommandResolver();
+        $this->commandResolver = $commandResolver !== null ? $commandResolver : new CommandResolver();
 
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);

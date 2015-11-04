@@ -100,7 +100,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             self::IS_REF => true,
             self::IS_REF_CHAINED => true,
         ));
-        
+
         $propertyMaxIndex = count($propertyValues) - 1;
 
         for ($i = $propertyMaxIndex; $i >= 0; --$i) {
@@ -570,9 +570,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Guesses how to write the property value.
      *
-     * @param string      $object
-     * @param string      $property
-     * @param mixed       $value
+     * @param string $object
+     * @param string $property
+     * @param mixed  $value
      *
      * @return array
      */

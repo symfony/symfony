@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-11-03T09:07:37Z
+
+We should also handle the case of unquoted values containing a ``:``, which are currently accepted in some cases by the Symfony parser (see https://github.com/FriendsOfPHP/security-advisories/pull/113)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-04T19:42:50Z
+
+I updated the handling of the `|` and `>` characters and now also trigger a deprecation when a colon (followed by a space) is used in a mapping value.

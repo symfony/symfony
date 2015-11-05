@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T21:44:58Z
+
+:+1:
+
+It's why it would be nice to optimize performance of PropertyAccess component: it will allow to deprecate all normalizers except `ObjectNormalizer` and ultimately ease maintenance.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2015-11-05T07:46:49Z
+
+@dunglas I'm not sure I agree with that since PropertyNormalizer and GetSetNormalizer are more limited in scope then ProperyAccess and sometimes that's exactly what I want :smile:
+It would be nice to have some sort of ReflectionCache that could be provided to a Normalizer to avoid recreating instances.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2015-11-05T07:47:56Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-05T11:00:06Z
+
+I've introduced this cache system in the PropertyAccess component. It's why having a single normalizer relying on this component can enhance global performance and ease the maintenance.

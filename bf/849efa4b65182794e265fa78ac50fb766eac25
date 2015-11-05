@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T18:19:20Z
+
+It may be possible by casting ReflectionParameter to string, isn't it?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-04T18:24:18Z
+
+It is possible, but it would take some work - the output looks like `Parameter #0 [ <required> Bar $bar ]`. Being able to capture the `Bar $bar` part would be cool to include, as it is what the the user actually sees in their code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T18:40:27Z
+
+or by catching the exception message, should be much easier:
+```
+php > $p = new ReflectionParameter(...);
+php > dump($p->getClass());
+PHP Warning:  Uncaught exception 'ReflectionException' with message 'Class foobar does not exist'
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T20:42:21Z
+
+I left 2 minor comments, otherwise :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-04T21:46:13Z
+
+I've done a simple version of what you suggested @nicolas-grekas - used the caught exception's message directly - here's what it looks like now: https://github.com/symfony/symfony/pull/16467/files#diff-d124c3d39cd5f7c732fb3d3be7a8cb42R207
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-05T10:02:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-05T11:04:03Z
+
+:+1:

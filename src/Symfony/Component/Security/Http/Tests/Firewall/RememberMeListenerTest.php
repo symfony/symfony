@@ -181,6 +181,60 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
+    public function testSessionStrategy()
+    {
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, true, true);
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null))
+        ;
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $service
+            ->expects($this->once())
+            ->method('autoLogin')
+            ->will($this->returnValue($token))
+        ;
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+        $manager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->will($this->returnValue($token))
+        ;
+        $session = $this->getMock('\Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session
+            ->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('migrate')
+        ;
+        $request = $this->getMock('\Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->any())
+            ->method('hasSession')
+            ->will($this->returnValue(true))
+        ;
+        $request
+            ->expects($this->any())
+            ->method('getSession')
+            ->will($this->returnValue($session))
+        ;
+        $event = $this->getGetResponseEvent();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue($request))
+        ;
+        $listener->handle($event);
+    }
+
     public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
     {
         list($listener, $context, $service, $manager, , $dispatcher) = $this->getListener(true);

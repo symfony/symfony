@@ -82,6 +82,23 @@ EOTXT
         );
     }
 
+    public function testReflectionParameter()
+    {
+        $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+ReflectionParameter {
+  +name: "arg1"
+  position: 0
+  typeHint: "Symfony\Component\VarDumper\Tests\Caster\NotExistingClass"
+  default: null
+}
+EOTXT
+            , $var
+        );
+    }
+
     /**
      * @requires PHP 7.0
      */
@@ -95,7 +112,7 @@ Closure {
   returnType: "int"
   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
   this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
-  file: "%sReflectionCasterTest.php(90) : eval()'d code"
+  file: "%sReflectionCasterTest.php(107) : eval()'d code"
   line: "1 to 1"
 }
 EOTXT
@@ -183,4 +200,8 @@ EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, array($r, $r->getExecutingGenerator()));
     }
+}
+
+function reflectionParameterFixture(NotExistingClass $arg1 = null, $arg2)
+{
 }

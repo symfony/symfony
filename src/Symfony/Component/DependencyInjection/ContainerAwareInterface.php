@@ -19,7 +19,7 @@ namespace Symfony\Component\DependencyInjection;
 interface ContainerAwareInterface
 {
     /**
-     * Sets the Container.
+     * Sets the container.
      *
      * @param ContainerInterface|null $container A ContainerInterface instance or null
      */

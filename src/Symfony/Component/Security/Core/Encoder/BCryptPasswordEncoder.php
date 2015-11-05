@@ -71,7 +71,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
         $options = array('cost' => $this->cost);
 
         if ($salt) {
-            $options['salt'] = $salt;
+            // Ignore $salt, the auto-generated one is always the best
         }
 
         return password_hash($raw, PASSWORD_BCRYPT, $options);

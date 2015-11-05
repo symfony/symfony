@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-11-04T15:26:40Z
+
+please add a test covering this
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T15:30:11Z
+
+@stof some tests exist in 2.7 (it's how I've found I've broke things). I'll backport them ASAP but I've opened this PR right now because 2.3 is currently buggy.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-04T15:35:30Z
+
+well, this PR is the one where backporting makes sense, as the backport is adding the test preventing this regression
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T19:03:00Z
+
+Test added
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T20:43:47Z
+
+AppVeyor failures look unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-05T10:04:34Z
+
+:+1:

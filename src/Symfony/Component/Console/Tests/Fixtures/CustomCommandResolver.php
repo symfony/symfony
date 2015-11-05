@@ -12,12 +12,12 @@
 namespace Symfony\Component\Console\Tests\Fixtures;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\CommandsResolver\CommandResolverInterface;
+use Symfony\Component\Console\CommandsResolver\CommandResolver;
 
 /**
  * @author Ivan Shcherbak <dev@funivan.com>
  */
-class CustomCommandResolver implements CommandResolverInterface
+class CustomCommandResolver extends CommandResolver
 {
     /**
      * Cache commands.
@@ -62,17 +62,9 @@ class CustomCommandResolver implements CommandResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function add(Command $command)
-    {
-        $this->commands[$command->getName()] = $command;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function has($name)
     {
-        if (isset($this->commands[$name])) {
+        if (parent::has($name)) {
             return true;
         }
 
@@ -84,8 +76,9 @@ class CustomCommandResolver implements CommandResolverInterface
      */
     public function get($name)
     {
-        if (isset($this->commands[$name])) {
-            return $this->commands[$name];
+        $command = parent::get($name);
+        if ($command) {
+            return $command;
         }
 
         $class = self::getClassFromName($name);
@@ -93,7 +86,12 @@ class CustomCommandResolver implements CommandResolverInterface
             return;
         }
 
-        return new $class();
+      /** @var Command $command */
+      $command = new $class();
+        # Do not create command on next request. Register it in current command resolver
+        $this->add($command);
+
+        return $command;
     }
 
     /**

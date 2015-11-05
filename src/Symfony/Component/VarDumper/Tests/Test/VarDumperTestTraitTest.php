@@ -10,7 +10,7 @@
  */
 
 // Skipping trait tests for PHP < 5.4
-if (version_compare(PHP_VERSION, '5.4.0-dev', '>=')) {
-    require 'VarDumpTestTraitRequire54.php';
+if (PHP_VERSION_ID >= 50400) {
+    require __DIR__.'/VarDumperTestTraitRequire54.php';
 }
 

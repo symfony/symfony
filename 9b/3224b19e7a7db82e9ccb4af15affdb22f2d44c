@@ -1,0 +1,382 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-09-29T13:30:54Z
+
+Obviously, there are a few minor todos as you mentioned, but this accomplishes all of the goals of my other PR's that you listed, but indeed, in a much simpler way (and a smaller code footprint). I'm very pleased by this version!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T18:16:45Z
+
+The updated routing method looks good to me. :+1: in general - except for the name of course :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T18:21:38Z
+
+@fabpot if we want some tests (there's not much to test, but there could be some) or other changes and I can help - let me know and I can steal this PR and make those changes (and take all the credit!)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T20:51:54Z
+
+Here is a small usage example:
+
+```php
+<?php
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Debug\Debug;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\MicroKernel;
+use Symfony\Component\Routing\RouteCollectionBuilder;
+
+class AppKernel extends MicroKernel
+{
+    public function home()
+    {
+        return new Response('Foo');
+    }
+
+    public function registerBundles()
+    {
+        return array(
+            new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+        );
+    }
+
+    protected function configureRoutes(RouteCollectionBuilder $routes)
+    {
+        $routes->add('/', 'kernel:home');
+    }
+
+    protected function configureServices(ContainerBuilder $c, LoaderInterface $loader)
+    {
+        $c->setParameter('kernel.secret', 'foo');
+    }
+}
+
+$kernel = new AppKernel('dev', true);
+$request = Request::createFromGlobals();
+$response = $kernel->handle($request);
+$response->send();
+$kernel->terminate($request, $response);
+```
+
+I'm not quite satisfied as we cannot use a closure for controllers (as Symfony dumps the routes as a PHP file).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T20:55:54Z
+
+Question: is it really something we want to package in Symfony itself. As you can see, the code is quite minimal, so isn't it something for a `small/micro` distribution? Or part of a tutorial in the docs? For me, that's more like a starting point rather than some kind of infrastructure that needs to be standardized.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-01T21:11:41Z
+
+If this is something that will be asked for frequently, I would say yes (personally I don't see any use cases for myself right now). The code that would reside inside the core looks good so far.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-01T21:17:41Z
+
+The fact that closures cannot be used defeats the initial purpose (at least for me). With closure support, that would make it something interesting for small websites, APIs, things that Silex is good at.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-01T21:25:16Z
+
+@fabpot I want the code *somewhere* where people can just use it, so people can get a minimal Symfony project up and running really quickly and with minimal setup. If we make the user do that boilerplate, it defeats the purpose.
+
+My vote is for core because I want say: "you can create a symfony app by requiring `symfony/symfony` and creating a single file that extends MicroKernel" (or whatever we call it).
+
+Also, I think the kernel should be used in the SE: I think loads things in a way that's more clear, but basically works the same (you could easily remove `routing_dev.yml` for example).
+
+And finally, yes, Silex is awesome. But it doesn't have bundle support, which means I forfeit a lot of solutions I might be accustomed to using. A Silex app also can't evolve into a full Symfony app very easily if it grows. The idea behind this was - as much as possible - to have my cake and eat it too: get full Symfony, but get it small.
+
+Anyways, I see your point - after all, this class is quite small - but that's my vote. We could move it into `FrameworkBundle` if we want to hide it a bit from the core components (especially since it requires `FrameworkBundle`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-02T02:11:03Z
+
+Also, I don't envision that you'll normally have *just* one file, though that ability is cool. More that it's easy to create a minimal application easily: a kernel, controller classes, services and some configuration files if you choose.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-10-02T09:41:15Z
+
+I don't like the idea of using this in the Standard Edition. The Standard Edition should be the base template for common Symfony applications, which tend to be quite advanced. This still is a nice feature, but for 20% or so of the Symfony developers.
+
+What about creating a new package, like `symfony/micro`, which requires `symfony/symfony` and this class. Then you can say *"Require the `symfony/micro` package, use the `MicroKernel` class and you're ready"*.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-02T11:39:58Z
+
+What about inside `FrameworkBundle`? Having a new package for this one class looks like overkill, and this is just one small class.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-10-02T12:09:55Z
+
+:+1: for `FrameworkBundle`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-05T09:31:50Z
+
+Is it too late to have this class considered to be merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-05T10:09:40Z
+
+Honestly, I'm not very sure we need to include this class in Symfony. As you can see, the amount of code is minimal and advocating several ways of doing the same thing is always bad. Also, I don't see much benefits in using this instead of what we already have.
+
+So, before merging this, I would want to understand the real use cases of this and why it's better than the current way. We can even decide to make it the preferred/only way at some point.
+
+To sum up, as the code is minimal and because we can easily write a cookbook, I don't want to merge it now for 2.8/3.0.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-10-05T14:43:09Z
+
+@fabpot Ok, let me state my case! :).
+
+Yes: there should only be one way to do things, and I've already removed a lot from the "micro kernel" idea for this. That's why I think this should be used in the SE.
+
+**1) Why would this be the preferred way?**
+
+Here's the diff to make this the kernel for the SE: https://gist.github.com/weaverryan/25351e929a5a0d04c1e6/revisions#diff-237b910f44f219a85dbcda0e21295717. (it could be even smaller - if I didn't remove `routing_dev.yml`)
+
+So why is this a better way?
+
+A) Container loading is the same as now + you have access to the ContainerBuilder.
+
+B) Route loading, same as now, but your code is in PHP, so you can use some logic, e.g. loading
+extra routes in dev/test environments, or building routes in PHP.
+
+This could be enough to accept this class into core.
+
+**2) Use-cases**
+
+>
+A) Creating a micro-service or a demo with minimal files
+
+In this kernel, the loading of container/routing resources is done very explicitly. So it would be very natural to start with the SE (or start from scratch) and create an app with less configuration files / directories. But, it would also still look *very* similar to a traditional SE project: everything runs through `configure***()` methods in both cases, which are explicit and clear in their purpose.
+
+The setup for the service route loader and closure container loader are boilerplate, and making the
+user go through this makes doing this less attractive, especially for beginners:, since the setup is quite advanced. But, if it's available as a core class, looking at the source code later could be used for teaching.
+
+>
+B) Clarity for learning.
+
+I first teach that Symfony is a routing/controller/response system. What simpler way than to show them the `configureRoutes()` method with a simple PHP route first that points to a controller? Then, we could naturally refactor to loading configuration files. The same goes for the container: I explain that we "teach" the container how to instantiate our services. Doing that in a method called `configureServices()` using native PHP at first would be very natural. Then we can load a YAML file (from that same method) as a different way of organization.
+
+Again, if you require the route/container loader setup, that'll be a problem. Even if I did this before the class for them, the code is still sitting there, exposing complexity I have to tell them to ignore. And, their project wouldn't look like the SE - eventually we'd have to refactor this back to the "normal" method.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-05T14:55:51Z
+
+Another use case: create a microkernel to use it in functional tests of Symfony bundles.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-15T09:04:18Z
+
+> What about inside FrameworkBundle? Having a new package for this one class looks like overkill, and this is just one small class.
+
+I wanted to write that this class could be used without the FrameworkBundle, but then I noticed it uses the framework extension. In which case the FrameworkBundle is probably the right place for it (unless we can make that extension is loaded optionally). Either way, I'd love to see this in core. I can see myself using it for simple projects, prototypes, workshop applications, or as Javier mentioned functional tests.
+
+How about symfony/micro-edition?
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-10-29T17:35:24Z
+
+I totally agree with @weaverryan , this code should be in the core. It'd be an awesome step for a "Symfony nude/empty/micro/small/light Edition" that would require only the FrameworkBundle and a single Controller class.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-10-29T17:39:31Z
+
+:+1: i like this idea as it does a lot of the stuff that i am trying to tie into Silex eg. the Routing.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-10-29T20:15:04Z
+
+I reviewed the code a bit, and actually, as this kernel is abstract, I think it could be good for the different `configure*` methods to be abstract too.
+There are three methods to be overriden, for routes, services and extensions.
+With the `registerBundles` function, it means that there will be at least 4 methods defined in application kernel. If this abstract kernel is used, I bet it will be unlikely that the 3 abstracted methods would be empty. And if they're empty, it's not a problem: there are many small apps where the `services.yml` file is empty, or `routing.yml` contains only the `AppBundle/Controller/` annotation loader for every controller.
+
+It'd allow a better start to understand how a kernel can be configured this way IMO.
+
+---------------------------------------------------------------------------
+
+by mfdj at 2015-10-29T21:20:14Z
+
+I like how flat this Kernel is (in the [PEP20](https://www.python.org/dev/peps/pep-0020/) sense)… `FlatKernel` is probably obtuse but it resonates with the design characteristic.
+
+A great reason to have this in the core is it enables demonstrating the framework to a non-Symfony (or even non-PHP) developer. An app powered by a single file  — with no disclaimers about non-standard approach! — very appealing to the uninitiated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-30T17:14:13Z
+
+I've just made some changes:
+
+ * moved the class to `FrameworkBundle`;
+ * merged the `configureServices()` and `configureExtensions()` into one new `configureContainer()` method;
+ * made the two `configure*()` method abstract.
+
+"We" want to merge that into 2.8, so ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-30T17:14:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-30T17:32:42Z
+
+And now with some tests \o/
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-30T18:07:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-10-30T20:23:23Z
+
+Yeah, trick or treat!
+
+Can't wait for this kernel to be alive in 2.8, it'd be a great move, and I bet there will be many "Symfony micro-apps" in the future :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-10-31T09:08:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T01:27:16Z
+
+Making this class compatible with PHP 5.3 is a PITA. What about making it require PHP 5.5?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-04T03:52:02Z
+
+@fabpot is there something beyond the ugly $that? I don't think requiring 5.5 will cause many practical issues, but the $that doesn't seem like a deal breaker (and we could change it in 3.0 immediately). But if there is some other issue, then 5.5 is ok - I just want it to be in :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T08:57:35Z
+
+`$that is not enough`, the method should also be changed to public instead of protected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T09:09:10Z
+
+I personally would be ok if we say that this new feature is 5.4+ only.
+What about replacing this abstract class by a trait + an interface btw?
+It would naturally enforce the 5.4+ requirement, and also provide a cleaner type-system.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-11-04T09:11:17Z
+
+We can solve it by adding another public method and mark it as internal
+```php
+/**
+ * This method is added because it's needs to be callable from a closure in PHP 5.3. It should be removed in 3.0.
+ * @internal
+ */
+public function configure(ContainerBuilder $c, LoaderInterface $loader)
+{
+    $this->configureContainer($c, $loader);
+}
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-11-04T09:27:47Z
+
+I agree with @nicolas-grekas on making a trait instead of a class for this feature. An interface is not necessary as traits can define abstract methods.
+
+```php
+class AppKernel extends Kernel
+{
+    use MicroKernelTrait;
+
+    protected function configureRoutes(RouteCollectionBuilder $routes) {}
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader) {}
+}
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-04T15:32:42Z
+
+The trait would be clean, but I don't think traits are always clear. In this case, I may still think I need to implement registerContainerConfiguration in AppKernel (and if you do that, you'll kill the functionality). But maybe no one else would think in this way.
+
+Since this is an "extra" feature that someone on 5.3 could just duplicate and reimplement anyways, I don't see an issue with not supporting 5.3... other than getting the tests to pass. Is it possible to skip a test for a Php version? Or are we making more trouble?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T15:38:22Z
+
+If copy/pasting is fine, then it means semantically you need a trait. Having an abstract class creates a new type that anyone could hint in some signature, which would be a mistake. That's what trait are for.
+
+> I may still think I need to implement registerContainerConfiguration in AppKernel
+
+then read the doc again about traits... (not you @weaverryan , but that hypothetical "I")
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-04T15:54:15Z
+
+A trait is really fine with me :)
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2015-11-04T16:02:21Z
+
+Actually, a trait sounds more like a "behavior" to me more than a proper application of a concept. An abstract class, instead, looks more than a working example of a class that only needs some configuration (= the abstract methods) to work properly when using it.
+
+Indeed, using a trait would force the PHP requirement to be 5.4+ but is this really needed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-05T11:13:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-05T13:08:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-05T13:11:23Z
+
+:+1: the trait looks good.

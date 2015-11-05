@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\VarDumper\Tests\Test;
 
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-class VarDumperTestTraitTest extends VarDumperTestCase
+class VarDumperTestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use VarDumperTestTrait;
 

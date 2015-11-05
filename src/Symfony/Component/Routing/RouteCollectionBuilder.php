@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * Helps add and import routes into a RouteCollection.
@@ -35,6 +36,7 @@ class RouteCollectionBuilder
     private $options = array();
     private $schemes;
     private $methods;
+    private $resources = array();
 
     /**
      * @param LoaderInterface $loader
@@ -238,6 +240,20 @@ class RouteCollectionBuilder
     }
 
     /**
+     * Adds a resource for this collection.
+     *
+     * @param ResourceInterface $resource
+     *
+     * @return $this
+     */
+    private function addResource(ResourceInterface $resource)
+    {
+        $this->resources[] = $resource;
+
+        return $this;
+    }
+
+    /**
      * Creates the final RouteCollection and returns it.
      *
      * @return RouteCollection
@@ -290,6 +306,10 @@ class RouteCollectionBuilder
                 $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);
+            }
+
+            foreach ($this->resources as $resource) {
+                $routeCollection->addResource($resource);
             }
         }
 

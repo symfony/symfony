@@ -49,16 +49,17 @@ class RouteCollectionBuilder
     /**
      * Import an external routing resource and returns the RouteCollectionBuilder.
      *
-     *  $routes->mount('/blog', $routes->import('blog.yml'));
+     *  $routes->import('blog.yml', '/blog');
      *
      * @param mixed  $resource
+     * @param string $prefix
      * @param string $type
      *
      * @return RouteCollectionBuilder
      *
      * @throws FileLoaderLoadException
      */
-    public function import($resource, $type = null)
+    public function import($resource, $prefix = '/', $type = null)
     {
         /** @var RouteCollection $collection */
         $collection = $this->load($resource, $type);
@@ -72,6 +73,9 @@ class RouteCollectionBuilder
         foreach ($collection->getResources() as $resource) {
             $builder->addResource($resource);
         }
+
+        // mount into this builder
+        $this->mount($prefix, $builder);
 
         return $builder;
     }

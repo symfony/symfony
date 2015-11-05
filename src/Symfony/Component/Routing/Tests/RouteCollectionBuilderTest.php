@@ -45,7 +45,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
         // import the file!
         $routes = new RouteCollectionBuilder($loader);
-        $importedRoutes = $routes->import('admin_routing.yml', 'yaml');
+        $importedRoutes = $routes->import('admin_routing.yml', '/', 'yaml');
 
         // we should get back a RouteCollectionBuilder
         $this->assertInstanceOf('Symfony\Component\Routing\RouteCollectionBuilder', $importedRoutes);
@@ -56,6 +56,9 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($originalRoute, $route);
         // should return file_resource.yml, which is in the original collection
         $this->assertCount(1, $addedCollection->getResources());
+
+        // make sure the routes were imported into the top-level builder
+        $this->assertCount(1, $routes->build());
     }
 
     /**
@@ -285,7 +288,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->will($this->returnValue($importedCollection));
         // import this from the /admin route builder
-        $adminRoutes->mount('/imported', $adminRoutes->import('admin.yml'));
+        $adminRoutes->import('admin.yml', '/imported');
 
         $collection = $routes->build();
         $this->assertEquals('/admin/dashboard', $collection->get('admin_dashboard')->getPath(), 'Routes before mounting have the prefix');

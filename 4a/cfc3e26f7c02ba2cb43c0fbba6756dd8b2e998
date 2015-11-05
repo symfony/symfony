@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-07-20T19:42:48Z
+
+Big :+1: for supporting `--`, however ...
+
+> To keep BC, I did this by adding a param to hasParameterOption/getParameterOption instead of doing it by default. This creates another BC issue though in that it changes the InputInterface. I don't think that's a major concern but it's worth mentioning.
+
+Following the [bc promise](http://symfony.com/bc), you are allowed to do this since the `InputInterface` isn't tagged as public API, but you have to follow: "Should be avoided. When done, this change must be documented in the UPGRADE file."
+
+However, it seems more like a bug that the `InputInterface` is not tagged as public API, since ,for instance, `OutputInterface` is. In case this is true (@fabpot?), you are no longer allowed to do this.
+
+> The other only minor BC change is if you do getParameterOption() of a flag option i.e. --foo without a value. Before it was returning null in ArgvInput and true in ArrayInput. I normalized this to true for both since I think that makes more sense, but strictly speaking while it improves interface interchangeability, it's a BC break.
+
+Since `ArgvInput` is part of the public API, you are not allowed to change the return type following the BC promise. Also, changing `null` to `true` means every statement using it will fail (since `null` is a falsey value and `true` is not).
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-07-20T20:06:17Z
+
+@WouterJ regarding the interface. If we can't change it, we can just skip those changes on the interface. Since the new param is optional implementors can add that to the interface AFAIK without breaking anything.
+
+As for ArgvInput.. I can make ArrayInput return null if that's preferable. I don't really mind either way, but anyway it's very unlikely anyone called getParameterOption on an option that doesn't take a value, that'd be kinda useless since hasParameterOption tells you if it's there or not already. Not sure how strictly we want to adhere to the book. By the book isn't my specialty so I'll defer to others :)
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-10-31T19:09:19Z
+
+What's the current state of this?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-10-31T22:58:35Z
+
+I am not sure. I think it was ready but sure should be reviewed. /cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-01T11:27:10Z
+
+I think this is a good idea and since we need to change the interface (there is no other way to solve this, is there?) it would be a good fit for 3.0.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-01T11:27:49Z
+
+@Seldaek Is it much work to rebase this on `master`? Would be interesting to if tests still pass.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-11-02T06:42:02Z
+
+Rebased.. It can apply on 2.8 or master.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-02T09:39:29Z
+
+Something seems to be broken (tests in the FrameworkBundle report not existing arguments).
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-11-03T20:45:57Z
+
+OK build is fixed, travis anyway, appveyor seems unrelated.

@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-01T16:45:13Z
+
+@symfony/deciders this is ready.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-11-01T17:02:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-01T17:04:28Z
+
+Shouldn't we deprecate in 2.8? IMHO yes, what do others think?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-01T17:10:58Z
+
+@nicolas-grekas please read the description.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-01T17:19:42Z
+
+I think we should deprecate in 2.8:
+
+ * Symfony 3 requires PHP 5.5
+ * Symfony promises a very smooth (no changes required) upgrade process from 2.8 to 3.0 when having no deprecation notices in 2.8
+ * This means applications have to run Symfony 2.8 on PHP 5.5 already
+ * Which means they can use the trait (as it's available from PHP 5.4)
+
+Actually, maybe we should even trigger a deprecation notice when PHP <5.5 in `Kernel#handle()` or the like in Symfony 2.8.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-01T18:06:16Z
+
+Of course there would be an upgrade path: first upgrade to php5.5, which is already required. I agree with @wouterj arguments (but for notices, they should not be triggered conditionally upon the php version)
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-11-01T20:31:41Z
+
+:+1: Awesome
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-02T00:47:12Z
+
+IMO developers should be able to upgrade their 2.x projects to 2.8 while avoiding any deprecation message. People stuck on PHP 5.3 would not be able to do so.
+Anyway, I'm ok with whatever approach we take. Time for @fabpot to decide :)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-03T18:27:54Z
+
+status: reviewed
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T00:13:03Z
+
+IIRC, we agreed to not have any deprecation notices in 3.0. So, it's either 2.8 or 3.1.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-04T00:32:29Z
+
+Lets just merge #16424, ill rebase this one then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T13:26:18Z
+
+While rebasing @Tobion you could also remove the uses of the VarDumperTestCase also (replaced by VarDumperTestTrait). Or I can do it, as you want.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T17:43:18Z
+
+Sibling PR on 2.8 to not break 3.0 compat (and make tests green for the deps=2.8 line): #16466
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-04T17:50:32Z
+
+Rebased and I found two more classes (commands in the TwigBundle) where we can use the ContainerAwareTrait. I made those commands final because they is not meant to be extended. By using the trait, which uses `protected` visibility for the container property, it would otherwise make the container property part of of BC promise.
+I also changed the VarDumper to use its trait.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T19:03:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T20:24:05Z
+
+Tests are broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-04T20:27:23Z
+
+The hard coded line info (63 to 63) needs to be updated (65 to 65)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-04T23:47:00Z
+
+Fixed tests

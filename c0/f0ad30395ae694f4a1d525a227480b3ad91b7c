@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-19T11:02:52Z
+
+It makes me crazy :)
+
+Ok, seems only one requires can be extracted to annotation
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-26T22:48:09Z
+
+I can confirm this fixes the tests run on an environment with no intl installed :+1:

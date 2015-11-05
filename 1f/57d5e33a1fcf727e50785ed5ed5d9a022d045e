@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-11-02T11:20:46Z
+
+This is not a feature, this is simply a better error message which imo falls under a bug-fix. This could in theory even be merged back into 2.3 and would also be valuable in 2.7.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-02T11:43:40Z
+
+:+1: a very nice error message improvement
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T00:39:28Z
+
+That's not just about a better error message but a change in behavior, so that's for 2.8.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T00:39:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-05T12:34:22Z
+
+:+1:

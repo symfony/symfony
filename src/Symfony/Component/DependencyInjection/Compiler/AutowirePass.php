@@ -104,7 +104,7 @@ class AutowirePass implements CompilerPassInterface
                 // Typehint against a non-existing class
 
                 if (!$parameter->isDefaultValueAvailable()) {
-                    continue;
+                    throw new RuntimeException(sprintf('Cannot autowire argument %s for %s because the type-hinted class does not exist (%s).', $index + 1, $definition->getClass(), $reflectionException->getMessage()), 0, $reflectionException);
                 }
 
                 $value = $parameter->getDefaultValue();

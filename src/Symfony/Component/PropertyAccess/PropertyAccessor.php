@@ -404,7 +404,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // returns true, consequently the following line will result in a
             // fatal error.
 
-            $object->{$access[self::ACCESS_NAME]} = $value;
+            $object->$property = $value;
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
         } else {

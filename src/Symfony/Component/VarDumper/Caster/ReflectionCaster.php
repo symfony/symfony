@@ -167,7 +167,11 @@ class ReflectionCaster
         ));
 
         try {
-            if ($c->isArray()) {
+            if (method_exists($c, 'hasType')) {
+                if ($c->hasType()) {
+                    $a[$prefix.'typeHint'] = $c->getType()->__toString();
+                }
+            } elseif ($c->isArray()) {
                 $a[$prefix.'typeHint'] = 'array';
             } elseif (method_exists($c, 'isCallable') && $c->isCallable()) {
                 $a[$prefix.'typeHint'] = 'callable';

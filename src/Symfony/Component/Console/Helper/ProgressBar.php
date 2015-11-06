@@ -408,8 +408,15 @@ class ProgressBar
         $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
             if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
                 $text = call_user_func($formatter, $this, $this->output);
+                if ($this->adjustBarWidthToWindowWidth($text)) {
+                    $text = call_user_func($formatter, $this, $this->output);
+                }
             } elseif (isset($this->messages[$matches[1]])) {
                 $text = $this->messages[$matches[1]];
+                if ($this->adjustBarWidthToWindowWidth($text)) {
+                    $text = $this->messages[$matches[1]];
+                }
+
             } else {
                 return $matches[0];
             }
@@ -599,5 +606,23 @@ class ProgressBar
             'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
             'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
+    }
+
+    /**
+     * @param string $line
+     * @return bool
+     */
+    private function adjustBarWidthToWindowWidth($line)
+    {
+        $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
+        $windowWidth = exec('tput cols');
+
+        if ($lineLength > $windowWidth) {
+            $barWidthDelta = $lineLength - $windowWidth;
+            $newBarWidth = $this->barWidth - $barWidthDelta - 20;
+            $this->setBarWidth($newBarWidth);
+            return true;
+        }
+        return false;
     }
 }

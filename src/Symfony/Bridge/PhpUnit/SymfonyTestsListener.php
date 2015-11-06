@@ -56,6 +56,11 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                     }
                 }
             }
+            foreach ($suite->tests() as $test) {
+                if ($test instanceof \PHPUnit_Framework_TestSuite && in_array('time-sensitive', \PHPUnit_Util_Test::getGroups($test->getName()), true)) {
+                    ClockMock::register($test->getName());
+                }
+            }
         } elseif (2 === $this->state) {
             $skipped = array();
             foreach ($suite->tests() as $test) {

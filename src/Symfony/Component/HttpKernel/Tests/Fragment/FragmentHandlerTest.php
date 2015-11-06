@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group time-sensitive
+ */
 class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $requestStack;

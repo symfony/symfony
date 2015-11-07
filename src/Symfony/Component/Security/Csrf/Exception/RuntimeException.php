@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Csrf\Exception;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * Base RuntimeException for the Security/Csrf component.
+ *
+ * @author Jáchym Toušek <enumag@gmail.com>
  */
-class TokenNotFoundException extends RuntimeException
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

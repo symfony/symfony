@@ -498,30 +498,6 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->resolve();
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string", but is of type "integer".
-     */
-    public function testResolveFailsIfInvalidType()
-    {
-        $this->resolver->setDefined('foo');
-        $this->resolver->setAllowedTypes('foo', 'string');
-
-        $this->resolver->resolve(array('foo' => 42));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value null is expected to be of type "string", but is of type "NULL".
-     */
-    public function testResolveFailsIfInvalidTypeIsNull()
-    {
-        $this->resolver->setDefault('foo', null);
-        $this->resolver->setAllowedTypes('foo', 'string');
-
-        $this->resolver->resolve();
-    }
-
     public function testResolveSucceedsIfValidType()
     {
         $this->resolver->setDefault('foo', 'bar');
@@ -548,17 +524,6 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setAllowedTypes('foo', array('string', 'bool'));
 
         $this->assertNotEmpty($this->resolver->resolve());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testResolveFailsIfNotInstanceOfClass()
-    {
-        $this->resolver->setDefault('foo', 'bar');
-        $this->resolver->setAllowedTypes('foo', '\stdClass');
-
-        $this->resolver->resolve();
     }
 
     public function testResolveSucceedsIfInstanceOfClass()
@@ -1559,51 +1524,55 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getFormatValueData
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".
      */
-    public function testFormatValueObject()
+    public function testFormatValue($actualType, $allowedType, $exceptionMessage)
     {
         $this->resolver->setDefined('option');
-        $this->resolver->setAllowedTypes('option', 'string');
+        $this->resolver->setAllowedTypes('option', $allowedType);
 
-        $this->resolver->resolve(array('option' => $this->resolver));
+        $this->resolver->resolve(array('option' => $actualType));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "option" with value array is expected to be of type "string", but is of type "array".
-     */
-    public function testFormatValueArray()
+    public function getFormatValueData()
     {
-        $this->resolver->setDefined('option');
-        $this->resolver->setAllowedTypes('option', 'string');
-
-        $this->resolver->resolve(array('option' => array()));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "option" with value resource is expected to be of type "string", but is of type "resource".
-     */
-    public function testFormatValueResource()
-    {
-        $this->resolver->setDefined('option');
-        $this->resolver->setAllowedTypes('option', 'string');
-        $handle = fopen(__FILE__, "r");
-
-        $this->resolver->resolve(array('option' => $handle));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "option" with value true is expected to be of type "string", but is of type "boolean".
-     */
-    public function testFormatValueTrue()
-    {
-        $this->resolver->setDefined('option');
-        $this->resolver->setAllowedTypes('option', 'string');
-
-        $this->resolver->resolve(array('option' => true));
+        return array(
+            array(
+                'actualType' => true,
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value true is expected to be of type "string", but is of type "boolean".'
+            ),
+            array(
+                'actualType' => fopen(__FILE__, "r"),
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value resource is expected to be of type "string", but is of type "resource".'
+            ),
+            array(
+                'actualType' => array(),
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value array is expected to be of type "string", but is of type "array".'
+            ),
+            array(
+                'actualType' => $this->resolver,
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".'
+            ),
+            array(
+                'actualType' => 42,
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value 42 is expected to be of type "string", but is of type "integer".'
+            ),
+            array(
+                'actualType' => null,
+                'allowedType' => 'string',
+                'exceptionMessage' => 'The option "option" with value null is expected to be of type "string", but is of type "NULL".'
+            ),
+            array(
+                'actualType' => 'bar',
+                'allowedType' => '\stdClass',
+                'exceptionMessage' => ''
+            ),
+        );
     }
 }

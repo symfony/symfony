@@ -49,7 +49,7 @@
 
         <firewall name="secure" stateless="true">
             <http-basic />
-            <http-digest key="TheKey" />
+            <http-digest secret="TheSecret" />
             <form-login />
             <anonymous />
             <switch-user />

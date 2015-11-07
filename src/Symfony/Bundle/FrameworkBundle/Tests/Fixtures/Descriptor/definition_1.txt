@@ -1,15 +1,17 @@
----------------- ----------------------------- 
-  [32mOption[39m           [32mValue[39m                        
- ---------------- ----------------------------- 
-  Service ID       -                            
-  Class            Full\Qualified\Class1        
-  Tags             -                            
-  Scope            container                    
-  Public           yes                          
-  Synthetic        no                           
-  Lazy             yes                          
-  Synchronized     no                           
-  Abstract         yes                          
-  Factory Class    Full\Qualified\FactoryClass  
-  Factory Method   get                          
- ---------------- -----------------------------
+------------------ ----------------------------- 
+  [32mOption[39m             [32mValue[39m                        
+ ------------------ ----------------------------- 
+  Service ID         -                            
+  Class              Full\Qualified\Class1        
+  Tags               -                            
+  Scope              container                    
+  Public             yes                          
+  Synthetic          no                           
+  Lazy               yes                          
+  Synchronized       no                           
+  Abstract           yes                          
+  Autowired          no                           
+  Autowiring Types   -                            
+  Factory Class      Full\Qualified\FactoryClass  
+  Factory Method     get                          
+ ------------------ -----------------------------

@@ -15,6 +15,7 @@ definition_1
 - Shared: yes
 - Synchronized: no
 - Abstract: yes
+- Autowired: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 

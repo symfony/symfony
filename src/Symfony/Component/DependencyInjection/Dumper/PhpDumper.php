@@ -616,6 +616,15 @@ EOF;
 EOF;
         }
 
+        if ($definition->isAutowired()) {
+            $doc = <<<EOF
+
+     *
+     * This service is autowired.
+EOF;
+
+        }
+
         if ($definition->isLazy()) {
             $lazyInitialization = '$lazyLoad = true';
             $lazyInitializationDoc = "\n     * @param bool    \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";

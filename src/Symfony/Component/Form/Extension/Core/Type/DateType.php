@@ -175,15 +175,17 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholder = $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
-        };
-
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
+                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+
+                $placeholder = $options['empty_value'];
+            }
+
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -213,7 +215,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
+            'empty_value' => new \Exception(), // deprecated
             'placeholder' => $placeholder,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -228,7 +230,6 @@ class DateType extends AbstractType
             'compound' => $compound,
         ));
 
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
 
         $resolver->setAllowedValues('input', array(

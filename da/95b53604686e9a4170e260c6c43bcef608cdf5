@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T15:40:02Z
+
+Other implementations of renamed options default the original option to `null` and use the old option if not null or use the default of the new option instead. Is there any reason to implement this in another way?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T15:44:02Z
+
+@WouterJ Do you have an example?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T16:18:39Z
+
+@xabbuh for instance the `virtual -> inherit_data` rename: https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Form/Extension/Core/Type/FormType.php#L155
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-09-27T16:25:11Z
+
+@WouterJ The thing is that the default value of the `empty_value` option depends on the value of the `required` option. I am not sure if the code were really readable when we made a similar change here.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T16:26:06Z
+
+The virtual example is non-optimal as well. Best appraoch is (which I used for the options i deprecated).
+- old option defaults to null
+- new option has new default
+- new option has normalizer that triggers error if old option != null and uses that value instead
+
+Otherwise deprecations would not be triggered if the new option is overwritten but the old option is still used (which would then break in 3.0 as the option doesn't exist anymore).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-09-27T16:57:39Z
+
+Hmm, the actual problem here is that `null` is completely valid as a value for `placeholder`/`empty_value`. So someone explicitely configuring `'empty_value' => null` should be catched as a deprecated usage (and if the default is `''` but `null` was configured explicitely, it should be `null` and not `''`).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T18:42:40Z
+
+Just use a different value as default then that doesn't have a real meaning,e .g. `true`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-27T18:56:00Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-04T20:58:54Z
+
+I updated here.
+
+Status: Needs Review

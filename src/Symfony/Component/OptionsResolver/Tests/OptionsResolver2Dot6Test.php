@@ -1554,7 +1554,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
                 'exceptionMessage' => 'The option "option" with value array is expected to be of type "string", but is of type "array".'
             ),
             array(
-                'actualType' => $this->resolver,
+                'actualType' => new OptionsResolver(),
                 'allowedType' => 'string',
                 'exceptionMessage' => 'The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".'
             ),

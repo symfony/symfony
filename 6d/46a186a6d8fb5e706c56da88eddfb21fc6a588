@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-19T22:15:35Z
+
+I'm not sure is IOException in this case broke BC.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-20T00:23:16Z
+
+The same problem is in line 145: https://github.com/ewgRa/symfony/blob/issue-16258-race-condition/src/Symfony/Component/HttpKernel/Profiler/FileProfilerStorage.php#L145
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-20T00:23:28Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-20T07:52:56Z
+
+@Tobion Thanks for review
+
+> The HttpKernel should not need to know the Filesystem Component exceptions
+
+Where I can read more? It is quite strange, HttpKernel work with disk, but throw RuntimeException instead of IOException. And what If I want to find all code that work with IO? With IOException it is more obvious.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2015-10-20T07:56:48Z
+
+@ewgRa The HttpKernel doesn't have any dependency on the filesystem component, using an exception would require to add it.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-20T08:01:40Z
+
+@jvasseur Thanks! Check composer at components and understand now that they can be used separately. Good to know.
+
+---------------------------------------------------------------------------
+
+by epilgrim at 2015-10-20T08:02:20Z
+
+I've seen this also happening at https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/HttpKernel/HttpCache/Store.php#L40
+
+Edit: Should that be fixed also?
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-20T08:20:07Z
+
+@epilgrim I think you are right. Checks added in HttpCache in three places where mkdir called.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-10-20T09:08:11Z
+
+Done. Previous build seems have random hhvm test fail.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2015-10-31T13:03:18Z
+
+(for ref.: https://github.com/symfony/symfony/pull/14728 (please ignore))
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T00:42:50Z
+
+:+1: should be merged in 2.3 as this is a bug fix.

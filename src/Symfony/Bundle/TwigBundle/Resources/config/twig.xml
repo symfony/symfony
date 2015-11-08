@@ -12,7 +12,14 @@
                 <argument>app</argument>
                 <argument type="service" id="twig.app_variable" />
             </call>
+            <call method="registerRuntimeLoader">
+                <argument type="service" id="twig.extension_runtime_loader" />
+            </call>
             <configurator service="twig.configurator.environment" method="configure" />
+        </service>
+
+        <service id="twig.extension_runtime_loader" class="Symfony\Bridge\Twig\Extension\ContainerAwareRuntimeLoader" public="false">
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="twig.app_variable" class="Symfony\Bridge\Twig\AppVariable" public="false">
@@ -116,6 +123,8 @@
         </service>
 
         <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
+
+        <service id="twig.extension.runtime.form" class="Symfony\Bridge\Twig\Extension\FormExtensionRuntime">
             <argument type="service" id="twig.form.renderer" />
         </service>
 

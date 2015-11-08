@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Extension\FormExtensionRuntime;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
@@ -23,10 +24,11 @@ use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
-    /**
-     * @var FormExtension
-     */
-    protected $extension;
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
+    private $environment;
 
     protected function setUp()
     {
@@ -37,30 +39,26 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addGlobal('global', '');
+        $this->environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $this->environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $this->environment->addGlobal('global', '');
         // the value can be any template that exists
-        $environment->addGlobal('dynamic_template_name', 'child_label');
+        $this->environment->addGlobal('dynamic_template_name', 'child_label');
+        $this->environment->addExtension(new FormExtension($renderer));
 
         $rendererEngine = new TwigRendererEngine(array(
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ), $this->environment);
         $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
 
-        $this->extension = new FormExtension($renderer);
+        $loader = $this->getMock('Twig_RuntimeLoaderInterface');
+        $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
+            array('form', new FormExtensionRuntime($renderer)),
+            array('translator', null),
+        )));
 
-        $environment->addExtension($this->extension);
-
-        $this->extension->initRuntime($environment);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->extension = null;
+        $this->environment->registerRuntimeLoader($loader);
     }
 
     public function testThemeBlockInheritanceUsingUse()
@@ -100,7 +98,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $renderer = $this->extension->renderer;
+        $renderer = $this->environment->getRuntime('form')->renderer;
         $renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
         $renderer->searchAndRenderBlock($view, 'row');
     }
@@ -128,7 +126,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
 
-        $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
+        $this->assertSame($expected, $this->environment->getRuntime('form')->isSelectedChoice($choice, $value));
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
@@ -157,7 +155,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderForm(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -166,42 +164,42 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             $vars += array('label' => $label);
         }
 
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_start', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
+        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->renderer->setTheme($view, $themes);
+        $this->environment->getRuntime('form')->renderer->setTheme($view, $themes);
     }
 
     public static function themeBlockInheritanceProvider()

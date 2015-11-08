@@ -498,6 +498,32 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->resolve();
     }
 
+    /**
+     * @dataProvider provideInvalidTypes
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfInvalidType($actualType, $allowedType, $exceptionMessage)
+    {
+        $this->setExpectedException('InvalidArgumentException', $exceptionMessage);
+        $this->resolver->setDefined('option');
+        $this->resolver->setAllowedTypes('option', $allowedType);
+
+        $this->resolver->resolve(array('option' => $actualType));
+    }
+
+    public function provideInvalidTypes()
+    {
+        return array(
+            array(true, 'string', 'The option "option" with value true is expected to be of type "string", but is of type "boolean".'),
+            array(fopen(__FILE__, "r"), 'string', 'The option "option" with value resource is expected to be of type "string", but is of type "resource".'),
+            array(array(), 'string', 'The option "option" with value array is expected to be of type "string", but is of type "array".'),
+            array(new OptionsResolver(), 'string', 'The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".'),
+            array(42, 'string', 'The option "option" with value 42 is expected to be of type "string", but is of type "integer".'),
+            array(null, 'string', 'The option "option" with value null is expected to be of type "string", but is of type "NULL".'),
+            array('bar', '\stdClass', 'The option "option" with value "bar" is expected to be of type "\stdClass", but is of type "string".'),
+        );
+    }
+
     public function testResolveSucceedsIfValidType()
     {
         $this->resolver->setDefault('foo', 'bar');
@@ -1521,58 +1547,5 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('lazy1', function () {});
 
         count($this->resolver);
-    }
-
-    /**
-     * @dataProvider getFormatValueData
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testFormatValue($actualType, $allowedType, $exceptionMessage)
-    {
-        $this->resolver->setDefined('option');
-        $this->resolver->setAllowedTypes('option', $allowedType);
-
-        $this->resolver->resolve(array('option' => $actualType));
-    }
-
-    public function getFormatValueData()
-    {
-        return array(
-            array(
-                'actualType' => true,
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value true is expected to be of type "string", but is of type "boolean".'
-            ),
-            array(
-                'actualType' => fopen(__FILE__, "r"),
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value resource is expected to be of type "string", but is of type "resource".'
-            ),
-            array(
-                'actualType' => array(),
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value array is expected to be of type "string", but is of type "array".'
-            ),
-            array(
-                'actualType' => new OptionsResolver(),
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".'
-            ),
-            array(
-                'actualType' => 42,
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value 42 is expected to be of type "string", but is of type "integer".'
-            ),
-            array(
-                'actualType' => null,
-                'allowedType' => 'string',
-                'exceptionMessage' => 'The option "option" with value null is expected to be of type "string", but is of type "NULL".'
-            ),
-            array(
-                'actualType' => 'bar',
-                'allowedType' => '\stdClass',
-                'exceptionMessage' => ''
-            ),
-        );
     }
 }

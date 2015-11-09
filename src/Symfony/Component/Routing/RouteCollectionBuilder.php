@@ -51,9 +51,9 @@ class RouteCollectionBuilder
      *
      *  $routes->import('blog.yml', '/blog');
      *
-     * @param mixed  $resource
-     * @param string $prefix
-     * @param string $type
+     * @param mixed       $resource
+     * @param string|null $prefix
+     * @param string      $type
      *
      * @return RouteCollectionBuilder
      *

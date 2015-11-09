@@ -100,6 +100,18 @@ class YamlDumper extends Dumper
             $code .= sprintf("        deprecated: %s\n", $definition->getDeprecationMessage('%service_id%'));
         }
 
+        if ($definition->isAutowired()) {
+            $code .= "        autowire: true\n";
+        }
+
+        $autowiringTypesCode = '';
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $autowiringTypesCode .= sprintf("            - %s\n", $this->dumper->dump($autowiringType));
+        }
+        if ($autowiringTypesCode) {
+            $code .= sprintf("        autowiring_types:\n%s", $autowiringTypesCode);
+        }
+
         if ($definition->isLazy()) {
             $code .= sprintf("        lazy: true\n");
         }

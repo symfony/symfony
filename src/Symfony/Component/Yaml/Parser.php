@@ -112,7 +112,7 @@ class Parser
 
                         $data[] = $parser->parse($block, $exceptionOnInvalidType, $objectSupport, $objectForMap);
                     } else {
-                        $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                        $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap, $context);
                     }
                 }
                 if ($isRef) {
@@ -228,7 +228,7 @@ class Parser
                         }
                     }
                 } else {
-                    $value = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                    $value = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap, $context);
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
@@ -443,12 +443,13 @@ class Parser
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
      * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param string $context                The parser context (either sequence or mapping)
      *
      * @return mixed A PHP value
      *
      * @throws ParseException When reference does not exist
      */
-    private function parseValue($value, $exceptionOnInvalidType, $objectSupport, $objectForMap)
+    private function parseValue($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $context)
     {
         if (0 === strpos($value, '*')) {
             if (false !== $pos = strpos($value, '#')) {
@@ -468,6 +469,13 @@ class Parser
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
             return $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+        }
+
+        if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($value, ': ')) {
+            @trigger_error(sprintf('Using a colon in an unquoted mapping value in line %d is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+
+            // to be thrown in 3.0
+            // throw new ParseException('A colon cannot be used in an unquoted mapping value.');
         }
 
         try {

@@ -353,6 +353,11 @@ class XmlDescriptor extends Descriptor
             $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
         }
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
+
+        if (method_exists($definition, 'isAutowired')) {
+            $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
+        }
+
         $serviceXML->setAttribute('file', $definition->getFile());
 
         if (!$omitTags) {

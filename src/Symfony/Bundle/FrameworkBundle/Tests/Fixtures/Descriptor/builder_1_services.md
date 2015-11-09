@@ -13,6 +13,7 @@ definition_1
 - Lazy: yes
 - Shared: yes
 - Abstract: yes
+- Autowired: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 
@@ -25,6 +26,7 @@ definition_2
 - Lazy: no
 - Shared: yes
 - Abstract: no
+- Autowired: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

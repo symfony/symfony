@@ -20,10 +20,25 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
  */
 class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 {
+    private static $globallyEnabled = false;
     private $state = -1;
     private $skippedFile = false;
     private $wasSkipped = array();
     private $isSkipped = array();
+
+    public function __construct(array $extraClockMockedNamespaces = array())
+    {
+        if ($extraClockMockedNamespaces) {
+            foreach ($extraClockMockedNamespaces as $ns) {
+                ClockMock::register($ns.'\DummyClass');
+            }
+        }
+        if (self::$globallyEnabled) {
+            $this->state = -2;
+        } else {
+            self::$globallyEnabled = true;
+        }
+    }
 
     public function __destruct()
     {
@@ -56,9 +71,16 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                     }
                 }
             }
-            foreach ($suite->tests() as $test) {
-                if ($test instanceof \PHPUnit_Framework_TestSuite && in_array('time-sensitive', \PHPUnit_Util_Test::getGroups($test->getName()), true)) {
-                    ClockMock::register($test->getName());
+            $testSuites = array($suite);
+            for ($i = 0; isset($testSuites[$i]); ++$i) {
+                foreach ($testSuites[$i]->tests() as $test) {
+                    if ($test instanceof \PHPUnit_Framework_TestSuite) {
+                        if (class_exists($test->getName(), false) && in_array('time-sensitive', \PHPUnit_Util_Test::getGroups($test->getName()), true)) {
+                            ClockMock::register($test->getName());
+                        } else {
+                            $testSuites[] = $test;
+                        }
+                    }
                 }
             }
         } elseif (2 === $this->state) {
@@ -91,7 +113,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function startTest(\PHPUnit_Framework_Test $test)
     {
-        if ($test instanceof \PHPUnit_Framework_TestCase) {
+        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
             $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName());
 
             if (in_array('time-sensitive', $groups, true)) {
@@ -103,7 +125,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        if ($test instanceof \PHPUnit_Framework_TestCase) {
+        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
             $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName());
 
             if (in_array('time-sensitive', $groups, true)) {

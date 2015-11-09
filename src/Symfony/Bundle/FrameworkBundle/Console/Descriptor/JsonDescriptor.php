@@ -215,6 +215,16 @@ class JsonDescriptor extends Descriptor
         }
 
         $data['abstract'] = $definition->isAbstract();
+
+        if (method_exists($definition, 'isAutowired')) {
+            $data['autowire'] = $definition->isAutowired();
+
+            $data['autowiring_types'] = array();
+            foreach ($definition->getAutowiringTypes() as $autowiringType) {
+                $data['autowiring_types'][] = $autowiringType;
+            }
+        }
+
         $data['file'] = $definition->getFile();
 
         if ($factory = $definition->getFactory()) {

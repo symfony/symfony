@@ -118,6 +118,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
+        $def->setAutowiringTypes($parentDef->getAutowiringTypes());
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
@@ -182,6 +183,11 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         // append method calls
         if (count($calls = $definition->getMethodCalls()) > 0) {
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
+        }
+
+        // merge autowiring types
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $def->addAutowiringType($autowiringType);
         }
 
         // these attributes are always taken from the child

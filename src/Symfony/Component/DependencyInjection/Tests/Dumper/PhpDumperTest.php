@@ -208,4 +208,12 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
+
+    public function testDumpAutowireData()
+    {
+        $container = include self::$fixturesPath.'/containers/container24.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services24.php'), $dumper->dump());
+    }
 }

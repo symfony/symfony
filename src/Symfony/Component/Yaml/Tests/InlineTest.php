@@ -203,6 +203,21 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         return array(array('@'), array('`'));
     }
 
+    /**
+     * @group legacy
+     * @dataProvider getScalarIndicators
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     */
+    public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
+    {
+        Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
+    }
+
+    public function getScalarIndicators()
+    {
+        return array(array('|'), array('>'));
+    }
+
     public function getTestsForParse()
     {
         return array(

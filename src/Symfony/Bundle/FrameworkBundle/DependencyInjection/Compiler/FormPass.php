@@ -34,8 +34,12 @@ class FormPass implements CompilerPassInterface
         $types = array();
 
         foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
-            // Support type access by FQCN
             $serviceDefinition = $container->getDefinition($serviceId);
+            if (!$serviceDefinition->isPublic()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as form types are lazy-loaded.', $serviceId));
+            }
+
+            // Support type access by FQCN
             $types[$serviceDefinition->getClass()] = $serviceId;
         }
 
@@ -44,6 +48,11 @@ class FormPass implements CompilerPassInterface
         $typeExtensions = array();
 
         foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
+            $serviceDefinition = $container->getDefinition($serviceId);
+            if (!$serviceDefinition->isPublic()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as form type extensions are lazy-loaded.', $serviceId));
+            }
+
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } else {
@@ -57,6 +66,12 @@ class FormPass implements CompilerPassInterface
 
         // Find all services annotated with "form.type_guesser"
         $guessers = array_keys($container->findTaggedServiceIds('form.type_guesser'));
+        foreach ($guessers as $serviceId) {
+            $serviceDefinition = $container->getDefinition($serviceId);
+            if (!$serviceDefinition->isPublic()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as form type guessers are lazy-loaded.', $serviceId));
+            }
+        }
 
         $definition->replaceArgument(3, $guessers);
     }

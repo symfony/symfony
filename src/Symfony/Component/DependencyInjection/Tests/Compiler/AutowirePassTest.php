@@ -189,7 +189,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $definition->getArgument(2));
     }
 
-    public function testDontTriggeruAutowiring()
+    public function testDontTriggerAutowiring()
     {
         $container = new ContainerBuilder();
 
@@ -200,6 +200,36 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertCount(0, $container->getDefinition('bar')->getArguments());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire argument 2 for Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument because the type-hinted class does not exist (Class Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass does not exist).
+     */
+    public function testClassNotFoundThrowsException()
+    {
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', __NAMESPACE__.'\BadTypeHintedArgument');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    public function testDontUseAbstractServices()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('abstract_foo', __NAMESPACE__.'\Foo')->setAbstract(true);
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('bar', __NAMESPACE__.'\Bar')->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $arguments = $container->getDefinition('bar')->getArguments();
+        $this->assertSame('foo', (string) $arguments[0]);
     }
 }
 
@@ -295,6 +325,13 @@ class LesTilleuls
 class OptionalParameter
 {
     public function __construct(CollisionInterface $c = null, A $a, Foo $f = null)
+    {
+    }
+}
+
+class BadTypeHintedArgument
+{
+    public function __construct(Dunglas $k, NotARealClass $r)
     {
     }
 }

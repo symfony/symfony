@@ -13,6 +13,7 @@ definition_2
 - Lazy: no
 - Shared: yes
 - Abstract: no
+- Autowired: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

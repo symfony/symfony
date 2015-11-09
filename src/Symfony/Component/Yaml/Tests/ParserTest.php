@@ -783,6 +783,31 @@ EOF;
 
         $this->assertEquals($expected, $this->parser->parse($yaml));
     }
+
+    /**
+     * @group legacy
+     * throw ParseException in Symfony 3.0
+     */
+    public function testColonInMappingValueException()
+    {
+        $yaml = <<<EOF
+foo: bar: baz
+EOF;
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $this->parser->parse($yaml);
+
+        $this->assertCount(1, $deprecations);
+        $this->assertContains('Using a colon in an unquoted mapping value in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $deprecations[0]);
+
+        restore_error_handler();
+    }
 }
 
 class B

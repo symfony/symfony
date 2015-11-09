@@ -30,7 +30,9 @@
 
                     ]
                 }
-            ]
+            ],
+            "autowire": false,
+            "autowiring_types": []
         }
     },
     "aliases": [

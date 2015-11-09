@@ -104,7 +104,7 @@ class AutowirePass implements CompilerPassInterface
                 // Typehint against a non-existing class
 
                 if (!$parameter->isDefaultValueAvailable()) {
-                    continue;
+                    throw new RuntimeException(sprintf('Cannot autowire argument %s for %s because the type-hinted class does not exist (%s).', $index + 1, $definition->getClass(), $reflectionException->getMessage()), 0, $reflectionException);
                 }
 
                 $value = $parameter->getDefaultValue();
@@ -138,13 +138,19 @@ class AutowirePass implements CompilerPassInterface
      */
     private function populateAvailableType($id, Definition $definition)
     {
-        if (!$definition->getClass()) {
+        // Never use abstract services
+        if ($definition->isAbstract()) {
             return;
         }
 
         foreach ($definition->getAutowiringTypes() as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
+        }
+
+        // Cannot use reflection if the class isn't set
+        if (!$definition->getClass()) {
+            return;
         }
 
         if ($reflectionClass = $this->getReflectionClass($id, $definition)) {

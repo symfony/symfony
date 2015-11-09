@@ -24,15 +24,15 @@ use Psr\Log\LoggerInterface;
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    private $key;
+    private $secret;
     private $realmName;
     private $nonceValiditySeconds;
     private $logger;
 
-    public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
+    public function __construct($realmName, $secret, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
-        $this->key = $key;
+        $this->secret = $secret;
         $this->nonceValiditySeconds = $nonceValiditySeconds;
         $this->logger = $logger;
     }
@@ -43,7 +43,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
-        $signatureValue = md5($expiryTime.':'.$this->key);
+        $signatureValue = md5($expiryTime.':'.$this->secret);
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
 
@@ -65,11 +65,21 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     }
 
     /**
-     * @return string
+     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
      */
     public function getKey()
     {
-        return $this->key;
+        @trigger_error(__method__.'() is deprecated since version 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
+
+        return $this->getSecret();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
     }
 
     /**

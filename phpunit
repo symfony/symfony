@@ -13,7 +13,7 @@ $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = ProcessUtils::escapeArgument($PHP);
 $COMPOSER_INTERPRETER = $PHP;
 
-if (!file_exists($COMPOSER = __DIR__ . '/composer.phar')) {
+if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
     $COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : (`which composer.phar` ?: `which composer`));
     if (file_exists($COMPOSER)) {
         //If composer is found in the path, an interpreter won't be needed to execute it
@@ -21,7 +21,7 @@ if (!file_exists($COMPOSER = __DIR__ . '/composer.phar')) {
     } else {
         stream_copy_to_stream(
             fopen('https://getcomposer.org/composer.phar', 'rb'),
-            fopen($COMPOSER = __DIR__ . '/composer.phar', 'wb')
+            fopen($COMPOSER = __DIR__.'/composer.phar', 'wb')
         );
     }
 }

@@ -157,7 +157,7 @@ class JsonDescriptor extends Descriptor
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
 
-        $this->writeData(array($key => $this->formatParameter($parameter)), $options);
+        $this->writeData(array($key => $parameter), $options);
     }
 
     /**

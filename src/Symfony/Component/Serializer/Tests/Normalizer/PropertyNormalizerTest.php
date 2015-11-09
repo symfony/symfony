@@ -338,6 +338,14 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDenormalizeShouldIgnoreStaticProperty()
+    {
+        $obj = $this->normalizer->denormalize(array('outOfScope' => true), __NAMESPACE__.'\PropertyDummy');
+
+        $this->assertEquals(new PropertyDummy(), $obj);
+        $this->assertEquals('out_of_scope', PropertyDummy::$outOfScope);
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
      * @expectedExceptionMessage Cannot normalize attribute "bar" because injected serializer is not a normalizer
@@ -358,10 +366,16 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
+
+    public function testNoStaticPropertySupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new StaticPropertyDummy()));
+    }
 }
 
 class PropertyDummy
 {
+    public static $outOfScope = 'out_of_scope';
     public $foo;
     private $bar;
     protected $camelCase;
@@ -420,3 +434,9 @@ class PropertyCamelizedDummy
         $this->kevinDunglas = $kevinDunglas;
     }
 }
+
+class StaticPropertyDummy
+{
+    private static $property = 'value';
+}
+

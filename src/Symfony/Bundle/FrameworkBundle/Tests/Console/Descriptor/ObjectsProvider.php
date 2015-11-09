@@ -72,9 +72,16 @@ class ObjectsProvider
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('database_name', 'symfony');
+        $builder->setParameter('twig.form.resources', array(
+            'bootstrap_3_horizontal_layout.html.twig',
+            'bootstrap_3_layout.html.twig',
+            'form_div_layout.html.twig',
+            'form_table_layout.html.twig',
+        ));
 
         return array(
             'parameter' => $builder,
+            'array_parameter' => $builder,
         );
     }
 

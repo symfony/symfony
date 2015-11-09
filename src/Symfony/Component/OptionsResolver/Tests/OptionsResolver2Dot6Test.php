@@ -500,14 +500,12 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideInvalidTypes
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfInvalidType($actualType, $allowedType, $exceptionMessage)
     {
-        $this->setExpectedException('InvalidArgumentException', $exceptionMessage);
         $this->resolver->setDefined('option');
         $this->resolver->setAllowedTypes('option', $allowedType);
-
+        $this->setExpectedException('Symfony\Component\OptionsResolver\Exception\InvalidOptionsException', $exceptionMessage);
         $this->resolver->resolve(array('option' => $actualType));
     }
 
@@ -515,7 +513,8 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(true, 'string', 'The option "option" with value true is expected to be of type "string", but is of type "boolean".'),
-            array(fopen(__FILE__, "r"), 'string', 'The option "option" with value resource is expected to be of type "string", but is of type "resource".'),
+            array(false, 'string', 'The option "option" with value false is expected to be of type "string", but is of type "boolean".'),
+            array(fopen(__FILE__, 'r'), 'string', 'The option "option" with value resource is expected to be of type "string", but is of type "resource".'),
             array(array(), 'string', 'The option "option" with value array is expected to be of type "string", but is of type "array".'),
             array(new OptionsResolver(), 'string', 'The option "option" with value Symfony\Component\OptionsResolver\OptionsResolver is expected to be of type "string", but is of type "Symfony\Component\OptionsResolver\OptionsResolver".'),
             array(42, 'string', 'The option "option" with value 42 is expected to be of type "string", but is of type "integer".'),

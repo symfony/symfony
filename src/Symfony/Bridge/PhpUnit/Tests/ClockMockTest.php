@@ -49,12 +49,22 @@ class ClockMockTest extends \PHPUnit_Framework_TestCase
 
     public function testSleep()
     {
-        $this->assertEquals(0, ClockMock::sleep(0));
+        $sleep = 10000;
+        $t1 = ClockMock::time();
+        $this->assertEquals(0, ClockMock::sleep($sleep));
+        $t2 = ClockMock::time();
+
+        $this->assertLessThanOrEqual($sleep, $t2 - $t1);
     }
 
     public function testUsleep()
     {
-        $this->assertNull(ClockMock::usleep(0));
+        $sleep = 1000000;
+        $t1 = ClockMock::time();
+        $this->assertNull(ClockMock::usleep($sleep));
+        $t2 = ClockMock::time();
+
+        $this->assertLessThanOrEqual($sleep / 1000000, $t2 - $t1);
     }
 
     public function testMicrotimeTrue()

@@ -40,7 +40,6 @@
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/*/Resources</directory>
-                <file>./src/Symfony/Bridge/PhpUnit/bootstrap.php</file>
             </exclude>
         </whitelist>
     </filter>

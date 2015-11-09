@@ -19,6 +19,8 @@ use Symfony\Component\Console\Command\Command;
 interface CommandResolverInterface
 {
     /**
+     * Store initialized commands.
+     *
      * @param Command $command
      */
     public function add(Command $command);

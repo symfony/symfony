@@ -18,6 +18,9 @@
             <framework:package name="bar">
                 <framework:base-url>https://bar2.example.com</framework:base-url>
             </framework:package>
+            <framework:package name="bar_null_version" version="">
+                <framework:base-url>https://bar3.example.com</framework:base-url>
+            </framework:package>
         </framework:templating>
     </framework:config>
 </container>

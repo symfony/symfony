@@ -13,3 +13,6 @@ framework:
                 version_format: %%s-%%s
             bar:
                 base_urls: "https://bar2.example.com"
+            bar_null_version:
+                version: null
+                base_urls: "https://bar3.example.com"

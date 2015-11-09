@@ -516,7 +516,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount($legacy ? 3 : 4, $packages);
+        $this->assertCount($legacy ? 4 : 5, $packages);
 
         if (!$legacy) {
             $package = $container->getDefinition($packages['images_path']);
@@ -531,6 +531,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition($packages['bar']);
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+
+        $this->assertEquals($legacy ? 'assets.empty_version_strategy' : 'assets._version__default', (string)$container->getDefinition('assets._package_bar')->getArgument(1));
+        $this->assertEquals('assets.empty_version_strategy', (string)$container->getDefinition('assets._package_bar_null_version')->getArgument(1));
     }
 
     private function assertPathPackage(ContainerBuilder $container, Definition $package, $basePath, $version, $format)

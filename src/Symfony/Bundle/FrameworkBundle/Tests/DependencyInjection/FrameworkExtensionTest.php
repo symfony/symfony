@@ -530,7 +530,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
 
         $package = $container->getDefinition($packages['bar']);
-        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? null : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
 
         $this->assertEquals($legacy ? 'assets.empty_version_strategy' : 'assets._version__default', (string)$container->getDefinition('assets._package_bar')->getArgument(1));
         $this->assertEquals('assets.empty_version_strategy', (string)$container->getDefinition('assets._package_bar_null_version')->getArgument(1));

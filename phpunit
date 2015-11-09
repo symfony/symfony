@@ -1,6 +1,18 @@
 #!/usr/bin/env php
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+// Please update when phpunit needs to be reinstalled with fresh deps:
+// Cache-Id-Version: 2015-11-09 12:13 UTC
+
 use Symfony\Component\Process\ProcessUtils;
 
 error_reporting(-1);

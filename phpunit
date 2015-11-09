@@ -22,19 +22,11 @@ require __DIR__.'/src/Symfony/Component/Process/ProcessUtils.php';
 $PHPUNIT_VERSION = PHP_VERSION_ID >= 70000 ? '5.0' : '4.8';
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
-
-if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
-    $COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : (`which composer.phar` ?: `which composer`));
-    if (!file_exists($COMPOSER)) {
-        stream_copy_to_stream(
-            fopen('https://getcomposer.org/composer.phar', 'rb'),
-            fopen($COMPOSER = __DIR__.'/composer.phar', 'wb')
-        );
-    }
-}
-
 $PHP = ProcessUtils::escapeArgument($PHP);
-$COMPOSER = $PHP.' '.ProcessUtils::escapeArgument($COMPOSER);
+
+$COMPOSER = file_exists($COMPOSER = __DIR__.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : `which composer.phar`))
+    ? $PHP.' '.ProcessUtils::escapeArgument($COMPOSER)
+    : 'composer';
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.md5")) {
     // Build a standalone phpunit without symfony/yaml

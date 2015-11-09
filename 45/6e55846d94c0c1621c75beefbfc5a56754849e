@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-08T11:08:47Z
+
+Test failures seem unrelated
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-09T16:28:50Z
+
+ping @symfony/deciders This should definitely make it into the first beta/RC of 2.8
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-09T17:18:58Z
+
+:+1: (tests are green now)
+status: reviewed

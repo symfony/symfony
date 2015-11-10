@@ -119,12 +119,12 @@ class Process
     /**
      * Constructor.
      *
-     * @param string             $commandline The command line to run
-     * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
-     * @param array|null         $env         The environment variables or null to inherit
-     * @param string|null        $stdin       The STDIN content
-     * @param integer|float|null $timeout     The timeout in seconds or null to disable
-     * @param array              $options     An array of options for proc_open
+     * @param string         $commandline The command line to run
+     * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env         The environment variables or null to inherit
+     * @param string|null    $stdin       The STDIN content
+     * @param int|float|null $timeout     The timeout in seconds or null to disable
+     * @param array          $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
      *
@@ -184,7 +184,7 @@ class Process
      * @param callback|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return integer The exit status code
+     * @return int The exit status code
      *
      * @throws RuntimeException When process can't be launch or is stopped
      *
@@ -299,7 +299,7 @@ class Process
      *
      * @param callback|null $callback A valid PHP callback
      *
-     * @return integer The exitcode of the process
+     * @return int The exitcode of the process
      *
      * @throws RuntimeException When process timed out
      * @throws RuntimeException When process stopped after receiving signal
@@ -314,7 +314,7 @@ class Process
         do {
             $this->checkTimeout();
             $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->hasOpenHandles();
-            $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
+            $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;
             $this->readPipes(true, $close);
         } while ($running);
 
@@ -336,7 +336,7 @@ class Process
     /**
      * Returns the Pid (process identifier), if applicable.
      *
-     * @return integer|null The process id if running, null otherwise
+     * @return int|null The process id if running, null otherwise
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      */
@@ -354,7 +354,8 @@ class Process
     /**
      * Sends a posix signal to the process.
      *
-     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param int $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     *
      * @return Process
      *
      * @throws LogicException   In case the process is not running
@@ -446,7 +447,7 @@ class Process
     /**
      * Returns the exit code returned by the process.
      *
-     * @return integer The exit status code
+     * @return int The exit status code
      *
      * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      *
@@ -520,7 +521,7 @@ class Process
      *
      * It is only meaningful if hasBeenSignaled() returns true.
      *
-     * @return integer
+     * @return int
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      *
@@ -558,7 +559,7 @@ class Process
      *
      * It is only meaningful if hasBeenStopped() returns true.
      *
-     * @return integer
+     * @return int
      *
      * @api
      */
@@ -624,10 +625,10 @@ class Process
     /**
      * Stops the process.
      *
-     * @param integer|float $timeout The timeout in seconds
-     * @param integer       $signal  A posix signal to send in case the process has not stop at timeout, default is SIGKILL
+     * @param int|float $timeout The timeout in seconds
+     * @param int       $signal  A posix signal to send in case the process has not stop at timeout, default is SIGKILL
      *
-     * @return integer The exit-code of the process
+     * @return int The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
@@ -716,7 +717,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|float|null $timeout The timeout in seconds
+     * @param int|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -740,7 +741,7 @@ class Process
     /**
      * Enables or disables the TTY mode.
      *
-     * @param boolean $tty True to enabled and false to disable
+     * @param bool $tty True to enabled and false to disable
      *
      * @return self The current Process instance
      */

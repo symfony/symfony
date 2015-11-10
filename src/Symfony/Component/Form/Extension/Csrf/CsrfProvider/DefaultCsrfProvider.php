@@ -66,7 +66,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
             return StringUtils::equals($expectedToken, $token);
         }
 
-        return $token === $this->generateCsrfToken($intention);
+        return $token === $expectedToken;
     }
 
     /**

@@ -611,7 +611,8 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Resources/` directory was moved to `Core/Resources/`
 
- * The `key` settings of `anonymous` and `remember_me` are renamed to `secret`.
+ * The `key` settings of `anonymous`, `remember_me` and `http_digest` are
+   renamed to `secret`.
 
    Before:
 
@@ -623,6 +624,8 @@ UPGRADE FROM 2.x to 3.0
                # ...
                anonymous: { key: "%secret%" }
                remember_me:
+                   key: "%secret%"
+               http_digest:
                    key: "%secret%"
    ```
 
@@ -636,6 +639,7 @@ UPGRADE FROM 2.x to 3.0
 
            <anonymous key="%secret%"/>
            <remember-me key="%secret%"/>
+           <http-digest key="%secret%"/>
        </firewall>
    </config>
    ```
@@ -648,6 +652,7 @@ UPGRADE FROM 2.x to 3.0
            // ...
            'anonymous' => array('key' => '%secret%'),
            'remember_me' => array('key' => '%secret%'),
+           'http_digest' => array('key' => '%secret%'),
        ),
    ));
    ```
@@ -663,6 +668,8 @@ UPGRADE FROM 2.x to 3.0
                anonymous: { secret: "%secret%" }
                remember_me:
                    secret: "%secret%"
+               http_digest:
+                   secret: "%secret%"
    ```
 
    ```xml
@@ -675,6 +682,7 @@ UPGRADE FROM 2.x to 3.0
 
            <anonymous secret="%secret%"/>
            <remember-me secret="%secret%"/>
+           <http-digest secret="%secret%"/>
        </firewall>
    </config>
    ```
@@ -687,6 +695,7 @@ UPGRADE FROM 2.x to 3.0
            // ...
            'anonymous' => array('secret' => '%secret%'),
            'remember_me' => array('secret' => '%secret%'),
+           'http_digest' => array('secret' => '%secret%'),
        ),
    ));
   ```

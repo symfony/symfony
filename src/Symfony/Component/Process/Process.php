@@ -242,8 +242,7 @@ class Process
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // Workaround for the bug, when PTS functionality is enabled.
-            // @see : https://github.com/symfony/symfony/issues/12643
-            // @see : https://github.com/php/php-src/pull/1588
+            // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen('php://fd/0', 'r');
         }
 

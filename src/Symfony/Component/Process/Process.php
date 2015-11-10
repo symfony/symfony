@@ -238,7 +238,20 @@ class Process
             }
         }
 
+        $ptsWorkaround = null;
+
+        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // Workaround for the bug, when PTS functionality is enabled.
+            // @see : https://github.com/symfony/symfony/issues/12643
+            // @see : https://github.com/php/php-src/pull/1588
+            $ptsWorkaround = fopen("php://fd/0", "r");
+        }
+
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
+
+        if ($ptsWorkaround) {
+            fclose($ptsWorkaround);
+        }
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');

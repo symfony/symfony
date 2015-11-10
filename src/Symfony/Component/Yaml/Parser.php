@@ -472,10 +472,7 @@ class Parser
         }
 
         if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($value, ': ')) {
-            @trigger_error(sprintf('Using a colon in an unquoted mapping value in line %d is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
-
-            // to be thrown in 3.0
-            // throw new ParseException('A colon cannot be used in an unquoted mapping value.');
+            throw new ParseException('A colon cannot be used in an unquoted mapping value.');
         }
 
         try {

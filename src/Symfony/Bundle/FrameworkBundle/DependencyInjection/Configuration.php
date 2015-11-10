@@ -85,6 +85,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+        $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
@@ -105,6 +106,17 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('csrf_protection')
+                    ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -114,8 +126,12 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->arrayNode('csrf_protection')
-                            ->canBeEnabled()
+                            ->treatFalseLike(array('enabled' => false))
+                            ->treatTrueLike(array('enabled' => true))
+                            ->treatNullLike(array('enabled' => true))
+                            ->addDefaultsIfNotSet()
                             ->children()
+                                ->booleanNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
                                 ->scalarNode('field_name')->defaultValue('_token')->end()
                             ->end()
                         ->end()

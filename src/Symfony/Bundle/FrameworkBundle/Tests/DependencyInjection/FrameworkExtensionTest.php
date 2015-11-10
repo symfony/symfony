@@ -24,7 +24,7 @@ abstract class FrameworkExtensionTest extends TestCase
 {
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
-    public function testCsrfProtection()
+    public function testFormCsrfProtection()
     {
         $container = $this->createContainerFromFile('full');
 

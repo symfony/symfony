@@ -1,5 +1,5 @@
 framework:
     secret: s3cr3t
-    form:
-        csrf_protection: true
+    csrf_protection: ~
+    form: ~
     session: ~

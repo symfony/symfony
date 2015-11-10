@@ -244,7 +244,7 @@ class Process
             // Workaround for the bug, when PTS functionality is enabled.
             // @see : https://github.com/symfony/symfony/issues/12643
             // @see : https://github.com/php/php-src/pull/1588
-            $ptsWorkaround = fopen("php://fd/0", "r");
+            $ptsWorkaround = fopen('php://fd/0', 'r');
         }
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);

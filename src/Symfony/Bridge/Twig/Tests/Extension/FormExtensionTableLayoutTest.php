@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Extension\FormExtensionRuntime;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
@@ -51,7 +50,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
         $loader = $this->getMock('Twig_RuntimeLoaderInterface');
         $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
-            array('form', new FormExtensionRuntime($renderer)),
+            array('form', $renderer),
             array('translator', null),
         )));
 
@@ -84,7 +83,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     protected function renderForm(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -93,41 +92,41 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             $vars += array('label' => $label);
         }
 
-        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form_start', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = array())
     {
-        return (string) $this->environment->getRuntime('form')->renderer->renderBlock($view, 'form_end', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->environment->getRuntime('form')->renderer->setTheme($view, $themes);
+        $this->environment->getRuntime('form')->setTheme($view, $themes);
     }
 }

@@ -124,9 +124,7 @@
 
         <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
 
-        <service id="twig.extension.runtime.form" class="Symfony\Bridge\Twig\Extension\FormExtensionRuntime">
-            <argument type="service" id="twig.form.renderer" />
-        </service>
+        <service id="twig.extension.runtime.form" alias="twig.form.renderer" />
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
 

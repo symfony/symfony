@@ -77,7 +77,7 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = Response::HTTP_FOUND)
     {
         return new RedirectResponse($url, $status);
     }
@@ -91,7 +91,7 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    protected function redirectToRoute($route, array $parameters = array(), $status = 302)
+    protected function redirectToRoute($route, array $parameters = array(), $status = Response::HTTP_FOUND)
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }

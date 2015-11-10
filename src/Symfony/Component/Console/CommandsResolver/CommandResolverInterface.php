@@ -20,6 +20,7 @@ interface CommandResolverInterface
 {
     /**
      * Store initialized commands.
+     * Important! Commands with the same name will be overridden.
      *
      * @param Command $command
      */

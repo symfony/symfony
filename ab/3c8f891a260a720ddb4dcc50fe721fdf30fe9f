@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-10T00:40:42Z
+
+When fabbot.io patch is applied, there is a conflicts, I think better to merge it without conflicts.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-10T00:50:00Z
+
+Test failure seems not related to this PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-10T10:34:33Z
+
+@ewgRa could you please fabbot's issues also (even if unrelated to your change)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-10T10:39:29Z
+
+See https://github.com/symfony/symfony/issues/12643#issuecomment-92279343 for some background on why this works
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-10T10:40:48Z
+
+:+1: (after rebasing)
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-10T10:44:01Z
+
+done, anything else?

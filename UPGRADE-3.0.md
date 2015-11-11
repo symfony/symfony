@@ -124,6 +124,24 @@ UPGRADE FROM 2.x to 3.0
    ));
    ```
 
+ * The option "`virtual`" was renamed to "`inherit_data`".
+
+   Before:
+
+   ```php
+   $builder->add('address', 'form', array(
+       'virtual' => true,
+   ));
+   ```
+
+   After:
+
+   ```php
+   $builder->add('address', 'form', array(
+       'inherit_data' => true,
+   ));
+   ```
+
  * The method `AbstractType::setDefaultOptions(OptionsResolverInterface $resolver)` and
    `AbstractTypeExtension::setDefaultOptions(OptionsResolverInterface $resolver)` have been
    renamed. You should use `AbstractType::configureOptions(OptionsResolver $resolver)` and
@@ -203,24 +221,6 @@ UPGRADE FROM 2.x to 3.0
    $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
        // ...
    });
-   ```
-
- * The option "`virtual`" was renamed to "`inherit_data`".
-
-   Before:
-
-   ```php
-   $builder->add('address', 'form', array(
-       'virtual' => true,
-   ));
-   ```
-
-   After:
-
-   ```php
-   $builder->add('address', 'form', array(
-       'inherit_data' => true,
-   ));
    ```
 
  * The class `VirtualFormAwareIterator` was renamed to `InheritDataAwareIterator`.

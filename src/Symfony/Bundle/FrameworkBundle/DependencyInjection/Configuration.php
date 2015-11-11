@@ -63,6 +63,7 @@ class Configuration implements ConfigurationInterface
                         && !count($v['templating']['packages'])
                     ) {
                         $v['assets'] = array(
+                            'version_strategy' => null,
                             'version' => null,
                             'version_format' => '%%s?%%s',
                             'base_path' => '',
@@ -78,6 +79,7 @@ class Configuration implements ConfigurationInterface
                 ->ifTrue(function ($v) { return isset($v['templating']); })
                 ->then(function ($v) {
                     if ($v['templating']['assets_version']
+                        || $v['templating']['assets_version_strategy']
                         || count($v['templating']['assets_base_urls']['http'])
                         || count($v['templating']['assets_base_urls']['ssl'])
                         || count($v['templating']['packages'])
@@ -89,7 +91,12 @@ class Configuration implements ConfigurationInterface
                             throw new \LogicException('You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.');
                         }
 
+                        if (null !== $v['templating']['assets_version_strategy'] && null !== $v['templating']['assets_version']) {
+                            throw new \LogicException('You cannot use version_strategy and version settings in assets configuration.');
+                        }
+
                         $v['assets'] = array(
+                            'version_strategy' => $v['templating']['assets_version_strategy'],
                             'version' => $v['templating']['assets_version'],
                             'version_format' => $v['templating']['assets_version_format'],
                             'base_path' => '',
@@ -98,7 +105,12 @@ class Configuration implements ConfigurationInterface
                         );
 
                         foreach ($v['templating']['packages'] as $name => $config) {
+                            if (null !== $config['version_strategy'] && null !== $config['version']) {
+                                throw new \LogicException('You cannot use version_strategy and version settings in same package.');
+                            }
+
                             $v['assets']['packages'][$name] = array(
+                                'version_strategy' => $config['version_strategy'],
                                 'version' => (string) $config['version'],
                                 'version_format' => $config['version_format'],
                                 'base_path' => '',
@@ -107,7 +119,25 @@ class Configuration implements ConfigurationInterface
                         }
                     }
 
-                    unset($v['templating']['assets_version'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+                    unset($v['templating']['assets_version'], $v['templating']['assets_version_strategy'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
+            ->ifTrue(function ($v) { return isset($v['assets']); })
+            ->then(function ($v) {
+                    if (null !== $v['assets']['version_strategy'] && null !== $v['assets']['version']) {
+                        throw new \LogicException('You cannot use version_strategy and version settings in assets configuration.');
+                    }
+
+                    if (count($v['assets']['packages'])) {
+                        foreach ($v['assets']['packages'] as $config) {
+                            if (null !== $config['version_strategy'] && null !== $config['version'] && '' !== $config['version']) {
+                                throw new \LogicException('You cannot use version_strategy and version settings in same package.');
+                            }
+                        }
+                    }
 
                     return $v;
                 })
@@ -454,6 +484,7 @@ class Configuration implements ConfigurationInterface
                     ->info('templating configuration')
                     ->canBeUnset()
                     ->children()
+                        ->scalarNode('assets_version_strategy')->defaultNull()->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('assets_version')->defaultNull()->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()
@@ -530,6 +561,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')
                                 ->children()
+                                    ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')->defaultNull()->end()
                                     ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
                                     ->arrayNode('base_urls')
@@ -570,6 +602,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->fixXmlConfig('base_url')
                     ->children()
+                        ->scalarNode('version_strategy')->defaultNull()->end()
                         ->scalarNode('version')->defaultNull()->end()
                         ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
                         ->scalarNode('base_path')->defaultValue('')->end()
@@ -589,6 +622,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')
                                 ->children()
+                                    ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')->defaultNull()->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()

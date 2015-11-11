@@ -119,6 +119,98 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage You cannot use version_strategy and version settings in assets configuration.
+     * @group legacy
+     */
+    public function testLegacyInvalidVersionStrategy()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+                array(
+                    'templating' => array(
+                        'engines' => null,
+                        'assets_base_urls' => '//example.com',
+                        'assets_version' => 1,
+                        'assets_version_strategy' => 'foo'
+                    )
+                ),
+            ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage You cannot use version_strategy and version settings in same package.
+     * @group legacy
+     */
+    public function testLegacyInvalidPackageVersionStrategy()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+                array(
+                    'templating' => array(
+                        'engines' => null,
+                        'assets_base_urls' => '//example.com',
+                        'assets_version' => 1,
+                        'packages' => array(
+                            'foo' => array(
+                                'base_urls' => '//example.com',
+                                'version' => 1,
+                                'version_strategy' => 'foo'
+                            )
+                        )
+                    )
+                ),
+            ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage You cannot use version_strategy and version settings in assets configuration.
+     */
+    public function testInvalidVersionStrategy()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+                array(
+                    'assets' => array(
+                        'base_urls' => '//example.com',
+                        'version' => 1,
+                        'version_strategy' => 'foo'
+                    )
+                ),
+            ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage You cannot use version_strategy and version settings in same package.
+     */
+    public function testInvalidPackageVersionStrategy()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $processor->processConfiguration($configuration, array(
+                array(
+                    'assets' => array(
+                        'base_urls' => '//example.com',
+                        'version' => 1,
+                        'packages' => array(
+                            'foo' => array(
+                                'base_urls' => '//example.com',
+                                'version' => 1,
+                                'version_strategy' => 'foo'
+                            )
+                        )
+                    )
+                ),
+            ));
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(

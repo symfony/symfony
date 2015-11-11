@@ -223,7 +223,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // default package
         $defaultPackage = $container->getDefinition($packages->getArgument(0));
-        $this->assertEquals('assets.custom_version_strategy', (string)$defaultPackage->getArgument(1));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testAssets()
@@ -238,7 +238,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // default package
         $defaultPackage = $container->getDefinition($packages->getArgument(0));
-        $this->assertEquals('assets.custom_version_strategy', (string)$defaultPackage->getArgument(1));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testTranslator()

@@ -134,8 +134,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'engines' => null,
                         'assets_base_urls' => '//example.com',
                         'assets_version' => 1,
-                        'assets_version_strategy' => 'foo'
-                    )
+                        'assets_version_strategy' => 'foo',
+                    ),
                 ),
             ));
     }
@@ -159,10 +159,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'foo' => array(
                                 'base_urls' => '//example.com',
                                 'version' => 1,
-                                'version_strategy' => 'foo'
-                            )
-                        )
-                    )
+                                'version_strategy' => 'foo',
+                            ),
+                        ),
+                    ),
                 ),
             ));
     }
@@ -180,8 +180,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'assets' => array(
                         'base_urls' => '//example.com',
                         'version' => 1,
-                        'version_strategy' => 'foo'
-                    )
+                        'version_strategy' => 'foo',
+                    ),
                 ),
             ));
     }
@@ -203,10 +203,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'foo' => array(
                                 'base_urls' => '//example.com',
                                 'version' => 1,
-                                'version_strategy' => 'foo'
-                            )
-                        )
-                    )
+                                'version_strategy' => 'foo',
+                            ),
+                        ),
+                    ),
                 ),
             ));
     }

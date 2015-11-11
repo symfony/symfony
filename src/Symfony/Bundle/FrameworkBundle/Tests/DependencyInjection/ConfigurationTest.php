@@ -123,10 +123,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'trusted_proxies' => array(),
             'ide' => null,
             'default_locale' => 'en',
+            'csrf_protection' => array(
+                'enabled' => false,
+            ),
             'form' => array(
                 'enabled' => false,
                 'csrf_protection' => array(
-                    'enabled' => false,
+                    'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
                 ),
             ),

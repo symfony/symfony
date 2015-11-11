@@ -1,6 +1,7 @@
 framework:
     secret: s3cr3t
     default_locale: fr
+    csrf_protection: true
     form:
         csrf_protection:
             field_name: _csrf

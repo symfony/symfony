@@ -1,3 +1,0 @@
-framework:
-    form:
-        csrf_protection: false

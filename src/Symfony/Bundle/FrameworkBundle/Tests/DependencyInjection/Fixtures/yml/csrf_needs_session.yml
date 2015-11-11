@@ -1,3 +1,2 @@
 framework:
-    form:
-        csrf_protection: ~
+    csrf_protection: ~

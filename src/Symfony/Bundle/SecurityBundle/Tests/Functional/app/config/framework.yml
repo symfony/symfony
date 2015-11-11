@@ -1,15 +1,14 @@
 framework:
-    secret:        test
-    router:        { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
-    validation:    { enabled: true, enable_annotations: true }
+    secret: test
+    router: { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
+    validation: { enabled: true, enable_annotations: true }
     assets: ~
-    form:
-        csrf_protection:
-            enabled: true
+    csrf_protection: true
+    form: true
     test: ~
     default_locale: en
     session:
-        storage_id:     session.storage.mock_file
+        storage_id: session.storage.mock_file
     profiler: { only_exceptions: false }
 
 services:

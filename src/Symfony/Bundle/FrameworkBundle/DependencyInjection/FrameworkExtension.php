@@ -97,7 +97,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['form']['csrf_protection'], $container, $loader);
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if (isset($config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -198,6 +198,9 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
+        if (null === $config['form']['csrf_protection']['enabled']) {
+            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
+        }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');

@@ -275,6 +275,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => false,
             ),
             'assets' => array(
+                'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',
                 'base_path' => '',

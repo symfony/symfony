@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-03T18:26:16Z
+
+1. it should not be done with the LegacyOptionsResolverTest but the real one
+2. private methods should not be tested with reflection but through the public api
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-11-03T23:19:55Z
+
+@Tobion
+
+I introduced the changes you wanted. I have very mixed feelings about the principle number 2. I know that it's good for most cases but sometimes some parts of code are harder to test. I don't see anything wrong with using reflections in such cases. Can this be discussed?
+
+Thanks for review.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-04T00:21:46Z
+
+I agree with @Tobion, private methods encapsulate logic as black boxes. We need to test them via the regular public API developers are going to use.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-04T00:26:15Z
+
+@eventhorizonpl I don't see the `true` case (https://github.com/eventhorizonpl/symfony/blob/options_resolver_test_coverage/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L1192) being used in the `OptionsResolver2Dot6Test`. Are you sure it's 100% tests coverage with only the new test class?
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-11-04T00:42:40Z
+
+@Tobion
+
+true case is covered by testResolveFailsIfValueAllowedCallbackReturnsFalse according to a report.
+
+![scren](https://cloud.githubusercontent.com/assets/566953/10926226/4f3b5bd4-8295-11e5-85c6-647cb58e311f.png)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-04T14:18:16Z
+
+@eventhorizonpl `testResolveFailsIfValueAllowedCallbackReturnsFalse` is only in the legacy test suite. So in master, where the legacy is removed, there would not be 100% test coverage anymore.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-06T17:58:21Z
+
+@eventhorizonpl can you please rewrite the tests to use a dataProvider. This provider (actual type, allowed type, exception message) would then also cover all the other types (from `testResolveFailsIfInvalidType`, `testResolveFailsIfInvalidTypeIsNull`, `testResolveFailsIfNotInstanceOfClass`). This way there is much less repitition.
+And you could also do a similar approach to test that passing the correct type succeeds for each type (`testResolveSucceedsIfValidType` etc.).
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-11-07T23:35:20Z
+
+@Tobion
+
+I added dataProvider for my tests and testResolveFailsIfInvalidType, testResolveFailsIfInvalidTypeIsNull, testResolveFailsIfNotInstanceOfClass.
+
+I didn't changed testResolveSucceedsIfValidType* because my current goal is not to fix all tests. Right now it's just about covering code.

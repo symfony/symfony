@@ -260,11 +260,6 @@ class ChoiceType extends AbstractType
             // Harden against NULL values (like in EntityType and ModelType)
             $choices = null !== $options['choices'] ? $options['choices'] : array();
 
-            // BC when choices are in the keys, not in the values
-            if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value'], false);
-            }
-
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 

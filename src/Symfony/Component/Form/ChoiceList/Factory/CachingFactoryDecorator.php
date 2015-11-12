@@ -137,35 +137,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated Added for backwards compatibility in Symfony 2.7, to be
-     *             removed in Symfony 3.0.
-     */
-    public function createListFromFlippedChoices($choices, $value = null, $triggerDeprecationNotice = true)
-    {
-        if ($choices instanceof \Traversable) {
-            $choices = iterator_to_array($choices);
-        }
-
-        // The value is not validated on purpose. The decorated factory may
-        // decide which values to accept and which not.
-
-        // We ignore the choice groups for caching. If two choice lists are
-        // requested with the same choices, but a different grouping, the same
-        // choice list is returned.
-        self::flatten($choices, $flatChoices);
-
-        $hash = self::generateHash(array($flatChoices, $value), 'fromFlippedChoices');
-
-        if (!isset($this->lists[$hash])) {
-            $this->lists[$hash] = $this->decoratedFactory->createListFromFlippedChoices($choices, $value, $triggerDeprecationNotice);
-        }
-
-        return $this->lists[$hash];
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {

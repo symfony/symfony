@@ -23,7 +23,7 @@ class SwitchUserTest extends WebTestCase
         $client->request('GET', '/profile?_switch_user='.$targetUser);
 
         $this->assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
-        $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
+        $this->assertEquals($expectedUser, $client->getProfile()->get('security')->getUser());
     }
 
     public function testSwitchedUserCannotSwitchToOther()
@@ -34,7 +34,7 @@ class SwitchUserTest extends WebTestCase
         $client->request('GET', '/profile?_switch_user=user_cannot_switch_2');
 
         $this->assertEquals(500, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->get('security')->getUser());
     }
 
     public function testSwitchedUserExit()
@@ -45,7 +45,7 @@ class SwitchUserTest extends WebTestCase
         $client->request('GET', '/profile?_switch_user=_exit');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+        $this->assertEquals('user_can_switch', $client->getProfile()->get('security')->getUser());
     }
 
     public function getTestParameters()

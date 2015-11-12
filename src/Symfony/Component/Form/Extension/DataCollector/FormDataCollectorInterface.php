@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  * @since  2.4
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Profiler\FormDataCollectorInterface instead.
  */
 interface FormDataCollectorInterface extends DataCollectorInterface
 {

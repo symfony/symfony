@@ -27,7 +27,7 @@
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
         {{ template.renderblock('toolbar', {
-            'collector': profile.getcollector(name),
+            'collector': profile.get(name),
             'profiler_url': profiler_url,
             'token': profile.token,
             'name': name,

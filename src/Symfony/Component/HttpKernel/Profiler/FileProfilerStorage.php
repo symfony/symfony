@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\FileProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use Symfony\Component\Profiler\Storage\FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * Storage for profiler using files.
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Component\Profiler\Storage\FileProfilerStorage} instead.
  */
 class FileProfilerStorage implements ProfilerStorageInterface
 {

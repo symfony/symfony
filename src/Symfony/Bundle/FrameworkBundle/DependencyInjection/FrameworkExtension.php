@@ -309,7 +309,7 @@ class FrameworkExtension extends Extension
         $supported = array(
             'sqlite' => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
             'mysql' => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file' => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
+            'file' => 'Symfony\Component\Profiler\Storage\FileProfilerStorage',
             'mongodb' => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
             'memcache' => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
             'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',

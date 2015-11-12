@@ -15,11 +15,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Profiler\ProfileData\ProfileDataInterface;
 
 /**
  * ConfigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\ConfigDataCollector instead.
  */
 class ConfigDataCollector extends DataCollector
 {

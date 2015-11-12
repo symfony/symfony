@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
+/**
+ * @group legacy
+ */
 class FileProfilerStorageTest extends AbstractProfilerStorageTest
 {
     private $tmpDir;

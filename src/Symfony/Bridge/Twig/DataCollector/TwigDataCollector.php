@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * TwigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Bridge\Twig\Profiler\TwigDataCollector instead.
  */
 class TwigDataCollector extends DataCollector implements LateDataCollectorInterface
 {

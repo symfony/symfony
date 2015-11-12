@@ -66,11 +66,14 @@ class Client extends BaseClient
      */
     public function getProfile()
     {
-        if (!$this->kernel->getContainer()->has('profiler')) {
+        if (!$this->kernel->getContainer()->has('profiler.storage')) {
+            return false;
+        }
+        if (!$token = $this->response->headers->get('X-Debug-Token')) {
             return false;
         }
 
-        return $this->kernel->getContainer()->get('profiler')->loadProfileFromResponse($this->response);
+        return $this->kernel->getContainer()->get('profiler.storage')->read($token);
     }
 
     /**

@@ -11,12 +11,12 @@
 
     <services>
         <service id="web_profiler.command.import" class="%web_profiler.command.import.class%">
-            <argument type="service" id="profiler" on-invalid="null" />
+            <argument type="service" id="profiler.storage" on-invalid="null" />
             <tag name="console.command" />
         </service>
 
         <service id="web_profiler.command.export" class="%web_profiler.command.export.class%">
-            <argument type="service" id="profiler" on-invalid="null" />
+            <argument type="service" id="profiler.storage" on-invalid="null" />
             <tag name="console.command" />
         </service>
     </services>

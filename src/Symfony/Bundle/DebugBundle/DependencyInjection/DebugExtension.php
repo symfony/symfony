@@ -40,12 +40,10 @@ class DebugExtension extends Extension
             ->addMethodCall('setMaxString', array($config['max_string_length']));
 
         if (null !== $config['dump_destination']) {
-            $container->getDefinition('var_dumper.cli_dumper')
-                ->replaceArgument(0, $config['dump_destination'])
-            ;
-            $container->getDefinition('data_collector.dump')
-                ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
-            ;
+
+            /*$container->getDefinition('data_collector.dump')
+                ->replaceArgument(1, new Reference('var_dumper.cli_dumper'))
+            ;*/
         }
     }
 

@@ -55,6 +55,7 @@
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
+        "symfony/profiler": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",

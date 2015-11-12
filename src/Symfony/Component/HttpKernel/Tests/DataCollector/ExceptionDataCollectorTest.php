@@ -16,6 +16,9 @@ use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()

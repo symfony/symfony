@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+@trigger_error('The '.__NAMESPACE__.'\TimeDataCollector class is deprecated since Symfony 2.8 and will be removed in 3.0. Use Symfony\Component\HttpKernel\Profiler\TimeDataCollector instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -19,6 +21,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * TimeDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Component\HttpKernel\Profiler\TimeDataCollector} instead.
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {

@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Profiler\Profile;
+use Symfony\Component\Profiler\Profiler;
 
 /**
  * Profiler Templates Manager.
@@ -25,18 +25,15 @@ class TemplateManager
 {
     protected $twig;
     protected $templates;
-    protected $profiler;
 
     /**
      * Constructor.
      *
-     * @param Profiler          $profiler
      * @param \Twig_Environment $twig
      * @param array             $templates
      */
-    public function __construct(Profiler $profiler, \Twig_Environment $twig, array $templates)
+    public function __construct(\Twig_Environment $twig, array $templates)
     {
-        $this->profiler = $profiler;
         $this->twig = $twig;
         $this->templates = $templates;
     }
@@ -44,8 +41,8 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param Profile $profile
-     * @param string  $panel
+     * @param Profile   $profile
+     * @param string    $panel
      *
      * @return mixed
      *
@@ -100,7 +97,7 @@ class TemplateManager
 
             list($name, $template) = $arguments;
 
-            if (!$this->profiler->has($name) || !$profile->hasCollector($name)) {
+            if (!$profile->has($name)) {
                 continue;
             }
 

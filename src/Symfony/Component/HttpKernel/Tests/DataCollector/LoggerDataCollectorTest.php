@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
+/**
+ * @group legacy
+ */
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     /**

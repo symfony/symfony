@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+@trigger_error('The '.__NAMESPACE__.'\MemoryDataCollector class is deprecated since Symfony 2.8 and will be removed in 3.0. Use Symfony\Component\Profiler\DataCollector\MemoryDataCollector instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
  * MemoryDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Component\Profiler\DataCollector\MemoryDataCollector} instead.
  */
 class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface
 {

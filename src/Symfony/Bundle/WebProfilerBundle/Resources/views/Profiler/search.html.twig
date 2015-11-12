@@ -2,27 +2,27 @@
     <form action="{{ path('_profiler_search') }}" method="get">
         <div class="form-group">
             <label for="ip">IP</label>
-            <input type="text" name="ip" id="ip" value="{{ ip }}">
+            <input type="text" name="filters[method]" id="ip" value="{{ filters.ip is defined ? filters.ip : null}}">
         </div>
 
         <div class="form-group">
             <label for="method">Method</label>
             <select name="method" id="method">
-                <option value="">Any</option>
+                <option value=""{{ filters.method is not defined or '' == filters.method ? ' selected="selected"' : '' }}>Any</option>
                 {% for m in ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
-                    <option {{ m == method ? 'selected="selected"' }}>{{ m }}</option>
+                    <option{{ filters.method is defined and m == filters.method ? ' selected="selected"' : '' }}>{{ m }}</option>
                 {% endfor %}
             </select>
         </div>
 
         <div class="form-group">
             <label for="url">URL</label>
-            <input type="text" name="url" id="url" value="{{ url }}">
+            <input type="text" name="filters[url]" id="url" value="{{ filters.url is defined ? filters.url : null }}">
         </div>
 
         <div class="form-group">
             <label for="token">Token</label>
-            <input type="text" name="token" id="token" value="{{ token }}">
+            <input type="text" name="filters[url]" id="url" value="{{ filters.url is defined ? filters.url : null }}">
         </div>
 
         <div class="form-group">

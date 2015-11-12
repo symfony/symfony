@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+@trigger_error('The '.__NAMESPACE__.'\RouterDataCollector class is deprecated since Symfony 2.8 and will be removed in 3.0. Use Symfony\Component\HttpKernel\Profiler\RouterDataCollector instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,6 +22,9 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  * RouterDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Component\HttpKernel\Profiler\RouterDataCollector} instead.
  */
 class RouterDataCollector extends DataCollector
 {

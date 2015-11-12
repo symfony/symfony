@@ -39,6 +39,7 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
             array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, $this, 'ACCESS_ABSTAIN if class is not supported'),
 
             array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, null, 'ACCESS_ABSTAIN if object is null'),
+            array(array('EDIT'), VoterInterface::ACCESS_ABSTAIN, 'foo', 'ACCESS_ABSTAIN if object is string'),
 
             array(array(), VoterInterface::ACCESS_ABSTAIN, new \stdClass(), 'ACCESS_ABSTAIN if no attributes were provided'),
         );

@@ -24,6 +24,8 @@ interface RequestMatcherInterface
      * @param Request $request The request to check for a match
      *
      * @return bool true if the request matches, false otherwise
+     *
+     * @throws \UnexpectedValueException When match pattern has wrong type
      */
     public function matches(Request $request);
 }

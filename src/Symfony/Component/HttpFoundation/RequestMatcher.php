@@ -132,6 +132,10 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         foreach ($this->attributes as $key => $pattern) {
+            if (!is_string($pattern)) {
+                throw new \UnexpectedValueException('The matcher type must be a string.');
+            }
+
             if (!preg_match('{'.$pattern.'}', $request->attributes->get($key))) {
                 return false;
             }

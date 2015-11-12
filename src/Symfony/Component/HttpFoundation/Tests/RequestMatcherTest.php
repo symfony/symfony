@@ -126,5 +126,15 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher->matchAttribute('foo', 'babar');
         $this->assertFalse($matcher->matches($request));
+
+        $matcher->matchAttribute('foo', 1);
+        try {
+            $matcher->matches($request);
+
+            $this->fail('Matching against non-string value.');
+        } catch (\UnexpectedValueException $e) {
+            $this->assertEquals('The matcher type must be a string.', $e->getMessage());
+        }
+
     }
 }

@@ -61,7 +61,7 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('1', array('ay','bo', 'cgg','dz','id', 'ja', 'jbo', 'ka','kk','km','ko','ky')),
-            array('2', array('nl', 'fr', 'en', 'de', 'de_GE')),
+            array('2', array('nl', 'fr', 'en', 'de', 'de_GE', 'hy', 'hy_AM')),
             array('3', array('be','bs','cs','hr')),
             array('4', array('cy','mt', 'sl')),
             array('5', array()),

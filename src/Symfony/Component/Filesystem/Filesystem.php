@@ -544,7 +544,7 @@ class Filesystem
      * Returns the "chmod" of the file or directory
      *
      * @param string $path A file or directory path.
-     * @param boolean $description Get file permissions as a long description ex: 'u-wxrw--wt'.
+     * @param boolean $groups Get file|directory permissions by groups ex: 'u-wxrw--wt'.
      *                               * Description result
      *                               * s => socket;
      *                               * l => symbolic link;
@@ -557,7 +557,7 @@ class Filesystem
      *
      * @return string Permissions of the file|directory or throw an exception on failure.
      */
-    public function permssions($path, $description = false)
+    public function permssions($path, $groups = false)
     {
         if (!is_dir($path) && !is_file($path)) {
             throw new IOException(sprintf('Unable to guess "%s" type.', $path), 0, null, $path);
@@ -565,7 +565,7 @@ class Filesystem
 
         $perms = substr(sprintf('%o', fileperms($path)), -4);
 
-        if (!$description) {
+        if (!$groups) {
             return $perms;
         }
 

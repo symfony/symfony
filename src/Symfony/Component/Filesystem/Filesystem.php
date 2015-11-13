@@ -541,6 +541,67 @@ class Filesystem
     }
 
     /**
+     * Returns the "chmod" of the file or directory
+     *
+     * @param string $path A file or directory path.
+     * @param boolean $description Get file permissions as a long description ex: 'u-wxrw--wt'.
+     *                               * Description result
+     *                               * s => socket;
+     *                               * l => symbolic link;
+     *                               * - => regular;
+     *                               * b => block special;
+     *                               * d => directory;
+     *                               * c => character special;
+     *                               * p => FIFO pipe;
+     *                               * u => unknown.
+     *
+     * @return string Permissions of the file|directory or throw an exception on failure.
+     */
+    public function permssions($path, $description = false)
+    {
+        if (!is_dir($path) && !is_file($path)) {
+            throw new IOException(sprintf('Unable to guess "%s" type.', $path), 0, null, $path);
+        }
+
+        $perms = substr(sprintf('%o', fileperms($path)), -4);
+
+        if (!$description) {
+            return $perms;
+        }
+
+        if (($perms & 0xC000) == 0xC000) {
+            $out = 's';
+        } elseif (($perms & 0xA000) == 0xA000) {
+            $out = 'l';
+        } elseif (($perms & 0x8000) == 0x8000) {
+            $out = '-';
+        } elseif (($perms & 0x6000) == 0x6000) {
+            $out = 'b';
+        } elseif (($perms & 0x4000) == 0x4000) {
+            $out = 'd';
+        } elseif (($perms & 0x2000) == 0x2000) {
+            $out = 'c';
+        } elseif (($perms & 0x1000) == 0x1000) {
+            $out = 'p';
+        } else {
+            $out = 'u';
+        }
+
+        $out .=
+            (($perms & 0x0100) ? 'r' : '-') .
+            (($perms & 0x0080) ? 'w' : '-') .
+            (($perms & 0x0040) ? (($perms & 0x0800) ? 's' : 'x') : (($perms & 0x0800) ? 'S' : '-')) .
+            (($perms & 0x0020) ? 'r' : '-') .
+            (($perms & 0x0010) ? 'w' : '-') .
+            (($perms & 0x0008) ? (($perms & 0x0400) ? 's' : 'x') : (($perms & 0x0400) ? 'S' : '-')) .
+            (($perms & 0x0004) ? 'r' : '-') .
+            (($perms & 0x0002) ? 'w' : '-') .
+            (($perms & 0x0001) ? (($perms & 0x0200) ? 't' : 'x') : (($perms & 0x0200) ? 'T' : '-'));
+
+        return $out;
+    }
+
+    /**
      * @param mixed $files
      *
      * @return \Traversable

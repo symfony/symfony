@@ -1145,4 +1145,29 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFilePermissions(767, $targetFilePath);
     }
+
+    public function testGetFilePermissions()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+
+        touch($file);
+        chmod($file, 0755);
+
+        $this->assertSame('0755', $this->filesystem->permssions($file));
+        $this->assertSame('u-wxrw--wt', $this->filesystem->permssions($file, true));
+    }
+
+    public function testGetDirectoryPermissions()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR;
+
+        mkdir($dir, 0755);
+
+        $this->assertSame('0755', $this->filesystem->permssions($dir));
+        $this->assertSame('u-wxrw--wt', $this->filesystem->permssions($dir, true));
+    }
 }

@@ -545,15 +545,15 @@ class Filesystem
      *
      * @param string $path A file or directory path.
      * @param boolean $groups Get file|directory permissions by groups ex: 'u-wxrw--wt'.
-     *                               * Description result
-     *                               * s => socket;
-     *                               * l => symbolic link;
-     *                               * - => regular;
-     *                               * b => block special;
-     *                               * d => directory;
-     *                               * c => character special;
-     *                               * p => FIFO pipe;
-     *                               * u => unknown.
+     *                        formats:
+     *                        s => socket;
+     *                        l => symbolic link;
+     *                        - => regular;
+     *                        b => block special;
+     *                        d => directory;
+     *                        c => character special;
+     *                        p => FIFO pipe;
+     *                        u => unknown.
      *
      * @return string Permissions of the file|directory or throw an exception on failure.
      */

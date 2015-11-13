@@ -557,7 +557,7 @@ class Filesystem
      *
      * @return string Permissions of the file|directory or throw an exception on failure.
      */
-    public function permssions($path, $groups = false)
+    public function permissions($path, $groups = false)
     {
         if (!is_dir($path) && !is_file($path)) {
             throw new IOException(sprintf('Unable to guess "%s" type.', $path), 0, null, $path);

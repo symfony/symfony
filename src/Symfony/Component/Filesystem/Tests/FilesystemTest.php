@@ -1155,8 +1155,8 @@ class FilesystemTest extends FilesystemTestCase
         touch($file);
         chmod($file, 0755);
 
-        $this->assertSame('0755', $this->filesystem->permssions($file));
-        $this->assertSame('u-wxrw--wt', $this->filesystem->permssions($file, true));
+        $this->assertSame('0755', $this->filesystem->permissions($file));
+        $this->assertSame('u-wxrw--wt', $this->filesystem->permissions($file, true));
     }
 
     public function testGetDirectoryPermissions()
@@ -1167,7 +1167,7 @@ class FilesystemTest extends FilesystemTestCase
 
         mkdir($dir, 0755);
 
-        $this->assertSame('0755', $this->filesystem->permssions($dir));
-        $this->assertSame('u-wxrw--wt', $this->filesystem->permssions($dir, true));
+        $this->assertSame('0755', $this->filesystem->permissions($dir));
+        $this->assertSame('u-wxrw--wt', $this->filesystem->permissions($dir, true));
     }
 }

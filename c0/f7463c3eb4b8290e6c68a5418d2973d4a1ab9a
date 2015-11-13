@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-27T15:20:13Z
+
+I think you also need to do the same changes in `router_prod.php`.
+
+---------------------------------------------------------------------------
+
+by bytehead at 2015-10-27T15:27:20Z
+
+> I think you also need to do the same changes in router_prod.php.
+
+Yes, the behaviour is also wrong in prod environment.
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2015-10-27T15:31:37Z
+
+You are right. I have updated the PR.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-10-30T15:04:20Z
+
+What needs to be done here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-04T21:12:27Z
+
+Isn't this something to be fixed in PHP?
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2015-11-05T07:27:56Z
+
+Certainly not. Adjusting the environment variables is done by the rewrite module of your web server. Just look at the existing code:
+
+https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/Resources/config/router_prod.php#L34
+
+`$_SERVER['SCRIPT_FILENAME']` is already being adjusted; but since the script is in fact rewriting the URL, `$_SERVER['SCRIPT_NAME']` and `$_SERVER['PHP_SELF']` have to be adjusted accordingly, too.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-11-12T09:26:54Z
+
+You should change (because of the prod file) the headline of this PR

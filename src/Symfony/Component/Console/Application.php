@@ -35,6 +35,8 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -64,19 +66,23 @@ class Application
     private $definition;
     private $helperSet;
     private $dispatcher;
-    private $terminalDimensions;
     private $defaultCommand;
 
     /**
-     * Constructor.
-     *
-     * @param string $name    The name of the application
-     * @param string $version The version of the application
+     * @var TerminalDimensionsProviderInterface
      */
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    private $terminalDimensionsProvider;
+
+    /**
+     * @param string                                $name The name of the application
+     * @param string                                $version The version of the application
+     * @param TerminalDimensionsProviderInterface   $terminalDimensionsProvider
+     */
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
     {
         $this->name = $name;
         $this->version = $version;
+        $this->terminalDimensionsProvider = $terminalDimensionsProvider ?: new TerminalDimensionsProvider();
         $this->defaultCommand = 'list';
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
@@ -656,9 +662,7 @@ class Application
      */
     protected function getTerminalWidth()
     {
-        $dimensions = $this->getTerminalDimensions();
-
-        return $dimensions[0];
+        return $this->terminalDimensionsProvider->getTerminalWidth();
     }
 
     /**
@@ -668,9 +672,7 @@ class Application
      */
     protected function getTerminalHeight()
     {
-        $dimensions = $this->getTerminalDimensions();
-
-        return $dimensions[1];
+        return $this->terminalDimensionsProvider->getTerminalWidth();
     }
 
     /**
@@ -680,33 +682,7 @@ class Application
      */
     public function getTerminalDimensions()
     {
-        if ($this->terminalDimensions) {
-            return $this->terminalDimensions;
-        }
-
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            // extract [w, H] from "wxh (WxH)"
-            if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
-                return array((int) $matches[1], (int) $matches[2]);
-            }
-            // extract [w, h] from "wxh"
-            if (preg_match('/^(\d+)x(\d+)$/', $this->getConsoleMode(), $matches)) {
-                return array((int) $matches[1], (int) $matches[2]);
-            }
-        }
-
-        if ($sttyString = $this->getSttyColumns()) {
-            // extract [w, h] from "rows h; columns w;"
-            if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
-                return array((int) $matches[2], (int) $matches[1]);
-            }
-            // extract [w, h] from "; h rows; w columns"
-            if (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
-                return array((int) $matches[2], (int) $matches[1]);
-            }
-        }
-
-        return array(null, null);
+        return $this->terminalDimensionsProvider->getTerminalDimensions();
     }
 
     /**
@@ -721,7 +697,7 @@ class Application
      */
     public function setTerminalDimensions($width, $height)
     {
-        $this->terminalDimensions = array($width, $height);
+        $this->terminalDimensionsProvider->setTerminalDimensions($width, $height);
 
         return $this;
     }
@@ -878,54 +854,6 @@ class Application
             new ProcessHelper(),
             new QuestionHelper(),
         ));
-    }
-
-    /**
-     * Runs and parses stty -a if it's available, suppressing any error output.
-     *
-     * @return string
-     */
-    private function getSttyColumns()
-    {
-        if (!function_exists('proc_open')) {
-            return;
-        }
-
-        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
-            $info = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
-
-            return $info;
-        }
-    }
-
-    /**
-     * Runs and parses mode CON if it's available, suppressing any error output.
-     *
-     * @return string <width>x<height> or null if it could not be parsed
-     */
-    private function getConsoleMode()
-    {
-        if (!function_exists('proc_open')) {
-            return;
-        }
-
-        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
-        $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
-        if (is_resource($process)) {
-            $info = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
-
-            if (preg_match('/--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
-                return $matches[2].'x'.$matches[1];
-            }
-        }
     }
 
     /**

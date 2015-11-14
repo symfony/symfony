@@ -57,9 +57,9 @@ class ProgressBar
     private $terminalDimensionsProvider;
 
     /**
-     * @param OutputInterface                       $output An OutputInterface instance
-     * @param int                                   $max    Maximum steps (0 if unknown)
-     * @param TerminalDimensionsProviderInterface   $terminalDimensionsProvider
+     * @param OutputInterface                     $output An OutputInterface instance
+     * @param int                                 $max    Maximum steps (0 if unknown)
+     * @param TerminalDimensionsProviderInterface $terminalDimensionsProvider
      */
     public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
     {

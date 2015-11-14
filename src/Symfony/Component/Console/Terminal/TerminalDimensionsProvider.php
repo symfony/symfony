@@ -94,7 +94,7 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 
 		$descriptorspec = array(
 			1 => array('pipe', 'w'),
-			2 => array('pipe', 'w')
+			2 => array('pipe', 'w'),
 		);
 		$process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
 		if (is_resource($process)) {
@@ -122,7 +122,7 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 
 		$descriptorspec = array(
 			1 => array('pipe', 'w'),
-			2 => array('pipe', 'w')
+			2 => array('pipe', 'w'),
 		);
 
 		$process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));

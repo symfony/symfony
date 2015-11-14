@@ -74,9 +74,9 @@ class Application
     private $terminalDimensionsProvider;
 
     /**
-     * @param string                                $name The name of the application
-     * @param string                                $version The version of the application
-     * @param TerminalDimensionsProviderInterface   $terminalDimensionsProvider
+     * @param string                              $name The name of the application
+     * @param string                              $version The version of the application
+     * @param TerminalDimensionsProviderInterface $terminalDimensionsProvider
      */
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
     {

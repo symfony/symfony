@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\LogicException;
@@ -615,8 +616,7 @@ class ProgressBar
     private function adjustBarWidthToWindowWidth($line)
     {
         $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
-        $windowWidth = exec('tput cols');
-
+        $windowWidth = $this->getTerminalWidth();
         if ($lineLength > $windowWidth) {
             $barWidthDelta = $lineLength - $windowWidth;
             $newBarWidth = $this->barWidth - $barWidthDelta - 20;
@@ -624,5 +624,23 @@ class ProgressBar
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTerminalWidth()
+    {
+        $dimensions = $this->getTerminalDimensions();
+        return $dimensions[0];
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getTerminalDimensions()
+    {
+        $application = new Application();
+        return $application->getTerminalDimensions();
     }
 }

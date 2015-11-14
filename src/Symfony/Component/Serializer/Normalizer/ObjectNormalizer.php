@@ -66,7 +66,7 @@ class ObjectNormalizer extends AbstractNormalizer
 
             // methods
             $reflClass = new \ReflectionClass($object);
-            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC ) as $reflMethod) {
+            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
                 if (
                     !$reflMethod->isStatic() &&
                     !$reflMethod->isConstructor() &&

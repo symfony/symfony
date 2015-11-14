@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractNormalizer
 {
+    private static $attributesCache = array();
+
     /**
      * @var PropertyAccessorInterface
      */
@@ -58,42 +60,7 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         $data = array();
-        $attributes = $this->getAllowedAttributes($object, $context, true);
-
-        // If not using groups, detect manually
-        if (false === $attributes) {
-            $attributes = array();
-
-            // methods
-            $reflClass = new \ReflectionClass($object);
-            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if (
-                    !$reflMethod->isStatic() &&
-                    !$reflMethod->isConstructor() &&
-                    !$reflMethod->isDestructor() &&
-                    0 === $reflMethod->getNumberOfRequiredParameters()
-                ) {
-                    $name = $reflMethod->getName();
-
-                    if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
-                        // getters and hassers
-                        $attributes[lcfirst(substr($name, 3))] = true;
-                    } elseif (strpos($name, 'is') === 0) {
-                        // issers
-                        $attributes[lcfirst(substr($name, 2))] = true;
-                    }
-                }
-            }
-
-            // properties
-            foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-                if (!$reflProperty->isStatic()) {
-                    $attributes[$reflProperty->getName()] = true;
-                }
-            }
-
-            $attributes = array_keys($attributes);
-        }
+        $attributes = $this->getAttributes($object, $context);
 
         foreach ($attributes as $attribute) {
             if (in_array($attribute, $this->ignoredAttributes)) {
@@ -161,5 +128,65 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         return $object;
+    }
+
+    /**
+     * Gets and caches attributes for this class and context.
+     *
+     * @param object $object
+     * @param array  $context
+     *
+     * @return array
+     */
+    private function getAttributes($object, array $context)
+    {
+        $key = sprintf('%s-%s', get_class($object), serialize($context));
+
+        if (isset(self::$attributesCache[$key])) {
+            return self::$attributesCache[$key];
+        }
+
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
+
+        if (false !== $allowedAttributes) {
+            return self::$attributesCache[$key] = $allowedAttributes;
+        }
+
+        // If not using groups, detect manually
+        $attributes = array();
+
+        // methods
+        $reflClass = new \ReflectionClass($object);
+        foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
+            if (
+                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+                $reflMethod->isStatic() ||
+                $reflMethod->isConstructor() ||
+                $reflMethod->isDestructor()
+            ) {
+                continue;
+            }
+
+            $name = $reflMethod->getName();
+
+            if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
+                // getters and hassers
+                $attributes[lcfirst(substr($name, 3))] = true;
+            } elseif (strpos($name, 'is') === 0) {
+                // issers
+                $attributes[lcfirst(substr($name, 2))] = true;
+            }
+        }
+
+        // properties
+        foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
+            if ($reflProperty->isStatic()) {
+                continue;
+            }
+
+            $attributes[$reflProperty->getName()] = true;
+        }
+
+        return self::$attributesCache[$key] = array_keys($attributes);
     }
 }

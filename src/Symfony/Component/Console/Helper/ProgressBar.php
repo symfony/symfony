@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -51,12 +52,16 @@ class ProgressBar
     private static $formats;
 
     /**
-     * Constructor.
-     *
-     * @param OutputInterface $output An OutputInterface instance
-     * @param int             $max    Maximum steps (0 if unknown)
+     * @var TerminalDimensionsProviderInterface
      */
-    public function __construct(OutputInterface $output, $max = 0)
+    private $terminalDimensionsProvider;
+
+    /**
+     * @param OutputInterface                       $output An OutputInterface instance
+     * @param int                                   $max    Maximum steps (0 if unknown)
+     * @param TerminalDimensionsProviderInterface   $terminalDimensionsProvider
+     */
+    public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -64,6 +69,7 @@ class ProgressBar
 
         $this->output = $output;
         $this->setMaxSteps($max);
+        $this->terminalDimensionsProvider = $terminalDimensionsProvider ?: new TerminalDimensionsProvider();
 
         if (!$this->output->isDecorated()) {
             // disable overwrite when output does not support ANSI codes.
@@ -616,31 +622,15 @@ class ProgressBar
     private function adjustBarWidthToWindowWidth($line)
     {
         $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
-        $windowWidth = $this->getTerminalWidth();
+        $windowWidth = $this->terminalDimensionsProvider->getTerminalWidth();
         if ($lineLength > $windowWidth) {
             $barWidthDelta = $lineLength - $windowWidth;
             $newBarWidth = $this->barWidth - $barWidthDelta - 20;
             $this->setBarWidth($newBarWidth);
+
             return true;
         }
+
         return false;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTerminalWidth()
-    {
-        $dimensions = $this->getTerminalDimensions();
-        return $dimensions[0];
-    }
-
-    /**
-     * @return int[]
-     */
-    private function getTerminalDimensions()
-    {
-        $application = new Application();
-        return $application->getTerminalDimensions();
     }
 }

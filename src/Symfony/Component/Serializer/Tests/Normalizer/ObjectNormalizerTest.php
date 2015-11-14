@@ -456,6 +456,11 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
+
+    public function testNormalizeStatic()
+    {
+        $this->assertEquals(array('foo' => 'K'), $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
+    }
 }
 
 class ObjectDummy
@@ -603,5 +608,16 @@ class ObjectConstructorArgsWithDefaultValueDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class ObjectWithStaticPropertiesAndMethods
+{
+    public $foo = 'K';
+    public static $bar = 'A';
+
+    public static function getBaz()
+    {
+        return 'L';
     }
 }

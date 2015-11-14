@@ -16,7 +16,7 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 	/**
 	 * @var int[]
 	 */
-	private $terminalDimensions;
+	private $terminalDimensions = array();
 
 	/**
 	 * {@inheritdoc}
@@ -30,26 +30,26 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 		if ($this->isWindowsEnvironment()) {
 			// extract [w, H] from "wxh (WxH)"
 			if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
-				return [(int) $matches[1], (int) $matches[2]];
+				return array((int) $matches[1], (int) $matches[2]);
 			}
 			// extract [w, h] from "wxh"
 			if (preg_match('/^(\d+)x(\d+)$/', $this->getConsoleMode(), $matches)) {
-				return [(int) $matches[1], (int) $matches[2]];
+				return array((int) $matches[1], (int) $matches[2]);
 			}
 		}
 
 		if ($sttyString = $this->getSttyColumns()) {
 			// extract [w, h] from "rows h; columns w;"
 			if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
-				return [(int) $matches[2], (int) $matches[1]];
+				return array((int) $matches[2], (int) $matches[1]);
 			}
 			// extract [w, h] from "; h rows; w columns"
 			if (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
-				return [(int) $matches[2], (int) $matches[1]];
+				return array((int) $matches[2], (int) $matches[1]);
 			}
 		}
 
-		return [null, null];
+		return array(null, null);
 	}
 
 	/**
@@ -69,6 +69,19 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 	}
 
 	/**
+	 * Sets terminal dimensions.
+	 *
+	 * Can be useful to force terminal dimensions for functional tests.
+	 *
+	 * @param int $width
+	 * @param int $height
+	 */
+	public function setTerminalDimensions($width, $height)
+	{
+		$this->terminalDimensions = array($width, $height);
+	}
+
+	/**
 	 * Runs and parses mode CON if it's available, suppressing any error output.
 	 *
 	 * @return string <width>x<height> or null if it could not be parsed
@@ -79,11 +92,11 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 			return;
 		}
 
-		$descriptorspec = [
-			1 => ['pipe', 'w'],
-			2 => ['pipe', 'w']
-		];
-		$process = proc_open('mode CON', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+		$descriptorspec = array(
+			1 => array('pipe', 'w'),
+			2 => array('pipe', 'w')
+		);
+		$process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
 		if (is_resource($process)) {
 			$info = stream_get_contents($pipes[1]);
 			fclose($pipes[1]);
@@ -107,12 +120,12 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
 			return;
 		}
 
-		$descriptorspec = [
-			1 => ['pipe', 'w'],
-			2 => ['pipe', 'w']
-		];
+		$descriptorspec = array(
+			1 => array('pipe', 'w'),
+			2 => array('pipe', 'w')
+		);
 
-		$process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+		$process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
 		if (is_resource($process)) {
 			$info = stream_get_contents($pipes[1]);
 			fclose($pipes[1]);

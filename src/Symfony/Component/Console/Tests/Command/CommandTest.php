@@ -385,6 +385,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
         $command->addUsage('some usage');
         $this->assertSame('namespace:name some usage', $command->getUsages()[0]);
+
+        $command->addUsage('namespace:name is easy to use');
+        $this->assertSame('namespace:name is easy to use', $command->getUsages()[1]);
+
     }
 }
 

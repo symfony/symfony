@@ -12,8 +12,10 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,6 +24,7 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\TraversableDummy;
 
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,6 +57,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $this->assertEquals($application, $command->getApplication(), '->setApplication() sets the current application');
+    }
+
+    public function testSetApplicationNullToNullHelperSet()
+    {
+        $command = new \TestCommand();
+        $application = new Application();
+
+        $command->setApplication($application);
+        $this->assertInstanceOf(HelperSet::class, $command->getHelperSet());
+
+        $command->setApplication(null);
+        $this->assertNull($command->getHelperSet());
     }
 
     public function testSetGetDefinition()
@@ -337,6 +352,39 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function callableMethodCommand(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('from the code...');
+    }
+
+    public function testSetProcessTitle()
+    {
+        $command = new \TestCommand();
+
+        $this->assertSame('', cli_get_process_title());
+
+        $command->setProcessTitle('process title');
+        $inputMock = $this->prophesize(InputInterface::class);
+        $outputMock = $this->prophesize(OutputInterface::class);
+        $command->run($inputMock->reveal(), $outputMock->reveal());
+
+        $this->assertSame('process title', cli_get_process_title());
+    }
+
+    public function testSetAliases()
+    {
+        $command = new \TestCommand();
+        $command->setAliases([]);
+        $command->setAliases(new TraversableDummy());
+
+        $this->setExpectedException(InvalidArgumentException::class);
+        $command->setAliases('invalid');
+    }
+
+    public function testAddUsage()
+    {
+        $command = new \TestCommand();
+        $this->assertSame([], $command->getUsages());
+
+        $command->addUsage('some usage');
+        $this->assertSame('namespace:name some usage', $command->getUsages()[0]);
     }
 }
 

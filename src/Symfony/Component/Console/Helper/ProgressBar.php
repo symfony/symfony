@@ -217,7 +217,7 @@ class ProgressBar
      */
     public function setBarWidth($size)
     {
-        $this->barWidth = (int) $size;
+        $this->barWidth = max(1, (int) $size);
     }
 
     /**

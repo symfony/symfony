@@ -32,24 +32,7 @@ class TerminalDimensionsProviderTest extends PHPUnit_Framework_TestCase
         $dimensions = $this->terminalDimensionsProvider->getTerminalDimensions();
         $this->assertCount(2, $dimensions);
 
-        if ($this->isUnixEnvironment()) {
-            $this->assertSame((int) exec('tput cols'), $dimensions[0]);
-        }
-    }
-
-    public function testGetTerminalWidth()
-    {
-        $width = $this->terminalDimensionsProvider->getTerminalWidth();
-        if ($this->isUnixEnvironment()) {
-            $this->assertSame((int) exec('tput cols'), $width);
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    private function isUnixEnvironment()
-    {
-        return '/' === DIRECTORY_SEPARATOR;
+        $this->terminalDimensionsProvider->setTerminalDimensions(100, 50);
+        $this->assertSame(array(100, 50), $this->terminalDimensionsProvider->getTerminalDimensions());
     }
 }

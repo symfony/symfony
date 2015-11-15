@@ -69,12 +69,7 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
     }
 
     /**
-     * Sets terminal dimensions.
-     *
-     * Can be useful to force terminal dimensions for functional tests.
-     *
-     * @param int $width
-     * @param int $height
+     * {@inheritdoc}
      */
     public function setTerminalDimensions($width, $height)
     {

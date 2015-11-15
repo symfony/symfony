@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 
 /**
  * @group time-sensitive
@@ -22,7 +24,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 {
     public function testMultipleStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance();
         $bar->start();
@@ -38,7 +40,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAdvance()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance();
 
@@ -52,7 +54,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAdvanceWithStep()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance(5);
 
@@ -66,7 +68,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAdvanceMultipleTimes()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance(3);
         $bar->advance(2);
@@ -82,7 +84,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAdvanceOverMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, $this->createTerminalDimensionsProvider());
         $bar->setProgress(9);
         $bar->advance();
         $bar->advance();
@@ -105,7 +107,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         ;
 
         // max in construct, no format
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance(10);
         $bar->finish();
@@ -114,7 +116,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in start, no format
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start(10);
         $bar->advance(10);
         $bar->finish();
@@ -123,7 +125,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in construct, explicit format before
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, $this->createTerminalDimensionsProvider());
         $bar->setFormat('normal');
         $bar->start();
         $bar->advance(10);
@@ -133,7 +135,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
 
         // max in start, explicit format before
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->setFormat('normal');
         $bar->start(10);
         $bar->advance(10);
@@ -145,7 +147,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testCustomizations()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, $this->createTerminalDimensionsProvider());
         $bar->setBarWidth(10);
         $bar->setBarCharacter('_');
         $bar->setEmptyBarCharacter(' ');
@@ -164,7 +166,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testDisplayWithoutStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->display();
 
         rewind($output->getStream());
@@ -176,7 +178,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testDisplayWithQuietVerbosity()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(true, StreamOutput::VERBOSITY_QUIET), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(true, StreamOutput::VERBOSITY_QUIET), 50, $this->createTerminalDimensionsProvider());
         $bar->display();
 
         rewind($output->getStream());
@@ -188,7 +190,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testFinishWithoutStart()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->finish();
 
         rewind($output->getStream());
@@ -200,7 +202,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testPercent()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -218,7 +220,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testOverwriteWithShorterLine()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         $bar->display();
@@ -240,7 +242,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testStartWithMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->setFormat('%current%/%max% [%bar%]');
         $bar->start(50);
         $bar->advance();
@@ -255,7 +257,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCurrentProgress()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -288,7 +290,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegressProgress()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->setProgress(15);
         $bar->setProgress(10);
@@ -309,7 +311,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testMultiByteSupport()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->setBarCharacter('■');
         $bar->advance(3);
@@ -324,7 +326,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testClear()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->setProgress(25);
         $bar->clear();
@@ -340,7 +342,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testPercentNotHundredBeforeComplete()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 200);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 200, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->display();
         $bar->advance(199);
@@ -358,7 +360,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testNonDecoratedOutput()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 200, $this->createTerminalDimensionsProvider());
         $bar->start();
 
         for ($i = 0; $i < 200; ++$i) {
@@ -386,7 +388,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testNonDecoratedOutputWithClear()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false), 50);
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 50, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->setProgress(25);
         $bar->clear();
@@ -404,7 +406,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testNonDecoratedOutputWithoutMax()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(false));
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance();
 
@@ -419,10 +421,10 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     public function testParallelBars()
     {
         $output = $this->getOutputStream();
-        $bar1 = new ProgressBar($output, 2);
-        $bar2 = new ProgressBar($output, 3);
+        $bar1 = new ProgressBar($output, 2, $this->createTerminalDimensionsProvider());
+        $bar2 = new ProgressBar($output, 3, $this->createTerminalDimensionsProvider());
         $bar2->setProgressCharacter('#');
-        $bar3 = new ProgressBar($output);
+        $bar3 = new ProgressBar($output, 0, $this->createTerminalDimensionsProvider());
 
         $bar1->start();
         $output->write("\n");
@@ -479,7 +481,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     {
         $output = $this->getOutputStream();
 
-        $bar = new ProgressBar($output);
+        $bar = new ProgressBar($output, 0, $this->createTerminalDimensionsProvider());
         $bar->start();
         $bar->advance();
         $bar->advance();
@@ -502,7 +504,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', function (ProgressBar $bar) {
             return $bar->getMaxSteps() - $bar->getProgress();
         });
-        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, $this->createTerminalDimensionsProvider());
         $bar->setFormat(' %remaining_steps% [%bar%]');
 
         $bar->start();
@@ -520,7 +522,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testMultilineFormat()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3, $this->createTerminalDimensionsProvider());
         $bar->setFormat("%bar%\nfoobar");
 
         $bar->start();
@@ -540,7 +542,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAnsiColorsAndEmojis()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 15);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 15, $this->createTerminalDimensionsProvider());
         ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
             static $i = 0;
             $mem = 100000 * $i;
@@ -583,7 +585,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testSetFormat()
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->setFormat('normal');
         $bar->start();
         rewind($output->getStream());
@@ -592,7 +594,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             stream_get_contents($output->getStream())
         );
 
-        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10, $this->createTerminalDimensionsProvider());
         $bar->setFormat('normal');
         $bar->start();
         rewind($output->getStream());
@@ -607,7 +609,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatsWithoutMax($format)
     {
-        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar = new ProgressBar($output = $this->getOutputStream(), 0, $this->createTerminalDimensionsProvider());
         $bar->setFormat($format);
         $bar->start();
 
@@ -640,5 +642,16 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $count = substr_count($expected, "\n");
 
         return "\x0D".($count ? sprintf("\033[%dA", $count) : '').$expected;
+    }
+
+    /**
+     * @return TerminalDimensionsProviderInterface
+     */
+    private function createTerminalDimensionsProvider()
+    {
+        $terminalDimensionsProvider = new TerminalDimensionsProvider();
+        $terminalDimensionsProvider->setTerminalDimensions(800, 5);
+
+        return $terminalDimensionsProvider;
     }
 }

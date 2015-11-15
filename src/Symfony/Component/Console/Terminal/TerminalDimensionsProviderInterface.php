@@ -33,4 +33,14 @@ interface TerminalDimensionsProviderInterface
 	 * @return int|null
 	 */
 	public function getTerminalHeight();
+
+	/**
+	 * Sets terminal dimensions.
+	 *
+	 * Can be useful to force terminal dimensions for functional tests.
+	 *
+	 * @param int $width
+	 * @param int $height
+	 */
+	public function setTerminalDimensions($width, $height);
 }

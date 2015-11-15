@@ -412,28 +412,9 @@ class ProgressBar
             $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
         }
 
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
-            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
-                $text = call_user_func($formatter, $this, $this->output);
-                if ($this->adjustBarWidthToWindowWidth($text)) {
-                    $text = call_user_func($formatter, $this, $this->output);
-                }
-            } elseif (isset($this->messages[$matches[1]])) {
-                $text = $this->messages[$matches[1]];
-                if ($this->adjustBarWidthToWindowWidth($text)) {
-                    $text = $this->messages[$matches[1]];
-                }
-
-            } else {
-                return $matches[0];
-            }
-
-            if (isset($matches[2])) {
-                $text = sprintf('%'.$matches[2], $text);
-            }
-
-            return $text;
-        }, $this->format));
+        $line = $this->buildLine();
+        $line = $this->adjustLineWidthToTerminalWidth($line);
+        $this->overwrite($line);
     }
 
     /**
@@ -616,22 +597,43 @@ class ProgressBar
     }
 
     /**
+     * @return string
+     */
+    private function buildLine()
+    {
+        return preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $this, $this->output);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
+            } else {
+                return $matches[0];
+            }
+
+            if (isset($matches[2])) {
+                $text = sprintf('%'.$matches[2], $text);
+            }
+
+            return $text;
+        }, $this->format);
+    }
+
+    /**
      * @param string $line
      *
      * @return bool
      */
-    private function adjustBarWidthToWindowWidth($line)
+    private function adjustLineWidthToTerminalWidth($line)
     {
         $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
-        $windowWidth = $this->terminalDimensionsProvider->getTerminalWidth();
-        if ($lineLength > $windowWidth) {
-            $barWidthDelta = $lineLength - $windowWidth;
-            $newBarWidth = $this->barWidth - $barWidthDelta - 20;
+        $terminalWidth = $this->terminalDimensionsProvider->getTerminalWidth();
+        if ($lineLength > $terminalWidth) {
+            $newBarWidth = $this->barWidth - $lineLength + $terminalWidth;
             $this->setBarWidth($newBarWidth);
 
-            return true;
+            return $this->buildLine();
         }
 
-        return false;
+        return $line;
     }
 }

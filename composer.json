@@ -105,6 +105,11 @@
             "**/Tests/"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfony\\Component\\Console\\Tests\\": "src/Symfony/Component/Console/Tests"
+        }
+    },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

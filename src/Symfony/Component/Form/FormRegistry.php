@@ -120,7 +120,7 @@ class FormRegistry implements FormRegistryInterface
         $hasCustomName = $name !== $fqcn;
 
         if ($parentType instanceof FormTypeInterface) {
-            @trigger_error('Returning a FormTypeInterface from FormTypeInterface::getParent() is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Returning a FormTypeInterface from %s::getParent() is deprecated since version 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', $fqcn), E_USER_DEPRECATED);
 
             $this->resolveAndAddType($parentType);
             $parentType = $parentType->getName();
@@ -128,14 +128,11 @@ class FormRegistry implements FormRegistryInterface
 
         if ($hasCustomName) {
             foreach ($this->extensions as $extension) {
-                $typeExtensions = array_merge(
-                    $typeExtensions,
-                    $extension->getTypeExtensions($name)
-                );
-            }
+                if ($x = $extension->getTypeExtensions($name)) {
+                    @trigger_error(sprintf('Returning a type name from %s::getExtendedType() is deprecated since version 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', get_class($x[0])), E_USER_DEPRECATED);
 
-            if ($typeExtensions) {
-                @trigger_error('Returning a type name from FormTypeExtensionInterface::getExtendedType() is deprecated since version 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', E_USER_DEPRECATED);
+                    $typeExtensions = array_merge($typeExtensions, $x);
+                }
             }
         }
 

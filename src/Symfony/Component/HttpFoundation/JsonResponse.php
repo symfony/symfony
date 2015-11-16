@@ -49,8 +49,7 @@ class JsonResponse extends Response
      */
     public function __construct($data = null, $status = 200, $headers = array())
     {
-        parent::__construct('', $status, $headers);
-
+        parent::__construct('{}', $status, $headers);
         if (null === $data) {
             $data = new \ArrayObject();
         }

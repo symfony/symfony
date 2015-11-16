@@ -144,6 +144,10 @@ class JsonResponse extends Response
     {
         $this->encodingOptions = (int) $encodingOptions;
 
+        if ($this->content !== null) {
+            $this->data = $this->content;
+        }
+
         return $this->setData(json_decode($this->data));
     }
 

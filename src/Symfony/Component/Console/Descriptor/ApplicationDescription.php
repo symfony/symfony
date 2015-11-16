@@ -112,6 +112,7 @@ class ApplicationDescription
 
             /** @var Command $command */
             foreach ($commands as $name => $command) {
+                var_dump($command->getName());
                 if (!$command->getName()) {
                     continue;
                 }

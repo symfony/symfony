@@ -24,7 +24,16 @@ namespace Symfony\Component\HttpFoundation;
  */
 class JsonResponse extends Response
 {
+    /**
+     * Associative representation of $content.
+     *
+     * @var array
+     */
     protected $data;
+
+    /**
+     * @var string
+     */
     protected $callback;
 
     // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
@@ -85,66 +94,65 @@ class JsonResponse extends Response
     }
 
     /**
+     * Sets the content to be sent as JSON.
+     *
+     * @param string $content
+     *
+     * @return Response
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setContent($content)
+    {
+        $data = json_decode($content);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(json_last_error_msg());
+        }
+        $this->data = $data;
+
+        return $this->update();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContent()
+    {
+        if ($this->callback !== null) {
+            // Not using application/javascript for compatibility reasons with older browsers.
+            $this->headers->set('Content-Type', 'text/javascript');
+
+            return sprintf('/**/%s(%s);', $this->callback, $this->content);
+        }
+
+        return parent::getContent();
+    }
+
+    /**
+     * Add content to existing data array.
+     *
+     * @param array $data
+     *
+     * @return JsonResponse
+     *
+     * @throws \Exception
+     */
+    public function addData($data = array())
+    {
+        $this->data = array_merge_recursive($this->data, (array) $data);
+
+        return $this->update();
+    }
+
+    /**
      * Sets the data to be sent as JSON.
      *
      * @param mixed $data
      *
      * @return JsonResponse
-     *
-     * @throws \InvalidArgumentException
      */
     public function setData($data = array())
     {
-        if (defined('HHVM_VERSION')) {
-            // HHVM does not trigger any warnings and let exceptions
-            // thrown from a JsonSerializable object pass through.
-            // If only PHP did the same...
-            $data = json_encode($data, $this->encodingOptions);
-        } else {
-            try {
-                if (PHP_VERSION_ID < 50400) {
-                    // PHP 5.3 triggers annoying warnings for some
-                    // types that can't be serialized as JSON (INF, resources, etc.)
-                    // but doesn't provide the JsonSerializable interface.
-                    set_error_handler('var_dump', 0);
-                    $data = @json_encode($data, $this->encodingOptions);
-                } else {
-                    // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
-                    // objects in a new exception that needs to be removed.
-                    // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
-                    if (PHP_VERSION_ID < 50500) {
-                        // Clear json_last_error()
-                        json_encode(null);
-                        $errorHandler = set_error_handler('var_dump');
-                        restore_error_handler();
-                        set_error_handler(function () use ($errorHandler) {
-                            if (JSON_ERROR_NONE === json_last_error()) {
-                                return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
-                            }
-                        });
-                    }
-
-                    $data = json_encode($data, $this->encodingOptions);
-                }
-
-                if (PHP_VERSION_ID < 50500) {
-                    restore_error_handler();
-                }
-            } catch (\Exception $e) {
-                if (PHP_VERSION_ID < 50500) {
-                    restore_error_handler();
-                }
-                if (PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
-                    throw $e->getPrevious() ?: $e;
-                }
-                throw $e;
-            }
-        }
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException(json_last_error_msg());
-        }
-
         $this->data = $data;
 
         return $this->update();
@@ -171,29 +179,79 @@ class JsonResponse extends Response
     {
         $this->encodingOptions = (int) $encodingOptions;
 
-        return $this->setData(json_decode($this->data));
+        return $this->update();
     }
 
     /**
      * Updates the content and headers according to the JSON data and callback.
      *
      * @return JsonResponse
+     *
+     * @throws \Exception
      */
-    protected function update()
+    private function update()
     {
-        if (null !== $this->callback) {
-            // Not using application/javascript for compatibility reasons with older browsers.
-            $this->headers->set('Content-Type', 'text/javascript');
-
-            return $this->setContent(sprintf('/**/%s(%s);', $this->callback, $this->data));
-        }
-
         // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
         // in order to not overwrite a custom definition.
         if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
             $this->headers->set('Content-Type', 'application/json');
         }
 
-        return $this->setContent($this->data);
+        if (defined('HHVM_VERSION')) {
+            // HHVM does not trigger any warnings and let exceptions
+            // thrown from a JsonSerializable object pass through.
+            // If only PHP did the same...
+            $serializedData = json_encode($this->data, $this->encodingOptions);
+        } else {
+            try {
+                if (PHP_VERSION_ID < 50400) {
+                    // PHP 5.3 triggers annoying warnings for some
+                    // types that can't be serialized as JSON (INF, resources, etc.)
+                    // but doesn't provide the JsonSerializable interface.
+                    set_error_handler('var_dump', 0);
+                    $serializedData = @json_encode($this->data, $this->encodingOptions);
+                } else {
+                    // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
+                    // objects in a new exception that needs to be removed.
+                    // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
+                    if (PHP_VERSION_ID < 50500) {
+                        // Clear json_last_error()
+                        json_encode(null);
+                        $errorHandler = set_error_handler('var_dump');
+                        restore_error_handler();
+                        set_error_handler(function () use ($errorHandler) {
+                            if (JSON_ERROR_NONE === json_last_error()) {
+                                return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
+                            }
+
+                            return;
+                        });
+                    }
+
+                    $serializedData = json_encode($this->data, $this->encodingOptions);
+                }
+
+                if (PHP_VERSION_ID < 50500) {
+                    restore_error_handler();
+                }
+            } catch (\Exception $e) {
+                if (PHP_VERSION_ID < 50500) {
+                    restore_error_handler();
+                }
+                if (PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                    throw $e->getPrevious() ?: $e;
+                }
+                throw $e;
+            }
+        }
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(json_last_error_msg());
+        }
+
+        // update content with serialized data
+        $this->content = $serializedData;
+
+        return $this;
     }
 }

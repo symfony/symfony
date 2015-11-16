@@ -213,28 +213,24 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         JsonResponse::create($serializable);
     }
 
-    public function testSetDataAfterSettingEncodingOptions()
+    public function testDataAfterSettingEncodingOptions()
     {
         $response = new JsonResponse();
         $response->setData(array(array(1, 2, 3)));
 
         $this->assertEquals('[[1,2,3]]', $response->getContent());
-
         $response->setEncodingOptions(JSON_FORCE_OBJECT);
-        $response->setData(array(array(4, 5, 6)));
-        $this->assertEquals('{"0":{"0":4,"1":5,"2":6}}', $response->getContent());
+
+        $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }
 
-    public function testSetContentAfterSettingEncodingOptions()
+    public function testContentAfterSettingEncodingOptionsToBeEmpty()
     {
         $response = new JsonResponse();
-        $response->setData(array(array(1, 2, 3)));
+        $response->setContent('{"different":{"key":"value"}}');
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
 
-        $this->assertEquals('[[1,2,3]]', $response->getContent());
-
-        $response->setEncodingOptions(JSON_PRETTY_PRINT);
-        $response->setContent("['baz' => ['foo' => 'bar']]");
-        $this->assertEquals("['baz' => ['foo' => 'bar']]", $response->getContent());
+        $this->assertEquals($response->getContent(), '{"different":{"key":"value"}}');
     }
 }
 

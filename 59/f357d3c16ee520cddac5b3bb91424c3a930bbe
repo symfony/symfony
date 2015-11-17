@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-14T11:32:24Z
+
+Maybe should I open another PR for the PropertyAccess Component to prevent it from trying to access static methods/properties?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-14T17:54:17Z
+
+CS fixed. Travis failure is not related.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-17T00:10:00Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by roundge at 2015-11-17T14:53:10Z
+
+yeah thanks @dunglas to take seriously my problem!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-17T14:55:14Z
+
+makes sense to me
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-17T15:57:40Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-17T17:20:19Z
+
+:+1:

@@ -104,6 +104,42 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      */
+    public function getRawChoices()
+    {
+        if (!$this->loadedList) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        }
+
+        return $this->loadedList->getRawChoices();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawChoiceValues()
+    {
+        if (!$this->loadedList) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        }
+
+        return $this->loadedList->getRawChoiceValues();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawKeys()
+    {
+        if (!$this->loadedList) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+        }
+
+        return $this->loadedList->getRawKeys();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOriginalKeys()
     {
         if (!$this->loadedList) {

@@ -590,7 +590,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $server['PHP_AUTH_USER'] = 'fabien';
+        $server = array('PHP_AUTH_USER' => 'fabien');
         $request->initialize(array(), array(), array(), array(), array(), $server);
         $this->assertEquals('fabien', $request->getUserInfo());
 

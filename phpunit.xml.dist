@@ -40,6 +40,10 @@
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/*/Resources</directory>
+                <directory>./src/Symfony/Bridge/*/vendor</directory>
+                <directory>./src/Symfony/Bundle/*/vendor</directory>
+                <directory>./src/Symfony/Component/*/vendor</directory>
+                <directory>./src/Symfony/Component/*/*/vendor</directory>
             </exclude>
         </whitelist>
     </filter>

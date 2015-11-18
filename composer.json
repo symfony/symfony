@@ -74,6 +74,7 @@
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
         "ircmaxell/password-compat": "~1.0",
+        "zendframework/zend-stdlib": "~2.5",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2"
     },

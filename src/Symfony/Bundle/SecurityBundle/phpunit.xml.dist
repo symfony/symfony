@@ -9,6 +9,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
     </php>
+
     <testsuites>
         <testsuite name="Symfony SecurityBundle Test Suite">
             <directory>./Tests/</directory>
@@ -19,8 +20,8 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
                 <directory>./Resources</directory>
+                <directory>./Tests</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>

@@ -9,6 +9,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
     </php>
+
     <testsuites>
         <testsuite name="Symfony ProxyManager Bridge Test Suite">
             <directory>./Tests/</directory>

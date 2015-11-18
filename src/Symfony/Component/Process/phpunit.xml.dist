@@ -9,6 +9,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
     </php>
+
     <testsuites>
         <testsuite name="Symfony Process Component Test Suite">
             <directory>./Tests/</directory>
@@ -20,6 +21,7 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Tests</directory>
+                <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>

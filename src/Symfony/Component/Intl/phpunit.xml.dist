@@ -26,6 +26,7 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
+                <directory>./Resources</directory>
                 <directory>./Tests</directory>
                 <directory>./vendor</directory>
             </exclude>

@@ -118,7 +118,11 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://username:password@symfony.com'),
             array('http://user-name@symfony.com'),
             array('http://symfony.com?'),
+            array('http://symfony.com?query=1'),
+            array('http://symfony.com/?query=1'),
             array('http://symfony.com#'),
+            array('http://symfony.com#fragment'),
+            array('http://symfony.com/#fragment'),
         );
     }
 

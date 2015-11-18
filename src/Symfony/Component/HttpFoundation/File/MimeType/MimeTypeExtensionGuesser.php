@@ -661,6 +661,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'image/gif' => 'gif',
         'image/ief' => 'ief',
         'image/jpeg' => 'jpeg',
+        'image/pjpeg' => 'jpeg',
         'image/ktx' => 'ktx',
         'image/png' => 'png',
         'image/prs.btif' => 'btif',

@@ -131,6 +131,7 @@ class PluralizationRules
             case 'fr':
             case 'gun':
             case 'hi':
+            case 'hy':
             case 'ln':
             case 'mg':
             case 'nso':

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-17T21:19:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-17T21:28:02Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-17T22:11:39Z
+
+Just a curious.
+
+What is a standard way to check OS in Symfony?
+
+At some places it is check DIRECTORY_SEPARATOR, in another places it is strpos(PHP_OS, "WIN") === 0.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-17T22:14:44Z
+
+@ewgRa We always check the value of the `DIRECTORY_SEPARATOR` constant. There shouldn't be any other checks anymore (we unified that some time ago).

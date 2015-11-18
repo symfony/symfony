@@ -20,7 +20,7 @@ class JsonDecodeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->decoder = new JsonDecode(TRUE);
+        $this->decoder = new JsonDecode(true);
     }
 
     public function testDecodeWithValidData()
@@ -35,7 +35,7 @@ class JsonDecodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testDecodeWithInvalidData()
     {

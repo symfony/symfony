@@ -28,7 +28,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         $phpBin = new PhpExecutableFinder();
-        self::$phpBin = $phpBin->find();
+        self::$phpBin = 'phpdbg' === PHP_SAPI ? 'php' : $phpBin->find();
     }
 
     public function testThatProcessDoesNotThrowWarningDuringRun()
@@ -81,7 +81,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         // exec is mandatory here since we send a signal to the process
         // see https://github.com/symfony/symfony/issues/5030 about prepending
         // command with exec
-        $p = $this->getProcess('exec php '.__DIR__.'/NonStopableProcess.php 3');
+        $p = $this->getProcess('exec '.self::$phpBin.' '.__DIR__.'/NonStopableProcess.php 3');
         $p->start();
         usleep(100000);
         $start = microtime(true);
@@ -470,7 +470,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does have /dev/tty support');
         }
 
-        $process = $this->getProcess('echo "foo" >> /dev/null && php -r "usleep(100000);"');
+        $process = $this->getProcess('echo "foo" >> /dev/null && '.self::$phpBin.' -r "usleep(100000);"');
         $process->setTty(true);
         $process->start();
         $this->assertTrue($process->isRunning());
@@ -730,7 +730,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         $termSignal = defined('SIGKILL') ? SIGKILL : 9;
 
-        $process = $this->getProcess('exec php -r "while (true) {}"');
+        $process = $this->getProcess('exec '.self::$phpBin.' -r "while (true) {}"');
         $process->start();
         posix_kill($process->getPid(), $termSignal);
 
@@ -754,18 +754,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         // Ensure that restart returned a new process by check that the output is different
         $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
-    }
-
-    public function testPhpDeadlock()
-    {
-        $this->markTestSkipped('Can cause PHP to hang');
-
-        // Sleep doesn't work as it will allow the process to handle signals and close
-        // file handles from the other end.
-        $process = $this->getProcess(self::$phpBin.' -r "while (true) {}"');
-        $process->start();
-
-        // PHP will deadlock when it tries to cleanup $process
     }
 
     public function testRunProcessWithTimeout()

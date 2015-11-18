@@ -11,7 +11,7 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id-Version: 2015-11-09 12:13 UTC
+// Cache-Id-Version: 2015-11-18 14:14 UTC
 
 use Symfony\Component\Process\ProcessUtils;
 
@@ -23,12 +23,15 @@ $PHPUNIT_VERSION = PHP_VERSION_ID >= 70000 ? '5.0' : '4.8';
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = ProcessUtils::escapeArgument($PHP);
+if ('phpdbg' === PHP_SAPI) {
+    $PHP .= ' -qrr';
+}
 
 $COMPOSER = file_exists($COMPOSER = __DIR__.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : `which composer.phar`))
     ? $PHP.' '.ProcessUtils::escapeArgument($COMPOSER)
     : 'composer';
 
-if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.md5")) {
+if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml
 
     $oldPwd = getcwd();
@@ -49,7 +52,6 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update symfony/yaml");
-    passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"<=3.0.0\"");
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
     passthru("$COMPOSER install --prefer-source --no-progress --ansi");
     file_put_contents('phpunit', <<<EOPHP
@@ -66,7 +68,7 @@ EOPHP
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', str_replace('/', DIRECTORY_SEPARATOR, "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge")));
         symlink(realpath('../src/Symfony/Bridge/PhpUnit'), "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge");
     }
-    file_put_contents('.md5', md5_file(__FILE__));
+    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__));
     chdir($oldPwd);
 
 }

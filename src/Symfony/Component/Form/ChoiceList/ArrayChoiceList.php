@@ -54,6 +54,27 @@ class ArrayChoiceList implements ChoiceListInterface
     protected $valueCallback;
 
     /**
+     * The raw choice of the choices array.
+     *
+     * @var array
+     */
+    protected $rawChoices;
+
+    /**
+     * The raw choice values of the choices array.
+     *
+     * @var array
+     */
+    protected $rawChoiceValues;
+
+    /**
+     * The raw keys of the choices array.
+     *
+     * @var int[]|string[]
+     */
+    protected $rawKeys;
+
+    /**
      * Creates a list with the given choices and values.
      *
      * The given choice array must have the same array keys as the value array.
@@ -63,6 +84,8 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                    for a choice. If `null` is passed,
      *                                    incrementing integers are used as
      *                                    values
+     *
+     * @throws UnexpectedTypeException
      */
     public function __construct($choices, $value = null)
     {
@@ -88,11 +111,14 @@ class ArrayChoiceList implements ChoiceListInterface
         // If the choices are given as recursive array (i.e. with explicit
         // choice groups), flatten the array. The grouping information is needed
         // in the view only.
-        $this->flatten($choices, $value, $choicesByValues, $keysByValues, $structuredValues);
+        $this->flatten($choices, $value, $choicesByValues, $keysByValues, $structuredValues, $rawChoices, $rawChoiceValues, $rawKeys);
 
         $this->choices = $choicesByValues;
         $this->originalKeys = $keysByValues;
         $this->structuredValues = $structuredValues;
+        $this->rawChoices = $rawChoices;
+        $this->rawChoiceValues = $rawChoiceValues;
+        $this->rawKeys = $rawKeys;
     }
 
     /**
@@ -125,6 +151,30 @@ class ArrayChoiceList implements ChoiceListInterface
     public function getOriginalKeys()
     {
         return $this->originalKeys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawChoices()
+    {
+        return $this->rawChoices;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawChoiceValues()
+    {
+        return $this->rawChoiceValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRawKeys()
+    {
+        return $this->rawKeys;
     }
 
     /**
@@ -183,20 +233,27 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                  corresponding values
      * @param array    $keysByValues    The original keys indexed by the
      *                                  corresponding values
+     * @param $structuredValues
+     * @param $rawChoices
+     * @param $rawChoiceValues
+     * @param $rawKeys
      *
      * @internal Must not be used by user-land code
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues, &$rawChoices, &$rawChoiceValues, &$rawKeys)
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();
             $keysByValues = array();
             $structuredValues = array();
+            $rawChoices = array();
+            $rawChoiceValues = array();
+            $rawKeys = array();
         }
 
         foreach ($choices as $key => $choice) {
             if (is_array($choice)) {
-                $this->flatten($choice, $value, $choicesByValues, $keysByValues, $structuredValues[$key]);
+                $this->flatten($choice, $value, $choicesByValues, $keysByValues, $structuredValues[$key], $rawChoices[$key], $rawChoiceValues[$key], $rawKeys[$key]);
 
                 continue;
             }
@@ -205,6 +262,9 @@ class ArrayChoiceList implements ChoiceListInterface
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;
+            $rawChoices[$key] = $choice;
+            $rawChoiceValues[$key] = $choiceValue;
+            $rawKeys[$key] = $key;
         }
     }
 }

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-11-17T13:02:49Z
+
+The previous code was already defining and initializing the array.
+
+---------------------------------------------------------------------------
+
+by belka-ew at 2015-11-18T07:14:16Z
+
+I just saw in all other methods in this class, that $server is first defined:
+```
+$server = array();
+```
+and thought it could be an error. But I see know, that PHP automatically creates an array on try to assign a value to an index of an unexisting array.

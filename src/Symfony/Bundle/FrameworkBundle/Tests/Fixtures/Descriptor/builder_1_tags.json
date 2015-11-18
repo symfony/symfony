@@ -11,7 +11,9 @@
             "abstract": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
-            "factory_method": "get"
+            "factory_method": "get",
+            "autowire": false,
+            "autowiring_types": []
         }
     ],
     "tag2": [
@@ -26,7 +28,9 @@
             "abstract": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
-            "factory_method": "get"
+            "factory_method": "get",
+            "autowire": false,
+            "autowiring_types": []
         }
     ]
 }

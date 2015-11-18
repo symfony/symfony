@@ -12,7 +12,7 @@ It comes with the following features:
 
 By default any non-legacy-tagged or any non-@-silenced deprecation notices will
 make tests fail.
-This can be changed by setting the SYMFONY_DEPRECATIONS_HELPER environment
+This can be changed by setting the `SYMFONY_DEPRECATIONS_HELPER` environment
 variable to `weak`. This will make the bridge ignore deprecation notices and
 is useful to projects that must use deprecated interfaces for backward
 compatibility reasons.
@@ -33,7 +33,7 @@ A summary of deprecation notices is displayed at the end of the test suite:
 Usage
 -----
 
-Add this bridge to the `require-dev` section of your composer.json file
+Add this bridge to the `require-dev` section of your `composer.json` file
 (not in `require`) with e.g. `composer require --dev "symfony/phpunit-bridge"`.
 
 When running `phpunit`, you will see a summary of deprecation notices at the end

@@ -359,6 +359,8 @@
                                 activeTab = activeTab.parentNode;
                             }
 
+                            /* get the full list of tabs through the parent of the active tab element */
+                            var tabNavigation = activeTab.parentNode.children;
                             for (var k = 0; k < tabNavigation.length; k++) {
                                 var tabId = tabNavigation[k].getAttribute('data-tab-id');
                                 document.getElementById(tabId).className = 'hidden';

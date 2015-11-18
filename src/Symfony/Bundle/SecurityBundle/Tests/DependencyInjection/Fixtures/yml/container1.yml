@@ -47,7 +47,7 @@ security:
             stateless: true
             http_basic: true
             http_digest:
-                key: TheKey
+                secret: TheSecret
             form_login: true
             anonymous: true
             switch_user: true

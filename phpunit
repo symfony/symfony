@@ -1,6 +1,18 @@
 #!/usr/bin/env php
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+// Please update when phpunit needs to be reinstalled with fresh deps:
+// Cache-Id-Version: 2015-11-09 12:13 UTC
+
 use Symfony\Component\Process\ProcessUtils;
 
 error_reporting(-1);
@@ -10,19 +22,11 @@ require __DIR__.'/src/Symfony/Component/Process/ProcessUtils.php';
 $PHPUNIT_VERSION = PHP_VERSION_ID >= 70000 ? '5.0' : '4.8';
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
-
-if (!file_exists($COMPOSER = __DIR__.'/composer.phar')) {
-    $COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : (`which composer.phar` ?: `which composer`));
-    if (!file_exists($COMPOSER)) {
-        stream_copy_to_stream(
-            fopen('https://getcomposer.org/composer.phar', 'rb'),
-            fopen($COMPOSER = __DIR__.'/composer.phar', 'wb')
-        );
-    }
-}
-
 $PHP = ProcessUtils::escapeArgument($PHP);
-$COMPOSER = $PHP.' '.ProcessUtils::escapeArgument($COMPOSER);
+
+$COMPOSER = file_exists($COMPOSER = __DIR__.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : `which composer.phar`))
+    ? $PHP.' '.ProcessUtils::escapeArgument($COMPOSER)
+    : 'composer';
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__) !== @file_get_contents("$PHPUNIT_DIR/.md5")) {
     // Build a standalone phpunit without symfony/yaml
@@ -45,6 +49,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update symfony/yaml");
+    passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"<=3.0.0\"");
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
     passthru("$COMPOSER install --prefer-source --no-progress --ansi");
     file_put_contents('phpunit', <<<EOPHP

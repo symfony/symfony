@@ -41,8 +41,8 @@ class PhpExecutableFinder
         }
 
         // PHP_BINARY return the current sapi executable
-        if (defined('PHP_BINARY') && PHP_BINARY && in_array(PHP_SAPI, array('cli', 'cli-server')) && is_file(PHP_BINARY)) {
-            return PHP_BINARY;
+        if (defined('PHP_BINARY') && PHP_BINARY && in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) && is_file(PHP_BINARY)) {
+            return PHP_BINARY.($includeArgs ? ' '.implode(' ', $this->findArguments()) : '');
         }
 
         if ($php = getenv('PHP_PATH')) {
@@ -76,9 +76,10 @@ class PhpExecutableFinder
     {
         $arguments = array();
 
-        // HHVM support
         if (defined('HHVM_VERSION')) {
             $arguments[] = '--php';
+        } elseif ('phpdbg' === PHP_SAPI) {
+            $arguments[] = '-qrr';
         }
 
         return $arguments;

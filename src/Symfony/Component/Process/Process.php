@@ -285,7 +285,7 @@ class Process
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // Workaround for the bug, when PTS functionality is enabled.
             // @see : https://bugs.php.net/69442
-            $ptsWorkaround = fopen('php://fd/0', 'r');
+            $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by chx at 2015-11-18T11:04:43Z
+
+See https://bz.apache.org/bugzilla/show_bug.cgi?id=44995 and https://bz.apache.org/bugzilla/show_bug.cgi?id=54946 on why Apache refuses empty `Reason-Phrase`.

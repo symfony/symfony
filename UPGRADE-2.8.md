@@ -442,6 +442,10 @@ FrameworkBundle
 Security
 --------
 
+ * The `AbstractVoter` class was deprecated. Instead, extend the `Voter` class and
+   move your voting logic in the `supports($attribute, $subject)` and
+   `voteOnAttribute($attribute, $object, TokenInterface $token)` methods.
+
  * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
    deprecated and will be removed from the interface in 3.0.
 

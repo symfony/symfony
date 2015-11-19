@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-10-20T12:54:58Z
+
+I don't understand what you are trying to fix here
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-10-20T13:44:12Z
+
+Migth be clearer with a simple example: https://gist.github.com/Nicofuma/a7672bf0776efb2eaa5f
+the output is:
+```
+"%%unescape_it%%"
+"%unescape_it%"
+```
+
+while we are expecting:
+```
+"%unescape_it%"
+"%unescape_it%"
+```
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-11-02T10:12:54Z
+
+Bump, this is a real issue for us as it throws an error to some of our users - because they have a % in their database password - each time they clear the cache.
+
+---------------------------------------------------------------------------
+
+by Oyabun1 at 2015-11-02T23:03:36Z
+
+> this is a real issue for us as it throws an error to some of our users - because they have a % in their database password
+
+I've had a few users of phpBB, experiencing the issue with the % character, try the changes in the commit and it resolved the problem for them.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-11-10T08:32:45Z
+
+Bump again
+
+@stof could you give this PR another look please?
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2015-11-16T08:39:14Z
+
+@stof @fabpot @Tobion anyone, could it be possible to have some feedbacks please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-19T14:11:44Z
+
+:+1:
+Status: reviewed

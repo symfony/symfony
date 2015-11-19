@@ -895,7 +895,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->callMethod($service, $call);
         }
 
-        $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
+        $properties = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())));
         foreach ($properties as $name => $value) {
             $service->$name = $value;
         }
@@ -1054,7 +1054,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
+        call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1]))));
     }
 
     /**

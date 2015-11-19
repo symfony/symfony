@@ -13,7 +13,7 @@ CHANGELOG
  * deprecated `Symfony\Component\Security\Core\Util\ClassUtils`, use
    `Symfony\Component\Security\Acl\Util\ClassUtils` instead
  * deprecated the `Symfony\Component\Security\Core\Util\SecureRandom` class in favor of the `random_bytes()` function
- * deprecated `supportsAttribute()` and `supportsClass()` methods of
+ * removed `supportsAttribute()` and `supportsClass()` methods from
    `Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface` and
    `Symfony\Component\Security\Core\Authorization\Voter\VoterInterface`.
  * deprecated `getSupportedAttributes()` and `getSupportedClasses()` methods of

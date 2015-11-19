@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-29T08:55:22Z
+
+I remember some related issue reported by a user of the Safari browser. Have you tested this change in Chrome, Firefox and Safari? Thanks!
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-10-29T09:10:18Z
+
+From left to right: Edge, Edge (minimized), Chrome 46, Chrome 46 (minimized), FF41, FF41 (minimized)
+
+![image](https://cloud.githubusercontent.com/assets/2707563/10814221/cedc9300-7e24-11e5-8914-0f69d6db9277.png)
+
+So Webkit and Gecko are fine. Let's see or I can make another PR to fix Edge later today
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-29T09:22:02Z
+
+This is how I see the minimized toolbar in Safari:
+
+**Before** (it was slightly wrong)
+
+![before](https://cloud.githubusercontent.com/assets/73419/10814526/d4bf3faa-7e26-11e5-8233-5d7d8bdf3469.png)
+
+**After this change** (it's a bit worse)
+
+![after](https://cloud.githubusercontent.com/assets/73419/10814532/de471b7e-7e26-11e5-9a96-0132b3f9b770.png)
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-10-29T09:30:35Z
+
+Didn't have a Safari environment available right now, did hope they'd respect webkit ;) The anchor needs `display: block`, can you pull latest?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-10-29T09:43:30Z
+
+No luck with the latest changes. However, if I make this change:
+
+```diff
+.sf-minitoolbar {
+-    padding: 6px 6px 0;
++    padding: 4px 6px 0;
+}
+```
+
+The problem is fixed in Safari:
+
+![after_2](https://cloud.githubusercontent.com/assets/73419/10815045/db08a178-7e29-11e5-84b4-3054e5fa3651.png)
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-10-29T09:49:56Z
+
+Mmh, that also doesn't really seem squarish, let me get back to you after I've solved this :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-07T08:34:37Z
+
+@Rvanlaak Any news?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-11-18T14:46:03Z
+
+Wasn't able to find a Mac to fix this so far, and the latest Safari for Windows is a bit old for testing right?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-18T17:39:10Z
+
+@rvanlaak yeah, safari on windows is not relevant
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-11-19T09:09:44Z
+
+Updated + rebased, this should do the trick for both Edge and Safari
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-19T15:40:22Z
+
+@rvanlaak is this related to the issue reported in https://github.com/symfony/symfony/issues/16597 or is it a different topic ?
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-11-19T16:12:28Z
+
+Yes, this fixes #16597 for IE11 and Edge. Also see https://github.com/symfony/symfony/pull/16377#issuecomment-152121129

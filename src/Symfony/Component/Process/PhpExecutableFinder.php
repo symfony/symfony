@@ -19,13 +19,6 @@ namespace Symfony\Component\Process;
  */
 class PhpExecutableFinder
 {
-    private $executableFinder;
-
-    public function __construct()
-    {
-        $this->executableFinder = new ExecutableFinder();
-    }
-
     /**
      * Finds The PHP executable.
      *
@@ -45,26 +38,7 @@ class PhpExecutableFinder
             return PHP_BINARY.($includeArgs ? ' '.implode(' ', $this->findArguments()) : '');
         }
 
-        if ($php = getenv('PHP_PATH')) {
-            if (!is_executable($php)) {
-                return false;
-            }
-
-            return $php;
-        }
-
-        if ($php = getenv('PHP_PEAR_PHP_BIN')) {
-            if (is_executable($php)) {
-                return $php;
-            }
-        }
-
-        $dirs = array(PHP_BINDIR);
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $dirs[] = 'C:\xampp\php\\';
-        }
-
-        return $this->executableFinder->find('php', false, $dirs);
+        return false;
     }
 
     /**

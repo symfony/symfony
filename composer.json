@@ -83,7 +83,6 @@
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
-        "zendframework/zend-stdlib": "~2.2",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2",
         "phpdocumentor/reflection": "^1.0.7"

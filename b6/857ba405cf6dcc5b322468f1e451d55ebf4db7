@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-17T00:09:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-18T10:26:40Z
+
+I've just merged another PR which also added some tests, can you rebase? Thanks.
+
+---------------------------------------------------------------------------
+
+by FlorianLB at 2015-11-18T10:53:49Z
+
+Done.
+
+I tried to merge in a relevant way the 2 versions of `JsonDecodeTest.php`, specially the `json_last_error_msg` part, hope it's fine !

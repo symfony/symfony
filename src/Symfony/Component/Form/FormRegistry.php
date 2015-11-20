@@ -88,7 +88,7 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->resolveAndAddType($type);
+            $this->types[$name] = $this->resolveAndAddType($type);
         }
 
         return $this->types[$name];
@@ -115,13 +115,11 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
-        $resolvedType = $this->resolvedTypeFactory->createResolvedType(
+        return $this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         );
-
-        $this->types[$fqcn] = $resolvedType;
     }
 
     /**

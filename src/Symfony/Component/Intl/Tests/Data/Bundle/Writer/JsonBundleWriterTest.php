@@ -17,7 +17,6 @@ use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- * @requires PHP 5.4
  */
 class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,10 +43,6 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if (PHP_VERSION_ID < 50400) {
-            return;
-        }
-
         $this->filesystem->remove($this->directory);
     }
 

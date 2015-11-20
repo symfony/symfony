@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Yaml::parse() now throws an exception when a blackslash is not escaped
+   in double-quoted strings
+
 2.8.0
 -----
 

@@ -25,18 +25,6 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->form->setData(null);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('repeated', array(
-            'type' => 'text',
-        ));
-
-        $this->assertSame('repeated', $form->getConfig()->getType()->getName());
-    }
-
     public function testSetData()
     {
         $this->form->setData('foobar');

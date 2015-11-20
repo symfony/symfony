@@ -205,7 +205,6 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage This error is expected
-     * @requires PHP 5.4
      */
     public function testSetContentJsonSerializeError()
     {

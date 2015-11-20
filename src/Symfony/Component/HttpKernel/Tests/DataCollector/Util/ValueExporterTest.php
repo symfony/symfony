@@ -31,9 +31,6 @@ class ValueExporterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Object(DateTime) - 2014-06-10T07:35:40+0000', $this->valueExporter->exportValue($dateTime));
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testDateTimeImmutable()
     {
         $dateTime = new \DateTimeImmutable('2014-06-10 07:35:40', new \DateTimeZone('UTC'));

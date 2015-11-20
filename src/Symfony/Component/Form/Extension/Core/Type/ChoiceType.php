@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -28,7 +27,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as LegacyChoiceListInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
@@ -202,7 +200,6 @@ class ChoiceType extends AbstractType
         }
 
         // BC
-        $view->vars['empty_value'] = $view->vars['placeholder'];
         $view->vars['empty_value_in_choices'] = $view->vars['placeholder_in_choices'];
 
         if ($options['multiple'] && !$options['expanded']) {
@@ -248,21 +245,11 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $placeholder = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
-            if ($choiceList) {
-                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
-
-                if ($choiceList instanceof LegacyChoiceListInterface) {
-                    return new LegacyChoiceListAdapter($choiceList);
-                }
-
-                return $choiceList;
-            }
-
+        $choiceListNormalizer = function (Options $options) use ($choiceListFactory) {
             if (null !== $options['choice_loader']) {
                 return $choiceListFactory->createListFromLoader(
                     $options['choice_loader'],
@@ -282,12 +269,6 @@ class ChoiceType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
-            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
-
-                $placeholder = $options['empty_value'];
-            }
-
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return;
@@ -329,8 +310,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
-            'empty_value' => new \Exception(), // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'error_bubbling' => false,
             'compound' => $compound,
             // The view data is always a string, even if the "data" option
@@ -344,7 +324,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choices_as_values', 'bool');
@@ -355,14 +335,6 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('group_by', array('null', 'array', '\Traversable', 'string', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

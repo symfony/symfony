@@ -185,8 +185,20 @@ abstract class AbstractCloner implements ClonerInterface
      */
     public function cloneVar($var, $filter = 0)
     {
+        $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) {
+            if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
+                // Cloner never dies
+                throw new \ErrorException($msg, 0, $type, $file, $line);
+            }
+
+            if ($this->prevErrorHandler) {
+                return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+            }
+
+            return false;
+        });
         $this->filter = $filter;
-        $this->prevErrorHandler = set_error_handler(array($this, 'handleError'));
+
         try {
             $data = $this->doClone($var);
         } catch (\Exception $e) {
@@ -297,24 +309,5 @@ abstract class AbstractCloner implements ClonerInterface
         }
 
         return $a;
-    }
-
-    /**
-     * Special handling for errors: cloning must be fail-safe.
-     *
-     * @internal
-     */
-    public function handleError($type, $msg, $file, $line, $context)
-    {
-        if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
-            // Cloner never dies
-            throw new \ErrorException($msg, 0, $type, $file, $line);
-        }
-
-        if ($this->prevErrorHandler) {
-            return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
-        }
-
-        return false;
     }
 }

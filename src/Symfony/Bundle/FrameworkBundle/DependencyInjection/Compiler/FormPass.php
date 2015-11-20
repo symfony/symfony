@@ -30,21 +30,13 @@ class FormPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('form.extension');
 
-        // Builds an array with service IDs as keys and tag aliases as values
+        // Builds an array with fully-qualified type class names as keys and service IDs as values
         $types = array();
 
         foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
             $serviceDefinition = $container->getDefinition($serviceId);
             if (!$serviceDefinition->isPublic()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must be public as form types are lazy-loaded.', $serviceId));
-            }
-            // The following if-else block is deprecated and will be removed
-            // in Symfony 3.0
-            // Deprecation errors are triggered in the form registry
-            if (isset($tag[0]['alias'])) {
-                $types[$tag[0]['alias']] = $serviceId;
-            } else {
-                $types[$serviceId] = $serviceId;
             }
 
             // Support type access by FQCN
@@ -63,12 +55,8 @@ class FormPass implements CompilerPassInterface
 
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
-            } elseif (isset($tag[0]['alias'])) {
-                @trigger_error('The alias option of the form.type_extension tag is deprecated since version 2.8 and will be removed in 3.0. Use the extended_type option instead.', E_USER_DEPRECATED);
-                $extendedType = $tag[0]['alias'];
             } else {
-                @trigger_error('The extended_type option of the form.type_extension tag is required since version 2.8.', E_USER_DEPRECATED);
-                $extendedType = $serviceId;
+                throw new \InvalidArgumentException(sprintf('Tagged form type extension must have the extended type configured using the extended_type/extended-type attribute, none was configured for the "%s" service.', $serviceId));
             }
 
             $typeExtensions[$extendedType][] = $serviceId;

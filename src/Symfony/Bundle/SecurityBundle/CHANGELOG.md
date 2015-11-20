@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Removed the `security.context` service.
+
 2.8.0
 -----
 

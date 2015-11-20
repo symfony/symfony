@@ -112,7 +112,7 @@ class ExpressionLanguage
      *
      * @see ExpressionFunction
      */
-    public function register($name, $compiler, $evaluator)
+    public function register($name, callable $compiler, callable $evaluator)
     {
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
     }

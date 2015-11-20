@@ -59,7 +59,7 @@ class LazyChoiceList implements ChoiceListInterface
      * @param null|callable         $value  The callable generating the choice
      *                                      values
      */
-    public function __construct(ChoiceLoaderInterface $loader, $value = null)
+    public function __construct(ChoiceLoaderInterface $loader, callable $value = null)
     {
         $this->loader = $loader;
         $this->value = $value;

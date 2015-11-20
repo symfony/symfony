@@ -113,21 +113,12 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def = new Definition();
 
         // merge in parent definition
-        // purposely ignored attributes: scope, abstract, tags
+        // purposely ignored attributes: abstract, tags
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
         $def->setAutowiringTypes($parentDef->getAutowiringTypes());
-        if ($parentDef->getFactoryClass(false)) {
-            $def->setFactoryClass($parentDef->getFactoryClass(false));
-        }
-        if ($parentDef->getFactoryMethod(false)) {
-            $def->setFactoryMethod($parentDef->getFactoryMethod(false));
-        }
-        if ($parentDef->getFactoryService(false)) {
-            $def->setFactoryService($parentDef->getFactoryService(false));
-        }
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
@@ -141,15 +132,6 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {
             $def->setClass($definition->getClass());
-        }
-        if (isset($changes['factory_class'])) {
-            $def->setFactoryClass($definition->getFactoryClass(false));
-        }
-        if (isset($changes['factory_method'])) {
-            $def->setFactoryMethod($definition->getFactoryMethod(false));
-        }
-        if (isset($changes['factory_service'])) {
-            $def->setFactoryService($definition->getFactoryService(false));
         }
         if (isset($changes['factory'])) {
             $def->setFactory($definition->getFactory());
@@ -210,7 +192,6 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope(false), false);
         $def->setTags($definition->getTags());
 
         return $def;

@@ -183,17 +183,11 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $placeholder = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
-
-                $placeholder = $options['empty_value'];
-            }
-
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -240,8 +234,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => new \Exception(), // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -280,14 +273,6 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'date';
@@ -298,11 +283,7 @@ class DateType extends AbstractType
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
-        if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
-            $formatter->setTimeZone('UTC');
-        } else {
-            $formatter->setTimeZoneId('UTC');
-        }
+        $formatter->setTimeZone('UTC');
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
@@ -316,11 +297,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if ($setTimeZone) {
-            $formatter->setTimeZone($timezone);
-        } else {
-            $formatter->setTimeZoneId($timezone);
-        }
+        $formatter->setTimeZone($timezone);
 
         return $timestamps;
     }

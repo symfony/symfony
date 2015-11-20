@@ -42,28 +42,6 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * @deprecated since version 2.7, to be removed in 3.0.
-     *             Inject the escaping strategy on \Twig_Environment instead.
-     */
-    public function setDefaultEscapingStrategy($strategy)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Inject the escaping strategy in the Twig_Environment object instead.', E_USER_DEPRECATED);
-
-        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
-    }
-
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0.
-     *             Use the 'filename' strategy instead.
-     */
-    public function guessDefaultEscapingStrategy($filename)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Twig_FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
-
-        return \Twig_FileExtensionEscapingStrategy::guess($filename);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function render($name, array $parameters = array())

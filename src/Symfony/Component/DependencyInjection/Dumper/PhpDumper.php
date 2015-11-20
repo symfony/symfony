@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
@@ -57,11 +56,6 @@ class PhpDumper extends Dumper
     private $expressionLanguage;
     private $targetDirRegex;
     private $targetDirMaxMatches;
-
-    /**
-     * @var ExpressionFunctionProviderInterface[]
-     */
-    private $expressionLanguageProviders = array();
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -382,10 +376,8 @@ class PhpDumper extends Dumper
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation = '';
 
-        if (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
+        if (!$isProxyCandidate && $definition->isShared()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
-            $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
         }
@@ -572,18 +564,6 @@ class PhpDumper extends Dumper
                     $return[] = sprintf('@return object An instance returned by %s::%s().', $factory[0]->getClass(), $factory[1]);
                 }
             }
-        } elseif ($definition->getFactoryClass(false)) {
-            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryClass(false), $definition->getFactoryMethod(false));
-        } elseif ($definition->getFactoryService(false)) {
-            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryService(false), $definition->getFactoryMethod(false));
-        }
-
-        $scope = $definition->getScope(false);
-        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
-            if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
-                $return[] = '';
-            }
-            $return[] = sprintf("@throws InactiveScopeException when the '%s' service is requested while the '%s' scope is not active", $id, $scope);
         }
 
         if ($definition->isDeprecated()) {
@@ -597,7 +577,7 @@ class PhpDumper extends Dumper
         $return = str_replace("\n     * \n", "\n     *\n", implode("\n     * ", $return));
 
         $doc = '';
-        if ($definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
+        if ($definition->isShared()) {
             $doc .= <<<EOF
 
      *
@@ -650,16 +630,6 @@ EOF;
 
         $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id) : '';
 
-        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
-            $code .= <<<EOF
-        if (!isset(\$this->scopedServices['$scope'])) {
-            throw new InactiveScopeException('$id', '$scope');
-        }
-
-
-EOF;
-        }
-
         if ($definition->isSynthetic()) {
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
         } else {
@@ -693,7 +663,7 @@ EOF;
      */
     private function addServices()
     {
-        $publicServices = $privateServices = $synchronizers = '';
+        $publicServices = $privateServices = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
@@ -702,70 +672,9 @@ EOF;
             } else {
                 $privateServices .= $this->addService($id, $definition);
             }
-
-            $synchronizers .= $this->addServiceSynchronizer($id, $definition);
         }
 
-        return $publicServices.$synchronizers.$privateServices;
-    }
-
-    /**
-     * Adds synchronizer methods.
-     *
-     * @param string     $id         A service identifier
-     * @param Definition $definition A Definition instance
-     *
-     * @return string|null
-     *
-     * @deprecated since version 2.7, will be removed in 3.0.
-     */
-    private function addServiceSynchronizer($id, Definition $definition)
-    {
-        if (!$definition->isSynchronized(false)) {
-            return;
-        }
-
-        if ('request' !== $id) {
-            @trigger_error('Synchronized services were deprecated in version 2.7 and won\'t work anymore in 3.0.', E_USER_DEPRECATED);
-        }
-
-        $code = '';
-        foreach ($this->container->getDefinitions() as $definitionId => $definition) {
-            foreach ($definition->getMethodCalls() as $call) {
-                foreach ($call[1] as $argument) {
-                    if ($argument instanceof Reference && $id == (string) $argument) {
-                        $arguments = array();
-                        foreach ($call[1] as $value) {
-                            $arguments[] = $this->dumpValue($value);
-                        }
-
-                        $call = $this->wrapServiceConditionals($call[1], sprintf("\$this->get('%s')->%s(%s);", $definitionId, $call[0], implode(', ', $arguments)));
-
-                        $code .= <<<EOF
-        if (\$this->initialized('$definitionId')) {
-            $call
-        }
-
-EOF;
-                    }
-                }
-            }
-        }
-
-        if (!$code) {
-            return;
-        }
-
-        return <<<EOF
-
-    /**
-     * Updates the '$id' service.
-     */
-    protected function synchronize{$this->camelize($id)}Service()
-    {
-$code    }
-
-EOF;
+        return $publicServices.$privateServices;
     }
 
     private function addNewInstance($id, Definition $definition, $return, $instantiation)
@@ -795,23 +704,6 @@ EOF;
             }
 
             return sprintf("        $return{$instantiation}\\%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
-        } elseif (null !== $definition->getFactoryMethod(false)) {
-            if (null !== $definition->getFactoryClass(false)) {
-                $class = $this->dumpValue($definition->getFactoryClass(false));
-
-                // If the class is a string we can optimize call_user_func away
-                if (strpos($class, "'") === 0) {
-                    return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $definition->getFactoryMethod(false), $arguments ? implode(', ', $arguments) : '');
-                }
-
-                return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass(false)), $definition->getFactoryMethod(false), $arguments ? ', '.implode(', ', $arguments) : '');
-            }
-
-            if (null !== $definition->getFactoryService(false)) {
-                return sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService(false)), $definition->getFactoryMethod(false), implode(', ', $arguments));
-            }
-
-            throw new RuntimeException(sprintf('Factory method requires a factory service or factory class in service definition for %s', $id));
         }
 
         if (false !== strpos($class, '$')) {
@@ -840,7 +732,6 @@ EOF;
 $namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -881,12 +772,6 @@ EOF;
 
 EOF;
 
-        if (count($scopes = $this->container->getScopes(false)) > 0) {
-            $code .= "\n";
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
-        }
-
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 
@@ -920,22 +805,7 @@ EOF;
             $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
         }
 
-        $code .= <<<EOF
-
-        \$this->services =
-        \$this->scopedServices =
-        \$this->scopeStacks = array();
-EOF;
-
-        $code .= "\n";
-        if (count($scopes = $this->container->getScopes(false)) > 0) {
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren(false)).";\n";
-        } else {
-            $code .= "        \$this->scopes = array();\n";
-            $code .= "        \$this->scopeChildren = array();\n";
-        }
-
+        $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 
@@ -1347,18 +1217,6 @@ EOF;
                 throw new RuntimeException('Cannot dump definition because of invalid factory');
             }
 
-            if (null !== $value->getFactoryMethod(false)) {
-                if (null !== $value->getFactoryClass(false)) {
-                    return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass(false)), $value->getFactoryMethod(false), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
-                } elseif (null !== $value->getFactoryService(false)) {
-                    $service = $this->dumpValue($value->getFactoryService(false));
-
-                    return sprintf('%s->%s(%s)', 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService(false)), $value->getFactoryMethod(false), implode(', ', $arguments));
-                } else {
-                    throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
-                }
-            }
-
             $class = $value->getClass();
             if (null === $class) {
                 throw new RuntimeException('Cannot dump definitions which have no class nor factory.');
@@ -1387,9 +1245,8 @@ EOF;
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
             } else {
-                $that = $this;
-                $replaceParameters = function ($match) use ($that) {
-                    return "'.".$that->dumpParameter(strtolower($match[2])).".'";
+                $replaceParameters = function ($match) {
+                    return "'.".$this->dumpParameter(strtolower($match[2])).".'";
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
@@ -1422,26 +1279,13 @@ EOF;
      *
      * @return string
      */
-    public function dumpParameter($name)
+    private function dumpParameter($name)
     {
         if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
             return $this->dumpValue($this->container->getParameter($name), false);
         }
 
         return sprintf("\$this->getParameter('%s')", strtolower($name));
-    }
-
-    /**
-     * @deprecated since version 2.6.2, to be removed in 3.0.
-     *             Use \Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
-     *
-     * @param ExpressionFunctionProviderInterface $provider
-     */
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6.2 and will be removed in 3.0. Use the Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider method instead.', E_USER_DEPRECATED);
-
-        $this->expressionLanguageProviders[] = $provider;
     }
 
     /**
@@ -1533,7 +1377,7 @@ EOF;
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
                 throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
-            $providers = array_merge($this->container->getExpressionLanguageProviders(), $this->expressionLanguageProviders);
+            $providers = $this->container->getExpressionLanguageProviders();
             $this->expressionLanguage = new ExpressionLanguage(null, $providers);
 
             if ($this->container->isTrackingResources()) {

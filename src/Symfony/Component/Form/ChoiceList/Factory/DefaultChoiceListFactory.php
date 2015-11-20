@@ -15,12 +15,10 @@ use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -65,23 +63,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
-        // Backwards compatibility
-        if ($list instanceof LegacyChoiceListAdapter && empty($preferredChoices)
-            && null === $label && null === $index && null === $groupBy && null === $attr) {
-            $mapToNonLegacyChoiceView = function (LegacyChoiceView &$choiceView) {
-                $choiceView = new ChoiceView($choiceView->data, $choiceView->value, $choiceView->label);
-            };
-
-            $adaptedList = $list->getAdaptedList();
-
-            $remainingViews = $adaptedList->getRemainingViews();
-            $preferredViews = $adaptedList->getPreferredViews();
-            array_walk_recursive($remainingViews, $mapToNonLegacyChoiceView);
-            array_walk_recursive($preferredViews, $mapToNonLegacyChoiceView);
-
-            return new ChoiceListView($remainingViews, $preferredViews);
-        }
-
         $preferredViews = array();
         $otherViews = array();
         $choices = $list->getChoices();

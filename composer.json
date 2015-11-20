@@ -16,11 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": ">=5.5.9",
         "doctrine/common": "~2.4",
         "twig/twig": "~1.23|~2.0",
         "psr/log": "~1.0",
-        "symfony/security-acl": "~2.7",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php54": "~1.0",
@@ -51,7 +50,6 @@
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
-        "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
@@ -67,7 +65,6 @@
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
-        "symfony/swiftmailer-bridge": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
@@ -81,10 +78,11 @@
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
-        "doctrine/doctrine-bundle": "~1.2",
+        "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2",
+        "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection": "^1.0.7"
     },
     "conflict": {
@@ -110,7 +108,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

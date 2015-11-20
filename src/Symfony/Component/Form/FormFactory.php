@@ -61,39 +61,11 @@ class FormFactory implements FormFactoryInterface
      */
     public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
-        $name = null;
-        $typeName = null;
-
-        if ($type instanceof ResolvedFormTypeInterface) {
-            if (method_exists($type, 'getBlockPrefix')) {
-                // As of Symfony 3.0, the block prefix of the type is used as
-                // default name
-                $name = $type->getBlockPrefix();
-            } else {
-                // BC
-                $typeName = $type->getName();
-            }
-        } elseif ($type instanceof FormTypeInterface) {
-            // BC
-            $typeName = $type->getName();
-        } elseif (is_string($type)) {
-            // BC
-            $typeName = $type;
-        } else {
-            throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
+        if (!is_string($type)) {
+            throw new UnexpectedTypeException($type, 'string');
         }
 
-        if (null === $name) {
-            if (false === strpos($typeName, '\\')) {
-                // No FQCN - leave unchanged for BC
-                $name = $typeName;
-            } else {
-                // FQCN
-                $name = StringUtil::fqcnToBlockPrefix($typeName);
-            }
-        }
-
-        return $this->createNamedBuilder($name, $type, $data, $options);
+        return $this->createNamedBuilder(StringUtil::fqcnToBlockPrefix($type), $type, $data, $options);
     }
 
     /**
@@ -105,16 +77,11 @@ class FormFactory implements FormFactoryInterface
             $options['data'] = $data;
         }
 
-        if ($type instanceof FormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
-            $type = $this->resolveType($type);
-        } elseif (is_string($type)) {
-            $type = $this->registry->getType($type);
-        } elseif ($type instanceof ResolvedFormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
-        } else {
-            throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
+        if (!is_string($type)) {
+            throw new UnexpectedTypeException($type, 'string');
         }
+
+        $type = $this->registry->getType($type);
 
         $builder = $type->createBuilder($this, $name, $options);
 
@@ -162,33 +129,5 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);
-    }
-
-    /**
-     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
-     * it with its parent type.
-     *
-     * @param FormTypeInterface $type The type to resolve.
-     *
-     * @return ResolvedFormTypeInterface The resolved type.
-     */
-    private function resolveType(FormTypeInterface $type)
-    {
-        $parentType = $type->getParent();
-
-        if ($parentType instanceof FormTypeInterface) {
-            $parentType = $this->resolveType($parentType);
-        } elseif (null !== $parentType) {
-            $parentType = $this->registry->getType($parentType);
-        }
-
-        return $this->resolvedTypeFactory->createResolvedType(
-            $type,
-            // Type extensions are not supported for unregistered type instances,
-            // i.e. type instances that are passed to the FormFactory directly,
-            // nor for their parents, if getParent() also returns a type instance.
-            array(),
-            $parentType
-        );
     }
 }

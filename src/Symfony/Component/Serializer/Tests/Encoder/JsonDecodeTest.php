@@ -12,33 +12,63 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class JsonDecodeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
-    private $decoder;
+    private $decode;
 
     protected function setUp()
     {
-        $this->decoder = new JsonDecode(true);
+        $this->decode = new JsonDecode();
     }
 
-    public function testDecodeWithValidData()
+    public function testSupportsDecoding()
     {
-        $json = json_encode(array(
-            'hello' => 'world',
-        ));
-        $result = $this->decoder->decode($json, 'json');
-        $this->assertEquals(array(
-            'hello' => 'world',
-        ), $result);
+        $this->assertTrue($this->decode->supportsDecoding(JsonEncoder::FORMAT));
+        $this->assertFalse($this->decode->supportsDecoding('foobar'));
     }
 
     /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @dataProvider decodeProvider
      */
-    public function testDecodeWithInvalidData()
+    public function testDecode($toDecode, $expected, $context)
     {
-        $result = $this->decoder->decode('kaboom!', 'json');
+        $this->assertEquals(
+            $expected,
+            $this->decode->decode($toDecode, JsonEncoder::FORMAT, $context)
+        );
+    }
+
+    public function decodeProvider()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->foo = 'bar';
+
+        $assoc = array('foo' => 'bar');
+
+        return array(
+            array('{"foo": "bar"}', $stdClass, array()),
+            array('{"foo": "bar"}', $assoc, array('json_decode_associative' => true)),
+        );
+    }
+
+    /**
+     * @requires function json_last_error_msg
+     * @dataProvider decodeProviderException
+     * @expectedException Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testDecodeWithException($value)
+    {
+        $this->decode->decode($value,  JsonEncoder::FORMAT);
+    }
+
+    public function decodeProviderException()
+    {
+        return array(
+            array("{'foo': 'bar'}"),
+            array('kaboom!'),
+        );
     }
 }

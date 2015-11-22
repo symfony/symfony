@@ -362,6 +362,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getSetAliasesData()
+     *
      * @param string[]|\Traversable $aliases
      */
     public function testSetAliases($aliases)

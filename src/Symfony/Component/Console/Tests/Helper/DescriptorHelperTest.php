@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
-use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DescriptorHelperTest extends \PHPUnit_Framework_TestCase

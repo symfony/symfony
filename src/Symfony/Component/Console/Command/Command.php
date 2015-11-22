@@ -513,7 +513,7 @@ class Command
     /**
      * Sets the aliases for the command.
      *
-     * @param string[] $aliases An array of aliases for the command
+     * @param string[]|\Traversable $aliases An array of aliases for the command
      *
      * @return Command The current instance
      *
@@ -537,7 +537,7 @@ class Command
     /**
      * Returns the aliases for the command.
      *
-     * @return array An array of aliases for the command
+     * @return string[]|\Traversable An array of aliases for the command
      */
     public function getAliases()
     {

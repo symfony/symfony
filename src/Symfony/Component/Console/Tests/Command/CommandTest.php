@@ -361,14 +361,35 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('process title', cli_get_process_title());
     }
 
-    public function testSetAliases()
+    /**
+     * @dataProvider getSetAliasesData()
+     * @param string[]|\Traversable $aliases
+     */
+    public function testSetAliases($aliases)
     {
         $command = new TestCommand();
-        $command->setAliases([]);
-        $command->setAliases(new TraversableDummy());
+        $command->setAliases($aliases);
+
+        $this->assertEquals($aliases, $command->getAliases());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSetAliasesData()
+    {
+        return [
+            [['some:alias']],
+            [new \ArrayIterator(['some:alias'])],
+        ];
+    }
+
+    public function testSetAliasesWithNonArrayNorTraversable()
+    {
+        $command = new TestCommand();
 
         $this->setExpectedException(InvalidArgumentException::class);
-        $command->setAliases('invalid');
+        $command->setAliases('some:invalid:alias');
     }
 
     public function testAddUsage()

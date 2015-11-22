@@ -228,7 +228,13 @@ class Command
         $this->initialize($input, $output);
 
         if (null !== $this->processTitle) {
-            cli_set_process_title($this->processTitle);
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processTitle);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processTitle);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
         }
 
         if ($input->isInteractive()) {

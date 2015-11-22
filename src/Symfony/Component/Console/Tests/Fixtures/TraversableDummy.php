@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Fixtures;
 
-use ArrayIterator;
-use IteratorAggregate;
-
-class TraversableDummy implements IteratorAggregate
+class TraversableDummy implements \IteratorAggregate
 {
     public function getIterator()
     {
-        return new ArrayIterator(['foo', 'bar']);
+        return new \ArrayIterator(['foo', 'bar']);
     }
 }

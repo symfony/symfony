@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Console\Tests\Event;
 
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleCommandEventTest extends PHPUnit_Framework_TestCase
+class ConsoleCommandEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testDisableEnableCommand()
     {

@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
-use PHPUnit_Framework_Assert;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Tests\Fixtures\Helper\SomeInputAwareHelper;
 
-class InputAwareHelperTest extends PHPUnit_Framework_TestCase
+class InputAwareHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testStrlen()
     {
@@ -25,6 +23,6 @@ class InputAwareHelperTest extends PHPUnit_Framework_TestCase
         $inputMock = $this->prophesize(InputInterface::class);
         $helper->setInput($inputMock->reveal());
 
-        $this->assertInstanceOf(InputInterface::class, PHPUnit_Framework_Assert::getObjectAttribute($helper, 'input'));
+        $this->assertInstanceOf(InputInterface::class, \PHPUnit_Framework_Assert::getObjectAttribute($helper, 'input'));
     }
 }

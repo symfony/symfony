@@ -1,0 +1,11 @@
+--- src/Symfony/Component/Console/Tests/Command/CommandTest.php	2015-11-22 22:42:04.696382332 +0000
++++ src/Symfony/Component/Console/Tests/Command/CommandTest.php	2015-11-22 22:42:18.240237357 +0000
+@@ -364,7 +364,7 @@
+     {
+         $command = new TestCommand();
+ 
+-        $this->assertSame(null, \PHPUnit_Framework_Assert::getObjectAttribute($command, 'processTitle'));
++        $this->assertNull(\PHPUnit_Framework_Assert::getObjectAttribute($command, 'processTitle'));
+ 
+         $command->setProcessTitle('process title');
+         $inputMock = $this->prophesize('Symfony\Component\Console\Input\InputInterface');

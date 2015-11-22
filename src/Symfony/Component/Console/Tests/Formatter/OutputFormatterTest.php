@@ -159,6 +159,27 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m \033[39m\033[32m<setting=value>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
     }
 
+    public function testGetNonExistingStyle()
+    {
+        $formatter = new OutputFormatter();
+        $this->setExpectedException('InvalidArgumentException');
+        $formatter->getStyle('missing style');
+    }
+
+    public function testStyleStack()
+    {
+        $formatter = new OutputFormatter();
+        $this->assertInstanceOf('Symfony\Component\Console\Formatter\OutputFormatterStyleStack', $formatter->getStyleStack());
+    }
+
+    public function testStylesViaConstructor()
+    {
+        $formatter = new OutputFormatter(false, array(
+             'short' => new OutputFormatterStyle(),
+        ));
+        $this->assertInstanceOf('Symfony\Component\Console\Formatter\OutputFormatterStyleInterface', $formatter->getStyle('short'));
+    }
+
     public function testFormatLongString()
     {
         $formatter = new OutputFormatter(true);

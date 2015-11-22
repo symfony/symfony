@@ -180,7 +180,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     public function testStylesViaConstructor()
     {
         $formatter = new OutputFormatter(false, [
-            'short' => new OutputFormatterStyle()
+            'short' => new OutputFormatterStyle(),
         ]);
 
         $this->assertInstanceOf(OutputFormatterStyleInterface::class, $formatter->getStyle('short'));

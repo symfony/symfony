@@ -52,8 +52,6 @@ abstract class Helper implements HelperInterface
     public static function strlen($string)
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
-            var_dump($encoding);
-            die;
             return strlen($string);
         }
 

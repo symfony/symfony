@@ -350,14 +350,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new TestCommand();
 
-        $this->assertSame('', cli_get_process_title());
+        $this->assertSame(null, \PHPUnit_Framework_Assert::getObjectAttribute($command, 'processTitle'));
 
         $command->setProcessTitle('process title');
         $inputMock = $this->prophesize(InputInterface::class);
         $outputMock = $this->prophesize(OutputInterface::class);
         $command->run($inputMock->reveal(), $outputMock->reveal());
 
-        $this->assertSame('process title', cli_get_process_title());
+        $this->assertSame('process title', \PHPUnit_Framework_Assert::getObjectAttribute($command, 'processTitle'));
     }
 
     /**

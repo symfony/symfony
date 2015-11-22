@@ -25,7 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\TestCommand;
-use Symfony\Component\Console\Tests\Fixtures\TraversableDummy;
 
 class CommandTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Tests\Fixtures\TestCommand;
 
-class ApplicationDescriptorTest extends PHPUnit_Framework_TestCase
+class ApplicationDescriptorTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetMissingCommand()
     {

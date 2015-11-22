@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Descriptor;
 
-use PHPUnit_Framework_TestCase;
-use stdClass;
 use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DescriptorTest extends PHPUnit_Framework_TestCase
+class DescriptorTest extends \PHPUnit_Framework_TestCase
 {
     public function testDescribeOnlyAllowedObjects()
     {
@@ -25,7 +23,7 @@ class DescriptorTest extends PHPUnit_Framework_TestCase
         $output = $this->prophesize(OutputInterface::class);
 
         $this->setExpectedException(InvalidArgumentException::class);
-        $descriptor->describe($output->reveal(), new stdClass());
+        $descriptor->describe($output->reveal(), new \stdClass());
     }
 
 }

@@ -1042,8 +1042,8 @@ class FilesystemTest extends FilesystemTestCase
         $dirname = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'does_not_exist';
 
         $filename = $this->filesystem->tempnam($dirname, 'bar');
-
-        $this->assertStringStartsWith(rtrim($scheme.sys_get_temp_dir(), DIRECTORY_SEPARATOR), $filename);
+        $realTempDir = realpath(sys_get_temp_dir());
+        $this->assertStringStartsWith(rtrim($scheme.$realTempDir, DIRECTORY_SEPARATOR), $filename);
         $this->assertFileExists($filename);
 
         // Tear down

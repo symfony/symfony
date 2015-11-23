@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-09T14:33:34Z
+
+Ping @symfony/deciders - this is totally subjective, but we should decide either way.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-09T15:00:50Z
+
+Would it be possible to change `load` to be public and return a new builder instance? That way it would support both type of usage (mutable,immutable)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-09T15:08:11Z
+
+@henrikbjorn The `import` method *does* return the new `RouteCollectionBuilder` - so you could still mutate it after it's been added:
+
+```php
+$adminRoutes = $routes->import(__DIR__.'/config/admin.yml', '/admin');
+$adminRoutes->setDefault('_locale', 'fr');
+```
+
+Is that what you're after? Btw, I saw your [Muse](https://github.com/henrikbjorn/Muse) test app - thanks for testing things.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-09T15:53:57Z
+
+@weaverryan almost, i can think of cases where i want the "old" behavior where it isnt automatically added. That is what i want `load()` to do, and have import be load & mount.
+
+No problem :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-09T16:03:12Z
+
+@henrikbjorn What's your use-case for that? Obviously making `load()` public is trivial, but we want to keep the public API as small as possible.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-10T08:00:08Z
+
+If i wanted to build something using this class by itself then it would be a good idea to have a immutable option of loading routes. But maybe i am grasping for straws (thats a thing right?)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-10T15:32:15Z
+
+@henrikbjorn Ha, it is a thing ;). I still don't quite understand the mutable versus immutable thing and what use-case you're thinking of. But not necessarily because what you're asking doesn't make sense - I may just need more info. Can you give a code example of what you might want to accomplish that isn't possible/easy with the current interface? Would the change in this PR improve things, or not matter?
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-11T07:25:47Z
+
+The change currently does exactly what is was assuming it would do eg `$builder->import('@MuseBundle/Resources/routing/routing.xml')` :+1:
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-11-11T07:55:39Z
+
+I see an inconsistency in method signatures:
+
+```php
+function import($resource, $prefix = '/', $type = null)
+function mount($prefix, RouteCollectionBuilder $builder)
+```
+
+I perceive `$resource` and `$builder` as similar things in this context. They both define a set of routes.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-11T15:45:00Z
+
+@GromNaN I don't understand, what would you change?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-11T16:26:19Z
+
+Btw, if we're going to merge this or make any other changes... it needs to happen... like yesterday :). So any constructive :+1: , :-1: or specific changes would be ideal
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-11T19:40:45Z
+
+@weaverryan he wants the $builder to be the first argument to mount, which makes sense to me.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-11-11T19:40:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-19T15:50:17Z
+
+I'd still like to see this merged - as I was just thinking how `import()` for all other loaders (e.g. `YamlFileLoader`) actually imports the configuration, whereas here it really just "loads" and returns it.
+
+@symfony/deciders can we either close or merge this?
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-11-23T09:02:58Z
+
+This change makes it more understandable what happens :+1:

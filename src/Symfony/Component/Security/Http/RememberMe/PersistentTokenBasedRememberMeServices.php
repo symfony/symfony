@@ -71,7 +71,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         list($series, $tokenValue) = $cookieParts;
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
 
-        if ($persistentToken->getTokenValue() !== $tokenValue) {
+        if (!hash_equals($persistentToken->getTokenValue(), $tokenValue)) {
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 

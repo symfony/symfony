@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-23T08:49:56Z
+
+:+1: the effect is subtle ... but probably needed to make it look better.
+
+---------------------------------------------------------------------------
+
+by JKapitein at 2015-11-23T08:55:51Z
+
+I've removed the outdated CSS properties and moved the radius when the toolbar is on top to the bottom left.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-23T08:58:38Z
+
+@JKapitein thanks! If I may ask a last change, we sort CSS properties alphabetically to ease its maintenance.
+
+---------------------------------------------------------------------------
+
+by JKapitein at 2015-11-23T09:01:32Z
+
+Done! Never noticed that..
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-23T09:04:32Z
+
+@JKapitein thanks! You deserve a SensioLabs Connect badge for your patience!!

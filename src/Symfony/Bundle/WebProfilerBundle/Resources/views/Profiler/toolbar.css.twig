@@ -1,5 +1,6 @@
 .sf-minitoolbar {
     background-color: #222;
+    border-top-left-radius: 4px;
     bottom: 0;
     display: none;
     height: 30px;
@@ -8,6 +9,7 @@
     right: 0;
     z-index: 99999;
 }
+
 .sf-minitoolbar a {
     display: block;
 }
@@ -357,6 +359,8 @@
 /* Override the setting when the toolbar is on the top */
 {% if position == 'top' %}
     .sf-minitoolbar {
+        border-bottom-left-radius: 4px;
+        border-top-left-radius: 0;
         bottom: auto;
         right: 0;
         top: 0;

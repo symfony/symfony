@@ -88,7 +88,7 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->types[$name] = $this->resolveAndAddType($type);
+            $this->types[$name] = $this->resolveType($type);
         }
 
         return $this->types[$name];
@@ -102,7 +102,7 @@ class FormRegistry implements FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The resolved type.
      */
-    private function resolveAndAddType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type)
     {
         $typeExtensions = array();
         $parentType = $type->getParent();

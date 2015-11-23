@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -99,7 +100,7 @@ class DigestAuthenticationListener implements ListenerInterface
             return;
         }
 
-        if ($serverDigestMd5 !== $digestAuth->getResponse()) {
+        if (!StringUtils::equals($serverDigestMd5, $digestAuth->getResponse())) {
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Expected response: "%s" but received: "%s"; is AuthenticationDao returning clear text passwords?', $serverDigestMd5, $digestAuth->getResponse()));
             }

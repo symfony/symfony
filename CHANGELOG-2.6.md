@@ -7,6 +7,11 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.12 (2015-11-23)
+
+ * security #16631 CVE-2015-8124: Session Fixation in the "Remember Me" Login Feature (xabbuh)
+ * security #16630 CVE-2015-8125: Potential Remote Timing Attack Vulnerability in Security Remember-Me Service (xabbuh)
+
 * 2.6.11 (2015-07-26)
 
  * bug #15361 [Yaml] throw a ParseException on invalid data type (xabbuh)

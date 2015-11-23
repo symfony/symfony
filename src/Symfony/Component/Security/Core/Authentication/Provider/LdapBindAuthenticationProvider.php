@@ -58,7 +58,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function retrieveUser($username, UsernamePasswordToken $token)
     {
-        if ('NONE_PROVIDED' === $username) {
+        if (AuthenticationProviderInterface::USERNAME_NONE_PROVIDED === $username) {
             throw new UsernameNotFoundException('Username can not be null');
         }
 

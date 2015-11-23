@@ -25,6 +25,13 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 interface AuthenticationProviderInterface extends AuthenticationManagerInterface
 {
     /**
+     * Username non provided
+     *
+     * @var string
+     */
+    const USERNAME_NONE_PROVIDED = 'NONE_PROVIDED';
+
+    /**
      * Checks whether this provider supports the given token.
      *
      * @param TokenInterface $token A TokenInterface instance

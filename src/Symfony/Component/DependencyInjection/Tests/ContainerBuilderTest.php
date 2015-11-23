@@ -324,7 +324,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
-        $builder->register('foo1', 'FooClass')->addMethodCall('setBar', array(array('%%unescape_it%%')));
+        $builder->register('foo1', 'Bar\FooClass')->addMethodCall('setBar', array(array('%%unescape_it%%')));
         $builder->setParameter('value', 'bar');
         $this->assertEquals(array('%unescape_it%'), $builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
     }
@@ -333,7 +333,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
-        $builder->register('foo1', 'FooClass')->setProperty('bar', array('%value%', new Reference('bar'), '%%unescape_it%%'));
+        $builder->register('foo1', 'Bar\FooClass')->setProperty('bar', array('%value%', new Reference('bar'), '%%unescape_it%%'));
         $builder->setParameter('value', 'bar');
         $this->assertEquals(array('bar', $builder->get('bar'), '%unescape_it%'), $builder->get('foo1')->bar, '->createService() replaces the values in the properties');
     }

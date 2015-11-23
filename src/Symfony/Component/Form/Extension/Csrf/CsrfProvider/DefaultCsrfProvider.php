@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
+use Symfony\Component\Security\Core\Util\StringUtils;
+
 @trigger_error('The '.__NAMESPACE__.'\DefaultCsrfProvider is deprecated since version 2.4 and will be removed in version 3.0. Use the \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage class instead.', E_USER_DEPRECATED);
 
 /**
@@ -61,7 +63,17 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     public function isCsrfTokenValid($intention, $token)
     {
-        return $token === $this->generateCsrfToken($intention);
+        $expectedToken = $this->generateCsrfToken($intention);
+
+        if (function_exists('hash_equals')) {
+            return hash_equals($expectedToken, $token);
+        }
+
+        if (class_exists('Symfony\Component\Security\Core\Util\StringUtils')) {
+            return StringUtils::equals($expectedToken, $token);
+        }
+
+        return $token === $expectedToken;
     }
 
     /**

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-11-24T11:59:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-24T12:00:14Z
+
+:+1:
+
+Composer avoids that to avoid the stat calls on each class loading, but it is indeed a good idea to do this in the DebugClassLoader

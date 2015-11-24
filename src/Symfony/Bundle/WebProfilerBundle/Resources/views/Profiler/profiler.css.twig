@@ -808,12 +808,27 @@ table.logs .metadata strong {
     color: #222;
 }
 
+table.logs .sf-call-stack {
+    margin: 1em 0 1em 1.5em;
+}
+table.logs .sf-call-stack li {
+    margin-bottom: 5px;
+}
+table.logs .sf-call-stack abbr {
+    border: none;
+}
+
 {# Doctrine panel
    ========================================================================= #}
 .sql-runnable {
     background: #F5F5F5;
     margin: .5em 0;
     padding: 1em;
+}
+.queries-table pre {
+    {{ mixins.break_long_words|raw }}
+    margin: 0;
+    white-space: pre-wrap;
 }
 
 {# Dump panel

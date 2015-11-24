@@ -98,6 +98,7 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test...', $formatter->truncate($message, 4));
         $this->assertSame('testing truncat...', $formatter->truncate($message, 15));
         $this->assertSame('testing truncate...', $formatter->truncate($message, 16));
+        $this->assertSame('zażółć gęślą...', $formatter->truncate('zażółć gęślą jaźń', 12));
     }
 
     public function testTruncatingMessageWithCustomSuffix()

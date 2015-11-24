@@ -89,7 +89,7 @@ class FormatterHelper extends Helper
             return $message;
         }
 
-        return substr($message, 0, $length) . $suffix;
+        return substr($message, 0, $length).$suffix;
     }
 
     /**

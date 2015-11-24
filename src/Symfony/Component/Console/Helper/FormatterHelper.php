@@ -73,6 +73,26 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Truncates a message to the given length.
+     *
+     * @param string $message
+     * @param int    $length
+     * @param string $suffix
+     *
+     * @return string
+     */
+    public function truncate($message, $length, $suffix = '...')
+    {
+        $computedLength = $length - strlen($suffix);
+
+        if ($computedLength > strlen($message)) {
+            return $message;
+        }
+
+        return substr($message, 0, $length) . $suffix;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()

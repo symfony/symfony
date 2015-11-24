@@ -7,6 +7,34 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.7 (2015-11-23)
+
+ * security #16631 CVE-2015-8124: Session Fixation in the "Remember Me" Login Feature (xabbuh)
+ * security #16630 CVE-2015-8125: Potential Remote Timing Attack Vulnerability in Security Remember-Me Service (xabbuh)
+ * bug #16588 Sent out a status text for unknown HTTP headers. (dawehner)
+ * bug #16295 [DependencyInjection] Unescape parameters for all types of injection (Nicofuma)
+ * bug #16574 [Process] Fix PhpProcess with phpdbg runtime (nicolas-grekas)
+ * bug #16578 [Console] Fix bug in windows detection (kbond)
+ * bug #16546 [Serializer] ObjectNormalizer: don't serialize static methods and props (dunglas)
+ * bug #16352 Fix the server variables in the router_*.php files (leofeyer)
+ * bug #16537 [Validator] Allow an empty path with a non empty fragment or a query (jakzal)
+ * bug #16528 [Translation] Add support for Armenian pluralization. (marcosdsanchez)
+ * bug #16510 [Process] fix Proccess run with pts enabled (ewgRa)
+ * bug #16292 fix race condition at mkdir (#16258) (ewgRa)
+ * bug #15945 [Form] trigger deprecation warning when using empty_value (xabbuh)
+ * bug #16384 [FrameworkBundle] JsonDescriptor - encode container params only once (xabbuh)
+ * bug #16480 [VarDumper] Fix PHP7 type-hints compat (nicolas-grekas)
+ * bug #16463 [PropertyAccess] Port of the performance optimization from 2.3 (dunglas)
+ * bug #16462 [PropertyAccess] Fix dynamic property accessing. (dunglas)
+ * bug #16454 [Serializer] GetSetNormalizer shouldn't set/get static methods (boekkooi)
+ * bug #16453 [Serializer] PropertyNormalizer shouldn't set static properties (boekkooi)
+ * bug #16471 [VarDumper] Fix casting for ReflectionParameter (nicolas-grekas)
+ * bug #16294 [PropertyAccess] Major performance improvement (dunglas)
+ * bug #16331 fixed Twig deprecation notices (fabpot)
+ * bug #16306 [DoctrineBridge] Fix issue which prevent the profiler to explain a query  (Baachi)
+ * bug #16359 Use mb_detect_encoding with $strict = true (nicolas-grekas)
+ * bug #16144 [Security] don't allow to install the split Security packages (xabbuh)
+
 * 2.7.6 (2015-10-27)
 
  * bug #16338 [VarDumper] Fix anonymous class dumping (nicolas-grekas)

@@ -442,38 +442,8 @@ FrameworkBundle
 Security
 --------
 
- * The AbstractToken::isGranted() method was deprecated. Instead,
-   override the voteOnAttribute() method. This method has one small
-   difference: it's passed the TokenInterface instead of the user:
-
-   Before:
-
-   ```php
-   class MyCustomVoter extends AbstractVoter
-   {
-       // ...
-
-       protected function isGranted($attribute, $object, $user = null)
-       {
-           // ...
-       }
-   }
-   ```
-
-   After:
-
-   ```php
-   class MyCustomVoter extends AbstractVoter
-   {
-       // ...
-
-       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
-       {
-           $user = $token->getUser();
-           // ...
-       }
-   }
-   ```
+ * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
+   deprecated and will be removed from the interface in 3.0.
 
 Config
 ------

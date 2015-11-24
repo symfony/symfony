@@ -83,9 +83,9 @@ class FormatterHelper extends Helper
      */
     public function truncate($message, $length, $suffix = '...')
     {
-        $computedLength = $length - mb_strlen($suffix);
+        $computedLength = $length - $this->strlen($suffix);
 
-        if ($computedLength > mb_strlen($message)) {
+        if ($computedLength > $this->strlen($message)) {
             return $message;
         }
 

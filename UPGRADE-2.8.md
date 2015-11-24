@@ -505,3 +505,11 @@ Config
    Additionally, if you have implemented cache validation strategies *using* `isFresh()`
    yourself, you should have a look at the new cache validation system based on
    `ResourceChecker`s.
+
+Yaml
+----
+
+ * Deprecated usage of a colon in an unquoted mapping value
+ * Deprecated usage of `@`, `` ` ``, `|`, and `>` at the beginning of an unquoted string
+ * Deprecated non-escaped \ in double-quoted strings when parsing Yaml
+   ("Foo\Var" is not valid whereas "Foo\\Var" is)

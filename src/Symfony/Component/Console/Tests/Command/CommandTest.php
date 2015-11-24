@@ -375,7 +375,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getSetAliasesData()
+     * @dataProvider provideDataForSettingAliases
      */
     public function testSetAliases($aliases)
     {
@@ -388,7 +388,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array[]
      */
-    public function getSetAliasesData()
+    public function provideDataForSettingAliases()
     {
         return array(
             array(array('some:alias')),

@@ -54,7 +54,8 @@
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
-        "doctrine/cache": "For using alternative cache drivers"
+        "doctrine/cache": "For using alternative cache drivers",
+        "symfony/process": "For using the server:run command"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

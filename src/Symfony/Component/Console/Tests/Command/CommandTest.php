@@ -376,8 +376,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getSetAliasesData()
-     *
-     * @param string[]|\Traversable $aliases
      */
     public function testSetAliases($aliases)
     {
@@ -398,11 +396,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testSetAliasesWithNonArrayNorTraversable()
     {
         $command = new TestCommand();
 
-        $this->setExpectedException('InvalidArgumentException');
         $command->setAliases('some:invalid:alias');
     }
 

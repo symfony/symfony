@@ -22,7 +22,6 @@
             <exclude>
                 <directory>./Tests</directory>
                 <directory>./vendor</directory>
-                <file>./bootstrap.php</file>
             </exclude>
         </whitelist>
     </filter>

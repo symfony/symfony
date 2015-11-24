@@ -392,7 +392,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array('some:alias')),
-            array(new \ArrayIterator(['some:alias'])),
+            array(new \ArrayIterator(array('some:alias'))),
         );
     }
 
@@ -412,9 +412,11 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $command->getUsages());
 
         $command->addUsage('some usage');
-        $this->assertSame('namespace:name some usage', $command->getUsages()[0]);
+        $usages = $command->getUsages();
+        $this->assertSame('namespace:name some usage', $usages[0]);
 
         $command->addUsage('namespace:name is easy to use');
-        $this->assertSame('namespace:name is easy to use', $command->getUsages()[1]);
+        $usages = $command->getUsages();
+        $this->assertSame('namespace:name is easy to use', $usages[1]);
     }
 }

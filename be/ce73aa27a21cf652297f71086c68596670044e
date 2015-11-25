@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-30T01:54:37Z
+
+AFAIK php arrays are only limited my memory. So what does this solve?
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-10-30T07:47:21Z
+
+I know, that's what I thought as well.
+
+yet when I checked out https://github.com/AntoineLemaire/symfony-standard/commits/2.8, and I debugged the generated appDevUrlGenerator.php file by dumping the `self::$declaredRoutes` there were only 7265 routes in there instead of 20000+.
+
+well after a bit of experimenting it seems the issue is that declaring the routes in the constructor instead of the class fixes it as well.
+
+will make a test case to illustrate the issue.
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-10-30T09:15:45Z
+
+you can find an illustration of the issue at http://khepri.be/test_appDevUrlGenerator.php  ( source at http://khepri.be/test_appDevUrlGenerator.php.txt )
+
+Basicly 2 identical arrays, one defined in the class and one in the constructor.
+constructor shows the correct amount while the one in the class only has 1 element.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2015-10-30T13:23:29Z
+
+`# php /srv/www/test_appDevUrlGenerator.php.txt`
+32769 routes in constructor
+32769 routes in class
+`# php -v`
+PHP 5.5.30-1.pi (cli) (built: Oct 19 2015 07:37:46)
+Copyright (c) 1997-2015 The PHP Group
+Zend Engine v2.5.0, Copyright (c) 1998-2015 Zend Technologies
+    with Zend OPcache v7.0.6-dev, Copyright (c) 1999-2015, by Zend Technologies
+    with Xdebug v2.3.3, Copyright (c) 2002-2015, by Derick Rethans
+    with blackfire v1.6.0, https://blackfire.io, by Blackfireio Inc.
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-10-30T14:50:41Z
+
+Seems to be an issue from php 5.6+
+
+you can find a simplified example at https://gist.github.com/jelte/b2a9d73aec0211b07f6e
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2015-10-30T17:25:40Z
+
+Then I suggest reporting this. As it probably also doesn't work in 7.0
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-10-30T17:43:39Z
+
+I confirm the bug in PHP 5.6.13. Seems pretty serious. Can somebody report it on PHP?
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-10-30T20:51:20Z
+
+done, https://bugs.php.net/bug.php?id=70823
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-10-31T10:08:18Z
+
+It was marked duplicate, and can't be fixed without breaking extensions.
+20000+ routes? WTF! Why do you need this many?
+
+Not using static may work also, but is a problem when you use something like ReactPHP and get allot of duplicated values in memory.
+
+If you have this many routes, I guess one way to make it work is to separate them using a (I hope get this term right) binary-tree when the routes are split over multiple static variables (like done for the dumped  matching).
+
+---------------------------------------------------------------------------
+
+by JHGitty at 2015-11-02T02:35:00Z
+
+Known PHP issue for PHP5.6+ but it is only fixed in PHP7+.
+https://bugs.php.net/bug.php?id=68057
+
+ [2015-03-23 17:51 UTC] bwoebi@php.net
+Fixing this is an ABI break (**so not really possible for 5.6.x**). It's **fixed in master (PHP 7+)** though.
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-11-02T14:41:46Z
+
+As this is a bug in PHP 5.6 which won't be fixed I made it an exception for that specific PHP version and only in case you have a large number of routes.
+
+@sstok The large number of routes are due to a large amount of locales (30+) and translated uri's (check the ticket), With large sites, without some dynamic routes it can happen.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-02T14:48:23Z
+
+this needs to be covered by a test
+
+---------------------------------------------------------------------------
+
+by jelte at 2015-11-02T16:22:10Z
+
+@stof Test has been added
+@SoboLAN `generateDeclaredRoutes` is a string so obviously it didn't work, but counting the routes does. Also set the correct cut off number to 32769.
+@sstok good point, added.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-05T14:55:32Z
+
+:+1:

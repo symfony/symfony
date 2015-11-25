@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension;
+use Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface;
+use Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension;
 
 class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,16 +30,16 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dataCollector = $this->getMock('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface');
+        $this->dataCollector = $this->getMock(FormDataCollectorInterface::class);
         $this->extension = new DataCollectorExtension($this->dataCollector);
     }
 
     public function testLoadTypeExtensions()
     {
-        $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
+        $typeExtensions = $this->extension->getTypeExtensions(FormType::class);
 
         $this->assertInternalType('array', $typeExtensions);
         $this->assertCount(1, $typeExtensions);
-        $this->assertInstanceOf('Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension', array_shift($typeExtensions));
+        $this->assertInstanceOf(DataCollectorTypeExtension::class, array_shift($typeExtensions));
     }
 }

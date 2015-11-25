@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -18,11 +21,11 @@ class ButtonTypeTest extends BaseTypeTest
 {
     public function testCreateButtonInstances()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\Button', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ButtonType'));
+        $this->assertInstanceOf(Button::class, $this->factory->create(ButtonType::class));
     }
 
     protected function getTestedType()
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\ButtonType';
+        return ButtonType::class;
     }
 }

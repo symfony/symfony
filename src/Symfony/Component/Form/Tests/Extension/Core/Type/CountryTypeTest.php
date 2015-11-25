@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -26,7 +27,7 @@ class CountryTypeTest extends TestCase
 
     public function testCountriesAreSelectable()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
+        $form = $this->factory->create(CountryType::class);
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
@@ -40,7 +41,7 @@ class CountryTypeTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType', 'Symfony\Component\Form\Extension\Core\Type\CountryType');
+        $form = $this->factory->create(CountryType::class, CountryType::class);
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Test\TypeTestCase;
+
+class FileTypeTest extends TypeTestCase
 {
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
+        $form = $this->factory->createBuilder(FileType::class)->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
 
         $form->setData($data);
@@ -26,7 +29,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmit()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
+        $form = $this->factory->createBuilder(FileType::class)->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
 
         $form->submit($data);
@@ -37,7 +40,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     // https://github.com/symfony/symfony/issues/6134
     public function testSubmitEmpty()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType')->getForm();
+        $form = $this->factory->createBuilder(FileType::class)->getForm();
 
         $form->submit(null);
 
@@ -46,7 +49,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultiple()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
+        $form = $this->factory->createBuilder(FileType::class, null, array(
             'multiple' => true,
         ))->getForm();
 
@@ -65,9 +68,9 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testDontPassValueToView()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FileType');
+        $form = $this->factory->create(FileType::class);
         $form->submit(array(
-            'Symfony\Component\Form\Extension\Core\Type\FileType' => $this->createUploadedFileMock('abcdef', 'original.jpg', true),
+            FileType::class => $this->createUploadedFileMock('abcdef', 'original.jpg', true),
         ));
         $view = $form->createView();
 

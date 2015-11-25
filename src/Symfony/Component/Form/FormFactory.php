@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Util\StringUtil;
 
 class FormFactory implements FormFactoryInterface
@@ -35,7 +37,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function create($type = FormType::class, $data = null, array $options = array())
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
@@ -43,7 +45,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createNamed($name, $type = FormType::class, $data = null, array $options = array())
     {
         return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
@@ -59,7 +61,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createBuilder($type = FormType::class, $data = null, array $options = array())
     {
         if (!is_string($type)) {
             throw new UnexpectedTypeException($type, 'string');
@@ -71,7 +73,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createNamedBuilder($name, $type = FormType::class, $data = null, array $options = array())
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -98,7 +100,7 @@ class FormFactory implements FormFactoryInterface
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'Symfony\Component\Form\Extension\Core\Type\TextType', $data, $options);
+            return $this->createNamedBuilder($property, TextType::class, $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
@@ -106,7 +108,7 @@ class FormFactory implements FormFactoryInterface
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
-        $type = $typeGuess ? $typeGuess->getType() : 'Symfony\Component\Form\Extension\Core\Type\TextType';
+        $type = $typeGuess ? $typeGuess->getType() : TextType::class;
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
         $pattern = $patternGuess ? $patternGuess->getValue() : null;

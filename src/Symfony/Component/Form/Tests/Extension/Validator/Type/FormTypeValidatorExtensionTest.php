@@ -11,22 +11,24 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder(
-            'Symfony\Component\Form\Extension\Core\Type\FormType',
+            FormType::class,
             null,
             array(
                 'validation_groups' => 'group',
             )
         );
-        $builder->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\FormType');
+        $builder->add('firstName', FormType::class);
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
@@ -47,7 +49,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     public function testValidatorInterface()
     {
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator = $this->getMock(ValidatorInterface::class);
 
         $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
@@ -55,6 +57,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     protected function createForm(array $options = array())
     {
-        return $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, $options);
+        return $this->factory->create(FormType::class, null, $options);
     }
 }

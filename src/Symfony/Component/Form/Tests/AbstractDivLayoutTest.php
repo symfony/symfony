@@ -11,6 +11,13 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -18,7 +25,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 {
     public function testRow()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', TextType::class);
         $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
@@ -38,7 +45,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRowOverrideVariables()
     {
-        $view = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType')->createView();
+        $view = $this->factory->createNamed('name', TextType::class)->createView();
         $html = $this->renderRow($view, array(
             'attr' => array('class' => 'my&class'),
             'label' => 'foo&bar',
@@ -57,7 +64,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedRow()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType');
+        $form = $this->factory->createNamed('name', RepeatedType::class);
         $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
@@ -84,7 +91,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testButtonRow()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
+        $form = $this->factory->createNamed('name', ButtonType::class);
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -100,11 +107,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRest()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field2', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType')
-            ->add('field3', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field4', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('field1', TextType::class)
+            ->add('field2', RepeatedType::class)
+            ->add('field3', TextType::class)
+            ->add('field4', TextType::class)
             ->getForm()
             ->createView();
 
@@ -141,15 +148,15 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRestWithChildrenForms()
     {
-        $child1 = $this->factory->createNamedBuilder('child1', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field2', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $child1 = $this->factory->createNamedBuilder('child1', FormType::class)
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class);
 
-        $child2 = $this->factory->createNamedBuilder('child2', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field2', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $child2 = $this->factory->createNamedBuilder('child2', FormType::class)
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class);
 
-        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+        $view = $this->factory->createNamedBuilder('parent', FormType::class)
             ->add($child1)
             ->add($child2)
             ->getForm()
@@ -199,9 +206,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRestAndRepeatedWithRow()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('first', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('first', TextType::class)
+            ->add('password', RepeatedType::class)
             ->getForm()
             ->createView();
 
@@ -225,9 +232,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRestAndRepeatedWithRowPerChild()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('first', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('first', TextType::class)
+            ->add('password', RepeatedType::class)
             ->getForm()
             ->createView();
 
@@ -253,9 +260,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRestAndRepeatedWithWidgetPerChild()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('first', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('first', TextType::class)
+            ->add('password', RepeatedType::class)
             ->getForm()
             ->createView();
 
@@ -283,8 +290,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array('a', 'b'), array(
-            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $form = $this->factory->createNamed('names', CollectionType::class, array('a', 'b'), array(
+            'entry_type' => TextType::class,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -305,7 +312,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             array('title' => 'a'),
             array('title' => 'b'),
         );
-        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+        $form = $this->factory->createNamed('names', CollectionType::class, $data, array(
             'entry_type' => 'Symfony\Component\Form\Tests\Fixtures\AlternatingRowType',
         ));
 
@@ -323,8 +330,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testEmptyCollection()
     {
-        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $form = $this->factory->createNamed('names', CollectionType::class, array(), array(
+            'entry_type' => TextType::class,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -339,12 +346,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $collection = $this->factory->createNamedBuilder(
             'collection',
-            'Symfony\Component\Form\Extension\Core\Type\CollectionType',
+            CollectionType::class,
             array('a', 'b'),
-            array('entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            array('entry_type' => TextType::class)
         );
 
-        $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+        $form = $this->factory->createNamedBuilder('form', FormType::class)
           ->add($collection)
           ->getForm();
 
@@ -377,11 +384,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testForm()
     {
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+        $form = $this->factory->createNamedBuilder('name', FormType::class)
             ->setMethod('PUT')
             ->setAction('http://example.com')
-            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('firstName', TextType::class)
+            ->add('lastName', TextType::class)
             ->getForm();
 
         // include ampersands everywhere to validate escaping
@@ -421,9 +428,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testFormWidget()
     {
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+        $form = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('firstName', TextType::class)
+            ->add('lastName', TextType::class)
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -449,10 +456,10 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     // https://github.com/symfony/symfony/issues/2308
     public function testNestedFormError()
     {
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+        $form = $this->factory->createNamedBuilder('name', FormType::class)
             ->add($this->factory
-                ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array('error_bubbling' => false))
-                ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+                ->createNamedBuilder('child', FormType::class, null, array('error_bubbling' => false))
+                ->add('grandChild', FormType::class)
             )
             ->getForm();
 
@@ -475,11 +482,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ->method('getToken')
             ->will($this->returnValue(new CsrfToken('token_id', 'foo&bar')));
 
-        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+        $form = $this->factory->createNamedBuilder('name', FormType::class)
             ->add($this->factory
                 // No CSRF protection on nested forms
-                ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-                ->add($this->factory->createNamedBuilder('grandchild', 'Symfony\Component\Form\Extension\Core\Type\TextType'))
+                ->createNamedBuilder('child', FormType::class)
+                ->add($this->factory->createNamedBuilder('grandchild', TextType::class))
             )
             ->getForm();
 
@@ -496,8 +503,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRepeated()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $form = $this->factory->createNamed('name', RepeatedType::class, 'foobar', array(
+            'type' => TextType::class,
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -522,7 +529,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedWithCustomOptions()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->createNamed('name', RepeatedType::class, null, array(
             // the global required value cannot be overridden
             'first_options' => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2'),
@@ -550,8 +557,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testSearchInputName()
     {
-        $form = $this->factory->createNamedBuilder('full', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType')
+        $form = $this->factory->createNamedBuilder('full', FormType::class)
+            ->add('name', SearchType::class)
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -571,7 +578,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testLabelHasNoId()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
@@ -586,7 +593,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testLabelIsNotRenderedWhenSetToFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', TextType::class, null, array(
             'label' => false,
         ));
         $html = $this->renderRow($form->createView());
@@ -607,7 +614,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testThemeBlockInheritance($theme)
     {
         $view = $this->factory
-            ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
+            ->createNamed('name', EmailType::class)
             ->createView()
         ;
 
@@ -624,11 +631,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
      */
     public function testThemeInheritance($parentTheme, $childTheme)
     {
-        $child = $this->factory->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $child = $this->factory->createNamedBuilder('child', FormType::class)
+            ->add('field', TextType::class);
 
-        $view = $this->factory->createNamedBuilder('parent', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+        $view = $this->factory->createNamedBuilder('parent', FormType::class)
+            ->add('field', TextType::class)
             ->add($child)
             ->getForm()
             ->createView()
@@ -670,7 +677,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testCollectionRowWithCustomBlock()
     {
         $collection = array('one', 'two', 'three');
-        $form = $this->factory->createNamedBuilder('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', $collection)
+        $form = $this->factory->createNamedBuilder('names', CollectionType::class, $collection)
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -690,7 +697,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
      */
     public function testChoiceRowWithCustomBlock()
     {
-        $form = $this->factory->createNamedBuilder('name_c', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', 'a', array(
+        $form = $this->factory->createNamedBuilder('name_c', ChoiceType::class, 'a', array(
                 'choices' => array('a' => 'ChoiceA', 'b' => 'ChoiceB'),
                 'expanded' => true,
             ))
@@ -708,9 +715,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testFormEndWithRest()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field2', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class)
             ->getForm()
             ->createView();
 
@@ -738,9 +745,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testFormEndWithoutRest()
     {
-        $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('field2', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+        $view = $this->factory->createNamedBuilder('name', FormType::class)
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class)
             ->getForm()
             ->createView();
 
@@ -754,11 +761,11 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testWidgetContainerAttributes()
     {
-        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->createNamed('form', FormType::class, null, array(
             'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
         ));
 
-        $form->add('text', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form->add('text', TextType::class);
 
         $html = $this->renderWidget($form->createView());
 
@@ -768,7 +775,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testWidgetContainerAttributeNameRepeatedIfTrue()
     {
-        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->createNamed('form', FormType::class, null, array(
             'attr' => array('foo' => true),
         ));
 

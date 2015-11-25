@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Component\Validator\Validation;
@@ -36,10 +37,10 @@ class FormValidatorPerformanceTest extends FormPerformanceTestCase
     {
         $this->setMaxRunningTime(1);
 
-        $builder = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType');
+        $builder = $this->factory->createBuilder(FormType::class);
 
         for ($i = 0; $i < 40; ++$i) {
-            $builder->add($i, 'Symfony\Component\Form\Extension\Core\Type\FormType');
+            $builder->add($i, FormType::class);
 
             $builder->get($i)
                 ->add('a')

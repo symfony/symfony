@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\Form\Util\ServerParams;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,7 +42,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->serverParams = $this->getMock(
-            'Symfony\Component\Form\Util\ServerParams',
+            ServerParams::class,
             array('getNormalizedIniPostMaxSize', 'getContentLength')
         );
         $this->requestHandler = $this->getRequestHandler();
@@ -323,7 +327,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($iniMax));
 
         $options = array('post_max_size_message' => 'Max {{ max }}!');
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
+        $form = $this->factory->createNamed('name', TextType::class, null, $options);
         $this->setRequestData('POST', array(), array());
 
         $this->requestHandler->handleRequest($form, $this->request);
@@ -363,7 +367,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm($name, $method = null, $compound = true)
     {
-        $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $config = $this->getMock(FormConfigInterface::class);
         $config->expects($this->any())
             ->method('getMethod')
             ->will($this->returnValue($method));
@@ -371,7 +375,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getCompound')
             ->will($this->returnValue($compound));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMock(FormInterface::class);
         $form->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));

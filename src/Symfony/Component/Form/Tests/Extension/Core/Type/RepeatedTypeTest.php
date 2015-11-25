@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Test\TypeTestCase;
+
+class RepeatedTypeTest extends TypeTestCase
 {
     protected $form;
 
@@ -19,8 +23,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         parent::setUp();
 
-        $this->form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $this->form = $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
         ));
         $this->form->setData(null);
     }
@@ -35,8 +39,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetOptions()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $form = $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
             'options' => array('label' => 'Global'),
         ));
 
@@ -48,9 +52,9 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetOptionsPerChild()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->create(RepeatedType::class, null, array(
             // the global required value cannot be overridden
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'type' => TextType::class,
             'first_options' => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2'),
         ));
@@ -63,9 +67,9 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetRequired()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->create(RepeatedType::class, null, array(
             'required' => false,
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'type' => TextType::class,
         ));
 
         $this->assertFalse($form['first']->isRequired());
@@ -77,8 +81,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testSetInvalidOptions()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
             'options' => 'bad value',
         ));
     }
@@ -88,8 +92,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testSetInvalidFirstOptions()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
             'first_options' => 'bad value',
         ));
     }
@@ -99,15 +103,15 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testSetInvalidSecondOptions()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
             'second_options' => 'bad value',
         ));
     }
 
     public function testSetErrorBubblingToTrue()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->create(RepeatedType::class, null, array(
             'error_bubbling' => true,
         ));
 
@@ -118,7 +122,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetErrorBubblingToFalse()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->create(RepeatedType::class, null, array(
             'error_bubbling' => false,
         ));
 
@@ -129,7 +133,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetErrorBubblingIndividually()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+        $form = $this->factory->create(RepeatedType::class, null, array(
             'error_bubbling' => true,
             'options' => array('error_bubbling' => false),
             'second_options' => array('error_bubbling' => true),
@@ -142,8 +146,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetOptionsPerChildAndOverwrite()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        $form = $this->factory->create(RepeatedType::class, null, array(
+            'type' => TextType::class,
             'options' => array('label' => 'Label'),
             'second_options' => array('label' => 'Second label'),
         ));

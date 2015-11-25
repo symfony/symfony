@@ -12,11 +12,17 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\Form\SubmitButtonBuilder;
+use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -110,7 +116,7 @@ class CompoundFormTest extends AbstractFormTest
         $factory = Forms::createFormFactoryBuilder()
             ->getFormFactory();
 
-        $child = $factory->createNamed('file', 'Symfony\Component\Form\Extension\Core\Type\FileType', null, array('auto_initialize' => false));
+        $child = $factory->createNamed('file', FileType::class, null, array('auto_initialize' => false));
 
         $this->form->add($child);
         $this->form->submit(array('file' => null), false);
@@ -348,7 +354,7 @@ class CompoundFormTest extends AbstractFormTest
             ->method('mapDataToForms')
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
             ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(array($child->getName() => $child), iterator_to_array($iterator));
             }));
 
@@ -442,7 +448,7 @@ class CompoundFormTest extends AbstractFormTest
             ->method('mapDataToForms')
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
             ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
             }));
 
@@ -497,7 +503,7 @@ class CompoundFormTest extends AbstractFormTest
             ->method('mapFormsToData')
             ->with($this->isInstanceOf('\RecursiveIteratorIterator'), 'bar')
             ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
                 $this->assertEquals('Bernhard', $child1->getData());
                 $this->assertEquals('Schussek', $child2->getData());
@@ -569,7 +575,7 @@ class CompoundFormTest extends AbstractFormTest
             ->method('mapFormsToData')
             ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
             ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
-                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertInstanceOf(InheritDataAwareIterator::class, $iterator->getInnerIterator());
                 $this->assertSame(array('name' => $child), iterator_to_array($iterator));
             }));
 
@@ -866,7 +872,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertSame($error1, $errorsAsArray[0]);
         $this->assertSame($error2, $errorsAsArray[1]);
-        $this->assertInstanceOf('Symfony\Component\Form\FormErrorIterator', $errorsAsArray[2]);
+        $this->assertInstanceOf(FormErrorIterator::class, $errorsAsArray[2]);
 
         $nestedErrorsAsArray = iterator_to_array($errorsAsArray[2]);
 
@@ -877,7 +883,7 @@ class CompoundFormTest extends AbstractFormTest
     // Basic cases are covered in SimpleFormTest
     public function testCreateViewWithChildren()
     {
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type = $this->getMock(ResolvedFormTypeInterface::class);
         $options = array('a' => 'Foo', 'b' => 'Bar');
         $field1 = $this->getMockForm('foo');
         $field2 = $this->getMockForm('bar');
@@ -937,7 +943,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testNoClickedButton()
     {
-        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+        $button = $this->getMockBuilder(SubmitButton::class)
             ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
             ->setMethods(array('isClicked'))
             ->getMock();
@@ -959,7 +965,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testClickedButton()
     {
-        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+        $button = $this->getMockBuilder(SubmitButton::class)
             ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
             ->setMethods(array('isClicked'))
             ->getMock();
@@ -978,7 +984,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $button = $this->getBuilder('submit')->getForm();
 
-        $nestedForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $nestedForm = $this->getMockBuilder(Form::class)
             ->setConstructorArgs(array($this->getBuilder('nested')))
             ->setMethods(array('getClickedButton'))
             ->getMock();
@@ -997,7 +1003,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $button = $this->getBuilder('submit')->getForm();
 
-        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $parentForm = $this->getMockBuilder(Form::class)
             ->setConstructorArgs(array($this->getBuilder('parent')))
             ->setMethods(array('getClickedButton'))
             ->getMock();

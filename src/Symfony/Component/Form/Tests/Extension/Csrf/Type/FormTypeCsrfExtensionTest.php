@@ -12,6 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -24,7 +27,7 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
     {
         // The form needs a child in order to trigger CSRF protection by
         // default
-        $builder->add('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $builder->add('name', TextType::class);
     }
 }
 
@@ -66,7 +69,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testCsrfProtectionByDefaultIfRootAndCompound()
     {
         $view = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->create(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'compound' => true,
             ))
@@ -78,9 +81,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionByDefaultIfCompoundButNotRoot()
     {
         $view = $this->factory
-            ->createNamedBuilder('root', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->createNamedBuilder('root', FormType::class)
             ->add($this->factory
-                ->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+                ->createNamedBuilder('form', FormType::class, null, array(
                     'csrf_field_name' => 'csrf',
                     'compound' => true,
                 ))
@@ -95,7 +98,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionByDefaultIfRootButNotCompound()
     {
         $view = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->create(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'compound' => false,
             ))
@@ -107,7 +110,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testCsrfProtectionCanBeDisabled()
     {
         $view = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->create(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_protection' => false,
                 'compound' => true,
@@ -125,7 +128,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue(new CsrfToken('TOKEN_ID', 'token')));
 
         $view = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->create(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -144,7 +147,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue('token'));
 
         $view = $this->factory
-            ->createNamed('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createNamed('FORM_NAME', FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -158,11 +161,11 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     {
         $this->tokenManager->expects($this->once())
             ->method('getToken')
-            ->with('Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->with(FormType::class)
             ->will($this->returnValue('token'));
 
         $view = $this->factory
-            ->createNamed('', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createNamed('', FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -191,13 +194,13 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createBuilder(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', TextType::class)
             ->getForm();
 
         $form->submit(array(
@@ -223,12 +226,12 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createNamedBuilder('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createNamedBuilder('FORM_NAME', FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ))
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', TextType::class)
             ->getForm();
 
         $form->submit(array(
@@ -250,16 +253,16 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
-            ->with(new CsrfToken('Symfony\Component\Form\Extension\Core\Type\FormType', 'token'))
+            ->with(new CsrfToken(FormType::class, 'token'))
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createNamedBuilder('', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createNamedBuilder('', FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ))
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', TextType::class)
             ->getForm();
 
         $form->submit(array(
@@ -280,13 +283,13 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isTokenValid');
 
         $form = $this->factory
-            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createBuilder(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
-            ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('child', TextType::class)
             ->getForm();
 
         $form->submit(array(
@@ -307,9 +310,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isTokenValid');
 
         $form = $this->factory
-            ->createNamedBuilder('root', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->createNamedBuilder('root', FormType::class)
             ->add($this->factory
-                ->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+                ->createNamedBuilder('form', FormType::class, null, array(
                     'csrf_field_name' => 'csrf',
                     'csrf_token_manager' => $this->tokenManager,
                     'csrf_token_id' => 'TOKEN_ID',
@@ -331,7 +334,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isTokenValid');
 
         $form = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->create(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -346,7 +349,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionOnPrototype()
     {
         $prototypeView = $this->factory
-            ->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
+            ->create(CollectionType::class, null, array(
                 'entry_type' => __CLASS__.'_ChildType',
                 'entry_options' => array(
                     'csrf_field_name' => 'csrf',
@@ -374,7 +377,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
              ->will($this->returnValue('[trans]Foobar[/trans]'));
 
         $form = $this->factory
-            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+            ->createBuilder(FormType::class, null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_message' => 'Foobar',

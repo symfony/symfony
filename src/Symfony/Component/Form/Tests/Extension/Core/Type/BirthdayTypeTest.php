@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+
 /**
  * @author Stepan Anchugov <kixxx1@gmail.com>
  */
@@ -21,13 +23,13 @@ class BirthdayTypeTest extends BaseTypeTest
      */
     public function testSetInvalidYearsOption()
     {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\BirthdayType', null, array(
+        $this->factory->create(BirthdayType::class, null, array(
             'years' => 'bad value',
         ));
     }
 
     protected function getTestedType()
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
+        return BirthdayType::class;
     }
 }

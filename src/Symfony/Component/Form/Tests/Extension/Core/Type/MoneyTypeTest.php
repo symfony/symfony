@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -29,7 +30,7 @@ class MoneyTypeTest extends TestCase
     {
         \Locale::setDefault('de_DE');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType');
+        $form = $this->factory->create(MoneyType::class);
         $view = $form->createView();
 
         $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
@@ -39,7 +40,7 @@ class MoneyTypeTest extends TestCase
     {
         \Locale::setDefault('en_US');
 
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'JPY'));
+        $form = $this->factory->create(MoneyType::class, null, array('currency' => 'JPY'));
         $view = $form->createView();
         $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
     }
@@ -49,8 +50,8 @@ class MoneyTypeTest extends TestCase
     {
         \Locale::setDefault('de_DE');
 
-        $form1 = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'GBP'));
-        $form2 = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'EUR'));
+        $form1 = $this->factory->create(MoneyType::class, null, array('currency' => 'GBP'));
+        $form2 = $this->factory->create(MoneyType::class, null, array('currency' => 'EUR'));
         $view1 = $form1->createView();
         $view2 = $form2->createView();
 

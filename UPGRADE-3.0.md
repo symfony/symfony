@@ -264,6 +264,12 @@ UPGRADE FROM 2.x to 3.0
        // ...
    }
    ```
+   
+ * The option "options" of the CollectionType has been renamed to "entry_options".
+
+ * The option "type" of the CollectionType has been renamed to "entry_type".
+   As a value for the option you must provide the fully-qualified class name (FQCN) 
+   now as well.   
 
  * The `FormIntegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
 

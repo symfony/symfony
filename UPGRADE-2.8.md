@@ -213,6 +213,14 @@ Form
        }
    }
    ```
+   
+ * The option "options" of the CollectionType has been renamed to "entry_options".
+   The usage of the option "options" is deprecated and will be removed in Symfony 3.0.
+
+ * The option "type" of the CollectionType has been renamed to "entry_type".
+   The usage of the option "type" is deprecated and will be removed in Symfony 3.0.
+   As a value for the option you should provide the fully-qualified class name (FQCN) 
+   now as well.
 
  * Passing type instances to `Form::add()`, `FormBuilder::add()` and the
    `FormFactory::create*()` methods is deprecated and will not be supported

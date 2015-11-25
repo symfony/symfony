@@ -205,7 +205,7 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
             array("namespace   Bar ;\nclass Foo {}\n", "namespace   Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n"),
-            array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}\n"),
+            array("\nnamespace\n{\nclass Foo {}\n\$namespace=123;}\n", "\nnamespace\n{\nclass Foo {}\n\$namespace=123;}\n"),
         );
     }
 

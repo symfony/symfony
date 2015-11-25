@@ -72,9 +72,9 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $cliOutput)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $cliOutput);
+        $output = new SymfonyStyle($input, $cliOutput = $output);
 
         if (!extension_loaded('pcntl')) {
             $output->error(array(

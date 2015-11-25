@@ -95,7 +95,16 @@ class Collection implements \Countable, \IteratorAggregate, \ArrayAccess
         unset($entries['count']);
 
         $this->entries = array_map(function (array $entry) {
-            return new Entry($entry['dn'], $entry['attributes']);
+            $dn = $entry['dn'];
+            $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
+                'count' => null,
+                'dn' => null,
+            ]);
+            array_walk($attributes, function (&$value, $attribute) {
+                unset($value['count']);
+            });
+
+            return new Entry($dn, $attributes);
         }, $entries);
     }
 }

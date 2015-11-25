@@ -511,5 +511,17 @@ Yaml
 
  * Deprecated usage of a colon in an unquoted mapping value
  * Deprecated usage of `@`, `` ` ``, `|`, and `>` at the beginning of an unquoted string
- * Deprecated non-escaped \ in double-quoted strings when parsing Yaml
-   ("Foo\Var" is not valid whereas "Foo\\Var" is)
+ * When surrounding strings with double-quotes, you must now escape `\` characters. Not
+   escaping those characters (when surrounded by double-quotes) is deprecated.
+
+   Before:
+
+   ```yml
+   class: "Foo\Var"
+   ```
+
+   After:
+
+   ```yml
+   class: "Foo\\Var"
+   ```

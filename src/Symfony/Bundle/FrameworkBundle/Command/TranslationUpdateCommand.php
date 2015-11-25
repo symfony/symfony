@@ -196,10 +196,10 @@ EOF
                     $bundleTransPath = $path;
                 }
             }
-
-            if ($bundleTransPath) {
-                $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
+            if (!$bundleTransPath) {
+                $bundleTransPath = end($transPaths).'translations';
             }
+            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated.';

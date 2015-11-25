@@ -39,8 +39,11 @@ class UrlPackage extends Package
     private $sslPackage;
 
     /**
+     * Constructor.
+     *
      * @param string|array             $baseUrls        Base asset URLs
      * @param VersionStrategyInterface $versionStrategy The version strategy
+     * @param ContextInterface         $context         The context
      */
     public function __construct($baseUrls = array(), VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
@@ -118,6 +121,15 @@ class UrlPackage extends Package
         return fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }
 
+    /**
+     * Returns ssl urls.
+     *
+     * @param array $urls An array of urls.
+     *
+     * @return array An array of ssl urls.
+     *
+     * @throws InvalidArgumentException If one of urls is not valid.
+     */
     private function getSslUrls($urls)
     {
         $sslUrls = array();

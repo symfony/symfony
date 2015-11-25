@@ -29,8 +29,11 @@ class PathPackage extends Package
     private $basePath;
 
     /**
+     * Constructor.
+     *
      * @param string                   $basePath        The base path to be prepended to relative paths
      * @param VersionStrategyInterface $versionStrategy The version strategy
+     * @param ContextInterface         $context         The context
      */
     public function __construct($basePath, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {

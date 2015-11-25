@@ -1,0 +1,224 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-20T23:02:31Z
+
+`$extension->getTypeExtensions($fqcn)` should also use $name and not FQCN IMO. So you can have different type extensions per $name and not class.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-20T23:14:52Z
+
+@Tobion who can confirm this ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-20T23:26:50Z
+
+In light of this, the `form.type` tag `alias` attribute should maybe not be removed as well: https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/FormPass.php#L45
+
+This way it would be possible to actually configure different types of one class in the DI. Otherwise it would only be possible with a custom FormExtension.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-23T08:30:59Z
+
+The errors are not coming from this PR.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-23T17:55:16Z
+
+@jakzal fixed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-23T17:57:33Z
+
+@rande could you please add a test?
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-23T18:00:08Z
+
+@nicolas-grekas I did not change public methods, what kind of test do you want ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-24T09:59:56Z
+
+A test that will prevent any regression... You changed the behavior, this must be actionable from the outside, since you hit the issue :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-25T04:25:49Z
+
+This one looks important to me if that blocks the update of Sonata admin. Any comments before I merge it? ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-25T07:44:38Z
+
+At least, we need a test to prevent future regressions.
+
+Discussing whether or not multiple form types of the same class should be possible to register can be discussed in a different issue then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-25T07:46:26Z
+
+Ah I see, we already have #16611 for that.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-25T08:28:53Z
+
+Looks like a good fix. We use `$name` instead of `$fqcn` when accessing the `$types` property in all other places. I'd add a test though. What about @Tobion's comment?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T14:15:14Z
+
+Also looks good to me, once there is a test. @rande are you able to add a test?
+
+About @Tobion's comment, we could certainly re-add the `form.type` `alias` configuration to optionally you to have multiple form types from the same class. But I'm realizing that this is a slippery area. We want to avoid a situation where 95% of the time you se a FQCN like `TextType::class`, and then suddenly you use an alias-like string like `sonata_entity` (just making that up). It might be better to make this alias ability only allowable on form type extensions, and discourage its use for consistency.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-25T14:23:46Z
+
+Yeah let's keep `alias` removed. It's an edge case we do not have to uspport out-of-the-box. Otherwise it will cause confusion again.
+
+> $extension->getTypeExtensions($fqcn) should also use $name and not FQCN IMO. So you can have different type extensions per $name and not class.
+
+But I still think this should be changed as well. For core types it doesn't change anything, but it allows more flexibility. E.g. you can write a form type extension is that based on the name or for the class if you have multiple of the same.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-25T14:23:55Z
+
+I don't really want to introduce aliases for types again. We managed to reduce complexity by removing one layer of abstraction, namely the mapping of strings to type classes. Using type classes with the `::class` constant is much more explicit and less magic now. I know it takes some getting used to.
+
+I think the way to solve this problem is by sub-typing. If you have an abstract type and want more specific types inheriting from that type, you can do that. I know this is not as elegant as before, but it's not hard.
+
+In the long run, I want to also remove the "virtual inheritance" model, i.e. let types directly inherit their parent type. Then this will become even easier.
+
+For me, the overall goal is to reduce complexity of the component as much as possible. Necessarily this means that some things need to be changed for major version bumps.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T14:30:39Z
+
+For the record, the following PR https://github.com/sonata-project/SonataCoreBundle/pull/212/files will re-introduce alias feature for Symfony3. I know it is bad, but it is one thing (among small others) that avoid making bundles compatible with SF2.7 => SF3.0. SF2.7 and SF2.8 are LTS versions of Symfony, we (sonata-project) cannot afford to maintain 2 branches.
+
+I don't see how alias add complexity, I see more complexity with the 3.0 implementation.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T14:39:09Z
+
+The other solution for us will be to only support 2.8 and 3.0. Dropping support for 2.3 and 2.7 LTS. @lsmith77 what is the CMF policy on symfony version support ?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-11-25T14:42:17Z
+
+right now we are hoping to continue to support 2.3 until May next year .. but maybe we need to stare reality into the eye ..
+
+/cc @dbu
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T14:43:34Z
+
+@rande eventually you would drop support for 2.7 LTS (i.e. when the LTS itself is not supported), and *then* you could stop using the form extension "alias" thing in Sonata and use multiple classes instead, correct? Correct me if I'm over-simplifying (because you are working in a real use-case), but the complexity is really caused by maintaining a bundle that works across multiple versions (where this new system exists versus doesn't exist), right?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2015-11-25T15:14:01Z
+
+IMO, the `alias` attr should be re-introduced. It maybe simplifies the internal of the form component but limit us in its usage.
+
+In one of our application, we have abstracted all our models to something called `resource`. The resource is a kind of model metadata. A bundle defines its resources and then, a generic implementation will create as much forms as we have resources by using the same form type class as foundation. Then, each form name/form type service name is built dynamically according to the linked resource and we alias this dynamic name in the container. That allows us to provide a default choice implementation for all our models.
+
+Now, conssider we have more than 100+ model classes. Upgrading to newer version obliges us to create more than 100+ form types and also update the generic way we register our forms which defintively not simplify things for us. Additionally, I'm just talking about the choice forms here but we have also abstracted other form types... For now, if I have to upgrade this app, I would just say that I can't without heavily refactoring this system...
+
+Basically, the main issue is in Symfony 2.x we were able to map multiple form types to a single implementation (n:n relation) whereas now we are stuck to a 1:1 relation which sounds like a feature removal to me.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T15:17:47Z
+
+@egeloen the SonataCoreBundle's PR will add the feature back and be used as a transition mechanism.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T15:24:37Z
+
+So there are only 2 paths, correct?
+
+1) Make SonataAdminBundle only support 2.8+, even while 2.7 has LTS support
+2) Re-add the alias system back in this one spot (using form extensions).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-25T15:25:28Z
+
+I suggest you work on a community bundle that adds the form type aliasing. If I'm not mistaken, this should be possible by creating a decorator for the form factory that maintains an internal map from aliases to FQCNs. You can then add your own names dynamically to that map.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2015-11-25T15:35:28Z
+
+@webmozart do you confirm that the form component will have a 1:1 relation and it will be that for Symfony 3.0 with no chance to change your mind on this topic?
+
+Using the community bundle will work but will just be a workaround solution since I would prefer to follow the internal form architecture. So, at a time, I will conssider upgrade this app anyway and so introduce plenty of form types just to be able to use them by FQCN... It will remember me when I have to upgrade forms from Symfony 2.0 to 2.1.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T15:35:35Z
+
+Here the documentation of @webmozart proposal. Can be extract on its own if required .. https://github.com/sonata-project/SonataCoreBundle/pull/212/files#diff-76ab2cc9f90b0fbbd52c3d6cc001a8d4
+
+@weaverryan actually, the AdminBundle can be compatible with sf2.3 and upper if this PR get merged. see https://gist.github.com/rande/e4f8de0330a7a9f6f1b7 .
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-25T15:39:58Z
+
+@egeloen In Symfony 3.0, the mapping from aliases to type classes was removed. This simplifies both using and creating form types for a majority of our users. Also, this makes it possible to remove the virtual inheritance model and improve performance in future releases.
+
+It's not possible to revert this, both due to our release policy and because then we won't be able to do necessary performance improvements.
+
+I'm sorry that your use case becomes more complicated. But as I said, creating an aliasing bundle might be a good solution.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T15:40:54Z
+
+@rande that's what I meant by my option (2), because this PR effectively re-adds the ability to do aliasing via extensions, correct? Does your linked 212 PR require this PR to be merged?
+
+@webmozart do you have issues with this PR specifically?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-25T15:41:27Z
+
+@weaverryan no, looks good :+1:
+
+---------------------------------------------------------------------------
+
+by egeloen at 2015-11-25T15:42:27Z
+
+@rande Would be great if you can extract it from the Sonata core and provide it as a standalone component/bundle.
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T15:44:01Z
+
+@weaverryan this PR fixes the original method signature from the PHPDoc. As a side effect, it will indeed make the sonata's PR works ;)
+
+---------------------------------------------------------------------------
+
+by rande at 2015-11-25T15:46:15Z
+
+@egeloen ok, I can do that. I will have to do a massive search and replace ;) How should we name this plugin => Symfony3LegacyBundle ... it will be an open door as people will want to restore.... hum ... the ``security.context`` ... for instance.

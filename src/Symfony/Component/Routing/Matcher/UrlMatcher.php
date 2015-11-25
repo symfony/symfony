@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+@trigger_error('The '.__NAMESPACE__.'\UrlMatcher class is deprecated since version 2.8 and will be removed in 3.0. Use the RequestMatcher instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
@@ -24,6 +26,9 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  * UrlMatcher matches URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Use {@link Symfony\Component\Routing\Matcher\RequestMatcher} instead.
  */
 class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 {

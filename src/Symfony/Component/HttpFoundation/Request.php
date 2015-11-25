@@ -895,6 +895,11 @@ class Request
         return $this->pathInfo;
     }
 
+    public function setPathInfo($pathInfo)
+    {
+        $this->pathInfo = $pathInfo;
+    }
+
     /**
      * Returns the root path from which this request is executed.
      *

@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+@trigger_error('The '.__NAMESPACE__.'\RedirectableUrlMatcher class is deprecated since version 2.8 and will be removed in 3.0. Extend RedirectableRequestMatcher instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Extend {@link Symfony\Component\Routing\Matcher\RedirectableRequestMatcher} instead.
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {

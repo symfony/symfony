@@ -43,8 +43,14 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     protected $generator;
 
+    private $baseUri;
+    private $scriptName;
+    private $defaultParameters = array();
+
     /**
      * @var RequestContext
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     protected $context;
 
@@ -86,19 +92,80 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Constructor.
      *
-     * @param LoaderInterface $loader   A LoaderInterface instance
-     * @param mixed           $resource The main resource to load
-     * @param array           $options  An array of options
-     * @param RequestContext  $context  The context
-     * @param LoggerInterface $logger   A logger instance
+     * @param LoaderInterface     $loader   A LoaderInterface instance
+     * @param mixed               $resource The main resource to load
+     * @param array               $options  An array of options
+     * @param string|UriInterface $baseUri  The base URI as string or PSR-7 UriInterface implementation
+     * @param LoggerInterface     $logger   A logger instance
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), $baseUri = 'http://localhost/', LoggerInterface $logger = null)
     {
         $this->loader = $loader;
         $this->resource = $resource;
         $this->logger = $logger;
-        $this->context = $context ?: new RequestContext();
+        if (null === $baseUri) {
+            $this->setContext(new RequestContext());
+        } elseif ($baseUri instanceof RequestContext) {
+            $this->setContext($baseUri);
+        } else {
+            $this->setBaseUri($baseUri);
+        }
         $this->setOptions($options);
+    }
+
+    /**
+     * Sets the base URI to use for generating references.
+     *
+     * The base URI is usually the current URI of the request. With it the generator knows how to construct relative references
+     * to the target route. So it's purpose is comparable to the <base href> HTML tag. The information in the base URI will also
+     * be used when generating an absolute URI for a route without specific scheme or host requirement. The default base URI
+     * before calling this method is "http://localhost/".
+     *
+     * @param string|UriInterface $uri The base URI as string or PSR-7 UriInterface implementation
+     */
+    public function setBaseUri($uri)
+    {
+        // Lazy initialize the generator. So it is only created once generate() is actually called.
+        if (null !== $this->generator) {
+            $this->getGenerator()->setBaseUri($uri);
+        } else {
+            $this->baseUri = $uri;
+        }
+    }
+
+    /**
+     * Sets the script path used as path prefix for generated URIs.
+     *
+     * This is usually the front controller path, e.g. "/app_dev.php", that all paths should start with. It should be empty,
+     * which is the default, when URI rewriting is used or the URI should not contain the script. The naming is based on
+     * SCRIPT_NAME in the CGI spec which is also available in the $_SERVER global in PHP.
+     *
+     * @param string $scriptName The URL encoded script name
+     */
+    public function setScriptName($scriptName)
+    {
+        if (null !== $this->generator) {
+            $this->getGenerator()->setScriptName($scriptName);
+        } else {
+            $this->scriptName = $scriptName;
+        }
+    }
+
+    /**
+     * Sets a parameter value that will be used for placeholders by default.
+     *
+     * This placeholder parameter will be used if none has not been provided explicitly in the generate() method.
+     *
+     * @param string           $name  A parameter name
+     * @param string|int|float $value The parameter value
+     */
+    public function setDefaultParameter($name, $value)
+    {
+        if (null !== $this->generator) {
+            $this->getGenerator()->setDefaultParameter($name, $value);
+        } else {
+            $this->defaultParameters[$name] = $value;
+        }
     }
 
     /**
@@ -129,6 +196,8 @@ class Router implements RouterInterface, RequestMatcherInterface
             'matcher_cache_class' => 'ProjectUrlMatcher',
             'resource_type' => null,
             'strict_requirements' => true,
+            'http_port' => 80,
+            'https_port' => 443,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
@@ -195,9 +264,13 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use setBaseUri and setScriptName instead.
      */
     public function setContext(RequestContext $context)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use setBaseUri and setScriptName instead.', E_USER_DEPRECATED);
+
         $this->context = $context;
 
         if (null !== $this->matcher) {
@@ -210,9 +283,17 @@ class Router implements RouterInterface, RequestMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function getContext()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        if (null === $this->context) {
+            $this->context = new RequestContext();
+        }
+
         return $this->context;
     }
 
@@ -268,7 +349,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->getContext());
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -317,8 +398,12 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
+        if (null !== $this->context) {
+            $this->baseUri = $this->context->getScheme().'://'.$this->context->getHost().$this->context->getBaseUrl().$this->context->getPathInfo();
+        }
+
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->baseUri, $this->logger, $this->options['http_port'], $this->options['https_port']);
         } else {
             $class = $this->options['generator_cache_class'];
             $baseClass = $this->options['generator_base_class'];
@@ -338,11 +423,17 @@ class Router implements RouterInterface, RequestMatcherInterface
 
             require_once $cache->getPath();
 
-            $this->generator = new $class($this->context, $this->logger);
+            $this->generator = new $class($this->baseUri, $this->logger, $this->options['http_port'], $this->options['https_port']);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {
             $this->generator->setStrictRequirements($this->options['strict_requirements']);
+        }
+
+        $this->generator->setScriptName($this->scriptName);
+
+        foreach ($this->defaultParameters as $name => $value) {
+            $this->generator->setDefaultParameter($name, $value);
         }
 
         return $this->generator;

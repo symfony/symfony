@@ -19,6 +19,9 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  * UrlMatcherInterface is the interface that all URL matcher classes must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *             Use {@link Symfony\Component\Routing\Matcher\RequestMatcherInterface} instead.
  */
 interface UrlMatcherInterface extends RequestContextAwareInterface
 {

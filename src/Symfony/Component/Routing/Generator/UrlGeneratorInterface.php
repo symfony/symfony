@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
- * UrlGeneratorInterface is the interface that all URL generator classes must implement.
+ * UrlGeneratorInterface describes a class that is able to generate a URL reference for a named route.
  *
  * The constants in this interface define the different types of resource references that
  * are declared in RFC 3986: http://tools.ietf.org/html/rfc3986
@@ -25,6 +25,9 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * and we do not need to distinguish them as the difference is mostly semantical and
  * less technical. Generating URIs, i.e. representation-independent resource identifiers,
  * is also possible.
+ *
+ * In Symfony 3.0 the methods UrlGenerator::setBaseUri, UrlGenerator::setScriptName, UrlGenerator::setDefaultParameter
+ * will be added to the interface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>

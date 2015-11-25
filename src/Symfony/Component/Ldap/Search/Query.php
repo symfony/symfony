@@ -44,6 +44,7 @@ class Query implements QueryInterface
             'sizeLimit' => 0,
             'timeout' => 0,
             'deref' => LDAP_DEREF_NEVER,
+            'attrsOnly' => 0,
         ));
         $resolver->setAllowedValues('deref', [LDAP_DEREF_ALWAYS, LDAP_DEREF_NEVER, LDAP_DEREF_FINDING, LDAP_DEREF_SEARCHING]);
         $resolver->setNormalizer('filter', function (Options $options, $value) {

@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-11-19T14:29:03Z
+
+I don't see any reason to deprecated AbstractVoter in favor of an abstract Voter class (which does not follow our naming conventions btw). This does not remove the BC break
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-11-19T14:30:53Z
+
+> I don't see any reason to deprecated AbstractVoter
+
+I deprecated it because I added a new "base voter".
+I added a new "base voter" in order to fix listed issue.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-11-20T15:25:05Z
+
+I reverted the change on the interface to ease integration of this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-20T15:33:14Z
+
+:+1:
+Status: reviewed
+
+It removes a limitation of the current AbstractVoter (the first `if` block of the `vote` method) that can't be fixed with a simple deprecation notice. Which means we need a new class name. `Voter` is fine to me (abstract, like `Command` is).
+@weaverryan I'd be happy to have your vote here since you cared about the linked issue.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-20T18:38:57Z
+
+I left a few comments, but I'm "pro" this idea and I like the name.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-22T23:50:03Z
+
+But I also think this can wait until 3.1... It's great, but I'm not sure it's important enough to stick into the release at the last second: there's too much else going on. If we do save this for 3.1, then I can update the `AbstractVoter` docs (I can't work on that til this gets a decision).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-22T23:50:29Z
+
+Whoops - I meant wait until 3.1 - I updated my comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-24T14:03:49Z
+
+We worked together with @lyrixx on this, the PR now has two commits:
+- the first one (d3c6d93) reverts all changes made between 2.7 and 2.8-beta on AbstractVoter and deprecates it instead, see diff below;
+- the second one moves all this work made between 2.7 and 2.8-beta to the new `Voter` class.
+
+The new `Voter` class is now more generic, at least it is generic enough to be reused by all the concrete voters we provide by default (to be done in an other PR).
+
+We can postpone this deprecation to 3.1, but it would be quite unfortunate to ask devs to update their app twice. It's late but maybe not too late to fix this limitation now. That would reduce the burden significantly on this topic.
+
+```
+git diff 2.7...d3c6d93 -- src/Symfony/Component/Security/Core/Authorization/Voter/
+```
+```diff
+diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/AbstractVoter.php b/src/Symfony/Component/Security/Core/Authorization/Voter/AbstractVoter.php
+index efa1562..5dcf787 100644
+--- a/src/Symfony/Component/Security/Core/Authorization/Voter/AbstractVoter.php
++++ b/src/Symfony/Component/Security/Core/Authorization/Voter/AbstractVoter.php
+@@ -11,6 +11,8 @@
+
+ namespace Symfony\Component\Security\Core\Authorization\Voter;
+
++@trigger_error('The '.__NAMESPACE__.'\AbstractVoter class is deprecated since version 2.8, to be removed in 3.0. Upgrade to Symfony\Component\Security\Core\Authorization\Voter\Voter instead.', E_USER_DEPRECATED);
++
+ use Symfony\Component\Security\Core\User\UserInterface;
+ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+@@ -18,6 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+  * Abstract Voter implementation that reduces boilerplate code required to create a custom Voter.
+  *
+  * @author Roman Marint<C5><A1>enko <inoryy@gmail.com>
++ *
++ * @deprecated since version 2.8, to be removed in 3.0. Upgrade to Symfony\Component\Security\Core\Authorization\Voter\Voter instead.
+  */
+ abstract class AbstractVoter implements VoterInterface
+ {
+diff --git a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
+index d00ff1c..7e243f9 100644
+--- a/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
++++ b/src/Symfony/Component/Security/Core/Authorization/Voter/VoterInterface.php
+@@ -30,6 +30,8 @@ interface VoterInterface
+      * @param string $attribute An attribute
+      *
+      * @return bool true if this Voter supports the attribute, false otherwise
++     *
++     * @deprecated since version 2.8, to be removed in 3.0.
+      */
+     public function supportsAttribute($attribute);
+
+@@ -39,6 +41,8 @@ interface VoterInterface
+      * @param string $class A class name
+      *
+      * @return bool true if this Voter can process the class
++     *
++     * @deprecated since version 2.8, to be removed in 3.0.
+      */
+     public function supportsClass($class);
+ ```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-24T16:52:35Z
+
+Thank you all for the feedback, all comments are now resolved, votes pending :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-25T12:49:27Z
+
+So, IIUC, the `AbstractVoter` class is the same as in 2.7 with the deprecation notices added and the new `Voter` class only removed the `if` statement that was problematic. Looks like a no-brainer to me. :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T13:58:47Z
+
+:+1: I agree - that bug was always something we wanted to fix - we should have just done it all at once (like this PR).

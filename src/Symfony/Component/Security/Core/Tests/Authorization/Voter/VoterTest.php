@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-/**
- * @group legacy
- */
-class AbstractVoterTest extends \PHPUnit_Framework_TestCase
+class VoterTest extends \PHPUnit_Framework_TestCase
 {
     protected $token;
 
@@ -51,8 +50,21 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVote(array $attributes, $expectedVote, $object, $message)
     {
-        $voter = new Fixtures\MyVoter();
+        $voter = new VoterTest_Voter();
 
         $this->assertEquals($expectedVote, $voter->vote($this->token, $object, $attributes), $message);
+    }
+}
+
+class VoterTest_Voter extends Voter
+{
+    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    {
+        return 'EDIT' === $attribute;
+    }
+
+    protected function supports($attribute, $object)
+    {
+        return $object instanceof \stdClass && in_array($attribute, array('EDIT', 'CREATE'));
     }
 }

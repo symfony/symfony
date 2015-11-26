@@ -116,6 +116,10 @@ class SecurityExtension extends Extension
 
     private function aclLoad($config, ContainerBuilder $container)
     {
+        if (!interface_exists('Symfony\Component\Security\Acl\Model\AclInterface')) {
+            throw new \LogicException('You must install symfony/security-acl in order to use the ACL functionality.');
+        }
+
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 

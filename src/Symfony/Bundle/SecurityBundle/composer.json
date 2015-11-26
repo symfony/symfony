@@ -18,7 +18,6 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/security": "~2.8|~3.0",
-        "symfony/security-acl": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/polyfill-php70": "~1.0"
     },
@@ -30,6 +29,7 @@
         "symfony/form": "~2.8|~3.0",
         "symfony/framework-bundle": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/security-acl": "~2.8|~3.0",
         "symfony/twig-bundle": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
@@ -38,6 +38,9 @@
         "symfony/expression-language": "~2.8|~3.0",
         "doctrine/doctrine-bundle": "~1.4",
         "twig/twig": "~1.23|~2.0"
+    },
+    "suggest": {
+        "symfony/security-acl": "For using the ACL functionality of this bundle"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },

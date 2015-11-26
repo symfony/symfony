@@ -159,20 +159,27 @@ class ArrayKeyChoiceList extends ArrayChoiceList
      *                                  corresponding values
      * @param array    $keysByValues    The original keys indexed by the
      *                                  corresponding values
+     * @param $structuredValues
+     * @param $rawChoices
+     * @param $rawChoiceValues
+     * @param $rawKeys
      *
      * @internal Must not be used by user-land code
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues, &$rawChoices, &$rawChoiceValues, &$rawKeys)
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();
             $keysByValues = array();
             $structuredValues = array();
+            $rawChoices = array();
+            $rawChoiceValues = array();
+            $rawKeys = array();
         }
 
         foreach ($choices as $choice => $key) {
             if (is_array($key)) {
-                $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice]);
+                $this->flatten($key, $value, $choicesByValues, $keysByValues, $structuredValues[$choice], $rawChoices[$choice], $rawChoiceValues[$choice], $rawKeys[$choice]);
 
                 continue;
             }
@@ -181,6 +188,9 @@ class ArrayKeyChoiceList extends ArrayChoiceList
             $choicesByValues[$choiceValue] = $choice;
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;
+            $rawChoices[$choice] = $choiceValue;
+            $rawChoiceValues[$choice] = $choiceValue;
+            $rawKeys[$choice] = $key;
         }
     }
 }

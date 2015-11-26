@@ -103,12 +103,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // choice is not added to any group
         if (is_callable($groupBy)) {
             foreach ($choices as $value => $choice) {
+                $stringValue = (string) $value;
+
                 self::addChoiceViewGroupedBy(
                     $groupBy,
                     $choice,
-                    (string) $value,
+                    $stringValue,
                     $label,
-                    $keys,
+                    $keys[$stringValue],
                     $index,
                     $attr,
                     $preferredChoices,
@@ -118,11 +120,11 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             }
         } else {
             // Otherwise use the original structure of the choices
-            self::addChoiceViewsGroupedBy(
-                $list->getStructuredValues(),
+            self::addChoiceViews(
+                $list->getRawChoices(),
+                $list->getRawChoiceValues(),
                 $label,
-                $choices,
-                $keys,
+                $list->getRawKeys(),
                 $index,
                 $attr,
                 $preferredChoices,
@@ -148,48 +150,47 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceView($data, $value, $labelCallback, $label, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
-        $key = $keys[$value];
-        $nextIndex = is_int($index) ? $index++ : call_user_func($index, $choice, $key, $value);
+        $nextIndex = is_int($index) ? $index++ : call_user_func($index, $data, $label, $value);
 
         $view = new ChoiceView(
-            $choice,
+            $data,
             $value,
             // If the labels are null, use the original choice key by default
-            null === $label ? (string) $key : (string) call_user_func($label, $choice, $key, $value),
+            null === $labelCallback ? (string) $label : (string) call_user_func($labelCallback, $data, $label, $value),
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
-            is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
+            is_callable($attr) ? call_user_func($attr, $data, $label, $value) : (isset($attr[$label]) ? $attr[$label] : array())
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && call_user_func($isPreferred, $choice, $key, $value)) {
+        if ($isPreferred && call_user_func($isPreferred, $data, $label, $value)) {
             $preferredViews[$nextIndex] = $view;
         } else {
             $otherViews[$nextIndex] = $view;
         }
     }
 
-    private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViews($dataValues, $values, $labelCallback, $labels, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        foreach ($groupBy as $key => $value) {
-            if (null === $value) {
+        foreach ($dataValues as $key => $data) {
+            if (null === $data) {
                 continue;
             }
 
             // Add the contents of groups to new ChoiceGroupView instances
-            if (is_array($value)) {
+            if (is_array($data)) {
                 $preferredViewsForGroup = array();
                 $otherViewsForGroup = array();
 
-                self::addChoiceViewsGroupedBy(
-                    $value,
-                    $label,
-                    $choices,
-                    $keys,
+                self::addChoiceViews(
+                    $data,
+                    $values[$key],
+                    $labelCallback,
+                    $labels[$key],
                     $index,
                     $attr,
                     $isPreferred,
@@ -210,10 +211,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add ungrouped items directly
             self::addChoiceView(
-                $choices[$value],
-                $value,
-                $label,
-                $keys,
+                $data,
+                $values[$key],
+                $labelCallback,
+                $labels[$key],
                 $index,
                 $attr,
                 $isPreferred,
@@ -223,17 +224,17 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewGroupedBy($groupBy, $data, $value, $labelCallback, $label, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
     {
-        $groupLabel = call_user_func($groupBy, $choice, $keys[$value], $value);
+        $groupLabel = call_user_func($groupBy, $data, $label, $value);
 
         if (null === $groupLabel) {
             // If the callable returns null, don't group the choice
             self::addChoiceView(
-                $choice,
+                $data,
                 $value,
+                $labelCallback,
                 $label,
-                $keys,
                 $index,
                 $attr,
                 $isPreferred,
@@ -254,10 +255,10 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
 
         self::addChoiceView(
-            $choice,
+            $data,
             $value,
+            $labelCallback,
             $label,
-            $keys,
             $index,
             $attr,
             $isPreferred,

@@ -312,6 +312,9 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList` class has been removed in
    favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
 
+ * The `Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList` class has been removed in
+   favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
+
 ### FrameworkBundle
 
  * The `config:debug`, `container:debug`, `router:debug`, `translation:debug`

@@ -251,6 +251,9 @@ Form
        <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\TextType" />
    </service>
    ```
+   
+ * The class `ArrayKeyChoiceList` was deprecated and will be removed in Symfony
+   3.0. Use `ArrayChoiceList` instead.
 
 Translator
 ----------

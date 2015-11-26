@@ -21,7 +21,10 @@
         "ext-ldap": "*"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Ldap\\": "" }
+        "psr-4": { "Symfony\\Component\\Ldap\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

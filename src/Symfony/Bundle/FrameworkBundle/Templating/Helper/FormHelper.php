@@ -223,7 +223,7 @@ class FormHelper extends Helper
      * echo $view['form']->csrfToken('rm_user_'.$user->getId());
      * </code>
      *
-     * Check the token in your action using the same intention.
+     * Check the token in your action using the same CSRF token id.
      *
      * <code>
      * $csrfProvider = $this->get('security.csrf.token_generator');
@@ -232,15 +232,15 @@ class FormHelper extends Helper
      * }
      * </code>
      *
-     * @param string $intention The intention of the protected action
+     * @param string $tokenId The CSRF token id of the protected action
      *
      * @return string A CSRF token
      *
      * @throws \BadMethodCallException When no CSRF provider was injected in the constructor.
      */
-    public function csrfToken($intention)
+    public function csrfToken($tokenId)
     {
-        return $this->renderer->renderCsrfToken($intention);
+        return $this->renderer->renderCsrfToken($tokenId);
     }
 
     public function humanize($text)

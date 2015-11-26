@@ -13,9 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
@@ -57,17 +54,9 @@ class FormRenderer implements FormRendererInterface
      *
      * @param FormRendererEngineInterface    $engine
      * @param CsrfTokenManagerInterface|null $csrfTokenManager
-     *
-     * @throws UnexpectedTypeException
      */
-    public function __construct(FormRendererEngineInterface $engine, $csrfTokenManager = null)
+    public function __construct(FormRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
     {
-        if ($csrfTokenManager instanceof CsrfProviderInterface) {
-            $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);
-        } elseif (null !== $csrfTokenManager && !$csrfTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($csrfTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface or null');
-        }
-
         $this->engine = $engine;
         $this->csrfTokenManager = $csrfTokenManager;
     }

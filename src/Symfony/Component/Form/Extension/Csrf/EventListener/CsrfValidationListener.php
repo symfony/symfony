@@ -12,9 +12,6 @@
 namespace Symfony\Component\Form\Extension\Csrf\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -75,14 +72,8 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
-    public function __construct($fieldName, $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct($fieldName, CsrfTokenManagerInterface $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
     {
-        if ($tokenManager instanceof CsrfProviderInterface) {
-            $tokenManager = new CsrfProviderAdapter($tokenManager);
-        } elseif (!$tokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($tokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
-        }
-
         $this->fieldName = $fieldName;
         $this->tokenManager = $tokenManager;
         $this->tokenId = $tokenId;

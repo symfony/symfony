@@ -12,10 +12,6 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfTokenManagerAdapter;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
@@ -55,14 +51,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $translationDomain;
 
-    public function __construct($defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
-        if ($defaultTokenManager instanceof CsrfProviderInterface) {
-            $defaultTokenManager = new CsrfProviderAdapter($defaultTokenManager);
-        } elseif (!$defaultTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($defaultTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
-        }
-
         $this->defaultTokenManager = $defaultTokenManager;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
@@ -130,39 +120,14 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             return $options['intention'];
         };
 
-        // BC clause for the "csrf_provider" option
-        $csrfTokenManager = function (Options $options) {
-            if ($options['csrf_provider'] instanceof CsrfTokenManagerInterface) {
-                return $options['csrf_provider'];
-            }
-
-            return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
-                ? $options['csrf_provider']->getTokenManager(false)
-                : new CsrfProviderAdapter($options['csrf_provider']);
-        };
-
-        $defaultTokenManager = $this->defaultTokenManager;
-        $csrfProviderNormalizer = function (Options $options, $csrfProvider) use ($defaultTokenManager) {
-            if (null !== $csrfProvider) {
-                @trigger_error('The form option "csrf_provider" is deprecated since version 2.8 and will be removed in 3.0. Use "csrf_token_manager" instead.', E_USER_DEPRECATED);
-
-                return $csrfProvider;
-            }
-
-            return $defaultTokenManager;
-        };
-
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'csrf_token_manager' => $csrfTokenManager,
+            'csrf_token_manager' => $this->defaultTokenManager,
             'csrf_token_id' => $csrfTokenId,
-            'csrf_provider' => null, // deprecated
             'intention' => null, // deprecated
         ));
-
-        $resolver->setNormalizer('csrf_provider', $csrfProviderNormalizer);
     }
 
     /**

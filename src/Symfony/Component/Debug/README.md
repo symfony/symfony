@@ -31,7 +31,7 @@ Note that the `Debug::enable()` call also registers the debug class loader
 from the Symfony ClassLoader component when available.
 
 This component can optionally take advantage of the features of the HttpKernel
-and HttpFoundation components.
+component.
 
 Resources
 ---------

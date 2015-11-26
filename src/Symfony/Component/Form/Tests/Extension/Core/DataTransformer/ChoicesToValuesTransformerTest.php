@@ -20,7 +20,7 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $list = new ArrayChoiceList(array('A', 'B', 'C'));
+        $list = new ArrayChoiceList(array('', false, 'X'));
         $this->transformer = new ChoicesToValuesTransformer($list);
     }
 
@@ -31,7 +31,7 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransform()
     {
-        $in = array('A', 'B', 'C');
+        $in = array('', false, 'X');
         $out = array('0', '1', '2');
 
         $this->assertSame($out, $this->transformer->transform($in));
@@ -54,7 +54,7 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
     {
         // values are expected to be valid choices and stay the same
         $in = array('0', '1', '2');
-        $out = array('A', 'B', 'C');
+        $out = array('', false, 'X');
 
         $this->assertSame($out, $this->transformer->reverseTransform($in));
     }

@@ -251,6 +251,9 @@ Form
        <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\TextType" />
    </service>
    ```
+   
+ * The `TimezoneType::getTimezones()` method was deprecated and will be removed
+   in Symfony 3.0. You should not use this method.
 
 Translator
 ----------

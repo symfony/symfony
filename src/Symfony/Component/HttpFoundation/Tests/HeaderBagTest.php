@@ -120,6 +120,14 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
         $this->assertTrue($bag->contains('foo', 'bor'), '->contains second value');
         $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
+
+        // Basic string checking
+        $bag->set('arf', 'bow, wow');
+        $this->assertTrue($bag->contains('arf', 'bow, wow'), '->contains both values');
+        $this->assertTrue($bag->contains('arf', 'bow'), '->contains first value');
+        $this->assertTrue($bag->contains('arf', 'wow'), '->contains second value');
+        $this->assertTrue($bag->contains('arf', 'bow,'), '->contains string value');
+        $this->assertFalse($bag->contains('arf', 'wow,'), '->contains unknown string value');
     }
 
     public function testCacheControlDirectiveAccessors()

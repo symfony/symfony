@@ -174,7 +174,19 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function contains($key, $value)
     {
-        return in_array($value, $this->get($key, null, false));
+        $valuesInBag = $this->get($key, null, false);
+
+        if (in_array($value, $valuesInBag)) {
+            return true;
+        }
+
+        foreach ($valuesInBag as $v) {
+            if (strpos($v, $value) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

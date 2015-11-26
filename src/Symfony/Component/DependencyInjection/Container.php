@@ -272,16 +272,12 @@ class Container implements ResettableContainerInterface
             try {
                 $service = $this->$method();
             } catch (\Exception $e) {
-                unset($this->loading[$id]);
-
-                if (array_key_exists($id, $this->services)) {
-                    unset($this->services[$id]);
-                }
+                unset($this->services[$id]);
 
                 throw $e;
+            } finally {
+                unset($this->loading[$id]);
             }
-
-            unset($this->loading[$id]);
 
             return $service;
         }

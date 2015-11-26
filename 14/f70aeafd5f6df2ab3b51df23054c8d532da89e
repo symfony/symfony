@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-11-21T16:54:10Z
+
+@WouterJ I agree! that's why I asked for help ... but sadly the issue stalled: https://github.com/symfony/symfony/issues/16000
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-21T16:54:32Z
+
+Btw, not sure where the error is coming from as SymfonyStyle implements OutputInterface and the isDebug method, but this is at least more correct than before.
+
+---------------------------------------------------------------------------
+
+by intermike at 2015-11-21T17:05:46Z
+
+Awesome. This fix works for me. No error so far.
+
+Should I close the issue 16622 by myself?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-21T17:07:08Z
+
+@intermike good to hear that :) I've added your issue to the PR table in the description. When this PR is merged, the issue will be closed automatically.
+
+Thanks for reporting this to Symfony!
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-11-21T23:51:13Z
+
+> Btw, not sure where the error is coming from as SymfonyStyle implements OutputInterface and the isDebug method, but this is at least more correct than before.
+
+@WouterJ : It only does in 3.0, not in 2.8 actually. Because it's only part of the `OutputInterface` since 3.0 for BC reasons, and the implementation in 2.8 was done in the `Output` class. Which is not extended by the `SymfonyStyle`  nor `OutputStyle`.
+IMO it won't be a shame for the `OutputStyle` to provide those methods [as done in 3.0](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Style/OutputStyle.php#L117-L147).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-22T00:03:01Z
+
+:+1: to add them in 2.7. I consider it a bug that it isn't
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-11-22T00:54:40Z
+
+It would be kind of ugly however, as it will require checking if each method exists in the provided `$output`, which could be any `OutputInterface` instance. Something like:
+
+```php
+# OutputStyle.php
+
+public function isDebug()
+{
+    if (!method_exists($this->output, 'isDebug')) {
+        throw new \BadMethodCallException(sprintf(
+            'Method "%s" of "%s" does not exist',
+            get_class($this->output),
+            __METHOD__
+        ));
+    }
+
+    return $this->output->isDebug();
+}
+```
+
+Also we wouldn't be able to base ourself on this API for solving this issue depending on the output instance used in the commands :/
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T14:26:31Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-25T15:38:34Z
+
+Changed it to set `$cliOutput` in the code instead of the parameter (proposal of @intermike). This way, the PR can be merged without deciding on the name of the Symfony style variable.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-11-25T15:42:55Z
+
+:+1:
+
+The naming - and details in this PR - are all internal things anyways that can be changed later.

@@ -22,8 +22,6 @@ class StaticVersionStrategy implements VersionStrategyInterface
     private $format;
 
     /**
-     * Constructor.
-     *
      * @param string $version Version number
      * @param string $format  Url format
      */

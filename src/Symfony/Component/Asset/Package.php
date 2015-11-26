@@ -26,12 +26,6 @@ class Package implements PackageInterface
     private $versionStrategy;
     private $context;
 
-    /**
-     * Constructor.
-     *
-     * @param VersionStrategyInterface $versionStrategy The version strategy
-     * @param ContextInterface         $context         The context
-     */
     public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
         $this->versionStrategy = $versionStrategy;
@@ -59,8 +53,6 @@ class Package implements PackageInterface
     }
 
     /**
-     * Returns context.
-     *
      * @return ContextInterface
      */
     protected function getContext()
@@ -69,8 +61,6 @@ class Package implements PackageInterface
     }
 
     /**
-     * Returns version strategy.
-     *
      * @return VersionStrategyInterface
      */
     protected function getVersionStrategy()
@@ -78,13 +68,6 @@ class Package implements PackageInterface
         return $this->versionStrategy;
     }
 
-    /**
-     * Determinates if url is absolute.
-     *
-     * @param string $url An url
-     *
-     * @return bool
-     */
     protected function isAbsoluteUrl($url)
     {
         return false !== strpos($url, '://') || '//' === substr($url, 0, 2);

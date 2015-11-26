@@ -22,11 +22,6 @@ class RequestStackContext implements ContextInterface
 {
     private $requestStack;
 
-    /**
-     * Constructor.
-     *
-     * @param RequestStack $requestStack A RequestStack instance
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;

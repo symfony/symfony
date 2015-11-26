@@ -196,18 +196,9 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $response = new JsonResponse();
         $response->setData(array(array(1, 2, 3)));
         $response->setContent('{"different":{"key":"value"}}');
-        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $response->setEncodingOptions(JSON_OBJECT_AS_ARRAY);
 
         $this->assertEquals('{"different":{"key":"value"}}', $response->getContent());
-    }
-
-    public function testAddDataToExistingData()
-    {
-        $response = new JsonResponse();
-        $response->setData(array('some' => array('key1' => 'foo')));
-        $response->addData(array('some' => array('key2' => 'bar')));
-
-        $this->assertEquals('{"some":{"key1":"foo","key2":"bar"}}', $response->getContent());
     }
 
     /**

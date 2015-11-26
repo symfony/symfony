@@ -24,16 +24,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class JsonResponse extends Response
 {
-    /**
-     * Associative representation of $content.
-     *
-     * @var array
-     */
     protected $data;
-
-    /**
-     * @var string
-     */
     protected $callback;
 
     // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
@@ -50,6 +41,7 @@ class JsonResponse extends Response
     public function __construct($data = null, $status = 200, $headers = array())
     {
         parent::__construct('{}', $status, $headers);
+
         if (null === $data) {
             $data = new \ArrayObject();
         }
@@ -88,57 +80,6 @@ class JsonResponse extends Response
         }
 
         $this->callback = $callback;
-
-        return $this->update();
-    }
-
-    /**
-     * Sets the content to be sent as JSON.
-     *
-     * @param string $content
-     *
-     * @return Response
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setContent($content)
-    {
-        $data = json_decode($content);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException(json_last_error_msg());
-        }
-        $this->data = $data;
-
-        return $this->update();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContent()
-    {
-        if ($this->callback !== null) {
-            // Not using application/javascript for compatibility reasons with older browsers.
-            $this->headers->set('Content-Type', 'text/javascript');
-
-            return sprintf('/**/%s(%s);', $this->callback, $this->content);
-        }
-
-        return parent::getContent();
-    }
-
-    /**
-     * Add content to existing data array.
-     *
-     * @param array $data
-     *
-     * @return JsonResponse
-     *
-     * @throws \Exception
-     */
-    public function addData($data = array())
-    {
-        $this->data = array_merge_recursive($this->data, (array) $data);
 
         return $this->update();
     }
@@ -188,14 +129,8 @@ class JsonResponse extends Response
      *
      * @throws \Exception
      */
-    private function update()
+    protected function update()
     {
-        // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
-        // in order to not overwrite a custom definition.
-        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
-            $this->headers->set('Content-Type', 'application/json');
-        }
-
         if (defined('HHVM_VERSION')) {
             // HHVM does not trigger any warnings and let exceptions
             // thrown from a JsonSerializable object pass through.
@@ -248,9 +183,31 @@ class JsonResponse extends Response
             throw new \InvalidArgumentException(json_last_error_msg());
         }
 
-        // update content with serialized data
-        $this->content = $serializedData;
+        if (null !== $this->callback) {
+            // Not using application/javascript for compatibility reasons with older browsers.
+            $this->headers->set('Content-Type', 'text/javascript');
 
-        return $this;
+            return $this->setContent(sprintf('/**/%s(%s);', $this->callback, $serializedData));
+        }
+
+        // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
+        // in order to not overwrite a custom definition.
+        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
+            $this->headers->set('Content-Type', 'application/json');
+        }
+
+        return $this->setContent($serializedData);
+    }
+
+    /**
+     * @param mixed $content
+     *
+     * @return Response
+     */
+    public function setContent($content)
+    {
+        $this->data = json_decode($content);
+
+        return parent::setContent($content);
     }
 }

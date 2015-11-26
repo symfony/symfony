@@ -840,19 +840,19 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     */
-    public function testViewDataMustNotBeObjectIfDataClassIsNull()
+    public function testViewDataMayBeObjectIfDataClassIsNull()
     {
+        $object = new \stdClass();
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
         $config->addViewTransformer(new FixedDataTransformer(array(
             '' => '',
-            'foo' => new \stdClass(),
+            'foo' => $object,
         )));
         $form = new Form($config);
 
         $form->setData('foo');
+
+        $this->assertSame($object, $form->getViewData());
     }
 
     public function testViewDataMayBeArrayAccessIfDataClassIsNull()

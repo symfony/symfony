@@ -356,21 +356,11 @@ class Form implements \IteratorAggregate, FormInterface
         if (!FormUtil::isEmpty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
-            $actualType = is_object($viewData) ? 'an instance of class '.get_class($viewData) : 'a(n) '.gettype($viewData);
-
-            if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
-                $expectedType = 'scalar, array or an instance of \ArrayAccess';
-
-                throw new LogicException(
-                    'The form\'s view data is expected to be of type '.$expectedType.', '.
-                    'but is '.$actualType.'. You '.
-                    'can avoid this error by setting the "data_class" option to '.
-                    '"'.get_class($viewData).'" or by adding a view transformer '.
-                    'that transforms '.$actualType.' to '.$expectedType.'.'
-                );
-            }
-
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
+                $actualType = is_object($viewData)
+                    ? 'an instance of class '.get_class($viewData)
+                    : 'a(n) '.gettype($viewData);
+
                 throw new LogicException(
                     'The form\'s view data is expected to be an instance of class '.
                     $dataClass.', but is '.$actualType.'. You can avoid this error '.

@@ -501,9 +501,7 @@ class Definition
      */
     public function clearTag($name)
     {
-        if (isset($this->tags[$name])) {
-            unset($this->tags[$name]);
-        }
+        unset($this->tags[$name]);
 
         return $this;
     }

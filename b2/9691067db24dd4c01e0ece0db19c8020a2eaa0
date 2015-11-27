@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-26T17:43:21Z
+
+:+1:
+but this needs to be merged after #16687 to verify the notice is not triggered outside of the legacy test group

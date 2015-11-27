@@ -20,7 +20,7 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $list = new ArrayChoiceList(array('', 0, 'X'));
+        $list = new ArrayChoiceList(array('', false, 'X'));
 
         $this->transformer = new ChoiceToValueTransformer($list);
     }
@@ -35,7 +35,7 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
         return array(
             // more extensive test set can be found in FormUtilTest
             array('', '0'),
-            array(0, '1'),
+            array(false, '1'),
         );
     }
 
@@ -53,7 +53,7 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
             // values are expected to be valid choice keys already and stay
             // the same
             array('0', ''),
-            array('1', 0),
+            array('1', false),
             array('2', 'X'),
         );
     }

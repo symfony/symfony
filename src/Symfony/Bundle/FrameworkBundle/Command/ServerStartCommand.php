@@ -74,7 +74,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $output = new SymfonyStyle($input, $cliOutput = $output);
 
         if (!extension_loaded('pcntl')) {
             $output->error(array(
@@ -85,7 +85,7 @@ EOF
             if ($output->ask('Do you want to execute <info>server:run</info> immediately? [Yn] ', true)) {
                 $command = $this->getApplication()->find('server:run');
 
-                return $command->run($input, $output);
+                return $command->run($input, $cliOutput);
             }
 
             return 1;

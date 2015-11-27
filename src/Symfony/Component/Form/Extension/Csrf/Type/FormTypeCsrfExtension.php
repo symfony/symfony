@@ -123,6 +123,10 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         // BC clause for the "intention" option
         $csrfTokenId = function (Options $options) {
+            if (null !== $options['intention']) {
+                @trigger_error('The form option "intention" is deprecated since version 2.8 and will be removed in 3.0. Use "csrf_token_id" instead.', E_USER_DEPRECATED);
+            }
+
             return $options['intention'];
         };
 
@@ -137,15 +141,28 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
                 : new CsrfProviderAdapter($options['csrf_provider']);
         };
 
+        $defaultTokenManager = $this->defaultTokenManager;
+        $csrfProviderNormalizer = function (Options $options, $csrfProvider) use ($defaultTokenManager) {
+            if (null !== $csrfProvider) {
+                @trigger_error('The form option "csrf_provider" is deprecated since version 2.8 and will be removed in 3.0. Use "csrf_token_manager" instead.', E_USER_DEPRECATED);
+
+                return $csrfProvider;
+            }
+
+            return $defaultTokenManager;
+        };
+
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $csrfTokenManager,
             'csrf_token_id' => $csrfTokenId,
-            'csrf_provider' => $this->defaultTokenManager,
-            'intention' => null,
+            'csrf_provider' => null, // deprecated
+            'intention' => null, // deprecated
         ));
+
+        $resolver->setNormalizer('csrf_provider', $csrfProviderNormalizer);
     }
 
     /**

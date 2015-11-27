@@ -74,8 +74,8 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
             'firewalls' => array(
                 'stub' => array(
                     'logout' => array(
-                        'csrf_provider' => 'a_token_generator',
-                        'intention' => 'a_token_id',
+                        'csrf_token_generator' => 'a_token_generator',
+                        'csrf_token_id' => 'a_token_id',
                     ),
                 ),
             ),

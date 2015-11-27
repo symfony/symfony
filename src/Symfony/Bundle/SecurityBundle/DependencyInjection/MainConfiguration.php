@@ -242,6 +242,8 @@ class MainConfiguration implements ConfigurationInterface
                 ->beforeNormalization()
                     ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
                     ->then(function ($v) {
+                        @trigger_error("Setting the 'csrf_provider' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_generator' configuration key instead.", E_USER_DEPRECATED);
+
                         $v['csrf_token_generator'] = $v['csrf_provider'];
                         unset($v['csrf_provider']);
 
@@ -251,6 +253,8 @@ class MainConfiguration implements ConfigurationInterface
                 ->beforeNormalization()
                     ->ifTrue(function ($v) { return isset($v['intention']); })
                     ->then(function ($v) {
+                        @trigger_error("Setting the 'intention' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_id' key instead.", E_USER_DEPRECATED);
+
                         $v['csrf_token_id'] = $v['intention'];
                         unset($v['intention']);
 

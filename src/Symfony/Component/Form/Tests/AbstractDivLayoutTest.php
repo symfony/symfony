@@ -692,7 +692,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testChoiceRowWithCustomBlock()
     {
         $form = $this->factory->createNamedBuilder('name_c', 'choice', 'a', array(
-                'choices' => array('a' => 'ChoiceA', 'b' => 'ChoiceB'),
+                'choices' => array('ChoiceA' => 'a', 'ChoiceB' => 'b'),
+                'choices_as_values' => true,
                 'expanded' => true,
             ))
             ->getForm();

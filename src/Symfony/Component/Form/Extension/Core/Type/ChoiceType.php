@@ -268,6 +268,14 @@ class ChoiceType extends AbstractType
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
+        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) {
+            if (true !== $choicesAsValues) {
+                @trigger_error('The value "false" for the "choices_as_values" option is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', E_USER_DEPRECATED);
+            }
+
+            return $choicesAsValues;
+        };
+
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
@@ -323,6 +331,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+        $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
 
         $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));

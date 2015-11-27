@@ -319,6 +319,12 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList` class has been removed in
    favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
+   
+ * The `TimezoneType::getTimezones()` method was removed. You should not use 
+   this method.
+
+ * The `Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList` class has been removed in
+   favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
 
 ### FrameworkBundle
 

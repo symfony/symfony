@@ -68,6 +68,12 @@ class ArrayChoiceList implements ChoiceListInterface
             $choices = iterator_to_array($choices);
         }
 
+        if (null === $value && $this->castableToString($choices)) {
+            $value = function ($choice) {
+                return (string) $choice;
+            };
+        }
+
         if (null !== $value) {
             // If a deterministic value generator was passed, use it later
             $this->valueCallback = $value;
@@ -200,5 +206,36 @@ class ArrayChoiceList implements ChoiceListInterface
             $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;
         }
+    }
+
+    /**
+     * Checks whether the given choices can be cast to strings without
+     * generating duplicates.
+     *
+     * @param array      $choices The choices.
+     * @param array|null $cache   The cache for previously checked entries. Internal
+     *
+     * @return bool Returns true if the choices can be cast to strings and
+     *              false otherwise.
+     */
+    private function castableToString(array $choices, array &$cache = array())
+    {
+        foreach ($choices as $choice) {
+            if (is_array($choice)) {
+                if (!$this->castableToString($choice, $cache)) {
+                    return false;
+                }
+
+                continue;
+            } elseif (!is_scalar($choice)) {
+                return false;
+            } elseif (isset($cache[(string) $choice])) {
+                return false;
+            }
+
+            $cache[(string) $choice] = true;
+        }
+
+        return true;
     }
 }

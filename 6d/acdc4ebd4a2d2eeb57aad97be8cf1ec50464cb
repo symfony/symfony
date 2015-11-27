@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-26T18:02:02Z
+
+It triggers deprecation notices that must be fixed.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-26T18:03:36Z
+
+@fabpot see the description. It depends on a PR not yet merged

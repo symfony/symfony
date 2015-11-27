@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-26T15:03:12Z
+
+Seems it is cover my case, but not cover all cases. For example this one: https://gist.githubusercontent.com/ewgRa/2a71d44329be2be6446e/raw/733b5baf2b18e42149a670e92e0a27b87ff27567/gistfile1.txt
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-26T15:24:47Z
+
+@ewgRa The keys you pass in the `choices` array need to be unique. You can map those keys to labels by using a closure in the `choice_label` option though. The closure accepts the current `$choice`, `$key` and `$value`. Use `$key` (i.e. the key in the `choices` array) to access the corresponding label and return it from the closure.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-26T16:07:17Z
+
+@webmozart at least my case this PR solve.
+
+Maybe good idea to document it, or add checks in cases like I show at gist.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-26T16:58:41Z
+
+See https://github.com/symfony/symfony-docs/issues/5905 for documentation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-27T12:18:19Z
+
+:+1: (with [one comment](https://github.com/symfony/symfony/pull/16685#discussion_r46041957))
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-27T14:26:04Z
+
+Updated

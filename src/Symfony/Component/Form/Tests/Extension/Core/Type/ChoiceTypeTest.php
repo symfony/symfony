@@ -142,7 +142,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testExpandedFlippedChoicesOptionsTurnIntoChildren()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'expanded' => true,
             'choices' => array_flip($this->choices),
         ));

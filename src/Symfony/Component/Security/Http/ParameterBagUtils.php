@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * Encapsulates the logic needed to find deep items in request parameters
+ * Encapsulates the logic needed to find deep items in request parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

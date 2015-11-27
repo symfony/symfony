@@ -72,6 +72,33 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return isset($this->data['logs']) ? $this->data['logs'] : array();
     }
 
+    /**
+     * Sort collected logs in groups and count the logs per channel.
+     */
+    public function getGroupedLogs()
+    {
+        $deprecationLogs = $debugLogs = $infoAndErrorLogs = array(
+            'logs' => array(),
+            'channels' => array_fill_keys($this->getChannels(), 0),
+        );
+
+        foreach ($this->getLogs() as $log) {
+            if (isset($log['context']['level']) && isset($log['context']['type']) && in_array($log['context']['type'], array(E_DEPRECATED, E_USER_DEPRECATED))) {
+                $deprecationLogs = $this->addLogToGroup($log, $deprecationLogs);
+            } elseif ($log['priorityName'] == 'DEBUG') {
+                $debugLogs = $this->addLogToGroup($log, $debugLogs);
+            } else {
+                $infoAndErrorLogs = $this->addLogToGroup($log, $infoAndErrorLogs);
+            }
+        }
+
+        return array(
+            'deprecations' => $deprecationLogs,
+            'debugs' => $debugLogs,
+            'info_and_errors' => $infoAndErrorLogs,
+        );
+    }
+
     public function getPriorities()
     {
         return isset($this->data['priorities']) ? $this->data['priorities'] : array();
@@ -80,6 +107,16 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function countDeprecations()
     {
         return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
+    }
+
+    public function countChannel($channel)
+    {
+        return isset($this->data['channel_counts'][$channel]) ? $this->data['channel_counts'][$channel] : 0;
+    }
+
+    public function getChannels()
+    {
+        return isset($this->data['channel_counts']) ? array_keys($this->data['channel_counts']) : array();
     }
 
     public function countScreams()
@@ -165,6 +202,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         $count = array(
             'error_count' => $this->logger->countErrors(),
             'deprecation_count' => 0,
+            'channel_counts' => array(),
             'scream_count' => 0,
             'priorities' => array(),
         );
@@ -179,6 +217,14 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 );
             }
 
+            if (isset($log['channel'])) {
+                if (isset($count['channel_counts'][$log['channel']])) {
+                    ++$count['channel_counts'][$log['channel']];
+                } else {
+                    $count['channel_counts'][$log['channel']] = 1;
+                }
+            }
+
             if (isset($log['context']['type'], $log['context']['level'])) {
                 if (E_DEPRECATED === $log['context']['type'] || E_USER_DEPRECATED === $log['context']['type']) {
                     ++$count['deprecation_count'];
@@ -189,7 +235,30 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         ksort($count['priorities']);
+        ksort($count['channel_counts']);
 
         return $count;
+    }
+
+    /**
+     * Add the log item to the group and handle the channel.
+     *
+     * @param $log
+     * @param $group
+     *
+     * @return array
+     */
+    private function addLogToGroup($log, $group)
+    {
+        $group['logs'][] = $log;
+        if (isset($log['channel'])) {
+            if (isset($log['context']['errorCount'])) {
+                $group['channels'][$log['channel']] += $log['context']['errorCount'];
+            } else {
+                ++$group['channels'][$log['channel']];
+            }
+        }
+
+        return $group;
     }
 }

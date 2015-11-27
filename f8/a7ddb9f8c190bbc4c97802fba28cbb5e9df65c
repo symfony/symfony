@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-11-26T14:33:21Z
+
+this should probably be reported to APCu though, as it means there is a bug in it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-26T14:39:09Z
+
+In fact, I just realised that this might be fixed by the recent release of 4.0.8 (https://github.com/krakjoe/apcu/issues/67)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-26T15:00:59Z
+
+Still failing with 4.0.8 (https://ci.appveyor.com/project/nicolas-grekas/symfony/build/1.0.8#L950)
+Reverting to the workaround...

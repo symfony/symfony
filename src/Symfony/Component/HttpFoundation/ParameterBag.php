@@ -163,7 +163,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function getDigits($key, $default = '', $deep = false)
     {
         // we need to remove - and + because they're allowed in the filter
-        return str_replace(array('-', '+'), '', $this->filter($key, $default, $deep, FILTER_SANITIZE_NUMBER_INT));
+        return str_replace(array('-', '+'), '', $this->filter($key, $default, FILTER_SANITIZE_NUMBER_INT, array(), $deep));
     }
 
     /**
@@ -191,7 +191,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getBoolean($key, $default = false, $deep = false)
     {
-        return $this->filter($key, $default, $deep, FILTER_VALIDATE_BOOLEAN);
+        return $this->filter($key, $default, FILTER_VALIDATE_BOOLEAN, array(), $deep);
     }
 
     /**
@@ -199,16 +199,31 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key     Key.
      * @param mixed  $default Default = null.
-     * @param bool   $deep    Default = false.
      * @param int    $filter  FILTER_* constant.
      * @param mixed  $options Filter options.
+     * @param bool   $deep    Default = false.
      *
      * @see http://php.net/manual/en/function.filter-var.php
      *
      * @return mixed
      */
-    public function filter($key, $default = null, $deep = false, $filter = FILTER_DEFAULT, $options = array())
+    public function filter($key, $default = null, $filter = FILTER_DEFAULT, $options = array(), $deep = false)
     {
+        static $filters = null;
+
+        if (null === $filters) {
+            foreach (filter_list() as $tmp) {
+                $filters[filter_id($tmp)] = 1;
+            }
+        }
+        if (is_bool($filter) || !isset($filters[$filter]) || is_array($deep)) {
+            @trigger_error('Passing the $deep boolean as 3rd argument to the '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Remove it altogether as the $deep argument will be removed in 3.0.', E_USER_ERROR);
+            $tmp = $deep;
+            $deep = $filter;
+            $filter = $options;
+            $options = $tmp;
+        }
+
         $value = $this->get($key, $default, $deep);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.

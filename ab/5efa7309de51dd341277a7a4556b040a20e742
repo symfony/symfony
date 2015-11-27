@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-26T17:32:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-26T17:46:01Z
+
+IMO, this needs to be done in 2.8, not in 2.7. Existing 2.7 projects running without deprecation warnings should not get such new warning in the next patch release.
+We already followed this policy in the past
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-26T17:48:09Z
+
+@stof only the deprecation triggering part then. The code should really remain here.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-26T17:53:12Z
+
+> In 2.8, the ``choices_as_values`` option will be deprecated entirely.
+
+This is not possible, as it would mean that it is impossible to write code working on 2.8 and 3.0 without deprecation notices.
+In 2.7+, you are forced to pass it to use the new way. This means that we need to keep the option in 3.0 (making it a no-op), so that 2.8 code continues to work (because passing unknown options is forbidden)
+This option can only be deprecated later in the 3.x lifetime (the ideal time would be after the 2.8 EOL, so that bundle supporting the 2.8 LTS can run deprecation-free and bundles requiring 3+ can simply omit it)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-26T17:57:23Z
+
+@stof The option was already deprecated (check the UPGRADE file), but the deprecation error was missing. The upgrade path is:
+
+2.7: choices_as_values=false is deprecated, you should set it to true
+3.0: choices_as_values=false is unsupported, choices_as_values=true is deprecated
+4.0: choices_as_values is removed
+
+We can also switch the first step to 2.8 if you prefer that.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-26T17:58:31Z
+
+@webmozart in case we forgot deprecation warnings in 2.7 before the release, they have been added in 2.8 in the past. So the deprecation warning should go in 2.8
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-26T18:01:04Z
+
+@stof Ok. I changed the deprecation message to 2.8. Let's merge this into 2.8.

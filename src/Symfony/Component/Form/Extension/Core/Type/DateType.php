@@ -93,15 +93,12 @@ class DateType extends AbstractType
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
-                $yearOptions['choices_as_values'] = true;
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
                 $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
-                $monthOptions['choices_as_values'] = true;
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
                 $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
-                $dayOptions['choices_as_values'] = true;
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
                 $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }

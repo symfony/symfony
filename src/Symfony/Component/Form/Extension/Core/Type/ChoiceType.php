@@ -260,20 +260,19 @@ class ChoiceType extends AbstractType
             // Harden against NULL values (like in EntityType and ModelType)
             $choices = null !== $options['choices'] ? $options['choices'] : array();
 
-            // BC when choices are in the keys, not in the values
-            if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value'], false);
-            }
-
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
         $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) {
-            if (true !== $choicesAsValues) {
-                @trigger_error('The value "false" for the "choices_as_values" option is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', E_USER_DEPRECATED);
+            if (null !== $choicesAsValues) {
+                if (true !== $choicesAsValues) {
+                    throw new \RuntimeException('The "choices_as_values" option should not be used. Remove it and flip the contents of the "choices" option instead.');
+                }
+                // To be uncommented in 3.1
+                //@trigger_error('The "choices_as_values" option is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
             }
 
-            return $choicesAsValues;
+            return true;
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
@@ -309,7 +308,7 @@ class ChoiceType extends AbstractType
             'expanded' => false,
             'choice_list' => null, // deprecated
             'choices' => array(),
-            'choices_as_values' => false,
+            'choices_as_values' => null,  // to be deprecated in 3.1
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
@@ -336,7 +335,6 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
-        $resolver->setAllowedTypes('choices_as_values', 'bool');
         $resolver->setAllowedTypes('choice_loader', array('null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface'));
         $resolver->setAllowedTypes('choice_label', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));

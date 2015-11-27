@@ -37,7 +37,6 @@ class TimezoneType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => self::getFlippedTimezones(),
-            'choices_as_values' => true,
             'choice_translation_domain' => false,
         ));
     }

@@ -24,7 +24,6 @@ class CurrencyType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => array_flip(Intl::getCurrencyBundle()->getCurrencyNames()),
-            'choices_as_values' => true,
             'choice_translation_domain' => false,
         ));
     }

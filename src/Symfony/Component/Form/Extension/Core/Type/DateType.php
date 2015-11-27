@@ -93,12 +93,15 @@ class DateType extends AbstractType
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
+                $yearOptions['choices_as_values'] = true;
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
                 $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
+                $monthOptions['choices_as_values'] = true;
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
                 $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
+                $dayOptions['choices_as_values'] = true;
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
                 $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
@@ -297,6 +300,7 @@ class DateType extends AbstractType
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
+        $formattedTimestamps = array();
 
         if ($setTimeZone = PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {
             $formatter->setTimeZone('UTC');
@@ -307,8 +311,8 @@ class DateType extends AbstractType
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
 
-            foreach ($timestamps as $key => $timestamp) {
-                $timestamps[$key] = $formatter->format($timestamp);
+            foreach ($timestamps as $timestamp => $choice) {
+                $formattedTimestamps[$formatter->format($timestamp)] = $choice;
             }
 
             // I'd like to clone the formatter above, but then we get a
@@ -322,7 +326,7 @@ class DateType extends AbstractType
             $formatter->setTimeZoneId($timezone);
         }
 
-        return $timestamps;
+        return $formattedTimestamps;
     }
 
     private function listYears(array $years)
@@ -331,7 +335,7 @@ class DateType extends AbstractType
 
         foreach ($years as $year) {
             if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
-                $result[$year] = $y;
+                $result[$y] = $year;
             }
         }
 
@@ -343,7 +347,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($months as $month) {
-            $result[$month] = gmmktime(0, 0, 0, $month, 15);
+            $result[gmmktime(0, 0, 0, $month, 15)] = $month;
         }
 
         return $result;
@@ -354,7 +358,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($days as $day) {
-            $result[$day] = gmmktime(0, 0, 0, 5, $day);
+            $result[gmmktime(0, 0, 0, 5, $day)] = $day;
         }
 
         return $result;

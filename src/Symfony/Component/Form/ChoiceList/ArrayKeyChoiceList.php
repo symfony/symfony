@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\ChoiceList;
 
+@trigger_error('The '.__NAMESPACE__.'\ArrayKeyChoiceList class is deprecated since version 2.8 and will be removed in 3.0. Use '.__NAMESPACE__.'\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**

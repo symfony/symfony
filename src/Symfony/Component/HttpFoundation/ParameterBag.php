@@ -250,7 +250,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key     Key.
      * @param mixed  $default Default = null.
-     * @param bool   $deep    Default = false.
      * @param int    $filter  FILTER_* constant.
      * @param mixed  $options Filter options.
      *
@@ -258,8 +257,15 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return mixed
      */
-    public function filter($key, $default = null, $deep = false, $filter = FILTER_DEFAULT, $options = array())
+    public function filter($key, $default = null, $filter = FILTER_DEFAULT, $options = array())
     {
+        $deep = false;
+        if (is_bool($filter)) {
+            $deep = $filter;
+            $filter = func_num_args() > 3 ? func_get_arg(3) : FILTER_DEFAULT;
+            $options = func_num_args() > 4 ? func_get_arg(4) : array();
+        }
+
         $value = $this->get($key, $default, $deep);
 
         // Always turn $options into an array - this allows filter_var option shortcuts.

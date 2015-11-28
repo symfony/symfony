@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-23T09:37:14Z
+
+Can you rebase? Thanks.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-25T13:27:23Z
+
+Rebased.
+
+I've also refactored the code to add a guard clause according to @iltar comment but I left the constructor/destructor for now as we don't know the impact on performance such check can have.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-25T18:22:44Z
+
+@stof bug fixed and test added. Thanks for the review.

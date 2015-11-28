@@ -238,7 +238,7 @@ class ChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choiceLabels = array();
+        $choiceLabels = (object) array('labels' => array());
         $choiceListFactory = $this->choiceListFactory;
 
         $emptyData = function (Options $options) {
@@ -254,9 +254,9 @@ class ChoiceType extends AbstractType
         };
 
         // BC closure, to be removed in 3.0
-        $choicesNormalizer = function (Options $options, $choices) use (&$choiceLabels) {
+        $choicesNormalizer = function (Options $options, $choices) use ($choiceLabels) {
             // Unset labels from previous invocations
-            $choiceLabels = array();
+            $choiceLabels->labels = array();
 
             // This closure is irrelevant when "choices_as_values" is set to true
             if ($options['choices_as_values']) {
@@ -269,7 +269,7 @@ class ChoiceType extends AbstractType
         };
 
         // BC closure, to be removed in 3.0
-        $choiceLabel = function (Options $options) use (&$choiceLabels) {
+        $choiceLabel = function (Options $options) use ($choiceLabels) {
             // If the choices contain duplicate labels, the normalizer of the
             // "choices" option stores them in the $choiceLabels variable
 
@@ -277,14 +277,15 @@ class ChoiceType extends AbstractType
             $options->offsetGet('choices');
 
             // Pick labels from $choiceLabels if available
-            // Don't invoke count() to avoid creating a copy of the array (yet)
-            if ($choiceLabels) {
+            if ($choiceLabels->labels) {
                 // Don't pass the labels by reference. We do want to create a
                 // copy here so that every form has an own version of that
-                // variable (contrary to the global reference shared by all
+                // variable (contrary to the $choiceLabels object shared by all
                 // forms)
-                return function ($choice, $key) use ($choiceLabels) {
-                    return $choiceLabels[$key];
+                $labels = $choiceLabels->labels;
+
+                return function ($choice, $key) use ($labels) {
+                    return $labels[$key];
                 };
             }
 
@@ -502,26 +503,26 @@ class ChoiceType extends AbstractType
      * are lost. Store them in a utility array that is used from the
      * "choice_label" closure by default.
      *
-     * @param array    $choices      The choice labels indexed by choices.
-     *                               Labels are replaced by generated keys.
-     * @param array    $choiceLabels The array that receives the choice labels
-     *                               indexed by generated keys.
-     * @param int|null $nextKey      The next generated key.
+     * @param array  $choices      The choice labels indexed by choices.
+     *                             Labels are replaced by generated keys.
+     * @param object $choiceLabels The object that receives the choice labels
+     *                             indexed by generated keys.
+     * @param int    $nextKey      The next generated key.
      *
      * @internal Public only to be accessible from closures on PHP 5.3. Don't
-     *           use this method, as it may be removed without notice.
+     *           use this method as it may be removed without notice and will be in 3.0.
      */
-    public static function normalizeLegacyChoices(array &$choices, array &$choiceLabels, &$nextKey = 0)
+    public static function normalizeLegacyChoices(array &$choices, $choiceLabels, &$nextKey = 0)
     {
-        foreach ($choices as $choice => &$choiceLabel) {
+        foreach ($choices as $choice => $choiceLabel) {
             if (is_array($choiceLabel)) {
-                self::normalizeLegacyChoices($choiceLabel, $choiceLabels, $nextKey);
+                $choiceLabel = ''; // Dereference $choices[$choice]
+                self::normalizeLegacyChoices($choices[$choice], $choiceLabels, $nextKey);
                 continue;
             }
 
-            $choiceLabels[$nextKey] = $choiceLabel;
-            $choices[$choice] = $nextKey;
-            ++$nextKey;
+            $choiceLabels->labels[$nextKey] = $choiceLabel;
+            $choices[$choice] = $nextKey++;
         }
     }
 }

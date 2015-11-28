@@ -238,6 +238,7 @@ class ChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $choiceLabels = array();
         $choiceListFactory = $this->choiceListFactory;
 
         $emptyData = function (Options $options) {
@@ -250,6 +251,44 @@ class ChoiceType extends AbstractType
 
         $placeholder = function (Options $options) {
             return $options['required'] ? null : '';
+        };
+
+        // BC closure, to be removed in 3.0
+        $choicesNormalizer = function (Options $options, $choices) use (&$choiceLabels) {
+            // Unset labels from previous invocations
+            $choiceLabels = array();
+
+            // This closure is irrelevant when "choices_as_values" is set to true
+            if ($options['choices_as_values']) {
+                return $choices;
+            }
+
+            ChoiceType::normalizeLegacyChoices($choices, $choiceLabels);
+
+            return $choices;
+        };
+
+        // BC closure, to be removed in 3.0
+        $choiceLabel = function (Options $options) use (&$choiceLabels) {
+            // If the choices contain duplicate labels, the normalizer of the
+            // "choices" option stores them in the $choiceLabels variable
+
+            // Trigger the normalizer
+            $options->offsetGet('choices');
+
+            // Pick labels from $choiceLabels if available
+            // Don't invoke count() to avoid creating a copy of the array (yet)
+            if ($choiceLabels) {
+                // Don't pass the labels by reference. We do want to create a
+                // copy here so that every form has an own version of that
+                // variable (contrary to the global reference shared by all
+                // forms)
+                return function ($choice, $key) use ($choiceLabels) {
+                    return $choiceLabels[$key];
+                };
+            }
+
+            return;
         };
 
         $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
@@ -330,7 +369,7 @@ class ChoiceType extends AbstractType
             'choices' => array(),
             'choices_as_values' => false,
             'choice_loader' => null,
-            'choice_label' => null,
+            'choice_label' => $choiceLabel,
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
@@ -348,6 +387,7 @@ class ChoiceType extends AbstractType
             'choice_translation_domain' => true,
         ));
 
+        $resolver->setNormalizer('choices', $choicesNormalizer);
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
@@ -470,5 +510,35 @@ class ChoiceType extends AbstractType
             $options['group_by'],
             $options['choice_attr']
         );
+    }
+
+    /**
+     * When "choices_as_values" is set to false, the choices are in the keys and
+     * their labels in the values. Labels may occur twice. The form component
+     * flips the choices array in the new implementation, so duplicate labels
+     * are lost. Store them in a utility array that is used from the
+     * "choice_label" closure by default.
+     *
+     * @param array    $choices      The choice labels indexed by choices.
+     *                               Labels are replaced by generated keys.
+     * @param array    $choiceLabels The array that receives the choice labels
+     *                               indexed by generated keys.
+     * @param int|null $nextKey      The next generated key.
+     *
+     * @internal Public only to be accessible from closures on PHP 5.3. Don't
+     *           use this method, as it may be removed without notice.
+     */
+    public static function normalizeLegacyChoices(array &$choices, array &$choiceLabels, &$nextKey = 0)
+    {
+        foreach ($choices as $choice => &$choiceLabel) {
+            if (is_array($choiceLabel)) {
+                self::normalizeLegacyChoices($choiceLabel, $choiceLabels, $nextKey);
+                continue;
+            }
+
+            $choiceLabels[$nextKey] = $choiceLabel;
+            $choices[$choice] = $nextKey;
+            ++$nextKey;
+        }
     }
 }

@@ -1828,6 +1828,23 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ), $view->vars['choices']);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testDuplicateChoiceLabels()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'A'),
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('a', 'a', 'A'),
+            new ChoiceView('b', 'b', 'B'),
+            new ChoiceView('c', 'c', 'A'),
+        ), $view->vars['choices']);
+    }
+
     public function testAdjustFullNameForMultipleNonExpanded()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(

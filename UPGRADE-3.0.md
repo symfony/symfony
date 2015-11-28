@@ -1341,8 +1341,21 @@ UPGRADE FROM 2.x to 3.0
 
  * Using a colon in an unquoted mapping value leads to a `ParseException`.
  * Starting an unquoted string with `@`, `` ` ``, `|`, or `>` leads to a `ParseException`.
- * Deprecated non-escaped \ in double-quoted strings when parsing Yaml
-   ("Foo\Var" is not valid whereas "Foo\\Var" is)
+ * When surrounding strings with double-quotes, you must now escape `\` characters. Not
+   escaping those characters (when surrounded by double-quotes) leads to a `ParseException`.
+
+   Before:
+
+   ```yml
+   class: "Foo\Var"
+   ```
+
+   After:
+
+   ```yml
+   class: "Foo\\Var"
+   ```
+
 
  * The ability to pass file names to `Yaml::parse()` has been removed.
 

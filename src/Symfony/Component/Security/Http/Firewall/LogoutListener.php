@@ -57,11 +57,17 @@ class LogoutListener implements ListenerInterface
             throw new InvalidArgumentException('The CSRF token manager should be an instance of CsrfProviderInterface or CsrfTokenManagerInterface.');
         }
 
+        if (isset($options['intention'])) {
+            @trigger_error('The "intention" option for the '.__CLASS__.' is deprecated since version 2.8 and will be removed in 3.0. Use the "csrf_token_id" option instead.', E_USER_DEPRECATED);
+
+            $options['csrf_token_id'] = $options['intention'];
+        }
+
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
         $this->options = array_merge(array(
             'csrf_parameter' => '_csrf_token',
-            'intention' => 'logout',
+            'csrf_token_id' => 'logout',
             'logout_path' => '/logout',
         ), $options);
         $this->successHandler = $successHandler;
@@ -101,7 +107,7 @@ class LogoutListener implements ListenerInterface
         if (null !== $this->csrfTokenManager) {
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
-            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['intention'], $csrfToken))) {
+            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
                 throw new LogoutException('Invalid CSRF token.');
             }
         }

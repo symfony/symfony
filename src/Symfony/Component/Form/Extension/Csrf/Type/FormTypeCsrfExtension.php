@@ -111,22 +111,12 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        // BC clause for the "intention" option
-        $csrfTokenId = function (Options $options) {
-            if (null !== $options['intention']) {
-                @trigger_error('The form option "intention" is deprecated since version 2.8 and will be removed in 3.0. Use "csrf_token_id" instead.', E_USER_DEPRECATED);
-            }
-
-            return $options['intention'];
-        };
-
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $this->defaultTokenManager,
-            'csrf_token_id' => $csrfTokenId,
-            'intention' => null, // deprecated
+            'csrf_token_id' => null,
         ));
     }
 

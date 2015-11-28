@@ -25,15 +25,13 @@ col-sm-2
 {# Rows #}
 
 {% block form_row -%}
-{% spaceless %}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
-        {{ form_label(form) }}
+        {{- form_label(form) -}}
         <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
-            {{ form_errors(form) }}
+            {{- form_widget(form) -}}
+            {{- form_errors(form) -}}
         </div>
-    </div>
-{% endspaceless %}
+{##}</div>
 {%- endblock form_row %}
 
 {% block checkbox_row -%}

@@ -814,7 +814,7 @@ class Request
         }
 
         $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
-        $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
+        $firstTrustedIp = null;
 
         foreach ($clientIps as $key => $clientIp) {
             // Remove port (unfortunately, it does happen)
@@ -822,13 +822,22 @@ class Request
                 $clientIps[$key] = $clientIp = $match[1];
             }
 
+            if (!filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                unset($clientIps[$key]);
+            }
+
             if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
                 unset($clientIps[$key]);
+
+                // Fallback to this when the client IP falls into the range of trusted proxies
+                if (null ===  $firstTrustedIp) {
+                    $firstTrustedIp = $clientIp;
+                }
             }
         }
 
         // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : array($ip);
+        return $clientIps ? array_reverse($clientIps) : array($firstTrustedIp);
     }
 
     /**

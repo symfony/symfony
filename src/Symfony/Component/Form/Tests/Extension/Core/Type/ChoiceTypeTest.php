@@ -71,16 +71,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testChoiceListOptionExpectsChoiceListInterface()
-    {
-        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
-            'choice_list' => array('foo' => 'foo'),
-        ));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
         $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(

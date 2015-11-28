@@ -45,7 +45,9 @@ class ConsoleHelperPass implements CompilerPassInterface
      *
      * @param $container the container in which the service is definied
      * @param string $id the service ID
+     *
      * @throws InvalidArgumentException if the service is invalid.
+     *
      * @return string the service ID if valid
      */
     protected function assureValidService(ContainerBuilder $container, $id)
@@ -79,14 +81,16 @@ class ConsoleHelperPass implements CompilerPassInterface
     }
 
     /**
-     * Check to see if the class implements the required `HelperInterface`
+     * Check to see if the class implements the required `HelperInterface`.
      *
      * @param string $class The class to check
-     * @return boolean
+     *
+     * @return bool
      */
     protected function isHelper($class)
     {
         $ref = new \ReflectionClass($class);
+
         return $ref->implementsInterface('Symfony\\Component\\Console\\Helper\\HelperInterface');
     }
 }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Search\QueryInterface;
-use Symfony\Component\Ldap\Search\Result;
 
 /**
  * Ldap interface.
@@ -41,7 +40,7 @@ interface LdapInterface
      *
      * @param string $dn
      * @param string $query
-     * @param mixed  $filter
+     * @param array  $options
      *
      * @return QueryInterface
      */

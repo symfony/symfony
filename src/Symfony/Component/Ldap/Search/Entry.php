@@ -23,8 +23,8 @@ class Entry
     /**
      * Constructor.
      *
-     * @param $dn
-     * @param array $attributes
+     * @param string $dn
+     * @param array  $attributes
      */
     public function __construct($dn, array $attributes = array())
     {

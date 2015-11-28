@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-23T09:40:10Z
+
+Is it really a bug or just a simplification? If the latter, we need to merge this into 2.8 instead.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-28T13:20:56Z
+
+@fabpot I think we can call this a simplification.

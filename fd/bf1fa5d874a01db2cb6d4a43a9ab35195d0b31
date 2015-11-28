@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-10-27T13:24:50Z
+
+Hello.
+
+Thanks for your first contribution.
+
+Unfortunately I'm :-1: with this PR because you can easily change this value thanks to form theming.
+
+---------------------------------------------------------------------------
+
+by pieter2627 at 2015-10-27T14:02:25Z
+
+NP, had to create a theme with the PR code in a project awhile ago where some inputs were shorter than the full width and just thought it might be helpful as part of the core theme.
+
+Note that in creating the tests for the PR a bug was found (see 2nd commit). If the PR is turned down, should I file a bug and create a PR with that fix or can I just create a PR (that is if that is still seen as a bug)?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-10-27T14:05:37Z
+
+You could remove non bug fix commit and edit the pr title ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-07T08:36:13Z
+
+@pieter2627 Can you update this PR to just keep the bug fix? Thanks.
+
+---------------------------------------------------------------------------
+
+by pieter2627 at 2015-11-07T10:45:04Z
+
+Yes, I'll see to do so soon. (Will also include the test as it exposed the bug and confirms the fix)
+
+---------------------------------------------------------------------------
+
+by pieter2627 at 2015-11-14T10:24:51Z
+
+I have pushed the updated code, but the tests seem to have failed due to an issue that existed in the 2.8 branch at the time. I can rebase them on the latest 2.8 and update the PR if needed?
+
+Also the title is updated as @lyrixx suggested, but I'm not sure if the description should be amended (to keep the base of the discussion) or completely redone to just have the bug fix?

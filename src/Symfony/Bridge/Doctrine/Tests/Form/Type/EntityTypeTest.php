@@ -982,37 +982,13 @@ class EntityTypeTest extends TypeTestCase
             'property3' => 2,
         ));
 
-        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
-        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
-        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
+        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
+        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
+        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
-        $this->assertSame($choiceList1, $choiceList2);
-        $this->assertSame($choiceList1, $choiceList3);
-    }
-
-    public function testCacheChoiceLists()
-    {
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-
-        $this->persist(array($entity1));
-
-        $field1 = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $field2 = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
-            'em' => 'default',
-            'class' => self::SINGLE_IDENT_CLASS,
-            'required' => false,
-            'choice_label' => 'name',
-        ));
-
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $field1->getConfig()->getOption('choice_list'));
-        $this->assertSame($field1->getConfig()->getOption('choice_list'), $field2->getConfig()->getOption('choice_list'));
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertSame($choiceLoader1, $choiceLoader2);
+        $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
     protected function createRegistryMock($name, $em)

@@ -42,7 +42,7 @@ class ConsoleHelperPassTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('myhelper.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyHelper');
 
         $definition = new Definition('%myhelper.class%');
-        $definition->addTag('console.helper', ['alias' => 'myhelper']);
+        $definition->addTag('console.helper', array('alias' => 'myhelper'));
         $container->setDefinition('myhelper', $definition);
 
         $container->compile();

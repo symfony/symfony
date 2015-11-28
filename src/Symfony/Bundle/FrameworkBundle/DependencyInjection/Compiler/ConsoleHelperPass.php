@@ -29,7 +29,7 @@ class ConsoleHelperPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $ids = [];
+        $ids = array();
         foreach ($container->findTaggedServiceIds(self::TAG) as $id => $tags) {
             $id = $this->assureValidService($container, $id);
             $alias = empty($tags[0]['alias']) ? null : $tags[0]['alias'];

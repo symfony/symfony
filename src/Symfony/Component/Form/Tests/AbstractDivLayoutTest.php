@@ -692,7 +692,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamedBuilder('name_c', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', 'a', array(
                 'choices' => array('ChoiceA' => 'a', 'ChoiceB' => 'b'),
-                'choices_as_values' => true,
                 'expanded' => true,
             ))
             ->getForm();

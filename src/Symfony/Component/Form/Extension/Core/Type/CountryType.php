@@ -24,7 +24,6 @@ class CountryType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => array_flip(Intl::getRegionBundle()->getCountryNames()),
-            'choices_as_values' => true,
             'choice_translation_domain' => false,
         ));
     }

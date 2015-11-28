@@ -24,7 +24,6 @@ class LanguageType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => array_flip(Intl::getLanguageBundle()->getLanguageNames()),
-            'choices_as_values' => true,
             'choice_translation_domain' => false,
         ));
     }

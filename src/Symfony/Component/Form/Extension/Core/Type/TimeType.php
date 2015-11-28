@@ -68,7 +68,6 @@ class TimeType extends AbstractType
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
-                $hourOptions['choices_as_values'] = true;
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
                 $hourOptions['choice_translation_domain'] = $options['choice_translation_domain']['hour'];
 
@@ -78,7 +77,6 @@ class TimeType extends AbstractType
                     }
 
                     $minuteOptions['choices'] = $minutes;
-                    $minuteOptions['choices_as_values'] = true;
                     $minuteOptions['placeholder'] = $options['placeholder']['minute'];
                     $minuteOptions['choice_translation_domain'] = $options['choice_translation_domain']['minute'];
                 }
@@ -91,7 +89,6 @@ class TimeType extends AbstractType
                     }
 
                     $secondOptions['choices'] = $seconds;
-                    $secondOptions['choices_as_values'] = true;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
                     $secondOptions['choice_translation_domain'] = $options['choice_translation_domain']['second'];
                 }

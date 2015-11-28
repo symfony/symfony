@@ -76,12 +76,12 @@ class UserLoginType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        /* Note: the form's intention must correspond to that for the form login
+        /* Note: the form's csrf_token_id must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.
          */
 
         $resolver->setDefaults(array(
-            'intention' => 'authenticate',
+            'csrf_token_id' => 'authenticate',
         ));
     }
 }

@@ -94,15 +94,11 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
     }
 
     /**
-     * Renders a CSRF token.
-     *
-     * @param string $intention The intention of the protected action.
-     *
-     * @return string A CSRF token.
+     * {@inheritdoc}
      */
-    public function renderCsrfToken($intention)
+    public function renderCsrfToken($tokenId)
     {
-        return $this->renderer->renderCsrfToken($intention);
+        return $this->renderer->renderCsrfToken($tokenId);
     }
 
     /**

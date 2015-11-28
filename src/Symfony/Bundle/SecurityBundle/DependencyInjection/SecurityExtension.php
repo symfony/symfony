@@ -303,7 +303,7 @@ class SecurityExtension extends Extension
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
             $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
-                'intention' => $firewall['logout']['csrf_token_id'],
+                'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
             ));
             $listeners[] = new Reference($listenerId);

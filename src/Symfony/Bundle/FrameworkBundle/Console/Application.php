@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class Application extends BaseApplication
 {
     private $kernel;
-    private $commandsRegistered = false;
+    private $registered = false;
 
     /**
      * Constructor.
@@ -69,10 +69,10 @@ class Application extends BaseApplication
     {
         $this->kernel->boot();
 
-        if (!$this->commandsRegistered) {
+        if (!$this->registered) {
             $this->registerCommands();
-
-            $this->commandsRegistered = true;
+            $this->registerHelpers();
+            $this->registered = true;
         }
 
         $container = $this->kernel->getContainer();
@@ -111,6 +111,17 @@ class Application extends BaseApplication
         if ($container->hasParameter('console.command.ids')) {
             foreach ($container->getParameter('console.command.ids') as $id) {
                 $this->add($container->get($id));
+            }
+        }
+    }
+
+    protected function registerHelpers()
+    {
+        $container = $this->kernel->getContainer();
+        if ($container->hasParameter('console.helper.ids')) {
+            $helpers = $this->getHelperSet();
+            foreach ($container->getParameter('console.helper.ids') as $id => $alias) {
+                $helpers->set($container->get($id), $alias);
             }
         }
     }

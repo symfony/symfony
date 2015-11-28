@@ -31,7 +31,9 @@ class ConsoleHelperPass implements CompilerPassInterface
     {
         $ids = [];
         foreach ($container->findTaggedServiceIds(self::TAG) as $id => $tags) {
-            $ids[] = $this->assureValidService($container, $id);
+            $id = $this->assureValidService($container, $id);
+            $alias = empty($tags[0]['alias']) ? null : $tags[0]['alias'];
+            $ids[$id] = $alias;
         }
 
         $container->setParameter(sprintf('%s.ids', self::TAG), $ids);

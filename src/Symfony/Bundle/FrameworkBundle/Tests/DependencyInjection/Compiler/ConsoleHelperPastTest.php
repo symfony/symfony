@@ -32,7 +32,23 @@ class ConsoleHelperPassTest extends \PHPUnit_Framework_TestCase
         $container->compile();
 
         $this->assertTrue($container->hasParameter('console.helper.ids'));
-        $this->assertSame(array('myhelper'), $container->getParameter('console.helper.ids'));
+        $this->assertSame(array('myhelper' => null), $container->getParameter('console.helper.ids'));
+    }
+
+    public function testProcessWhenHelperHasTagAliasIncludesAliasInTheArray()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new ConsoleHelperPass());
+        $container->setParameter('myhelper.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyHelper');
+
+        $definition = new Definition('%myhelper.class%');
+        $definition->addTag('console.helper', ['alias' => 'myhelper']);
+        $container->setDefinition('myhelper', $definition);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasParameter('console.helper.ids'));
+        $this->assertSame(array('myhelper' => 'myhelper'), $container->getParameter('console.helper.ids'));
     }
 
     /**

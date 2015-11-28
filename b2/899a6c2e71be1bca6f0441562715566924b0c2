@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-22T14:58:02Z
+
+> @jakzal said in #15813 (comment) that unlink()ing the lock file should clear the statcache, but I am not sure if that is true in Apache prefork MPM setups.
+
+From the [php.net/clearstatcache docs](http://php.net/clearstatcache):
+
+> However unlink() clears the cache automatically.
+
+I don't see how would this be different for apache prefork MPM?
+
+> So, my assumption is that the is_file() result is based on the fstat cache and wrong once a process has seen the lock file.
+
+As long as this is just an assumption, and not a confirmed bug, I'm :-1: for this change.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-10-22T15:09:14Z
+
+Thoughts:
+
+- If you create a "lock" file, run the following script and then remove the file from a different terminal/shell/whatever, the script will be stuck in the loop.
+
+```php
+<?php
+
+while (is_file("lock")) {
+    print "lock exists...\n";
+    sleep(1);
+}
+```
+
+- Under Apache prefork MPM, I don't see how the statcache could be shared and/or cleared without some advanced IPC messaging. I don't believe PHP does that.
+
+- As I said before, trying to `file_get_contents` when `is_file` returned true would give "file not found" very often. With this change, I was always able to successfully read the file.
+
+I know that these are just hints – so what kind of "evidence" or confirmation are we looking for?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-10-22T15:11:23Z
+
+> From the php.net/clearstatcache docs:
+>> However unlink() clears the cache automatically.
+
+It also says:
+> For instance, if the same file is being checked multiple times within a single script, and that file is in danger of being removed or changed during that script's operation, you may elect to clear the status cache.
+
+Maybe the note regarding `unlink()` refers only to `unlink()` calls from within the same script/process.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-22T18:51:11Z
+
+> Maybe the note regarding unlink() refers only to unlink() calls from within the same script/process.
+
+Indeed. Looks like you're right here.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2015-11-22T11:04:17Z
+
+@mpdude it's been a month, can you confirm this PR solved the problem?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-11-22T13:26:29Z
+
+Haven't seen it for a while, but that's not a 100% guarantee...

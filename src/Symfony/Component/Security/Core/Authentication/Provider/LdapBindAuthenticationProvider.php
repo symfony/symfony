@@ -74,7 +74,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         $password = $token->getCredentials();
 
         try {
-            $username = $this->ldap->escape($username, '', LdapClientInterface::LDAP_ESCAPE_DN);
+            $username = $this->ldap->escape($username, '', LDAP_ESCAPE_DN);
             $dn = str_replace('{username}', $username, $this->dnString);
 
             $this->ldap->bind($dn, $password);

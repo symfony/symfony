@@ -56,9 +56,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * Returns the prefix of the template block name for this type.
-     *
-     * @return string The prefix of the template block name
+     * {@inheritdoc}
      */
     public function getBlockPrefix()
     {

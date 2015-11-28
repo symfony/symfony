@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-11-25T22:50:23Z
+
+btw. these should be also docs for variables?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-25T23:08:09Z
+
+I can be completely wrong (feel free to comment if I am), but imo none of the added docs does add something. Because of the typehint, you already know the type and the description with `A <typehint> instance` tells just as much as the typehint. Same applies to `Constructor.` for a method called `__construct()`.
+
+Don't get me wrong, I like that you are putting time into improving Symfony's code, but I'm not sure if this change any value.

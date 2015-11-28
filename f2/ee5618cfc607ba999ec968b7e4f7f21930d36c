@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-28T13:20:03Z
+
+Failures seem unrelated to this PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-28T15:34:07Z
+
+@WouterJ Can you rebase on the latest `master` branch? That should make the test pass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-28T15:34:57Z
+
+:+1: anyway as the failure is not related to these changes
+
+Status: Reviewed

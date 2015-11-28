@@ -70,6 +70,16 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
             throw new InvalidArgumentException('The CSRF token manager should be an instance of CsrfProviderInterface or CsrfTokenManagerInterface.');
         }
 
+        if (isset($options['intention'])) {
+            if (isset($options['csrf_token_id'])) {
+                throw new \InvalidArgumentException(sprintf('You should only define an option for one of "intention" or "csrf_token_id" for the "%s". Use the "csrf_token_id" as it replaces "intention".', __CLASS__));
+            }
+
+            @trigger_error('The "intention" option for the '.__CLASS__.' is deprecated since version 2.8 and will be removed in 3.0. Use the "csrf_token_id" option instead.', E_USER_DEPRECATED);
+
+            $options['csrf_token_id'] = $options['intention'];
+        }
+
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->csrfTokenManager = $csrfTokenManager;
 
@@ -77,7 +87,7 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'csrf_parameter' => '_csrf_token',
-            'intention' => 'authenticate',
+            'csrf_token_id' => 'authenticate',
             'post_only' => true,
         ), $options);
 
@@ -104,7 +114,7 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
         if (null !== $this->csrfTokenManager) {
             $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->options['csrf_parameter']);
 
-            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['intention'], $csrfToken))) {
+            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['csrf_token_id'], $csrfToken))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

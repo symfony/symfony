@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-11-27T11:11:24Z
+
+Can you apply the fabbot fixes? Also, CsrfFormLoginTest fails on 5.5. Is this related?
+
+:+1: otherwise
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-28T10:15:40Z
+
+@nicolas-grekas Will you remove the deprecated related config options from the SecurityBundle here too or should I open a separate pull request?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-28T10:24:17Z
+
+@xabbuh please do

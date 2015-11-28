@@ -152,46 +152,37 @@ class SimpleProcessTest extends AbstractProcessTest
 
     public function testStopTerminatesProcessCleanly()
     {
-        try {
-            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
-            $process->run(function () use ($process) {
-                $process->stop();
-            });
-        } catch (\RuntimeException $e) {
-            $this->fail('A call to stop() is not expected to cause wait() to throw a RuntimeException');
-        }
+        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process->run(function () use ($process) {
+            $process->stop();
+        });
+        $this->assertTrue(true, 'A call to stop() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testKillSignalTerminatesProcessCleanly()
     {
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
-        try {
-            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
-            $process->run(function () use ($process) {
-                if ($process->isRunning()) {
-                    $process->signal(defined('SIGKILL') ? SIGKILL : 9);
-                }
-            });
-        } catch (\RuntimeException $e) {
-            $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
-        }
+        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process->run(function () use ($process) {
+            if ($process->isRunning()) {
+                $process->signal(defined('SIGKILL') ? SIGKILL : 9);
+            }
+        });
+        $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testTermSignalTerminatesProcessCleanly()
     {
         $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
 
-        try {
-            $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
-            $process->run(function () use ($process) {
-                if ($process->isRunning()) {
-                    $process->signal(defined('SIGTERM') ? SIGTERM : 15);
-                }
-            });
-        } catch (\RuntimeException $e) {
-            $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
-        }
+        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process->run(function () use ($process) {
+            if ($process->isRunning()) {
+                $process->signal(defined('SIGTERM') ? SIGTERM : 15);
+            }
+        });
+        $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testStopWithTimeoutIsActuallyWorking()

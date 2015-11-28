@@ -8,7 +8,8 @@ It comes with the following features:
  * disable the garbage collector;
  * enforce a consistent `C` locale;
  * auto-register `class_exists` to load Doctrine annotations;
- * print a user deprecation notices summary at the end of the test suite.
+ * print a user deprecation notices summary at the end of the test suite;
+ * display the stack trace of a deprecation on-demand.
 
 By default any non-legacy-tagged or any non-@-silenced deprecation notices will
 make tests fail.
@@ -51,3 +52,9 @@ You have to decide either to:
  * update your code to not use deprecated interfaces anymore, thus gaining better
    forward compatibility;
  * or move them to the **Legacy** section (by using one of the above way).
+
+In case you need to inspect the stack trace of a particular deprecation triggered by
+one of your unit tests, you can set the `SYMFONY_DEPRECATIONS_HELPER` env var to
+a regexp that matches this test case's `class::method` name. For example,
+`SYMFONY_DEPRECATIONS_HELPER=/^MyTest::testMethod$/ phpunit` will stop your test
+suite once a deprecation is triggered by the `MyTest::testMethod` test.

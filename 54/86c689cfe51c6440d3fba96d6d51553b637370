@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-28T11:27:41Z
+
+@xabbuh thanks for the review!
+
+@nicolas-grekas there are some common changes made here and in the already merged #16692. Expect merge conflicts ;)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-28T11:34:19Z
+
+I cleaned up the commits now. Ready to review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-28T12:02:49Z
+
+:+1: thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-28T15:29:04Z
+
+:+1:
+
+Status: Reviewed

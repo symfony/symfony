@@ -13,7 +13,6 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Search\QueryInterface;
-use Symfony\Component\Ldap\Search\Result;
 
 /**
  * Ldap interface.

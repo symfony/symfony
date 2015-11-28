@@ -27,7 +27,7 @@ class ResultIterator implements \Iterator
      * Constructor.
      *
      * @param ConnectionInterface $connection
-     * @param QueryInterface $search
+     * @param QueryInterface      $search
      */
     public function __construct(ConnectionInterface $connection, QueryInterface $search)
     {
@@ -36,7 +36,7 @@ class ResultIterator implements \Iterator
     }
 
     /**
-     * Fetches the current entry
+     * Fetches the current entry.
      *
      * @return Entry
      */
@@ -49,7 +49,7 @@ class ResultIterator implements \Iterator
     }
 
     /**
-     * Sets the cursor to the next entry
+     * Sets the cursor to the next entry.
      */
     public function next()
     {
@@ -58,7 +58,7 @@ class ResultIterator implements \Iterator
     }
 
     /**
-     * Returns the current key
+     * Returns the current key.
      *
      * @return int
      */
@@ -68,7 +68,7 @@ class ResultIterator implements \Iterator
     }
 
     /**
-     * Checks whether the current entry is valid or not
+     * Checks whether the current entry is valid or not.
      *
      * @return bool
      */
@@ -78,7 +78,7 @@ class ResultIterator implements \Iterator
     }
 
     /**
-     * Rewinds the iterator to the first entry
+     * Rewinds the iterator to the first entry.
      */
     public function rewind()
     {

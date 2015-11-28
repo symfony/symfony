@@ -20,7 +20,7 @@ namespace Symfony\Component\Ldap\Search;
 interface QueryInterface
 {
     /**
-     * Executes a query and returns the list of Ldap entries
+     * Executes a query and returns the list of Ldap entries.
      *
      * @return Collection|Entry[]
      */

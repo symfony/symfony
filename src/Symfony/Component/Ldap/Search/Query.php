@@ -31,9 +31,9 @@ class Query implements QueryInterface
      * Constructor.
      *
      * @param ConnectionInterface $connection
-     * @param $dn
-     * @param $query
-     * @param array $options
+     * @param string              $dn
+     * @param string              $query
+     * @param array               $options
      */
     public function __construct(ConnectionInterface $connection, $dn, $query, array $options = array())
     {
@@ -58,7 +58,7 @@ class Query implements QueryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function execute()
     {

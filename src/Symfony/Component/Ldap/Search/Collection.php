@@ -26,7 +26,8 @@ class Collection implements \Countable, \IteratorAggregate, \ArrayAccess
      * Constructor.
      *
      * @param ConnectionInterface $connection
-     * @param QueryInterface $search
+     * @param QueryInterface      $search
+     * @param array               $entries
      */
     public function __construct(ConnectionInterface $connection, QueryInterface $search, array $entries = array())
     {

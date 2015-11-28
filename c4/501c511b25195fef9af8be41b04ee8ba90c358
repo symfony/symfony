@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-11-28T09:25:18Z
+
+:+1:  Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-28T09:29:17Z
+
+Looks like we should remove the config option for this in the SecurityBundle too.

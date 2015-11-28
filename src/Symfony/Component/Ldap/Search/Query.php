@@ -46,7 +46,7 @@ class Query implements QueryInterface
             'deref' => LDAP_DEREF_NEVER,
             'attrsOnly' => 0,
         ));
-        $resolver->setAllowedValues('deref', [LDAP_DEREF_ALWAYS, LDAP_DEREF_NEVER, LDAP_DEREF_FINDING, LDAP_DEREF_SEARCHING]);
+        $resolver->setAllowedValues('deref', array(LDAP_DEREF_ALWAYS, LDAP_DEREF_NEVER, LDAP_DEREF_FINDING, LDAP_DEREF_SEARCHING));
         $resolver->setNormalizer('filter', function (Options $options, $value) {
             return is_array($value) ? $value : array($value);
         });
@@ -69,7 +69,7 @@ class Query implements QueryInterface
 
         $con = $this->connection->getResource();
         if (!$this->search = ldap_search($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $this->options['maxItems'], $this->options['timeout'], $this->options['deref'])) {
-            throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s"', $dn, $query, implode(',', $options['filter'])));
+            throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s"', $this->dn, $this->query, implode(',', $this->options['filter'])));
         };
 
         return new Collection($this->connection, $this);

@@ -53,7 +53,7 @@ You have to decide either to:
    forward compatibility;
  * or move them to the **Legacy** section (by using one of the above way).
 
-In you need to inspect the stack trace of a particular deprecation triggered by
+In case you need to inspect the stack trace of a particular deprecation triggered by
 one of your unit tests, you can set the `SYMFONY_DEPRECATIONS_HELPER` env var to
 a regexp that matches this test case's `class::method` name. For example,
 `SYMFONY_DEPRECATIONS_HELPER=/^MyTest::testMethod$/ phpunit` will stop your test

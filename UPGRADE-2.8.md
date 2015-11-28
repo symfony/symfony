@@ -455,6 +455,15 @@ Security
  * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
    deprecated and will be removed from the interface in 3.0.
 
+ * The `intention` option is deprecated for all the authentication listeners,
+   and will be removed in 3.0. Use the `csrf_token_id` option instead.
+
+SecurityBundle
+--------------
+
+ * The `intention` firewall listener setting is deprecated, and will be removed in 3.0.
+   Use the `csrf_token_id` option instead.
+
 Config
 ------
 

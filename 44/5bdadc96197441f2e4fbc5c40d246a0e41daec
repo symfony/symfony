@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-28T12:06:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-28T12:46:54Z
+
+Tests are failing:
+https://travis-ci.org/symfony/symfony/jobs/93650423#L2028
+https://travis-ci.org/symfony/symfony/jobs/93650424#L1655

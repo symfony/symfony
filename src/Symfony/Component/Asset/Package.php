@@ -60,6 +60,9 @@ class Package implements PackageInterface
         return $this->context;
     }
 
+    /**
+     * @return VersionStrategyInterface
+     */
     protected function getVersionStrategy()
     {
         return $this->versionStrategy;

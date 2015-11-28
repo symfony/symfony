@@ -21,6 +21,10 @@ class StaticVersionStrategy implements VersionStrategyInterface
     private $version;
     private $format;
 
+    /**
+     * @param string $version Version number
+     * @param string $format  Url format
+     */
     public function __construct($version, $format = null)
     {
         $this->version = $version;

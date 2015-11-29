@@ -115,9 +115,10 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Returns the Session Object
+     * Returns the Session Object.
      *
      * @throws \LogicException
+     *
      * @return SessionInterface
      */
     protected function getSession()

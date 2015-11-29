@@ -117,6 +117,7 @@ class ControllerTest extends TestCase
 
     /**
      * @param $token
+     *
      * @return ContainerInterface
      */
     private function getContainerWithTokenStorage($token = null)
@@ -155,7 +156,6 @@ class TestController extends Controller
     {
         return parent::getSession();
     }
-
 
     public function getUser()
     {

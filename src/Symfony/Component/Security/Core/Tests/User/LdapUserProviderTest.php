@@ -21,7 +21,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
         $ldap
             ->expects($this->once())
             ->method('bind')
@@ -37,11 +37,26 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMockBuilder('Symfony\Component\Ldap\Search\Result')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
+        $result
+            ->expects($this->once())
+            ->method('all')
+            ->will($this->returnValue(array(
+            )))
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
             ->will($this->returnValue('foo'))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($result))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
@@ -53,7 +68,19 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMockBuilder('Symfony\Component\Ldap\Search\Result')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
+        $result
+            ->expects($this->once())
+            ->method('all')
+            ->will($this->returnValue(array(
+                array(),
+                array(),
+            )))
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -61,12 +88,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue(array(
-                array(),
-                array(),
-                'count' => 2,
-            )))
+            ->method('query')
+            ->will($this->returnValue($result))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
@@ -75,7 +98,21 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessfulLoadUserByUsername()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMockBuilder('Symfony\Component\Ldap\Search\Result')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapInterface');
+        $result
+            ->expects($this->once())
+            ->method('all')
+            ->will($this->returnValue(array(
+                array(
+                    'sAMAccountName' => 'foo',
+                    'userpassword' => 'bar',
+                ),
+            )))
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -83,14 +120,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue(array(
-                array(
-                    'sAMAccountName' => 'foo',
-                    'userpassword' => 'bar',
-                ),
-                'count' => 1,
-            )))
+            ->method('query')
+            ->will($this->returnValue($result))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');

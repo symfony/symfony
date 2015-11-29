@@ -995,13 +995,13 @@ class EntityTypeTest extends TypeTestCase
             'property3' => 2,
         ));
 
-        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
-        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
-        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
+        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
+        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
+        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
-        $this->assertSame($choiceList1, $choiceList2);
-        $this->assertSame($choiceList1, $choiceList3);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertSame($choiceLoader1, $choiceLoader2);
+        $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
     public function testCacheChoiceLists()
@@ -1024,8 +1024,8 @@ class EntityTypeTest extends TypeTestCase
             'choice_label' => 'name',
         ));
 
-        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $field1->getConfig()->getOption('choice_list'));
-        $this->assertSame($field1->getConfig()->getOption('choice_list'), $field2->getConfig()->getOption('choice_list'));
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $field1->getConfig()->getOption('choice_loader'));
+        $this->assertSame($field1->getConfig()->getOption('choice_loader'), $field2->getConfig()->getOption('choice_loader'));
     }
 
     /**

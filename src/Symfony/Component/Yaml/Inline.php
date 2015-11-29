@@ -238,7 +238,7 @@ class Inline
 
             // a non-quoted string cannot start with @ or ` (reserved) nor with a scalar indicator (| or >)
             if ($output && ('@' === $output[0] || '`' === $output[0] || '|' === $output[0] || '>' === $output[0])) {
-                @trigger_error(sprintf('Not quoting a scalar starting with "%s" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $output[0]), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not quoting the scalar "%s" starting with "%s" is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $output, $output[0]), E_USER_DEPRECATED);
 
                 // to be thrown in 3.0
                 // throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));

@@ -18,6 +18,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @internal
  */
 class LdapClient implements LdapClientInterface
 {

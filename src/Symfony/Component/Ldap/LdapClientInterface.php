@@ -18,12 +18,11 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @internal
  */
 interface LdapClientInterface
 {
-    const LDAP_ESCAPE_FILTER = 0x01;
-    const LDAP_ESCAPE_DN = 0x02;
-
     /**
      * Return a connection bound to the ldap.
      *

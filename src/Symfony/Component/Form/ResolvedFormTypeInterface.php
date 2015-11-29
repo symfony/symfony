@@ -21,6 +21,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 interface ResolvedFormTypeInterface
 {
     /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * @return string The prefix of the template block name
+     */
+    public function getBlockPrefix();
+
+    /**
      * Returns the parent type.
      *
      * @return ResolvedFormTypeInterface|null The parent type or null.

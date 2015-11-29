@@ -115,10 +115,7 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
 
-        $admDefinition = $container->getDefinition('security.access.decision_manager');
-        $registeredVoters = array_map('strval', $admDefinition->getArgument(0));
-
-        $this->assertNotContains('security.access.role_hierarchy_voter', $registeredVoters);
+        $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
     protected function getRawContainer()

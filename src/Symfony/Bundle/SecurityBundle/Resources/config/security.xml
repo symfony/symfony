@@ -47,6 +47,7 @@
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
 
         <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
+        <parameter key="security.role_hierarchy.roles" type="collection" />
     </parameters>
 
     <services>

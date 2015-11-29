@@ -16,6 +16,9 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 
+/**
+ * @requires extension ldap
+ */
 class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**

@@ -785,7 +785,7 @@ EOF;
     }
 
     /**
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage A colon cannot be used in an unquoted mapping value.
      */
     public function testColonInMappingValueException()

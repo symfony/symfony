@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-11-29T18:43:28Z
+
+I stumbled about those errors, I think it would be helpful to mention the file, otherwise you just know the line number and not even the value. Upgrading it is not very easy.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-29T19:54:03Z
+
+@peterrehm Adding the file in exceptions is done by the main Yaml class, which is the only one to know the file. The Parser class only deals with strings. So, adding the file to the deprecation notices would be very difficult.

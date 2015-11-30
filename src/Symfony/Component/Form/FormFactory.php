@@ -74,15 +74,29 @@ class FormFactory implements FormFactoryInterface
                 $typeName = $type->getName();
             }
         } elseif ($type instanceof FormTypeInterface) {
-            // BC
-            $typeName = $type->getName();
+            if (method_exists($type, 'getBlockPrefix')) {
+                // As of Symfony 3.0, the block prefix of the type is used as
+                // default name
+                $name = $type->getBlockPrefix();
+            } else {
+                // BC
+                $typeName = $type->getName();
+            }
         } elseif (is_string($type)) {
-            // BC
-            $typeName = $type;
+            $resolvedType = $this->registry->getType($type);
+            if (method_exists($resolvedType, 'getBlockPrefix')) {
+                // As of Symfony 3.0, the block prefix of the type is used as
+                // default name
+                $name = $resolvedType->getBlockPrefix();
+            } else {
+                // BC
+                $typeName = $type;
+            }
         } else {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
+        // BC when there is no block prefix
         if (null === $name) {
             if (false === strpos($typeName, '\\')) {
                 // No FQCN - leave unchanged for BC

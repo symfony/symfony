@@ -615,6 +615,10 @@ UPGRADE FROM 2.x to 3.0
 
 ### Security
 
+ * The `vote()` method from the `VoterInterface` was changed to now accept arbitrary
+   types and not only objects. You can rely on the new abstract `Voter` class introduced
+   in 2.8 to ease integrating your own voters.
+
  * The `Resources/` directory was moved to `Core/Resources/`
 
  * The `key` settings of `anonymous`, `remember_me` and `http_digest` are

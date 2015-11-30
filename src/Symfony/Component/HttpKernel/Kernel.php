@@ -66,8 +66,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     const RELEASE_VERSION = 1;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '05/2018';
-    const END_OF_LIFE = '05/2019';
+    const END_OF_MAINTENANCE = '11/2018';
+    const END_OF_LIFE = '11/2019';
 
     /**
      * Constructor.

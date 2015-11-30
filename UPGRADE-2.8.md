@@ -448,6 +448,9 @@ FrameworkBundle
 Security
 --------
 
+ * The `object` variable passed to expressions evaluated by the `ExpressionVoter`
+   is deprecated. Instead use the new `subject` variable.
+
  * The `AbstractVoter` class was deprecated. Instead, extend the `Voter` class and
    move your voting logic in the `supports($attribute, $subject)` and
    `voteOnAttribute($attribute, $object, TokenInterface $token)` methods.

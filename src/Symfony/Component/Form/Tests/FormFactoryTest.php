@@ -220,6 +220,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($resolvedType));
 
         $resolvedType->expects($this->once())
+            ->method('getBlockPrefix')
+            ->will($this->returnValue('type'));
+
+        $resolvedType->expects($this->once())
             ->method('createBuilder')
             ->with($this->factory, 'type', $options)
             ->will($this->returnValue($this->builder));
@@ -249,6 +253,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->with('Vendor\Name\Space\UserForm')
             ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('getBlockPrefix')
+            ->will($this->returnValue('user_form'));
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -282,6 +290,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($resolvedType));
 
         $resolvedType->expects($this->once())
+            ->method('getBlockPrefix')
+            ->will($this->returnValue('user'));
+
+        $resolvedType->expects($this->once())
             ->method('createBuilder')
             ->with($this->factory, 'user', $options)
             ->will($this->returnValue($this->builder));
@@ -313,6 +325,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($resolvedType));
 
         $resolvedType->expects($this->once())
+            ->method('getBlockPrefix')
+            ->will($this->returnValue('type'));
+
+        $resolvedType->expects($this->once())
             ->method('createBuilder')
             ->with($this->factory, 'type', $options)
             ->will($this->returnValue($this->builder));
@@ -342,6 +358,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->with('Vendor\Name\Space\MyProfileHTMLType')
             ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('getBlockPrefix')
+            ->will($this->returnValue('my_profile_html'));
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')

@@ -86,6 +86,7 @@ class ExpressionVoter implements VoterInterface
             'token' => $token,
             'user' => $token->getUser(),
             'object' => $subject,
+            'subject' => $subject,
             'roles' => array_map(function ($role) { return $role->getRole(); }, $roles),
             'trust_resolver' => $this->trustResolver,
         );

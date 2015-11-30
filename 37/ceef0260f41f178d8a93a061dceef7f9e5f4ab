@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-30T10:57:23Z
+
+If someone has an idea how we could trigger a deprecation warning when the user accesses the deprecated `object` variable, I will be happy to include such a change here too.

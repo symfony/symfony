@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-30T11:14:03Z
+
+Yeeah, tests are green on appveyor!
+This PR should remove a bunch of transient tests on appveyor.

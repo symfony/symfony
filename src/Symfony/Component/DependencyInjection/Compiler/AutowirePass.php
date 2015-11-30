@@ -227,7 +227,7 @@ class AutowirePass implements CompilerPassInterface
      */
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
-        if (!$typeHint->isInstantiable()) {
+        if (isset($this->notGuessableTypes[$typeHint->name]) || !$typeHint->isInstantiable()) {
             throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s".', $typeHint->name, $id));
         }
 

@@ -117,6 +117,56 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a".
+     */
+    public function testTypeNotGuessable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a1', __NAMESPACE__.'\Foo');
+        $container->register('a2', __NAMESPACE__.'\Foo');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgument');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a".
+     */
+    public function testTypeNotGuessableWithSubclass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a1', __NAMESPACE__.'\B');
+        $container->register('a2', __NAMESPACE__.'\B');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgumentForSubclass');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    public function testTypeNotGuessableWithTypeSet()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a1', __NAMESPACE__.'\Foo');
+        $container->register('a2', __NAMESPACE__.'\Foo')->addAutowiringType(__NAMESPACE__.'\Foo');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgument');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertCount(1, $container->getDefinition('a')->getArguments());
+        $this->assertEquals('a2', (string) $container->getDefinition('a')->getArgument(0));
+    }
+
     public function testWithTypeSet()
     {
         $container = new ContainerBuilder();
@@ -332,6 +382,18 @@ class OptionalParameter
 class BadTypeHintedArgument
 {
     public function __construct(Dunglas $k, NotARealClass $r)
+    {
+    }
+}
+class NotGuessableArgument
+{
+    public function __construct(Foo $k)
+    {
+    }
+}
+class NotGuessableArgumentForSubclass
+{
+    public function __construct(A $k)
     {
     }
 }

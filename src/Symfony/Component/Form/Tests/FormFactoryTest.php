@@ -341,6 +341,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateUsesTypeNameIfTypeGivenAsString()
     {
         $options = array('a' => '1', 'b' => '2');
@@ -372,6 +375,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateStripsNamespaceOffTypeName()
     {
         $options = array('a' => '1', 'b' => '2');
@@ -403,6 +409,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\UserForm', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCreateStripsNamespaceOffTypeNameAccessByFQCN()
     {
         $options = array('a' => '1', 'b' => '2');
@@ -434,6 +443,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('userform', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateStripsTypeSuffixOffTypeName()
     {
         $options = array('a' => '1', 'b' => '2');
@@ -465,6 +477,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\UserType', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateDoesNotStripTypeSuffixIfResultEmpty()
     {
         $options = array('a' => '1', 'b' => '2');
@@ -496,6 +511,9 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\Type', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateConvertsTypeToUnderscoreSyntax()
     {
         $options = array('a' => '1', 'b' => '2');

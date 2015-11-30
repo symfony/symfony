@@ -113,7 +113,7 @@ https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/ValidatorServic
 
 Documentation:
 
-https://symfony.com/doc/3.0/book/validation.html
+https://symfony.com/doc/3.1/book/validation.html
 
 JSR-303 Specification:
 

@@ -28,7 +28,7 @@ https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/TranslationServ
 
 Documentation:
 
-https://symfony.com/doc/3.0/book/translation.html
+https://symfony.com/doc/3.1/book/translation.html
 
 You can run the unit tests with the following command:
 

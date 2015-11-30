@@ -65,7 +65,11 @@ class FormFactory implements FormFactoryInterface
             throw new UnexpectedTypeException($type, 'string');
         }
 
-        return $this->createNamedBuilder(StringUtil::fqcnToBlockPrefix($type), $type, $data, $options);
+        if (null === $name = $this->registry->getType($type)->getBlockPrefix()) {
+            $name = StringUtil::fqcnToBlockPrefix($type);
+        }
+
+        return $this->createNamedBuilder($name, $type, $data, $options);
     }
 
     /**

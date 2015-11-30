@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Util\StringUtil;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -65,11 +64,7 @@ class FormFactory implements FormFactoryInterface
             throw new UnexpectedTypeException($type, 'string');
         }
 
-        if (null === $name = $this->registry->getType($type)->getBlockPrefix()) {
-            $name = StringUtil::fqcnToBlockPrefix($type);
-        }
-
-        return $this->createNamedBuilder($name, $type, $data, $options);
+        return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $type, $data, $options);
     }
 
     /**

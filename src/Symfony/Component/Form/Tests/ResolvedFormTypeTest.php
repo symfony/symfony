@@ -361,7 +361,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
     {
-        return $this->getMock($typeClass, array('getName', 'getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
+        return $this->getMock($typeClass, array('getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
     }
 
     /**

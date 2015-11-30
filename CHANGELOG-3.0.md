@@ -7,6 +7,10 @@ in 3.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.0.0...v3.0.1
 
+* 3.0.0 (2015-11-30)
+
+ * 
+
 * 3.0.0-BETA1 (2015-11-16)
 
  * feature #16516 Remove some more legacy code (nicolas-grekas)

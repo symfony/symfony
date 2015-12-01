@@ -105,6 +105,22 @@ UPGRADE FROM 2.x to 3.0
    removed: `ContainerBuilder::synchronize()`, `Definition::isSynchronized()`,
    and `Definition::setSynchronized()`.
 
+### DomCrawler
+
+ * The interface of the `Symfony\Component\DomCrawler\Crawler` changed. It does no longer implement `\Iterator` but `\IteratorAggregate`. If you rely on methods of the `\Iterator` interface, call the `getIterator` method of the `\IteratorAggregate` interface before. No changes are required in a `\Traversable`-aware control structure, such as `foreach`.
+
+   Before:
+
+   ```php
+   $crawler->current();
+   ```
+
+   After:
+
+   ```php
+   $crawler->getIterator()->current();
+   ```
+
 ### EventDispatcher
 
  * The method `getListenerPriority($eventName, $listener)` has been added to the

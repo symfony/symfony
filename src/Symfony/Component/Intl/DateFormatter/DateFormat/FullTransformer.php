@@ -214,7 +214,7 @@ class FullTransformer
      */
     public function isQuoteMatch($quoteMatch)
     {
-        return ("'" === $quoteMatch[0]);
+        return "'" === $quoteMatch[0];
     }
 
     /**

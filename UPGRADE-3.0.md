@@ -114,6 +114,12 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The `getBlockPrefix()` method was added to the `FormTypeInterface` in replacement of
+   the `getName()` method which has been has been removed.
+ * The `configureOptions()` method was added to the `FormTypeInterface` in replacement
+   of the `setDefaultOptions()` method which has been removed.
+ * The `getBlockPrefix()` method was added to the `ResolvedFormTypeInterface` in
+   replacement of the `getName()` method which has been has been removed.
  * The option "precision" was renamed to "scale".
 
    Before:

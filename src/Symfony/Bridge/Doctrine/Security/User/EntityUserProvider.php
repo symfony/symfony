@@ -107,14 +107,14 @@ class EntityUserProvider implements UserProviderInterface
         return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
     }
 
-    private function getEntityManager()
+    private function getObjectManager()
     {
         return $this->registry->getManager($this->managerName);
     }
 
     private function getRepository()
     {
-        return $this->getEntityManager()->getRepository($this->getClass());
+        return $this->getObjectManager()->getRepository($this->classOrAlias);
     }
 
     private function getClass()
@@ -134,6 +134,6 @@ class EntityUserProvider implements UserProviderInterface
 
     private function getClassMetadata()
     {
-        return $this->getEntityManager()->getClassMetadata($this->getClass());
+        return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }
 }

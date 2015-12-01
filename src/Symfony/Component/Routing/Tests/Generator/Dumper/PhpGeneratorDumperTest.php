@@ -86,7 +86,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
     public function testDumpWithTooManyRoutes()
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
-        for ( $i = 0; $i < 32769; ++$i ) {
+        for ($i = 0; $i < 32769; ++$i) {
             $this->routeCollection->add('route_'.$i, new Route('/route_'.$i));
         }
         $this->routeCollection->add('Test2', new Route('/testing2'));

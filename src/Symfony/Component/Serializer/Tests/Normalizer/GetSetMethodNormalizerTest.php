@@ -91,9 +91,9 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     public function attributeProvider()
     {
         return array(
-            array('attribute_test', array('attribute_test'),'AttributeTest'),
-            array('attribute_test', array('any'),'attribute_test'),
-            array('attribute', array('attribute'),'Attribute'),
+            array('attribute_test', array('attribute_test'), 'AttributeTest'),
+            array('attribute_test', array('any'), 'attribute_test'),
+            array('attribute', array('attribute'), 'Attribute'),
             array('attribute', array(), 'attribute'),
         );
     }

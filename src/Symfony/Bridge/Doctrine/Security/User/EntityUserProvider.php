@@ -27,22 +27,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class EntityUserProvider implements UserProviderInterface
 {
+    private $registry;
+    private $managerName;
+    private $classOrAlias;
     private $class;
-    private $repository;
     private $property;
-    private $metadata;
 
-    public function __construct(ManagerRegistry $registry, $class, $property = null, $managerName = null)
+    public function __construct(ManagerRegistry $registry, $classOrAlias, $property = null, $managerName = null)
     {
-        $em = $registry->getManager($managerName);
-        $this->class = $class;
-        $this->metadata = $em->getClassMetadata($class);
-
-        if (false !== strpos($this->class, ':')) {
-            $this->class = $this->metadata->getName();
-        }
-
-        $this->repository = $em->getRepository($class);
+        $this->registry = $registry;
+        $this->managerName = $managerName;
+        $this->classOrAlias = $classOrAlias;
         $this->property = $property;
     }
 
@@ -51,14 +46,15 @@ class EntityUserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
+        $repository = $this->getRepository();
         if (null !== $this->property) {
-            $user = $this->repository->findOneBy(array($this->property => $username));
+            $user = $repository->findOneBy(array($this->property => $username));
         } else {
-            if (!$this->repository instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('The Doctrine repository "%s" must implement UserProviderInterface.', get_class($this->repository)));
+            if (!$repository instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('The Doctrine repository "%s" must implement UserProviderInterface.', get_class($repository)));
             }
 
-            $user = $this->repository->loadUserByUsername($username);
+            $user = $repository->loadUserByUsername($username);
         }
 
         if (null === $user) {
@@ -73,18 +69,20 @@ class EntityUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        if (!$user instanceof $this->class) {
+        $class = $this->getClass();
+        if (!$user instanceof $class) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        if ($this->repository instanceof UserProviderInterface) {
-            $refreshedUser = $this->repository->refreshUser($user);
+        $repository = $this->getRepository();
+        if ($repository instanceof UserProviderInterface) {
+            $refreshedUser = $repository->refreshUser($user);
         } else {
             // The user must be reloaded via the primary key as all other data
             // might have changed without proper persistence in the database.
             // That's the case when the user has been changed by a form with
             // validation errors.
-            if (!$id = $this->metadata->getIdentifierValues($user)) {
+            if (!$id = $this->getClassMetadata()->getIdentifierValues($user)) {
                 throw new \InvalidArgumentException('You cannot refresh a user '.
                     'from the EntityUserProvider that does not contain an identifier. '.
                     'The user object has to be serialized with its own identifier '.
@@ -92,7 +90,7 @@ class EntityUserProvider implements UserProviderInterface
                 );
             }
 
-            $refreshedUser = $this->repository->find($id);
+            $refreshedUser = $repository->find($id);
             if (null === $refreshedUser) {
                 throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
             }
@@ -106,6 +104,36 @@ class EntityUserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $class === $this->class || is_subclass_of($class, $this->class);
+        return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
+    }
+
+    private function getObjectManager()
+    {
+        return $this->registry->getManager($this->managerName);
+    }
+
+    private function getRepository()
+    {
+        return $this->getObjectManager()->getRepository($this->classOrAlias);
+    }
+
+    private function getClass()
+    {
+        if (null === $this->class) {
+            $class = $this->classOrAlias;
+
+            if (false !== strpos($class, ':')) {
+                $class = $this->getClassMetadata()->getName();
+            }
+
+            $this->class = $class;
+        }
+
+        return $this->class;
+    }
+
+    private function getClassMetadata()
+    {
+        return $this->getObjectManager()->getClassMetadata($this->classOrAlias);
     }
 }

@@ -801,6 +801,8 @@ class Process
             $this->close();
         }
 
+        // Free memory from self-reference callback created by buildCallback
+        // Doing so in other contexts like __destruct or by garbage collector is ineffective
         $this->callback = null;
 
         return $this->exitcode;

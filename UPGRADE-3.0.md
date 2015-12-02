@@ -490,6 +490,25 @@ UPGRADE FROM 2.x to 3.0
    `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`
    interface.
    The `security.csrf.token_manager` should be used instead.
+   
+ * The ability to pass `apc` as the `framework.validation.cache` config option value has been removed. Use `validator.mapping.cache.apc` instead:
+   
+   Before:
+   
+   ```yaml
+   framework:
+       validation:
+           cache: apc
+   ```
+   
+   After:
+   
+   ```yaml
+   framework:
+       validation:
+           cache: validator.mapping.cache.apc
+   ```
+ 
 
 ### HttpKernel
 

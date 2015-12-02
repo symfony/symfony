@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-01T09:53:09Z
+
+instead of ``loadMetadata``, I suggest getting the repository and the metadata from the entity manager only on demand (getting it several times is not an issue as the entity manager keeps them in memory and so the second access will just read them from the array). This would simplify lots of things (and initializing ``$this->class`` requires loading the metadata only when it contains a ``:`` to resolve the alias)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-01T16:23:28Z
+
+@stof good suggestions - I've just updated this PR: we get everything lazily. This is still an internal refactoring - I tried to minimize the changes to make this obvious.
+
+Now, would this be a bug fix for 2.3? I have the PR opened against 2.8... which doesn't make any sense :). It seems like this should go into 2.3 or into master for 3.1. I'd like to put it into 2.3.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-01T18:03:22Z
+
+Does this fix doctrine/DoctrineBundle#351 ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-01T21:58:14Z
+
+@Tobion Yes and no. It definitely fixed one more case where that error happens. But are there other situations that still cause that error? Possibly. But yea, when I saw this issue locally, I knew it was doctrine/DoctrineBundle#351 and wanted to squash it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-01T22:06:07Z
+
+:+1: for 2.3
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-02T00:19:06Z
+
+The only other place where `getClassMetadata` or `getRepositoy` is called in a constructor in symfony is the for the ChoiceLoader in Doctrine form type. But that is only constructed on demand when evaluating choices. So that should not be a problem. So i think after this change symfony itself is save against doctrine/DoctrineBundle#351
+
+:+1: for 2.3
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-02T10:17:41Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T11:55:42Z
+
+I agree this should go in 2.3
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T15:18:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-02T15:18:30Z
+
+I've just rebased this against 2.3 - it shows as a conflict against 2.8, but will merge cleanly into 2.3.
+
+It should be ready for a merge. Tests before my last rebase all passed except for an unrelated hhvm failure.

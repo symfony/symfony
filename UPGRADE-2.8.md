@@ -453,6 +453,28 @@ FrameworkBundle
            cookie_httponly: false
    ```
 
+ * The `validator.mapping.cache.apc` service is deprecated, and will be removed in 3.0.
+   Use `validator.mapping.cache.doctrine.apc` instead.
+   
+ * The ability to pass `apc` as the `framework.validation.cache` configuration key value is deprecated, 
+   and will be removed in 3.0. Use `validator.mapping.cache.doctrine.apc` instead:
+   
+   Before:
+   
+   ```yaml
+   framework:
+       validation:
+           cache: apc
+   ```
+
+   After:
+   
+   ```yaml
+   framework:
+       validation:
+           cache: validator.mapping.cache.doctrine.apc
+   ```
+
 Security
 --------
 

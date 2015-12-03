@@ -52,7 +52,7 @@ abstract class AbstractProxy
      */
     public function isSessionHandlerInterface()
     {
-        return ($this instanceof \SessionHandlerInterface);
+        return $this instanceof \SessionHandlerInterface;
     }
 
     /**

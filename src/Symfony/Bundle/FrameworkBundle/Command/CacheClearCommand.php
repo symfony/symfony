@@ -54,7 +54,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir = $realCacheDir.'_old';
+        $oldCacheDir = substr($realCacheDir, 0, -1).'_';
+        if ('_' === substr($realCacheDir, -1)) {
+            $oldCacheDir = substr($realCacheDir, 0, -1).'-';
+        }
         $filesystem = $this->getContainer()->get('filesystem');
 
         if (!is_writable($realCacheDir)) {

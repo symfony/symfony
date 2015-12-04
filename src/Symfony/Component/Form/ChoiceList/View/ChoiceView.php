@@ -54,6 +54,13 @@ class ChoiceView
     public $labelAttr;
 
     /**
+     * Additional attributes for labels HTML tag.
+     *
+     * @var array
+     */
+    public $labelAttr;
+
+    /**
      * Creates a new choice view.
      *
      * @param mixed  $data      The original choice

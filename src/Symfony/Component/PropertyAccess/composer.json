@@ -20,6 +20,12 @@
         "symfony/polyfill-php70": "~1.0",
         "symfony/inflector": "~3.1"
     },
+    "require-dev": {
+        "symfony/cache": "~3.1"
+    },
+    "suggest": {
+        "psr/cache-implementation": "To cache access methods."
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },
         "exclude-from-classmap": [

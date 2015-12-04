@@ -21,18 +21,69 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
+    /**
+     * @internal
+     */
     const VALUE = 0;
+
+    /**
+     * @internal
+     */
     const IS_REF = 1;
+
+    /**
+     * @internal
+     */
     const ACCESS_HAS_PROPERTY = 0;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE = 1;
+
+    /**
+     * @internal
+     */
     const ACCESS_NAME = 2;
+
+    /**
+     * @internal
+     */
     const ACCESS_REF = 3;
+
+    /**
+     * @internal
+     */
     const ACCESS_ADDER = 4;
+
+    /**
+     * @internal
+     */
     const ACCESS_REMOVER = 5;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_METHOD = 0;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_PROPERTY = 1;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_MAGIC = 2;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
+
+    /**
+     * @internal
+     */
     const ACCESS_TYPE_NOT_FOUND = 4;
 
     private $magicCall;

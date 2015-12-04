@@ -302,6 +302,9 @@ SecurityBundle
  * Using voters that do not implement the `VoterInterface`is now deprecated in
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
 
+ * Using guard authenticator that implement the `GuardAuthenticatorInterface` is now
+   deprecated, this will be removed in 4.0. `AuthenticatorInterface` must be used now.
+
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 
  * `InitAclCommand::__construct()` now takes an instance of

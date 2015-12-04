@@ -659,6 +659,9 @@ Security
  * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
    class instead.
 
+ * The `GuardAuthenticatorInterface` has been removed. Implement
+   `Symfony\Component\Security\Guard\AuthenticatorInterface` class instead.
+
  * The `LogoutUrlGenerator::registerListener()` method expects a 6th `string $context = null` argument.
 
  * The `AccessDecisionManager::setVoters()` method has been removed. Pass the

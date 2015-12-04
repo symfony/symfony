@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * The interface for all "guard" authenticators.
@@ -27,11 +28,23 @@ use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
  * one location.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
- *
- * @deprecated Symfony\Component\Security\Guard\AuthenticatorInterface must be used instead
+ * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  */
-interface GuardAuthenticatorInterface extends AuthenticatorInterface
+interface AuthenticatorInterface extends AuthenticationEntryPointInterface
 {
+    /**
+     * Does the authenticator support the given Request ?
+     *
+     * If this returns true, authentication will continue (e.g. getCredentials() will be called).
+     * If false, this authenticator is done. The next (if any) authenticators will be called and
+     * may authenticate the user, or leave the user as anonymous.
+     *
+     * @param Request $request
+     *
+     * @return bool
+     */
+    public function supports(Request $request);
+
     /**
      * Get the authentication credentials from the request and return them
      * as any type (e.g. an associate array). If you return null, authentication
@@ -41,14 +54,10 @@ interface GuardAuthenticatorInterface extends AuthenticatorInterface
      *
      * For example, for a form login, you might:
      *
-     *      if ($request->request->has('_username')) {
-     *          return array(
-     *              'username' => $request->request->get('_username'),
-     *              'password' => $request->request->get('_password'),
-     *          );
-     *      } else {
-     *          return;
-     *      }
+     *      return array(
+     *          'username' => $request->request->get('_username'),
+     *          'password' => $request->request->get('_password'),
+     *      );
      *
      * Or for an API token that's on a header, you might use:
      *
@@ -96,7 +105,7 @@ interface GuardAuthenticatorInterface extends AuthenticatorInterface
     public function checkCredentials($credentials, UserInterface $user);
 
     /**
-     * Create an authenticated token for the given user.
+     * Creates an authenticated token for the given user.
      *
      * If you don't care about which token class is used or don't really
      * understand what a "token" is, you can skip this method by extending
@@ -154,7 +163,6 @@ interface GuardAuthenticatorInterface extends AuthenticatorInterface
      *      done by having a _remember_me checkbox in your form, but
      *      can be configured by the "always_remember_me" and "remember_me_parameter"
      *      parameters under the "remember_me" firewall key
-     *  D) The onAuthenticationSuccess method returns a Response object
      *
      * @return bool
      */

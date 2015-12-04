@@ -61,14 +61,14 @@ class GuardAuthenticatorHandler
     /**
      * Returns the "on success" response for the given GuardAuthenticator.
      *
-     * @param TokenInterface              $token
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string                      $providerKey        The provider (i.e. firewall) key
+     * @param TokenInterface         $token
+     * @param Request                $request
+     * @param AuthenticatorInterface $guardAuthenticator
+     * @param string                 $providerKey        The provider (i.e. firewall) key
      *
      * @return null|Response
      */
-    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
+    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, AuthenticatorInterface $guardAuthenticator, $providerKey)
     {
         $response = $guardAuthenticator->onAuthenticationSuccess($request, $token, $providerKey);
 
@@ -88,14 +88,14 @@ class GuardAuthenticatorHandler
      * Convenience method for authenticating the user and returning the
      * Response *if any* for success.
      *
-     * @param UserInterface               $user
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $authenticator
-     * @param string                      $providerKey   The provider (i.e. firewall) key
+     * @param UserInterface          $user
+     * @param Request                $request
+     * @param AuthenticatorInterface $authenticator
+     * @param string                 $providerKey   The provider (i.e. firewall) key
      *
      * @return Response|null
      */
-    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, GuardAuthenticatorInterface $authenticator, $providerKey)
+    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, AuthenticatorInterface $authenticator, $providerKey)
     {
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
@@ -110,14 +110,14 @@ class GuardAuthenticatorHandler
      * Handles an authentication failure and returns the Response for the
      * GuardAuthenticator.
      *
-     * @param AuthenticationException     $authenticationException
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string                      $providerKey             The key of the firewall
+     * @param AuthenticationException $authenticationException
+     * @param Request                 $request
+     * @param AuthenticatorInterface  $guardAuthenticator
+     * @param string                  $providerKey             The key of the firewall
      *
      * @return null|Response
      */
-    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
+    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $guardAuthenticator, $providerKey)
     {
         $token = $this->tokenStorage->getToken();
         if ($token instanceof PostAuthenticationGuardToken && $providerKey === $token->getProviderKey()) {

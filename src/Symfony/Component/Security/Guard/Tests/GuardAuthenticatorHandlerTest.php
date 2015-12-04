@@ -128,7 +128,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $this->request = new Request(array(), array(), array(), array(), array(), array());
-        $this->guardAuthenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $this->guardAuthenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\AuthenticatorInterface')->getMock();
     }
 
     protected function tearDown()

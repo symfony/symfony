@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-12-03T09:52:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T11:27:13Z
+
+:+1:, as a bug fix for me
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-03T11:50:08Z
+
+The build failure seems unrelated.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-04T21:34:28Z
+
+@nicolas-grekas can you ping the people in charge of the ``Config`` component please ?
+Would be good if someone else reviews this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-05T09:12:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T09:13:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-05T09:38:49Z
+
+:+1: (I think we accidentally just removed the methods instead of throwing the exception as it was planed initially, see https://github.com/symfony/symfony/pull/15285#issuecomment-121687849).

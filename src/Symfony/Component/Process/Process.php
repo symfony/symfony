@@ -1136,6 +1136,11 @@ class Process
             $this->exitcode = 128 + $this->processInformation['termsig'];
         }
 
+        // Free memory from self-reference callback created by buildCallback
+        // Doing so in other contexts like __destruct or by garbage collector is ineffective
+        // Now pipes are closed, so the callback is no longer necessary
+        $this->callback = null;
+
         return $this->exitcode;
     }
 

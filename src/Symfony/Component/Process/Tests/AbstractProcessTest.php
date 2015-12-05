@@ -194,6 +194,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Input can not be set while the process is running.
+     */
     public function testSetInputWhileRunningThrowsAnException()
     {
         $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
@@ -203,9 +207,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $process->stop();
             $this->fail('A LogicException should have been raised.');
         } catch (LogicException $e) {
-            $this->assertEquals('Input can not be set while the process is running.', $e->getMessage());
         }
         $process->stop();
+
+        throw $e;
     }
 
     /**
@@ -756,6 +761,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
     }
 
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage The process timed-out.
+     */
     public function testRunProcessWithTimeout()
     {
         $timeout = 0.5;
@@ -769,14 +778,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
         $duration = microtime(true) - $start;
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            // Windows is a bit slower as it read file handles, then allow twice the precision
-            $maxDuration = $timeout + 2 * Process::TIMEOUT_PRECISION;
-        } else {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            // On Windows, timers are too transient
             $maxDuration = $timeout + Process::TIMEOUT_PRECISION;
+            $this->assertLessThan($maxDuration, $duration);
         }
 
-        $this->assertLessThan($maxDuration, $duration);
+        throw $e;
     }
 
     public function testCheckTimeoutOnNonStartedProcess()
@@ -792,6 +800,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->checkTimeout();
     }
 
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage The process timed-out.
+     */
     public function testCheckTimeoutOnStartedProcess()
     {
         $timeout = 0.5;
@@ -814,6 +826,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->assertLessThan($timeout + $precision, $duration);
         $this->assertFalse($process->isSuccessful());
+
+        throw $e;
     }
 
     public function testIdleTimeout()
@@ -852,6 +866,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
+     */
     public function testStartAfterATimeout()
     {
         $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 1000; while ($n--) {echo \'\'; usleep(1000); }')));
@@ -865,6 +883,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->start();
         usleep(1000);
         $process->stop();
+
+        throw $e;
     }
 
     public function testGetPid()
@@ -894,14 +914,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Extension pcntl is required.');
         }
 
-        $process = $this->getProcess('exec php -f '.__DIR__.'/SignalListener.php');
+        $process = $this->getProcess('exec '.self::$phpBin.' '.__DIR__.'/SignalListener.php');
         $process->start();
-        usleep(500000);
-        $process->signal(SIGUSR1);
 
-        while ($process->isRunning() && false === strpos($process->getOutput(), 'Caught SIGUSR1')) {
-            usleep(10000);
+        while (false === strpos($process->getOutput(), 'Caught')) {
+            usleep(1000);
         }
+        $process->signal(SIGUSR1);
+        $process->wait();
 
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
     }
@@ -962,6 +982,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideMethodsThatNeedATerminatedProcess
+     * @expectedException Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Process must be terminated before calling
      */
     public function testMethodsThatNeedATerminatedProcess($method)
     {
@@ -972,10 +994,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $process->stop(0);
             $this->fail('A LogicException must have been thrown');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Process\Exception\LogicException', $e);
-            $this->assertEquals(sprintf('Process must be terminated before calling %s.', $method), $e->getMessage());
         }
         $process->stop(0);
+
+        throw $e;
     }
 
     public function provideMethodsThatNeedATerminatedProcess()

@@ -169,8 +169,16 @@ class Process
 
     public function __destruct()
     {
-        // stop() will check if we have a process running.
-        $this->stop();
+        if ($this->isRunning()) {
+            $this->doSignal(15, false);
+            usleep(10000);
+        }
+        if ($this->isRunning()) {
+            usleep(100000);
+            $this->doSignal(9, false);
+        }
+
+        // Don't call ->stop() nor ->close() since we don't want to wait for the subprocess here
     }
 
     public function __clone()
@@ -1468,7 +1476,7 @@ class Process
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
-            if ($exitCode) {
+            if ($exitCode && $this->isRunning()) {
                 if ($throwException) {
                     throw new RuntimeException(sprintf('Unable to kill the process (%s).', implode(' ', $output)));
                 }

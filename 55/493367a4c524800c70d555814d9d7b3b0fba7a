@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-11-29T15:35:54Z
+
+Nice PR! Maybe I would add explicit test to cover the change in behavior of `setRedrawFrequency()` method.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-11-29T22:13:48Z
+
+:+1: But please add a test
+
+> This gets tested implicitly in ProgressBarTest::testNonDecoratedOutputWithoutMax.
+
+There cannot be a test for this. Otherwise it would fail.
+
+---------------------------------------------------------------------------
+
+by dritter at 2015-11-30T17:40:07Z
+
+Added tests and rebased against the newest 2.8 branch.
+
+---------------------------------------------------------------------------
+
+by dritter at 2015-12-01T00:01:06Z
+
+@Tobion All done. :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-01T00:46:00Z
+
+:+1: Should be merged in 2.7
+
+Status: Reviewed

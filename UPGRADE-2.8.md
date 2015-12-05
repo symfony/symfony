@@ -1,6 +1,20 @@
 ﻿UPGRADE FROM 2.7 to 2.8
 =======================
 
+All components
+--------------
+
+* Symfony now requires the iconv extension to be present, which is the case by
+  default in most environments. However, if you're not able to ensure this
+  extension to be installed in your target environment, you can add Symfony's
+  iconv polyfill to your project's composer.json file.
+
+  ```json
+  "require": {
+      "symfony/polyfill-iconv": "~1.0"
+  }
+  ```
+
 Form
 ----
 

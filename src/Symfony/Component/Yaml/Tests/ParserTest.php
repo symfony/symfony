@@ -1425,6 +1425,32 @@ YAML
             ),
         );
     }
+
+    public function testParseMultiLineQuotedString()
+    {
+        $yaml = <<<EOT
+foo: "bar
+  baz
+   foobar
+foo"
+bar: baz
+EOT;
+
+        $this->assertSame(array('foo' => 'bar baz foobar foo', 'bar' => 'baz'), $this->parser->parse($yaml));
+    }
+
+    public function testParseMultiLineUnquotedString()
+    {
+        $yaml = <<<EOT
+foo: bar
+  baz
+   foobar
+  foo
+bar: baz
+EOT;
+
+        $this->assertSame(array('foo' => 'bar baz foobar foo', 'bar' => 'baz'), $this->parser->parse($yaml));
+    }
 }
 
 class B

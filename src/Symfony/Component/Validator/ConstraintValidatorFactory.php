@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\L18nValidator;
 
@@ -29,6 +30,9 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
     private $propertyAccessor;
 
+    /**
+     * @var RequestStack
+     */
     private $requestStack;
 
     public function __construct($propertyAccessor = null, $requestStack = null)

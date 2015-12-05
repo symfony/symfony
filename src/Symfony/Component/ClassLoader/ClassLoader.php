@@ -97,7 +97,7 @@ class ClassLoader
                     $paths
                 ));
             } elseif (!in_array($paths, $this->prefixes[$prefix])) {
-                 $this->prefixes[$prefix][] = $paths;
+                $this->prefixes[$prefix][] = $paths;
             }
         } else {
             $this->prefixes[$prefix] = array_unique((array) $paths);

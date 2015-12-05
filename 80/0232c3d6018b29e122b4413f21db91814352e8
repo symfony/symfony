@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T17:48:26Z
+
+Is the HHVM failure in the process component test related to the change you made here ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T11:29:46Z
+
+HHVM failure is unrelated, it would need an other fix

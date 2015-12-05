@@ -64,6 +64,7 @@ abstract class Voter implements VoterInterface
      * @param TokenInterface $token
      *
      * @return bool
+     *
      * @deprecated
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

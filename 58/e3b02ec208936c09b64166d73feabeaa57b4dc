@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2015-12-05T11:46:18Z
+
+btw, if someone can cancel the Travis run on this issue, feel free to do so. The travis queue is pretty full right now due to the HackDay. And this PR only changed a text file, so running tests is pretty pointless.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-05T11:57:55Z
+
+:+1:

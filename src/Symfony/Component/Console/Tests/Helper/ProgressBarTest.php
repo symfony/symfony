@@ -296,7 +296,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testRedrawFrequency()
     {
-        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($output = $this->getOutputStream(), 6));
+        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream(), 6));
         $bar->expects($this->exactly(4))->method('display');
 
         $bar->setRedrawFrequency(2);
@@ -305,6 +305,26 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar->advance(2);
         $bar->advance(2);
         $bar->advance(1);
+    }
+
+    public function testRedrawFrequencyIsAtLeastOneIfZeroGiven()
+    {
+        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream()));
+
+        $bar->expects($this->exactly(2))->method('display');
+        $bar->setRedrawFrequency(0);
+        $bar->start();
+        $bar->advance();
+    }
+
+    public function testRedrawFrequencyIsAtLeastOneIfSmallerOneGiven()
+    {
+        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream()));
+
+        $bar->expects($this->exactly(2))->method('display');
+        $bar->setRedrawFrequency(0.9);
+        $bar->start();
+        $bar->advance();
     }
 
     /**

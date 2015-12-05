@@ -67,10 +67,8 @@ class ProgressBar
             // disable overwrite when output does not support ANSI codes.
             $this->overwrite = false;
 
-            if ($this->max > 10) {
-                // set a reasonable redraw frequency so output isn't flooded
-                $this->setRedrawFrequency($max / 10);
-            }
+            // set a reasonable redraw frequency so output isn't flooded
+            $this->setRedrawFrequency($max / 10);
         }
 
         $this->startTime = time();
@@ -316,11 +314,11 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in steps
+     * @param int|float $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
-        $this->redrawFreq = (int) $freq;
+        $this->redrawFreq = max((int) $freq, 1);
     }
 
     /**

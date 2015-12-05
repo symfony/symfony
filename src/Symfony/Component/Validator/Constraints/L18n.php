@@ -28,7 +28,7 @@ class L18n extends Constraint
     public $constraint;
 
     /**
-     * @var string $locale
+     * @var string
      */
     private $locale;
 
@@ -68,5 +68,4 @@ class L18n extends Constraint
     {
         return 'validator.l18n';
     }
-
 }

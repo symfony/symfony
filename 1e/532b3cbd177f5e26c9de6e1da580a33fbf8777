@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-01T05:31:10Z
+
+:+1: The YAML errors are indeed quite difficult to find.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-02T12:49:09Z
+
+The `ParseException` from the Yaml component allows to pass the affected line number and the snippet causing the error (failures will then be shown like `[...] at line x (near "foo").`). We should use that feature here.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-02T14:59:51Z
+
+But in Inline::parseScalar I do not have access to the line number. I find the line number not helpful as you do not even know the file, you anyway have to grep for it.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T15:06:08Z
+
+@xabbuh The ParseException already contains it in 3.0, as the parser does it with a global try/catch/rethrow
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-02T21:06:37Z
+
+Okay, so good to go?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:56:28Z
+
+Please fix the tests
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-05T11:31:52Z
+
+Updated, buils are pending...
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-05T13:09:05Z
+
+@stof Tests passed now.

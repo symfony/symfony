@@ -37,7 +37,7 @@ abstract class Voter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            if ($this->shallVoteOnAttribute($attribute, $subject, $token)) {
                 // grant access as soon as at least one attribute returns a positive response
                 return self::ACCESS_GRANTED;
             }
@@ -65,5 +65,5 @@ abstract class Voter implements VoterInterface
      *
      * @return bool
      */
-    abstract protected function voteOnAttribute($attribute, $subject, TokenInterface $token);
+    abstract protected function shallVoteOnAttribute($attribute, $subject, TokenInterface $token);
 }

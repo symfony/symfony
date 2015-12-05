@@ -92,12 +92,16 @@ class DoctrineTokenProvider implements TokenProviderInterface
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed'
             .' WHERE series=:series';
-        $paramValues = array('value' => $tokenValue,
-                             'lastUsed' => $lastUsed,
-                             'series' => $series,);
-        $paramTypes = array('value' => \PDO::PARAM_STR,
-                             'lastUsed' => DoctrineType::DATETIME,
-                             'series' => \PDO::PARAM_STR,);
+        $paramValues = array(
+            'value' => $tokenValue,
+            'lastUsed' => $lastUsed,
+            'series' => $series,
+        );
+        $paramTypes = array(
+            'value' => \PDO::PARAM_STR,
+            'lastUsed' => DoctrineType::DATETIME,
+            'series' => \PDO::PARAM_STR,
+        );
         $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
@@ -112,16 +116,20 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $sql = 'INSERT INTO rememberme_token'
             .' (class, username, series, value, lastUsed)'
             .' VALUES (:class, :username, :series, :value, :lastUsed)';
-        $paramValues = array('class' => $token->getClass(),
-                             'username' => $token->getUsername(),
-                             'series' => $token->getSeries(),
-                             'value' => $token->getTokenValue(),
-                             'lastUsed' => $token->getLastUsed(),);
-        $paramTypes = array('class' => \PDO::PARAM_STR,
-                             'username' => \PDO::PARAM_STR,
-                             'series' => \PDO::PARAM_STR,
-                             'value' => \PDO::PARAM_STR,
-                             'lastUsed' => DoctrineType::DATETIME,);
+        $paramValues = array(
+            'class' => $token->getClass(),
+            'username' => $token->getUsername(),
+            'series' => $token->getSeries(),
+            'value' => $token->getTokenValue(),
+            'lastUsed' => $token->getLastUsed(),
+        );
+        $paramTypes = array(
+            'class' => \PDO::PARAM_STR,
+            'username' => \PDO::PARAM_STR,
+            'series' => \PDO::PARAM_STR,
+            'value' => \PDO::PARAM_STR,
+            'lastUsed' => DoctrineType::DATETIME,
+        );
         $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
     }
 }

@@ -31,7 +31,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     public function testTrans($template, $expected, array $variables = array())
     {
         if ($expected != $this->getTemplate($template)->render($variables)) {
-            print $template."\n";
+            echo $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
             $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));

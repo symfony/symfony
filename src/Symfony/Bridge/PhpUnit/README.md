@@ -14,9 +14,9 @@ It comes with the following features:
 By default any non-legacy-tagged or any non-@-silenced deprecation notices will
 make tests fail.
 This can be changed by setting the `SYMFONY_DEPRECATIONS_HELPER` environment
-variable to `weak`. This will make the bridge ignore deprecation notices and
-is useful to projects that must use deprecated interfaces for backward
-compatibility reasons.
+variable to `weak` or `weak-verbose`. This will make the bridge ignore
+deprecation notices and is useful to projects that must use deprecated interfaces
+for backward compatibility reasons.
 
 A summary of deprecation notices is displayed at the end of the test suite:
 
@@ -53,8 +53,9 @@ You have to decide either to:
    forward compatibility;
  * or move them to the **Legacy** section (by using one of the above way).
 
-In case you need to inspect the stack trace of a particular deprecation triggered by
-one of your unit tests, you can set the `SYMFONY_DEPRECATIONS_HELPER` env var to
-a regexp that matches this test case's `class::method` name. For example,
-`SYMFONY_DEPRECATIONS_HELPER=/^MyTest::testMethod$/ phpunit` will stop your test
-suite once a deprecation is triggered by the `MyTest::testMethod` test.
+In case you need to inspect the stack trace of a particular deprecation triggered
+by your unit tests, you can set the `SYMFONY_DEPRECATIONS_HELPER` env var to a
+regular expression that matches this deprecation's message, encapsed between `/`.
+For example, `SYMFONY_DEPRECATIONS_HELPER=/foobar/ phpunit` will stop your test
+suite once a deprecation notice is triggered whose message contains the "foobar"
+string.

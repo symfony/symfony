@@ -74,7 +74,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            'Bar' => array(1,2,3),
+            'Bar' => array(1, 2, 3),
             'a' => 'b',
         );
         $expected = '<?xml version="1.0"?>'."\n".
@@ -384,7 +384,7 @@ XML;
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            'Bar' => array(1,2,3),
+            'Bar' => array(1, 2, 3),
             'a' => 'b',
         );
         $expected = array(
@@ -397,7 +397,7 @@ XML;
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            'Bar' => array(1,2,3),
+            'Bar' => array(1, 2, 3),
             'a' => 'b',
         );
         $xml = $this->encoder->encode($obj, 'xml');

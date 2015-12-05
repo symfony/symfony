@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T09:25:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T09:31:11Z
+
+Can you also add a testcase covering the Logger class ? The fact that it is missing is the reason why it was not catched earlier.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-12-05T10:02:52Z
+
+I'll do that, but I'd better submit the test in a separate PR against 2.3, I guess?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-12-05T10:26:50Z
+
+See #16850 for the test case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-05T10:33:42Z
+
+:+1:

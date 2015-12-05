@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T09:30:55Z
+
+@nicolas-grekas this still does not fix the case of ``null`` for types loading choices in a different way (even though they should probably change the default for ``choices_as_values`` in this case, avoiding the issue)
+
+---------------------------------------------------------------------------
+
+by piogrek at 2015-12-02T11:03:20Z
+
+@stof thanks for a hint I think that's the simplest way and EntityType already have it. Just found PR from last night (but it needs more thought) https://github.com/symfony/propel1-bridge/pull/1
+
+---------------------------------------------------------------------------
+
+by mbabker at 2015-12-03T22:46:39Z
+
+FWIW I ran into the same error condition in #16792 using a combination of the Form component 2.8 and Doctrine bridge 3.0 with the EntityType and this PR fixed the error for that case.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:31:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-05T11:14:04Z
+
+:+1:

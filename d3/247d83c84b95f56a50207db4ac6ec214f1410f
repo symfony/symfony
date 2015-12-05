@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:32:24Z
+
+Rather than testing the legacy APIs only, we should have tests covering the non-deprecated APIs too (so that we can have tests which are kept when merging into 3.0)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-12-05T10:48:36Z
+
+Yeah, good point. I've added some non-legacy tests.

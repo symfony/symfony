@@ -263,9 +263,11 @@ class ChoiceType extends AbstractType
                 return $choices;
             }
 
-            ChoiceType::normalizeLegacyChoices($choices, $choiceLabels);
+            if (null === $choices) {
+                return;
+            }
 
-            return $choices;
+            return ChoiceType::normalizeLegacyChoices($choices, $choiceLabels);
         };
 
         // BC closure, to be removed in 3.0
@@ -520,26 +522,30 @@ class ChoiceType extends AbstractType
      * are lost. Store them in a utility array that is used from the
      * "choice_label" closure by default.
      *
-     * @param array  $choices      The choice labels indexed by choices.
-     *                             Labels are replaced by generated keys.
-     * @param object $choiceLabels The object that receives the choice labels
-     *                             indexed by generated keys.
-     * @param int    $nextKey      The next generated key.
+     * @param array|\Traversable  $choices      The choice labels indexed by choices.
+     * @param object              $choiceLabels The object that receives the choice labels
+     *                                          indexed by generated keys.
+     * @param int                 $nextKey      The next generated key.
+     *
+     * @return array The choices in a normalized array with labels replaced by generated keys.
      *
      * @internal Public only to be accessible from closures on PHP 5.3. Don't
      *           use this method as it may be removed without notice and will be in 3.0.
      */
-    public static function normalizeLegacyChoices(array &$choices, $choiceLabels, &$nextKey = 0)
+    public static function normalizeLegacyChoices($choices, $choiceLabels, &$nextKey = 0)
     {
+        $normalizedChoices = array();
+
         foreach ($choices as $choice => $choiceLabel) {
-            if (is_array($choiceLabel)) {
-                $choiceLabel = ''; // Dereference $choices[$choice]
-                self::normalizeLegacyChoices($choices[$choice], $choiceLabels, $nextKey);
+            if (is_array($choiceLabel) || $choiceLabel instanceof \Traversable) {
+                $normalizedChoices[$choice] = self::normalizeLegacyChoices($choiceLabel, $choiceLabels, $nextKey);
                 continue;
             }
 
             $choiceLabels->labels[$nextKey] = $choiceLabel;
-            $choices[$choice] = $nextKey++;
+            $normalizedChoices[$choice] = $nextKey++;
         }
+
+        return $normalizedChoices;
     }
 }

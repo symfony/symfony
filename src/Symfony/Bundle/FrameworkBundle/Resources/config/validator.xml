@@ -28,8 +28,14 @@
 
         <service id="validator.mapping.class_metadata_factory" alias="validator" public="false" />
 
-        <service id="validator.mapping.cache.apc" class="Symfony\Component\Validator\Mapping\Cache\ApcCache" public="false">
-            <argument>%validator.mapping.cache.prefix%</argument>
+        <service id="validator.mapping.cache.doctrine.apc" class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">
+            <argument type="service">
+                <service class="Doctrine\Common\Cache\ApcCache">
+                    <call method="setNamespace">
+                        <argument>%validator.mapping.cache.prefix%</argument>
+                    </call>
+                </service>
+            </argument>
         </service>
 
         <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory" public="false">

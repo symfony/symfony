@@ -744,8 +744,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process timed-out.
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.5 seconds.
      */
     public function testRunProcessWithTimeout()
     {
@@ -783,8 +783,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process timed-out.
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.5 seconds.
      */
     public function testCheckTimeoutOnStartedProcess()
     {

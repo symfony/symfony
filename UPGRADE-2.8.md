@@ -186,6 +186,41 @@ Form
    }
    ```
 
+ * In Symfony 2.8 a small BC break was introduced with the new choices_as_values
+   option. In order to have the choice values populated to the html value attribute
+   you had to define the choice_value option. This is now not any more needed.
+ 
+   Before:
+
+   ```php
+   $form->add('status', 'choice', array(
+       'choices' => array(
+           'Enabled' => Status::ENABLED,
+           'Disabled' => Status::DISABLED,
+           'Ignored' => Status::IGNORED,
+       ),
+       'choices_as_values' => true,
+       // important if you rely on your option value attribute (e.g. for JavaScript)
+       // this will keep the same functionality as before
+       'choice_value' => function ($choice) {
+           return $choice;
+       },
+   ));
+   ```
+   
+   After (Symfony 2.8+):
+   
+   ```php
+   $form->add('status', 'choice', array(
+       'choices' => array(
+           'Enabled' => Status::ENABLED,
+           'Disabled' => Status::DISABLED,
+           'Ignored' => Status::IGNORED,
+       ),
+       'choices_as_values' => true
+   ));
+   ```
+
  * Returning type instances from `FormTypeInterface::getParent()` is deprecated
    and will not be supported anymore in Symfony 3.0. Return the fully-qualified
    class name of the parent type class instead.

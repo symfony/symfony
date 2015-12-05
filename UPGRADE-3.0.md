@@ -365,6 +365,41 @@ UPGRADE FROM 2.x to 3.0
        }
    }
    ```
+   
+ * In Symfony 2.8 a small BC break was introduced with the new choices_as_values
+   option. In order to have the choice values populated to the html value attribute
+   you had to define the choice_value option. This is now not any more needed.
+ 
+   Before:
+
+   ```php
+   $form->add('status', 'choice', array(
+       'choices' => array(
+           'Enabled' => Status::ENABLED,
+           'Disabled' => Status::DISABLED,
+           'Ignored' => Status::IGNORED,
+       ),
+       // choices_as_values will default to true in Symfony 3.0
+       'choices_as_values' => true,
+       // important if you rely on your option value attribute (e.g. for JavaScript)
+       // this will keep the same functionality as before
+       'choice_value' => function ($choice) {
+           return $choice;
+       },
+   ));
+   ```
+   
+   After:
+   
+   ```php
+   $form->add('status', 'choice', array(
+       'choices' => array(
+           'Enabled' => Status::ENABLED,
+           'Disabled' => Status::DISABLED,
+           'Ignored' => Status::IGNORED,
+       )
+   ));
+   ```   
 
  * The `request` service was removed. You must inject the `request_stack`
    service instead.

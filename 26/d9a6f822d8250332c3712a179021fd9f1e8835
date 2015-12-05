@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T16:45:59Z
+
+shouldn't this be validated in ``Definition::setFactory`` instead, to warn as early as possible ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-02T16:48:03Z
+
+I did it in Definition at first, but all validation logic is in the PhpDumper really, so it belongs to it IMHO.
+Anyway, and definition is going to be dumped at some point, or used, with some fatal/exception already.
+Dumping invalid php is really the thing that needs to be prevented.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T16:59:00Z
+
+The case of no method should at least be covered at the loader level, to give a better exception message to the user to make it easier to debug
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-02T17:00:23Z
+
+@stof it could but someone else could do it. That's enough time/work on one PR for me :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T17:02:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T17:02:42Z
+
+@nicolas-grekas it would be great to add a test covering it to prevent regressions
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T11:22:19Z
+
+Tests added
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-04T23:29:12Z
+
+:+1:

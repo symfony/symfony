@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by hansstevens at 2015-12-05T09:32:17Z
+
+Sorry, doesn't work for me either.
+<img width="816" alt="screen shot 2015-12-05 at 10 29 47" src="https://cloud.githubusercontent.com/assets/865375/11607133/59ebbbb4-9b3b-11e5-9d2d-d3806f14c1c2.png">
+
+---------------------------------------------------------------------------
+
+by peterpacket at 2015-12-05T09:39:40Z
+
+It doesn't work on chrome. It does work in firefox though.
+
+![image](https://cloud.githubusercontent.com/assets/5574437/11607164/789cd20e-9b3c-11e5-8a81-58da70957dcf.png)
+
+---------------------------------------------------------------------------
+
+by KoenraadM at 2015-12-05T09:42:42Z
+
+99998 Still shows the dump over the bar in Chrome
+
+---------------------------------------------------------------------------
+
+by brpauwels at 2015-12-05T09:46:17Z
+
+Doesn't work for me on Chrome.
+<img width="1438" alt="screen_after" src="https://cloud.githubusercontent.com/assets/6988341/11607189/5b7bb216-9b3d-11e5-9846-d2b624086297.png">
+
+---------------------------------------------------------------------------
+
+by wpottier at 2015-12-05T09:50:27Z
+
+after some investigation it's related to webkit animation that cause the animated element to ignore z-index behavior. (reports in chromium track : https://code.google.com/p/chromium/issues/detail?id=501596)
+
+so PR if fine.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:02:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-05T10:02:26Z
+
+:+1: as bug fix on 2.7

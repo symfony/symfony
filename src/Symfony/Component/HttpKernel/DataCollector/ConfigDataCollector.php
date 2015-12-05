@@ -300,11 +300,11 @@ class ConfigDataCollector extends DataCollector
 
         foreach ($this->getEnabledBundles() as $bundleName => $bundlePath) {
             foreach ($installedPackages as $packageName => $packageVersion) {
-                if (strpos($bundlePath.'/', '/vendor/'.$packageName.'/')) {
+                if (strpos($bundlePath.DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.$packageName.DIRECTORY_SEPARATOR)) {
                     $bundleVersion = $packageVersion;
 
                     break;
-                } elseif (strpos($bundlePath, 'symfony/symfony/src/Symfony/Bundle')) {
+                } elseif (strpos($bundlePath, 'symfony'.DIRECTORY_SEPARATOR.'symfony'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Symfony'.DIRECTORY_SEPARATOR.'Bundle')) {
                     // this is a built-in Symfony bundle; its version is the same as Symfony
                     $bundleVersion = Kernel::VERSION;
 

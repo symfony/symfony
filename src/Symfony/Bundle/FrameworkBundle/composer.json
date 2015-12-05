@@ -58,7 +58,8 @@
         "symfony/serializer": "For using the serializer service",
         "symfony/validator": "For using validation",
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
-        "symfony/property-info": "For using the property_info_extractor service"
+        "symfony/property-info": "For using the property_info_extractor service",
+        "symfony/process": "For using the server:run command"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

@@ -53,6 +53,19 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(4, $logger->countErrors());
     }
 
+    public function testGetLogs()
+    {
+        $logger = new Logger('test');
+        $logger->pushHandler(new DebugHandler());
+
+        $logger->addInfo('test');
+        $this->assertCount(1, $logger->getLogs());
+        list($record) = $logger->getLogs();
+
+        $this->assertEquals('test', $record['message']);
+        $this->assertEquals(Logger::INFO, $record['priority']);
+    }
+
     public function testCountErrorsWithoutDebugHandler()
     {
         $handler = new TestHandler();

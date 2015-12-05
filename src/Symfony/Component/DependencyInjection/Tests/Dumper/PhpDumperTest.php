@@ -154,6 +154,31 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper->dump();
     }
 
+    /**
+     * @dataProvider provideInvalidFactories
+     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot dump definition
+     */
+    public function testInvalidFactories($factory)
+    {
+        $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setFactory($factory);
+        $container->setDefinition('bar', $def);
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
+
+    public function provideInvalidFactories()
+    {
+        return array(
+            array(array('', 'method')),
+            array(array('class', '')),
+            array(array('...', 'method')),
+            array(array('class', '...')),
+        );
+    }
+
     public function testAliases()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';

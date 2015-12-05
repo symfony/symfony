@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T11:10:04Z
+
+this should also be reset at the end of a normal run (i.e. without the user stopping the process), as the callback won't be necessary anymore either (basically, the same benchmark without the call to ``->stop()``)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-02T11:15:25Z
+
+And I think this can break the call to ``getOutput`` or ``getErrorOutput`` in the current implementation
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2015-12-02T13:48:09Z
+
+@stof unsetting the callback automatically after `run` breaks `getOutput` and `getErrorOutput`, that's why I put it in `stop`, a method called only on `__destruct` or manually in particular cases.
+
+I am sure that it does not break anything where I put it because:
+
+1. No test fails (the one failing in Windows is unreleated)
+2. The `stop` calls [updateStatus](https://github.com/symfony/symfony/blob/v3.0.0/src/Symfony/Component/Process/Process.php#L799), which calls [readPipes](https://github.com/symfony/symfony/blob/v3.0.0/src/Symfony/Component/Process/Process.php#L1269) and so all the Pipes are already filled. After that, every internal call to `readPipes` will result in an [empty foreach](https://github.com/symfony/symfony/blob/v3.0.0/src/Symfony/Component/Process/Process.php#L1327), unless you restart the process with another callback build
+
+My tests on unsetting the callback in any other context other then `stop`, like `__destruct`, has led to ineffective memory freeing, or breaking something.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T11:37:56Z
+
+I think the callback should also be reset in `wait` (and thus in run also since `wait` is used in `run`).
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2015-12-03T11:43:12Z
+
+@nicolas-grekas only after pipes are close you can be sure to unset the callback, and the pipes are closed only in stop: https://github.com/symfony/process/blob/v3.0.0/Process.php#L1356
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T11:47:58Z
+
+The line you linked doesn't proves anything about what stop does that wait doesn't do. And in fact, as far as I read correctly, wait waits for isRunning to be false, which means pipes are closed. Or did I read too quickly?
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2015-12-03T13:21:28Z
+
+@nicolas-grekas your assumptions are based on the ability of PipesInterface::readAndWrite $close flag to close the Pipes. What I read in the interface (https://github.com/symfony/process/blob/v3.0.0/Pipes/PipesInterface.php#L43) is "Whether to close pipes if they've reached EOF" which means is not mandatory to close the pipes with the flag activated.
+In fact on Windows, the pipes may not be closed even with the flag set to true: https://github.com/symfony/process/blob/v3.0.0/Pipes/WindowsPipes.php#L132 .
+The only way to be sure pipes are closed, is to call `PipesInterface::close`, which you can be sure is always called if and only if the `Process::stop` is called because of [this](https://github.com/symfony/process/blob/v3.0.0/Process.php#L799-L802) and [this](https://github.com/symfony/process/blob/v3.0.0/Process.php#L1271-L1273) together.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T14:05:51Z
+
+@Slamdunk let me give you my understanding of the code:
+- wait loops [until the process is running](https://github.com/symfony/process/blob/v3.0.0/Process.php#L368)
+- isRunning returning false means that it [has called Process->close](https://github.com/symfony/process/blob/v3.0.0/Process.php#L1272)
+- which means that [processPipes](https://github.com/symfony/process/blob/v3.0.0/Process.php#L1356) are [fclosed](https://github.com/symfony/process/blob/v3.0.0/Pipes/WindowsPipes.php#L156)
+
+readPipes is not part of this closing procedure (it happens earlier in the call chain)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T14:08:57Z
+
+Btw, this means that resetting the callback should be done only in the `close` method!
+
+---------------------------------------------------------------------------
+
+by Slamdunk at 2015-12-03T15:38:57Z
+
+@nicolas-grekas :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-03T16:39:43Z
+
+:+1: for merging on 2.3
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:15:17Z
+
+:+1:

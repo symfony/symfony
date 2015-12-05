@@ -29,7 +29,7 @@ class ElementNodeTest extends AbstractNodeTest
         return array(
             array(new ElementNode(), 0),
             array(new ElementNode(null, 'element'), 1),
-            array(new ElementNode('namespace', 'element'),1),
+            array(new ElementNode('namespace', 'element'), 1),
         );
     }
 }

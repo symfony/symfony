@@ -334,11 +334,11 @@ class ConfigDataCollector extends DataCollector
         $projectRootDirectory = $this->findProjectRootDirectory();
 
         while ($path !== $projectRootDirectory) {
-            if (file_exists($composerLockPath = $path.'/composer.lock')) {
+            if (file_exists($composerLockPath = $path.DIRECTORY_SEPARATOR.'composer.lock')) {
                 return $composerLockPath;
             }
 
-            $path = realpath($path.'/..');
+            $path = realpath($path.DIRECTORY_SEPARATOR.'..');
         }
     }
 

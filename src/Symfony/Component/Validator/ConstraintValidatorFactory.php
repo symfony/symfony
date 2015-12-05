@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Constraints\L18nValidator;
 
 /**
  * Default implementation of the ConstraintValidatorFactoryInterface.
@@ -28,9 +29,12 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
     private $propertyAccessor;
 
-    public function __construct($propertyAccessor = null)
+    private $requestStack;
+
+    public function __construct($propertyAccessor = null, $requestStack = null)
     {
         $this->propertyAccessor = $propertyAccessor;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -41,9 +45,17 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         $className = $constraint->validatedBy();
 
         if (!isset($this->validators[$className])) {
-            $this->validators[$className] = 'validator.expression' === $className
-                ? new ExpressionValidator($this->propertyAccessor)
-                : new $className();
+            switch ($className) {
+                case 'validator.expression':
+                    $this->validators[$className] = new ExpressionValidator($this->propertyAccessor);
+                    break;
+                case 'validator.l18n':
+                    $this->validators[$className] = new L18nValidator($this->requestStack);
+                    break;
+                default:
+                    $this->validators[$className] = new $className();
+                    break;
+            }
         }
 
         return $this->validators[$className];

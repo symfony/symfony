@@ -18,6 +18,9 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DeprecationErrorHandler
 {
+    const MODE_WEAK = 'weak';
+    const MODE_WEAK_VERBOSE = 'weak-verbose';
+
     private static $isRegistered = false;
 
     public static function register($mode = false)
@@ -64,7 +67,7 @@ class DeprecationErrorHandler
                     $group = 'remaining';
                 }
 
-                if (isset($mode[0]) && '/' === $mode[0] && preg_match($mode, $class.'::'.$method)) {
+                if (isset($mode[0]) && '/' === $mode[0] && preg_match($mode, $msg)) {
                     $e = new \Exception($msg);
                     $r = new \ReflectionProperty($e, 'trace');
                     $r->setAccessible(true);
@@ -78,7 +81,7 @@ class DeprecationErrorHandler
 
                     exit(1);
                 }
-                if ('legacy' !== $group && 'weak' !== $mode) {
+                if ('legacy' !== $group && self::MODE_WEAK !== $mode) {
                     $ref = &$deprecations[$group][$msg]['count'];
                     ++$ref;
                     $ref = &$deprecations[$group][$msg][$class.'::'.$method];
@@ -144,7 +147,7 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if ('weak' !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
+                if (self::MODE_WEAK !== $mode && self::MODE_WEAK_VERBOSE !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
                     exit(1);
                 }
             });

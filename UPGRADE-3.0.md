@@ -752,14 +752,14 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
- * The `AbstractVoter::isGranted()` method have been replaced by `AbstractVoter::voteOnAttribute()`.
+ * The `AbstractVoter::voteOnAttribute()` method have been replaced by `AbstractVoter::isGranted()`.
 
    Before:
 
    ```php
    class MyVoter extends AbstractVoter
    {
-       protected function isGranted($attribute, $object, $user = null)
+       protected function voteOnAttribute($attribute, $object, $user = null)
        {
            return 'EDIT' === $attribute && $user === $object->getAuthor();
        }
@@ -773,7 +773,7 @@ UPGRADE FROM 2.x to 3.0
    ```php
    class MyVoter extends AbstractVoter
    {
-       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+       protected function isGranted($attribute, $object, TokenInterface $token)
        {
            return 'EDIT' === $attribute && $token->getUser() === $object->getAuthor();
        }

@@ -105,6 +105,22 @@ UPGRADE FROM 2.x to 3.0
    removed: `ContainerBuilder::synchronize()`, `Definition::isSynchronized()`,
    and `Definition::setSynchronized()`.
 
+### DomCrawler
+
+ * The interface of the `Symfony\Component\DomCrawler\Crawler` changed. It does no longer implement `\Iterator` but `\IteratorAggregate`. If you rely on methods of the `\Iterator` interface, call the `getIterator` method of the `\IteratorAggregate` interface before. No changes are required in a `\Traversable`-aware control structure, such as `foreach`.
+
+   Before:
+
+   ```php
+   $crawler->current();
+   ```
+
+   After:
+
+   ```php
+   $crawler->getIterator()->current();
+   ```
+
 ### EventDispatcher
 
  * The method `getListenerPriority($eventName, $listener)` has been added to the
@@ -114,6 +130,12 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The `getBlockPrefix()` method was added to the `FormTypeInterface` in replacement of
+   the `getName()` method which has been has been removed.
+ * The `configureOptions()` method was added to the `FormTypeInterface` in replacement
+   of the `setDefaultOptions()` method which has been removed.
+ * The `getBlockPrefix()` method was added to the `ResolvedFormTypeInterface` in
+   replacement of the `getName()` method which has been has been removed.
  * The option "precision" was renamed to "scale".
 
    Before:

@@ -48,7 +48,7 @@ class AmqpCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        // BC layer in the ampq lib
+        // BC layer in the amqp lib
         if (method_exists($c, 'getReadTimeout')) {
             $timeout = $c->getReadTimeout();
         } else {

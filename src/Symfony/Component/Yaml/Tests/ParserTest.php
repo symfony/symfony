@@ -785,8 +785,8 @@ EOF;
     }
 
     /**
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A colon cannot be used in an unquoted mapping value.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage A colon cannot be used in an unquoted mapping value
      */
     public function testColonInMappingValueException()
     {
@@ -795,6 +795,16 @@ foo: bar: baz
 EOF;
 
         $this->parser->parse($yaml);
+    }
+
+    public function testColonInMappingValueExceptionNotTriggeredByColonInComment()
+    {
+        $yaml = <<<EOT
+foo:
+    bar: foobar # Note: a comment after a colon
+EOT;
+
+        $this->assertSame(array('foo' => array('bar' => 'foobar')), $this->parser->parse($yaml));
     }
 }
 

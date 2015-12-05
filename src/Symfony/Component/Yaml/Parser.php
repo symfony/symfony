@@ -471,12 +471,14 @@ class Parser
             return $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
         }
 
-        if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($value, ': ')) {
-            throw new ParseException('A colon cannot be used in an unquoted mapping value.');
-        }
-
         try {
-            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+            $parsedValue = Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+
+            if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {
+                throw new ParseException('A colon cannot be used in an unquoted mapping value.');
+            }
+
+            return $parsedValue;
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);
@@ -710,6 +712,6 @@ class Parser
      */
     private function isStringUnIndentedCollectionItem()
     {
-        return (0 === strpos($this->currentLine, '- '));
+        return 0 === strpos($this->currentLine, '- ');
     }
 }

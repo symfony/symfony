@@ -22,7 +22,7 @@
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
-        "symfony/form": "~2.8,>2.8-BETA1|~3.0,>3.0-BETA1",
+        "symfony/form": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0",

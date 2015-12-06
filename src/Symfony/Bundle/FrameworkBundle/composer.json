@@ -55,7 +55,7 @@
         "symfony/validator": "For using validation",
         "symfony/yaml": "For using the debug:config and lint:yaml commands",
         "doctrine/cache": "For using alternative cache drivers",
-        "symfony/process": "For using the server:run command"
+        "symfony/process": "For using the server:run, server:start, server:stop, and server:status commands"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

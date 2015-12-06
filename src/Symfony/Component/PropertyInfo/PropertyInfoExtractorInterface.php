@@ -20,4 +20,8 @@ namespace Symfony\Component\PropertyInfo;
  */
 interface PropertyInfoExtractorInterface extends PropertyTypeExtractorInterface, PropertyDescriptionExtractorInterface, PropertyAccessExtractorInterface, PropertyListExtractorInterface
 {
+    /**
+     * @param ExtractorInterface $extractor
+     */
+    public function addExtractor(ExtractorInterface $extractor);
 }

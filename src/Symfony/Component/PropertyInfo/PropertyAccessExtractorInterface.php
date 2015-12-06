@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyAccessExtractorInterface
+interface PropertyAccessExtractorInterface extends ExtractorInterface
 {
     /**
      * Is the property readable?

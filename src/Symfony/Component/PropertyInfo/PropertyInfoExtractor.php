@@ -19,37 +19,27 @@ namespace Symfony\Component\PropertyInfo;
 class PropertyInfoExtractor implements PropertyInfoExtractorInterface
 {
     /**
-     * @var PropertyListExtractorInterface[]
+     * @var \SplObjectStorage
      */
-    private $listExtractors;
+    private $extractors;
 
     /**
-     * @var PropertyTypeExtractorInterface[]
+     * @param ExtractorInterface[] $extractors
      */
-    private $typeExtractors;
-
-    /**
-     * @var PropertyDescriptionExtractorInterface[]
-     */
-    private $descriptionExtractors;
-
-    /**
-     * @var PropertyAccessExtractorInterface[]
-     */
-    private $accessExtractors;
-
-    /**
-     * @param PropertyListExtractorInterface[]        $listExtractors
-     * @param PropertyTypeExtractorInterface[]        $typeExtractors
-     * @param PropertyDescriptionExtractorInterface[] $descriptionExtractors
-     * @param PropertyAccessExtractorInterface[]      $accessExtractors
-     */
-    public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array())
+    public function __construct(array $extractors = array())
     {
-        $this->listExtractors = $listExtractors;
-        $this->typeExtractors = $typeExtractors;
-        $this->descriptionExtractors = $descriptionExtractors;
-        $this->accessExtractors = $accessExtractors;
+        $this->extractors = new \SplObjectStorage();
+        foreach ($extractors as $extractor) {
+            $this->addExtractor($extractor);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addExtractor(ExtractorInterface $extractor)
+    {
+        $this->extractors->attach($extractor);
     }
 
     /**
@@ -57,7 +47,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getProperties($class, array $context = array())
     {
-        return $this->extract($this->listExtractors, 'getProperties', array($class, $context));
+        return $this->extract(
+            PropertyListExtractorInterface::class,
+            'getProperties',
+            array($class, $context)
+        );
     }
 
     /**
@@ -65,7 +59,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getShortDescription($class, $property, array $context = array())
     {
-        return $this->extract($this->descriptionExtractors, 'getShortDescription', array($class, $property, $context));
+        return $this->extract(
+            PropertyDescriptionExtractorInterface::class,
+            'getShortDescription',
+            array($class, $property, $context)
+        );
     }
 
     /**
@@ -73,7 +71,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getLongDescription($class, $property, array $context = array())
     {
-        return $this->extract($this->descriptionExtractors, 'getLongDescription', array($class, $property, $context));
+        return $this->extract(
+            PropertyDescriptionExtractorInterface::class,
+            'getLongDescription',
+            array($class, $property, $context)
+        );
     }
 
     /**
@@ -81,7 +83,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getTypes($class, $property, array $context = array())
     {
-        return $this->extract($this->typeExtractors, 'getTypes', array($class, $property, $context));
+        return $this->extract(
+            PropertyTypeExtractorInterface::class,
+            'getTypes',
+            array($class, $property, $context)
+        );
     }
 
     /**
@@ -89,7 +95,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function isReadable($class, $property, array $context = array())
     {
-        return $this->extract($this->accessExtractors, 'isReadable', array($class, $property, $context));
+        return $this->extract(
+            PropertyAccessExtractorInterface::class,
+            'isReadable',
+            array($class, $property, $context)
+        );
     }
 
     /**
@@ -97,24 +107,30 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function isWritable($class, $property, array $context = array())
     {
-        return $this->extract($this->accessExtractors, 'isWritable', array($class, $property, $context));
+        return $this->extract(
+            PropertyAccessExtractorInterface::class,
+            'isWritable',
+            array($class, $property, $context)
+        );
     }
 
     /**
      * Iterates over registered extractors and return the first value found.
      *
-     * @param array  $extractors
+     * @param string $interfaceFilter
      * @param string $method
      * @param array  $arguments
      *
      * @return mixed
      */
-    private function extract(array $extractors, $method, array $arguments)
+    private function extract($interfaceFilter, $method, array $arguments)
     {
-        foreach ($extractors as $extractor) {
-            $value = call_user_func_array(array($extractor, $method), $arguments);
-            if (null !== $value) {
-                return $value;
+        foreach ($this->extractors as $extractor) {
+            if ($extractor instanceof $interfaceFilter) {
+                $value = call_user_func_array(array($extractor, $method), $arguments);
+                if (null !== $value) {
+                    return $value;
+                }
             }
         }
     }

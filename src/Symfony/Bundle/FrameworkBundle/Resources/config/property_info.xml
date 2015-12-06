@@ -7,16 +7,11 @@
     <services>
         <service id="property_info" class="Symfony\Component\PropertyInfo\PropertyInfoExtractor" >
             <argument type="collection" />
-            <argument type="collection" />
-            <argument type="collection" />
-            <argument type="collection" />
         </service>
 
         <!-- Extractor -->
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor" public="false">
-            <tag name="property_info.list_extractor" priority="-1000" />
-            <tag name="property_info.type_extractor" priority="-1000" />
-            <tag name="property_info.access_extractor" priority="-1000" />
+            <tag name="property_info.extractor" priority="-1000" />
         </service>
     </services>
 </container>

@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PropertyDescriptionExtractorInterface
+interface PropertyDescriptionExtractorInterface extends ExtractorInterface
 {
     /**
      * Gets the short description of the property.

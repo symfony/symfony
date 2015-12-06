@@ -81,7 +81,7 @@ class DeprecationErrorHandler
 
                     exit(1);
                 }
-                if ('legacy' !== $group && self::MODE_WEAK !== $mode) {
+                if ('legacy' !== $group && DeprecationErrorHandler::MODE_WEAK !== $mode) {
                     $ref = &$deprecations[$group][$msg]['count'];
                     ++$ref;
                     $ref = &$deprecations[$group][$msg][$class.'::'.$method];
@@ -147,7 +147,7 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if (self::MODE_WEAK !== $mode && self::MODE_WEAK_VERBOSE !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
+                if (DeprecationErrorHandler::MODE_WEAK !== $mode && DeprecationErrorHandler::MODE_WEAK_VERBOSE !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
                     exit(1);
                 }
             });

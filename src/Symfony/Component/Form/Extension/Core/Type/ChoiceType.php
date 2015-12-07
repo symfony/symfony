@@ -325,7 +325,9 @@ class ChoiceType extends AbstractType
             if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
                 @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
 
-                $placeholder = $options['empty_value'];
+                if (null === $placeholder || '' === $placeholder) {
+                    $placeholder = $options['empty_value'];
+                }
             }
 
             if ($options['multiple']) {

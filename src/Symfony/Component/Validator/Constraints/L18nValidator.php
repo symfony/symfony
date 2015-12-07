@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Validator;
 
 /**
  * @author Michael Hindley <mikael.chojnacki@gmail.com>
@@ -38,7 +36,7 @@ class L18nValidator extends ConstraintValidator
     }
 
     /**
-     * @param mixed $value
+     * @param mixed      $value
      * @param Constraint $constraint
      */
     public function validate($value, Constraint $constraint)
@@ -49,7 +47,7 @@ class L18nValidator extends ConstraintValidator
         }
 
         if (!$constraint instanceof L18n) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\L18n');
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\L18n');
         }
 
         if (null === $value) {
@@ -66,12 +64,12 @@ class L18nValidator extends ConstraintValidator
             $validator = $context->getValidator()->inContext($context);
 
             foreach ($value as $key => $element) {
-                $validator->atPath('[' . $key . ']')->validate($element, $constraint->constraints);
+                $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
             }
         } else {
             // 2.4 API
             foreach ($value as $key => $element) {
-                $context->validateValue($element, $constraint->constraints, '[' . $key . ']');
+                $context->validateValue($element, $constraint->constraints, '['.$key.']');
             }
         }
     }

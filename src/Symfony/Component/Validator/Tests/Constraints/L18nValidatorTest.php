@@ -65,7 +65,7 @@ class L18nValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '[' . $key . ']', $value, array($constraint));
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint));
         }
 
         $this->validator->validate($array, new L18n(array('locale' => 'en', 'constraints' => array($constraint))));
@@ -86,7 +86,7 @@ class L18nValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '[' . $key . ']', $value, array($constraint1, $constraint2));
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint1, $constraint2));
         }
 
         $this->validator->validate($array, new L18n(array('locale' => 'en', 'constraints' => $constraints)));

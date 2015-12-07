@@ -1,14 +1,26 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\L18n;
 use Symfony\Component\Validator\Constraints\L18nValidator;
-use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Range;
 
+/**
+ * @author Michael Hindley <mikael.chojnacki@gmail.com>
+ */
 class L18nValidatorTest extends AbstractConstraintValidatorTest
 {
     /**
@@ -28,83 +40,66 @@ class L18nValidatorTest extends AbstractConstraintValidatorTest
         return $validator;
     }
 
-    public function testNoViolationsAreCreated()
+    public function testNullIsValid()
     {
-        $fakeValidator = new DontAddViolationValidator();
+        $this->validator->validate(null,new L18n(array('locale' => 'en','constraints' => array(new Range(array('min' => 4))))));
 
-        $mockConstraint = $this->getMock('Symfony\Component\Validator\Constraint');
-        $mockConstraint->method('validatedBy')->willReturn(
-            get_class($fakeValidator)
-        );
-
-        $validator = $this->createValidator();
-        $validator->initialize($this->context);
-
-        $validator->validate(
-            null,
-            new L18n(
-                array('locale' => 'en', 'value' => $mockConstraint)
-            )
-        );
-
-        $this->assertCount(0, $this->context->getViolations());
+        $this->assertNoViolation();
     }
 
-    public function testNoViolationIsCreatedForDifferentLocale()
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
+    public function testThrowsExceptionIfNotTraversable()
     {
-        $fakeValidator = new AddViolationValidator();
-
-        $mockConstraint = $this->getMock('Symfony\Component\Validator\Constraint');
-        $mockConstraint->method('validatedBy')->willReturn(
-            get_class($fakeValidator)
-        );
-
-        $validator = $this->createValidator();
-        $validator->initialize($this->context);
-
-        $validator->validate(
-            null,
-            new L18n(
-                array('locale' => 'sv', 'value' => $mockConstraint)
-            )
-        );
-
-        $this->assertCount(0, $this->context->getViolations());
+        $this->validator->validate( 'foo.barbar', new L18n(array('locale' => 'en','constraints' => array(new Range(array('min' => 4))))));
     }
 
-    public function testViolationIsCreated()
+    /**
+     * @dataProvider getValidArguments
+     */
+    public function testWalkSingleConstraint($array)
     {
-        $fakeValidator = new AddViolationValidator();
+        $constraint = new Range(array('min' => 4));
 
-        $mockConstraint = $this->getMock('Symfony\Component\Validator\Constraint');
-        $mockConstraint->method('validatedBy')->willReturn(
-            get_class($fakeValidator)
-        );
+        $i = 0;
 
-        $validator = $this->createValidator();
-        $validator->initialize($this->context);
+        foreach ($array as $key => $value) {
+            $this->expectValidateValueAt($i++, '[' . $key . ']', $value, array($constraint));
+        }
 
-        $validator->validate(
-            null,
-            new L18n(
-                array('locale' => 'en', 'value' => $mockConstraint)
-            )
-        );
+        $this->validator->validate($array, new L18n(array('locale' => 'en', 'constraints' => array($constraint))));
 
-        $this->assertCount(1, $this->context->getViolations());
+        $this->assertNoViolation();
     }
 
-}
-
-class AddViolationValidator extends ConstraintValidator
-{
-    public function validate($value, Constraint $constraint)
+    /**
+     * @dataProvider getValidArguments
+     */
+    public function testWalkMultipleConstraints($array)
     {
-        $this->context->addViolation('');
-    }
-}
+        $constraint1 = new Range(array('min' => 4));
+        $constraint2 = new NotNull();
 
-class DontAddViolationValidator extends ConstraintValidator
-{
-    public function validate($value, Constraint $constraint){}
+        $constraints = array($constraint1, $constraint2);
+
+        $i = 0;
+
+        foreach ($array as $key => $value) {
+            $this->expectValidateValueAt($i++, '[' . $key . ']', $value, array($constraint1, $constraint2));
+        }
+
+        $this->validator->validate($array, new L18n(array('locale' => 'en', 'constraints' => $constraints)));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidArguments()
+    {
+        return array(
+            array(array(5, 6, 7)),
+            array(new \ArrayObject(array(5, 6, 7))),
+        );
+    }
+
 }

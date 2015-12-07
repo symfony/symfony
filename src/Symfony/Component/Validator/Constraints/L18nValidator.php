@@ -14,7 +14,10 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Validator;
 
 /**
  * @author Michael Hindley <mikael.chojnacki@gmail.com>
@@ -35,7 +38,7 @@ class L18nValidator extends ConstraintValidator
     }
 
     /**
-     * @param mixed      $value
+     * @param mixed $value
      * @param Constraint $constraint
      */
     public function validate($value, Constraint $constraint)
@@ -44,20 +47,33 @@ class L18nValidator extends ConstraintValidator
         if ($this->requestStack->getCurrentRequest()->getLocale() !== $constraint->getLocale()) {
             return;
         }
-        // Every constraint has a validatedBy method which determines the validator
-        $validatorClass = $constraint->getConstraint()->validatedBy();
 
-        // Expression needs dependencies in it's constructor
-        if ($validatorClass === Expression::class) {
-            throw new InvalidArgumentException(
-                sprintf('%s is not supported by the %s', Expression::class, this::class)
-            );
+        if (!$constraint instanceof L18n) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\L18n');
         }
 
-        // Instantiate the validator class and init it providing the same context
-        $validator = new $validatorClass();
-        $validator->initialize($this->context);
-        $validator->validate($value, $constraint->getConstraint());
-    }
+        if (null === $value) {
+            return;
+        }
 
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array or Traversable');
+        }
+
+        $context = $this->context;
+
+        if ($context instanceof ExecutionContextInterface) {
+            $validator = $context->getValidator()->inContext($context);
+
+            foreach ($value as $key => $element) {
+                $validator->atPath('[' . $key . ']')->validate($element, $constraint->constraints);
+            }
+        } else {
+            // 2.4 API
+            foreach ($value as $key => $element) {
+                $context->validateValue($element, $constraint->constraints, '[' . $key . ']');
+            }
+        }
+    }
 }
+

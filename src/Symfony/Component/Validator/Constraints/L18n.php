@@ -22,10 +22,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class L18n extends Constraint
 {
-    /**
-     * @var Constraint
-     */
-    public $constraint;
+    public $constraints = array();
 
     /**
      * @var string
@@ -42,7 +39,23 @@ class L18n extends Constraint
         }
 
         $this->locale = $options['locale'];
-        $this->constraint = $options['value'];
+        $this->constraints = $options['constraints'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultOption()
+    {
+        return 'constraints';
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequiredOptions()
+    {
+        return array('constraints');
     }
 
     /**
@@ -54,18 +67,19 @@ class L18n extends Constraint
     }
 
     /**
-     * @return Constraint
-     */
-    public function getConstraint()
-    {
-        return $this->constraint;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function validatedBy()
     {
         return 'validator.l18n';
     }
+
+    /**
+     * @return string
+     */
+    protected function getCompositeOption()
+    {
+        return 'constraints';
+    }
+
 }

@@ -84,9 +84,9 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
-        $input->isInteractive() ? $output->title('Symfony Password Encoder Utility') : $output->newLine();
+        $input->isInteractive() ? $io->title('Symfony Password Encoder Utility') : $io->newLine();
 
         $password = $input->getArgument('password');
         $userClass = $input->getArgument('user-class');
@@ -101,12 +101,12 @@ EOF
 
         if (!$password) {
             if (!$input->isInteractive()) {
-                $output->error('The password must not be empty.');
+                $io->error('The password must not be empty.');
 
                 return 1;
             }
             $passwordQuestion = $this->createPasswordQuestion($input, $output);
-            $password = $output->askQuestion($passwordQuestion);
+            $password = $io->askQuestion($passwordQuestion);
         }
 
         $salt = null;
@@ -114,9 +114,9 @@ EOF
         if ($input->isInteractive() && !$emptySalt) {
             $emptySalt = true;
 
-            $output->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
+            $io->note('The command will take care of generating a salt for you. Be aware that some encoders advise to let them generate their own salt. If you\'re using one of those encoders, please answer \'no\' to the question below. '.PHP_EOL.'Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.');
 
-            if ($output->confirm('Confirm salt generation ?')) {
+            if ($io->confirm('Confirm salt generation ?')) {
                 $salt = $this->generateSalt();
                 $emptySalt = false;
             }
@@ -133,15 +133,15 @@ EOF
         if (!$emptySalt) {
             $rows[] = array('Generated salt', $salt);
         }
-        $output->table(array('Key', 'Value'), $rows);
+        $io->table(array('Key', 'Value'), $rows);
 
         if (!$emptySalt) {
-            $output->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
+            $io->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', strlen($salt)));
         } elseif ($bcryptWithoutEmptySalt) {
-            $output->note('Bcrypt encoder used: the encoder generated its own built-in salt.');
+            $io->note('Bcrypt encoder used: the encoder generated its own built-in salt.');
         }
 
-        $output->success('Password encoding succeeded');
+        $io->success('Password encoding succeeded');
     }
 
     /**

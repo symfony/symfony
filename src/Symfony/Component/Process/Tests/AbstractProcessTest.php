@@ -709,26 +709,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckTimeoutOnStartedProcess()
     {
-        $timeout = 0.5;
-        $precision = 100000;
         $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->setTimeout($timeout);
-        $start = microtime(true);
+        $process->setTimeout(0.5);
 
         $process->start();
+        $start = microtime(true);
 
         try {
             while ($process->isRunning()) {
                 $process->checkTimeout();
-                usleep($precision);
+                usleep(100000);
             }
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
         $duration = microtime(true) - $start;
 
-        $this->assertLessThan($timeout + $precision, $duration);
-        $this->assertFalse($process->isSuccessful());
+        $this->assertLessThan(1, $duration);
 
         throw $e;
     }

@@ -158,7 +158,7 @@ EOF
         return array('template' => $template, 'file' => $file, 'valid' => true);
     }
 
-    private function display(InputInterface $input, OutputInterface $output, StyleInterface $io, $files)
+    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, $files)
     {
         switch ($input->getOption('format')) {
             case 'txt':
@@ -170,7 +170,7 @@ EOF
         }
     }
 
-    private function displayTxt(OutputInterface $output, StyleInterface $io, $filesInfo)
+    private function displayTxt(OutputInterface $output, SymfonyStyle $io, $filesInfo)
     {
         $errors = 0;
 

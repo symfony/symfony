@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Mapping;
 
+use Symfony\Component\PropertyInfo\Type;
+
 /**
  * {@inheritdoc}
  *
@@ -35,6 +37,15 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           {@link getGroups()} instead.
      */
     public $groups = array();
+
+    /**
+     * @var Type|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getTypes()} instead.
+     */
+    public $types;
 
     /**
      * Constructs a metadata for the given attribute.
@@ -75,11 +86,29 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
+    public function setTypes(array $types = null)
+    {
+        $this->types = $types;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
             $this->addGroup($group);
         }
+
+        // We don't need to merge types, this is handled by the PropertyInfo component
     }
 
     /**
@@ -89,6 +118,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return array('name', 'groups');
+        return array('name', 'groups', 'types');
     }
 }

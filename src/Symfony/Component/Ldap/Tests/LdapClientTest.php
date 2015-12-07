@@ -14,6 +14,9 @@ namespace Symfony\Component\Ldap\Tests;
 use Symfony\Component\Ldap\LdapClient;
 use Symfony\Polyfill\Php56\Php56 as p;
 
+/**
+ * @requires extension ldap
+ */
 class LdapClientTest extends \PHPUnit_Framework_TestCase
 {
     public function testLdapEscape()

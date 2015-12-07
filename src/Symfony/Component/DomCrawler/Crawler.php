@@ -230,7 +230,7 @@ class Crawler extends \SplObjectStorage
         $dom->validateOnParse = true;
 
         if ('' !== trim($content)) {
-            @$dom->loadXML($content, LIBXML_NONET);
+            @$dom->loadXML($content, LIBXML_NONET | LIBXML_PARSEHUGE);
         }
 
         libxml_use_internal_errors($internalErrors);

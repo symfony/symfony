@@ -230,7 +230,7 @@ class Crawler extends \SplObjectStorage
 
         if ('' !== trim($content)) {
             // remove the default namespace to make XPath expressions simpler
-            @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+            @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET | (defined('LIBXML_PARSEHUGE') ? LIBXML_PARSEHUGE : 0));
         }
 
         libxml_use_internal_errors($internalErrors);

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-11-03T22:55:37Z
+
+Can you add a test case?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-04T21:41:46Z
+
+IMO `$attributesAsString` can just be deleted: https://github.com/symfony/symfony/issues/16445#issuecomment-153875034
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-07T08:34:01Z
+
+IIUC, the `array_unique` can be removed altogether? If that's the case, let's do that.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-11-07T09:47:22Z
+
+It can with the metadata implementation provided in Symfony.
+
++1 for removing the call and adding a mention in the metadata interface that it's the responsibility of the implantation to return an uniquified list of attributes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-28T10:44:57Z
+
+@CornyPhoenix What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by CornyPhoenix at 2015-12-06T23:34:46Z
+
+@fabpot I am sorry for the late response. I removed the `array_unique` statement. Also I added a mention in the `ClassMetadataInterface` that the stored attribute metadata is a set, not a list, containing not more than one object per attribute.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-07T07:02:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-07T08:49:50Z
+
+@dunglas Which version should we merge this PR in?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-07T09:20:14Z
+
+2.7 IMO but not sure. I'll take a look and merge it.

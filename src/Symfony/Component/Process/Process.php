@@ -157,16 +157,7 @@ class Process
 
     public function __destruct()
     {
-        if ($this->isRunning()) {
-            $this->doSignal(15, false);
-            usleep(10000);
-        }
-        if ($this->isRunning()) {
-            usleep(100000);
-            $this->doSignal(9, false);
-        }
-
-        // Don't call ->stop() nor ->close() since we don't want to wait for the subprocess here
+        $this->stop(0);
     }
 
     public function __clone()

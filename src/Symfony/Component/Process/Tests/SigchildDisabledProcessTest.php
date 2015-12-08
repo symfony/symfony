@@ -85,13 +85,9 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
         parent::testProcessWithoutTermSignal();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
-     */
     public function testCheckTimeoutOnStartedProcess()
     {
-        parent::testCheckTimeoutOnStartedProcess();
+        $this->markTestSkipped('Stopping with signal is not supported in sigchild environment');
     }
 
     /**

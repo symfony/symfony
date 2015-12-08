@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Util;
 
 @trigger_error('The '.__NAMESPACE__.'\\StringUtils class is deprecated since version 2.8 and will be removed in 3.0. Use hash_equals() instead.', E_USER_DEPRECATED);
 
-use Symfony\Component\Polyfill\Util\Binary;
+use Symfony\Polyfill\Util\Binary;
 
 /**
  * String utility functions.

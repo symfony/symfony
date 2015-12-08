@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Mapping;
 
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 
 /**
@@ -33,6 +34,8 @@ class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGroups()
     {
         $attributeMetadata = new AttributeMetadata('group');
+        $this->assertEquals(array(), $attributeMetadata->getGroups());
+
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
@@ -40,7 +43,17 @@ class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('a', 'b'), $attributeMetadata->getGroups());
     }
 
-    public function testMerge()
+    public function testTypes()
+    {
+        $attributeMetadata = new AttributeMetadata('type');
+        $this->assertNull($attributeMetadata->getTypes());
+
+        $attributeMetadata->setTypes(array(new Type(Type::BUILTIN_TYPE_STRING)));
+
+        $this->assertEquals(array(new Type(Type::BUILTIN_TYPE_STRING)), $attributeMetadata->getTypes());
+    }
+
+    public function testMergeGroups()
     {
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->addGroup('a');
@@ -60,6 +73,8 @@ class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
         $attributeMetadata = new AttributeMetadata('attribute');
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
+
+        $attributeMetadata->setTypes(array(new Type(Type::BUILTIN_TYPE_INT)));
 
         $serialized = serialize($attributeMetadata);
         $this->assertEquals($attributeMetadata, unserialize($serialized));

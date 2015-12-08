@@ -12,6 +12,11 @@
 namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
@@ -74,5 +79,23 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $metadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
 
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true, true), $metadata);
+    }
+
+    public function testExtractTypes()
+    {
+        $factory = new ClassMetadataFactory(null, null, new PhpDocExtractor(), new ReflectionExtractor());
+
+        $expectedClassMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\TypeDummy');
+        $expectedClassMetadata->getReflectionClass();
+
+        $foo = new AttributeMetadata('foo');
+        $foo->setTypes(array(new Type('string')));
+        $expectedClassMetadata->addAttributeMetadata($foo);
+
+        $bar = new AttributeMetadata('bar');
+        $bar->setTypes(array(new Type('object', false, 'Symfony\Component\Serializer\Tests\Fixtures\TypeDummy')));
+        $expectedClassMetadata->addAttributeMetadata($bar);
+
+        $this->assertEquals($expectedClassMetadata, $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\TypeDummy'));
     }
 }

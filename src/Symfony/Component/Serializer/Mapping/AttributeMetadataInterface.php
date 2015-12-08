@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Mapping;
 
+use Symfony\Component\PropertyInfo\Type;
+
 /**
  * Stores metadata needed for serializing and deserializing attributes.
  *
@@ -40,6 +42,20 @@ interface AttributeMetadataInterface
      * @return string[]
      */
     public function getGroups();
+
+    /**
+     * Sets types of this attribute.
+     *
+     * @param Type[]|null $types
+     */
+    public function setTypes(array $types);
+
+    /**
+     * Gets types of this attribute.
+     *
+     * @return Type[]|null
+     */
+    public function getTypes();
 
     /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.

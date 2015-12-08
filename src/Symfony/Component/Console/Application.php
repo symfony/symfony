@@ -66,6 +66,7 @@ class Application
     private $dispatcher;
     private $terminalDimensions;
     private $defaultCommand;
+    private $singleCommand;
 
     /**
      * Constructor.
@@ -168,7 +169,7 @@ class Application
         if (true === $input->hasParameterOption(array('--help', '-h'), true)) {
             if (!$name) {
                 $name = 'help';
-                $input = new ArrayInput(array('command' => 'help'));
+                $input = new ArrayInput(array('command_name' => $this->defaultCommand));
             } else {
                 $this->wantHelps = true;
             }
@@ -226,6 +227,13 @@ class Application
      */
     public function getDefinition()
     {
+        if ($this->singleCommand) {
+            $inputDefinition = $this->definition;
+            $inputDefinition->setArguments();
+
+            return $inputDefinition;
+        }
+
         return $this->definition;
     }
 
@@ -859,7 +867,7 @@ class Application
      */
     protected function getCommandName(InputInterface $input)
     {
-        return $input->getFirstArgument();
+        return $this->singleCommand ? $this->defaultCommand : $input->getFirstArgument();
     }
 
     /**
@@ -1039,11 +1047,21 @@ class Application
     /**
      * Sets the default Command name.
      *
-     * @param string $commandName The Command name
+     * @param string $commandName     The Command name
+     * @param bool   $isSingleCommand Set to true if there is only one command in this application
      */
-    public function setDefaultCommand($commandName)
+    public function setDefaultCommand($commandName, $isSingleCommand = false)
     {
         $this->defaultCommand = $commandName;
+
+        if ($isSingleCommand) {
+            // Ensure the command exist
+            $this->find($commandName);
+
+            $this->singleCommand = true;
+        }
+
+        return $this;
     }
 
     private function stringWidth($string)

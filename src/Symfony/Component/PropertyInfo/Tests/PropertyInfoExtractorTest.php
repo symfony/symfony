@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
@@ -68,5 +69,14 @@ class PropertyInfoExtractorTest extends \PHPUnit_Framework_TestCase
     public function testGetProperties()
     {
         $this->assertEquals(array('a', 'b'), $this->propertyInfo->getProperties('Foo'));
+    }
+
+    public function testCache()
+    {
+        $extractors = array(new NullExtractor(), new DummyExtractor());
+        $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, new ArrayCache());
+
+        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
+        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
     }
 }

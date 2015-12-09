@@ -65,13 +65,16 @@ class UnusedTagsPass implements CompilerPassInterface
 
             // check for typos
             $candidates = array();
-            foreach ($tags as $definedTag) {
-                if ($definedTag === $tag) {
-                    continue;
-                }
 
-                if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= strlen($tag) / 3) {
-                    $candidates[] = $definedTag;
+            if (null !== $tag && '' !== $tag) {
+                foreach ($tags as $definedTag) {
+                    if ($definedTag === $tag) {
+                        continue;
+                    }
+
+                    if (false !== strpos($definedTag, $tag) || levenshtein($tag, $definedTag) <= strlen($tag) / 3) {
+                        $candidates[] = $definedTag;
+                    }
                 }
             }
 

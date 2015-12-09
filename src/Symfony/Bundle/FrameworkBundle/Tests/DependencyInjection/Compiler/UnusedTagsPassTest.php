@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class UnusedTagsPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,5 +49,24 @@ class UnusedTagsPassTest extends \PHPUnit_Framework_TestCase
             )));
 
         $pass->process($container);
+    }
+
+    public function testEmptyTagNameIsIgnored()
+    {
+        $pass = new UnusedTagsPass();
+
+        $container = new ContainerBuilder();
+        $definition = $container->register('foo');
+        $definition->addTag('', array('bar' => 'baz'));
+        $definition->addTag('foo');
+
+        $pass->process($container);
+
+        $this->assertMessageIsLogged($container, 'Tag "foo" was defined on service(s) "foo", but was never used.');
+    }
+
+    private function assertMessageIsLogged(ContainerBuilder $container, $message)
+    {
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass: '.$message, $container->getCompiler()->getLog());
     }
 }

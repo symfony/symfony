@@ -26,7 +26,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->errorReporting = error_reporting(E_ALL | E_STRICT);
+        $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
         spl_autoload_register(array($this->loader, 'loadClass'), true, true);
         DebugClassLoader::enable();

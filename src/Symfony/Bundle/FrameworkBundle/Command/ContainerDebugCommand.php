@@ -125,8 +125,8 @@ EOF
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
-        $options['output'] = $io;
-        $helper->describe($io, $object, $options);
+        $options['output'] = $output;
+        $helper->describe($output, $object, $options);
 
         if (!$input->getArgument('name') && $input->isInteractive()) {
             $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');

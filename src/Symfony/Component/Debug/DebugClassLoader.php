@@ -147,7 +147,7 @@ class DebugClassLoader
         try {
             if ($this->isFinder) {
                 if ($file = $this->classLoader[0]->findFile($class)) {
-                    require $file;
+                    require_once $file;
                 }
             } else {
                 call_user_func($this->classLoader, $class);

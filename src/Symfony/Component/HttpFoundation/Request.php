@@ -724,7 +724,7 @@ class Request
      */
     public function get($key, $default = null, $deep = false)
     {
-        if (true === $deep) {
+        if ($deep) {
             @trigger_error('Using paths to find deeper items in '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Filter the returned value in your own code instead.', E_USER_DEPRECATED);
         }
 

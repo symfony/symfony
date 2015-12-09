@@ -55,15 +55,15 @@ class SortableIterator implements \IteratorAggregate
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getATime() - $b->getATime());
+                return $a->getATime() - $b->getATime();
             };
         } elseif (self::SORT_BY_CHANGED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getCTime() - $b->getCTime());
+                return $a->getCTime() - $b->getCTime();
             };
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getMTime() - $b->getMTime());
+                return $a->getMTime() - $b->getMTime();
             };
         } elseif (is_callable($sort)) {
             $this->sort = $sort;

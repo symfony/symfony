@@ -7,6 +7,25 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.35 (2015-11-23)
+
+ * security #16631 CVE-2015-8124: Session Fixation in the "Remember Me" Login Feature (xabbuh)
+ * security #16630 CVE-2015-8125: Potential Remote Timing Attack Vulnerability in Security Remember-Me Service (xabbuh)
+ * bug #16588 Sent out a status text for unknown HTTP headers. (dawehner)
+ * bug #16295 [DependencyInjection] Unescape parameters for all types of injection (Nicofuma)
+ * bug #16574 [Process] Fix PhpProcess with phpdbg runtime (nicolas-grekas)
+ * bug #16352 Fix the server variables in the router_*.php files (leofeyer)
+ * bug #16537 [Validator] Allow an empty path with a non empty fragment or a query (jakzal)
+ * bug #16528 [Translation] Add support for Armenian pluralization. (marcosdsanchez)
+ * bug #16510 [Process] fix Proccess run with pts enabled (ewgRa)
+ * bug #16292 fix race condition at mkdir (#16258) (ewgRa)
+ * bug #16462 [PropertyAccess] Fix dynamic property accessing. (dunglas)
+ * bug #16294 [PropertyAccess] Major performance improvement (dunglas)
+ * bug #16331 fixed Twig deprecation notices (fabpot)
+ * bug #16306 [DoctrineBridge] Fix issue which prevent the profiler to explain a query  (Baachi)
+ * bug #16359 Use mb_detect_encoding with $strict = true (nicolas-grekas)
+ * bug #16144 [Security] don't allow to install the split Security packages (xabbuh)
+
 * 2.3.34 (2015-10-27)
 
  * bug #16288 [Process] Inherit env vars by default in PhpProcess (nicolas-grekas)

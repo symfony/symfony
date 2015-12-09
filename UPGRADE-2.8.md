@@ -1,6 +1,20 @@
 ﻿UPGRADE FROM 2.7 to 2.8
 =======================
 
+All components
+--------------
+
+* Symfony now requires the iconv extension to be present, which is the case by
+  default in most environments. However, if you're not able to ensure this
+  extension to be installed in your target environment, you can add Symfony's
+  iconv polyfill to your project's composer.json file.
+
+  ```json
+  "require": {
+      "symfony/polyfill-iconv": "~1.0"
+  }
+  ```
+
 Form
 ----
 
@@ -213,6 +227,14 @@ Form
        }
    }
    ```
+   
+ * The option "options" of the CollectionType has been renamed to "entry_options".
+   The usage of the option "options" is deprecated and will be removed in Symfony 3.0.
+
+ * The option "type" of the CollectionType has been renamed to "entry_type".
+   The usage of the option "type" is deprecated and will be removed in Symfony 3.0.
+   As a value for the option you should provide the fully-qualified class name (FQCN) 
+   now as well.
 
  * Passing type instances to `Form::add()`, `FormBuilder::add()` and the
    `FormFactory::create*()` methods is deprecated and will not be supported
@@ -251,6 +273,12 @@ Form
        <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\TextType" />
    </service>
    ```
+
+ * The `TimezoneType::getTimezones()` method was deprecated and will be removed
+   in Symfony 3.0. You should not use this method.
+
+ * The class `ArrayKeyChoiceList` was deprecated and will be removed in Symfony
+   3.0. Use `ArrayChoiceList` instead.
 
 Translator
 ----------
@@ -442,38 +470,24 @@ FrameworkBundle
 Security
 --------
 
- * The AbstractToken::isGranted() method was deprecated. Instead,
-   override the voteOnAttribute() method. This method has one small
-   difference: it's passed the TokenInterface instead of the user:
+ * The `object` variable passed to expressions evaluated by the `ExpressionVoter`
+   is deprecated. Instead use the new `subject` variable.
 
-   Before:
+ * The `AbstractVoter` class was deprecated. Instead, extend the `Voter` class and
+   move your voting logic in the `supports($attribute, $subject)` and
+   `voteOnAttribute($attribute, $object, TokenInterface $token)` methods.
 
-   ```php
-   class MyCustomVoter extends AbstractVoter
-   {
-       // ...
+ * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
+   deprecated and will be removed from the interface in 3.0.
 
-       protected function isGranted($attribute, $object, $user = null)
-       {
-           // ...
-       }
-   }
-   ```
+ * The `intention` option is deprecated for all the authentication listeners,
+   and will be removed in 3.0. Use the `csrf_token_id` option instead.
 
-   After:
+SecurityBundle
+--------------
 
-   ```php
-   class MyCustomVoter extends AbstractVoter
-   {
-       // ...
-
-       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
-       {
-           $user = $token->getUser();
-           // ...
-       }
-   }
-   ```
+ * The `intention` firewall listener setting is deprecated, and will be removed in 3.0.
+   Use the `csrf_token_id` option instead.
 
 Config
 ------
@@ -505,3 +519,23 @@ Config
    Additionally, if you have implemented cache validation strategies *using* `isFresh()`
    yourself, you should have a look at the new cache validation system based on
    `ResourceChecker`s.
+
+Yaml
+----
+
+ * Deprecated usage of a colon in an unquoted mapping value
+ * Deprecated usage of `@`, `` ` ``, `|`, and `>` at the beginning of an unquoted string
+ * When surrounding strings with double-quotes, you must now escape `\` characters. Not
+   escaping those characters (when surrounded by double-quotes) is deprecated.
+
+   Before:
+
+   ```yml
+   class: "Foo\Var"
+   ```
+
+   After:
+
+   ```yml
+   class: "Foo\\Var"
+   ```

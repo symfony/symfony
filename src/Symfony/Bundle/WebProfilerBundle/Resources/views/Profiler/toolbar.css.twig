@@ -1,12 +1,22 @@
 .sf-minitoolbar {
     background-color: #222;
+    border-top-left-radius: 4px;
     bottom: 0;
     display: none;
-    height: 36px;
-    padding: 5px 6px 0;
+    height: 30px;
+    padding: 6px 6px 0;
     position: fixed;
     right: 0;
     z-index: 99999;
+}
+
+.sf-minitoolbar a {
+    display: block;
+}
+.sf-minitoolbar svg,
+.sf-minitoolbar img {
+    max-height: 24px;
+    max-width: 24px;
 }
 
 .sf-toolbarreset * {
@@ -36,7 +46,8 @@
 }
 .sf-toolbarreset svg,
 .sf-toolbarreset img {
-    max-height: 20px;
+    max-height: 24px;
+    max-width: 24px;
 }
 
 .sf-toolbarreset .hide-button {
@@ -348,6 +359,8 @@
 /* Override the setting when the toolbar is on the top */
 {% if position == 'top' %}
     .sf-minitoolbar {
+        border-bottom-left-radius: 4px;
+        border-top-left-radius: 0;
         bottom: auto;
         right: 0;
         top: 0;

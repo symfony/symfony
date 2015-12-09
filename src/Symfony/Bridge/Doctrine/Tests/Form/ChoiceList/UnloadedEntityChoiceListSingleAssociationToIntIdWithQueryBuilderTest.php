@@ -14,6 +14,10 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 
+if (!class_exists('Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest')) {
+    return;
+}
+
 /**
  * @author Premi Giorgio <giosh94mhz@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>

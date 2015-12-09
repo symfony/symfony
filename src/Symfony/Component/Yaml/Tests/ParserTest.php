@@ -804,9 +804,19 @@ EOF;
         $this->parser->parse($yaml);
 
         $this->assertCount(1, $deprecations);
-        $this->assertContains('Using a colon in an unquoted mapping value in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $deprecations[0]);
+        $this->assertContains('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $deprecations[0]);
 
         restore_error_handler();
+    }
+
+    public function testColonInMappingValueExceptionNotTriggeredByColonInComment()
+    {
+        $yaml = <<<EOT
+foo:
+    bar: foobar # Note: a comment after a colon
+EOT;
+
+        $this->assertSame(array('foo' => array('bar' => 'foobar')), $this->parser->parse($yaml));
     }
 }
 

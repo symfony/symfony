@@ -340,7 +340,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('json', array('application/json', 'application/x-json')),
             array('xml', array('text/xml', 'application/xml', 'application/x-xml')),
             array('rdf', array('application/rdf+xml')),
-            array('atom',array('application/atom+xml')),
+            array('atom', array('application/atom+xml')),
         );
     }
 
@@ -590,7 +590,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $server['PHP_AUTH_USER'] = 'fabien';
+        $server = array('PHP_AUTH_USER' => 'fabien');
         $request->initialize(array(), array(), array(), array(), array(), $server);
         $this->assertEquals('fabien', $request->getUserInfo());
 

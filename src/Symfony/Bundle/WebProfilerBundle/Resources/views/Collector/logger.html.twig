@@ -162,13 +162,14 @@
         {% endif %}
 
         {% if stack %}
-            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show strack trace</button>
+            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
         {% endif %}
 
         {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
                 <ul class="sf-call-stack" id="{{ id }}" class="hidden">
             {% endif %}
+
             {% if call.class is defined %}
                 {% set from = call.class|abbr_class ~ '::' ~ call.function|abbr_method() %}
             {% elseif call.function is defined %}
@@ -179,7 +180,14 @@
                 {% set from = '-' %}
             {% endif %}
 
-            <li><span class="text-small">Called from</span> {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
+            {% set file_name = (call.file is defined and call.line is defined) ? call.file|replace({'\\': '/'})|split('/')|last %}
+
+            <li>
+                {{ from|raw }}
+                {% if file_name %}
+                    <span class="text-small">(called from {{ call.file|format_file(call.line, file_name)|raw }})</span>
+                {% endif %}
+            </li>
 
             {% if index == stack|length - 1 %}
                 </ul>

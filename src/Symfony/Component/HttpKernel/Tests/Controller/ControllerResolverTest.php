@@ -224,7 +224,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    protected function controllerMethod3($foo, $bar = null, $foobar)
+    protected function controllerMethod3($foo, $bar, $foobar)
     {
     }
 

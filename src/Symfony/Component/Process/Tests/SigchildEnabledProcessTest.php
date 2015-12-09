@@ -112,6 +112,10 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
         $this->markTestSkipped('Signal is not supported in sigchild environment');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
+     */
     public function testStartAfterATimeout()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {

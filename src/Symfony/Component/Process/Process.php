@@ -169,8 +169,16 @@ class Process
 
     public function __destruct()
     {
-        // stop() will check if we have a process running.
-        $this->stop();
+        if ($this->isRunning()) {
+            $this->doSignal(15, false);
+            usleep(10000);
+        }
+        if ($this->isRunning()) {
+            usleep(100000);
+            $this->doSignal(9, false);
+        }
+
+        // Don't call ->stop() nor ->close() since we don't want to wait for the subprocess here
     }
 
     public function __clone()
@@ -280,7 +288,19 @@ class Process
             }
         }
 
+        $ptsWorkaround = null;
+
+        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // Workaround for the bug, when PTS functionality is enabled.
+            // @see : https://bugs.php.net/69442
+            $ptsWorkaround = fopen(__FILE__, 'r');
+        }
+
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
+
+        if ($ptsWorkaround) {
+            fclose($ptsWorkaround);
+        }
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -763,22 +783,14 @@ class Process
      * Stops the process.
      *
      * @param int|float $timeout The timeout in seconds
-     * @param int       $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
+     * @param int       $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL (9)
      *
      * @return int The exit-code of the process
-     *
-     * @throws RuntimeException if the process got signaled
      */
     public function stop($timeout = 10, $signal = null)
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
-            if ('\\' === DIRECTORY_SEPARATOR && !$this->isSigchildEnabled()) {
-                exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
-                if ($exitCode > 0) {
-                    throw new RuntimeException('Unable to kill the process');
-                }
-            }
             // given `SIGTERM` may not be defined and that `proc_terminate` uses the constant value and not the constant itself, we use the same here
             $this->doSignal(15, false);
             do {
@@ -786,13 +798,9 @@ class Process
             } while ($this->isRunning() && microtime(true) < $timeoutMicro);
 
             if ($this->isRunning() && !$this->isSigchildEnabled()) {
-                if (null !== $signal || defined('SIGKILL')) {
-                    // avoid exception here :
-                    // process is supposed to be running, but it might have stop
-                    // just after this line.
-                    // in any case, let's silently discard the error, we can not do anything
-                    $this->doSignal($signal ?: SIGKILL, false);
-                }
+                // Avoid exception here: process is supposed to be running, but it might have stopped just
+                // after this line. In any case, let's silently discard the error, we cannot do anything.
+                $this->doSignal($signal ?: 9, false);
             }
         }
 
@@ -1409,6 +1417,11 @@ class Process
             $this->exitcode = 128 + $this->processInformation['termsig'];
         }
 
+        // Free memory from self-reference callback created by buildCallback
+        // Doing so in other contexts like __destruct or by garbage collector is ineffective
+        // Now pipes are closed, so the callback is no longer necessary
+        $this->callback = null;
+
         return $this->exitcode;
     }
 
@@ -1461,7 +1474,18 @@ class Process
             return false;
         }
 
-        if (true !== @proc_terminate($this->process, $signal)) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
+            if ($exitCode && $this->isRunning()) {
+                if ($throwException) {
+                    throw new RuntimeException(sprintf('Unable to kill the process (%s).', implode(' ', $output)));
+                }
+
+                return false;
+            }
+        }
+
+        if (true !== @proc_terminate($this->process, $signal) && '\\' !== DIRECTORY_SEPARATOR) {
             if ($throwException) {
                 throw new RuntimeException(sprintf('Error while sending signal `%s`.', $signal));
             }

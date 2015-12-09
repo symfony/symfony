@@ -62,34 +62,29 @@ class FormFactory implements FormFactoryInterface
     public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
     {
         $name = null;
-        $typeName = null;
 
         if ($type instanceof ResolvedFormTypeInterface) {
-            if (method_exists($type, 'getBlockPrefix')) {
-                // As of Symfony 3.0, the block prefix of the type is used as
-                // default name
-                $name = $type->getBlockPrefix();
-            } else {
-                // BC
-                $typeName = $type->getName();
-            }
+            $typeObject = $type;
         } elseif ($type instanceof FormTypeInterface) {
-            // BC
-            $typeName = $type->getName();
+            $typeObject = $type;
         } elseif (is_string($type)) {
-            // BC
-            $typeName = $type;
+            $typeObject = $this->registry->getType($type);
+            $name = $type;
         } else {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
-        if (null === $name) {
-            if (false === strpos($typeName, '\\')) {
-                // No FQCN - leave unchanged for BC
-                $name = $typeName;
-            } else {
+        if (method_exists($typeObject, 'getBlockPrefix')) {
+            // As of Symfony 3.0, the block prefix of the type is used as default name
+            $name = $typeObject->getBlockPrefix();
+        } else {
+            // BC when there is no block prefix
+            if (null === $name) {
+                $name = $typeObject->getName();
+            }
+            if (false !== strpos($name, '\\')) {
                 // FQCN
-                $name = StringUtil::fqcnToBlockPrefix($typeName);
+                $name = StringUtil::fqcnToBlockPrefix($name);
             }
         }
 
@@ -106,12 +101,12 @@ class FormFactory implements FormFactoryInterface
         }
 
         if ($type instanceof FormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead (%s).', get_class($type)), E_USER_DEPRECATED);
             $type = $this->resolveType($type);
         } elseif (is_string($type)) {
             $type = $this->registry->getType($type);
         } elseif ($type instanceof ResolvedFormTypeInterface) {
-            @trigger_error('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing type instances to FormBuilder::add(), Form::add() or the FormFactory is deprecated since version 2.8 and will not be supported in 3.0. Use the fully-qualified type class name instead (%s).', get_class($type->getInnerType())), E_USER_DEPRECATED);
         } else {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }

@@ -1,10 +1,14 @@
 Ldap Component
-=============
+==============
 
 A Ldap client for PHP on top of PHP's ldap extension.
 
-This component also provides a stub for the missing
-`ldap_escape` function in PHP versions lower than 5.6.
+Disclaimer
+----------
+
+This component is currently marked as internal, as it
+still needs some work. Breaking changes will be introduced
+in the next minor version of Symfony.
 
 Documentation
 -------------

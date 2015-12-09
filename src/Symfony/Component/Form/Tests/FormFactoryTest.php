@@ -302,13 +302,55 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->create(new \stdClass());
     }
 
+    public function testCreateUsesBlockPrefixIfTypeGivenAsString()
+    {
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedOptions = array('a' => '2', 'b' => '3');
+
+        // the interface does not have the method, so use the real class
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $resolvedType->expects($this->any())
+            ->method('getBlockPrefix')
+            ->willReturn('TYPE_PREFIX');
+
+        $this->registry->expects($this->any())
+            ->method('getType')
+            ->with('TYPE')
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'TYPE_PREFIX', $options)
+            ->will($this->returnValue($this->builder));
+
+        $this->builder->expects($this->any())
+            ->method('getOptions')
+            ->will($this->returnValue($resolvedOptions));
+
+        $resolvedType->expects($this->once())
+            ->method('buildForm')
+            ->with($this->builder, $resolvedOptions);
+
+        $this->builder->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue('FORM'));
+
+        $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCreateUsesTypeNameIfTypeGivenAsString()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('TYPE')
             ->will($this->returnValue($resolvedType));
@@ -333,13 +375,16 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateStripsNamespaceOffTypeName()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('Vendor\Name\Space\UserForm')
             ->will($this->returnValue($resolvedType));
@@ -364,13 +409,16 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\UserForm', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCreateStripsNamespaceOffTypeNameAccessByFQCN()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('userform')
             ->will($this->returnValue($resolvedType));
@@ -395,13 +443,16 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('userform', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateStripsTypeSuffixOffTypeName()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('Vendor\Name\Space\UserType')
             ->will($this->returnValue($resolvedType));
@@ -426,13 +477,16 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\UserType', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateDoesNotStripTypeSuffixIfResultEmpty()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('Vendor\Name\Space\Type')
             ->will($this->returnValue($resolvedType));
@@ -457,13 +511,16 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->create('Vendor\Name\Space\Type', null, $options));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateConvertsTypeToUnderscoreSyntax()
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects($this->any())
             ->method('getType')
             ->with('Vendor\Name\Space\MyProfileHTMLType')
             ->will($this->returnValue($resolvedType));

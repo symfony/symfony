@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -60,15 +59,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.8.0-DEV';
-    const VERSION_ID = 20800;
+    const VERSION = '2.8.1-DEV';
+    const VERSION_ID = 20801;
     const MAJOR_VERSION = 2;
     const MINOR_VERSION = 8;
-    const RELEASE_VERSION = 0;
+    const RELEASE_VERSION = 1;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '05/2018';
-    const END_OF_LIFE = '05/2019';
+    const END_OF_MAINTENANCE = '11/2018';
+    const END_OF_LIFE = '11/2019';
 
     /**
      * Constructor.
@@ -169,10 +168,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         foreach ($this->getBundles() as $bundle) {
             $bundle->shutdown();
             $bundle->setContainer(null);
-        }
-
-        if ($this->container instanceof ResettableContainerInterface) {
-            $this->container->reset();
         }
 
         $this->container = null;

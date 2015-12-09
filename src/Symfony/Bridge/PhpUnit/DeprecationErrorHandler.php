@@ -18,6 +18,9 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DeprecationErrorHandler
 {
+    const MODE_WEAK = 'weak';
+    const MODE_WEAK_VERBOSE = 'weak-verbose';
+
     private static $isRegistered = false;
 
     public static function register($mode = false)
@@ -47,17 +50,38 @@ class DeprecationErrorHandler
                 // No-op
             }
 
-            if (0 !== error_reporting()) {
-                $group = 'unsilenced';
-                $ref = &$deprecations[$group][$msg]['count'];
-                ++$ref;
-            } elseif (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
+            if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
                 $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
-                $group = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true) ? 'legacy' : 'remaining';
+                if (0 !== error_reporting()) {
+                    $group = 'unsilenced';
+                } elseif (0 === strpos($method, 'testLegacy')
+                    || 0 === strpos($method, 'provideLegacy')
+                    || 0 === strpos($method, 'getLegacy')
+                    || strpos($class, '\Legacy')
+                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                ) {
+                    $group = 'legacy';
+                } else {
+                    $group = 'remaining';
+                }
 
-                if ('legacy' !== $group && 'weak' !== $mode) {
+                if (isset($mode[0]) && '/' === $mode[0] && preg_match($mode, $msg)) {
+                    $e = new \Exception($msg);
+                    $r = new \ReflectionProperty($e, 'trace');
+                    $r->setAccessible(true);
+                    $r->setValue($e, array_slice($trace, 1, $i));
+
+                    echo "\n".ucfirst($group).' deprecation triggered by '.$class.'::'.$method.':';
+                    echo "\n".$msg;
+                    echo "\nStack trace:";
+                    echo "\n".str_replace(' '.getcwd().DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
+                    echo "\n";
+
+                    exit(1);
+                }
+                if ('legacy' !== $group && DeprecationErrorHandler::MODE_WEAK !== $mode) {
                     $ref = &$deprecations[$group][$msg]['count'];
                     ++$ref;
                     $ref = &$deprecations[$group][$msg][$class.'::'.$method];
@@ -78,7 +102,7 @@ class DeprecationErrorHandler
                 restore_error_handler();
                 self::register($mode);
             }
-        } else {
+        } elseif (!isset($mode[0]) || '/' !== $mode[0]) {
             self::$isRegistered = true;
             if (self::hasColorSupport()) {
                 $colorize = function ($str, $red) {
@@ -123,7 +147,7 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if ('weak' !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
+                if (DeprecationErrorHandler::MODE_WEAK !== $mode && DeprecationErrorHandler::MODE_WEAK_VERBOSE !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
                     exit(1);
                 }
             });

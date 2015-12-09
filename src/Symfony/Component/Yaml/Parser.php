@@ -347,7 +347,7 @@ class Parser
         if (null === $indentation) {
             $newIndent = $this->getCurrentLineIndentation();
 
-            $unindentedEmbedBlock = $this->isStringUnIndentedCollectionItem($this->currentLine);
+            $unindentedEmbedBlock = $this->isStringUnIndentedCollectionItem();
 
             if (!$this->isCurrentLineEmpty() && 0 === $newIndent && !$unindentedEmbedBlock) {
                 throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
@@ -373,7 +373,7 @@ class Parser
             return;
         }
 
-        $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
+        $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
 
         // Comments must not be removed inside a block scalar
         $removeCommentsPattern = '~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~';
@@ -386,7 +386,7 @@ class Parser
                 $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
             }
 
-            if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine) && $newIndent === $indent) {
+            if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
                 break;
             }
@@ -473,15 +473,17 @@ class Parser
             return $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
         }
 
-        if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($value, ': ')) {
-            @trigger_error(sprintf('Using a colon in an unquoted mapping value in line %d is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
-
-            // to be thrown in 3.0
-            // throw new ParseException('A colon cannot be used in an unquoted mapping value.');
-        }
-
         try {
-            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+            $parsedValue = Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+
+            if ('mapping' === $context && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {
+                @trigger_error(sprintf('Using a colon in the unquoted mapping value "%s" in line %d is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', $value, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+
+                // to be thrown in 3.0
+                // throw new ParseException('A colon cannot be used in an unquoted mapping value.');
+            }
+
+            return $parsedValue;
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);
@@ -698,7 +700,7 @@ class Parser
         if (
             $this->getCurrentLineIndentation() == $currentIndentation
             &&
-            $this->isStringUnIndentedCollectionItem($this->currentLine)
+            $this->isStringUnIndentedCollectionItem()
         ) {
             $ret = true;
         }
@@ -715,6 +717,6 @@ class Parser
      */
     private function isStringUnIndentedCollectionItem()
     {
-        return (0 === strpos($this->currentLine, '- '));
+        return 0 === strpos($this->currentLine, '- ');
     }
 }

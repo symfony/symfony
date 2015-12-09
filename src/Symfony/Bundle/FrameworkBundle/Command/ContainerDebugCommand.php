@@ -115,7 +115,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
-            $name = $this->findProperServiceName($input, $output, $object, $name);
+            $name = $this->findProperServiceName($input, $io, $object, $name);
             $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();

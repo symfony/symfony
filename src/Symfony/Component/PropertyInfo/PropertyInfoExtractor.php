@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo;
 
-use Doctrine\Common\Cache\Cache;
-
 /**
  * Default {@see PropertyInfoExtractorInterface} implementation.
  *
@@ -41,29 +39,17 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     private $accessExtractors;
 
     /**
-     * @var Cache
-     */
-    private $cache;
-
-    /**
-     * @var array
-     */
-    private $arrayCache = array();
-
-    /**
      * @param PropertyListExtractorInterface[]        $listExtractors
      * @param PropertyTypeExtractorInterface[]        $typeExtractors
      * @param PropertyDescriptionExtractorInterface[] $descriptionExtractors
      * @param PropertyAccessExtractorInterface[]      $accessExtractors
-     * @param Cache|null                              $cache
      */
-    public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array(), Cache $cache = null)
+    public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array())
     {
         $this->listExtractors = $listExtractors;
         $this->typeExtractors = $typeExtractors;
         $this->descriptionExtractors = $descriptionExtractors;
         $this->accessExtractors = $accessExtractors;
-        $this->cache = $cache;
     }
 
     /**
@@ -125,27 +111,11 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     private function extract(array $extractors, $method, array $arguments)
     {
-        $key = $method.serialize($arguments);
-
-        if (isset($this->arrayCache[$key])) {
-            return $this->arrayCache[$key];
-        }
-
-        if ($this->cache && $value = $this->cache->fetch($key)) {
-            return $this->arrayCache[$key] = $value;
-        }
-
         foreach ($extractors as $extractor) {
             $value = call_user_func_array(array($extractor, $method), $arguments);
             if (null !== $value) {
-                break;
+                return $value;
             }
         }
-
-        if ($this->cache) {
-            $this->cache->save($key, $value);
-        }
-
-        return $this->arrayCache[$key] = $value;
     }
 }

@@ -118,7 +118,7 @@ EOF
         $io->success(sprintf('Server running on http://%s', $address));
         $io->comment('Quit the server with CONTROL-C.');
 
-        if (null === $builder = $this->createPhpProcessBuilder($output, $address, $input->getOption('router'), $env)) {
+        if (null === $builder = $this->createPhpProcessBuilder($io, $address, $input->getOption('router'), $env)) {
             return 1;
         }
 
@@ -126,7 +126,7 @@ EOF
         $builder->setTimeout(null);
         $process = $builder->getProcess();
 
-        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+        if (OutputInterface::VERBOSITY_VERBOSE > $io->getVerbosity()) {
             $process->disableOutput();
         }
 

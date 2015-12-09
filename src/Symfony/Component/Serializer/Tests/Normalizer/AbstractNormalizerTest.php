@@ -26,8 +26,8 @@ class AbstractNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $loader = $this->getMock('Symfony\Component\Serializer\Mapping\Loader\LoaderChain', [], [[]]);
-        $this->classMetadata = $this->getMock('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory', [], [$loader]);
+        $loader = $this->getMock('Symfony\Component\Serializer\Mapping\Loader\LoaderChain', array(), array(array()));
+        $this->classMetadata = $this->getMock('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory', array(), array($loader));
         $this->normalizer = new AbstractNormalizerDummy($this->classMetadata);
     }
 
@@ -53,11 +53,11 @@ class AbstractNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
 
-        $result = $this->normalizer->getAllowedAttributes('c', ['groups' => ['test']], true);
-        $this->assertEquals(['a2', 'a4'], $result);
+        $result = $this->normalizer->getAllowedAttributes('c', array('groups' => array('test')), true);
+        $this->assertEquals(array('a2', 'a4'), $result);
 
-        $result = $this->normalizer->getAllowedAttributes('c', ['groups' => ['other']], true);
-        $this->assertEquals(['a3', 'a4'], $result);
+        $result = $this->normalizer->getAllowedAttributes('c', array('groups' => array('other')), true);
+        $this->assertEquals(array('a3', 'a4'), $result);
     }
 
     public function testGetAllowedAttributesAsObjects()
@@ -82,10 +82,10 @@ class AbstractNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
 
-        $result = $this->normalizer->getAllowedAttributes('c', ['groups' => ['test']], false);
-        $this->assertEquals([$a2, $a4], $result);
+        $result = $this->normalizer->getAllowedAttributes('c', array('groups' => array('test')), false);
+        $this->assertEquals(array($a2, $a4), $result);
 
-        $result = $this->normalizer->getAllowedAttributes('c', ['groups' => ['other']], false);
-        $this->assertEquals([$a3, $a4], $result);
+        $result = $this->normalizer->getAllowedAttributes('c', array('groups' => array('other')), false);
+        $this->assertEquals(array($a3, $a4), $result);
     }
 }

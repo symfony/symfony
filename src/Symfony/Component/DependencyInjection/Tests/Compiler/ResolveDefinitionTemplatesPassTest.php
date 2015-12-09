@@ -139,6 +139,25 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($def->getDecoratedService());
     }
 
+    public function testProcessDoesNotDropShared()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+        ;
+
+        $container
+            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setShared(false)
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertFalse($def->isShared());
+    }
+
     public function testProcessHandlesMultipleInheritance()
     {
         $container = new ContainerBuilder();

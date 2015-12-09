@@ -115,7 +115,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
-            $name = $this->findProperServiceName($input, $output, $object, $name);
+            $name = $this->findProperServiceName($input, $io, $object, $name);
             $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();
@@ -125,8 +125,8 @@ EOF
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
-        $options['output'] = $output;
-        $helper->describe($output, $object, $options);
+        $options['output'] = $io;
+        $helper->describe($io, $object, $options);
 
         if (!$input->getArgument('name') && $input->isInteractive()) {
             $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');

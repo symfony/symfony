@@ -126,7 +126,7 @@ EOF
         $builder->setTimeout(null);
         $process = $builder->getProcess();
 
-        if (OutputInterface::VERBOSITY_VERBOSE > $io->getVerbosity()) {
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
             $process->disableOutput();
         }
 

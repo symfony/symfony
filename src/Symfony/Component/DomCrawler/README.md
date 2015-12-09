@@ -26,6 +26,11 @@ $crawler->addContent('<html><body><p>Hello World!</p></body></html>');
 print $crawler->filter('body > p')->text();
 ```
 
+Documentation
+---------
+
+http://symfony.com/doc/current/components/dom_crawler.html
+
 Resources
 ---------
 

@@ -105,7 +105,7 @@ EOF
 
         $env = $this->getContainer()->getParameter('kernel.environment');
 
-        if (false === $router = $this->determineRouterScript($input->getOption('router'), $env, $output)) {
+        if (false === $router = $this->determineRouterScript($input->getOption('router'), $env, $io)) {
             return 1;
         }
 
@@ -148,7 +148,7 @@ EOF
             return 1;
         }
 
-        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $router)) {
+        if (null === $process = $this->createServerProcess($io, $address, $documentRoot, $router)) {
             return 1;
         }
 

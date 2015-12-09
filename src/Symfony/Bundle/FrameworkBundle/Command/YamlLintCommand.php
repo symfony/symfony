@@ -80,7 +80,7 @@ EOF
                 $content .= fread(STDIN, 1024);
             }
 
-            return $this->display($input, $output, $output, array($this->validate($content)));
+            return $this->display($input, $output, $io, array($this->validate($content)));
         }
 
         if (0 !== strpos($filename, '@') && !is_readable($filename)) {

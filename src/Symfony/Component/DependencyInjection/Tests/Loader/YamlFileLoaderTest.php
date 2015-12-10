@@ -233,4 +233,24 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The tag name for service ".+" in .+ must be a non-empty string/
+     */
+    public function testTagWithEmptyNameThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tag_name_empty_string.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageREgExp /The tag name for service "\.+" must be a non-empty string/
+     */
+    public function testTagWithNonStringNameThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tag_name_no_string.yml');
+    }
 }

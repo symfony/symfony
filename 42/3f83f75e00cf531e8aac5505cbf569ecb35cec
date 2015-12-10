@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-08T18:47:43Z
+
+Comments addressed, ready for a second round of review :)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-12-08T19:34:41Z
+
+Sorry not able to review in depth right now but I sure hope it won't blow up anything. Then again I think sigchild usage is probably less and less of a problem the more time passes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-09T10:06:02Z
+
+I added a special build of php with sigchild enabled on travis so that we can test, verify, prove and enforce that this really works :)
+Enabled on the first deps=no line only.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-09T11:00:30Z
+
+@nicolas-grekas have you tried running tests when forcing the sighchild compat layer to be disabled ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-09T11:24:10Z
+
+@stof yes. Nothing interesting here: tests either fail because of one of those exceptions about --enable-sigchild, or pass.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-09T11:50:34Z
+
+@nicolas-grekas but it needs to be done to ensure we don't miss some of the sigchild checks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-09T18:13:18Z
+
+Sigchild is now tested with and without the enhanced mode.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-12-10T09:51:22Z
+
+Looks good to me
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-10T15:19:20Z
+
+except for the comment I made, :+1:

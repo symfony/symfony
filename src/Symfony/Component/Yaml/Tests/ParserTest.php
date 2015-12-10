@@ -446,26 +446,25 @@ EOF;
         $this->parser->parse('foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Exception
-     * @expectedExceptionMessage !!php/object is deprecated use !php/object instead
-     */
     public function testDeprecatedObjectNotation()
-    {
-        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, true);
-    }
-
-    public function testDeprecatedObjectNotationWithErrorsSuppressed()
     {
         $input = <<<EOF
 foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
 
-        $previous = error_reporting(E_ALL & ~E_USER_DEPRECATED);
-        $actual = $this->parser->parse($input, false, true);
-        error_reporting($previous);
+        $actual = $this->parser->parse($input, true, true);
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => '!!php/object is deprecated since version 3.0 and will be removed in 4.0. Use !php/object instead.',
+        );
+
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $actual, '->parse() is able to parse objects');
+        $this->assertSame($xError, $lastError);
     }
 
     /**

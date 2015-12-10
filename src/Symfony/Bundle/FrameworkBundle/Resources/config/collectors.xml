@@ -15,6 +15,10 @@
             <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="335" />
         </service>
 
+        <service id="data_collector.ajax" class="Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector" public="false">
+            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="315" />
+        </service>
+
         <service id="data_collector.exception" class="Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="305" />
         </service>

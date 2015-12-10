@@ -150,6 +150,8 @@ EOF
             return;
         }
 
+        $resultMessage = 'Translation files were successfully updated.';
+
         // show compiled list of messages
         if (true === $input->getOption('dump-messages')) {
             $extractedMessagesCount = 0;
@@ -205,8 +207,6 @@ EOF
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated.';
-            } else {
-                $resultMessage = 'Translation files were successfully updated.';
             }
         }
 

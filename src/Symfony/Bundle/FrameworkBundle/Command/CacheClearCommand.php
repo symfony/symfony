@@ -58,7 +58,9 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir = $realCacheDir.'_old';
+        // the old cache dir name must not be longer than the real one to avoid exceeding
+        // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
+        $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
         $filesystem = $this->getContainer()->get('filesystem');
 
         if (!is_writable($realCacheDir)) {
@@ -79,7 +81,7 @@ EOF
             // the warmup cache dir name must have the same length than the real one
             // to avoid the many problems in serialized resources files
             $realCacheDir = realpath($realCacheDir);
-            $warmupDir = substr($realCacheDir, 0, -1).'_';
+            $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
 
             if ($filesystem->exists($warmupDir)) {
                 if ($outputIsVerbose) {
@@ -120,8 +122,6 @@ EOF
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
-        $this->getContainer()->get('filesystem')->remove($warmupDir);
-
         // create a temporary kernel
         $realKernel = $this->getContainer()->get('kernel');
         $realKernelClass = get_class($realKernel);

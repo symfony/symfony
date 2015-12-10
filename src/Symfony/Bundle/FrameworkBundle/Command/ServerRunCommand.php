@@ -29,18 +29,6 @@ class ServerRunCommand extends ServerCommand
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
-    {
-        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this

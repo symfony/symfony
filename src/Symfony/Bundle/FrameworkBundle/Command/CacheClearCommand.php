@@ -55,10 +55,12 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $outputIsVerbose = $output->isVerbose();
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir = $realCacheDir.'_old';
+        // the old cache dir name must not be longer than the real one to avoid exceeding
+        // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
+        $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');
         $filesystem = $this->getContainer()->get('filesystem');
 
         if (!is_writable($realCacheDir)) {
@@ -70,7 +72,7 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
@@ -79,17 +81,17 @@ EOF
             // the warmup cache dir name must have the same length than the real one
             // to avoid the many problems in serialized resources files
             $realCacheDir = realpath($realCacheDir);
-            $warmupDir = substr($realCacheDir, 0, -1).'_';
+            $warmupDir = substr($realCacheDir, 0, -1).('_' === substr($realCacheDir, -1) ? '-' : '_');
 
             if ($filesystem->exists($warmupDir)) {
                 if ($outputIsVerbose) {
-                    $output->comment('Clearing outdated warmup directory...');
+                    $io->comment('Clearing outdated warmup directory...');
                 }
                 $filesystem->remove($warmupDir);
             }
 
             if ($outputIsVerbose) {
-                $output->comment('Warming up cache...');
+                $io->comment('Warming up cache...');
             }
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
@@ -101,16 +103,16 @@ EOF
         }
 
         if ($outputIsVerbose) {
-            $output->comment('Removing old cache directory...');
+            $io->comment('Removing old cache directory...');
         }
 
         $filesystem->remove($oldCacheDir);
 
         if ($outputIsVerbose) {
-            $output->comment('Finished');
+            $io->comment('Finished');
         }
 
-        $output->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
     /**
@@ -120,8 +122,6 @@ EOF
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
-        $this->getContainer()->get('filesystem')->remove($warmupDir);
-
         // create a temporary kernel
         $realKernel = $this->getContainer()->get('kernel');
         $realKernelClass = get_class($realKernel);

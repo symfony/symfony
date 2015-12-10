@@ -39,6 +39,11 @@ class FrameworkExtension extends Extension
     private $sessionConfigEnabled = false;
 
     /**
+     * @var string|null
+     */
+    private $kernelRootHash;
+
+    /**
      * Responds to the app.config configuration parameter.
      *
      * @param array            $configs
@@ -777,7 +782,7 @@ class FrameworkExtension extends Extension
         if (isset($config['cache'])) {
             $container->setParameter(
                 'validator.mapping.cache.prefix',
-                'validator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+                'validator_'.$this->getKernelRootHash($container)
             );
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
@@ -959,13 +964,29 @@ class FrameworkExtension extends Extension
         if (isset($config['cache']) && $config['cache']) {
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
-                'serializer_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+                'serializer_'.$this->getKernelRootHash($container)
             );
 
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
         }
+    }
+
+    /**
+     * Gets a hash of the kernel root directory.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @return string
+     */
+    private function getKernelRootHash(ContainerBuilder $container)
+    {
+        if (!$this->kernelRootHash) {
+            $this->kernelRootHash = hash('sha256', $container->getParameter('kernel.root_dir'));
+        }
+
+        return $this->kernelRootHash;
     }
 
     /**

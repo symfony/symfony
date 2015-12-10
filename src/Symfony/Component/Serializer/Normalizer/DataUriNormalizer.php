@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Normalizes a {@see \SplFileInfo} object to a data URI.
- * Denormalizes a data URI to a {@see \SplFileObject} object using .
+ * Denormalizes a data URI to a {@see \SplFileObject} object.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -31,17 +31,25 @@ class PropertyInfoPass implements CompilerPassInterface
             return;
         }
 
+        if ($container->hasDefinition('serializer.mapping.class_metadata_factory')) {
+            $definition = $container->register('property_info.serializer_extractor', 'Symfony\Component\PropertyInfo\Extractor\SerializerExtractor');
+            $definition->addArgument(new Reference('serializer.mapping.class_metadata_factory'));
+            $definition->addTag('property_info.list_extractor', array('priority' => -999));
+        }
+
+        $definition = $container->getDefinition('property_info');
+
         $listExtractors = $this->findAndSortTaggedServices('property_info.list_extractor', $container);
-        $container->getDefinition('property_info')->replaceArgument(0, $listExtractors);
+        $definition->replaceArgument(0, $listExtractors);
 
         $typeExtractors = $this->findAndSortTaggedServices('property_info.type_extractor', $container);
-        $container->getDefinition('property_info')->replaceArgument(1, $typeExtractors);
+        $definition->replaceArgument(1, $typeExtractors);
 
         $descriptionExtractors = $this->findAndSortTaggedServices('property_info.description_extractor', $container);
-        $container->getDefinition('property_info')->replaceArgument(2, $descriptionExtractors);
+        $definition->replaceArgument(2, $descriptionExtractors);
 
         $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
-        $container->getDefinition('property_info')->replaceArgument(3, $accessExtractors);
+        $definition->replaceArgument(3, $accessExtractors);
     }
 
     /**

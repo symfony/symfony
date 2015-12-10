@@ -39,7 +39,6 @@ class LengthValidator extends ConstraintValidator
         }
 
         $stringValue = (string) $value;
-        $invalidCharset = false;
 
         if ('UTF8' === $charset = strtoupper($constraint->charset)) {
             $charset = 'UTF-8'; // iconv on Windows requires "UTF-8" instead of "UTF8"

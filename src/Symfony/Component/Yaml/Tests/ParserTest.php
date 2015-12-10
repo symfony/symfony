@@ -452,7 +452,7 @@ EOF;
      */
     public function testDeprecatedObjectNotation()
     {
-        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
+        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, true);
     }
 
     public function testDeprecatedObjectNotationWithErrorsSuppressed()

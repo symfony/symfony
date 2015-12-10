@@ -67,12 +67,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
 
         if (empty($name)) {
-            $output->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration.');
-            $output->newLine();
+            $io->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration.');
+            $io->newLine();
             $this->listBundles($output);
 
             return;
@@ -92,18 +92,18 @@ EOF
 
         switch ($input->getOption('format')) {
             case 'yaml':
-                $output->writeln(sprintf('# %s', $message));
+                $io->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
-                $output->writeln(sprintf('<!-- %s -->', $message));
+                $io->writeln(sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:
-                $output->writeln($message);
+                $io->writeln($message);
                 throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 
-        $output->writeln($dumper->dump($configuration, $extension->getNamespace()));
+        $io->writeln($dumper->dump($configuration, $extension->getNamespace()));
     }
 }

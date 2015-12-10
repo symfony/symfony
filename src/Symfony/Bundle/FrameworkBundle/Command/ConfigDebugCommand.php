@@ -55,12 +55,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
 
         if (empty($name)) {
-            $output->comment('Provide the name of a bundle as the first argument of this command to dump its configuration.');
-            $output->newLine();
+            $io->comment('Provide the name of a bundle as the first argument of this command to dump its configuration.');
+            $io->newLine();
             $this->listBundles($output);
 
             return;
@@ -80,12 +80,12 @@ EOF
         $config = $processor->processConfiguration($configuration, $configs);
 
         if ($name === $extension->getAlias()) {
-            $output->title(sprintf('Current configuration for extension with alias "%s"', $name));
+            $io->title(sprintf('Current configuration for extension with alias "%s"', $name));
         } else {
-            $output->title(sprintf('Current configuration for "%s"', $name));
+            $io->title(sprintf('Current configuration for "%s"', $name));
         }
 
-        $output->writeln(Yaml::dump(array($extension->getAlias() => $config), 3));
+        $io->writeln(Yaml::dump(array($extension->getAlias() => $config), 3));
     }
 
     private function compileContainer()

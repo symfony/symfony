@@ -55,7 +55,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
         $address = $input->getArgument('address');
         if (false === strpos($address, ':')) {
@@ -65,12 +65,12 @@ EOF
         $lockFile = $this->getLockFile($address);
 
         if (!file_exists($lockFile)) {
-            $output->error(sprintf('No web server is listening on http://%s', $address));
+            $io->error(sprintf('No web server is listening on http://%s', $address));
 
             return 1;
         }
 
         unlink($lockFile);
-        $output->success(sprintf('Stopped the web server listening on http://%s', $address));
+        $io->success(sprintf('Stopped the web server listening on http://%s', $address));
     }
 }

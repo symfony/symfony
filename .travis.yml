@@ -10,6 +10,7 @@ addons:
 cache:
     directories:
         - .phpunit
+        - php-5.3.9
 
 matrix:
     include:
@@ -32,6 +33,7 @@ env:
 
 before_install:
     - if [[ "$deps" = "no" ]] && [[ "$TRAVIS_PHP_VERSION" =~ 5.[45] ]] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then export deps=skip; fi;
+    - if [[ $deps = no && $TRAVIS_PHP_VERSION = 5.3 && ! -d php-5.3.9/sapi ]]; then wget http://museum.php.net/php5/php-5.3.9.tar.bz2; tar -xjf php-5.3.9.tar.bz2; (cd php-5.3.9; ./configure --enable-sigchild --enable-pcntl; make -j2); fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi;
     - echo "memory_limit = -1" >> $INI_FILE
     - echo "session.gc_probability = 0" >> $INI_FILE
@@ -56,6 +58,7 @@ install:
 script:
     - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
+    - if [[ $deps = no && $TRAVIS_PHP_VERSION = 5.3 ]]; then echo -e "1\\n0" | parallel --gnu 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-5.3.9/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
     - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
     - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
     - if [ "$deps" = "skip" ]; then echo 'This matrix line is skipped for pull requests.'; fi;

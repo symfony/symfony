@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-07T15:21:34Z
+
+ping @symfony/deciders this fix is important to merge as the bug is currently causing problems for all windows users running symfony. Together with doctrine/cache#107 it is gone.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-07T15:35:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-07T15:35:20Z
+
+:+1:
+
+Status: Reviewed

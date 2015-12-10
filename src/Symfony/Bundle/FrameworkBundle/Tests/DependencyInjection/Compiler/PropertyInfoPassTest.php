@@ -32,7 +32,8 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
 
-        $container->expects($this->any())
+        $container
+            ->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
 
@@ -53,9 +54,11 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
 
-        $container->expects($this->any())
+        $container
+            ->expects($this->any())
             ->method('findTaggedServiceIds')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue(array()))
+        ;
 
         $propertyInfoPass = new PropertyInfoPass();
 

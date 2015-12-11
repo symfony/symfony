@@ -18,7 +18,7 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCollectTestData
      */
-    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null, $expectedGroup = null)
     {
         $logger = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
@@ -35,6 +35,11 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         if (isset($expectedPriorities)) {
             $this->assertSame($expectedPriorities, $c->getPriorities());
+        }
+        if(!is_null($expectedGroup)) {
+            $groups = $c->getGroupedLogs();
+            $this->assertArrayHasKey($expectedGroup, $groups);
+            $this->assertEquals(count($expectedLogs), count($groups[$expectedGroup]['logs']));
         }
     }
 
@@ -89,6 +94,8 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
                 array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => -1, 'file' => __FILE__, 'line' => 123, 'errorCount' => 2), 'priority' => 100, 'priorityName' => 'DEBUG')),
                 0,
                 1,
+                null,
+                'debugs',
             ),
         );
     }

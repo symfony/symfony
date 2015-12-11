@@ -19,7 +19,11 @@
 
             <div class="sf-toolbar-info-piece">
                 <b>Deprecated Calls</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}">{{ collector.countdeprecations|default(0) }}</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countdeprecations ? 'yellow' }}"
+                      title="{{ collector.getChannelCount('app')|default(0) }} of {{ collector.countDeprecations()|default(0) }} deprecations are reported in the `app` channel."
+                >
+                    {{ collector.countDeprecations()|default(0) }}
+                </span>
             </div>
 
             <div class="sf-toolbar-info-piece">
@@ -45,6 +49,7 @@
 {% endblock %}
 
 {% block panel %}
+
     <h2>Log Messages</h2>
 
     {% if collector.logs is empty %}
@@ -52,29 +57,24 @@
             <p>No log messages available.</p>
         </div>
     {% else %}
+
         {# sort collected logs in groups #}
-        {% set deprecation_logs, debug_logs, info_and_error_logs = [], [], [] %}
-        {% for log in collector.logs %}
-            {% if log.context.level is defined and log.context.type is defined and log.context.type in [constant('E_DEPRECATED'), constant('E_USER_DEPRECATED')] %}
-                {% set deprecation_logs = deprecation_logs|merge([log]) %}
-            {% elseif log.priorityName == 'DEBUG' %}
-                {% set debug_logs = debug_logs|merge([log]) %}
-            {% else %}
-                {% set info_and_error_logs = info_and_error_logs|merge([log]) %}
-            {% endif %}
-        {% endfor %}
+        {% set groups = collector.groupedLogs %}
 
         <div class="sf-tabs">
             <div class="tab">
-                <h3 class="tab-title">Info. &amp; Errors <span class="badge">{{ info_and_error_logs|length }}</span></h3>
+                <h3 class="tab-title">Info. &amp; Errors <span class="badge">{{ groups.info_and_errors.logs|length }}</span></h3>
 
                 <div class="tab-content">
-                    {% if info_and_error_logs is empty %}
+                    {% if (groups.info_and_errors.logs|first).channel is defined %}
+                        {{ helper.render_channel_metrics(collector, groups.info_and_errors.channels) }}
+                    {% endif %}
+                    {% if groups.info_and_errors.logs is empty %}
                         <div class="empty">
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(info_and_error_logs, true) }}
+                        {{ helper.render_table(groups.info_and_errors.logs, true) }}
                     {% endif %}
                 </div>
             </div>
@@ -85,26 +85,32 @@
                 <h3 class="tab-title">Deprecations <span class="badge">{{ collector.countdeprecations|default(0) }}</span></h3>
 
                 <div class="tab-content">
-                    {% if deprecation_logs is empty %}
+                    {% if (groups.deprecations.logs|first).channel is defined %}
+                        {{ helper.render_channel_metrics(collector, groups.deprecations.channels) }}
+                    {% endif %}
+                    {% if groups.deprecations.logs is empty %}
                         <div class="empty">
                             <p>There are no log messages about deprecated features.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(deprecation_logs, false, true) }}
+                        {{ helper.render_table(groups.deprecations.logs, false, true) }}
                     {% endif %}
                 </div>
             </div>
 
             <div class="tab">
-                <h3 class="tab-title">Debug <span class="badge">{{ debug_logs|length }}</span></h3>
+                <h3 class="tab-title">Debug <span class="badge">{{ groups.debugs.logs|length }}</span></h3>
 
                 <div class="tab-content">
-                    {% if debug_logs is empty %}
+                    {% if (groups.debugs.logs|first).channel is defined %}
+                        {{ helper.render_channel_metrics(collector, groups.debugs.channels) }}
+                    {% endif %}
+                    {% if groups.debugs.logs is empty %}
                         <div class="empty">
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(debug_logs) }}
+                        {{ helper.render_table(groups.debugs.logs) }}
                     {% endif %}
                 </div>
             </div>
@@ -126,26 +132,26 @@
         </thead>
 
         <tbody>
-            {% for log in logs %}
-                {% set css_class = is_deprecation ? ''
-                    : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
-                    : log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning'
-                %}
-                <tr class="{{ css_class }}">
-                    <td class="font-normal text-small">
-                        {% if show_level %}
-                            <span class="colored text-bold nowrap">{{ log.priorityName }}</span>
-                        {% endif %}
-                        <span class="text-muted nowrap newline">{{ log.timestamp|date('H:i:s') }}</span>
-                    </td>
-
-                    {% if channel_is_defined %}
-                        <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+        {% for log in logs %}
+            {% set css_class = is_deprecation ? ''
+            : log.priorityName in ['CRITICAL', 'ERROR', 'ALERT', 'EMERGENCY'] ? 'status-error'
+            : log.priorityName in ['NOTICE', 'WARNING'] ? 'status-warning'
+            %}
+            <tr class="{{ css_class }}">
+                <td class="font-normal text-small">
+                    {% if show_level %}
+                        <span class="colored text-bold nowrap">{{ log.priorityName }}</span>
                     {% endif %}
+                    <span class="text-muted nowrap newline">{{ log.timestamp|date('H:i:s') }}</span>
+                </td>
 
-                    <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
-                </tr>
-            {% endfor %}
+                {% if channel_is_defined %}
+                    <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
+                {% endif %}
+
+                <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
@@ -162,14 +168,13 @@
         {% endif %}
 
         {% if stack %}
-            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
+            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show strack trace</button>
         {% endif %}
 
         {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
                 <ul class="sf-call-stack" id="{{ id }}" class="hidden">
             {% endif %}
-
             {% if call.class is defined %}
                 {% set from = call.class|abbr_class ~ '::' ~ call.function|abbr_method() %}
             {% elseif call.function is defined %}
@@ -180,14 +185,7 @@
                 {% set from = '-' %}
             {% endif %}
 
-            {% set file_name = (call.file is defined and call.line is defined) ? call.file|replace({'\\': '/'})|split('/')|last %}
-
-            <li>
-                {{ from|raw }}
-                {% if file_name %}
-                    <span class="text-small">(called from {{ call.file|format_file(call.line, file_name)|raw }})</span>
-                {% endif %}
-            </li>
+            <li><span class="text-small">Called from</span> {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
 
             {% if index == stack|length - 1 %}
                 </ul>
@@ -202,4 +200,18 @@
             </span>
         {% endif %}
     {% endif %}
+{% endmacro %}
+
+{% macro render_channel_metrics(collector, channel_counts) %}
+    {% for channel in collector.channels %}
+        {% if loop.first %}<div class="metrics">{% endif %}
+        <div class="metric">
+            <span class="value">
+                <span title="Shown logs in this tab.">{{ channel_counts[channel]|default(0) }}</span>
+                <span class="unit" title="Total logs in `{{ channel }}`.">/ {{ collector.countChannel(channel) }}</span>
+            </span>
+            <span class="label">{{ channel|upper }}</span>
+        </div>
+        {% if loop.last %}</div>{% endif %}
+    {% endfor %}
 {% endmacro %}

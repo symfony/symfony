@@ -28,6 +28,7 @@ class CollectionType extends AbstractType
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
+                'required' => $options['required'],
                 'label' => $options['prototype_name'].'label__',
             ), $options['options']));
             $builder->setAttribute('prototype', $prototype->getForm());

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-10T10:41:24Z
+
+I suggest adding some phpdoc on the ``register`` method describing the different accepted values for the mode
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-10T10:48:02Z
+
+@stof good idea, done
+
+---------------------------------------------------------------------------
+
+by craue at 2015-12-10T11:02:50Z
+
+I actually like the weak-verbose mode. What's wrong with it? But as long as I just need to set a very high number to achieve the same, I'm fine with it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-10T11:04:37Z
+
+@craue that's how you can get the equivalent of weak-verbose yes
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-10T11:05:04Z
+
+:+1: This is indeed a better solution.

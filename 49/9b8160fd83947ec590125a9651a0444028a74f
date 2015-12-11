@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-11-30T15:52:27Z
+
+this will have to wait for 3.1. It is too late to incorporate such change in 2.8/3.0 IMO, given that the release is today
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-11-30T15:56:55Z
+
+Would be helpful in case of silenced errors as I experienced them and it is not really a feature, just makes the errors more visible.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-08T11:48:31Z
+
+:+1: nice touch
+
+status: reviewed
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-12-08T11:53:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-08T13:47:56Z
+
+The question is just the target branch. As it is for me more like a bugfix it would be great to get this still into 2.8 to avoid confusion.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-08T23:06:02Z
+
+I agree with this PR. But I'd like to see two changes:
+
+- ~~I would suggest to rename `Silenced Errors` with `Silenced Reports` (both in the toolbar and log panel).
+The thing is that "errors" means it is a failure per se. But the silenced reports can also be warnings, info, notices, e.g. `@trigger_error('NOTICE', E_USER_NOTICE);` which is obviously not an error according according to the log levels.~~ Actually doesn't matter to me as you could also argue the other way that everything done via `trigger_error` are indeed errors.
+- The actual level of the silenced report is not easily seeable in the silenced tab. Thus I would suggest to add it above the time in the time column. That basically just means converting `context.type` to the `E_...` constant names. So where the `Info & Errors` tab shows the Log Level, we show the `E_...` constant names for silenced reports.
+
+If we do above changes, I'd also vote :+1: to merge it in 2.8 as it will prevent confusion due to these changes later.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-09T14:21:44Z
+
+@Tobion How would you convert the type back to the constant names? Any idea about that?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-09T14:31:44Z
+
+Similar to https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Debug/ErrorHandler.php#L49-L64 but with the constant names instead. Maybe the named constant should actually be added in the `context` directly. Then you do not need to do this in the view.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-10T13:29:22Z
+
+I have updated it to include an error_level in the context. This way we can keep the same renderer and I think this provides enough information. @Tobion what do you think?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-11T10:31:32Z
+
+@Tobion Updated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T11:15:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T15:06:30Z
+
+@javiereguiluz you agree with this PR as well?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-11T15:09:42Z
+
+@Tobion sure! I love it. @peterrehm thanks for adding this feature.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T15:17:02Z
+
+Ok to merge in 2.8 as a usability fix (and easier maintanance)? Or must wait for 3.1?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T19:28:48Z
+
+Tests are failing
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-12-11T20:14:38Z
+
+Should be fixed now.

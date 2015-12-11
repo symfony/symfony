@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "ext-ctype": "*"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Yaml\\": "" },

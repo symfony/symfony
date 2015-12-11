@@ -55,6 +55,7 @@ class CollectionType extends AbstractType
 
         if ($form->getConfig()->hasAttribute('prototype')) {
             $view->vars['prototype'] = $form->getConfig()->getAttribute('prototype')->createView($view);
+            $view->vars['prototype']->vars['required'] = $options['required'];
         }
     }
 

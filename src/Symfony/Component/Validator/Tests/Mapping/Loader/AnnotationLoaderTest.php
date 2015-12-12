@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintD;
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -89,6 +90,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($parent_metadata);
 
         $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent->addConstraint(new ConstraintD(array('target' => 'Symfony\Component\Validator\Tests\Fixtures\EntityParent')));
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 
@@ -113,6 +115,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent->addConstraint(new ConstraintD(array('target' => 'Symfony\Component\Validator\Tests\Fixtures\EntityParent')));
         $expected_parent->addPropertyConstraint('other', new NotNull());
         $expected_parent->getReflectionClass();
 

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * fixed `UniqueEntity` interaction with inheritance
+ * deprecated `UniqueEntity` constraints without a target (possible only if
+   `StaticMethodLoader` or a custom constraint loader is used)
+
 3.1.0
 -----
 

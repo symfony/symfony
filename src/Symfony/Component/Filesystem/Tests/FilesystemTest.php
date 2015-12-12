@@ -868,7 +868,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testMirrorCopiesLinkedDirectoryContents()
     {
-        $this->markAsSkippedIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing(true);
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
@@ -888,7 +888,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testMirrorCopiesRelativeLinkedContents()
     {
-        $this->markAsSkippedIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing(true);
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
         $oldPath = getcwd();
@@ -1012,7 +1012,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->markTestSkipped('Unable to retrieve file group name');
     }
 
-    private function markAsSkippedIfSymlinkIsMissing()
+    /**
+     * @param bool $relative Whether support for relative symlinks is required
+     */
+    private function markAsSkippedIfSymlinkIsMissing($relative = false)
     {
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');
@@ -1020,6 +1023,11 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         if (false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
+        }
+
+        // https://bugs.php.net/bug.php?id=69473
+        if ($relative && '\\' === DIRECTORY_SEPARATOR && 1 === PHP_ZTS) {
+            $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
         }
     }
 

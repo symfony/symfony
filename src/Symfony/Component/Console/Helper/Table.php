@@ -555,11 +555,9 @@ class Table
     }
 
     /**
-     * Gets column width.
+     * Calculates columns widths.
      *
-     * @param int $column
-     *
-     * @return int
+     * @param array $rows
      */
     private function calculateColumnsWidth($rows)
     {

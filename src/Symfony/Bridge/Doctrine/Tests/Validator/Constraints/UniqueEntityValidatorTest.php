@@ -16,10 +16,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\ChildEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\HighestEntity\InstanceEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
@@ -82,10 +84,13 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->getMock()
         ;
-        $em->expects($this->any())
-             ->method('getRepository')
-             ->will($this->returnValue($repositoryMock))
-        ;
+
+        if ($repositoryMock) {
+            $em->expects($this->any())
+               ->method('getRepository')
+               ->will($this->returnValue($repositoryMock))
+            ;
+        }
 
         $metadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
 
@@ -180,6 +185,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
             'fields' => array('name'),
             'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -212,6 +218,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name'),
             'em' => self::EM_NAME,
             'errorPath' => 'bar',
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -235,6 +242,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
             'fields' => array('name'),
             'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $entity1 = new SingleIntIdEntity(1, null);
@@ -256,6 +264,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name', 'name2'),
             'em' => self::EM_NAME,
             'ignoreNull' => false,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity',
         ));
 
         $entity1 = new DoubleNameEntity(1, 'Foo', null);
@@ -288,6 +297,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name', 'name2'),
             'em' => self::EM_NAME,
             'errorPath' => 'name2',
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity',
         ));
 
         $entity1 = new DoubleNameEntity(1, 'Foo', 'Bar');
@@ -320,6 +330,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name'),
             'em' => self::EM_NAME,
             'repositoryMethod' => 'findByCustom',
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $repository = $this->createRepositoryMock();
@@ -346,6 +357,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name'),
             'em' => self::EM_NAME,
             'repositoryMethod' => 'findByCustom',
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $entity = new SingleIntIdEntity(1, 'foo');
@@ -384,6 +396,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('name'),
             'em' => self::EM_NAME,
             'repositoryMethod' => 'findByCustom',
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $repository = $this->createRepositoryMock();
@@ -418,6 +431,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
             'fields' => array('single'),
             'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity',
         ));
 
         $entity1 = new SingleIntIdEntity(1, 'foo');
@@ -453,6 +467,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array('single'),
             'em' => self::EM_NAME,
             'ignoreNull' => false,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity',
         ));
 
         $associated = new AssociationEntity();
@@ -476,6 +491,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
             'fields' => array('composite'),
             'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity',
         ));
 
         $composite = new CompositeIntIdEntity(1, 1, 'test');
@@ -499,6 +515,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
             'fields' => array('name'),
             'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
         $this->em = null;
@@ -511,24 +528,80 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($entity, $constraint);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage Unable to find the object manager associated with an entity of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity"
-     */
-    public function testEntityManagerNullObject()
+    public function testTargetsRepoIsUsedForChildren()
     {
         $constraint = new UniqueEntity(array(
             'message' => 'myMessage',
             'fields' => array('name'),
-            // no "em" option set
+            'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity',
         ));
 
-        $this->em = null;
+        $repository = $this->createRepositoryMock();
+        $this->em = $this->createEntityManagerMock(null);
+        $this->em->expects($this->atLeastOnce())
+             ->method('getRepository')
+             ->with('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity')
+             ->will($this->returnValue($repository))
+        ;
         $this->registry = $this->createRegistryMock($this->em);
+
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
 
-        $entity = new SingleIntIdEntity(1, null);
+        $entity = new ChildEntity(1, 'Foo');
+
+        $this->validator->validate($entity, $constraint);
+    }
+
+    public function testTargetRepoIsHighestEntityFromTransient()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\HighestEntity\TargetTransient',
+        ));
+
+        $repository = $this->createRepositoryMock();
+        $this->em = $this->createEntityManagerMock(null);
+        $this->em->expects($this->atLeastOnce())
+             ->method('getRepository')
+             ->with('Symfony\Bridge\Doctrine\Tests\Fixtures\HighestEntity\GoodEntity')
+             ->will($this->returnValue($repository))
+        ;
+        $this->registry = $this->createRegistryMock($this->em);
+
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $entity = new InstanceEntity(1, 'Foo');
+
+        $this->validator->validate($entity, $constraint);
+    }
+
+    public function testTargetRepoIsHighestEntityFromMappedSuperClass()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'target' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\HighestEntity\TargetMappedSuperClass',
+        ));
+
+        $repository = $this->createRepositoryMock();
+        $this->em = $this->createEntityManagerMock(null);
+        $this->em->expects($this->atLeastOnce())
+             ->method('getRepository')
+             ->with('Symfony\Bridge\Doctrine\Tests\Fixtures\HighestEntity\GoodEntity')
+             ->will($this->returnValue($repository))
+        ;
+        $this->registry = $this->createRegistryMock($this->em);
+
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $entity = new InstanceEntity(1, 'Foo');
 
         $this->validator->validate($entity, $constraint);
     }

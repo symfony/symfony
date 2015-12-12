@@ -13,9 +13,17 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\InheritanceType;
 
-/** @Entity */
+/**
+ * @Entity
+ * @InheritanceType("SINGLE_TABLE")
+ * @DiscriminatorColumn(name="discr", type="string")
+ * @DiscriminatorMap({"parent" = "SingleIntIdEntity", "child" = "ChildEntity"})
+ */
 class SingleIntIdEntity
 {
     /** @Id @Column(type="integer") */

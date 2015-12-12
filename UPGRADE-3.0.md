@@ -106,6 +106,30 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * Create form.
+
+   Before:
+
+   ```php
+   //Controler
+   $form = $this->createForm( new MemberType, $member );
+   
+   //AbstractType
+   $builder->add('email', 'email');
+   ```
+
+   After:
+
+   ```php
+   //Controler
+   $form = $this->createForm( MemberType::class, $member );
+   
+   //AbstractType
+   use \Symfony\Component\Form\Extension\Core\Type\EmailType;
+   //...
+   $builder->add('email', EmailType::class);
+   ```
+
  * The option "precision" was renamed to "scale".
 
    Before:

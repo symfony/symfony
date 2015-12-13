@@ -112,7 +112,7 @@ class UrlPackage extends Package
      *
      * @param string $path
      *
-     * @return string The base URL for the given path
+     * @return float The base URL for the given path
      */
     protected function chooseBaseUrl($path)
     {

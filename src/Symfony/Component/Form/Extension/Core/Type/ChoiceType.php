@@ -264,8 +264,7 @@ class ChoiceType extends AbstractType
                 throw new \RuntimeException('The "choices_as_values" option should not be used. Remove it and flip the contents of the "choices" option instead.');
             }
 
-            // To be uncommented in 3.1
-            //@trigger_error('The "choices_as_values" option is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
+            @trigger_error('The "choices_as_values" option is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
 
             return true;
         };
@@ -302,7 +301,7 @@ class ChoiceType extends AbstractType
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),
-            'choices_as_values' => null, // to be deprecated in 3.1
+            'choices_as_values' => null, // deprecated since 3.1
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,

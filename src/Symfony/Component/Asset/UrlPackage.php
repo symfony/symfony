@@ -112,11 +112,11 @@ class UrlPackage extends Package
      *
      * @param string $path
      *
-     * @return float The base URL for the given path
+     * @return int The base URL for the given path
      */
     protected function chooseBaseUrl($path)
     {
-        return fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
+        return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }
 
     private function getSslUrls($urls)

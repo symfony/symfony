@@ -14,10 +14,11 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Normalizes a {@see \SplFileInfo} object to a data URI.
+ * Normalizes an {@see \SplFileInfo} object to a data URI.
  * Denormalizes a data URI to a {@see \SplFileObject} object.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -86,6 +87,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @see https://gist.github.com/bgrins/6194623
      *
+     * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
@@ -95,11 +97,16 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         try {
-            if ('Symfony\Component\HttpFoundation\File\File' === $class) {
-                return new File($data, false);
+            switch ($class) {
+                case 'Symfony\Component\HttpFoundation\File\File':
+                    return new File($data, false);
+
+                case 'SplFileObject':
+                case 'SplFileInfo':
+                    return new \SplFileObject($data);
             }
 
-            return new \SplFileObject($data);
+            throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileInfo" or "Symfony\Component\HttpFoundation\File\File".', $class));
         } catch (\RuntimeException $exception) {
             throw new UnexpectedValueException($exception->getMessage(), $exception->getCode(), $exception);
         }

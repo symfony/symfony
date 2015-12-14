@@ -156,7 +156,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
             foreach ($unorderedObjects as $object) {
-                $objectsById[$this->idReader->getIdValue($object)] = $object;
+                $objectsById[(string) $this->idReader->getIdValue($object)] = $object;
             }
 
             foreach ($values as $i => $id) {

@@ -32,7 +32,7 @@ class SymfonyQuestionHelper extends QuestionHelper
     {
         $validator = $question->getValidator();
         $question->setValidator(function ($value) use ($validator) {
-            if (null !== $validator && is_callable($validator)) {
+            if (null !== $validator) {
                 $value = $validator($value);
             }
 

@@ -634,6 +634,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function getWriteAccessInfo($object, $property, $value)
     {
         $key = get_class($object).'::'.$property;
+        $guessedAdders = '';
 
         if (isset($this->writePropertyCache[$key])) {
             $access = $this->writePropertyCache[$key];
@@ -648,7 +649,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
 
-                if (null !== $methods) {
+                if (null === $methods) {
+                    // It is sufficient to include only the adders in the error
+                    // message. If the user implements the adder but not the remover,
+                    // an exception will be thrown in findAdderAndRemover() that
+                    // the remover has to be implemented as well.
+                    $guessedAdders = '"add'.implode('()", "add', $singulars).'()", ';
+                } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
                     $access[self::ACCESS_ADDER] = $methods[0];
                     $access[self::ACCESS_REMOVER] = $methods[1];

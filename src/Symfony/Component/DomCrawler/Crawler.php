@@ -703,7 +703,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if(!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" containd.', get_class($node)));
+            throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
         }
 
         return new Link($node, $this->baseHref, $method);
@@ -721,7 +721,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $links = array();
         foreach ($this->nodes as $node) {
             if(!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" containd.', get_class($node)));
+                throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
             }
 
             $links[] = new Link($node, $this->baseHref, 'get');
@@ -749,7 +749,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $node = $this->getNode(0);
 
         if(!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" containd.', get_class($node)));
+            throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
         }
 
         $form = new Form($node, $this->uri, $method, $this->baseHref);
@@ -842,7 +842,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
         $crawler = $this->createSubCrawler(null);
 
-        foreach ($this as $node) {
+        foreach ($this->nodes as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
             $crawler->add($domxpath->query($xpath, $node));
         }

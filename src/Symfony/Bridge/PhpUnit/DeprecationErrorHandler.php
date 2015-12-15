@@ -19,14 +19,28 @@ namespace Symfony\Bridge\PhpUnit;
 class DeprecationErrorHandler
 {
     const MODE_WEAK = 'weak';
-    const MODE_WEAK_VERBOSE = 'weak-verbose';
 
     private static $isRegistered = false;
 
-    public static function register($mode = false)
+    /**
+     * Registers and configures the deprecation handler.
+     *
+     * The following reporting modes are supported:
+     * - use "weak" to hide the deprecation report but keep a global count;
+     * - use "/some-regexp/" to stop the test suite whenever a deprecation
+     *   message matches the given regular expression;
+     * - use a number to define the upper bound of allowed deprecations,
+     *   making the test suite fail whenever more notices are trigerred.
+     *
+     * @param int|string|false $mode The reporting mode. Defaults to not allowing any deprecations.
+     */
+    public static function register($mode = 0)
     {
         if (self::$isRegistered) {
             return;
+        }
+        if (self::MODE_WEAK !== $mode && (!isset($mode[0]) || '/' !== $mode[0])) {
+            $mode = preg_match('/^[1-9][0-9]*$/', $mode) ? (int) $mode : 0;
         }
         $deprecations = array(
             'unsilencedCount' => 0,
@@ -147,7 +161,8 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if (self::MODE_WEAK !== $mode && self::MODE_WEAK_VERBOSE !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
+
+                if (DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount']) {
                     exit(1);
                 }
             });

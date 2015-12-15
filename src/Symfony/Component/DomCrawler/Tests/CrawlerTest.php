@@ -38,7 +38,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
         $list = array();
-
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }

@@ -185,7 +185,7 @@ class Client extends BaseClient
         $code = <<<EOF
 <?php
 
-error_reporting($errorReporting & ~E_USER_DEPRECATED);
+error_reporting($errorReporting);
 
 if ('$autoloader') {
     require_once '$autoloader';

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T01:19:04Z
+
+:+1: Should be merged into 2.3
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T01:20:33Z
+
+Hm actually `$guessedAdders` is used in 2.3, but not in 2.7?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T07:00:24Z
+
+Yes because someone changed this behavior in 2.7 (before the optim).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T23:07:21Z
+
+So which branch is this for? I think you should open a PR that can be applied to 2.3 (with or without $guessedAdders).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-13T06:51:26Z
+
+2.7
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-13T13:38:26Z
+
+But those constants have been added in 2.3
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-14T21:19:41Z
+
+@Tobion Removed the unused variable check has it is not applicable to 2.3 and already fixed in #16698. So must be merged in 2.3 now.
+
+ping @symfony/deciders

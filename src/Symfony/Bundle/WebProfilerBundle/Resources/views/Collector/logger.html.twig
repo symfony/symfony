@@ -53,10 +53,12 @@
         </div>
     {% else %}
         {# sort collected logs in groups #}
-        {% set deprecation_logs, debug_logs, info_and_error_logs = [], [], [] %}
+        {% set deprecation_logs, debug_logs, info_and_error_logs, silenced_logs = [], [], [], [] %}
         {% for log in collector.logs %}
             {% if log.context.level is defined and log.context.type is defined and log.context.type in [constant('E_DEPRECATED'), constant('E_USER_DEPRECATED')] %}
                 {% set deprecation_logs = deprecation_logs|merge([log]) %}
+            {% elseif log.context.scream is defined and log.context.scream == true  %}
+                {% set silenced_logs = silenced_logs|merge([log]) %}
             {% elseif log.priorityName == 'DEBUG' %}
                 {% set debug_logs = debug_logs|merge([log]) %}
             {% else %}
@@ -108,6 +110,21 @@
                     {% endif %}
                 </div>
             </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Silenced Errors <span class="badge">{{ collector.countscreams|default(0) }}</span></h3>
+
+                <div class="tab-content">
+                    {% if silenced_logs is empty %}
+                        <div class="empty">
+                            <p>There are no log messages of this level.</p>
+                        </div>
+                    {% else %}
+                        {{ helper.render_table(silenced_logs) }}
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
     {% endif %}
 {% endblock %}

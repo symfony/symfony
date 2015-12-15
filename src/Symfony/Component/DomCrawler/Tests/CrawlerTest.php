@@ -37,7 +37,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->add($this->createNodeList());
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
-        $list = array();
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -47,7 +46,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMElement');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an \DOMNode');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
@@ -57,20 +56,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testAddInvalidType()
-    {
-        $crawler = new Crawler();
-        $crawler->add(1);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Nodes set in a Crawler must be DOMElement or DOMDocument instances, "DOMNode" given.
-     */
     public function testAddInvalidNode()
     {
         $crawler = new Crawler();
-        $crawler->add(new \DOMNode());
+        $crawler->add(1);
     }
 
     /**
@@ -274,7 +263,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMElement');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
     }
 
     public function testClear()
@@ -527,7 +516,7 @@ EOF
 
     public function testFilterXPathWithAttributeAxisAfterElementAxis()
     {
-        $this->assertCount(0, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
+        $this->assertCount(3, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
     }
 
     public function testFilterXPathWithChildAxis()
@@ -743,6 +732,22 @@ HTML;
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->link() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        $crawler = $this->createTestCrawler('http://example.com/bar/');
+
+        try {
+            $crawler->filterXPath('//li/text()')->link();
+            $this->fail('->link() throws an \InvalidArgumentException if the selected node is not instance of \DOMElement');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->link() throws an \InvalidArgumentException if the selected node is not instance of \DOMElement');
+        }
+
+        try {
+            $crawler->filterXPath('//li/text()')->links();
+            $this->fail('->links() throws an \InvalidArgumentException if the selected nodes are not instances of \DOMElement');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->links() throws an \InvalidArgumentException if the selected node are not instances of \DOMElement');
+        }
     }
 
     public function testSelectLinkAndLinkFiltered()
@@ -814,6 +819,13 @@ HTML;
             $this->fail('->form() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->form() throws an \InvalidArgumentException if the node list is empty');
+        }
+
+        try {
+            $crawler->filterXPath('//li/text()')->link();
+            $this->fail('->form() throws an \InvalidArgumentException if the selected node is not instance of \DOMElement');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->form() throws an \InvalidArgumentException if the selected node is not instance of \DOMElement');
         }
     }
 

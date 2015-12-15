@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+* [BC BREAK] The typehints on the `Link`, `Form` and `FormField` classes have been changed back from
+    `DOMElement` to `\DOMNode`. Creating links or forms via `Crawler::link()`, `Crawler::links()` and
+    `Crawler::form()` with any other type of `DOMNode` except `DOMElement` is now throwing an
+    `\InvalidArgumentException`.
+
 2.5.0
 -----
 

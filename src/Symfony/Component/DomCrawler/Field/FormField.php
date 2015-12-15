@@ -19,7 +19,7 @@ namespace Symfony\Component\DomCrawler\Field;
 abstract class FormField
 {
     /**
-     * @var \DOMElement
+     * @var \DOMNode
      */
     protected $node;
     /**
@@ -46,9 +46,9 @@ abstract class FormField
     /**
      * Constructor.
      *
-     * @param \DOMElement $node The node associated with this field
+     * @param \DOMNode $node The node associated with this field
      */
-    public function __construct(\DOMElement $node)
+    public function __construct(\DOMNode $node)
     {
         $this->node = $node;
         $this->name = $node->getAttribute('name');

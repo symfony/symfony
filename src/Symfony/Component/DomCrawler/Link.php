@@ -19,7 +19,7 @@ namespace Symfony\Component\DomCrawler;
 class Link
 {
     /**
-     * @var \DOMElement
+     * @var \DOMNode
      */
     protected $node;
 
@@ -36,13 +36,13 @@ class Link
     /**
      * Constructor.
      *
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string      $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string      $method     The method to use for the link (get by default)
+     * @param \DOMNode $node       A \DOMNode instance
+     * @param string   $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param string   $method     The method to use for the link (get by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
+    public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
         if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
@@ -56,7 +56,7 @@ class Link
     /**
      * Gets the node associated with this link.
      *
-     * @return \DOMElement A \DOMElement instance
+     * @return \DOMNode A \DOMNode instance
      */
     public function getNode()
     {
@@ -163,13 +163,13 @@ class Link
     }
 
     /**
-     * Sets current \DOMElement instance.
+     * Sets current \DOMNode instance.
      *
-     * @param \DOMElement $node A \DOMElement instance
+     * @param \DOMNode $node A \DOMNode instance
      *
      * @throws \LogicException If given node is not an anchor
      */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMNode $node)
     {
         if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to navigate from a "%s" tag.', $node->nodeName));

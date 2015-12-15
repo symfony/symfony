@@ -221,7 +221,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertNull($field->getValue(), '->getValue() returns null if the checkbox is not checked');
         $this->assertFalse($field->isMultiple(), '->hasValue() returns false for checkboxes');
         try {
-            $field->addChoice(new \DOMElement('input'));
+            $field->addChoice(new \DOMNode());
             $this->fail('->addChoice() throws a \LogicException for checkboxes');
         } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException for checkboxes');

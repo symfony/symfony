@@ -44,6 +44,12 @@
             </call>
         </service>
 
+        <service id="serializer.mapping.cache.apcu" class="Doctrine\Common\Cache\ApcuCache" public="false">
+            <call method="setNamespace">
+                <argument>%serializer.mapping.cache.prefix%</argument>
+            </call>
+        </service>
+
         <!-- Encoders -->
         <service id="serializer.encoder.xml" class="Symfony\Component\Serializer\Encoder\XmlEncoder" public="false">
             <tag name="serializer.encoder" />

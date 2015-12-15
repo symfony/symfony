@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\NotesContainer;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -315,5 +316,29 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertFalse($form->createView()->vars['required'], 'collection is not required');
         $this->assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
+    }
+
+    public function testDeleteDoesNotUseOffsetUnset()
+    {
+        $data = new NotesContainer();
+        $data->addNote('foo@bar.com');
+        $data->addNote('bar@bar.com');
+
+        $builder = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', $data, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\NotesContainer',
+        ));
+        $builder->add('notes', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array(
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'allow_delete' => true,
+            'by_reference' => false,
+        ));
+
+        $form = $builder->getForm();
+        $form->submit(array(
+            'notes' => array('bar@bar.com'),
+        ));
+
+        $this->assertEquals(1, $form->getData()->getNotes()->count());
+        $this->assertEquals('bar@bar.com', $form->getData()->getNotes()->first());
     }
 }

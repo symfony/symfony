@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-14T18:17:30Z
+
+What does this fix? What type is the id value that you want to cast?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-12-14T18:23:28Z
+
+Well, does that even matter? It's a regression right?
+But for info, https://github.com/ramsey/uuid-doctrine
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-14T19:31:08Z
+
+Just because the new version doesn't behave exactly like the deprecated one doesn't mean it's a regression.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-14T19:33:02Z
+
+Btw, for your use-case the string case is not safe to use anyway, because the https://github.com/ramsey/uuid/blob/master/src/UuidInterface.php does not mandate a `__toString` method.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-12-14T20:49:04Z
+
+If you don't want to classify it as a regression, fine, although the feels like a stretch in this particular case.
+
+My change is making the behaviour consistent throughout the class. It's casted to string in one place but not a other.
+
+My particular use case has no relevance in the discussion.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-12-14T20:50:42Z
+
+Thoughts @webmozart? Since you wrote it.
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2015-12-14T20:53:52Z
+
+Well it is used as a key in an array and ID in doctrine can be a value object.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-12-15T08:58:36Z
+
+I think it's fine to make this change. Could you add a test case though?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-12-15T10:16:47Z
+
+@webmozart thanks, will do
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-12-15T11:01:28Z
+
+@webmozart how's that?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-12-15T12:40:28Z
+
+:+1:

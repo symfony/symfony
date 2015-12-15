@@ -384,7 +384,7 @@ class Table
             $columns[] = $this->getNumberOfColumns($row);
         }
 
-        return $this->numberOfColumns = max($columns);
+        $this->numberOfColumns = max($columns);
     }
 
     private function buildTableRows($rows)
@@ -539,7 +539,7 @@ class Table
      *
      * @param array $row
      *
-     * @return array()
+     * @return array
      */
     private function getRowColumns($row)
     {
@@ -577,8 +577,6 @@ class Table
 
     /**
      * Gets column width.
-     *
-     * @param int $column
      *
      * @return int
      */

@@ -895,12 +895,12 @@ class OptionsResolver implements Options
      */
     private function verifyAllowedType($type, $value)
     {
-        if (substr($type, -2) === '[]') {
+        if (mb_substr($type, -2) === '[]') {
             //allowed type is typed array
             if (!is_array($value)) {
                 return false;
             }
-            $subType = substr($type, 0, -2);
+            $subType = mb_substr($type, 0, -2);
             foreach ($value as $v) {
                 //recursive call -> check subtype
                 if (!$this->verifyAllowedType($subType, $v)) {
@@ -997,7 +997,7 @@ class OptionsResolver implements Options
     {
         if (is_array($value) && $option) {
             foreach ($this->allowedTypes[$option] as $type) {
-                if (substr($type, -2) === '[]') {
+                if (mb_substr($type, -2) === '[]') {
                     return $this->formatComplexTypeOf($value, $type);
                 }
             }
@@ -1020,14 +1020,14 @@ class OptionsResolver implements Options
     private function formatComplexTypeOf(array $value, $type)
     {
         $suffix = '[]';
-        $type = substr($type, 0, -2);
-        while (substr($type, -2) === '[]') {
+        $type = mb_substr($type, 0, -2);
+        while (mb_substr($type, -2) === '[]') {
             $value = array_shift($value);
             if (!is_array($value)) {
                 //expected a nested array, but we've already hit a scalar
                 break;
             }
-            $type = substr($type, 0, -2);
+            $type = mb_substr($type, 0, -2);
             $suffix .= '[]';
         }
         if (is_array($value)) {

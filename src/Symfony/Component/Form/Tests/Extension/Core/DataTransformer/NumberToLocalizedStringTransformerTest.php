@@ -236,13 +236,11 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($to, $transformer->reverseTransform($from));
     }
 
-    // https://github.com/symfony/symfony/issues/7609
+    /**
+     * @see https://github.com/symfony/symfony/issues/7609
+     */
     public function testReverseTransformWithGroupingAndFixedSpaces()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('The "mbstring" extension is required for this test.');
-        }
-
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
@@ -586,10 +584,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('The "mbstring" extension is required for this test.');
-        }
-
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
@@ -606,10 +600,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransformIgnoresTrailingSpacesInExceptionMessage()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('The "mbstring" extension is required for this test.');
-        }
-
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
@@ -637,10 +627,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('The "mbstring" extension is required for this test.');
-        }
-
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 

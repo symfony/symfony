@@ -38,12 +38,13 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
      * @param TemplateFinderInterface $finder    The template paths cache warmer
      * @param array                   $paths     Additional twig paths to warm
      */
-    public function __construct(ContainerInterface $container, TemplateFinderInterface $finder, array $paths = array())
+    public function __construct(ContainerInterface $container, TemplateFinderInterface $finder = null, array $paths = array())
     {
         // We don't inject the Twig environment directly as it depends on the
         // template locator (via the loader) which might be a cached one.
         // The cached template locator is available once the TemplatePathsCacheWarmer
-        // has been warmed up
+        // has been warmed up.
+        // But it can also be null if templating has been disabled.
         $this->container = $container;
         $this->finder = $finder;
         $this->paths = $paths;
@@ -56,6 +57,10 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
+        if (null === $this->finder) {
+            return;
+        }
+
         $twig = $this->container->get('twig');
 
         $templates = $this->finder->findAllTemplates();

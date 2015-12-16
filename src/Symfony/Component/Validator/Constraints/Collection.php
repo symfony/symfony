@@ -18,8 +18,6 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Collection extends Composite
 {

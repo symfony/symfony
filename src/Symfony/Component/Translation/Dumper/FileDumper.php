@@ -97,8 +97,10 @@ abstract class FileDumper implements DumperInterface
      *
      * @return string representation
      */
-    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
+        @trigger_error('The '.__METHOD__.' method will replace the format method in 3.0. You should overwrite it instead of overwriting format instead.', E_USER_DEPRECATED);
+
         return $this->format($messages, $domain);
     }
 
@@ -109,8 +111,13 @@ abstract class FileDumper implements DumperInterface
      * @param string           $domain
      *
      * @return string representation
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Overwrite formatCatalogue() instead.
      */
-    abstract protected function format(MessageCatalogue $messages, $domain);
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        throw new \LogicException('The "FileDumper::format" method needs to be overwritten, you should implement either "format" or "formatCatalogue".');
+    }
 
     /**
      * Gets the file extension of the dumper.

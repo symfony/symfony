@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -93,9 +92,9 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
+            $io->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
         }
 
         $locale = $input->getArgument('locale');
@@ -152,7 +151,7 @@ EOF
                 $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            $output->warning($outputMessage);
+            $io->warning($outputMessage);
 
             return;
         }
@@ -202,21 +201,21 @@ EOF
             }
         }
 
-        $output->table($headers, $rows);
+        $io->table($headers, $rows);
     }
 
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<error>missing</error>';
+            return '<error> missing </error>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<comment>unused</comment>';
+            return '<comment> unused </comment>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<info>fallback</info>';
+            return '<info> fallback </info>';
         }
 
         return $state;
@@ -234,14 +233,14 @@ EOF
 
     private function formatId($id)
     {
-        return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
+        return sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
     private function sanitizeString($string, $length = 40)
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
-        if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
+        if (false !== $encoding = mb_detect_encoding($string, null, true)) {
             if (mb_strlen($string, $encoding) > $length) {
                 return mb_substr($string, 0, $length - 3, $encoding).'...';
             }

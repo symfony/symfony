@@ -69,6 +69,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
+    /** @group legacy */
     public function testSecureRandomIsAvailableIfCsrfIsDisabled()
     {
         $container = $this->createContainerFromFile('csrf_disabled');
@@ -250,7 +251,7 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('fr'), $calls[0][1][0]);
+        $this->assertEquals(array('fr'), $calls[1][1][0]);
     }
 
     public function testTranslatorMultipleFallbacks()
@@ -258,7 +259,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('translator_fallbacks');
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('en', 'fr'), $calls[0][1][0]);
+        $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
     }
 
     /**
@@ -297,13 +298,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
+     * @requires extension apc
      */
     public function testLegacyFullyConfiguredValidationService()
     {
-        if (!extension_loaded('apc')) {
-            $this->markTestSkipped('The apc extension is not available.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
@@ -320,8 +318,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
-        $this->assertInstanceOf('Doctrine\Common\Annotations\FileCacheReader', $container->get('annotation_reader'));
+        $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache')->getArgument(0));
+        $this->assertSame('annotations.cached_reader', (string) $container->getAlias('annotation_reader'));
+        $this->assertSame('annotations.filesystem_cache', (string) $container->getDefinition('annotations.cached_reader')->getArgument(1));
     }
 
     public function testFileLinkFormat()
@@ -484,6 +483,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('serializer_disabled');
 
         $this->assertFalse($container->hasDefinition('serializer'));
+    }
+
+    public function testPropertyInfoDisabled()
+    {
+        $container = $this->createContainerFromFile('default_config');
+        $this->assertFalse($container->has('property_info'));
+    }
+
+    public function testPropertyInfoEnabled()
+    {
+        $container = $this->createContainerFromFile('property_info');
+        $this->assertTrue($container->has('property_info'));
     }
 
     protected function createContainer(array $data = array())

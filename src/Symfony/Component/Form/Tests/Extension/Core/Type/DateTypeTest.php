@@ -715,7 +715,6 @@ class DateTypeTest extends TestCase
         $this->assertSame('single_text', $view->vars['widget']);
     }
 
-    // Bug fix
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set
@@ -769,6 +768,9 @@ class DateTypeTest extends TestCase
         $this->assertSame('Empty', $view['day']->vars['placeholder']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPassEmptyValueBC()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
@@ -930,8 +932,7 @@ class DateTypeTest extends TestCase
     public function testYearsFor32BitsMachines()
     {
         if (4 !== PHP_INT_SIZE) {
-            $this->markTestSkipped(
-                'PHP must be compiled in 32 bit mode to run this test');
+            $this->markTestSkipped('PHP 32 bit is required.');
         }
 
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
@@ -946,5 +947,42 @@ class DateTypeTest extends TestCase
         }
 
         $this->assertEquals($listChoices, $view['year']->vars['choices']);
+    }
+
+    public function testPassDefaultChoiceTranslationDomain()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType');
+
+        $view = $form->createView();
+        $this->assertFalse($view['year']->vars['choice_translation_domain']);
+        $this->assertFalse($view['month']->vars['choice_translation_domain']);
+        $this->assertFalse($view['day']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsString()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
+            'choice_translation_domain' => 'messages',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('messages', $view['year']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['month']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['day']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsArray()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
+            'choice_translation_domain' => array(
+                'year' => 'foo',
+                'day' => 'test',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('foo', $view['year']->vars['choice_translation_domain']);
+        $this->assertFalse($view['month']->vars['choice_translation_domain']);
+        $this->assertSame('test', $view['day']->vars['choice_translation_domain']);
     }
 }

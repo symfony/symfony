@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -42,8 +41,6 @@ use Symfony\Component\ClassLoader\ClassCollectionLoader;
  * It manages an environment made of bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Kernel implements KernelInterface, TerminableInterface
 {
@@ -62,23 +59,21 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.8.0-DEV';
-    const VERSION_ID = '20800';
-    const MAJOR_VERSION = '2';
-    const MINOR_VERSION = '8';
-    const RELEASE_VERSION = '0';
+    const VERSION = '2.8.1-DEV';
+    const VERSION_ID = 20801;
+    const MAJOR_VERSION = 2;
+    const MINOR_VERSION = 8;
+    const RELEASE_VERSION = 1;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '05/2018';
-    const END_OF_LIFE = '05/2019';
+    const END_OF_MAINTENANCE = '11/2018';
+    const END_OF_LIFE = '11/2019';
 
     /**
      * Constructor.
      *
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
-     *
-     * @api
      */
     public function __construct($environment, $debug)
     {
@@ -120,8 +115,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * Boots the current kernel.
-     *
-     * @api
      */
     public function boot()
     {
@@ -149,8 +142,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function terminate(Request $request, Response $response)
     {
@@ -165,8 +156,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function shutdown()
     {
@@ -181,17 +170,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundle->setContainer(null);
         }
 
-        if ($this->container instanceof ResettableContainerInterface) {
-            $this->container->reset();
-        }
-
         $this->container = null;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -214,8 +197,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getBundles()
     {
@@ -224,8 +205,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
@@ -244,8 +223,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getBundle($name, $first = true)
     {
@@ -321,8 +298,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getName()
     {
@@ -335,8 +310,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getEnvironment()
     {
@@ -345,8 +318,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function isDebug()
     {
@@ -355,8 +326,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getRootDir()
     {
@@ -370,8 +339,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getContainer()
     {
@@ -405,8 +372,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getStartTime()
     {
@@ -415,8 +380,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getCacheDir()
     {
@@ -425,8 +388,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getLogDir()
     {
@@ -435,8 +396,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getCharset()
     {

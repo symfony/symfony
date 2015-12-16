@@ -89,15 +89,60 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($provider->supportsClass(get_class($user2)));
     }
 
+    public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
+    {
+        $repository = $this->getMock('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface');
+        $repository->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with('name')
+            ->willReturn(
+                $this->getMock('\Symfony\Component\Security\Core\User\UserInterface')
+            );
+
+        $provider = new EntityUserProvider(
+            $this->getManager($this->getObjectManager($repository)),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
+        );
+
+        $provider->loadUserByUsername('name');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadUserByUserNameShouldDeclineInvalidInterface()
+    {
+        $repository = $this->getMock('\Symfony\Component\Security\Core\User\AdvancedUserInterface');
+
+        $provider = new EntityUserProvider(
+            $this->getManager($this->getObjectManager($repository)),
+            'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
+        );
+
+        $provider->loadUserByUsername('name');
+    }
+
     private function getManager($em, $name = null)
     {
         $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $manager->expects($this->once())
+        $manager->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
             ->will($this->returnValue($em));
 
         return $manager;
+    }
+
+    private function getObjectManager($repository)
+    {
+        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->getMockForAbstractClass();
+        $em->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        return $em;
     }
 
     private function createSchema($em)

@@ -131,6 +131,10 @@ class FrameworkExtension extends Extension
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
+        if (isset($config['property_info'])) {
+            $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
         $loader->load('debug_prod.xml');
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
@@ -479,7 +483,7 @@ class FrameworkExtension extends Extension
                 'sublime' => 'subl://open?url=file://%%f&line=%%l',
             );
 
-            $container->setParameter('templating.helper.code.file_link_format', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format') ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+            $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
         }
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
@@ -841,22 +845,29 @@ class FrameworkExtension extends Extension
     {
         $loader->load('annotations.xml');
 
-        if ('file' === $config['cache']) {
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+        if ('none' !== $config['cache']) {
+            if ('file' === $config['cache']) {
+                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+                }
+
+                $container
+                    ->getDefinition('annotations.filesystem_cache')
+                    ->replaceArgument(0, $cacheDir)
+                ;
+
+                // The annotations.file_cache_reader service is deprecated
+                $container
+                    ->getDefinition('annotations.file_cache_reader')
+                    ->replaceArgument(1, $cacheDir)
+                    ->replaceArgument(2, $config['debug'])
+                ;
             }
 
             $container
-                ->getDefinition('annotations.file_cache_reader')
-                ->replaceArgument(1, $cacheDir)
-                ->replaceArgument(2, $config['debug'])
-            ;
-            $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
-        } elseif ('none' !== $config['cache']) {
-            $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference($config['cache']))
+                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
@@ -976,6 +987,28 @@ class FrameworkExtension extends Extension
 
         if (isset($config['name_converter']) && $config['name_converter']) {
             $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
+        }
+    }
+
+    /**
+     * Loads property info configuration.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param XmlFileLoader    $loader
+     */
+    private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $loader->load('property_info.xml');
+
+        if (class_exists('phpDocumentor\Reflection\ClassReflector')) {
+            $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition->addTag('property_info.description_extractor', array('priority' => -1000));
+            $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }
     }
 

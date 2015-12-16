@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class GetAttrNode extends Node
 {
     const PROPERTY_CALL = 1;
@@ -78,7 +83,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                return call_user_func_array(array($obj, $this->nodes['attribute']->evaluate($functions, $values)), $this->nodes['arguments']->evaluate($functions, $values));
+                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);

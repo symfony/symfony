@@ -4,6 +4,8 @@ CHANGELOG
 2.8.0
 -----
 
+ * deprecated the abstract ContainerAware class in favor of ContainerAwareTrait
+ * deprecated IntrospectableContainerInterface, to be merged with ContainerInterface in 3.0
  * allowed specifying a directory to recursively load all configuration files it contains
  * deprecated the concept of scopes
  * added `Definition::setShared()` and `Definition::isShared()`

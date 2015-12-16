@@ -1,12 +1,17 @@
-<comment>Path</comment>         /name/add
-<comment>Path Regex</comment>   #^/name/add$#s
-<comment>Host</comment>         localhost
-<comment>Host Regex</comment>   #^localhost$#si
-<comment>Scheme</comment>       http|https
-<comment>Method</comment>       PUT|POST
-<comment>Class</comment>        Symfony\Component\Routing\Route
-<comment>Defaults</comment>     NONE
-<comment>Requirements</comment> NO CUSTOM
-<comment>Options</comment>      compiler_class: Symfony\Component\Routing\RouteCompiler
-             opt1: val1
-             opt2: val2
++--------------+---------------------------------------------------------+
+|[32m Property     [39m|[32m Value                                                   [39m|
++--------------+---------------------------------------------------------+
+| Route Name   |                                                         |
+| Path         | /name/add                                               |
+| Path Regex   | #^/name/add$#s                                          |
+| Host         | localhost                                               |
+| Host Regex   | #^localhost$#si                                         |
+| Scheme       | http|https                                              |
+| Method       | PUT|POST                                                |
+| Requirements | NO CUSTOM                                               |
+| Class        | Symfony\Component\Routing\Route                         |
+| Defaults     | NONE                                                    |
+| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler |
+|              | opt1: val1                                              |
+|              | opt2: val2                                              |
++--------------+---------------------------------------------------------+

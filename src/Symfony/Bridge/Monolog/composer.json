@@ -20,8 +20,7 @@
         "monolog/monolog": "~1.11"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/http-kernel": "~2.4|~3.0.0",
+        "symfony/http-kernel": "~2.4",
         "symfony/console": "~2.4|~3.0.0",
         "symfony/event-dispatcher": "~2.2|~3.0.0"
     },
@@ -31,7 +30,10 @@
         "symfony/event-dispatcher": "Needed when using log messages in console commands."
      },
     "autoload": {
-        "psr-4": { "Symfony\\Bridge\\Monolog\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Monolog\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

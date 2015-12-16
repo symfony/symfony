@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/config": "~2.7",
+        "symfony/config": "~2.8",
         "symfony/intl": "~2.4|~3.0.0",
         "symfony/yaml": "~2.2|~3.0.0",
         "psr/log": "~1.0"
@@ -34,7 +34,10 @@
         "psr/log": "To use logging capability in translator"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Translation\\": "" }
+        "psr-4": { "Symfony\\Component\\Translation\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

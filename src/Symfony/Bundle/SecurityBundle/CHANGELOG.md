@@ -4,8 +4,9 @@ CHANGELOG
 2.8.0
 -----
 
- * deprecated the `key` setting of `anonymous` and `remember_me` in favor of the
-   `secret` setting.
+ * deprecated the `key` setting of `anonymous`, `remember_me` and `http_digest`
+   in favor of the `secret` setting.
+ * deprecated the `intention` firewall listener setting in favor of the `csrf_token_id`.
 
 2.6.0
 -----

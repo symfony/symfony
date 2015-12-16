@@ -24,8 +24,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
- *
- * @api
  */
 class XmlDumper extends Dumper
 {
@@ -40,8 +38,6 @@ class XmlDumper extends Dumper
      * @param array $options An array of options
      *
      * @return string An xml string representing of the service container
-     *
-     * @api
      */
     public function dump(array $options = array())
     {
@@ -199,6 +195,24 @@ class XmlDumper extends Dumper
                 $factory->setAttribute('function', $callable);
             }
             $service->appendChild($factory);
+        }
+
+        if ($definition->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
+        if ($definition->isAutowired()) {
+            $service->setAttribute('autowire', 'true');
+        }
+
+        foreach ($definition->getAutowiringTypes() as $autowiringTypeValue) {
+            $autowiringType = $this->document->createElement('autowiring-type');
+            $autowiringType->appendChild($this->document->createTextNode($autowiringTypeValue));
+
+            $service->appendChild($autowiringType);
         }
 
         if ($callable = $definition->getConfigurator()) {

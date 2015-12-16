@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project.
@@ -82,10 +83,11 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $twig = $this->getTwigEnvironment();
 
         if (null === $twig) {
-            $output->writeln('<error>The Twig environment needs to be set.</error>');
+            $io->error('The Twig environment needs to be set.');
 
             return 1;
         }
@@ -100,7 +102,7 @@ EOF
                 }
             }
             $data['tests'] = array_keys($data['tests']);
-            $output->writeln(json_encode($data));
+            $io->writeln(json_encode($data));
 
             return 0;
         }
@@ -118,14 +120,11 @@ EOF
             if (!$items) {
                 continue;
             }
-            if ($index > 0) {
-                $output->writeln('');
-            }
-            $output->writeln('<info>'.ucfirst($type).'</info>');
+
+            $io->section(ucfirst($type));
+
             ksort($items);
-            foreach ($items as $item) {
-                $output->writeln('  '.$item);
-            }
+            $io->listing($items);
         }
 
         return 0;
@@ -150,7 +149,7 @@ EOF
                     return;
                 }
                 $refl = new \ReflectionMethod($cb[0], $cb[1]);
-            } elseif (is_object($cb) && is_callable($cb)) {
+            } elseif (is_object($cb) && method_exists($cb, '__invoke')) {
                 $refl = new \ReflectionMethod($cb, '__invoke');
             } elseif (function_exists($cb)) {
                 $refl = new \ReflectionFunction($cb);

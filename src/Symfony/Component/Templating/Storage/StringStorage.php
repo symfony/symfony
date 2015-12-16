@@ -15,8 +15,6 @@ namespace Symfony\Component\Templating\Storage;
  * StringStorage represents a template stored in a string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class StringStorage extends Storage
 {
@@ -24,8 +22,6 @@ class StringStorage extends Storage
      * Returns the content of the template.
      *
      * @return string The template content
-     *
-     * @api
      */
     public function getContent()
     {

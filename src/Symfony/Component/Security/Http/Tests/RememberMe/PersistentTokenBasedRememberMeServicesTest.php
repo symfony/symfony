@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\Util\SecureRandom;
 
 class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
@@ -180,7 +179,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
 
     public function testLogout()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo'));
+        $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo', 'secure' => true, 'httponly' => false));
         $request = new Request();
         $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
         $response = new Response();
@@ -201,6 +200,8 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         $this->assertTrue($cookie->isCleared());
         $this->assertEquals('/foo', $cookie->getPath());
         $this->assertEquals('foodomain.foo', $cookie->getDomain());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertFalse($cookie->isHttpOnly());
     }
 
     public function testLogoutSimplyIgnoresNonSetRequestCookie()
@@ -311,7 +312,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
             $userProvider = $this->getProvider();
         }
 
-        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger, new SecureRandom(sys_get_temp_dir().'/_sf2.seed'));
+        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger);
     }
 
     protected function getProvider()

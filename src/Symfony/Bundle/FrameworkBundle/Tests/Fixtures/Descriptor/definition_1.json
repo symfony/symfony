@@ -12,5 +12,7 @@
     "factory_method": "get",
     "tags": [
 
-    ]
+    ],
+    "autowire": false,
+    "autowiring_types": []
 }

@@ -17,10 +17,17 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "doctrine/common": "~2.3",
-        "twig/twig": "~1.20|~2.0",
+        "doctrine/common": "~2.4",
+        "twig/twig": "~1.23|~2.0",
         "psr/log": "~1.0",
-        "symfony/security-acl": "~2.7"
+        "symfony/security-acl": "~2.7",
+        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-php54": "~1.0",
+        "symfony/polyfill-php55": "~1.0",
+        "symfony/polyfill-php56": "~1.0",
+        "symfony/polyfill-php70": "~1.0",
+        "symfony/polyfill-util": "~1.0"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -43,16 +50,19 @@
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
+        "symfony/ldap": "self.version",
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
+        "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
+        "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
@@ -68,15 +78,17 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "self.version",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/dbal": "~2.4",
+        "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
-        "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0",
-        "egulias/email-validator": "~1.2"
+        "egulias/email-validator": "~1.2",
+        "phpdocumentor/reflection": "^1.0.7"
+    },
+    "conflict": {
+        "phpdocumentor/reflection": "<1.0.7"
     },
     "autoload": {
         "psr-4": {
@@ -89,10 +101,11 @@
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
-            "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
-        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "exclude-from-classmap": [
+            "**/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

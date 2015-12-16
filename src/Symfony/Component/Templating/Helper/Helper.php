@@ -18,8 +18,6 @@ namespace Symfony\Component\Templating\Helper;
  * class that exposes a read-only interface for templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Helper implements HelperInterface
 {
@@ -29,8 +27,6 @@ abstract class Helper implements HelperInterface
      * Sets the default charset.
      *
      * @param string $charset The charset
-     *
-     * @api
      */
     public function setCharset($charset)
     {
@@ -41,8 +37,6 @@ abstract class Helper implements HelperInterface
      * Gets the default charset.
      *
      * @return string The default charset
-     *
-     * @api
      */
     public function getCharset()
     {

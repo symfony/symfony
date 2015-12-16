@@ -3,11 +3,6 @@ shallow_clone: true
 platform: x86
 clone_folder: c:\projects\symfony
 
-environment:
-    matrix:
-        - PHP_EXT: 1
-        - PHP_EXT: 0
-
 cache:
     - c:\php -> appveyor.yml
     - .phpunit -> phpunit
@@ -18,33 +13,42 @@ init:
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET PHP=1
     - SET ANSICON=121x90 (121x90)
+    - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
 
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.3.11-nts-Win32-VC9-x86.zip
-    - IF %PHP%==1 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/ICU-51.2-dlls.zip
-    - IF %PHP%==1 7z x ICU-51.2-dlls.zip -y > 7z.log
+    - IF %PHP%==1 7z x ICU-51.2-dlls.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 cd ext
     - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/php_intl-3.0.0-5.3-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_intl-3.0.0-5.3-nts-vc9-x86.zip -y > 7z.log
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apc/3.1.13/php_apc-3.1.13-5.3-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_apc-3.1.13-5.3-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php_intl-3.0.0-5.3-nts-vc9-x86.zip -y >nul
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.8/php_apcu-4.0.8-5.3-nts-vc9-x86.zip
+    - IF %PHP%==1 7z x php_apcu-4.0.8-5.3-nts-vc9-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.3-nts-vc9-x86.zip
-    - IF %PHP%==1 7z x php_memcache-3.0.8-5.3-nts-vc9-x86.zip -y > 7z.log
+    - IF %PHP%==1 7z x php_memcache-3.0.8-5.3-nts-vc9-x86.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 cd ..
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    - IF %PHP%==1 copy /Y php.ini-development php.ini-min
+    - IF %PHP%==1 echo max_execution_time=1200 >> php.ini-min
+    - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min
+    - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
+    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
+    - IF %PHP%==1 copy /Y php.ini-min php.ini-max
+    - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
+    - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
+    - IF %PHP%==1 echo extension=php_memcache.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max
     - appveyor DownloadFile https://getcomposer.org/composer.phar
-    - copy php.ini-production php.ini /Y
-    - echo date.timezone="UTC" >> php.ini
-    - echo extension_dir=ext >> php.ini
-    - echo extension=php_openssl.dll >> php.ini
-    - IF %PHP_EXT%==1 echo extension=php_apc.dll >> php.ini
-    - IF %PHP_EXT%==1 echo extension=php_intl.dll >> php.ini
-    - IF %PHP_EXT%==1 echo extension=php_mbstring.dll >> php.ini
-    - IF %PHP_EXT%==1 echo extension=php_fileinfo.dll >> php.ini
-    - IF %PHP_EXT%==1 echo extension=php_pdo_sqlite.dll >> php.ini
+    - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
@@ -52,4 +56,9 @@ install:
 
 test_script:
     - cd c:\projects\symfony
-    - php phpunit symfony --exclude-group benchmark,intl-data
+    - SET X=0
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - copy /Y c:\php\php.ini-max c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - exit %X%

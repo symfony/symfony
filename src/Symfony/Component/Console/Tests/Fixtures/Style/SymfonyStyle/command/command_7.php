@@ -2,11 +2,11 @@
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tests\Style\SymfonyStyleWithForcedLineLength;
 
 //Ensure questions do not output anything when input is non-interactive
 return function (InputInterface $input, OutputInterface $output) {
-    $output = new SymfonyStyle($input, $output);
+    $output = new SymfonyStyleWithForcedLineLength($input, $output);
     $output->title('Title');
     $output->askHidden('Hidden question');
     $output->choice('Choice question with default', array('choice1', 'choice2'), 'choice1');

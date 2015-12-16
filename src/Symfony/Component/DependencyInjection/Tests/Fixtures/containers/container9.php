@@ -90,6 +90,10 @@ $container
     ->setDecoratedService('decorated', 'decorated.pif-pouf')
 ;
 $container
+    ->register('deprecated_service', 'stdClass')
+    ->setDeprecated(true)
+;
+$container
     ->register('new_factory', 'FactoryClass')
     ->setProperty('foo', 'bar')
     ->setPublic(false)

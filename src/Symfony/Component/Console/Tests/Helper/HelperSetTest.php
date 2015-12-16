@@ -16,9 +16,6 @@ use Symfony\Component\Console\Command\Command;
 
 class HelperSetTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::__construct
-     */
     public function testConstructor()
     {
         $mock_helper = $this->getGenericMockHelper('fake_helper');
@@ -28,9 +25,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($helperset->has('fake_helper_alias'), '__construct sets helper alias for given helper');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::set
-     */
     public function testSet()
     {
         $helperset = new HelperSet();
@@ -49,9 +43,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($helperset->has('fake_helper_alias'), '->set() adds helper alias when set');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::has
-     */
     public function testHas()
     {
         $helperset = new HelperSet(array('fake_helper_alias' => $this->getGenericMockHelper('fake_helper')));
@@ -59,9 +50,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($helperset->has('fake_helper_alias'), '->has() finds set helper by alias');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::get
-     */
     public function testGet()
     {
         $helper_01 = $this->getGenericMockHelper('fake_helper_01');
@@ -75,16 +63,14 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $helperset = new HelperSet();
         try {
             $helperset->get('foo');
-            $this->fail('->get() throws \InvalidArgumentException when helper not found');
+            $this->fail('->get() throws InvalidArgumentException when helper not found');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws \InvalidArgumentException when helper not found');
-            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws \InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws InvalidArgumentException when helper not found');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\ExceptionInterface', $e, '->get() throws domain specific exception when helper not found');
+            $this->assertContains('The helper "foo" is not defined.', $e->getMessage(), '->get() throws InvalidArgumentException when helper not found');
         }
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::setCommand
-     */
     public function testSetCommand()
     {
         $cmd_01 = new Command('foo');
@@ -100,9 +86,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::getCommand
-     */
     public function testGetCommand()
     {
         $cmd = new Command('foo');
@@ -111,9 +94,6 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
-    /**
-     * @covers \Symfony\Component\Console\Helper\HelperSet::getIterator
-     */
     public function testIteration()
     {
         $helperset = new HelperSet();

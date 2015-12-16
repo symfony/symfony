@@ -1,0 +1,53 @@
+{
+    "name": "symfony/property-info",
+    "type": "library",
+    "description": "Symfony Property Info Component",
+    "keywords": [
+        "property",
+        "type",
+        "PHPDoc",
+        "symfony",
+        "validator",
+        "doctrine"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9"
+    },
+    "require-dev": {
+        "symfony/serializer": "~2.7|~3.0.0",
+        "phpdocumentor/reflection": "^1.0.7",
+        "doctrine/annotations": "~1.0"
+    },
+    "conflict": {
+        "phpdocumentor/reflection": "<1.0.7"
+    },
+    "suggest": {
+        "symfony/doctrine-bridge": "To use Doctrine metadata",
+        "phpdocumentor/reflection": "To use the PHPDoc",
+        "symfony/serializer": "To use Serializer metadata"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8-dev"
+        }
+    }
+}

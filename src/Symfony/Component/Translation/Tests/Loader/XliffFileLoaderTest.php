@@ -30,7 +30,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadWithInternalErrorsEnabled()
     {
-        libxml_use_internal_errors(true);
+        $internalErrors = libxml_use_internal_errors(true);
 
         $this->assertSame(array(), libxml_get_errors());
 
@@ -41,6 +41,9 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
         $this->assertSame(array(), libxml_get_errors());
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
     }
 
     public function testLoadWithResname()
@@ -61,10 +64,6 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testEncoding()
     {
-        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
-            $this->markTestSkipped('The iconv and mbstring extensions are not available.');
-        }
-
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 
@@ -148,5 +147,23 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('notes' => array(array('content' => 'bar', 'from' => 'foo'))), $catalogue->getMetadata('extra', 'domain1'));
         // message with empty target
         $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux'))), $catalogue->getMetadata('key', 'domain1'));
+    }
+
+    public function testLoadVersion2()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-2.0.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        $domains = $catalogue->all();
+        $this->assertCount(3, $domains['domain1']);
+        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+
+        // target attributes
+        $this->assertEquals(array('target-attributes' => array('order' => 1)), $catalogue->getMetadata('bar', 'domain1'));
     }
 }

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 /*
@@ -24,6 +33,7 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
  * Tests SetAclCommand.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
+ * @requires extension pdo_sqlite
  */
 class SetAclCommandTest extends WebTestCase
 {
@@ -32,9 +42,6 @@ class SetAclCommandTest extends WebTestCase
 
     protected function setUp()
     {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            self::markTestSkipped('This test requires SQLite support in your environment');
-        }
         parent::setUp();
 
         $this->deleteTmpDir('Acl');

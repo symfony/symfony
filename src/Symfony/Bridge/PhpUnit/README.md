@@ -8,14 +8,15 @@ It comes with the following features:
  * disable the garbage collector;
  * enforce a consistent `C` locale;
  * auto-register `class_exists` to load Doctrine annotations;
- * print a user deprecation notices summary at the end of the test suite.
+ * print a user deprecation notices summary at the end of the test suite;
+ * display the stack trace of a deprecation on-demand.
 
 By default any non-legacy-tagged or any non-@-silenced deprecation notices will
-make tests fail.
-This can be changed by setting the SYMFONY_DEPRECATIONS_HELPER environment
-variable to `weak`. This will make the bridge ignore deprecation notices and
-is useful to projects that must use deprecated interfaces for backward
-compatibility reasons.
+make tests fail. This can be changed by setting the `SYMFONY_DEPRECATIONS_HELPER`
+environment variable to the maximum number of deprecations that are allowed to be
+triggered before making the test suite fail. Alternatively, setting it to `weak`
+will make the bridge ignore any deprecation notices and is useful to projects
+that must use deprecated interfaces for backward compatibility reasons.
 
 A summary of deprecation notices is displayed at the end of the test suite:
 
@@ -33,7 +34,7 @@ A summary of deprecation notices is displayed at the end of the test suite:
 Usage
 -----
 
-Add this bridge to the `require-dev` section of your composer.json file
+Add this bridge to the `require-dev` section of your `composer.json` file
 (not in `require`) with e.g. `composer require --dev "symfony/phpunit-bridge"`.
 
 When running `phpunit`, you will see a summary of deprecation notices at the end
@@ -51,3 +52,10 @@ You have to decide either to:
  * update your code to not use deprecated interfaces anymore, thus gaining better
    forward compatibility;
  * or move them to the **Legacy** section (by using one of the above way).
+
+In case you need to inspect the stack trace of a particular deprecation triggered
+by your unit tests, you can set the `SYMFONY_DEPRECATIONS_HELPER` env var to a
+regular expression that matches this deprecation's message, encapsed between `/`.
+For example, `SYMFONY_DEPRECATIONS_HELPER=/foobar/ phpunit` will stop your test
+suite once a deprecation notice is triggered whose message contains the "foobar"
+string.

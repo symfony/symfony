@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ObjectNormalizerTest
+     * @var ObjectNormalizer
      */
     private $normalizer;
     /**
@@ -155,11 +155,13 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
     }
 
+    /**
+     * @see https://bugs.php.net/62715
+     *
+     * @requires PHP 5.3.17
+     */
     public function testConstructorDenormalizeWithOptionalDefaultArgument()
     {
-        if (PHP_VERSION_ID <= 50316) {
-            $this->markTestSkipped('See https://bugs.php.net/62715');
-        }
         $obj = $this->normalizer->denormalize(
             array('bar' => 'test'),
             __NAMESPACE__.'\ObjectConstructorArgsWithDefaultValueDummy', 'any');
@@ -235,6 +237,18 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             array('groups' => array('a', 'b'))
         );
         $this->assertEquals($obj, $normalized);
+    }
+
+    public function testNormalizeNoPropertyInGroup()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $this->assertEquals(array(), $this->normalizer->normalize($obj, null, array('groups' => array('notExist'))));
     }
 
     public function testGroupsNormalizeWithNameConverter()
@@ -454,6 +468,11 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
+
+    public function testNormalizeStatic()
+    {
+        $this->assertEquals(array('foo' => 'K'), $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
+    }
 }
 
 class ObjectDummy
@@ -601,5 +620,16 @@ class ObjectConstructorArgsWithDefaultValueDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class ObjectWithStaticPropertiesAndMethods
+{
+    public $foo = 'K';
+    public static $bar = 'A';
+
+    public static function getBaz()
+    {
+        return 'L';
     }
 }

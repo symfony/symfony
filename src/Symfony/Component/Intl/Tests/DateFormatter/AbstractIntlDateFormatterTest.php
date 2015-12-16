@@ -29,8 +29,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * When a time zone is not specified, it uses the system default however it returns null in the getter method.
      *
-     * @covers Symfony\Component\Intl\DateFormatter\IntlDateFormatter::getTimeZoneId
-     *
      * @see StubIntlDateFormatterTest::testDefaultTimeZoneIntl()
      */
     public function testConstructorDefaultTimeZone()
@@ -385,14 +383,21 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFormatWithDateTimeZone()
+    public function testFormatWithDateTimeZoneGmt()
     {
-        if (PHP_VERSION_ID < 50500) {
+        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
             $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
         }
 
-        if (defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped('This test cannot work on HHVM. See https://github.com/facebook/hhvm/issues/5875 for the issue.');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzzz');
+
+        $this->assertEquals('GMT', $formatter->format(0));
+    }
+
+    public function testFormatWithDateTimeZoneGmtOffset()
+    {
+        if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID <= 50509) {
+            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
@@ -400,14 +405,13 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('GMT+03:00', $formatter->format(0));
     }
 
+    /**
+     * @requires extension intl
+     */
     public function testFormatWithIntlTimeZone()
     {
-        if (PHP_VERSION_ID < 50500 && !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+        if (PHP_VERSION_ID < 50500 && !method_exists('IntlDateFormatter', 'setTimeZone')) {
             $this->markTestSkipped('Only in PHP 5.5+ IntlDateFormatter allows to use DateTimeZone objects.');
-        }
-
-        if (!class_exists('IntlTimeZone')) {
-            $this->markTestSkipped('This test requires the IntlTimeZone class from the Intl extension.');
         }
 
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, \IntlTimeZone::createTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
@@ -864,7 +868,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Intl\DateFormatter\IntlDateFormatter::getTimeZoneId
      * @dataProvider setTimeZoneIdProvider
      */
     public function testSetTimeZoneId($timeZoneId, $expectedTimeZoneId)

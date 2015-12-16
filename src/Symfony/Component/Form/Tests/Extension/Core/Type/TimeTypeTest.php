@@ -477,7 +477,6 @@ class TimeTypeTest extends TestCase
         $this->assertTrue($form->isPartiallyFilled());
     }
 
-    // Bug fix
     public function testInitializeWithDateTime()
     {
         // Throws an exception if "data_class" option is not explicitly set
@@ -572,6 +571,9 @@ class TimeTypeTest extends TestCase
         $this->assertSame('Empty', $view['second']->vars['placeholder']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPassEmptyValueBC()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
@@ -732,5 +734,43 @@ class TimeTypeTest extends TestCase
         $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'seconds' => 'bad value',
         ));
+    }
+
+    public function testPassDefaultChoiceTranslationDomain()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType');
+
+        $view = $form->createView();
+        $this->assertFalse($view['hour']->vars['choice_translation_domain']);
+        $this->assertFalse($view['minute']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsString()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+            'choice_translation_domain' => 'messages',
+            'with_seconds' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('messages', $view['hour']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['minute']->vars['choice_translation_domain']);
+        $this->assertSame('messages', $view['second']->vars['choice_translation_domain']);
+    }
+
+    public function testPassChoiceTranslationDomainAsArray()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+            'choice_translation_domain' => array(
+                'hour' => 'foo',
+                'second' => 'test',
+            ),
+            'with_seconds' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('foo', $view['hour']->vars['choice_translation_domain']);
+        $this->assertFalse($view['minute']->vars['choice_translation_domain']);
+        $this->assertSame('test', $view['second']->vars['choice_translation_domain']);
     }
 }

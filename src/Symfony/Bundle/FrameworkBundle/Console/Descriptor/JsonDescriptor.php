@@ -157,7 +157,7 @@ class JsonDescriptor extends Descriptor
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
 
-        $this->writeData(array($key => $this->formatParameter($parameter)), $options);
+        $this->writeData(array($key => $parameter), $options);
     }
 
     /**
@@ -228,6 +228,16 @@ class JsonDescriptor extends Descriptor
         }
 
         $data['abstract'] = $definition->isAbstract();
+
+        if (method_exists($definition, 'isAutowired')) {
+            $data['autowire'] = $definition->isAutowired();
+
+            $data['autowiring_types'] = array();
+            foreach ($definition->getAutowiringTypes() as $autowiringType) {
+                $data['autowiring_types'][] = $autowiringType;
+            }
+        }
+
         $data['file'] = $definition->getFile();
 
         if ($definition->getFactoryClass(false)) {
@@ -294,27 +304,21 @@ class JsonDescriptor extends Descriptor
     {
         $data = array();
 
-        $registeredListeners = $eventDispatcher->getListeners($event, true);
+        $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
-            krsort($registeredListeners);
-            foreach ($registeredListeners as $priority => $listeners) {
-                foreach ($listeners as $listener) {
-                    $listener = $this->getCallableData($listener);
-                    $listener['priority'] = $priority;
-                    $data[] = $listener;
-                }
+            foreach ($registeredListeners as $listener) {
+                $l = $this->getCallableData($listener);
+                $l['priority'] = $eventDispatcher->getListenerPriority($event, $listener);
+                $data[] = $l;
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
-                krsort($eventListeners);
-                foreach ($eventListeners as $priority => $listeners) {
-                    foreach ($listeners as $listener) {
-                        $listener = $this->getCallableData($listener);
-                        $listener['priority'] = $priority;
-                        $data[$eventListened][] = $listener;
-                    }
+                foreach ($eventListeners as $eventListener) {
+                    $l = $this->getCallableData($eventListener);
+                    $l['priority'] = $eventDispatcher->getListenerPriority($eventListened, $eventListener);
+                    $data[$eventListened][] = $l;
                 }
             }
         }

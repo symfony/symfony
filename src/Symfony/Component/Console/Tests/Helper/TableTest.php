@@ -466,10 +466,6 @@ TABLE
 
     public function testRenderMultiByte()
     {
-        if (!function_exists('mb_strlen')) {
-            $this->markTestSkipped('The "mbstring" extension is not available');
-        }
-
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders(array('■■'))
@@ -575,6 +571,36 @@ TABLE;
 +---+--+
 | foo  |
 +---+--+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnStyle()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
+                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
+            ));
+
+        $style = new TableStyle();
+        $style->setPadType(STR_PAD_LEFT);
+        $table->setColumnStyle(3, $style);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
++---------------+----------------------+-----------------+--------+
+| ISBN          | Title                | Author          |  Price |
++---------------+----------------------+-----------------+--------+
+| 99921-58-10-7 | Divine Comedy        | Dante Alighieri |   9.95 |
+| 9971-5-0210-0 | A Tale of Two Cities | Charles Dickens | 139.25 |
++---------------+----------------------+-----------------+--------+
 
 TABLE;
 

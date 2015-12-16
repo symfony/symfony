@@ -63,31 +63,37 @@ class TimeType extends AbstractType
                 $hours = $minutes = array();
 
                 foreach ($options['hours'] as $hour) {
-                    $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
+                    $hours[str_pad($hour, 2, '0', STR_PAD_LEFT)] = $hour;
                 }
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
+                $hourOptions['choices_as_values'] = true;
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
+                $hourOptions['choice_translation_domain'] = $options['choice_translation_domain']['hour'];
 
                 if ($options['with_minutes']) {
                     foreach ($options['minutes'] as $minute) {
-                        $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
+                        $minutes[str_pad($minute, 2, '0', STR_PAD_LEFT)] = $minute;
                     }
 
                     $minuteOptions['choices'] = $minutes;
+                    $minuteOptions['choices_as_values'] = true;
                     $minuteOptions['placeholder'] = $options['placeholder']['minute'];
+                    $minuteOptions['choice_translation_domain'] = $options['choice_translation_domain']['minute'];
                 }
 
                 if ($options['with_seconds']) {
                     $seconds = array();
 
                     foreach ($options['seconds'] as $second) {
-                        $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
+                        $seconds[str_pad($second, 2, '0', STR_PAD_LEFT)] = $second;
                     }
 
                     $secondOptions['choices'] = $seconds;
+                    $secondOptions['choices_as_values'] = true;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
+                    $secondOptions['choice_translation_domain'] = $options['choice_translation_domain']['second'];
                 }
 
                 // Append generic carry-along options
@@ -168,16 +174,17 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholder = $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        // for BC with the "empty_value" option
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
-        };
-
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
+                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+
+                $placeholder = $options['empty_value'];
+            }
+
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -194,6 +201,23 @@ class TimeType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('hour' => $default, 'minute' => $default, 'second' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'hour' => $choiceTranslationDomain,
+                'minute' => $choiceTranslationDomain,
+                'second' => $choiceTranslationDomain,
+            );
+        };
+
         $resolver->setDefaults(array(
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
@@ -204,7 +228,7 @@ class TimeType extends AbstractType
             'with_seconds' => false,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
+            'empty_value' => new \Exception(), // deprecated
             'placeholder' => $placeholder,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
@@ -217,10 +241,11 @@ class TimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedValues('input', array(
             'datetime',

@@ -238,6 +238,7 @@ class ChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $choiceLabels = (object) array('labels' => array());
         $choiceListFactory = $this->choiceListFactory;
 
         $emptyData = function (Options $options) {
@@ -248,13 +249,49 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $emptyValue = function (Options $options) {
+        $placeholder = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        // for BC with the "empty_value" option
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
+        // BC closure, to be removed in 3.0
+        $choicesNormalizer = function (Options $options, $choices) use ($choiceLabels) {
+            // Unset labels from previous invocations
+            $choiceLabels->labels = array();
+
+            // This closure is irrelevant when "choices_as_values" is set to true
+            if ($options['choices_as_values']) {
+                return $choices;
+            }
+
+            if (null === $choices) {
+                return;
+            }
+
+            return ChoiceType::normalizeLegacyChoices($choices, $choiceLabels);
+        };
+
+        // BC closure, to be removed in 3.0
+        $choiceLabel = function (Options $options) use ($choiceLabels) {
+            // If the choices contain duplicate labels, the normalizer of the
+            // "choices" option stores them in the $choiceLabels variable
+
+            // Trigger the normalizer
+            $options->offsetGet('choices');
+
+            // Pick labels from $choiceLabels if available
+            if ($choiceLabels->labels) {
+                // Don't pass the labels by reference. We do want to create a
+                // copy here so that every form has an own version of that
+                // variable (contrary to the $choiceLabels object shared by all
+                // forms)
+                $labels = $choiceLabels->labels;
+
+                return function ($choice, $key) use ($labels) {
+                    return $labels[$key];
+                };
+            }
+
+            return;
         };
 
         $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
@@ -280,13 +317,27 @@ class ChoiceType extends AbstractType
 
             // BC when choices are in the keys, not in the values
             if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value']);
+                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value'], false);
             }
 
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
+        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) {
+            if (true !== $choicesAsValues) {
+                @trigger_error('The value "false" for the "choices_as_values" option is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', E_USER_DEPRECATED);
+            }
+
+            return $choicesAsValues;
+        };
+
         $placeholderNormalizer = function (Options $options, $placeholder) {
+            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
+                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+
+                $placeholder = $options['empty_value'];
+            }
+
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return;
@@ -321,14 +372,14 @@ class ChoiceType extends AbstractType
             'choices' => array(),
             'choices_as_values' => false,
             'choice_loader' => null,
-            'choice_label' => null,
+            'choice_label' => $choiceLabel,
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
-            'empty_value' => $emptyValue, // deprecated
+            'empty_value' => new \Exception(), // deprecated
             'placeholder' => $placeholder,
             'error_bubbling' => false,
             'compound' => $compound,
@@ -339,10 +390,11 @@ class ChoiceType extends AbstractType
             'choice_translation_domain' => true,
         ));
 
+        $resolver->setNormalizer('choices', $choicesNormalizer);
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
-        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+        $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
 
         $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
@@ -461,5 +513,39 @@ class ChoiceType extends AbstractType
             $options['group_by'],
             $options['choice_attr']
         );
+    }
+
+    /**
+     * When "choices_as_values" is set to false, the choices are in the keys and
+     * their labels in the values. Labels may occur twice. The form component
+     * flips the choices array in the new implementation, so duplicate labels
+     * are lost. Store them in a utility array that is used from the
+     * "choice_label" closure by default.
+     *
+     * @param array|\Traversable  $choices      The choice labels indexed by choices.
+     * @param object              $choiceLabels The object that receives the choice labels
+     *                                          indexed by generated keys.
+     * @param int                 $nextKey      The next generated key.
+     *
+     * @return array The choices in a normalized array with labels replaced by generated keys.
+     *
+     * @internal Public only to be accessible from closures on PHP 5.3. Don't
+     *           use this method as it may be removed without notice and will be in 3.0.
+     */
+    public static function normalizeLegacyChoices($choices, $choiceLabels, &$nextKey = 0)
+    {
+        $normalizedChoices = array();
+
+        foreach ($choices as $choice => $choiceLabel) {
+            if (is_array($choiceLabel) || $choiceLabel instanceof \Traversable) {
+                $normalizedChoices[$choice] = self::normalizeLegacyChoices($choiceLabel, $choiceLabels, $nextKey);
+                continue;
+            }
+
+            $choiceLabels->labels[$nextKey] = $choiceLabel;
+            $normalizedChoices[$choice] = $nextKey++;
+        }
+
+        return $normalizedChoices;
     }
 }

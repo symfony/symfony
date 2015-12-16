@@ -20,6 +20,8 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
  * RememberMeListener implements authentication capabilities via a cookie.
@@ -34,18 +36,20 @@ class RememberMeListener implements ListenerInterface
     private $logger;
     private $dispatcher;
     private $catchExceptions = true;
+    private $sessionStrategy;
 
     /**
      * Constructor.
      *
-     * @param TokenStorageInterface          $tokenStorage
-     * @param RememberMeServicesInterface    $rememberMeServices
-     * @param AuthenticationManagerInterface $authenticationManager
-     * @param LoggerInterface                $logger
-     * @param EventDispatcherInterface       $dispatcher
-     * @param bool                           $catchExceptions
+     * @param TokenStorageInterface                  $tokenStorage
+     * @param RememberMeServicesInterface            $rememberMeServices
+     * @param AuthenticationManagerInterface         $authenticationManager
+     * @param LoggerInterface                        $logger
+     * @param EventDispatcherInterface               $dispatcher
+     * @param bool                                   $catchExceptions
+     * @param SessionAuthenticationStrategyInterface $sessionStrategy
      */
-    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true)
+    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true, SessionAuthenticationStrategyInterface $sessionStrategy = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->rememberMeServices = $rememberMeServices;
@@ -53,6 +57,7 @@ class RememberMeListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->catchExceptions = $catchExceptions;
+        $this->sessionStrategy = null === $sessionStrategy ? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE) : $sessionStrategy;
     }
 
     /**
@@ -73,6 +78,9 @@ class RememberMeListener implements ListenerInterface
 
         try {
             $token = $this->authenticationManager->authenticate($token);
+            if ($request->hasSession() && $request->getSession()->isStarted()) {
+                $this->sessionStrategy->onAuthentication($request, $token);
+            }
             $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {

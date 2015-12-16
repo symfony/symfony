@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Config\Loader\FileLoader;
 
@@ -22,8 +23,6 @@ use Symfony\Component\Config\Loader\FileLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class YamlFileLoader extends FileLoader
 {
@@ -41,8 +40,6 @@ class YamlFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
-     *
-     * @api
      */
     public function load($file, $type = null)
     {
@@ -60,22 +57,26 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        $config = $this->yamlParser->parse(file_get_contents($path));
+        try {
+            $parsedConfig = $this->yamlParser->parse(file_get_contents($path));
+        } catch (ParseException $e) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
+        }
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
 
         // empty file
-        if (null === $config) {
+        if (null === $parsedConfig) {
             return $collection;
         }
 
         // not an array
-        if (!is_array($config)) {
+        if (!is_array($parsedConfig)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $path));
         }
 
-        foreach ($config as $name => $config) {
+        foreach ($parsedConfig as $name => $config) {
             if (isset($config['pattern'])) {
                 if (isset($config['path'])) {
                     throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
@@ -101,8 +102,6 @@ class YamlFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {

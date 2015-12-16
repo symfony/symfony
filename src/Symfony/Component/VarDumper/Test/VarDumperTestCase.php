@@ -16,20 +16,22 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0. Use the VarDumperTestTrait instead.
  */
 abstract class VarDumperTestCase extends \PHPUnit_Framework_TestCase
 {
     public function assertDumpEquals($dump, $data, $message = '')
     {
-        $this->assertSame(rtrim($dump), $this->getVarDumperDump($data), $message);
+        $this->assertSame(rtrim($dump), $this->getDump($data), $message);
     }
 
     public function assertDumpMatchesFormat($dump, $data, $message = '')
     {
-        $this->assertStringMatchesFormat(rtrim($dump), $this->getVarDumperDump($data), $message);
+        $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data), $message);
     }
 
-    private function getVarDumperDump($data)
+    protected function getDump($data)
     {
         $h = fopen('php://memory', 'r+b');
         $cloner = new VarCloner();

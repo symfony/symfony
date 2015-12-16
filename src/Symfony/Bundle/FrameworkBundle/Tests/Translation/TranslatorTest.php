@@ -104,34 +104,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->trans('foo');
     }
 
-    public function testLoadResourcesWithCaching()
-    {
-        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
-        $resourceFiles = array(
-            'fr' => array(
-                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
-        );
-
-        // prime the cache
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
-        $translator->setLocale('fr');
-
-        $this->assertEquals('répertoire', $translator->trans('folder'));
-
-        // do it another time as the cache is primed now
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'yml');
-        $translator->setLocale('fr');
-
-        $this->assertEquals('répertoire', $translator->trans('folder'));
-
-        // refresh cache when resources is changed in debug mode.
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true), 'yml');
-        $translator->setLocale('fr');
-
-        $this->assertEquals('folder', $translator->trans('folder'));
-    }
-
     public function testLoadResourcesWithoutCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
@@ -273,7 +245,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // prime the cache
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
-        $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $translator->warmup($this->tmpDir);
 
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
@@ -283,6 +255,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
         $translator->setLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 

@@ -19,8 +19,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * YamlFileLoader loads translations from Yaml files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class YamlFileLoader extends FileLoader
 {

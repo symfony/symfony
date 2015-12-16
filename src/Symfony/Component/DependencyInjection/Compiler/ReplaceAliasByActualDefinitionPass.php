@@ -45,7 +45,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             try {
                 $definition = $container->getDefinition($aliasId);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with "%s".', $alias, $id), null, $e);
+                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with actual definition "%s".', $id, $alias), null, $e);
             }
 
             if ($definition->isPublic()) {

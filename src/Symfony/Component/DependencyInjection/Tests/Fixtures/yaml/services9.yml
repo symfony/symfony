@@ -76,6 +76,9 @@ services:
         class: stdClass
         decorates: decorated
         decoration_inner_name: decorated.pif-pouf
+    deprecated_service:
+        class: stdClass
+        deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
     new_factory:
         class: FactoryClass
         public: false
@@ -90,5 +93,5 @@ services:
     service_from_static_method:
         class: Bar\FooClass
         factory: [Bar\FooClass, getInstance]
-    alias_for_foo: @foo
-    alias_for_alias: @foo
+    alias_for_foo: '@foo'
+    alias_for_alias: '@foo'

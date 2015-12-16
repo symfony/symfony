@@ -17,6 +17,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
  * Parser and formatter for time zone format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class TimeZoneTransformer extends Transformer
 {
@@ -29,7 +31,7 @@ class TimeZoneTransformer extends Transformer
     {
         $timeZone = substr($dateTime->getTimezone()->getName(), 0, 3);
 
-        if (!in_array($timeZone, array('Etc', 'UTC'))) {
+        if (!in_array($timeZone, array('Etc', 'UTC', 'GMT'))) {
             throw new NotImplementedException('Time zone different than GMT or UTC is not supported as a formatting output.');
         }
 

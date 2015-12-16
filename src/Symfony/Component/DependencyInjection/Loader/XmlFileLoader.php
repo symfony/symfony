@@ -157,6 +157,10 @@ class XmlFileLoader extends FileLoader
             }
         }
 
+        if ($value = $service->getAttribute('autowire')) {
+            $definition->setAutowired(XmlUtils::phpize($value));
+        }
+
         if ($value = $service->getAttribute('scope')) {
             $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
 
@@ -179,6 +183,10 @@ class XmlFileLoader extends FileLoader
 
         if ($files = $this->getChildren($service, 'file')) {
             $definition->setFile($files[0]->nodeValue);
+        }
+
+        if ($deprecated = $this->getChildren($service, 'deprecated')) {
+            $definition->setDeprecated(true, $deprecated[0]->nodeValue);
         }
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
@@ -241,6 +249,10 @@ class XmlFileLoader extends FileLoader
             }
 
             $definition->addTag($tag->getAttribute('name'), $parameters);
+        }
+
+        foreach ($this->getChildren($service, 'autowiring-type') as $type) {
+            $definition->addAutowiringType($type->textContent);
         }
 
         if ($value = $service->getAttribute('decorates')) {

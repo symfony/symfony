@@ -16,17 +16,21 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0"
+        "twig/twig": "~1.20|~2.0"
     },
     "suggest": {
         "ext-symfony_debug": ""
     },
     "autoload": {
         "files": [ "Resources/functions/dump.php" ],
-        "psr-4": { "Symfony\\Component\\VarDumper\\": "" }
+        "psr-4": { "Symfony\\Component\\VarDumper\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

@@ -13,16 +13,13 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
+/**
+ * @requires extension pdo_sqlite
+ * @group time-sensitive
+ */
 class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $dbFile;
-
-    protected function setUp()
-    {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            $this->markTestSkipped('This test requires SQLite support in your environment');
-        }
-    }
 
     protected function tearDown()
     {
@@ -30,6 +27,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         if ($this->dbFile) {
             @unlink($this->dbFile);
         }
+        parent::tearDown();
     }
 
     protected function getPersistentSqliteDsn()

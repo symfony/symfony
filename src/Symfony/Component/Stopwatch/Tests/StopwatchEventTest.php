@@ -13,12 +13,12 @@ namespace Symfony\Component\Stopwatch\Tests;
 
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
-require_once __DIR__.'/ClockMock.php';
-
 /**
  * StopwatchEventTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @group time-sensitive
  */
 class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 {

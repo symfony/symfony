@@ -43,8 +43,12 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      * @deprecated Added for backwards compatibility in Symfony 2.7, to be
      *             removed in Symfony 3.0.
      */
-    public function createListFromFlippedChoices($choices, $value = null)
+    public function createListFromFlippedChoices($choices, $value = null, $triggerDeprecationNotice = true)
     {
+        if ($triggerDeprecationNotice) {
+            @trigger_error('The '.__METHOD__.' is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return new ArrayKeyChoiceList($choices, $value);
     }
 

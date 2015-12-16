@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
@@ -128,6 +129,29 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetValueReadsMagicGetThatReturnsConstant()
     {
         $this->assertSame('constant value', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'constantMagicProperty'));
+    }
+
+    public function testGetValueNotModifyObject()
+    {
+        $object = new \stdClass();
+        $object->firstName = array('Bernhard');
+
+        $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
+        $this->assertSame(array('Bernhard'), $object->firstName);
+    }
+
+    public function testGetValueNotModifyObjectException()
+    {
+        $propertyAccessor = new PropertyAccessor(false, true);
+        $object = new \stdClass();
+        $object->firstName = array('Bernhard');
+
+        try {
+            $propertyAccessor->getValue($object, 'firstName[1]');
+        } catch (NoSuchIndexException $e) {
+        }
+
+        $this->assertSame(array('Bernhard'), $object->firstName);
     }
 
     /**

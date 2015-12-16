@@ -1,0 +1,8 @@
+services:
+    foo_service:
+        class:            FooClass
+        autowiring_types: [ Foo, Bar ]
+
+    baz_service:
+        class:            Baz
+        autowiring_types: Foo

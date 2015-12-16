@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/event-dispatcher": "~2.1|~3.0.0",
         "symfony/process": "~2.1|~3.0.0",
         "psr/log": "~1.0"
@@ -30,7 +30,10 @@
         "psr/log": "For using the console logger"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Console\\": "" }
+        "psr-4": { "Symfony\\Component\\Console\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

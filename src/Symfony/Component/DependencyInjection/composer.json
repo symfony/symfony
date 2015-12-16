@@ -19,7 +19,6 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/yaml": "~2.1|~3.0.0",
         "symfony/config": "~2.2|~3.0.0",
         "symfony/expression-language": "~2.6|~3.0.0"
@@ -33,7 +32,10 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" }
+        "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

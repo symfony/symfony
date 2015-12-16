@@ -68,9 +68,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
-        if ($container->has('templating')) {
-            $container->getDefinition('twig.cache_warmer')->addTag('kernel.cache_warmer');
-        } else {
+        if (!$container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.native_filesystem');
             $loader->addTag('twig.loader');
             $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());

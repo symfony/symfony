@@ -25,4 +25,14 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
+            <arguments>
+                <array>
+                    <element><string>Symfony\Component\HttpFoundation</string></element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
 </phpunit>

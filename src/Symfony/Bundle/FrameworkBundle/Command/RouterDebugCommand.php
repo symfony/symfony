@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Route;
 
@@ -77,8 +78,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.</comment>');
+            $io->caution('The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.');
         }
 
         $name = $input->getArgument('name');
@@ -89,11 +92,14 @@ EOF
             if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
+
             $this->convertController($route);
-            $helper->describe($output, $route, array(
+
+            $helper->describe($io, $route, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
+                'output' => $io,
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
@@ -102,10 +108,11 @@ EOF
                 $this->convertController($route);
             }
 
-            $helper->describe($output, $routes, array(
+            $helper->describe($io, $routes, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'output' => $io,
             ));
         }
     }

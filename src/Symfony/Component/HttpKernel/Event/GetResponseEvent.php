@@ -21,8 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
  * response is set.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class GetResponseEvent extends KernelEvent
 {
@@ -37,8 +35,6 @@ class GetResponseEvent extends KernelEvent
      * Returns the response object.
      *
      * @return Response
-     *
-     * @api
      */
     public function getResponse()
     {
@@ -49,8 +45,6 @@ class GetResponseEvent extends KernelEvent
      * Sets a response and stops event propagation.
      *
      * @param Response $response
-     *
-     * @api
      */
     public function setResponse(Response $response)
     {
@@ -63,8 +57,6 @@ class GetResponseEvent extends KernelEvent
      * Returns whether a response was set.
      *
      * @return bool Whether a response was set
-     *
-     * @api
      */
     public function hasResponse()
     {

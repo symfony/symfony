@@ -12,11 +12,12 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use Symfony\Component\VarDumper\Caster\Caster;
+use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CasterTest extends \PHPUnit_Framework_TestCase
+class CasterTest extends VarDumperTestCase
 {
     private $referenceArray = array(
         'null' => null,
@@ -28,7 +29,9 @@ class CasterTest extends \PHPUnit_Framework_TestCase
         "\0Foo\0private" => 'priv',
     );
 
-    /** @dataProvider provideFilter */
+    /**
+     * @dataProvider provideFilter
+     */
     public function testFilter($filter, $expectedDiff, $listedProperties = null)
     {
         if (null === $listedProperties) {
@@ -142,6 +145,34 @@ class CasterTest extends \PHPUnit_Framework_TestCase
                 ),
                 array('public', 'empty'),
             ),
+        );
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testAnonymousClass()
+    {
+        $c = eval('return new class extends stdClass { private $foo = "foo"; };');
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+stdClass@anonymous {
+  -foo: "foo"
+}
+EOTXT
+            , $c
+        );
+
+        $c = eval('return new class { private $foo = "foo"; };');
+
+        $this->assertDumpMatchesFormat(
+            <<<'EOTXT'
+@anonymous {
+  -foo: "foo"
+}
+EOTXT
+            , $c
         );
     }
 }

@@ -1,0 +1,8 @@
+
+services:
+    foo:
+        class: Foo
+        autowire: true
+        autowiring_types:
+            - A
+            - B

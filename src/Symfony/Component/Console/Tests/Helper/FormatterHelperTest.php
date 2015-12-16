@@ -54,10 +54,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatBlockWithDiacriticLetters()
     {
-        if (!function_exists('mb_detect_encoding')) {
-            $this->markTestSkipped('This test requires mbstring to work.');
-        }
-
         $formatter = new FormatterHelper();
 
         $this->assertEquals(
@@ -71,9 +67,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatBlockWithDoubleWidthDiacriticLetters()
     {
-        if (!extension_loaded('mbstring')) {
-            $this->markTestSkipped('This test requires mbstring to work.');
-        }
         $formatter = new FormatterHelper();
         $this->assertEquals(
             '<error>                    </error>'."\n".

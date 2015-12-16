@@ -58,8 +58,6 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @api
- *
  * @deprecated since version 2.4, to be removed in 3.0.
  *             Use the {@link ClassLoader} class instead.
  */
@@ -137,8 +135,6 @@ class UniversalClassLoader
      * Registers the directory to use as a fallback for namespaces.
      *
      * @param array $dirs An array of directories
-     *
-     * @api
      */
     public function registerNamespaceFallbacks(array $dirs)
     {
@@ -159,8 +155,6 @@ class UniversalClassLoader
      * Registers directories to use as a fallback for class prefixes.
      *
      * @param array $dirs An array of directories
-     *
-     * @api
      */
     public function registerPrefixFallbacks(array $dirs)
     {
@@ -181,8 +175,6 @@ class UniversalClassLoader
      * Registers an array of namespaces.
      *
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
-     *
-     * @api
      */
     public function registerNamespaces(array $namespaces)
     {
@@ -196,8 +188,6 @@ class UniversalClassLoader
      *
      * @param string       $namespace The namespace
      * @param array|string $paths     The location(s) of the namespace
-     *
-     * @api
      */
     public function registerNamespace($namespace, $paths)
     {
@@ -208,8 +198,6 @@ class UniversalClassLoader
      * Registers an array of classes using the PEAR naming convention.
      *
      * @param array $classes An array of classes (prefixes as keys and locations as values)
-     *
-     * @api
      */
     public function registerPrefixes(array $classes)
     {
@@ -223,8 +211,6 @@ class UniversalClassLoader
      *
      * @param string       $prefix The classes prefix
      * @param array|string $paths  The location(s) of the classes
-     *
-     * @api
      */
     public function registerPrefix($prefix, $paths)
     {
@@ -235,8 +221,6 @@ class UniversalClassLoader
      * Registers this instance as an autoloader.
      *
      * @param bool $prepend Whether to prepend the autoloader or not
-     *
-     * @api
      */
     public function register($prepend = false)
     {

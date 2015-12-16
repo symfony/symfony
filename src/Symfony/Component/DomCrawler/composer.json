@@ -16,17 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/css-selector": "~2.3|~3.0.0"
+        "symfony/css-selector": "~2.8|~3.0.0"
     },
     "suggest": {
         "symfony/css-selector": ""
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\DomCrawler\\": "" }
+        "psr-4": { "Symfony\\Component\\DomCrawler\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

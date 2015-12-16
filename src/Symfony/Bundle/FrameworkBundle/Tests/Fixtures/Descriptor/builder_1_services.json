@@ -14,7 +14,9 @@
             "factory_method": "get",
             "tags": [
 
-            ]
+            ],
+            "autowire": false,
+            "autowiring_types": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -48,7 +50,9 @@
 
                     ]
                 }
-            ]
+            ],
+            "autowire": false,
+            "autowiring_types": []
         }
     },
     "aliases": {

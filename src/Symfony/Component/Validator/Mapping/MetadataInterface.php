@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
 
 /**

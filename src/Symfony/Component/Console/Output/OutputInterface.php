@@ -17,52 +17,40 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * OutputInterface is the interface implemented by all Output classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface OutputInterface
 {
-    const VERBOSITY_QUIET = 0;
-    const VERBOSITY_NORMAL = 1;
-    const VERBOSITY_VERBOSE = 2;
-    const VERBOSITY_VERY_VERBOSE = 3;
-    const VERBOSITY_DEBUG = 4;
+    const VERBOSITY_QUIET = 16;
+    const VERBOSITY_NORMAL = 32;
+    const VERBOSITY_VERBOSE = 64;
+    const VERBOSITY_VERY_VERBOSE = 128;
+    const VERBOSITY_DEBUG = 256;
 
-    const OUTPUT_NORMAL = 0;
-    const OUTPUT_RAW = 1;
-    const OUTPUT_PLAIN = 2;
+    const OUTPUT_NORMAL = 1;
+    const OUTPUT_RAW = 2;
+    const OUTPUT_PLAIN = 4;
 
     /**
      * Writes a message to the output.
      *
      * @param string|array $messages The message as an array of lines or a single string
      * @param bool         $newline  Whether to add a newline
-     * @param int          $type     The type of output (one of the OUTPUT constants)
-     *
-     * @throws \InvalidArgumentException When unknown output type is given
-     *
-     * @api
+     * @param int          $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
      */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL);
+    public function write($messages, $newline = false, $options = 0);
 
     /**
      * Writes a message to the output and adds a newline at the end.
      *
      * @param string|array $messages The message as an array of lines of a single string
-     * @param int          $type     The type of output (one of the OUTPUT constants)
-     *
-     * @throws \InvalidArgumentException When unknown output type is given
-     *
-     * @api
+     * @param int          $options  A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
      */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL);
+    public function writeln($messages, $options = 0);
 
     /**
      * Sets the verbosity of the output.
      *
      * @param int $level The level of verbosity (one of the VERBOSITY constants)
-     *
-     * @api
      */
     public function setVerbosity($level);
 
@@ -70,8 +58,6 @@ interface OutputInterface
      * Gets the current verbosity of the output.
      *
      * @return int The current level of verbosity (one of the VERBOSITY constants)
-     *
-     * @api
      */
     public function getVerbosity();
 
@@ -79,8 +65,6 @@ interface OutputInterface
      * Sets the decorated flag.
      *
      * @param bool $decorated Whether to decorate the messages
-     *
-     * @api
      */
     public function setDecorated($decorated);
 
@@ -88,8 +72,6 @@ interface OutputInterface
      * Gets the decorated flag.
      *
      * @return bool true if the output will decorate messages, false otherwise
-     *
-     * @api
      */
     public function isDecorated();
 
@@ -97,8 +79,6 @@ interface OutputInterface
      * Sets output formatter.
      *
      * @param OutputFormatterInterface $formatter
-     *
-     * @api
      */
     public function setFormatter(OutputFormatterInterface $formatter);
 
@@ -106,8 +86,6 @@ interface OutputInterface
      * Returns current output formatter instance.
      *
      * @return OutputFormatterInterface
-     *
-     * @api
      */
     public function getFormatter();
 }

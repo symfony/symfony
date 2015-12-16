@@ -25,10 +25,11 @@
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
             <argument /> <!-- Catch exception flag set in RememberMeFactory -->
+            <argument type="service" id="security.authentication.session_strategy" />
         </service>
 
         <service id="security.authentication.provider.rememberme" class="%security.authentication.provider.rememberme.class%" abstract="true" public="false">
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
         </service>
 
         <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false" />
@@ -45,9 +46,7 @@
         <service id="security.authentication.rememberme.services.persistent"
                  class="%security.authentication.rememberme.services.persistent.class%"
                  parent="security.authentication.rememberme.services.abstract"
-                 abstract="true">
-            <argument type="service" id="security.secure_random" />
-        </service>
+                 abstract="true" />
 
         <service id="security.authentication.rememberme.services.simplehash"
                  class="%security.authentication.rememberme.services.simplehash.class%"

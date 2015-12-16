@@ -41,6 +41,13 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
+    public function testEmptyStringFromObjectIsValid()
+    {
+        $this->validator->validate(new EmailProvider(), new Url());
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -110,6 +117,12 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://☎.com/'),
             array('http://username:password@symfony.com'),
             array('http://user-name@symfony.com'),
+            array('http://symfony.com?'),
+            array('http://symfony.com?query=1'),
+            array('http://symfony.com/?query=1'),
+            array('http://symfony.com#'),
+            array('http://symfony.com#fragment'),
+            array('http://symfony.com/#fragment'),
         );
     }
 
@@ -140,8 +153,6 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://goog_le.com'),
             array('http://google.com::aa'),
             array('http://google.com:aa'),
-            array('http://symfony.com?'),
-            array('http://symfony.com#'),
             array('ftp://google.fr'),
             array('faked://google.fr'),
             array('http://127.0.0.1:aa/'),
@@ -176,5 +187,13 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('file://127.0.0.1'),
             array('git://[::1]/'),
         );
+    }
+}
+
+class EmailProvider
+{
+    public function __toString()
+    {
+        return '';
     }
 }

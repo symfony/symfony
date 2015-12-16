@@ -25,8 +25,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *     $output = new StreamOutput(fopen('php://stdout', 'w'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
@@ -41,14 +39,17 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
      * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
-     *
-     * @api
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
 
+        $actualDecorated = $this->isDecorated();
         $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
+
+        if (null === $decorated) {
+            $this->setDecorated($actualDecorated && $this->stderr->isDecorated());
+        }
     }
 
     /**
@@ -124,7 +125,13 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function isRunningOS400()
     {
-        return 'OS400' === php_uname('s');
+        $checks = array(
+            function_exists('php_uname') ? php_uname('s') : '',
+            getenv('OSTYPE'),
+            PHP_OS,
+        );
+
+        return false !== stristr(implode(';', $checks), 'OS400');
     }
 
     /**

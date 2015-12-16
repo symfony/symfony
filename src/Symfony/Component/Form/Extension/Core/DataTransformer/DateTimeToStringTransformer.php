@@ -86,7 +86,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * Transforms a DateTime object into a date string with the configured format
      * and timezone.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTime|\DateTimeInterface $value A DateTime object
      *
      * @return string A value as produced by PHP's date() function
      *
@@ -138,21 +138,21 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
+        $outputTz = new \DateTimeZone($this->outputTimezone);
+        $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
+
+        $lastErrors = \DateTime::getLastErrors();
+
+        if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
+            throw new TransformationFailedException(
+                implode(', ', array_merge(
+                    array_values($lastErrors['warnings']),
+                    array_values($lastErrors['errors'])
+                ))
+            );
+        }
+
         try {
-            $outputTz = new \DateTimeZone($this->outputTimezone);
-            $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
-
-            $lastErrors = \DateTime::getLastErrors();
-
-            if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
-                throw new TransformationFailedException(
-                    implode(', ', array_merge(
-                        array_values($lastErrors['warnings']),
-                        array_values($lastErrors['errors'])
-                    ))
-                );
-            }
-
             // On PHP versions < 5.3.7 we need to emulate the pipe operator
             // and reset parts not given in the format to their equivalent
             // of the UNIX base timestamp.
@@ -220,8 +220,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             if ($this->inputTimezone !== $this->outputTimezone) {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
-        } catch (TransformationFailedException $e) {
-            throw $e;
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }

@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Client simulates a browser and makes requests to a Kernel object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Client extends BaseClient
 {
@@ -107,7 +105,7 @@ class Client extends BaseClient
         $code = <<<EOF
 <?php
 
-error_reporting($errorReporting & ~E_USER_DEPRECATED);
+error_reporting($errorReporting);
 
 require_once '$requirePath';
 

@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements ResourceInterface, \Serializable
+class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
 {
     private $resource;
     private $pattern;
@@ -38,7 +38,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return md5(serialize(array($this->resource, $this->pattern)));
     }
 
     /**

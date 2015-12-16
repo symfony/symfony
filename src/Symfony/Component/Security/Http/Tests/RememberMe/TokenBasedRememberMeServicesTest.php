@@ -153,7 +153,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 
     public function testLogout()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false));
         $request = new Request();
         $response = new Response();
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
@@ -164,6 +164,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($cookie->isCleared());
         $this->assertEquals('/', $cookie->getPath());
         $this->assertNull($cookie->getDomain());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertFalse($cookie->isHttpOnly());
     }
 
     public function testLoginFail()

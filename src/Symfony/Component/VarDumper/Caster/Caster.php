@@ -36,8 +36,8 @@ class Caster
     /**
      * Casts objects to arrays and adds the dynamic property prefix.
      *
-     * @param object          $obj       The object to cast.
-     * @param ReflectionClass $reflector The class reflector to use for inspecting the object definition.
+     * @param object           $obj       The object to cast.
+     * @param \ReflectionClass $reflector The class reflector to use for inspecting the object definition.
      *
      * @return array The array-cast of the object, with prefixed dynamic properties.
      */
@@ -54,6 +54,8 @@ class Caster
             foreach ($p as $i => $k) {
                 if (!isset($k[0]) || ("\0" !== $k[0] && !$reflector->hasProperty($k))) {
                     $p[$i] = self::PREFIX_DYNAMIC.$k;
+                } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
+                    $p[$i] = "\0".$reflector->getParentClass().'@anonymous'.strrchr($k, "\0");
                 }
             }
             $a = array_combine($p, $a);

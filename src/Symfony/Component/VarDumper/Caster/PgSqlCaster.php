@@ -101,6 +101,7 @@ class PgSqlCaster
         }
 
         $a['param']['client_encoding'] = pg_client_encoding($link);
+        $a['param'] = new EnumStub($a['param']);
 
         return $a;
     }
@@ -145,7 +146,7 @@ class PgSqlCaster
             if ('1 chars' === $field['display']) {
                 $field['display'] = '1 char';
             }
-            $a['fields'][] = $field;
+            $a['fields'][] = new EnumStub($field);
         }
 
         return $a;

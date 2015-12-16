@@ -43,7 +43,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             array(),
             array(),
             array(),
-            array(),
         ));
 
         $definition1 = new Definition(__CLASS__.'_Type1');
@@ -69,6 +68,9 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ), $extDefinition->getArgument(1));
     }
 
+    /**
+     * @group legacy
+     */
     public function testUseCustomAliasIfSet()
     {
         $container = new ContainerBuilder();
@@ -77,7 +79,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setArguments(array(
             new Reference('service_container'),
-            array(),
             array(),
             array(),
             array(),
@@ -104,66 +105,25 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ), $extDefinition->getArgument(1));
     }
 
-    public function testPassLegacyNames()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new FormPass());
-
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
-        $extDefinition->setArguments(array(
-            new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-            array(),
-        ));
-
-        $definition1 = new Definition(__CLASS__.'_Type1');
-        $definition1->addTag('form.type');
-        $definition2 = new Definition(__CLASS__.'_Type2');
-        $definition2->addTag('form.type', array('alias' => 'mytype2'));
-
-        $container->setDefinition('form.extension', $extDefinition);
-        $container->setDefinition('my.type1', $definition1);
-        $container->setDefinition('my.type2', $definition2);
-
-        $container->compile();
-
-        $extDefinition = $container->getDefinition('form.extension');
-
-        $this->assertEquals(array(
-            // Service ID if no alias is set
-            'my.type1' => true,
-            // Alias if set
-            'mytype2' => true,
-        ), $extDefinition->getArgument(4));
-    }
-
     public function testAddTaggedTypeExtensions()
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
 
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
-        $extDefinition->setArguments(array(
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
             new Reference('service_container'),
-            array(),
             array(),
             array(),
             array(),
         ));
 
-        $definition1 = new Definition('stdClass');
-        $definition1->addTag('form.type_extension', array('alias' => 'type1'));
-        $definition2 = new Definition('stdClass');
-        $definition2->addTag('form.type_extension', array('alias' => 'type1'));
-        $definition3 = new Definition('stdClass');
-        $definition3->addTag('form.type_extension', array('alias' => 'type2'));
-
         $container->setDefinition('form.extension', $extDefinition);
-        $container->setDefinition('my.type_extension1', $definition1);
-        $container->setDefinition('my.type_extension2', $definition2);
-        $container->setDefinition('my.type_extension3', $definition3);
+        $container->register('my.type_extension1', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type1'));
+        $container->register('my.type_extension2', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type1'));
+        $container->register('my.type_extension3', 'stdClass')
+            ->addTag('form.type_extension', array('extended_type' => 'type2'));
 
         $container->compile();
 
@@ -180,6 +140,41 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ), $extDefinition->getArgument(2));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testAliasOptionForTaggedTypeExtensions()
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new FormPass());
+
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
+            new Reference('service_container'),
+            array(),
+            array(),
+            array(),
+        ));
+
+        $container->setDefinition('form.extension', $extDefinition);
+        $container->register('my.type_extension1', 'stdClass')
+            ->addTag('form.type_extension', array('alias' => 'type1'));
+        $container->register('my.type_extension2', 'stdClass')
+            ->addTag('form.type_extension', array('alias' => 'type2'));
+
+        $container->compile();
+
+        $extDefinition = $container->getDefinition('form.extension');
+
+        $this->assertSame(array(
+            'type1' => array(
+                'my.type_extension1',
+            ),
+            'type2' => array(
+                'my.type_extension2',
+            ),
+        ), $extDefinition->getArgument(2));
+    }
+
     public function testAddTaggedGuessers()
     {
         $container = new ContainerBuilder();
@@ -188,7 +183,6 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setArguments(array(
             new Reference('service_container'),
-            array(),
             array(),
             array(),
             array(),
@@ -211,6 +205,39 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
             'my.guesser1',
             'my.guesser2',
         ), $extDefinition->getArgument(3));
+    }
+
+    /**
+     * @dataProvider privateTaggedServicesProvider
+     */
+    public function testPrivateTaggedServices($id, $tagName, $expectedExceptionMessage)
+    {
+        $container = new ContainerBuilder();
+        $container->addCompilerPass(new FormPass());
+
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
+        $extDefinition->setArguments(array(
+            new Reference('service_container'),
+            array(),
+            array(),
+            array(),
+        ));
+
+        $container->setDefinition('form.extension', $extDefinition);
+        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName);
+
+        $this->setExpectedException('\InvalidArgumentException', $expectedExceptionMessage);
+
+        $container->compile();
+    }
+
+    public function privateTaggedServicesProvider()
+    {
+        return array(
+            array('my.type', 'form.type', 'The service "my.type" must be public as form types are lazy-loaded'),
+            array('my.type_extension', 'form.type_extension', 'The service "my.type_extension" must be public as form type extensions are lazy-loaded'),
+            array('my.guesser', 'form.type_guesser', 'The service "my.guesser" must be public as form type guessers are lazy-loaded'),
+        );
     }
 }
 

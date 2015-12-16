@@ -12,9 +12,8 @@
 
     <testsuites>
         <testsuite name="Symfony Security Component Test Suite">
-            <directory>./Acl/Tests/</directory>
-            <directory>./Core/Tests/</directory>
-            <directory>./Http/Tests/</directory>
+            <directory>./Tests/</directory>
+            <directory>./*/Tests/</directory>
         </testsuite>
     </testsuites>
 
@@ -22,10 +21,12 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
+                <directory>./Resources</directory>
+                <directory>./Tests</directory>
                 <directory>./vendor</directory>
-                <directory>./Acl/Tests</directory>
-                <directory>./Core/Tests</directory>
-                <directory>./Http/Tests</directory>
+                <directory>./*/Resources</directory>
+                <directory>./*/Tests</directory>
+                <directory>./*/vendor</directory>
             </exclude>
         </whitelist>
     </filter>

@@ -85,6 +85,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+            'toto/.git',
         );
 
         $sortByType = array(
@@ -92,6 +93,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.git',
             'foo',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo/.bar',
             '.foo/bar',
@@ -113,6 +115,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.php',
             'test.py',
             'toto',
+            'toto/.git',
         );
 
         $sortByAccessedTime = array(
@@ -127,6 +130,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'test.py',
                 'foo',
                 'toto',
+                'toto/.git',
                 'foo bar',
             ),
             // This file was accessed after sleeping for 1 sec
@@ -143,6 +147,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
+                'toto/.git',
                 'foo bar',
             ),
             array('test.php'),
@@ -159,6 +164,7 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
+                'toto/.git',
                 'foo bar',
             ),
             array('test.php'),

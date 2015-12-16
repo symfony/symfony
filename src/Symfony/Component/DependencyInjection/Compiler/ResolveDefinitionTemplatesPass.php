@@ -118,6 +118,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
+        $def->setAutowiringTypes($parentDef->getAutowiringTypes());
         if ($parentDef->getFactoryClass(false)) {
             $def->setFactoryClass($parentDef->getFactoryClass(false));
         }
@@ -126,6 +127,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
         if ($parentDef->getFactoryService(false)) {
             $def->setFactoryService($parentDef->getFactoryService(false));
+        }
+        if ($parentDef->isDeprecated()) {
+            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
         $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
@@ -162,6 +166,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
+        if (isset($changes['deprecated'])) {
+            $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
+        }
         if (isset($changes['decorated_service'])) {
             $decoratedService = $definition->getDecoratedService();
             if (null === $decoratedService) {
@@ -194,6 +201,11 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         // append method calls
         if (count($calls = $definition->getMethodCalls()) > 0) {
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
+        }
+
+        // merge autowiring types
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $def->addAutowiringType($autowiringType);
         }
 
         // these attributes are always taken from the child

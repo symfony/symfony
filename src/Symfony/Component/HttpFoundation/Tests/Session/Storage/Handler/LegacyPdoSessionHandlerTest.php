@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHan
 
 /**
  * @group legacy
+ * @group time-sensitive
+ * @requires extension pdo_sqlite
  */
 class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,10 +24,7 @@ class LegacyPdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
-            $this->markTestSkipped('This test requires SQLite support in your environment');
-        }
-
+        parent::setUp();
         $this->pdo = new \PDO('sqlite::memory:');
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)';

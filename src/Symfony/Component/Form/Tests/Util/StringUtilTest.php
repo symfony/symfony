@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Form\Tests\Util;
 
 use Symfony\Component\Form\Util\StringUtil;
@@ -18,10 +27,6 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrimUtf8Separators($hex)
     {
-        if (!function_exists('mb_convert_encoding')) {
-            $this->markTestSkipped('The "mb_convert_encoding" function is not available');
-        }
-
         // Convert hexadecimal representation into binary
         // H: hex string, high nibble first (UCS-2BE)
         // *: repeat until end of string
@@ -67,6 +72,33 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('0085'),
             // zero width space
 //            array('200B'),
+        );
+    }
+
+    /**
+     * @dataProvider fqcnToBlockPrefixProvider
+     */
+    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix)
+    {
+        $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);
+
+        $this->assertSame($expectedBlockPrefix, $blockPrefix);
+    }
+
+    public function fqcnToBlockPrefixProvider()
+    {
+        return array(
+            array('TYPE', 'type'),
+            array('\Type', 'type'),
+            array('\UserType', 'user'),
+            array('UserType', 'user'),
+            array('Vendor\Name\Space\Type', 'type'),
+            array('Vendor\Name\Space\UserForm', 'user_form'),
+            array('Vendor\Name\Space\UserType', 'user'),
+            array('Vendor\Name\Space\usertype', 'user'),
+            array('Symfony\Component\Form\Form', 'form'),
+            array('Vendor\Name\Space\BarTypeBazType', 'bar_type_baz'),
+            array('FooBarBazType', 'foo_bar_baz'),
         );
     }
 }

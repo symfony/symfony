@@ -4,16 +4,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="annotations.reader.class">Doctrine\Common\Annotations\AnnotationReader</parameter>
-        <parameter key="annotations.cached_reader.class">Doctrine\Common\Annotations\CachedReader</parameter>
-        <parameter key="annotations.file_cache_reader.class">Doctrine\Common\Annotations\FileCacheReader</parameter>
-    </parameters>
-
     <services>
-        <service id="annotations.reader" class="%annotations.reader.class%" public="false" />
+        <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false" />
 
-        <service id="annotations.cached_reader" class="%annotations.cached_reader.class%" public="false">
+        <service id="annotations.cached_reader" class="Doctrine\Common\Annotations\CachedReader" public="false">
             <argument type="service" id="annotations.reader" />
             <argument /><!-- Cache Implementation -->
             <argument /><!-- Debug-Flag -->
@@ -21,13 +15,6 @@
 
         <service id="annotations.filesystem_cache" class="Doctrine\Common\Cache\FilesystemCache" public="false">
             <argument /><!-- Cache-Directory -->
-        </service>
-
-        <service id="annotations.file_cache_reader" class="%annotations.file_cache_reader.class%" public="false">
-            <deprecated>The "%service_id%" service is deprecated since 2.8 and will be removed in 3.0.</deprecated>
-            <argument type="service" id="annotations.reader" />
-            <argument /><!-- Cache-Directory -->
-            <argument /><!-- Debug Flag -->
         </service>
 
         <service id="annotation_reader" alias="annotations.reader" />

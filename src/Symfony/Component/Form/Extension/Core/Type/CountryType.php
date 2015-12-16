@@ -24,7 +24,6 @@ class CountryType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => array_flip(Intl::getRegionBundle()->getCountryNames()),
-            'choices_as_values' => true,
             'choice_translation_domain' => false,
         ));
     }
@@ -35,14 +34,6 @@ class CountryType extends AbstractType
     public function getParent()
     {
         return __NAMESPACE__.'\ChoiceType';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

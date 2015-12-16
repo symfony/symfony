@@ -13,16 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('file');
-
-        $this->assertSame('file', $form->getConfig()->getType()->getName());
-    }
-
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()
     {

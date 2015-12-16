@@ -42,7 +42,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @return string The file path to the resource
      */
     public function getResource()
     {

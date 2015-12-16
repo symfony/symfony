@@ -19,11 +19,6 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
 {
     protected static $file;
 
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new TypeValidator();

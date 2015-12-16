@@ -58,10 +58,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
             $this->assertEquals('1.2', Inline::dump(1.2));
             $this->assertContains('fr', strtolower(setlocale(LC_NUMERIC, 0)));
+        } finally {
             setlocale(LC_NUMERIC, $locale);
-        } catch (\Exception $e) {
-            setlocale(LC_NUMERIC, $locale);
-            throw $e;
         }
     }
 
@@ -73,12 +71,12 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     * @expectedException        \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Found unknown escape character "\V".
      */
     public function testParseScalarWithNonEscapedBlackslashShouldThrowException()
     {
-        $this->assertSame('Foo\Var', Inline::parse('"Foo\Var"'));
+        Inline::parse('"Foo\Var"');
     }
 
     /**
@@ -191,9 +189,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider getReservedIndicators
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
     {
@@ -206,9 +204,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider getScalarIndicators
-     * throws \Symfony\Component\Yaml\Exception\ParseException in 3.0
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
     {

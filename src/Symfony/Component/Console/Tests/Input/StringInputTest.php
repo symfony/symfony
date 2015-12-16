@@ -41,19 +41,6 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $input->getOption('foo'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyInputOptionDefinitionInConstructor()
-    {
-        $definition = new InputDefinition(
-            array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
-        );
-
-        $input = new StringInput('--foo=bar', $definition);
-        $this->assertEquals('bar', $input->getOption('foo'));
-    }
-
     public function getTokenizeData()
     {
         return array(

@@ -79,28 +79,6 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isAbstract());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testProcessDoesNotCopyScope()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('parent')
-            ->setScope('foo')
-        ;
-
-        $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
-        ;
-
-        $this->process($container);
-
-        $def = $container->getDefinition('child');
-        $this->assertEquals(ContainerInterface::SCOPE_CONTAINER, $def->getScope());
-    }
-
     public function testProcessDoesNotCopyTags()
     {
         $container = new ContainerBuilder();

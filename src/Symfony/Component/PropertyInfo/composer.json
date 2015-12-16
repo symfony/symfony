@@ -23,10 +23,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/serializer": "~2.7|~3.0.0",
+        "symfony/serializer": "~2.8|~3.0",
         "phpdocumentor/reflection": "^1.0.7",
         "doctrine/annotations": "~1.0"
     },
@@ -47,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.1-dev"
         }
     }
 }

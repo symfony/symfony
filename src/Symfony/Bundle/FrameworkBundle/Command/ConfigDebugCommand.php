@@ -32,9 +32,6 @@ class ConfigDebugCommand extends AbstractConfigCommand
     {
         $this
             ->setName('debug:config')
-            ->setAliases(array(
-                'config:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
             ))
@@ -59,10 +56,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $io->caution('The use of "config:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:config" instead.');
-        }
-
         $name = $input->getArgument('name');
 
         if (empty($name)) {

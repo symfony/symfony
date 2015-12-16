@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `$mode` argument from `Filesystem::dumpFile()`
+
 2.8.0
 -----
 

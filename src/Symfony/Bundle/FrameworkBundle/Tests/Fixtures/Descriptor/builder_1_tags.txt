@@ -1,3 +1,4 @@
+
 [33mSymfony Container Public and Private Tags[39m
 [33m=========================================[39m
 
@@ -10,3 +11,4 @@
 [33m----------[39m
 
  * definition_2
+

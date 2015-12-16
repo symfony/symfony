@@ -278,6 +278,21 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given option with provided value is in the raw input');
     }
 
+    public function testHasParameterOptionOnlyOptions()
+    {
+        $input = new ArgvInput(array('cli.php', '-f', 'foo'));
+        $this->assertTrue($input->hasParameterOption('-f', true), '->hasParameterOption() returns true if the given short option is in the raw input');
+
+        $input = new ArgvInput(array('cli.php', '--foo', '--', 'foo'));
+        $this->assertTrue($input->hasParameterOption('--foo', true), '->hasParameterOption() returns true if the given long option is in the raw input');
+
+        $input = new ArgvInput(array('cli.php', '--foo=bar', 'foo'));
+        $this->assertTrue($input->hasParameterOption('--foo', true), '->hasParameterOption() returns true if the given long option with provided value is in the raw input');
+
+        $input = new ArgvInput(array('cli.php', '--', '--foo'));
+        $this->assertFalse($input->hasParameterOption('--foo', true), '->hasParameterOption() returns false if the given option is in the raw input but after an end of options signal');
+    }
+
     public function testToString()
     {
         $input = new ArgvInput(array('cli.php', '-f', 'foo'));
@@ -290,21 +305,25 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideGetParameterOptionValues
      */
-    public function testGetParameterOptionEqualSign($argv, $key, $expected)
+    public function testGetParameterOptionEqualSign($argv, $key, $onlyParams, $expected)
     {
         $input = new ArgvInput($argv);
-        $this->assertEquals($expected, $input->getParameterOption($key), '->getParameterOption() returns the expected value');
+        $this->assertEquals($expected, $input->getParameterOption($key, false, $onlyParams), '->getParameterOption() returns the expected value');
     }
 
     public function provideGetParameterOptionValues()
     {
         return array(
-            array(array('app/console', 'foo:bar', '-e', 'dev'), '-e', 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev'), '--env', 'dev'),
-            array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), 'dev'),
-            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), '1'),
-            array(array('app/console', 'foo:bar', '--env=dev', '', '--en=1'), array('--en'), '1'),
+            array(array('app/console', 'foo:bar', '-e', 'dev'), '-e', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev'), '--env', false, 'dev'),
+            array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), false, 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), false, '1'),
+            array(array('app/console', 'foo:bar', '--env=dev', '', '--en=1'), array('--en'), false, '1'),
+            array(array('app/console', 'foo:bar', '--env', 'val'), '--env', false, 'val'),
+            array(array('app/console', 'foo:bar', '--env', 'val', '--dummy'), '--env', false, 'val'),
+            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', false, 'dev'),
+            array(array('app/console', 'foo:bar', '--', '--env=dev'), '--env', true, false),
         );
     }
 

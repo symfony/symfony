@@ -853,11 +853,10 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->setContent('');
             $response->setStatusCode(200);
-            $that->assertEquals('HEAD', $request->getMethod());
+            $this->assertEquals('HEAD', $request->getMethod());
         });
 
         $this->request('HEAD', '/', array('HTTP_EXPECT' => 'something ...'));
@@ -867,12 +866,11 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
-            $that->assertNotEquals('HEAD', $request->getMethod());
+            $this->assertNotEquals('HEAD', $request->getMethod());
         });
 
         $this->request('GET', '/');
@@ -889,8 +887,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testSendsNoContentWhenFresh()
     {
         $time = \DateTime::createFromFormat('U', time());
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });

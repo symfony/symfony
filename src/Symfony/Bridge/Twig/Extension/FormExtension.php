@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 /**
  * FormExtension extends Twig with form capabilities.
@@ -61,7 +61,6 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('form_enctype', null, array('node_class' => 'Symfony\Bridge\Twig\Node\FormEnctypeNode', 'is_safe' => array('html'), 'deprecated' => true, 'alternative' => 'form_start')),
             new \Twig_SimpleFunction('form_widget', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_errors', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_label', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
@@ -95,15 +94,11 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
     }
 
     /**
-     * Renders a CSRF token.
-     *
-     * @param string $intention The intention of the protected action.
-     *
-     * @return string A CSRF token.
+     * {@inheritdoc}
      */
-    public function renderCsrfToken($intention)
+    public function renderCsrfToken($tokenId)
     {
-        return $this->renderer->renderCsrfToken($intention);
+        return $this->renderer->renderCsrfToken($tokenId);
     }
 
     /**

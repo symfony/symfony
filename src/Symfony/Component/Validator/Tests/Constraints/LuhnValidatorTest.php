@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Validation;
 
 class LuhnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LuhnValidator();

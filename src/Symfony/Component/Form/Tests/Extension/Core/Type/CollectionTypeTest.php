@@ -16,18 +16,6 @@ use Symfony\Component\Form\Tests\Fixtures\Author;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('collection', array(
-            'entry_type' => 'text',
-        ));
-
-        $this->assertSame('collection', $form->getConfig()->getType()->getName());
-    }
-
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
@@ -272,22 +260,6 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
 
         $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyEntryOptions()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\NumberType',
-            'options' => array('attr' => array('maxlength' => '10')),
-        ));
-
-        $resolvedOptions = $form->getConfig()->getOptions();
-
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\NumberType', $resolvedOptions['entry_type']);
-        $this->assertEquals(array('attr' => array('maxlength' => '10'), 'block_name' => 'entry'), $resolvedOptions['entry_options']);
     }
 
     public function testPrototypeDefaultLabel()

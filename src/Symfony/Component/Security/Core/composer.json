@@ -16,18 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/polyfill-php55": "~1.0",
+        "php": ">=5.5.9",
         "symfony/polyfill-php56": "~1.0",
-        "symfony/polyfill-php70": "~1.0",
         "symfony/polyfill-util": "~1.0"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "~2.1|~3.0.0",
-        "symfony/expression-language": "~2.6|~3.0.0",
-        "symfony/http-foundation": "~2.4|~3.0.0",
-        "symfony/ldap": "~2.8|~3.0.0",
-        "symfony/validator": "~2.5,>=2.5.9|~3.0.0",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/ldap": "~2.8|~3.0",
+        "symfony/validator": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
@@ -46,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

@@ -68,7 +68,6 @@ class TimeType extends AbstractType
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
-                $hourOptions['choices_as_values'] = true;
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
                 $hourOptions['choice_translation_domain'] = $options['choice_translation_domain']['hour'];
 
@@ -78,7 +77,6 @@ class TimeType extends AbstractType
                     }
 
                     $minuteOptions['choices'] = $minutes;
-                    $minuteOptions['choices_as_values'] = true;
                     $minuteOptions['placeholder'] = $options['placeholder']['minute'];
                     $minuteOptions['choice_translation_domain'] = $options['choice_translation_domain']['minute'];
                 }
@@ -91,7 +89,6 @@ class TimeType extends AbstractType
                     }
 
                     $secondOptions['choices'] = $seconds;
-                    $secondOptions['choices_as_values'] = true;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
                     $secondOptions['choice_translation_domain'] = $options['choice_translation_domain']['second'];
                 }
@@ -174,17 +171,11 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $placeholder = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
-            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
-
-                $placeholder = $options['empty_value'];
-            }
-
             if (is_array($placeholder)) {
                 $default = $placeholderDefault($options);
 
@@ -228,8 +219,7 @@ class TimeType extends AbstractType
             'with_seconds' => false,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => new \Exception(), // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -262,14 +252,6 @@ class TimeType extends AbstractType
         $resolver->setAllowedTypes('hours', 'array');
         $resolver->setAllowedTypes('minutes', 'array');
         $resolver->setAllowedTypes('seconds', 'array');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     /**

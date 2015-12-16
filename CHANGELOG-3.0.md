@@ -26,7 +26,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #16312 [HttpKernel] clearstatcache() so the Cache sees when a .lck file has been released (mpdude)
  * bug #16351 [WIP] [Form] [TwigBridge] Bootstrap horizontal theme missing tests (pieter2627)
  * feature #16715 [Form] Remove choices_as_values option on ChoiceType (nicolas-grekas)
- * feature #16692 [Form] Drop remaing CsrfProviderAdapter/Interface mentions (nicolas-grekas)
+ * feature #16692 [Form] Drop remaining CsrfProviderAdapter/Interface mentions (nicolas-grekas)
  * feature #16719 [Security] remove deprecated HTTP digest auth key  (xabbuh)
  * bug #16685 [Form] Fixed: Duplicate choice labels are remembered when using "choices_as_values" = false (webmozart)
  * feature #16709 [Bridge\PhpUnit] Display the stack trace of a deprecation on-demand (nicolas-grekas)

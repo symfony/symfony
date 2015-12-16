@@ -37,6 +37,13 @@
             <div class="sf-toolbar-info-piece">
                 <b>Actions</b>
                 <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
+                {% if 'ROLE_PREVIOUS_ADMIN' in collector.roles %}
+                    - <span>
+                        <a href="{{ path(profile.getcollector('request').requestattributes.get('_route'), {'_switch_user': '_exit'}) }}">
+                            Exit impersonation
+                        </a>
+                    </span>
+                {% endif %}
             </div>
             {% endif %}
         {% elseif collector.enabled %}
@@ -110,6 +117,21 @@
                 {% endif %}
             </tbody>
         </table>
+        
+        {% if collector.logoutUrl %}
+            <div>
+                <b>Actions:</b>
+                <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
+                {% if 'ROLE_PREVIOUS_ADMIN' in collector.roles %}
+                    - <span>
+                        <a href="{{ path(profile.getcollector('request').requestattributes.get('_route'), {'_switch_user': '_exit'}) }}">
+                            Exit impersonation
+                        </a>
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+        
     {% elseif collector.enabled %}
         <div class="empty">
             <p>There is no security token.</p>

@@ -695,7 +695,7 @@ class Crawler extends \SplObjectStorage
      *
      * @return Link A Link instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty or contains non DOMElement instances
+     * @throws \InvalidArgumentException If the current node list is empty or contains non-DOMElement instances
      */
     public function link($method = 'get')
     {
@@ -717,7 +717,7 @@ class Crawler extends \SplObjectStorage
      *
      * @return Link[] An array of Link instances
      *
-     * @throws \InvalidArgumentException If the current node list contains non DOMElement instances
+     * @throws \InvalidArgumentException If the current node list contains non-DOMElement instances
      */
     public function links()
     {
@@ -741,7 +741,7 @@ class Crawler extends \SplObjectStorage
      *
      * @return Form A Form instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty or contains non DOMElement instances
+     * @throws \InvalidArgumentException If the current node list is empty or contains non-DOMElement instances
      */
     public function form(array $values = null, $method = null)
     {

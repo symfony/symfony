@@ -325,8 +325,8 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
             'allow_add' => true,
             'prototype' => true,
-            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-            'entry_options' => array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'options' => array(
                 'data' => 'bar',
             ),
         ));

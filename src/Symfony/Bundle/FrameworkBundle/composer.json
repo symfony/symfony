@@ -20,6 +20,7 @@
         "symfony/dependency-injection": "~2.3",
         "symfony/config": "~2.3,>=2.3.12",
         "symfony/event-dispatcher": "~2.1",
+        "symfony/finder": "~2.0,>=2.0.5",
         "symfony/http-foundation": "~2.3,>=2.3.19",
         "symfony/http-kernel": "~2.3,>=2.3.22",
         "symfony/filesystem": "~2.3",
@@ -34,7 +35,6 @@
         "symfony/console": "~2.3",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
-        "symfony/finder": "~2.0,>=2.0.5",
         "symfony/intl": "~2.3",
         "symfony/security": "~2.3",
         "symfony/form": "~2.3.31",
@@ -45,7 +45,6 @@
     },
     "suggest": {
         "symfony/console": "For using the console commands",
-        "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
         "symfony/serializer": "For using the serializer service",

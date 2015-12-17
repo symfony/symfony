@@ -706,7 +706,7 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
         }
 
         return new Link($node, $this->baseHref, $method);
@@ -724,7 +724,7 @@ class Crawler extends \SplObjectStorage
         $links = array();
         foreach ($this as $node) {
             if (!$node instanceof \DOMElement) {
-                throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
             }
 
             $links[] = new Link($node, $this->baseHref, 'get');
@@ -752,7 +752,7 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf("The current node list should contain only DOMElement instances, '%s' found.", get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
         }
 
         $form = new Form($node, $this->uri, $method, $this->baseHref);

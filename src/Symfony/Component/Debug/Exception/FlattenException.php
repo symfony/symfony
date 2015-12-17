@@ -99,6 +99,8 @@ class FlattenException extends LegacyFlattenException
 
         if ($previous instanceof \Exception) {
             $e->setPrevious(static::create($previous));
+        } elseif ($previous instanceof \Throwable) {
+            $e->setPrevious(static::create(new FatalThrowableError($previous)));
         }
 
         return $e;

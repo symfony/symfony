@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ivarb at 2015-12-16T15:08:51Z
+
+Also noticed this bug while upgrading from 2.7 to 2.8. Would very much appreciate this patch in 2.8 :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T10:10:39Z
+
+:+1:
+Status: reviewed

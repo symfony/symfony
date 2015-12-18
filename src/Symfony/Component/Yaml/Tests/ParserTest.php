@@ -726,6 +726,100 @@ EOF;
 
         $this->assertEquals($expected, $this->parser->parse($yaml));
     }
+
+    /**
+     * @dataProvider getCommentLikeStringInScalarBlockData
+     */
+    public function testCommentLikeStringsAreNotStrippedInBlockScalars($yaml, $expectedParserResult)
+    {
+        $this->assertSame($expectedParserResult, $this->parser->parse($yaml));
+    }
+
+    public function getCommentLikeStringInScalarBlockData()
+    {
+        $yaml1 = <<<EOT
+pages:
+    -
+        title: some title
+        content: |
+            # comment 1
+            header
+
+                # comment 2
+                <body>
+                    <h1>title</h1>
+                </body>
+
+            footer # comment3
+EOT;
+        $expected1 = array(
+            'pages' => array(
+                array(
+                    'title' => 'some title',
+                    'content' => <<<EOT
+# comment 1
+header
+
+    # comment 2
+    <body>
+        <h1>title</h1>
+    </body>
+
+footer # comment3
+EOT
+                    ,
+                ),
+            ),
+        );
+
+        $yaml2 = <<<EOT
+test: |
+    foo
+    # bar
+    baz
+collection:
+    - one: |
+        foo
+        # bar
+        baz
+    - two: |
+        foo
+        # bar
+        baz
+EOT;
+        $expected2 = array(
+            'test' => <<<EOT
+foo
+# bar
+baz
+
+EOT
+            ,
+            'collection' => array(
+                array(
+                    'one' => <<<EOT
+foo
+# bar
+baz
+EOT
+                    ,
+                ),
+                array(
+                    'two' => <<<EOT
+foo
+# bar
+baz
+EOT
+                    ,
+                ),
+            ),
+        );
+
+        return array(
+            array($yaml1, $expected1),
+            array($yaml2, $expected2),
+        );
+    }
 }
 
 class B

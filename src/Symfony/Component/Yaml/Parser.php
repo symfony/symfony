@@ -303,6 +303,7 @@ class Parser
     private function getNextEmbedBlock($indentation = null, $inSequence = false)
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
+        $insideBlockScalar = $this->isBlockScalarHeader();
 
         if (!$this->moveToNextLine()) {
             return;
@@ -339,16 +340,20 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem();
 
-        // Comments must not be removed inside a block scalar
-        $removeCommentsPattern = '~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~';
-        $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+        if (!$insideBlockScalar) {
+            $insideBlockScalar = $this->isBlockScalarHeader();
+        }
+
+        $previousLineIndentation = $this->getCurrentLineIndentation();
 
         while ($this->moveToNextLine()) {
             $indent = $this->getCurrentLineIndentation();
 
-            if ($indent === $newIndent) {
-                $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+            if (!$insideBlockScalar && $indent === $previousLineIndentation) {
+                $insideBlockScalar = $this->isBlockScalarHeader();
             }
+
+            $previousLineIndentation = $indent;
 
             if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
@@ -360,7 +365,8 @@ class Parser
                 continue;
             }
 
-            if ($removeComments && $this->isCurrentLineComment()) {
+            // we ignore "comment" lines only when we are not inside a scalar block
+            if (!$insideBlockScalar && $this->isCurrentLineComment()) {
                 continue;
             }
 
@@ -671,5 +677,15 @@ class Parser
     private function isStringUnIndentedCollectionItem()
     {
         return 0 === strpos($this->currentLine, '- ');
+    }
+
+    /**
+     * Tests whether or not the current line is the header of a block scalar.
+     *
+     * @return bool
+     */
+    private function isBlockScalarHeader()
+    {
+        return (bool) preg_match('~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~', $this->currentLine);
     }
 }

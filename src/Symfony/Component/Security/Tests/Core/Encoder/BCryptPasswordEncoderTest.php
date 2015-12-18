@@ -45,9 +45,6 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @requires PHP 5.3.7
-     */
     public function testResultLength()
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
@@ -55,9 +52,6 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(60, strlen($result));
     }
 
-    /**
-     * @requires PHP 5.3.7
-     */
     public function testValidation()
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
@@ -73,13 +67,15 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
 
-        $encoder->encodePassword(str_repeat('a', 5000), 'salt');
+        $encoder->encodePassword(str_repeat('a', 73), 'salt');
     }
 
     public function testCheckPasswordLength()
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
+        $result = $encoder->encodePassword(str_repeat('a', 72), null);
 
-        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
+        $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
+        $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));
     }
 }

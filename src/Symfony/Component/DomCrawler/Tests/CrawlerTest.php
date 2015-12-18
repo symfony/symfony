@@ -737,7 +737,7 @@ HTML;
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^The current node list should contain only DOMElement instances/
+     * @expectedExceptionMessage The current node list should contain only DOMElement instances
      */
     public function testInvalidLink()
     {
@@ -747,7 +747,7 @@ HTML;
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^The current node list should contain only DOMElement instances/
+     * @expectedExceptionMessage The current node list should contain only DOMElement instances
      */
     public function testInvalidLinks()
     {
@@ -829,7 +829,7 @@ HTML;
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^The current node list should contain only DOMElement instances/
+     * @expectedExceptionMessage The current node list should contain only DOMElement instances
      */
     public function testInvalidForm()
     {

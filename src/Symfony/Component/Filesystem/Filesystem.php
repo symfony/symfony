@@ -531,7 +531,7 @@ class Filesystem
         }
 
         // Ignore for filesystems that do not support umask
-        @chmod($tmpFile, 0666);
+        @chmod($tmpFile, 0666 & ~umask());
         $this->rename($tmpFile, $filename, true);
     }
 

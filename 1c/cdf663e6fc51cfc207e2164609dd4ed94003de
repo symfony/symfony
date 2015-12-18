@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-09T11:04:58Z
+
+@nicolas-grekas this is for you to review :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-09T18:11:52Z
+
+Ack, I should be able to do it tomorrow
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-09T21:29:21Z
+
+What about defining the `E_STRICT` constant in the PHP 5.4 polyfill (or do we already do that?)? Then we could already simplify the code in previous versions.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-09T21:49:29Z
+
+E_ALL has a different meaning in PHP 5.3 and >= 5.4. That is problem. So we cannot do anything in Polyfill.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-09T21:57:18Z
+
+@Tobion I see, but then treating `-1` now like `E_ALL` could become tricky in the future (see my inline comment), couldn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-10T07:37:08Z
+
+Since PHP 7 introduced exceptions in the core, I seriously doubt that any new `E_*` will ever be introduced.
+:+1: for me

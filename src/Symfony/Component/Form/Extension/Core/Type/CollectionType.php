@@ -31,7 +31,7 @@ class CollectionType extends AbstractType
                 'label' => $options['prototype_name'].'label__',
             ), $options['options']);
 
-            if ($options['prototype_data'] !== null) {
+            if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
             }
 

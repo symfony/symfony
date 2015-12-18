@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-14T07:58:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by craue at 2015-12-14T10:14:54Z
+
+Is there any way to "feature detect" whether or not this option needs to be set (to `true`)?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-14T12:58:49Z
+
+@craue ``method_exists(AbstractType::class, 'getName')``, as this method has been removed in Symfony 3, and setting it is neccessary only in ``~2.7`` to get this behavior.
+
+---------------------------------------------------------------------------
+
+by craue at 2015-12-14T13:14:50Z
+
+@stof, thanks. I wonder why `AbstractType::getName` isn't mentioned in the 3.0.0 changelog. But that's out of scope of this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-14T13:17:58Z
+
+@craue because the changelog files are incomplete, as reported already. Latest removals have been forgotten

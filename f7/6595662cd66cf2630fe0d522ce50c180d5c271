@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by EVODelavega at 2015-12-16T16:32:11Z
+
+I've changed that same line to `$PHPUNIT_VERSION = PHP_VERSION_ID >= 50600 ? '5.0' : '4.8';` because travis' HHVM tests kept failing. After changing that the build was successful. Remove the `or` and I think this PR is ready to merge
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-12-16T19:47:00Z
+
+@EVODelavega @Tobion
+
+Done. How about using phpunit 5.1 instead of 5.0?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T10:05:08Z
+
+Please update the PR with 5.1 so that we can know if it works
+
+---------------------------------------------------------------------------
+
+by eventhorizonpl at 2015-12-18T15:10:03Z
+
+@nicolas-grekas
+
+done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T15:26:54Z
+
+:+1:

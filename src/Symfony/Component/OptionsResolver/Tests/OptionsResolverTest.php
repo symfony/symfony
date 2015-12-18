@@ -511,7 +511,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideInvalidTypes
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but is of type "double[][]".
      */
@@ -547,8 +546,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string", but is of type "integer".
+     * @dataProvider provideInvalidTypes
      */
     public function testResolveFailsIfInvalidType($actualType, $allowedType, $exceptionMessage)
     {

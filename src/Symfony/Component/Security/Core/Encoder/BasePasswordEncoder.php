@@ -95,6 +95,6 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      */
     protected function isPasswordTooLong($password)
     {
-        return strlen($password) > self::MAX_PASSWORD_LENGTH;
+        return strlen($password) > static::MAX_PASSWORD_LENGTH;
     }
 }

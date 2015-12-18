@@ -274,4 +274,30 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
+
+    public function testPrototypeDefaultRequired()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type' => 'file',
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+        ));
+
+        $this->assertTrue($form->createView()->vars['prototype']->vars['required']);
+    }
+
+    public function testPrototypeSetNotRequired()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type' => 'file',
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'required' => false,
+        ));
+
+        $this->assertFalse($form->createView()->vars['required'], 'collection is not required');
+        $this->assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
+    }
 }

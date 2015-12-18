@@ -891,7 +891,7 @@ class OptionsResolver implements Options
      * @param string $type  the required allowedType string
      * @param mixed  $value the value
      *
-     * @return bool Whether or not $value if of the allowed type
+     * @return bool Whether the $value is of the allowed type
      */
     private function verifyAllowedType($type, $value)
     {

@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-11T19:40:03Z
+
+This travis config automates the practice we used on 2.8/3.0:
+- the deps=high line is reversed when running with the master branch: the previous version (stable or latest of a major series) is checked out and each component is composer-installed with highest deps (meaning master deps when allowed in composer.json files). E.g. 2.8 with 3.0 deps at its time, and 3.0 with 3.1-master deps now
+- legacy tests are auto-skipped on deps=high when cross-major-version components are tested
+- the other changes are removing boilerplate, nothing more

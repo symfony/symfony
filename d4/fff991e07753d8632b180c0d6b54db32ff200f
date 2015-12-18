@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ChadSikorra at 2015-12-10T00:51:25Z
+
+I adjusted the test to require the LDAP extension. Seems to have appeased Appveyor anyway.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2015-12-10T08:47:41Z
+
+LGTM :+1:

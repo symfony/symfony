@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * deprecated the "choices_as_values" option of ChoiceType
+
 3.0.0
 -----
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-09T16:57:22Z
+
+@mvhirsch to test this add your test case to the list in the`Symfony\Component\Validator\Tests\Constraints\BicValidatorTest::getInvalidBics()` method

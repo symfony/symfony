@@ -374,6 +374,10 @@ DependencyInjection
    </services>
    ```
 
+ * `Symfony\Component\DependencyInjection\ContainerAware` has been deprecated, use 
+   `Symfony\Component\DependencyInjection\ContainerAwareTrait` or implement 
+   `Symfony\Component\DependencyInjection\ContainerAwareInterface` manually
+
 WebProfiler
 -----------
 

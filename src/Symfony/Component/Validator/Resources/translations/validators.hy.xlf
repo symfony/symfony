@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Էլ-փոստի արժեքը անվավեր է։</target>
+                <target>Անվավեր էլ֊փոստի արժեք։</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>

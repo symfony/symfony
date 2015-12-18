@@ -113,7 +113,7 @@ class LogoutUrlGenerator
 
             $request = $this->requestStack->getCurrentRequest();
 
-            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath().$logoutPath;
+            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
 
             if (!empty($parameters)) {
                 $url .= '?'.http_build_query($parameters);

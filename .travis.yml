@@ -7,60 +7,58 @@ addons:
         - parallel
         - language-pack-fr-base
 
-cache:
-    directories:
-        - .phpunit
-        - php-5.5.9
+env:
+    global:
+        - MIN_PHP=5.5.9
 
 matrix:
     include:
         - php: hhvm
         - php: 5.5
         - php: 5.6
-        - php: 5.6
-          env: deps=2.8
+          env: deps=high
         - php: 7.0
           env: deps=low
     fast_finish: true
 
+cache:
+    directories:
+        - .phpunit
+        - php-$MIN_PHP
+
 services: mongodb
 
-env:
-    global:
-        - deps=no
-        - SYMFONY_DEPRECATIONS_HELPER=weak
-
 before_install:
-    - if [[ "$deps" = "no" ]] && [[ "$TRAVIS_PHP_VERSION" = 5.6 ]] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then export deps=skip; fi;
-    - if [[ $deps = no && $TRAVIS_PHP_VERSION = 5.5 && ! -d php-5.5.9/sapi ]]; then wget http://museum.php.net/php5/php-5.5.9.tar.bz2; tar -xjf php-5.5.9.tar.bz2; (cd php-5.5.9; ./configure --enable-sigchild --enable-pcntl; make -j2); fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi;
-    - echo "memory_limit = -1" >> $INI_FILE
-    - echo "session.gc_probability = 0" >> $INI_FILE
-    - if [ "$deps" != "skip" ]; then composer self-update; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = mongo.so" >> $INI_FILE; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then echo "extension = memcache.so" >> $INI_FILE; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.8 && echo "apc.enable_cli = 1" >> $INI_FILE) || echo "Let's continue without apcu extension"; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]]; then pecl install -f memcached-2.1.0 || echo "Let's continue without memcached extension"; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" = 5.* ]] && [ "$deps" = "no" ]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo "extension = $(pwd)/modules/symfony_debug.so" >> $INI_FILE); fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = ldap.so" >> $INI_FILE; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi;
-    - if [ "$deps" != "skip" ]; then ./phpunit install; fi;
-    - export PHPUNIT="$(readlink -f ./phpunit)"
+    - if [[ ! $deps && ! $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && $TRAVIS_PHP_VERSION != hhvm && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; fi;
+    - if [[ ! $deps && ! -d php-$MIN_PHP/sapi ]]; then wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj; (cd php-$MIN_PHP; ./configure --enable-sigchild --enable-pcntl; make -j2); fi;
+    - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi;
+    - echo memory_limit = -1 >> $INI_FILE
+    - echo session.gc_probability = 0 >> $INI_FILE
+    - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi;
+    - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then echo extension = memcache.so >> $INI_FILE; fi;
+    - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.10 && echo apc.enable_cli = 1 >> $INI_FILE) || echo "Let's continue without apcu extension"; fi;
+    - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then pecl install -f memcached-2.1.0 || echo "Let's continue without memcached extension"; fi;
+    - if [[ $TRAVIS_PHP_VERSION = 5.* && ! $deps ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi;
+    - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi;
+    - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then phpenv config-rm xdebug.ini; fi;
+    - if [[ $deps != skip ]]; then composer self-update; fi;
+    - if [[ $deps != skip ]]; then ./phpunit install; fi;
+    - export PHPUNIT=$(readlink -f ./phpunit)
 
 install:
-    - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
-    - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
-    - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
-    - if [ "$deps" != "skip" ]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi;
-    - if [ "$deps" != "skip" ] && [ "$deps" != "no" ]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $COMPONENTS; fi;
-    - if [ "$deps" = "2.8" ]; then git fetch origin 2.8; git checkout -m FETCH_HEAD; export COMPOSER_ROOT_VERSION=2.8.x-dev; fi;
+    - if [[ $deps != skip ]]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi;
+    - if [[ $deps != skip && $deps ]]; then php .travis.php $TRAVIS_COMMIT_RANGE $TRAVIS_BRANCH $COMPONENTS; fi;
+    - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then SYMFONY_VERSION=$(git branch -r | grep -o '/[1-9].*' | tail -n 1 | sed s/.//); else SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*'); fi;
+    - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; fi;
+    - if [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git branch -r | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]]; then LEGACY=,legacy; fi;
+    - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev;
+    - if [[ ! $deps ]]; then composer --prefer-source install; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi;
+    - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi;
 
 script:
-    - if [ "$deps" = "no" ]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
-    - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
-    - if [[ $deps = no && $TRAVIS_PHP_VERSION = 5.5 ]]; then echo -e "1\\n0" | parallel --gnu 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-5.5.9/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
-    - if [ "$deps" = "high" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
-    - if [ "$deps" = "low" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
-    - if [ "$deps" = "2.8" ]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data,legacy'; fi;
-    - if [ "$deps" = "skip" ]; then echo 'This matrix line is skipped for pull requests.'; fi;
+    - if [[ ! $deps ]]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
+    - if [[ ! $deps ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
+    - if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | parallel --gnu 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi;
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [[ $deps = skip ]]; then echo This matrix line is skipped for pull requests.; fi;

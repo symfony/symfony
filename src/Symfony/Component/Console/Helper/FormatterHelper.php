@@ -89,7 +89,11 @@ class FormatterHelper extends Helper
             return $message;
         }
 
-        return mb_substr($message, 0, $length).$suffix;
+        if (false === $encoding = mb_detect_encoding($message, null, true)) {
+            return substr($message, 0, $length).$suffix;
+        }
+
+        return mb_substr($message, 0, $length, $encoding).$suffix;
     }
 
     /**

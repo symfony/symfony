@@ -288,4 +288,20 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
     }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyPrototypeData()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+            'allow_add' => true,
+            'prototype' => true,
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'options' => array(
+                'data' => 'bar',
+            ),
+        ));
+        $this->assertSame('bar', $form->createView()->vars['prototype']->vars['value']);
+    }
 }

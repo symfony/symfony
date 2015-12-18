@@ -22,8 +22,8 @@ install:
     - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul
     - IF %PHP%==1 del /Q *.zip
     - IF %PHP%==1 cd ext
-    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.8/php_apcu-4.0.8-5.5-nts-vc11-x86.zip
-    - IF %PHP%==1 7z x php_apcu-4.0.8-5.5-nts-vc11-x86.zip -y >nul
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.10/php_apcu-4.0.10-5.5-nts-vc11-x86.zip
+    - IF %PHP%==1 7z x php_apcu-4.0.10-5.5-nts-vc11-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.5-nts-vc11-x86.zip
     - IF %PHP%==1 7z x php_memcache-3.0.8-5.5-nts-vc11-x86.zip -y >nul
     - IF %PHP%==1 del /Q *.zip

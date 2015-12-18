@@ -18,8 +18,8 @@ use Symfony\Component\Process\ProcessUtils;
 error_reporting(-1);
 require __DIR__.'/src/Symfony/Component/Process/ProcessUtils.php';
 
-// PHPUnit 4.8 does not support PHP 7, while 5.0 requires PHP 5.6+
-$PHPUNIT_VERSION = PHP_VERSION_ID >= 70000 ? '5.0' : '4.8';
+// PHPUnit 4.8 does not support PHP 7, while 5.1 requires PHP 5.6+
+$PHPUNIT_VERSION = PHP_VERSION_ID >= 50600 ? '5.1' : '4.8';
 $PHPUNIT_DIR = __DIR__.'/.phpunit';
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = ProcessUtils::escapeArgument($PHP);
@@ -64,10 +64,6 @@ Symfony\Bridge\PhpUnit\TextUI\Command::main();
 EOPHP
     );
     chdir('..');
-    if (file_exists('../src/Symfony/Bridge/PhpUnit') && `git diff --name-only HEAD^ -- ../src/Symfony/Bridge/PhpUnit`) {
-        passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', str_replace('/', DIRECTORY_SEPARATOR, "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge")));
-        symlink(realpath('../src/Symfony/Bridge/PhpUnit'), "phpunit-$PHPUNIT_VERSION/vendor/symfony/phpunit-bridge");
-    }
     file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__));
     chdir($oldPwd);
 

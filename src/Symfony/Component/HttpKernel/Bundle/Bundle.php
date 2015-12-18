@@ -168,6 +168,10 @@ abstract class Bundle implements BundleInterface
             return;
         }
 
+        if (!class_exists('Symfony\Component\Finder\Finder')) {
+            throw new \RuntimeException('You need the symfony/finder component to register bundle commands.');
+        }
+
         $finder = new Finder();
         $finder->files()->name('*Command.php')->in($dir);
 

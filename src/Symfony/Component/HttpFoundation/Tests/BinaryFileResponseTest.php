@@ -153,19 +153,30 @@ class BinaryFileResponseTest extends ResponseTestCase
         );
     }
 
-    public function testXSendfile()
+    /**
+     * @dataProvider provideXSendfileFiles
+     */
+    public function testXSendfile($file)
     {
         $request = Request::create('/');
         $request->headers->set('X-Sendfile-Type', 'X-Sendfile');
 
         BinaryFileResponse::trustXSendfileTypeHeader();
-        $response = BinaryFileResponse::create(__DIR__.'/../README.md', 200, array('Content-Type' => 'application/octet-stream'));
+        $response = BinaryFileResponse::create($file, 200, array('Content-Type' => 'application/octet-stream'));
         $response->prepare($request);
 
         $this->expectOutputString('');
         $response->sendContent();
 
         $this->assertContains('README.md', $response->headers->get('X-Sendfile'));
+    }
+
+    public function provideXSendfileFiles()
+    {
+        return array(
+            array(__DIR__.'/../README.md'),
+            array('file://'.__DIR__.'/../README.md'),
+        );
     }
 
     /**

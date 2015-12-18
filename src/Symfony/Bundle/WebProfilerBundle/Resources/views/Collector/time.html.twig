@@ -68,7 +68,7 @@
 
             {% set subrequests_time = 0 %}
             {% for child in profile.children %}
-                {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
+                {% set subrequests_time = subrequests_time + child.get('time').events.__section__.duration %}
             {% endfor %}
 
             <div class="metric">
@@ -106,7 +106,7 @@
 
     {% if profile.parent %}
         <h3>
-            Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
+            Sub-Request {{ profile.get('request').requestattributes.get('_controller') }}
             <small>
                 {{ collector.events.__section__.duration }} ms
                 <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>
@@ -126,9 +126,9 @@
         <h3>Sub-requests <small>({{ profile.children|length }})</small></h3>
 
         {% for child in profile.children %}
-            {% set events = child.getcollector('time').events %}
+            {% set events = child.get('time').events %}
             <h4>
-                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>
+                <a href="{{ path('_profiler', { token: child.token, panel: 'time' }) }}">{{ child.get('request').requestattributes.get('_controller') }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
 
@@ -458,7 +458,7 @@
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ helper.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ helper.dump_request_data(child.token, child, child.get('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]

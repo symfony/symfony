@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0.
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {

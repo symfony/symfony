@@ -23,6 +23,8 @@ use Symfony\Component\Form\FormBuilderInterface;
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Profiler\Type\DataCollectorTypeExtension instead.
  */
 class DataCollectorTypeExtension extends AbstractTypeExtension
 {

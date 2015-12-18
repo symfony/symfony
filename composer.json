@@ -55,6 +55,7 @@
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
+        "symfony/profiler": "self.version",
         "symfony/property-access": "self.version",
         "symfony/property-info": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
@@ -84,6 +85,7 @@
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0",
+        "zendframework/zend-stdlib": "~2.4.8",
         "egulias/email-validator": "~1.2",
         "phpdocumentor/reflection": "^1.0.7"
     },

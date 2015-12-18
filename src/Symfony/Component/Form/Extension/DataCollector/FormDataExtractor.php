@@ -22,6 +22,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * @since  2.4
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Profiler\FormDataExtractor instead.
  */
 class FormDataExtractor implements FormDataExtractorInterface
 {

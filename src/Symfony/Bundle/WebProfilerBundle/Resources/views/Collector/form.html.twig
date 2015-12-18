@@ -3,23 +3,23 @@
 {% from _self import form_tree_entry, form_tree_details %}
 
 {% block toolbar %}
-    {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
-        {% set status_color = collector.data.nb_errors ? 'red' : '' %}
+    {% if collector.nbErrors > 0 or collector.forms|length %}
+        {% set status_color = collector.nbErrors ? 'red' : '' %}
         {% set icon %}
             {{ include('@WebProfiler/Icon/form.svg') }}
             <span class="sf-toolbar-value">
-                {{ collector.data.nb_errors ?: collector.data.forms|length }}
+                {{ collector.nb_errors ?: collector.forms|length }}
             </span>
         {% endset %}
 
         {% set text %}
             <div class="sf-toolbar-info-piece">
                 <b>Number of forms</b>
-                <span class="sf-toolbar-status">{{ collector.data.forms|length }}</span>
+                <span class="sf-toolbar-status">{{ collector.forms|length }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Number of errors</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.data.nb_errors > 0 ? 'red' }}">{{ collector.data.nb_errors }}</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.nbErrors > 0 ? 'red' }}">{{ collector.nbErrors }}</span>
             </div>
         {% endset %}
 
@@ -28,12 +28,12 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
+    <span class="label label-status-{{ collector.nb_errors ? 'error' }} {{ collector.forms is empty ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
-        {% if collector.data.nb_errors > 0 %}
+        {% if collector.nb_errors > 0 %}
             <span class="count">
-                <span>{{ collector.data.nb_errors }}</span>
+                <span>{{ collector.nb_errors }}</span>
             </span>
         {% endif %}
     </span>
@@ -188,18 +188,18 @@
 {% block panel %}
     <h2>Forms</h2>
 
-    {% if collector.data.forms|length %}
+    {% if collector.forms|length %}
         <div id="tree-menu" class="tree">
             <ul>
-            {% for formName, formData in collector.data.forms %}
-                {{ form_tree_entry(formName, formData, true) }}
+            {% for formHash, formData in collector.forms %}
+                {{ form_tree_entry(formHash, formData, true) }}
             {% endfor %}
             </ul>
         </div>
 
         <div id="tree-details-container">
-            {% for formName, formData in collector.data.forms %}
-                {{ form_tree_details(formName, formData, collector.data.forms_by_hash) }}
+            {% for formHash, formData in collector.forms %}
+                {{ form_tree_details(formHash, formData) }}
             {% endfor %}
         </div>
     {% else %}
@@ -437,7 +437,7 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
+            {{ data.name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
 
             {% if data.errors is defined and data.errors|length > 0 %}
                 <div class="badge-error">{{ data.errors|length }}</div>
@@ -458,7 +458,7 @@
     {% import _self as tree %}
     <div class="tree-details" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2>
-            {{ name|default('(no name)') }}
+            {{ data.name|default('(no name)') }}
             {% if data.type_class is defined and data.type is defined %}
             <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
             {% endif %}

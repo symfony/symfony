@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()

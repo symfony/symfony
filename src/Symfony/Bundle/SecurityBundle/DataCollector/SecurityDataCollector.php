@@ -23,6 +23,8 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
  * SecurityDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Security\Core\Profiler\SecurityDataCollector instead.
  */
 class SecurityDataCollector extends DataCollector
 {

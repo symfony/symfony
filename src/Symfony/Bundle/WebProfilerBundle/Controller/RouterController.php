@@ -12,12 +12,13 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\Profiler\Profiler;
 
 /**
  * RouterController.
@@ -27,13 +28,16 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 class RouterController
 {
     private $profiler;
+    private $profilerStorage;
     private $twig;
     private $matcher;
     private $routes;
 
-    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    public function __construct(Profiler $profiler = null, ProfilerStorageInterface $profilerStorage = null, \Twig_Environment $twig,
+                                UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
+        $this->profilerStorage = $profilerStorage;
         $this->twig = $twig;
         $this->matcher = $matcher;
         $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
@@ -50,7 +54,7 @@ class RouterController
      */
     public function panelAction($token)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -60,17 +64,17 @@ class RouterController
             return new Response('The Router is not enabled.', 200, array('Content-Type' => 'text/html'));
         }
 
-        $profile = $this->profiler->loadProfile($token);
+        $profile = $this->profilerStorage->read($token);
 
         $context = $this->matcher->getContext();
         $context->setMethod($profile->getMethod());
         $matcher = new TraceableUrlMatcher($this->routes, $context);
 
-        $request = $profile->getCollector('request');
+        $request = $profile->get('request');
 
         return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
             'request' => $request,
-            'router' => $profile->getCollector('router'),
+            'router' => $profile->get('router'),
             'traces' => $matcher->getTraces($request->getPathInfo()),
         )), 200, array('Content-Type' => 'text/html'));
     }

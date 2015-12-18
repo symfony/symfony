@@ -15,7 +15,7 @@ use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\DumpDataCollectorPas
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,12 +25,12 @@ class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
         $container->addCompilerPass(new DumpDataCollectorPass());
         $container->setParameter('templating.helper.code.file_link_format', 'file-link-format');
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, null));
-        $container->setDefinition('data_collector.dump', $definition);
+        $definition = new Definition('Symfony\Component\VarDumper\Dumper\TraceableDumper', array(null, null, null, null));
+        $container->setDefinition('var_dumper.traceable_dumper', $definition);
 
         $container->compile();
 
-        $this->assertSame('file-link-format', $definition->getArgument(1));
+        $this->assertSame('file-link-format', $definition->getArgument(2));
     }
 
     public function testProcessWithoutFileLinkFormatParameter()
@@ -38,27 +38,27 @@ class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, null));
-        $container->setDefinition('data_collector.dump', $definition);
+        $definition = new Definition('Symfony\Component\VarDumper\Dumper\TraceableDumper', array(null, null, null, null));
+        $container->setDefinition('var_dumper.traceable_dumper', $definition);
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(1));
+        $this->assertNull($definition->getArgument(2));
     }
 
     public function testProcessWithToolbarEnabled()
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
-        $requestStack = new RequestStack();
+        $dumper = new HtmlDumper();
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, $requestStack));
-        $container->setDefinition('data_collector.dump', $definition);
+        $definition = new Definition('Symfony\Component\VarDumper\Dumper\TraceableDumper', array($dumper, null, null, null));
+        $container->setDefinition('var_dumper.traceable_dumper', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::ENABLED);
 
         $container->compile();
 
-        $this->assertSame($requestStack, $definition->getArgument(3));
+        $this->assertSame($dumper, $definition->getArgument(0));
     }
 
     public function testProcessWithToolbarDisabled()
@@ -66,13 +66,13 @@ class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, new RequestStack()));
-        $container->setDefinition('data_collector.dump', $definition);
+        $definition = new Definition('Symfony\Component\VarDumper\Dumper\TraceableDumper', array(new HtmlDumper(), null, null, null));
+        $container->setDefinition('var_dumper.traceable_dumper', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::DISABLED);
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(3));
+        $this->assertNull($definition->getArgument(0));
     }
 
     public function testProcessWithoutToolbar()
@@ -80,11 +80,11 @@ class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, new RequestStack()));
-        $container->setDefinition('data_collector.dump', $definition);
+        $definition = new Definition('Symfony\Component\VarDumper\Dumper\TraceableDumper', array(new HtmlDumper(), null, null, null));
+        $container->setDefinition('var_dumper.traceable_dumper', $definition);
 
         $container->compile();
 
-        $this->assertNull($definition->getArgument(3));
+        $this->assertNull($definition->getArgument(0));
     }
 }

@@ -17,7 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\Profiler\Profile;
+use Symfony\Component\Profiler\Profiler;
+use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -30,6 +32,7 @@ class ProfilerController
     private $templateManager;
     private $generator;
     private $profiler;
+    private $profilerStorage;
     private $twig;
     private $templates;
     private $toolbarPosition;
@@ -37,16 +40,19 @@ class ProfilerController
     /**
      * Constructor.
      *
-     * @param UrlGeneratorInterface $generator       The URL Generator
-     * @param Profiler              $profiler        The profiler
-     * @param \Twig_Environment     $twig            The twig environment
-     * @param array                 $templates       The templates
-     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     * @param UrlGeneratorInterface     $generator          The URL Generator
+     * @param Profiler                  $profiler           The profiler
+     * @param ProfilerStorageInterface  $profilerStorage    The profiler storage
+     * @param \Twig_Environment         $twig               The twig environment
+     * @param array                     $templates          The templates
+     * @param string                    $toolbarPosition    The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, ProfilerStorageInterface $profilerStorage = null,
+                                \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
+        $this->profilerStorage = $profilerStorage;
         $this->twig = $twig;
         $this->templates = $templates;
         $this->toolbarPosition = $toolbarPosition;
@@ -61,7 +67,7 @@ class ProfilerController
      */
     public function homeAction()
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -82,7 +88,7 @@ class ProfilerController
      */
     public function panelAction(Request $request, $token)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -91,22 +97,24 @@ class ProfilerController
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+        if ('latest' === $token && $latest = current($this->profilerStorage->findBy(array(), 1, null, null))) {
             $token = $latest['token'];
         }
 
-        if (!$profile = $this->profiler->loadProfile($token)) {
-            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token, 'request' => $request)), 200, array('Content-Type' => 'text/html'));
+        if (!$profile = $this->profilerStorage->read($token)) {
+            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
         }
 
-        if (!$profile->hasCollector($panel)) {
+        $panel = $request->query->get('panel', $profile instanceof Profile?'request':'config');
+
+        if (!$profile->has($panel)) {
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
         return new Response($this->twig->render($this->getTemplateManager()->getName($profile, $panel), array(
             'token' => $token,
             'profile' => $profile,
-            'collector' => $profile->getCollector($panel),
+            'collector' => $profile->get($panel),
             'panel' => $panel,
             'page' => $page,
             'request' => $request,
@@ -127,12 +135,12 @@ class ProfilerController
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
         $this->profiler->disable();
-        $this->profiler->purge();
+        $this->profilerStorage->purge();
 
         return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'purge')), 302, array('Content-Type' => 'text/html'));
     }
@@ -149,7 +157,7 @@ class ProfilerController
      */
     public function infoAction(Request $request, $about)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -173,7 +181,7 @@ class ProfilerController
      */
     public function toolbarAction(Request $request, $token)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -190,7 +198,7 @@ class ProfilerController
 
         $this->profiler->disable();
 
-        if (!$profile = $this->profiler->loadProfile($token)) {
+        if (!$profile = $this->profilerStorage->read($token)) {
             return new Response('', 404, array('Content-Type' => 'text/html'));
         }
 
@@ -228,36 +236,27 @@ class ProfilerController
      */
     public function searchBarAction(Request $request)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
         $this->profiler->disable();
 
         if (null === $session = $request->getSession()) {
-            $ip =
-            $method =
-            $url =
+            $filters = array();
             $start =
             $end =
-            $limit =
-            $token = null;
+            $limit = null;
         } else {
-            $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
-            $method = $request->query->get('method', $session->get('_profiler_search_method'));
-            $url = $request->query->get('url', $session->get('_profiler_search_url'));
-            $start = $request->query->get('start', $session->get('_profiler_search_start'));
-            $end = $request->query->get('end', $session->get('_profiler_search_end'));
+            $filters = $request->query->get('filters', $session->get('_profiler_search_filters'));
+            $start = $request->query->get('limit', $session->get('_profiler_search_limit'));
+            $end = $request->query->get('limit', $session->get('_profiler_search_limit'));
             $limit = $request->query->get('limit', $session->get('_profiler_search_limit'));
-            $token = $request->query->get('token', $session->get('_profiler_search_token'));
         }
 
         return new Response(
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', array(
-                'token' => $token,
-                'ip' => $ip,
-                'method' => $method,
-                'url' => $url,
+                'filters' => $filters,
                 'start' => $start,
                 'end' => $end,
                 'limit' => $limit,
@@ -280,17 +279,15 @@ class ProfilerController
      */
     public function searchResultsAction(Request $request, $token)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
         $this->profiler->disable();
 
-        $profile = $this->profiler->loadProfile($token);
+        $profile = $this->profilerStorage->read($token);
 
-        $ip = $request->query->get('ip');
-        $method = $request->query->get('method');
-        $url = $request->query->get('url');
+        $filters = $request->query->get('filters', array());
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
@@ -299,15 +296,12 @@ class ProfilerController
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
-            'ip' => $ip,
-            'method' => $method,
-            'url' => $url,
+            'tokens' => $this->profilerStorage->findBy(array_replace($filters, array('profile_type' => 'http')), $limit, $start, $end),
+            'filters' => $filters,
             'start' => $start,
             'end' => $end,
             'limit' => $limit,
             'panel' => null,
-            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 
@@ -322,42 +316,37 @@ class ProfilerController
      */
     public function searchAction(Request $request)
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
         $this->profiler->disable();
 
-        $ip = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
-        $method = $request->query->get('method');
-        $url = $request->query->get('url');
+        $filters = $request->query->get('filters', array());
+        if ( isset($filters['id']) ) {
+            $filters['ip'] = preg_replace('/[^:\d\.]/', '', $filters['ip']);
+        }
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
-        $token = $request->query->get('token');
 
         if (null !== $session = $request->getSession()) {
-            $session->set('_profiler_search_ip', $ip);
-            $session->set('_profiler_search_method', $method);
-            $session->set('_profiler_search_url', $url);
+            $session->set('_profiler_search_filters', $filters);
             $session->set('_profiler_search_start', $start);
             $session->set('_profiler_search_end', $end);
             $session->set('_profiler_search_limit', $limit);
-            $session->set('_profiler_search_token', $token);
         }
 
-        if (!empty($token)) {
-            return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)), 302, array('Content-Type' => 'text/html'));
+        if (!empty($filters['token'])) {
+            return new RedirectResponse($this->generator->generate('_profiler', array('token' => $filters['token'])), 302, array('Content-Type' => 'text/html'));
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
+        $tokens = $this->profilerStorage->findBy(array_replace($filters, array('profile_type' => 'http')), $limit, $start, $end);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array(
             'request' => $request,
             'token' => $tokens ? $tokens[0]['token'] : 'empty',
-            'ip' => $ip,
-            'method' => $method,
-            'url' => $url,
+            'filters' => $filters,
             'start' => $start,
             'end' => $end,
             'limit' => $limit,
@@ -373,7 +362,7 @@ class ProfilerController
      */
     public function phpinfoAction()
     {
-        if (null === $this->profiler) {
+        if (null === $this->profiler || null === $this->profilerStorage) {
             throw new NotFoundHttpException('The profiler must be enabled.');
         }
 
@@ -394,7 +383,7 @@ class ProfilerController
     protected function getTemplateManager()
     {
         if (null === $this->templateManager) {
-            $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);
+            $this->templateManager = new TemplateManager($this->twig, $this->templates);
         }
 
         return $this->templateManager;

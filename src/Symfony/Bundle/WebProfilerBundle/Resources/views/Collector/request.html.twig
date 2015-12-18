@@ -199,7 +199,7 @@
                     <small>(token = {{ profile.parent.token }})</small>
                 </h3>
 
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: profile.parent.getcollector('request').requestattributes }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: profile.parent.get('request').requestattributes }, with_context = false) }}
             </div>
         </div>
         {% endif %}
@@ -212,12 +212,12 @@
                 {% for child in profile.children %}
                     <h3>
                         <a href="{{ path('_profiler', { token: child.token }) }}">
-                            {{- child.getcollector('request').requestattributes.get('_controller') -}}
+                            {{- child.get('request').requestattributes.get('_controller') -}}
                         </a>
                         <small>(token = {{ child.token }})</small>
                     </h3>
 
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.getcollector('request').requestattributes }, with_context = false) }}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: child.fet('request').requestattributes }, with_context = false) }}
                 {% endfor %}
             </div>
         </div>

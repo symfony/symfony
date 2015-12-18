@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
 {

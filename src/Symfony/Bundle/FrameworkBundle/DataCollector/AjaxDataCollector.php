@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector as BaseAjaxDataCollector;
+use Symfony\Bundle\FrameworkBundle\Profiler\DataCollector\AjaxDataCollector as BaseAjaxDataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-@trigger_error('The '.__NAMESPACE__.'\AjaxDataCollector class is deprecated since version 2.8 and will be removed in 3.0. Use Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\AjaxDataCollector class is deprecated since version 2.8 and will be removed in 3.0. Use Symfony\Bundle\FrameworkBundle\Profiler\DataCollector\AjaxDataCollector instead.', E_USER_DEPRECATED);
 
 /**
  * AjaxDataCollector.
@@ -24,4 +26,13 @@ use Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector as BaseAjaxData
  */
 class AjaxDataCollector extends BaseAjaxDataCollector
 {
+    public function collect(Request $request, Response $response, \Exception $exception = null)
+    {
+        // all collecting is done client side
+    }
+
+    public function getName()
+    {
+        return 'ajax';
+    }
 }

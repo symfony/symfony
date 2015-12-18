@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.3.9",
         "symfony/dependency-injection": "~2.8|~3.0.0",
-        "ocramius/proxy-manager": "~0.4|~1.0"
+        "ocramius/proxy-manager": "~0.4|~1.0",
+        "zendframework/zend-stdlib": "~2.4.8"
     },
     "require-dev": {
         "symfony/config": "~2.3|~3.0.0"

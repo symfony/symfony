@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
-use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Profiler\HttpProfile;
+use Symfony\Component\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
@@ -25,11 +26,12 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
         $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder('Symfony\Component\Profiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();
+        $profilerStorage = $this->getMockBuilder('Symfony\Component\Profiler\Storage\FileProfilerStorage')->disableOriginalConstructor()->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
+        $controller = new ProfilerController($urlGenerator, $profiler, $profilerStorage, $twig, array());
 
         $response = $controller->toolbarAction(Request::create('/_wdt/empty'), $token);
         $this->assertEquals(200, $response->getStatusCode());
@@ -49,18 +51,19 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
         $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder('Symfony\Component\Profiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();
+        $profilerStorage = $this->getMockBuilder('Symfony\Component\Profiler\Storage\FileProfilerStorage')->disableOriginalConstructor()->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
+        $controller = new ProfilerController($urlGenerator, $profiler, $profilerStorage, $twig, array());
 
-        $profiler
+        $profilerStorage
             ->expects($this->exactly(2))
-            ->method('loadProfile')
+            ->method('read')
             ->will($this->returnCallback(function ($token) {
                 if ('found' == $token) {
-                    return new Profile($token);
+                    return new Profile('TOKEN');
                 }
 
                 return;
@@ -79,11 +82,12 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
         $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->getMockBuilder('Symfony\Component\Profiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();
+        $profilerStorage = $this->getMockBuilder('Symfony\Component\Profiler\Storage\FileProfilerStorage')->disableOriginalConstructor()->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
+        $controller = new ProfilerController($urlGenerator, $profiler, $profilerStorage, $twig, array());
 
         $tokens = array(
             array(
@@ -105,9 +109,13 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
                 'status_code' => 404,
             ),
         );
-        $profiler
+        $profilerStorage
             ->expects($this->once())
-            ->method('find')
+            ->method('read')
+            ->will($this->returnValue(null));
+        $profilerStorage
+            ->expects($this->once())
+            ->method('findBy')
             ->will($this->returnValue($tokens));
 
         $request = Request::create('/_profiler/empty/search/results', 'GET', array(
@@ -120,17 +128,15 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with($this->stringEndsWith('results.html.twig'), $this->equalTo(array(
-                'token' => 'empty',
                 'profile' => null,
                 'tokens' => $tokens,
-                'ip' => '127.0.0.1',
-                'method' => 'GET',
-                'url' => 'http://example.com/',
                 'start' => null,
                 'end' => null,
                 'limit' => 2,
                 'panel' => null,
                 'request' => $request,
+                'filters' => array(),
+                'token' => 'empty'
             )));
 
         $response = $controller->searchResultsAction($request, 'empty');

@@ -11,27 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\RouterDataCollector as BaseRouterDataCollector;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
+use Symfony\Bundle\FrameworkBundle\Profiler\DataCollector\RouterDataCollector as BaseRouterDataCollector;
+
+@trigger_error('The '.__NAMESPACE__.'\RouterDataCollector class is deprecated since version 2.8 and will be removed in 3.0. Use Symfony\Bundle\FrameworkBundle\Profiler\DataCollector\RouterDataCollector  instead.', E_USER_DEPRECATED);
 
 /**
  * RouterDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Bundle\FrameworkBundle\Profiler\DataCollector\RouterDataCollector} instead.
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {
-    public function guessRoute(Request $request, $controller)
-    {
-        if (is_array($controller)) {
-            $controller = $controller[0];
-        }
-
-        if ($controller instanceof RedirectController) {
-            return $request->attributes->get('_route');
-        }
-
-        return parent::guessRoute($request, $controller);
-    }
 }

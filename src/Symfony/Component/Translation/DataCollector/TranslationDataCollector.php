@@ -16,9 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\Profiler\TranslationData;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Translation\Profiler\TranslationDataCollector instead.
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {

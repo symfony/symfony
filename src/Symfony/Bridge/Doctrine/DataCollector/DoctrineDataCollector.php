@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Response;
  * DoctrineDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Bridge\Doctrine\Profiler\DoctrineDataCollector instead.
  */
 class DoctrineDataCollector extends DataCollector
 {

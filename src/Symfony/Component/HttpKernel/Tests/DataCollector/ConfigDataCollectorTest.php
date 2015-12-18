@@ -17,6 +17,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()

@@ -10,19 +10,25 @@
             <argument type="service" id="var_dumper.cloner" />
         </service>
 
-        <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
-            <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240" />
+        <service id="var_dumper.traceable_dumper" class="Symfony\Component\VarDumper\Dumper\TraceableDumper">
+            <argument>null</argument><!-- debug.dump_destination -->
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
             <argument>%kernel.charset%</argument>
+            <argument type="service" id="twig.loader" on-invalid="ignore" />
+        </service>
+
+        <service id="data_collector.dump" class="Symfony\Component\VarDumper\Profiler\DumpDataCollector">
+            <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240" />
+            <tag name="kernel.event_subscriber" />
             <argument type="service" id="request_stack" />
-            <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
+            <argument type="service" id="var_dumper.traceable_dumper" />
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="var_dumper.cloner" />
-            <argument type="service" id="data_collector.dump" />
+            <argument type="service" id="var_dumper.traceable_dumper" />
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />

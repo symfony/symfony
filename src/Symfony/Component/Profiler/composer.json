@@ -1,0 +1,42 @@
+{
+    "name": "symfony/profiler",
+    "type": "library",
+    "description": "Symfony Profiler Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9",
+        "psr/log": "~1.0"
+    },
+    "require-dev": {
+        "symfony/dependency-injection": "~2.8",
+        "symfony/http-foundation": "~2.8",
+        "symfony/var-dumper": "~2.8",
+        "symfony/stopwatch": "~2.8",
+        "symfony/config": "~2.8",
+        "twig/twig": "~1.18"
+    },
+    "suggest": {
+        "symfony/stopwatch": ""
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Profiler\\": "" }
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8-dev"
+        }
+    }
+}

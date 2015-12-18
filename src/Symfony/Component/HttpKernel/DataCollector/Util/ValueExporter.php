@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector\Util;
 
+use Symfony\Component\Profiler\ProfileData\Util\ValueExporter as BaseValueExporter;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0. Use Symfony\Component\Profiler\ProfileData\Util\ValueExporter instead.
  */
-class ValueExporter
+class ValueExporter extends BaseValueExporter
 {
     /**
      * Converts a PHP value to a string.

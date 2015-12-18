@@ -18,6 +18,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ * @group legacy
  */
 class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
 {

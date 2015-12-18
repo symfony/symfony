@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * @group legacy
+ */
 class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()

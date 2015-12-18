@@ -31,8 +31,13 @@ class DumpExtension extends \Twig_Extension
 
     public function getFunctions()
     {
+        $function = new \Twig_SimpleFunction('dump', array($this, 'dump'), array('is_safe' => array('html'), 'needs_context' => true, 'needs_environment' => true));
+        if ( function_exists('dump') ) {
+            $function = new \Twig_SimpleFunction('dump', 'dump');
+        }
+
         return array(
-            new \Twig_SimpleFunction('dump', array($this, 'dump'), array('is_safe' => array('html'), 'needs_context' => true, 'needs_environment' => true)),
+            $function,
         );
     }
 
@@ -75,5 +80,6 @@ class DumpExtension extends \Twig_Extension
         rewind($dump);
 
         return stream_get_contents($dump);
+
     }
 }

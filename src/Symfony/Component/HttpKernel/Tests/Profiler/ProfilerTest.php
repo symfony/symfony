@@ -17,12 +17,15 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class ProfilerTest extends \PHPUnit_Framework_TestCase
 {
     private $tmp;
     private $storage;
 
-    public function testCollect()
+    public function testLegacyCollect()
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
@@ -35,7 +38,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(204, $profile->getStatusCode());
         $this->assertSame('GET', $profile->getMethod());
-        $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
+        $this->assertEquals(array('foo' => 'bar'), $profile->get('request')->getRequestQuery()->all());
     }
 
     public function testFindWorksWithDates()
@@ -68,6 +71,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
         $this->storage = new FileProfilerStorage('file:'.$this->tmp);
         $this->storage->purge();
+
     }
 
     protected function tearDown()

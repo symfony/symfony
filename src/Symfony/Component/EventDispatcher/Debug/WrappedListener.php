@@ -25,14 +25,16 @@ class WrappedListener
     private $called;
     private $stoppedPropagation;
     private $stopwatch;
+    private $priority;
     private $dispatcher;
 
-    public function __construct($listener, $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null)
+    public function __construct($listener, $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null, $priority = 0)
     {
         $this->listener = $listener;
         $this->name = $name;
         $this->stopwatch = $stopwatch;
         $this->dispatcher = $dispatcher;
+        $this->priority = $priority;
         $this->called = false;
         $this->stoppedPropagation = false;
     }
@@ -45,6 +47,11 @@ class WrappedListener
     public function wasCalled()
     {
         return $this->called;
+    }
+
+    public function priority()
+    {
+        return $this->priority;
     }
 
     public function stoppedPropagation()

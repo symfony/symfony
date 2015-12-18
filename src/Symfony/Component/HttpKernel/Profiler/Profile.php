@@ -11,14 +11,20 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\Profile class is deprecated since Symfony 2.8 and will be removed in 3.0. Use Symfony\Component\Profiler\Profile instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\Profiler\Profile as BaseProfile;
 
 /**
  * Profile.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link Symfony\Component\Profiler\Profile} instead.
  */
-class Profile
+class Profile extends BaseProfile
 {
     private $token;
 
@@ -27,96 +33,42 @@ class Profile
      */
     private $collectors = array();
 
-    private $ip;
-    private $method;
-    private $url;
     private $time;
+
     private $statusCode;
 
-    /**
-     * @var Profile
-     */
-    private $parent;
+    private $ip;
 
-    /**
-     * @var Profile[]
-     */
-    private $children = array();
+    private $method;
 
-    /**
-     * Constructor.
-     *
-     * @param string $token The token
-     */
-    public function __construct($token)
-    {
-        $this->token = $token;
-    }
+    private $url;
 
     /**
      * Sets the token.
      *
      * @param string $token The token
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
      */
     public function setToken($token)
     {
         $this->token = $token;
     }
 
-    /**
-     * Gets the token.
-     *
-     * @return string The token
-     */
     public function getToken()
     {
+        if ( null === $this->token ) {
+            return parent::getToken();
+        }
         return $this->token;
-    }
-
-    /**
-     * Sets the parent token.
-     *
-     * @param Profile $parent The parent Profile
-     */
-    public function setParent(Profile $parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * Returns the parent profile.
-     *
-     * @return Profile The parent profile
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Returns the parent token.
-     *
-     * @return null|string The parent token
-     */
-    public function getParentToken()
-    {
-        return $this->parent ? $this->parent->getToken() : null;
-    }
-
-    /**
-     * Returns the IP.
-     *
-     * @return string The IP
-     */
-    public function getIp()
-    {
-        return $this->ip;
     }
 
     /**
      * Sets the IP.
      *
      * @param string $ip
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
      */
     public function setIp($ip)
     {
@@ -124,56 +76,79 @@ class Profile
     }
 
     /**
-     * Returns the request method.
-     *
-     * @return string The request method
+     * @deprecated since 2.8.
      */
-    public function getMethod()
+    public function getIp()
     {
-        return $this->method;
+        return $this->ip;
     }
 
+    /**
+     * Sets the Method.
+     *
+     * @param string $method
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
+     */
     public function setMethod($method)
     {
         $this->method = $method;
     }
 
     /**
-     * Returns the URL.
-     *
-     * @return string The URL
+     * @deprecated since 2.8.
      */
-    public function getUrl()
+    public function getMethod()
     {
-        return $this->url;
+        return $this->method;
     }
 
+    /**
+     * Sets the URL.
+     *
+     * @param string $url
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
+     */
     public function setUrl($url)
     {
         $this->url = $url;
     }
 
     /**
-     * Returns the time.
-     *
-     * @return string The time
+     * @deprecated since 2.8.
      */
-    public function getTime()
+    public function getUrl()
     {
-        if (null === $this->time) {
-            return 0;
-        }
-
-        return $this->time;
+        return $this->url;
     }
 
+    /**
+     * Sets the time.
+     *
+     * @param int $time
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
+     */
     public function setTime($time)
     {
         $this->time = $time;
     }
 
+    public function getTime()
+    {
+        if ( null === $this->time ) {
+            return parent::getTime();
+        }
+        return $this->time;
+    }
+
     /**
+     * Sets the StatusCode.
+     *
      * @param int $statusCode
+     *
+     * @deprecated since 2.8, Profile will be immutable in 3.0.
      */
     public function setStatusCode($statusCode)
     {
@@ -182,6 +157,8 @@ class Profile
 
     /**
      * @return int
+     *
+     * @deprecated since 2.8, use Profile::getIndex($name).
      */
     public function getStatusCode()
     {
@@ -189,37 +166,36 @@ class Profile
     }
 
     /**
-     * Finds children profilers.
+     * Sets the Collectors associated with this profile.
      *
-     * @return Profile[] An array of Profile
+     * @param DataCollectorInterface[] $collectors
      */
-    public function getChildren()
+    public function setCollectors(array $collectors)
     {
-        return $this->children;
-    }
-
-    /**
-     * Sets children profiler.
-     *
-     * @param Profile[] $children An array of Profile
-     */
-    public function setChildren(array $children)
-    {
-        $this->children = array();
-        foreach ($children as $child) {
-            $this->addChild($child);
+        $this->collectors = array();
+        foreach ($collectors as $collector) {
+            $this->addCollector($collector);
         }
     }
 
     /**
-     * Adds the child token.
+     * Gets the Collectors associated with this profile.
      *
-     * @param Profile $child The child Profile
+     * @return DataCollectorInterface[]
      */
-    public function addChild(Profile $child)
+    public function getCollectors()
     {
-        $this->children[] = $child;
-        $child->setParent($this);
+        return $this->collectors;
+    }
+
+    /**
+     * Adds a Collector.
+     *
+     * @param DataCollectorInterface $collector A DataCollectorInterface instance
+     */
+    public function addCollector(DataCollectorInterface $dataCollector)
+    {
+        $this->collectors[$dataCollector->getName()] = $dataCollector;
     }
 
     /**
@@ -241,39 +217,6 @@ class Profile
     }
 
     /**
-     * Gets the Collectors associated with this profile.
-     *
-     * @return DataCollectorInterface[]
-     */
-    public function getCollectors()
-    {
-        return $this->collectors;
-    }
-
-    /**
-     * Sets the Collectors associated with this profile.
-     *
-     * @param DataCollectorInterface[] $collectors
-     */
-    public function setCollectors(array $collectors)
-    {
-        $this->collectors = array();
-        foreach ($collectors as $collector) {
-            $this->addCollector($collector);
-        }
-    }
-
-    /**
-     * Adds a Collector.
-     *
-     * @param DataCollectorInterface $collector A DataCollectorInterface instance
-     */
-    public function addCollector(DataCollectorInterface $collector)
-    {
-        $this->collectors[$collector->getName()] = $collector;
-    }
-
-    /**
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
@@ -285,8 +228,20 @@ class Profile
         return isset($this->collectors[$name]);
     }
 
-    public function __sleep()
+    public function getIndexes() {
+        return array(
+            'ip' => $this->ip,
+            'url' => $this->url,
+            'status_code' => $this->statusCode,
+            'method' => $this->method,
+        );
+    }
+
+    public function getIndex($name)
     {
-        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
+        if ( !isset($this->$name) ) {
+            return;
+        }
+        return $this->$name;
     }
 }

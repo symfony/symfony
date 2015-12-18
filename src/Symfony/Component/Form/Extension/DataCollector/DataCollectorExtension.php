@@ -21,6 +21,8 @@ use Symfony\Component\Form\AbstractExtension;
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since 2.8 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Profiler\DataCollectorExtension instead.
  */
 class DataCollectorExtension extends AbstractExtension
 {

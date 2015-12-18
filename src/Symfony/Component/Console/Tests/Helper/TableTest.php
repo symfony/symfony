@@ -461,6 +461,24 @@ TABLE
 
 TABLE
             ),
+            'Row with multiple cells' => array(
+                array(),
+                array(
+                    array(
+                        new TableCell('1', array('colspan' => 3)),
+                        new TableCell('2', array('colspan' => 2)),
+                        new TableCell('3', array('colspan' => 2)),
+                        new TableCell('4', array('colspan' => 2)),
+                    ),
+        ),
+                'default',
+<<<TABLE
++--+--+--+--+--+--+--+--+--+
+| 1      | 2   | 3   | 4   |
++--+--+--+--+--+--+--+--+--+
+
+TABLE
+            ),
         );
     }
 

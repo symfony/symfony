@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-17T21:10:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-17T21:15:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-17T21:20:39Z
+
+The failure on PHP 7 looks weird to me (Composer isn't able to find a matching package for `symfony/finder`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T09:04:19Z
+
+@xabbuh you need to remove the finder component from require-dev, that's the issue!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-18T09:09:18Z
+
+@nicolas-grekas oh good catch, thanks, the builds should pass now

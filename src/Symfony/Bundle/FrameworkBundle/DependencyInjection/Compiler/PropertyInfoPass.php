@@ -34,6 +34,7 @@ class PropertyInfoPass implements CompilerPassInterface
         if ($container->hasDefinition('serializer.mapping.class_metadata_factory')) {
             $definition = $container->register('property_info.serializer_extractor', 'Symfony\Component\PropertyInfo\Extractor\SerializerExtractor');
             $definition->addArgument(new Reference('serializer.mapping.class_metadata_factory'));
+            $definition->setPublic(false);
             $definition->addTag('property_info.list_extractor', array('priority' => -999));
         }
 

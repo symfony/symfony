@@ -47,6 +47,8 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testResultLength()
     {
+        $this->skipIfPhpVersionIsNotSupported();
+
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(self::PASSWORD, null);
         $this->assertEquals(60, strlen($result));
@@ -54,6 +56,8 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testValidation()
     {
+        $this->skipIfPhpVersionIsNotSupported();
+
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(self::PASSWORD, null);
         $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, null));
@@ -72,10 +76,19 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckPasswordLength()
     {
+        $this->skipIfPhpVersionIsNotSupported();
+
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(str_repeat('a', 72), null);
 
         $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));
+    }
+
+    private function skipIfPhpVersionIsNotSupported()
+    {
+        if (PHP_VERSION_ID < 50307 && !\PasswordCompat\binary\check()) {
+            $this->markTestSkipped('Skipping test as this PHP version is not compatible with the ircmaxell/password-compat library.');
+        }
     }
 }

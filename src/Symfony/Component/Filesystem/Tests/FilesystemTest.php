@@ -492,7 +492,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($directory, 0753, 0000, true);
 
-        $this->assertFilePermissions(753, $subdirectory);
+        $this->assertEquals(753, $this->getFilePermissions($subdirectory));
     }
 
     public function testChown()

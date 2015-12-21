@@ -117,7 +117,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $internalErrors = libxml_use_internal_errors(true);
 
         $crawler = new Crawler();
-        $crawler->addHtmlContent(<<<EOF
+        $crawler->addHtmlContent(<<<'EOF'
 <!DOCTYPE html>
 <html>
     <head>
@@ -158,7 +158,7 @@ EOF
         $internalErrors = libxml_use_internal_errors(true);
 
         $crawler = new Crawler();
-        $crawler->addXmlContent(<<<EOF
+        $crawler->addXmlContent(<<<'EOF'
 <!DOCTYPE html>
 <html>
     <head>
@@ -518,7 +518,7 @@ EOF
 
     public function testSelectButtonWithSingleQuotesInNameAttribute()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -539,7 +539,7 @@ HTML;
 
     public function testSelectButtonWithDoubleQuotesInNameAttribute()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -578,7 +578,7 @@ HTML;
 
     public function testSelectLinkAndLinkFiltered()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>

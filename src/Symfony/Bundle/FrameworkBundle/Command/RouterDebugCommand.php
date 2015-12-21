@@ -51,7 +51,7 @@ class RouterDebugCommand extends ContainerAwareCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
             ))
             ->setDescription('Displays current routes for an application')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:
 
   <info>php %command.full_name%</info>

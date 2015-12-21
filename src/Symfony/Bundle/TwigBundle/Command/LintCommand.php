@@ -29,7 +29,7 @@ class LintCommand extends ContainerAwareCommand
             ->setName('twig:lint')
             ->setDescription('Lints a template and outputs encountered errors')
             ->addArgument('filename')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a template and outputs to stdout
 the first encountered syntax error.
 

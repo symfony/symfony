@@ -106,16 +106,16 @@ EOF;
      */
     private function generateGenerateMethod()
     {
-        return <<<EOF
-    public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
+        return <<<'EOF'
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
-        if (!isset(self::\$declaredRoutes[\$name])) {
-            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
+        if (!isset(self::$declaredRoutes[$name])) {
+            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];
+        list($variables, $defaults, $requirements, $tokens, $hostTokens) = self::$declaredRoutes[$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
+        return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens);
     }
 EOF;
     }

@@ -108,9 +108,9 @@ class Translator extends BaseTranslator
                 $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
                 $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
 
-                $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+                $fallbackContent .= sprintf(<<<'EOF'
+$catalogue%s = new MessageCatalogue('%s', %s);
+$catalogue%s->addFallbackCatalogue($catalogue%s);
 
 
 EOF

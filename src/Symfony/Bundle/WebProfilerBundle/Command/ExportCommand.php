@@ -53,7 +53,7 @@ class ExportCommand extends Command
             ->setDefinition(array(
                 new InputArgument('token', InputArgument::REQUIRED, 'The profile token'),
             ))
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command exports a profile to the standard output:
 
   <info>php %command.full_name% profile_token</info>

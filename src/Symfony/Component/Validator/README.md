@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Length;
 
 $validator = Validation::createValidator();
 
-$violations = $validator->validateValue('Bernhard', new Length(array('min' => 10)));
+$violations = $validator->validate('Bernhard', new Length(array('min' => 10)));
 ```
 
 This validation will fail because the given string is shorter than ten
@@ -46,7 +46,7 @@ $constraint = new Assert\Collection(array(
     'password' => new Assert\Length(array('min' => 60)),
 ));
 
-$violations = $validator->validateValue($input, $constraint);
+$violations = $validator->validate($input, $constraint);
 ```
 
 Again, the validator returns the list of violations.

@@ -34,8 +34,8 @@ class IcuResFileDumper implements DumperInterface
             $file = $messages->getLocale().'.'.$this->getExtension();
             $path = $options['path'].'/'.$domain.'/';
 
-            if (!file_exists($path)) {
-                mkdir($path);
+            if (!file_exists($path) && !@mkdir($path) && !is_dir($path)) {
+                throw new \RuntimeException('The file dumper was not able to create a folder: '.$path);
             }
 
             // backup
@@ -102,11 +102,7 @@ class IcuResFileDumper implements DumperInterface
             1, 4, 0, 0              // Unicode version
         );
 
-        $output = $header
-               .$root
-               .$data;
-
-        return $output;
+        return $header.$root.$data;
     }
 
     private function writePadding($data)
@@ -120,9 +116,7 @@ class IcuResFileDumper implements DumperInterface
 
     private function getPosition($data)
     {
-        $position = (strlen($data) + 28) / 4;
-
-        return $position;
+        return (strlen($data) + 28) / 4;
     }
 
     /**

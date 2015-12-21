@@ -19,7 +19,6 @@ class FormLoginTest extends WebTestCase
     public function testFormLogin($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -39,7 +38,6 @@ class FormLoginTest extends WebTestCase
     public function testFormLoginWithCustomTargetPath($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -60,7 +58,6 @@ class FormLoginTest extends WebTestCase
     public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
 
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/login');
@@ -84,17 +81,13 @@ class FormLoginTest extends WebTestCase
         );
     }
 
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        parent::setUp();
-
-        $this->deleteTmpDir('StandardFormLogin');
+        parent::deleteTmpDir('StandardFormLogin');
     }
 
-    protected function tearDown()
+    public static function tearDownAfterClass()
     {
-        parent::tearDown();
-
-        $this->deleteTmpDir('StandardFormLogin');
+        parent::deleteTmpDir('StandardFormLogin');
     }
 }

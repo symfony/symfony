@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-14T07:38:02Z
+
+With this PR, HHVM tests last 5 minutes instead of 10 on Travis!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-14T07:43:16Z
+
+If you look at the patch, insulation still exists: not at the process level, but at the kernel level, which is enough to ensure no side-effects between tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-21T14:53:44Z
+
+ping @stof @fabpot there is real benefit into this
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-21T14:57:35Z
+
+Just removed my veto.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-21T17:33:04Z
+
+LGTM :+1:

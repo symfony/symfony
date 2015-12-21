@@ -116,8 +116,8 @@ class ClassCollectionLoader
         }
 
         // cache the core classes
-        if (!file_exists($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-            throw new \RuntimeException('Class Collection Loader was not able to create a folder: '.$cacheDir);
+        if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create a directory: %s', $cacheDir));
         }
         self::writeCacheFile($cache, '<?php '.$content);
 

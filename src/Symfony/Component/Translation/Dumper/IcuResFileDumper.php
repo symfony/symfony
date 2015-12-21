@@ -34,8 +34,8 @@ class IcuResFileDumper implements DumperInterface
             $file = $messages->getLocale().'.'.$this->getExtension();
             $path = $options['path'].'/'.$domain.'/';
 
-            if (!file_exists($path) && !@mkdir($path) && !is_dir($path)) {
-                throw new \RuntimeException('The file dumper was not able to create a folder: '.$path);
+            if (!is_dir($path) && !@mkdir($path) && !is_dir($path)) {
+                throw new \RuntimeException(sprintf('The File Dumper was not able to create a directory: %s', $path));
             }
 
             // backup

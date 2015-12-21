@@ -69,8 +69,8 @@ class CacheLoader extends Loader
 
         $content = $storage->getContent();
 
-        if (!file_exists($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
-            throw new \RuntimeException('Cache Loader was not able to create a folder: '.$dir);
+        if (!is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException(sprintf('Cache Loader was not able to create a directory: %s', $dir));
         }
 
         file_put_contents($path, $content);

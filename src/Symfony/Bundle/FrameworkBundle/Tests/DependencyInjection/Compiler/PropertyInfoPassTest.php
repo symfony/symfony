@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
@@ -33,7 +34,8 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
 
-        $container->expects($this->any())
+        $container
+            ->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
 
@@ -54,7 +56,8 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
 
-        $container->expects($this->any())
+        $container
+            ->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue(array()))
         ;
@@ -74,21 +77,41 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterSerializerExtractor()
     {
-        $serializerExtractorDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
-        $serializerExtractorDefinitionProphecy->addArgument(Argument::type('Symfony\Component\DependencyInjection\Reference'))->shouldBeCalled();
-        $serializerExtractorDefinitionProphecy->addTag('property_info.list_extractor', array('priority' => -999))->shouldBeCalled();
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('register', 'hasDefinition', 'getDefinition')
+        );
 
-        $propertyInfoDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+        $container
+            ->expects($this->exactly(2))
+            ->method('hasDefinition')
+            ->will($this->returnValue(true))
+        ;
 
-        $containerProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $containerProphecy->hasDefinition('property_info')->willReturn(true)->shouldBeCalled();
-        $containerProphecy->hasDefinition('serializer.mapping.class_metadata_factory')->willReturn(true)->shouldBeCalled();
-        $containerProphecy->getDefinition('property_info')->willReturn($propertyInfoDefinitionProphecy->reveal())->shouldBeCalled();
-        $containerProphecy->findTaggedServiceIds(Argument::type('string'))->willReturn(array());
+        $serializerExtractorDefinition = new Definition('Symfony\Component\PropertyInfo\Extractor\SerializerExtractor');
+        $container
+            ->expects($this->exactly(1))
+            ->method('register')
+            ->will($this->returnValue($serializerExtractorDefinition))
+        ;
 
-        $containerProphecy->register('property_info.serializer_extractor', 'Symfony\Component\PropertyInfo\Extractor\SerializerExtractor')->willReturn($serializerExtractorDefinitionProphecy->reveal());
+        $propertyInfoDefinition = new Definition(
+            'Symfony\Component\PropertyInfo\PropertyInfoExtractor',
+            array(null, null, null, null)
+        );
+        $container
+            ->expects($this->exactly(1))
+            ->method('getDefinition')
+            ->will($this->returnValue($propertyInfoDefinition))
+        ;
 
         $propertyInfoPass = new PropertyInfoPass();
-        $propertyInfoPass->process($containerProphecy->reveal());
+        $propertyInfoPass->process($container);
+
+        $this->assertEquals('serializer.mapping.class_metadata_factory', $serializerExtractorDefinition->getArgument(0)->__toString());
+        $this->assertFalse($serializerExtractorDefinition->isPublic());
+
+        $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
+        $this->assertEquals(array('priority' => -999), $tag[0]);
     }
 }

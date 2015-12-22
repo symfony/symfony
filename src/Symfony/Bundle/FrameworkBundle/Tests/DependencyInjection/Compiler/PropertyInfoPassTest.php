@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;

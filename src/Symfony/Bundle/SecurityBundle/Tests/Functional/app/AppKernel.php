@@ -65,6 +65,18 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        if (null === $this->name) {
+            $this->name = parent::getName().md5($this->rootConfig);
+        }
+
+        return $this->name;
+    }
+
     public function registerBundles()
     {
         if (!is_file($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {

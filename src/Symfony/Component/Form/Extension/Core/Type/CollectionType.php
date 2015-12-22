@@ -28,8 +28,9 @@ class CollectionType extends AbstractType
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototypeOptions = array_replace(array(
+                'required' => $options['required'],
                 'label' => $options['prototype_name'].'label__',
-            ), $options['options']);
+            ), $options['entry_options']);
 
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];

@@ -1,11 +1,8 @@
 
-
                     
   [Exception]       
   エラーメッセージ  
                     
 
-
 foo
-
 

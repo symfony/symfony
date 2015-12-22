@@ -603,7 +603,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', EntityType::class, null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -625,7 +625,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', EntityType::class, null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => false,
             'expanded' => true,
             'em' => 'default',
@@ -651,7 +651,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', EntityType::class, null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -682,7 +682,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', EntityType::class, null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -707,7 +707,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', EntityType::class, null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'multiple' => true,
             'expanded' => true,
             'em' => 'default',

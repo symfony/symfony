@@ -192,11 +192,11 @@ class Filesystem
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
-                $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
-            }
             if (true !== @chmod($file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
+            }
+            if ($recursive && is_dir($file) && !is_link($file)) {
+                $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
         }
     }

@@ -52,7 +52,7 @@ install:
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//); else SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*'); fi;
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; fi;
     - if [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]]; then LEGACY=,legacy; fi;
-    - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev; 
+    - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev;
     - if [[ ! $deps ]]; then composer --prefer-source install; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi;
 

@@ -1,3 +1,6 @@
+{# when updating any of these colors, do the same in profiler.css.twig #}
+{% set colors = { 'success': '#4F805D', 'warning': '#A46A1F', 'error': '#B0413E' } %}
+
 .sf-minitoolbar {
     background-color: #222;
     border-top-left-radius: 4px;
@@ -46,8 +49,8 @@
 }
 .sf-toolbarreset svg,
 .sf-toolbarreset img {
-    max-height: 24px;
-    max-width: 24px;
+    max-height: 20px;
+    max-width: 20px;
 }
 
 .sf-toolbarreset .hide-button {
@@ -180,30 +183,31 @@
     padding: 3px 6px;
     margin-bottom: 2px;
     vertical-align: middle;
-    min-width: 6px;
+    min-width: 15px;
     min-height: 13px;
+    text-align: center;
 }
 
 .sf-toolbar-block .sf-toolbar-status-green {
-    background-color: rgba(117, 158, 43, 0.8);
+    background-color: {{ colors.success|raw }};
 }
 .sf-toolbar-block .sf-toolbar-status-red {
-    background-color: rgba(200, 43, 43, 0.8);
+    background-color: {{ colors.error|raw }};
 }
 .sf-toolbar-block .sf-toolbar-status-yellow {
-    background-color: rgb(189, 132, 0);
+    background-color: {{ colors.warning|raw }};
 }
 
 .sf-toolbar-block.sf-toolbar-status-green {
-    background-color: rgba(117, 158, 43, 0.8);
+    background-color: {{ colors.success|raw }};
     color: #FFF;
 }
 .sf-toolbar-block.sf-toolbar-status-red {
-    background-color: rgba(200, 43, 43, 0.8);
+    background-color: {{ colors.error|raw }};
     color: #FFF;
 }
 .sf-toolbar-block.sf-toolbar-status-yellow {
-    background-color: rgb(189, 132, 0);
+    background-color: {{ colors.warning|raw }};
     color: #FFF;
 }
 

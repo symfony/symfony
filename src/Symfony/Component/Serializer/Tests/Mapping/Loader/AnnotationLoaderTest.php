@@ -43,12 +43,22 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadGroups()
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
         $this->loader->loadClassMetadata($classMetadata);
 
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(), $classMetadata);
+    }
+
+    public function testLoadMaxDepth()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertEquals(2, $attributesMetadata['foo']->getMaxDepth());
+        $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
     public function testLoadClassMetadataAndMerge()

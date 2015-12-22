@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -25,6 +26,14 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
+    const OBJECT_TO_POPULATE = 'object_to_populate';
+    const GROUPS = 'groups';
+    const ENABLE_MAX_DEPTH = 'enable_max_depth';
+    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+
+    public static $n;
+
     /**
      * @var int
      */
@@ -146,16 +155,16 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         $objectHash = spl_object_hash($object);
 
-        if (isset($context['circular_reference_limit'][$objectHash])) {
-            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context['circular_reference_limit'][$objectHash]);
+        if (isset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash])) {
+            if ($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] >= $this->circularReferenceLimit) {
+                unset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash]);
 
                 return true;
             }
 
-            ++$context['circular_reference_limit'][$objectHash];
+            ++$context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash];
         } else {
-            $context['circular_reference_limit'][$objectHash] = 1;
+            $context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] = 1;
         }
 
         return false;
@@ -193,13 +202,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        if (!$this->classMetadataFactory || !isset($context['groups']) || !is_array($context['groups'])) {
+        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !is_array($context[static::GROUPS])) {
             return false;
         }
 
         $allowedAttributes = array();
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
-            if (count(array_intersect($attributeMetadata->getGroups(), $context['groups']))) {
+            if (count(array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS]))) {
                 $allowedAttributes[] = $attributesAsString ? $attributeMetadata->getName() : $attributeMetadata;
             }
         }
@@ -239,11 +248,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
         if (
-            isset($context['object_to_populate']) &&
-            is_object($context['object_to_populate']) &&
-            $class === get_class($context['object_to_populate'])
+            isset($context[static::OBJECT_TO_POPULATE]) &&
+            is_object($context[static::OBJECT_TO_POPULATE]) &&
+            $class === get_class($context[static::OBJECT_TO_POPULATE])
         ) {
-            return $context['object_to_populate'];
+            return $context[static::OBJECT_TO_POPULATE];
         }
 
         $constructor = $reflectionClass->getConstructor();
@@ -286,5 +295,117 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         return new $class();
+    }
+
+    /**
+     * Should this attribute be normalized?
+     *
+     * @param mixed  $object
+     * @param string $attributeName
+     * @param array  $context
+     *
+     * @return bool
+     */
+    protected function isAttributeToNormalize($object, $attributeName, &$context)
+    {
+        return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
+    }
+
+    /**
+     * Sets an attribute and apply the name converter if necessary.
+     *
+     * @param array  $data
+     * @param string $attribute
+     * @param mixed  $attributeValue
+     *
+     * @return array
+     */
+    protected function setAttribute($data, $attribute, $attributeValue)
+    {
+        if ($this->nameConverter) {
+            $attribute = $this->nameConverter->normalize($attribute);
+        }
+
+        $data[$attribute] = $attributeValue;
+
+        return $data;
+    }
+
+    /**
+     * Normalizes complex types at the end of the process (recursive call).
+     *
+     * @param array       $data
+     * @param array       $stack
+     * @param string|null $format
+     * @param array       $context
+     *
+     * @return array
+     *
+     * @throws LogicException
+     */
+    protected function normalizeComplexTypes(array $data, array $stack, $format, array &$context)
+    {
+        foreach ($stack as $attribute => $attributeValue) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
+            }
+
+            $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+
+            $data = $this->setAttribute($data, $attribute, $attributeValue);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Is the max depth reached for the given attribute?
+     *
+     * @param string $class
+     * @param string $attribute
+     * @param array  $context
+     *
+     * @return bool
+     */
+    private function isMaxDepthReached($class, $attribute, array &$context)
+    {
+        if (!$this->classMetadataFactory || !isset($context[static::ENABLE_MAX_DEPTH])) {
+            return false;
+        }
+
+        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        if (!isset($attributesMetadata[$attribute])) {
+            return false;
+        }
+
+        $maxDepth = $attributesMetadata[$attribute]->getMaxDepth();
+        if (null === $maxDepth) {
+            return false;
+        }
+
+        $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
+        $keyExist = isset($context[$key]);
+
+        if ($keyExist && $context[$key] === $maxDepth) {
+            return true;
+        }
+
+        if ($keyExist) {
+            ++$context[$key];
+        } else {
+            $context[$key] = 1;
+        }
+
+        if ($attribute === 'foo') {
+            if (null === self::$n) {
+                self::$n = 0;
+            } else {
+                ++self::$n;
+            }
+        }
+
+        return false;
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -47,10 +46,11 @@ class PropertyNormalizer extends AbstractNormalizer
 
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
+        $stack = array();
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         foreach ($reflectionObject->getProperties() as $property) {
-            if (in_array($property->name, $this->ignoredAttributes) || $property->isStatic()) {
+            if ($property->isStatic() || !$this->isAttributeToNormalize($object, $property->name, $context)) {
                 continue;
             }
 
@@ -68,23 +68,17 @@ class PropertyNormalizer extends AbstractNormalizer
             if (isset($this->callbacks[$property->name])) {
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
+
+            // Recursive call are done at the end of the process to allow @MaxDepth to work
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $property->name));
-                }
-
-                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                $stack[$property->name] = $attributeValue;
+                continue;
             }
 
-            $propertyName = $property->name;
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->normalize($propertyName);
-            }
-
-            $attributes[$propertyName] = $attributeValue;
+            $attributes = $this->setAttribute($attributes, $property->name, $attributeValue);
         }
 
-        return $attributes;
+        return $this->normalizeComplexTypes($attributes, $stack, $format, $context);
     }
 
     /**

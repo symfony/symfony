@@ -55,38 +55,37 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         $attributes = array();
+        $stack = array();
+
         foreach ($reflectionMethods as $method) {
-            if ($this->isGetMethod($method)) {
-                $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-                if (in_array($attributeName, $this->ignoredAttributes)) {
-                    continue;
-                }
-
-                if (false !== $allowedAttributes && !in_array($attributeName, $allowedAttributes)) {
-                    continue;
-                }
-
-                $attributeValue = $method->invoke($object);
-                if (isset($this->callbacks[$attributeName])) {
-                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
-                }
-                if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                    if (!$this->serializer instanceof NormalizerInterface) {
-                        throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
-                    }
-
-                    $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
-                }
-
-                if ($this->nameConverter) {
-                    $attributeName = $this->nameConverter->normalize($attributeName);
-                }
-
-                $attributes[$attributeName] = $attributeValue;
+            if (!$this->isGetMethod($method)) {
+                continue;
             }
+
+            $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+            if (!$this->isAttributeToNormalize($object, $attributeName, $context)) {
+                continue;
+            }
+
+            if (false !== $allowedAttributes && !in_array($attributeName, $allowedAttributes)) {
+                continue;
+            }
+
+            $attributeValue = $method->invoke($object);
+            if (isset($this->callbacks[$attributeName])) {
+                $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
+            }
+
+            // Recursive call are done at the end of the process to allow @MaxDepth to work
+            if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                $stack[$attributeName] = $attributeValue;
+                continue;
+            }
+
+            $attributes = $this->setAttribute($attributes, $attributeName, $attributeValue);
         }
 
-        return $attributes;
+        return $this->normalizeComplexTypes($attributes, $stack, $format, $context);
     }
 
     /**

@@ -78,13 +78,15 @@ class AnnotationLoader implements LoaderInterface
             }
 
             $accessorOrMutator = preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches);
-            $attributeName = lcfirst($matches[2]);
+            if ($accessorOrMutator) {
+                $attributeName = lcfirst($matches[2]);
 
-            if (isset($attributesMetadata[$attributeName])) {
-                $attributeMetadata = $attributesMetadata[$attributeName];
-            } else {
-                $attributesMetadata[$attributeName] = $attributeMetadata = new AttributeMetadata($attributeName);
-                $classMetadata->addAttributeMetadata($attributeMetadata);
+                if (isset($attributesMetadata[$attributeName])) {
+                    $attributeMetadata = $attributesMetadata[$attributeName];
+                } else {
+                    $attributesMetadata[$attributeName] = $attributeMetadata = new AttributeMetadata($attributeName);
+                    $classMetadata->addAttributeMetadata($attributeMetadata);
+                }
             }
 
             foreach ($this->reader->getMethodAnnotations($method) as $annotation) {

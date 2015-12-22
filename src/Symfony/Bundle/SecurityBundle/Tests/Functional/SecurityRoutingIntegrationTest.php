@@ -19,7 +19,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
         $client->request('GET', '/protected_resource');
 
         $this->assertRedirect($client->getResponse(), '/login');
@@ -31,7 +30,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     public function testRoutingErrorIsExposedWhenNotProtected($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
         $client->request('GET', '/unprotected_resource');
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
@@ -43,7 +41,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
-        $client->insulate();
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();
         $form['_username'] = 'johannes';
@@ -120,17 +117,13 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         return array(array('config.yml'), array('routes_as_path.yml'));
     }
 
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        parent::setUp();
-
-        $this->deleteTmpDir('StandardFormLogin');
+        parent::deleteTmpDir('StandardFormLogin');
     }
 
-    protected function tearDown()
+    public static function tearDownAfterClass()
     {
-        parent::tearDown();
-
-        $this->deleteTmpDir('StandardFormLogin');
+        parent::deleteTmpDir('StandardFormLogin');
     }
 }

@@ -91,10 +91,10 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         }
         $this->routeCollection->add('Test2', new Route('/testing2'));
 
-        $data = $this->generatorDumper->dump(array(
+        file_put_contents($this->largeTestTmpFilepath, $this->generatorDumper->dump(array(
             'class' => 'ProjectLargeUrlGenerator',
-        ));
-        file_put_contents($this->largeTestTmpFilepath, $data);
+        )));
+        $this->routeCollection = $this->generatorDumper = null;
         include $this->largeTestTmpFilepath;
 
         $projectUrlGenerator = new \ProjectLargeUrlGenerator(new RequestContext('/app.php'));

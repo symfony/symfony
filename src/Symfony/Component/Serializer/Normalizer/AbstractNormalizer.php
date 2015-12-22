@@ -32,8 +32,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
 
-    public static $n;
-
     /**
      * @var int
      */
@@ -396,14 +394,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             ++$context[$key];
         } else {
             $context[$key] = 1;
-        }
-
-        if ($attribute === 'foo') {
-            if (null === self::$n) {
-                self::$n = 0;
-            } else {
-                ++self::$n;
-            }
         }
 
         return false;

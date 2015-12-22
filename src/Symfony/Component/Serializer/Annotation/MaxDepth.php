@@ -30,7 +30,7 @@ class MaxDepth
 
     public function __construct(array $data)
     {
-        if (!isset($data['value']) || !$data['value']) {
+        if (empty($data['value'])) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', get_class($this)));
         }
 

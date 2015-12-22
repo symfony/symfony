@@ -98,9 +98,7 @@ class AnnotationLoader implements LoaderInterface
                     foreach ($annotation->getGroups() as $group) {
                         $attributeMetadata->addGroup($group);
                     }
-                }
-
-                if ($annotation instanceof MaxDepth) {
+                } elseif ($annotation instanceof MaxDepth) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('MaxDepth on "%s::%s" cannot be added. MaxDepth can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }

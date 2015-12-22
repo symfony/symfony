@@ -47,10 +47,11 @@
         Contains serialization groups for a attributes. The name of the attribute should be given in the "name" option.
       ]]></xsd:documentation>
         </xsd:annotation>
-        <xsd:sequence>
+        <xsd:sequence minOccurs="0">
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="max-depth" type="xsd:int" />
     </xsd:complexType>
 
 </xsd:schema>

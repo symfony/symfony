@@ -65,6 +65,7 @@ class YamlFileLoader extends FileLoader
 
             if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
                 $attributesMetadata = $classMetadata->getAttributesMetadata();
+
                 foreach ($yaml['attributes'] as $attribute => $data) {
                     if (isset($attributesMetadata[$attribute])) {
                         $attributeMetadata = $attributesMetadata[$attribute];
@@ -75,8 +76,12 @@ class YamlFileLoader extends FileLoader
 
                     if (isset($data['groups'])) {
                         foreach ($data['groups'] as $group) {
-                            $attributeMetadata->addGroup($group);
+                            $attributeMetadata->addGroup((string) $group);
                         }
+                    }
+
+                    if (isset($data['max_depth'])) {
+                        $attributeMetadata->setMaxDepth((int) $data['max_depth']);
                     }
                 }
             }

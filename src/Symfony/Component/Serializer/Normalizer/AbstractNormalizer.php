@@ -318,7 +318,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @return array
      */
-    protected function setAttribute($data, $attribute, $attributeValue)
+    protected function setAttribute(array $data, $attribute, $attributeValue)
     {
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute);

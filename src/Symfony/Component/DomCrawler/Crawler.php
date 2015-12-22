@@ -695,7 +695,7 @@ class Crawler extends \SplObjectStorage
      *
      * @return Link A Link instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty or contains non-DOMElement instances
+     * @throws \InvalidArgumentException If the current node list is empty or the selected node is not instance of DOMElement
      */
     public function link($method = 'get')
     {
@@ -706,7 +706,7 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
         }
 
         return new Link($node, $this->baseHref, $method);
@@ -741,7 +741,7 @@ class Crawler extends \SplObjectStorage
      *
      * @return Form A Form instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty or contains non-DOMElement instances
+     * @throws \InvalidArgumentException If the current node list is empty or the selected node is not instance of DOMElement
      */
     public function form(array $values = null, $method = null)
     {
@@ -752,7 +752,7 @@ class Crawler extends \SplObjectStorage
         $node = $this->getNode(0);
 
         if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
         }
 
         $form = new Form($node, $this->uri, $method, $this->baseHref);

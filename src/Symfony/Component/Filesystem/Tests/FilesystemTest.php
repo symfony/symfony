@@ -496,7 +496,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->chmod($directory, 0753, 0000, true);
 
-        $this->assertEquals(753, $this->getFilePermissions($subdirectory));
+        $this->assertFilePermissions(753, $subdirectory);
     }
 
     public function testChown()

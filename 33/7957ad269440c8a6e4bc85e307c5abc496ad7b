@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-19T13:28:49Z
+
+This should make tests on Appveyor pass again.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-19T13:43:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-19T14:27:53Z
+
+I really prefer the annotation, we don't care about patched php versions, this is a test suite, not a framework :-)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-19T14:35:29Z
+
+Well, I think it's good to be able to run the tests on PHP 5.3 on Travis when we claim compatibility with that PHP version.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-19T15:06:11Z
+
+:+1:
+
+This allows to run the tests on Travis's lowest test jobs (as travis has a compatible PHP patch), but makes Appveyor pass as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-19T15:09:58Z
+
+Travis runs a higher version than 5.3.7 isn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-19T15:29:57Z
+
+@nicolas-grekas We define `MIN_PHP` to be `5.3.3` but we indeed don't seem to run tests with that version. Is that intended?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-19T15:59:40Z
+
+@xabbuh yep it is: the travis matrix is big enough, lowest php versions are run on appveyor
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-19T16:06:15Z
+
+@nicolas-grekas So we should remove the variable from the Travis config?
+
+Anyway, I would keep the test this way as the tests would then be executed on Appveyor if they ever used backported fixes in their PHP versions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-19T16:07:38Z
+
+As you can read in the travis file, the var is actually used for testing the process component with --enable-sigchild, so we should keep it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T07:46:27Z
+
+@xabbuh ok to revert to the annotated version? Adding this method + conditional branching adds cyclomatic complexity for a case that our test matrix never reaches and is not required to reach (because we don't test the native implementation but our php wrapper, which wouldn't be better covered by going to this corner case)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-22T08:20:16Z
+
+@nicolas-grekas I don't have too hard feelings about this. So I reverted to use the `@requires` annotation here again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T08:23:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-22T10:28:55Z
+
+Everything's finally green again.

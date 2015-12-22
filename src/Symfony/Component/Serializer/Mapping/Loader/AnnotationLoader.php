@@ -61,9 +61,7 @@ class AnnotationLoader implements LoaderInterface
                         foreach ($annotation->getGroups() as $group) {
                             $attributesMetadata[$property->name]->addGroup($group);
                         }
-                    }
-
-                    if ($annotation instanceof MaxDepth) {
+                    } elseif ($annotation instanceof MaxDepth) {
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     }
 

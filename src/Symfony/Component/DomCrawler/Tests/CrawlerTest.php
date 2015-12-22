@@ -63,15 +63,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->add(1);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAddMultipleDocumentNode()
-    {
-        $crawler = $this->createTestCrawler();
-        $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
-    }
-
     public function testAddHtmlContent()
     {
         $crawler = new Crawler();

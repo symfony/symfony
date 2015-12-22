@@ -16,6 +16,7 @@ init:
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
 
 install:
+    - exit 1
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.3.11-nts-Win32-VC9-x86.zip
@@ -55,6 +56,7 @@ install:
     - composer update --prefer-source --no-progress --ansi
 
 test_script:
+    - exit 1
     - cd c:\projects\symfony
     - SET X=0
     - copy /Y c:\php\php.ini-min c:\php\php.ini

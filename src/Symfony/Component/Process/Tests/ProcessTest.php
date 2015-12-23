@@ -791,7 +791,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         if ('\\' !== DIRECTORY_SEPARATOR) {
             // On Windows, timers are too transient
-            $maxDuration = $timeout + Process::TIMEOUT_PRECISION;
+            $maxDuration = $timeout + 2 * Process::TIMEOUT_PRECISION;
             $this->assertLessThan($maxDuration, $duration);
         }
 

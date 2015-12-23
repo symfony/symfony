@@ -43,7 +43,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
         }
 
         if (!is_dir($savePath) && !@mkdir($savePath, 0777, true) && !is_dir($savePath)) {
-            throw new \RuntimeException(sprintf('The Session Storage was not able to create a directory: %s', $savePath));
+            throw new \RuntimeException(sprintf('Session Storage was not able to create a directory: %s', $savePath));
         }
 
         $this->savePath = $savePath;

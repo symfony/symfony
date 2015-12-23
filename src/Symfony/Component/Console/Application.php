@@ -631,7 +631,7 @@ class Application
      */
     public function renderException($e, $output)
     {
-        $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+        $output->writeln('');
 
         do {
             $title = sprintf('  [%s]  ', get_class($e));

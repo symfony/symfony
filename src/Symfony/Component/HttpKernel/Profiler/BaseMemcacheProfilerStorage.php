@@ -45,7 +45,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
     {
         $indexName = $this->getIndexName();
 
@@ -67,12 +67,12 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
             }
 
             $values = explode("\t", $item, 7);
-            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = $values;
-            $statusCode = isset($values[6]) ? $values[6] : null;
+            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent, $itemStatusCode) = $values;
 
+            $itemStatusCode = (int) $itemStatusCode;
             $itemTime = (int) $itemTime;
 
-            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
+            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method) || $statusCode && $itemStatusCode !== $statusCode) {
                 continue;
             }
 
@@ -91,7 +91,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 'url' => $itemUrl,
                 'time' => $itemTime,
                 'parent' => $itemParent,
-                'status_code' => $statusCode,
+                'status_code' => $itemStatusCode,
             );
             --$limit;
         }
@@ -168,8 +168,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
             'time' => $profile->getTime(),
+            'status_code' => $profile->getStatusCode(),
         );
-
         $profileIndexed = false !== $this->getValue($this->getItemName($profile->getToken()));
 
         if ($this->setValue($this->getItemName($profile->getToken()), $data, $this->lifetime)) {

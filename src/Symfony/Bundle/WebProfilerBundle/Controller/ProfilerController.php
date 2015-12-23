@@ -237,19 +237,21 @@ class ProfilerController
         if (null === $session = $request->getSession()) {
             $ip =
             $method =
+            $statusCode =
             $url =
             $start =
             $end =
             $limit =
             $token = null;
         } else {
-            $ip = $request->query->get('ip', $session->get('_profiler_search_ip'));
-            $method = $request->query->get('method', $session->get('_profiler_search_method'));
-            $url = $request->query->get('url', $session->get('_profiler_search_url'));
-            $start = $request->query->get('start', $session->get('_profiler_search_start'));
-            $end = $request->query->get('end', $session->get('_profiler_search_end'));
-            $limit = $request->query->get('limit', $session->get('_profiler_search_limit'));
-            $token = $request->query->get('token', $session->get('_profiler_search_token'));
+            $ip = $session->get('_profiler_search_ip');
+            $method = $session->get('_profiler_search_method');
+            $statusCode = $session->get('_profiler_search_status_code');
+            $url = $session->get('_profiler_search_url');
+            $start = $session->get('_profiler_search_start');
+            $end = $session->get('_profiler_search_end');
+            $limit = $session->get('_profiler_search_limit');
+            $token = $session->get('_profiler_search_token');
         }
 
         return new Response(
@@ -257,6 +259,7 @@ class ProfilerController
                 'token' => $token,
                 'ip' => $ip,
                 'method' => $method,
+                'status_code' => $statusCode,
                 'url' => $url,
                 'start' => $start,
                 'end' => $end,
@@ -290,6 +293,7 @@ class ProfilerController
 
         $ip = $request->query->get('ip');
         $method = $request->query->get('method');
+        $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
@@ -299,9 +303,10 @@ class ProfilerController
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
+            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode),
             'ip' => $ip,
             'method' => $method,
+            'status_code' => $statusCode,
             'url' => $url,
             'start' => $start,
             'end' => $end,
@@ -330,6 +335,7 @@ class ProfilerController
 
         $ip = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');
+        $statusCode = $request->query->get('status_code');
         $url = $request->query->get('url');
         $start = $request->query->get('start', null);
         $end = $request->query->get('end', null);
@@ -339,6 +345,7 @@ class ProfilerController
         if (null !== $session = $request->getSession()) {
             $session->set('_profiler_search_ip', $ip);
             $session->set('_profiler_search_method', $method);
+            $session->set('_profiler_search_status_code', $statusCode);
             $session->set('_profiler_search_url', $url);
             $session->set('_profiler_search_start', $start);
             $session->set('_profiler_search_end', $end);
@@ -350,13 +357,14 @@ class ProfilerController
             return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)), 302, array('Content-Type' => 'text/html'));
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array(
             'request' => $request,
             'token' => $tokens ? $tokens[0]['token'] : 'empty',
             'ip' => $ip,
             'method' => $method,
+            'status_code' => $statusCode,
             'url' => $url,
             'start' => $start,
             'end' => $end,

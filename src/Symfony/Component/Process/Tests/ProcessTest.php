@@ -645,7 +645,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
         $this->skipIfNotEnhancedSigchild(false);
 
-        $process = $this->getProcess(self::$phpBin.' -r "while (true) usleep(100);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(32.1)"');
         $process->start();
         posix_kill($process->getPid(), 9); // SIGKILL
 
@@ -729,9 +729,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
-        $duration = microtime(true) - $start;
 
-        $this->assertLessThan(3, $duration);
+        $this->assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }

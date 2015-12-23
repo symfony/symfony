@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-23T10:44:43Z
+
+Fixed: trapping signals creates race conditions, but now that we signal the child pid directly, we don't need to trap anymore.

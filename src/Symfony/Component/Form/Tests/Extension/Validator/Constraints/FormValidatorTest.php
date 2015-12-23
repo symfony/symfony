@@ -125,10 +125,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
     public function testNotExistingConstraintIndex()
     {
-        $object = $this->getMock('\stdClass');
-        $options = array();
-
-        $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory, $options);
+        $object = new \stdClass;
+        $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);
         $form = $form->setData($object)->getForm();
 
         $this->validator->validate($form, new Form());

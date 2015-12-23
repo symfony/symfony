@@ -828,8 +828,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 $process->checkTimeout();
                 usleep(100000);
             }
-            $this->fail('A RuntimeException should have been raised');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised');
+        } catch (ProcessTimedOutException $e) {
         }
 
         $this->assertLessThan(15, microtime(true) - $start);
@@ -839,18 +839,18 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIdleTimeout()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->setTimeout(10);
-        $process->setIdleTimeout(0.5);
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(34);"');
+        $process->setTimeout(60);
+        $process->setIdleTimeout(0.1);
 
         try {
             $process->run();
 
             $this->fail('A timeout exception was expected.');
-        } catch (ProcessTimedOutException $ex) {
-            $this->assertTrue($ex->isIdleTimeout());
-            $this->assertFalse($ex->isGeneralTimeout());
-            $this->assertEquals(0.5, $ex->getExceededTimeout());
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isIdleTimeout());
+            $this->assertFalse($e->isGeneralTimeout());
+            $this->assertEquals(0.1, $e->getExceededTimeout());
         }
     }
 
@@ -859,17 +859,23 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestIncomplete('This test fails with a timeout on Windows, can someone investigate please?');
         }
-        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 30; while ($n--) {echo "foo\n"; usleep(100000); }')));
-        $process->setTimeout(2);
-        $process->setIdleTimeout(1);
+        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('while (true) {echo "foo\n"; usleep(10000);}')));
+        $process->setTimeout(1);
+        $process->start();
+
+        while (false === strpos($process->getOutput(), 'foo')) {
+            usleep(1000);
+        }
+
+        $process->setIdleTimeout(0.1);
 
         try {
-            $process->run();
+            $process->wait();
             $this->fail('A timeout exception was expected.');
         } catch (ProcessTimedOutException $ex) {
             $this->assertTrue($ex->isGeneralTimeout(), 'A general timeout is expected.');
             $this->assertFalse($ex->isIdleTimeout(), 'No idle timeout is expected.');
-            $this->assertEquals(2, $ex->getExceededTimeout());
+            $this->assertEquals(1, $ex->getExceededTimeout());
         }
     }
 
@@ -884,11 +890,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         try {
             $process->run();
-            $this->fail('A RuntimeException should have been raised.');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised.');
+        } catch (ProcessTimedOutException $e) {
         }
         $this->assertFalse($process->isRunning());
         $process->start();
+        $this->assertTrue($process->isRunning());
         $process->stop(0);
 
         throw $e;
@@ -1046,7 +1053,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testDisableOutputDisablesTheOutput()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('foo');
         $this->assertFalse($p->isOutputDisabled());
         $p->disableOutput();
         $this->assertTrue($p->isOutputDisabled());
@@ -1060,7 +1067,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisableOutputWhileRunningThrowsException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(39);"');
         $p->start();
         $p->disableOutput();
     }
@@ -1071,7 +1078,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testEnableOutputWhileRunningThrowsException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(40);"');
         $p->disableOutput();
         $p->start();
         $p->enableOutput();
@@ -1079,12 +1086,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableOrDisableOutputAfterRunDoesNotThrowException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('echo foo');
         $p->disableOutput();
-        $p->start();
-        $p->wait();
+        $p->run();
         $p->enableOutput();
         $p->disableOutput();
+        $this->assertTrue($p->isOutputDisabled());
     }
 
     /**
@@ -1093,7 +1100,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
     }
@@ -1104,16 +1111,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);
     }
 
     public function testSetNullIdleTimeoutWhileOutputIsDisabled()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->disableOutput();
-        $process->setIdleTimeout(null);
+        $this->assertSame($process, $process->setIdleTimeout(null));
     }
 
     /**
@@ -1121,7 +1128,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartWithACallbackAndDisabledOutput($startMethod, $exception, $exceptionMessage)
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('foo');
         $p->disableOutput();
         $this->setExpectedException($exception, $exceptionMessage);
         if ('mustRun' === $startMethod) {
@@ -1146,7 +1153,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(41);"');
         $p->disableOutput();
         $p->start();
         $p->{$fetchMethod}();
@@ -1161,7 +1168,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array('getIncrementalErrorOutput'),
         );
     }
-    
+
     public function testStopTerminatesProcessCleanly()
     {
         $process = $this->getProcess(self::$phpBin.' -r "echo 123; sleep(42);"');

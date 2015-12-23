@@ -68,7 +68,7 @@ class TranslationWriter
         $dumper = $this->dumpers[$format];
 
         if (isset($options['path']) && !is_dir($options['path']) && !@mkdir($options['path'], 0777, true) && !is_dir($options['path'])) {
-            throw new \RuntimeException(sprintf('Translation Writer was not able to create a directory: %s', $options['path']));
+            throw new \RuntimeException(sprintf('Translation Writer was not able to create a directory "%s"', $options['path']));
         }
 
         // save

@@ -76,12 +76,12 @@ class Process
 
     private static $sigchild;
     private static $posixSignals = array(
-        1 => 1,   // SIGHUP
-        2 => 2,   // SIGINT
-        3 => 3,   // SIGQUIT
-        6 => 6,   // SIGABRT
-        14 => 14, // SIGALRM
-        15 => 15, // SIGTERM
+         1, // SIGHUP
+         2, // SIGINT
+         3, // SIGQUIT
+         6, // SIGABRT
+        14, // SIGALRM
+        15, // SIGTERM
     );
 
     /**
@@ -285,11 +285,19 @@ class Process
             if (!isset($this->options['bypass_shell'])) {
                 $this->options['bypass_shell'] = true;
             }
-        }
+        } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors[3] = array('pipe', 'w');
 
-        $ptsWorkaround = null;
+            $commandline = '';
+            foreach (self::$posixSignals as $s) {
+                $commandline .= "trap 'echo s$s >&3' $s;";
+            }
 
-        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
+            $commandline .= '{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
+            $commandline .= 'pid=$!; echo $pid >&3; wait $pid; code=$?; echo x$code >&3; exit $code';
+
             // Workaround for the bug, when PTS functionality is enabled.
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
@@ -297,14 +305,14 @@ class Process
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
 
-        if ($ptsWorkaround) {
-            fclose($ptsWorkaround);
-        }
-
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
         }
         $this->status = self::STATUS_STARTED;
+
+        if (isset($descriptors[3])) {
+            $this->fallbackStatus['pid'] = (int) fgets($this->processPipes->pipes[3]);
+        }
 
         if ($this->tty) {
             return;
@@ -596,8 +604,6 @@ class Process
     public function getExitCode()
     {
         if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            $this->stop(0);
-
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
         }
 
@@ -651,8 +657,6 @@ class Process
         $this->requireProcessIsTerminated(__FUNCTION__);
 
         if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            $this->stop(0);
-
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
@@ -674,8 +678,6 @@ class Process
         $this->requireProcessIsTerminated(__FUNCTION__);
 
         if ($this->isSigchildEnabled() && (!$this->enhanceSigchildCompatibility || -1 === $this->processInformation['termsig'])) {
-            $this->stop(0);
-
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
@@ -1223,14 +1225,7 @@ class Process
             return $result = false;
         }
 
-        $proc = @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
-        if (is_resource($proc)) {
-            proc_close($proc);
-
-            return $result = true;
-        }
-
-        return $result = false;
+        return $result = (bool) @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
     }
 
     /**
@@ -1245,22 +1240,8 @@ class Process
         } else {
             $this->processPipes = UnixPipes::create($this, $this->input);
         }
-        $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
 
-        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-            $descriptors[3] = array('pipe', 'w');
-
-            $trap = '';
-            foreach (self::$posixSignals as $s) {
-                $trap .= "trap 'echo s$s >&3' $s;";
-            }
-
-            $this->commandline = $trap.'{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
-            $this->commandline .= 'pid=$!; echo p$pid >&3; wait $pid; code=$?; echo x$code >&3; exit $code';
-        }
-
-        return $descriptors;
+        return $this->processPipes->getDescriptors($this->outputDisabled);
     }
 
     /**
@@ -1379,8 +1360,11 @@ class Process
                         $this->fallbackStatus['signaled'] = true;
                         $this->fallbackStatus['exitcode'] = -1;
                         $this->fallbackStatus['termsig'] = (int) substr($data, 1);
-                    } elseif ('x' === $data[0] && !isset($this->fallbackStatus['signaled'])) {
-                        $this->fallbackStatus['exitcode'] = (int) substr($data, 1);
+                    } elseif ('x' === $data[0]) {
+                        $this->fallbackStatus['running'] = false;
+                        if (!isset($this->fallbackStatus['signaled'])) {
+                            $this->fallbackStatus['exitcode'] = (int) substr($data, 1);
+                        }
                     }
                 }
             } else {
@@ -1462,14 +1446,6 @@ class Process
             return false;
         }
 
-        if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled() && !isset(self::$posixSignals[$signal]) && !(function_exists('posix_kill') && @posix_kill($this->getPid(), $signal))) {
-            if ($throwException) {
-                throw new RuntimeException('This PHP has been compiled with --enable-sigchild and posix_kill() is not available.');
-            }
-
-            return false;
-        }
-
         if ('\\' === DIRECTORY_SEPARATOR) {
             exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
             if ($exitCode && $this->isRunning()) {
@@ -1479,14 +1455,21 @@ class Process
 
                 return false;
             }
-        }
-
-        if (true !== @proc_terminate($this->process, $signal) && '\\' !== DIRECTORY_SEPARATOR) {
-            if ($throwException) {
-                throw new RuntimeException(sprintf('Error while sending signal `%s`.', $signal));
+        } else {
+            if (!$this->enhanceSigchildCompatibility || !$this->isSigchildEnabled()) {
+                $ok = @proc_terminate($this->process, $signal);
+            } elseif (function_exists('posix_kill')) {
+                $ok = @posix_kill($this->getPid(), $signal);
+            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $this->getPid()), array(2 => array('pipe', 'w')), $pipes)) {
+                $ok = false === fgets($pipes[2]);
             }
+            if (!$ok) {
+                if ($throwException) {
+                    throw new RuntimeException(sprintf('Error while sending signal `%s`.', $signal));
+                }
 
-            return false;
+                return false;
+            }
         }
 
         $this->latestSignal = (int) $signal;

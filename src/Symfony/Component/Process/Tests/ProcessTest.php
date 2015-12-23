@@ -24,12 +24,23 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     private static $phpBin;
+    private static $sigchild;
     private static $notEnhancedSigchild = false;
 
     public static function setUpBeforeClass()
     {
         $phpBin = new PhpExecutableFinder();
         self::$phpBin = 'phpdbg' === PHP_SAPI ? 'php' : $phpBin->find();
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            // exec is mandatory to deal with sending a signal to the process
+            // see https://github.com/symfony/symfony/issues/5030 about prepending
+            // command with exec
+            self::$phpBin = 'exec '.self::$phpBin;
+        }
+
+        ob_start();
+        phpinfo(INFO_GENERAL);
+        self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }
 
     public function testThatProcessDoesNotThrowWarningDuringRun()
@@ -78,20 +89,18 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testStopWithTimeoutIsActuallyWorking()
     {
-        // exec is mandatory here since we send a signal to the process
-        // see https://github.com/symfony/symfony/issues/5030 about prepending
-        // command with exec
-        $p = $this->getProcess('exec '.self::$phpBin.' '.__DIR__.'/NonStopableProcess.php 3');
+        $p = $this->getProcess(self::$phpBin.' '.__DIR__.'/NonStopableProcess.php 30');
         $p->start();
-        usleep(100000);
-        $start = microtime(true);
-        $p->stop(1.1, SIGKILL);
-        while ($p->isRunning()) {
+
+        while (false === strpos($p->getOutput(), 'received')) {
             usleep(1000);
         }
-        $duration = microtime(true) - $start;
+        $start = microtime(true);
+        $p->stop(0.1);
 
-        $this->assertLessThan(4, $duration);
+        $p->wait();
+
+        $this->assertLessThan(15, microtime(true) - $start);
     }
 
     public function testAllOutputIsActuallyReadOnTermination()
@@ -109,12 +118,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
 
         $p->start();
-        // Let's wait enough time for process to finish...
-        // Here we don't call Process::run or Process::wait to avoid any read of pipes
-        usleep(500000);
 
-        if ($p->isRunning()) {
-            $this->markTestSkipped('Process execution did not complete in the required time frame');
+        // Don't call Process::run nor Process::wait to avoid any read of pipes
+        $h = new \ReflectionProperty($p, 'process');
+        $h->setAccessible(true);
+        $h = $h->getValue($p);
+        $s = proc_get_status($h);
+
+        while ($s['running']) {
+            usleep(1000);
+            $s = proc_get_status($h);
         }
 
         $o = $p->getOutput();
@@ -124,18 +137,14 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testCallbacksAreExecutedWithStart()
     {
-        $data = '';
-
-        $process = $this->getProcess('echo foo && '.self::$phpBin.' -r "sleep(1);" && echo foo');
+        $process = $this->getProcess('echo foo');
         $process->start(function ($type, $buffer) use (&$data) {
             $data .= $buffer;
         });
 
-        while ($process->isRunning()) {
-            usleep(10000);
-        }
+        $process->wait();
 
-        $this->assertEquals(2, preg_match_all('/foo/', $data, $matches));
+        $this->assertSame('foo'.PHP_EOL, $data);
     }
 
     /**
@@ -200,7 +209,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetInputWhileRunningThrowsAnException()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(30);"');
         $process->start();
         try {
             $process->setInput('foobar');
@@ -220,7 +229,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidInput($value)
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('foo');
         $process->setInput($value);
     }
 
@@ -237,7 +246,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidInput($expected, $value)
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('foo');
         $process->setInput($value);
         $this->assertSame($expected, $process->getInput());
     }
@@ -473,7 +482,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     public function testTTYCommand()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does have /dev/tty support');
+            $this->markTestSkipped('Windows does not have /dev/tty support');
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null && '.self::$phpBin.' -r "usleep(100000);"');
@@ -585,12 +594,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $process->start();
         $end = microtime(true);
         $this->assertLessThan(0.4, $end - $start);
-        $process->wait();
+        $process->stop();
     }
 
     public function testUpdateStatus()
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertTrue(strlen($process->getOutput()) > 0);
     }
@@ -599,7 +608,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(200000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(100000);"');
         $this->assertNull($process->getExitCode());
         $process->start();
         $this->assertNull($process->getExitCode());
@@ -611,7 +620,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(200000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(100000);"');
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
         $process->start();
@@ -624,14 +633,14 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertSame(0, $process->getExitCode());
     }
 
     public function testStatus()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(100000);"');
         $this->assertFalse($process->isRunning());
         $this->assertFalse($process->isStarted());
         $this->assertFalse($process->isTerminated());
@@ -650,7 +659,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStop()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(31);"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();
@@ -661,7 +670,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertTrue($process->isSuccessful());
     }
@@ -670,14 +679,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
+        $process = $this->getProcess(self::$phpBin.' -r "usleep(100000);"');
         $process->start();
 
         $this->assertFalse($process->isSuccessful());
 
-        while ($process->isRunning()) {
-            usleep(300000);
-        }
+        $process->wait();
 
         $this->assertTrue($process->isSuccessful());
     }
@@ -686,10 +693,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);throw new \Exception(\'BOUM\');"');
-        $process->start();
-        $this->assertTrue($process->isRunning());
-        $process->wait();
+        $process = $this->getProcess(self::$phpBin.' -r "throw new \Exception(\'BOUM\');"');
+        $process->run();
         $this->assertFalse($process->isSuccessful());
     }
 
@@ -700,19 +705,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -v');
-        $process->run();
-        $this->assertFalse($process->hasBeenSignaled());
-    }
-
-    public function testProcessWithoutTermSignalIsNotSignaled()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
-        }
-        $this->skipIfNotEnhancedSigchild();
-
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertFalse($process->hasBeenSignaled());
     }
@@ -724,7 +717,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertEquals(0, $process->getTermSignal());
     }
@@ -736,23 +729,10 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
         $this->skipIfNotEnhancedSigchild();
 
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(32);"');
         $process->start();
         $process->stop();
         $this->assertTrue($process->hasBeenSignaled());
-    }
-
-    public function testProcessWithTermSignal()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows does not support POSIX signals');
-        }
-        $this->skipIfNotEnhancedSigchild();
-
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(4);"');
-        $process->start();
-        $process->stop();
-
         $this->assertEquals(15, $process->getTermSignal()); // SIGTERM
     }
 
@@ -767,11 +747,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
         $this->skipIfNotEnhancedSigchild(false);
 
-        $termSignal = defined('SIGKILL') ? SIGKILL : 9;
-
-        $process = $this->getProcess('exec '.self::$phpBin.' -r "while (true) {}"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(32.1)"');
         $process->start();
-        posix_kill($process->getPid(), $termSignal);
+        posix_kill($process->getPid(), 9); // SIGKILL
 
         $process->wait();
     }
@@ -796,12 +774,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.5 seconds.
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
      */
     public function testRunProcessWithTimeout()
     {
-        $timeout = 0.5;
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(600000);"');
+        $timeout = 0.1;
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
         try {
@@ -822,25 +800,25 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckTimeoutOnNonStartedProcess()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->checkTimeout();
+        $process = $this->getProcess('echo foo');
+        $this->assertNull($process->checkTimeout());
     }
 
     public function testCheckTimeoutOnTerminatedProcess()
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
-        $process->checkTimeout();
+        $this->assertNull($process->checkTimeout());
     }
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
-     * @expectedExceptionMessage exceeded the timeout of 0.5 seconds.
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
      */
     public function testCheckTimeoutOnStartedProcess()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->setTimeout(0.5);
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(33);"');
+        $process->setTimeout(0.1);
 
         $process->start();
         $start = microtime(true);
@@ -850,30 +828,29 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 $process->checkTimeout();
                 usleep(100000);
             }
-            $this->fail('A RuntimeException should have been raised');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised');
+        } catch (ProcessTimedOutException $e) {
         }
-        $duration = microtime(true) - $start;
 
-        $this->assertLessThan(3, $duration);
+        $this->assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }
 
     public function testIdleTimeout()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->setTimeout(10);
-        $process->setIdleTimeout(0.5);
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(34);"');
+        $process->setTimeout(60);
+        $process->setIdleTimeout(0.1);
 
         try {
             $process->run();
 
             $this->fail('A timeout exception was expected.');
-        } catch (ProcessTimedOutException $ex) {
-            $this->assertTrue($ex->isIdleTimeout());
-            $this->assertFalse($ex->isGeneralTimeout());
-            $this->assertEquals(0.5, $ex->getExceededTimeout());
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isIdleTimeout());
+            $this->assertFalse($e->isGeneralTimeout());
+            $this->assertEquals(0.1, $e->getExceededTimeout());
         }
     }
 
@@ -882,17 +859,23 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestIncomplete('This test fails with a timeout on Windows, can someone investigate please?');
         }
-        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 30; while ($n--) {echo "foo\n"; usleep(100000); }')));
-        $process->setTimeout(2);
-        $process->setIdleTimeout(1);
+        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('while (true) {echo "foo\n"; usleep(10000);}')));
+        $process->setTimeout(1);
+        $process->start();
+
+        while (false === strpos($process->getOutput(), 'foo')) {
+            usleep(1000);
+        }
+
+        $process->setIdleTimeout(0.1);
 
         try {
-            $process->run();
+            $process->wait();
             $this->fail('A timeout exception was expected.');
         } catch (ProcessTimedOutException $ex) {
             $this->assertTrue($ex->isGeneralTimeout(), 'A general timeout is expected.');
             $this->assertFalse($ex->isIdleTimeout(), 'No idle timeout is expected.');
-            $this->assertEquals(2, $ex->getExceededTimeout());
+            $this->assertEquals(1, $ex->getExceededTimeout());
         }
     }
 
@@ -902,38 +885,39 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartAfterATimeout()
     {
-        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 1000; while ($n--) {echo \'\'; usleep(1000); }')));
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(35);"');
         $process->setTimeout(0.1);
 
         try {
             $process->run();
-            $this->fail('A RuntimeException should have been raised.');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised.');
+        } catch (ProcessTimedOutException $e) {
         }
+        $this->assertFalse($process->isRunning());
         $process->start();
-        usleep(1000);
-        $process->stop();
+        $this->assertTrue($process->isRunning());
+        $process->stop(0);
 
         throw $e;
     }
 
     public function testGetPid()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(36);"');
         $process->start();
         $this->assertGreaterThan(0, $process->getPid());
-        $process->wait();
+        $process->stop(0);
     }
 
     public function testGetPidIsNullBeforeStart()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
+        $process = $this->getProcess('foo');
         $this->assertNull($process->getPid());
     }
 
     public function testGetPidIsNullAfterRun()
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('echo foo');
         $process->run();
         $this->assertNull($process->getPid());
     }
@@ -943,7 +927,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSignal()
     {
-        $process = $this->getProcess('exec '.self::$phpBin.' '.__DIR__.'/SignalListener.php');
+        $process = $this->getProcess(self::$phpBin.' '.__DIR__.'/SignalListener.php');
         $process->start();
 
         while (false === strpos($process->getOutput(), 'Caught')) {
@@ -982,7 +966,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSignalProcessNotRunning()
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('foo');
         $process->signal(1); // SIGHUP
     }
 
@@ -991,7 +975,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethodsThatNeedARunningProcess($method)
     {
-        $process = $this->getProcess(self::$phpBin.' -v');
+        $process = $this->getProcess('foo');
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
         $process->{$method}();
     }
@@ -1014,7 +998,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethodsThatNeedATerminatedProcess($method)
     {
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(37);"');
         $process->start();
         try {
             $process->{$method}();
@@ -1038,36 +1022,38 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideWrongSignal
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function testSignalWithWrongIntSignal()
+    public function testWrongSignal($signal)
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(38);"');
         $process->start();
-        $process->signal(-4);
+        try {
+            $process->signal($signal);
+            $this->fail('A RuntimeException must have been thrown');
+        } catch (RuntimeException $e) {
+            $process->stop(0);
+        }
+
+        throw $e;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     */
-    public function testSignalWithWrongNonIntSignal()
+    public function provideWrongSignal()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('POSIX signals do not work on Windows');
-        }
-
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(3);"');
-        $process->start();
-        $process->signal('Céphalopodes');
+        return array(
+            array(-4),
+            array('Céphalopodes'),
+        );
     }
 
     public function testDisableOutputDisablesTheOutput()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('foo');
         $this->assertFalse($p->isOutputDisabled());
         $p->disableOutput();
         $this->assertTrue($p->isOutputDisabled());
@@ -1081,7 +1067,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisableOutputWhileRunningThrowsException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(39);"');
         $p->start();
         $p->disableOutput();
     }
@@ -1092,7 +1078,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testEnableOutputWhileRunningThrowsException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(40);"');
         $p->disableOutput();
         $p->start();
         $p->enableOutput();
@@ -1100,12 +1086,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableOrDisableOutputAfterRunDoesNotThrowException()
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('echo foo');
         $p->disableOutput();
-        $p->start();
-        $p->wait();
+        $p->run();
         $p->enableOutput();
         $p->disableOutput();
+        $this->assertTrue($p->isOutputDisabled());
     }
 
     /**
@@ -1114,7 +1100,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisableOutputWhileIdleTimeoutIsSet()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->setIdleTimeout(1);
         $process->disableOutput();
     }
@@ -1125,16 +1111,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetIdleTimeoutWhileOutputIsDisabled()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->disableOutput();
         $process->setIdleTimeout(1);
     }
 
     public function testSetNullIdleTimeoutWhileOutputIsDisabled()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('foo');
         $process->disableOutput();
-        $process->setIdleTimeout(null);
+        $this->assertSame($process, $process->setIdleTimeout(null));
     }
 
     /**
@@ -1142,7 +1128,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartWithACallbackAndDisabledOutput($startMethod, $exception, $exceptionMessage)
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess('foo');
         $p->disableOutput();
         $this->setExpectedException($exception, $exceptionMessage);
         if ('mustRun' === $startMethod) {
@@ -1167,7 +1153,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOutputWhileDisabled($fetchMethod)
     {
-        $p = $this->getProcess(self::$phpBin.' -r "usleep(500000);"');
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(41);"');
         $p->disableOutput();
         $p->start();
         $p->{$fetchMethod}();
@@ -1185,7 +1171,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStopTerminatesProcessCleanly()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process = $this->getProcess(self::$phpBin.' -r "echo 123; sleep(42);"');
         $process->run(function () use ($process) {
             $process->stop();
         });
@@ -1194,22 +1180,18 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testKillSignalTerminatesProcessCleanly()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process = $this->getProcess(self::$phpBin.' -r "echo 123; sleep(43);"');
         $process->run(function () use ($process) {
-            if ($process->isRunning()) {
-                $process->signal(9); // SIGKILL
-            }
+            $process->signal(9); // SIGKILL
         });
         $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
 
     public function testTermSignalTerminatesProcessCleanly()
     {
-        $process = $this->getProcess(self::$phpBin.' -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+        $process = $this->getProcess(self::$phpBin.' -r "echo 123; sleep(44);"');
         $process->run(function () use ($process) {
-            if ($process->isRunning()) {
-                $process->signal(15); // SIGTERM
-            }
+            $process->signal(15); // SIGTERM
         });
         $this->assertTrue(true, 'A call to signal() is not expected to cause wait() to throw a RuntimeException');
     }
@@ -1300,11 +1282,11 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     private function skipIfNotEnhancedSigchild($expectException = true)
     {
-        if (self::$notEnhancedSigchild) {
-            if ($expectException) {
+        if (self::$sigchild) {
+            if (!$expectException) {
+                $this->markTestSkipped('PHP is compiled with --enable-sigchild.');
+            } elseif (self::$notEnhancedSigchild) {
                 $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild.');
-            } else {
-                $this->markTestSkipped('PHP is compiled with --enable-sigchild and enhanced mode is disabled.');
             }
         }
     }

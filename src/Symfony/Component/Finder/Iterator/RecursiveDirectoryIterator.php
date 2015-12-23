@@ -118,8 +118,11 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return;
         }
 
-        // @see https://bugs.php.net/bug.php?id=49104
-        parent::next();
+        // @see https://bugs.php.net/bug.php?id=68557
+        if (version_compare(PHP_VERSION, '5.5.23', '<')
+            or (version_compare(PHP_VERSION, '5.6.0', '>=') and version_compare(PHP_VERSION, '5.6.7', '<'))) {
+            parent::next();
+        }
 
         parent::rewind();
     }

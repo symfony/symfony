@@ -12,9 +12,10 @@
 namespace Symfony\Component\Finder\Iterator;
 
 /**
- * This iterator just overrides the rewind method in order to correct a PHP bug.
+ * This iterator just overrides the rewind method in order to correct a PHP bug,
+ * which existed before version 5.5.23/5.6.7.
  *
- * @see https://bugs.php.net/bug.php?id=49104
+ * @see https://bugs.php.net/bug.php?id=68557
  *
  * @author Alex Bogomazov
  */
@@ -28,22 +29,24 @@ abstract class FilterIterator extends \FilterIterator
      */
     public function rewind()
     {
-        $iterator = $this;
-        while ($iterator instanceof \OuterIterator) {
-            $innerIterator = $iterator->getInnerIterator();
+        if (version_compare(PHP_VERSION, '5.5.23', '<')
+            or (version_compare(PHP_VERSION, '5.6.0', '>=') and version_compare(PHP_VERSION, '5.6.7', '<'))) {
+            $iterator = $this;
+            while ($iterator instanceof \OuterIterator) {
+                $innerIterator = $iterator->getInnerIterator();
 
-            if ($innerIterator instanceof RecursiveDirectoryIterator) {
-                if ($innerIterator->isRewindable()) {
-                    $innerIterator->next();
-                    $innerIterator->rewind();
+                if ($innerIterator instanceof RecursiveDirectoryIterator) {
+                    if ($innerIterator->isRewindable()) {
+                        $innerIterator->next();
+                        $innerIterator->rewind();
+                    }
+                } elseif ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
+                    $iterator->getInnerIterator()->next();
+                    $iterator->getInnerIterator()->rewind();
                 }
-            } elseif ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
-                $iterator->getInnerIterator()->next();
-                $iterator->getInnerIterator()->rewind();
+                $iterator = $iterator->getInnerIterator();
             }
-            $iterator = $iterator->getInnerIterator();
         }
-
         parent::rewind();
     }
 }

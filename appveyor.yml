@@ -52,9 +52,10 @@ install:
 
 test_script:
     - cd c:\projects\symfony
+    - Setlocal EnableDelayedExpansion
     - SET X=0
     - copy /Y c:\php\php.ini-min c:\php\php.ini
-    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
-    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=1
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
     - exit %X%

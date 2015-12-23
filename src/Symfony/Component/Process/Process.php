@@ -75,14 +75,6 @@ class Process
     private $latestSignal;
 
     private static $sigchild;
-    private static $posixSignals = array(
-         1, // SIGHUP
-         2, // SIGINT
-         3, // SIGQUIT
-         6, // SIGABRT
-        14, // SIGALRM
-        15, // SIGTERM
-    );
 
     /**
      * Exit codes translation table.
@@ -289,14 +281,9 @@ class Process
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
 
-            $commandline = '';
-            foreach (self::$posixSignals as $s) {
-                $commandline .= "trap 'echo s$s >&3' $s;";
-            }
-
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
-            $commandline .= '{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
-            $commandline .= 'pid=$!; echo $pid >&3; wait $pid; code=$?; echo x$code >&3; exit $code';
+            $commandline = '{ ('.$this->commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
+            $commandline .= 'pid=$!; echo $pid >&3; wait $pid; code=$?; echo $code >&3; exit $code';
 
             // Workaround for the bug, when PTS functionality is enabled.
             // @see : https://bugs.php.net/69442
@@ -1314,19 +1301,9 @@ class Process
         $callback = $this->callback;
         foreach ($result as $type => $data) {
             if (3 === $type) {
-                foreach (explode("\n", substr($data, 0, -1)) as $data) {
-                    if ('p' === $data[0]) {
-                        $this->fallbackStatus['pid'] = (int) substr($data, 1);
-                    } elseif ('s' === $data[0]) {
-                        $this->fallbackStatus['signaled'] = true;
-                        $this->fallbackStatus['exitcode'] = -1;
-                        $this->fallbackStatus['termsig'] = (int) substr($data, 1);
-                    } elseif ('x' === $data[0]) {
-                        $this->fallbackStatus['running'] = false;
-                        if (!isset($this->fallbackStatus['signaled'])) {
-                            $this->fallbackStatus['exitcode'] = (int) substr($data, 1);
-                        }
-                    }
+                $this->fallbackStatus['running'] = false;
+                if (!isset($this->fallbackStatus['signaled'])) {
+                    $this->fallbackStatus['exitcode'] = (int) $data;
                 }
             } else {
                 $callback($type === self::STDOUT ? self::OUT : self::ERR, $data);

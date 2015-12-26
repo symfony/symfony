@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-17T16:14:23Z
+
+this is not good, as it looses the debugging info.It might be better to wrap it in a FatalThrowableError to be able to continue the flattening
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-17T16:24:35Z
+
+I'm fine with that if you want me to make that change. I just thought you'd want to separate that behaviour from that class, so I went with skipping.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-17T16:28:20Z
+
+How does this look then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T17:13:37Z
+
+:+1:
+And if you manage to add a test case I would be +2 :)
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-18T17:19:30Z
+
+I'll add a couple of tests in a few hours.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T09:29:51Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T11:26:25Z
+
+Sorry, I'll get to this soon. ;)
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T12:10:39Z
+
+Ping @nicolas-grekas. Not sure what's going on with travis. Looks like it couldn't be arsed to run the tests for some reason?
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T12:17:17Z
+
+Yeh, PHP 5.4 and 5.5 are running no tests for some reason. :/
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T12:18:56Z
+
+This travis issue is affecting the entire code base. For example, one of your PRs didn't get the tests run: https://github.com/symfony/symfony/pull/17104.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T12:24:22Z
+
+5.4 and 5.5 are skipped for PRs so that we get more slots on travis
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T12:24:55Z
+
+Ah, right, so it was intentional. That makes sense. I was just worried that they were getting silently skipped. ;)
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T12:25:46Z
+
+They still waste about 50 seconds of time though each. :(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T12:31:25Z
+
+Yep... I found no way to be quicker, the slow part is apt-get, which can't be skipped AFAIK
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-22T13:10:25Z
+
+Test passing now btw. ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T13:12:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-26T12:14:24Z
+
+Is this good to merge then? I'm just concious that new symfony releases normally happen around a month after the previous ones, and I'd quite like to have this fix included in the next set of releases.
+
+BTW, Happy Christmas everyone. :christmas_tree:

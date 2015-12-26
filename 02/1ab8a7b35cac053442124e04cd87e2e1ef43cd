@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-12-08T10:46:49Z
+
+Can you add a test to prevent future regressions?
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by mihai-stancu at 2015-12-08T11:42:28Z
+
+Sure, will come back with the test for this soon.
+
+I just want to make sure there's no counter opinion relating to this (such as "why would you use embedded objects as entity identifiers").
+
+---------------------------------------------------------------------------
+
+by mihai-stancu at 2015-12-22T17:50:27Z
+
+@sstok sorry for the delay, I added the suggested tests.

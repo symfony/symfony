@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by azatyan at 2015-12-10T13:58:07Z
+
+Added description.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-18T16:19:18Z
+
+Are you sure we need to use `:` instead of `.` here?
+
+---------------------------------------------------------------------------
+
+by azatyan at 2015-12-26T07:27:32Z
+
+Yes @fabpot  in armenian language the sentence full stop sign is "։" http://unicode-table.com/en/0589/
+
+---------------------------------------------------------------------------
+
+by roubenz at 2015-12-26T07:39:41Z
+
++ @azatyan is right.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-26T11:33:36Z
+
+`src/Symfony/Component/Form/Resources/translations/validators.hy.xlf` also needs to be updated.

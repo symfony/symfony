@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class ConditionalNode extends Node
+final class ConditionalNode extends Node
 {
     public function __construct(Node $expr1, Node $expr2, Node $expr3)
     {

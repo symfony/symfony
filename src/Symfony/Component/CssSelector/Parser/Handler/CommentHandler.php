@@ -24,7 +24,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class CommentHandler implements HandlerInterface
+final class CommentHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}

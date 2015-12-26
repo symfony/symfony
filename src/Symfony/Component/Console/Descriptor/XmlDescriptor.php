@@ -24,7 +24,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @internal
  */
-class XmlDescriptor extends Descriptor
+final class XmlDescriptor extends Descriptor
 {
     /**
      * @param InputDefinition $definition

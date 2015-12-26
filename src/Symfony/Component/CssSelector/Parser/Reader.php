@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Parser;
  *
  * @internal
  */
-class Reader
+final class Reader
 {
     /**
      * @var string

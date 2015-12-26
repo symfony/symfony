@@ -26,7 +26,7 @@ use Symfony\Component\Intl\Exception\UnexpectedTypeException;
  *
  * @internal
  */
-class TextBundleWriter implements BundleWriterInterface
+final class TextBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}

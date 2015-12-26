@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\XPath;
  *
  * @internal
  */
-class XPathExpr
+final class XPathExpr
 {
     /**
      * @var string

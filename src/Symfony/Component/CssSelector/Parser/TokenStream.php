@@ -24,7 +24,7 @@ use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
  *
  * @internal
  */
-class TokenStream
+final class TokenStream
 {
     /**
      * @var Token[]

@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class TextDescriptor extends Descriptor
+final class TextDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}

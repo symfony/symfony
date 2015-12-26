@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  *
  * @internal
  */
-class DayOfWeekTransformer extends Transformer
+final class DayOfWeekTransformer extends Transformer
 {
     /**
      * {@inheritdoc}

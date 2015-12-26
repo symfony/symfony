@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class GetAttrNode extends Node
+final class GetAttrNode extends Node
 {
     const PROPERTY_CALL = 1;
     const METHOD_CALL = 2;

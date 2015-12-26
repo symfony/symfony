@@ -29,7 +29,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  *
  * @internal
  */
-class StringHandler implements HandlerInterface
+final class StringHandler implements HandlerInterface
 {
     /**
      * @var TokenizerPatterns

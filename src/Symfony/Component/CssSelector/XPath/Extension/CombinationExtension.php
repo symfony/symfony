@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class CombinationExtension extends AbstractExtension
+final class CombinationExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}

@@ -25,7 +25,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class NodeExtension extends AbstractExtension
+final class NodeExtension extends AbstractExtension
 {
     const ELEMENT_NAME_IN_LOWER_CASE = 1;
     const ATTRIBUTE_NAME_IN_LOWER_CASE = 2;

@@ -28,7 +28,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class FunctionExtension extends AbstractExtension
+final class FunctionExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}

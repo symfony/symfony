@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  *
  * @internal
  */
-class CurrencyDataGenerator extends AbstractDataGenerator
+final class CurrencyDataGenerator extends AbstractDataGenerator
 {
     const UNKNOWN_CURRENCY_ID = 'XXX';
 

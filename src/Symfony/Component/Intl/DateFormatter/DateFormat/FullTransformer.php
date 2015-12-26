@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
  *
  * @internal
  */
-class FullTransformer
+final class FullTransformer
 {
     private $quoteMatch = "'(?:[^']+|'')*'";
     private $implementedChars = 'MLydQqhDEaHkKmsz';

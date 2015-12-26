@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  *
  * @internal
  */
-class JsonBundleReader implements BundleReaderInterface
+final class JsonBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}

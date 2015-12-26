@@ -24,7 +24,7 @@ use Symfony\Component\Form\Exception\RuntimeException;
  *
  * @internal This class is meant for internal use only.
  */
-class IdReader
+final class IdReader
 {
     /**
      * @var ObjectManager

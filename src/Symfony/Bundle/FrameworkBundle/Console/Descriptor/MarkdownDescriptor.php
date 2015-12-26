@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class MarkdownDescriptor extends Descriptor
+final class MarkdownDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}

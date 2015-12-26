@@ -27,7 +27,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  *
  * @internal
  */
-class HashHandler implements HandlerInterface
+final class HashHandler implements HandlerInterface
 {
     /**
      * @var TokenizerPatterns

@@ -24,7 +24,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @internal
  */
-class JsonDescriptor extends Descriptor
+final class JsonDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}

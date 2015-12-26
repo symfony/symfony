@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  *
  * @internal
  */
-class SecondTransformer extends Transformer
+final class SecondTransformer extends Transformer
 {
     /**
      * {@inheritdoc}

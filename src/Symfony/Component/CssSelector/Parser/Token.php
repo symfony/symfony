@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Parser;
  *
  * @internal
  */
-class Token
+final class Token
 {
     const TYPE_FILE_END = 'eof';
     const TYPE_DELIMITER = 'delimiter';

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class XmlDescriptor extends Descriptor
+final class XmlDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}

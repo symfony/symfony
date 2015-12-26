@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Locale;
  *
  * @internal
  */
-class ScriptDataProvider
+final class ScriptDataProvider
 {
     /**
      * @var string

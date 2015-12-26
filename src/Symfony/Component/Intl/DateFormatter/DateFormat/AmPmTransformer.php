@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  *
  * @internal
  */
-class AmPmTransformer extends Transformer
+final class AmPmTransformer extends Transformer
 {
     /**
      * {@inheritdoc}

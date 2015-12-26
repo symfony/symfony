@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  *
  * @internal
  */
-class RegionBundle extends RegionDataProvider implements RegionBundleInterface
+final class RegionBundle extends RegionDataProvider implements RegionBundleInterface
 {
     /**
      * @var LocaleDataProvider

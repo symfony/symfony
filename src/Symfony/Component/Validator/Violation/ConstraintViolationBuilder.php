@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Util\PropertyPath;
  * @internal You should not instantiate or use this class. Code against
  *           {@link ConstraintViolationBuilderInterface} instead.
  */
-class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
+final class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {
     /**
      * @var ConstraintViolationList

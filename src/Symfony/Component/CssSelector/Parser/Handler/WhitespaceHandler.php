@@ -25,7 +25,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class WhitespaceHandler implements HandlerInterface
+final class WhitespaceHandler implements HandlerInterface
 {
     /**
      * {@inheritdoc}

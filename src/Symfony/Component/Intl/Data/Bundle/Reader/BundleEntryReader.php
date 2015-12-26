@@ -26,7 +26,7 @@ use Symfony\Component\Intl\Data\Util\RecursiveArrayAccess;
  *
  * @internal
  */
-class BundleEntryReader implements BundleEntryReaderInterface
+final class BundleEntryReader implements BundleEntryReaderInterface
 {
     /**
      * @var BundleReaderInterface

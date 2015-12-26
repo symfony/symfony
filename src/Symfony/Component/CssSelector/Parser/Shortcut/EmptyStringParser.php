@@ -29,7 +29,7 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  *
  * @internal
  */
-class EmptyStringParser implements ParserInterface
+final class EmptyStringParser implements ParserInterface
 {
     /**
      * {@inheritdoc}

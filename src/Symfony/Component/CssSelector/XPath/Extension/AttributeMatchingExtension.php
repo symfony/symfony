@@ -24,7 +24,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class AttributeMatchingExtension extends AbstractExtension
+final class AttributeMatchingExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}

@@ -25,7 +25,7 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  *
  * @internal
  */
-class ElementParser implements ParserInterface
+final class ElementParser implements ParserInterface
 {
     /**
      * {@inheritdoc}

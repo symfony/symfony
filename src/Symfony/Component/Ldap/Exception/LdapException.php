@@ -18,6 +18,6 @@ namespace Symfony\Component\Ldap\Exception;
  *
  * @internal
  */
-class LdapException extends \RuntimeException
+final class LdapException extends \RuntimeException
 {
 }

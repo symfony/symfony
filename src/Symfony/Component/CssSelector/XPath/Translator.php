@@ -28,7 +28,7 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  *
  * @internal
  */
-class Translator implements TranslatorInterface
+final class Translator implements TranslatorInterface
 {
     /**
      * @var ParserInterface

@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  *
  * @internal
  */
-class ScriptDataGenerator extends AbstractDataGenerator
+final class ScriptDataGenerator extends AbstractDataGenerator
 {
     /**
      * Collects all available language codes.

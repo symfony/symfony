@@ -176,4 +176,13 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $cookie = new Cookie('foo', 'bar', 0);
         $this->assertFalse($cookie->isExpired());
     }
+
+    /**
+     * @expectedException        UnexpectedValueException
+     * @expectedExceptionMessage The cookie expiration time "string" is not valid.
+     */
+    public function testConstructException()
+    {
+        $cookie = new Cookie('foo', 'bar', 'string');
+    }
 }

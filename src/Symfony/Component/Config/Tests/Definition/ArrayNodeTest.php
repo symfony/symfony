@@ -75,6 +75,10 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
                 array('foo-bar_moo' => 'foo'),
             ),
             array(
+                array('anything-with-dash-and-no-underscore' => 'first', 'no_dash' => 'second'),
+                array('anything_with_dash_and_no_underscore' => 'first', 'no_dash' => 'second'),
+            ),
+            array(
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
             ),

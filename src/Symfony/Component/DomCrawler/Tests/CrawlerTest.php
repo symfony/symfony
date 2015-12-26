@@ -65,16 +65,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Nodes set in a Crawler must be DOMElement or DOMDocument instances, "DOMNode" given.
-     */
-    public function testAddInvalidNode()
-    {
-        $crawler = new Crawler();
-        $crawler->add(new \DOMNode());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Attaching DOM nodes from multiple documents in the same crawler is forbidden.
      */
     public function testAddMultipleDocumentNode()

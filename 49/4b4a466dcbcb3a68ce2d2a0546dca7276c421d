@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-23T13:22:13Z
+
+IMO you should add a note to specify that we can't update this interface until the next major release as it wasn't internal before.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-23T14:43:55Z
+
+@Ener-Getick we can because it wasn't marked `@api` and marking things with `@internal` is still in progress.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-23T14:48:14Z
+
+ok so :+1:

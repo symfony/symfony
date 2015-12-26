@@ -438,6 +438,28 @@ EOF;
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
     }
 
+    public function testObjectForMapEnabledWithMapping()
+    {
+        $yaml = <<<EOF
+foo:
+    fiz: [cat]
+EOF;
+        $result = $this->parser->parse($yaml, false, false, true);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertInstanceOf('stdClass', $result->foo);
+        $this->assertEquals(array('cat'), $result->foo->fiz);
+    }
+
+    public function testObjectForMapEnabledWithInlineMapping()
+    {
+        $result = $this->parser->parse('{ "foo": "bar", "fiz": "cat" }', false, false, true);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals('bar', $result->foo);
+        $this->assertEquals('cat', $result->fiz);
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
@@ -898,6 +920,57 @@ EOT
         return array(
             array($yaml1, $expected1),
             array($yaml2, $expected2),
+        );
+    }
+
+    public function testBlankLinesAreParsedAsNewLinesInFoldedBlocks()
+    {
+        $yaml = <<<EOT
+test: >
+    <h2>A heading</h2>
+
+    <ul>
+    <li>a list</li>
+    <li>may be a good example</li>
+    </ul>
+EOT;
+
+        $this->assertSame(
+            array(
+                'test' => <<<EOT
+<h2>A heading</h2>
+<ul> <li>a list</li> <li>may be a good example</li> </ul>
+EOT
+                ,
+            ),
+            $this->parser->parse($yaml)
+        );
+    }
+
+    public function testAdditionallyIndentedLinesAreParsedAsNewLinesInFoldedBlocks()
+    {
+        $yaml = <<<EOT
+test: >
+    <h2>A heading</h2>
+
+    <ul>
+      <li>a list</li>
+      <li>may be a good example</li>
+    </ul>
+EOT;
+
+        $this->assertSame(
+            array(
+                'test' => <<<EOT
+<h2>A heading</h2>
+<ul>
+  <li>a list</li>
+  <li>may be a good example</li>
+</ul>
+EOT
+                ,
+            ),
+            $this->parser->parse($yaml)
         );
     }
 }

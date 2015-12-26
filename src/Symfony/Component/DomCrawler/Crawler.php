@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
- * Crawler eases navigation of a list of \DOMElement objects.
+ * Crawler eases navigation of a list of \DOMNode objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -293,10 +293,6 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         if ($node instanceof \DOMDocument) {
             $node = $node->documentElement;
-        }
-
-        if (!$node instanceof \DOMElement) {
-            throw new \InvalidArgumentException(sprintf('Nodes set in a Crawler must be DOMElement or DOMDocument instances, "%s" given.', get_class($node)));
         }
 
         if (null !== $this->document && $this->document !== $node->ownerDocument) {
@@ -696,7 +692,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return Link A Link instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty
+     * @throws \InvalidArgumentException If the current node list is empty or the selected node is not instance of DOMElement
      */
     public function link($method = 'get')
     {
@@ -706,6 +702,10 @@ class Crawler implements \Countable, \IteratorAggregate
 
         $node = $this->getNode(0);
 
+        if (!$node instanceof \DOMElement) {
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+        }
+
         return new Link($node, $this->baseHref, $method);
     }
 
@@ -713,11 +713,17 @@ class Crawler implements \Countable, \IteratorAggregate
      * Returns an array of Link objects for the nodes in the list.
      *
      * @return Link[] An array of Link instances
+     *
+     * @throws \InvalidArgumentException If the current node list contains non-DOMElement instances
      */
     public function links()
     {
         $links = array();
         foreach ($this->nodes as $node) {
+            if (!$node instanceof \DOMElement) {
+                throw new \InvalidArgumentException(sprintf('The current node list should contain only DOMElement instances, "%s" found.', get_class($node)));
+            }
+
             $links[] = new Link($node, $this->baseHref, 'get');
         }
 
@@ -732,7 +738,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return Form A Form instance
      *
-     * @throws \InvalidArgumentException If the current node list is empty
+     * @throws \InvalidArgumentException If the current node list is empty or the selected node is not instance of DOMElement
      */
     public function form(array $values = null, $method = null)
     {
@@ -740,7 +746,13 @@ class Crawler implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $form = new Form($this->getNode(0), $this->uri, $method, $this->baseHref);
+        $node = $this->getNode(0);
+
+        if (!$node instanceof \DOMElement) {
+            throw new \InvalidArgumentException(sprintf('The selected node should be instance of DOMElement, got "%s".', get_class($node)));
+        }
+
+        $form = new Form($node, $this->uri, $method, $this->baseHref);
 
         if (null !== $values) {
             $form->setValues($values);
@@ -832,12 +844,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
         foreach ($this->nodes as $node) {
             $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
-
-            foreach ($domxpath->query($xpath, $node) as $subNode) {
-                if ($subNode->nodeType === 1) {
-                    $crawler->add($subNode);
-                }
-            }
+            $crawler->add($domxpath->query($xpath, $node));
         }
 
         return $crawler;

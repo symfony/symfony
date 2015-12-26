@@ -58,6 +58,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $qb = clone $this->queryBuilder;
         $alias = current($qb->getRootAliases());
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
+        $parameter = str_replace('.', '_', $parameter);
         $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
 
         // Guess type

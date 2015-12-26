@@ -18,6 +18,8 @@ namespace Symfony\Component\Serializer\Mapping;
  *
  * There may only exist one metadata for each attribute according to its name.
  *
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface ClassMetadataInterface

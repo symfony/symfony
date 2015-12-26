@@ -94,13 +94,8 @@ class FlattenException extends LegacyFlattenException
         $e->setClass(get_class($exception));
         $e->setFile($exception->getFile());
         $e->setLine($exception->getLine());
-
-        $previous = $exception->getPrevious();
-
-        if ($previous instanceof \Exception) {
-            $e->setPrevious(static::create($previous));
-        } elseif ($previous instanceof \Throwable) {
-            $e->setPrevious(static::create(new FatalThrowableError($previous)));
+        if ($exception->getPrevious()) {
+            $e->setPrevious(static::create($exception->getPrevious()));
         }
 
         return $e;

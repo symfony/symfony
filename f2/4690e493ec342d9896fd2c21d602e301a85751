@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-12-24T13:16:37Z
+
+What solved by this issue:
+
+At the moment, if you define a bundle configuration like this:
+
+```
+config:
+   anything-with-a-dash-and-no-underscore: value
+   anythingelse: othervalue
+```
+
+It is resolved like this:
+```
+["config"]=>
+  array(2) {
+    ["anythingelse"] => string(10) "othervalue"
+    ["anything_with_a_dash_and_no_underscore"] => string(5) "value"
+  }
+```
+instead of
+```
+["config"]=>
+  array(2) {
+    ["anything_with_a_dash_and_no_underscore"] => string(5) "value"
+    ["anythingelse"] => string(10) "othervalue"
+  }
+```
+This is particularly a problem when defining prioritized rules :)
+
+You can find the details of the issue at https://github.com/nelmio/NelmioSecurityBundle/issues/72
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-24T13:32:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2015-12-24T13:44:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-26T07:55:18Z
+
+:+1:
+
+Status: Reviewed

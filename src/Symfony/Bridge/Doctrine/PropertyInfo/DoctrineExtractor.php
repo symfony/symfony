@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException as OrmMappingException;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -42,7 +43,10 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         try {
             $metadata = $this->classMetadataFactory->getMetadataFor($class);
+
         } catch (MappingException $exception) {
+            return;
+        } catch (OrmMappingException $exception) {
             return;
         }
 
@@ -57,6 +61,8 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
         try {
             $metadata = $this->classMetadataFactory->getMetadataFor($class);
         } catch (MappingException $exception) {
+            return;
+        } catch (OrmMappingException $exception) {
             return;
         }
 

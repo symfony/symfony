@@ -81,4 +81,14 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
             array('notMapped', null),
         );
     }
+
+    public function testGetPropertiesCatchException()
+    {
+        $this->assertNull($this->extractor->getProperties('Not\Exist'));
+    }
+
+    public function testGetTypesCatchException()
+    {
+        $this->assertNull($this->extractor->getTypes('Not\Exist', 'baz'));
+    }
 }

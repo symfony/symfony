@@ -35,7 +35,7 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias'),
             ))
             ->setDescription('Dumps default configuration for an extension')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the default configuration for an extension/bundle.
 
 The extension alias or bundle name can be used:

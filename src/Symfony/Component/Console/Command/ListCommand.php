@@ -34,7 +34,7 @@ class ListCommand extends Command
             ->setName('list')
             ->setDefinition($this->createDefinition())
             ->setDescription('Lists commands')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lists all commands:
 
   <info>php %command.full_name%</info>

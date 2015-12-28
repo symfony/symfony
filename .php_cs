@@ -24,5 +24,7 @@ return Symfony\CS\Config\Config::create()
             ->notPath('src/Symfony/Component/Yaml/Tests/Fixtures/sfTests.yml')
             // test template
             ->notPath('src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
+            // explicit heredoc test
+            ->notPath('src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
     )
 ;

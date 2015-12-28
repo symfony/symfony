@@ -90,7 +90,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testEndOfTheDocumentMarker()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 --- %YAML:1.0
 foo
 ...
@@ -473,7 +473,7 @@ EOF;
      */
     public function testUnindentedCollectionException()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 
 collection:
 -item1
@@ -490,7 +490,7 @@ EOF;
      */
     public function testShortcutKeyUnindentedCollectionException()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 
 collection:
 -  key: foo
@@ -507,7 +507,7 @@ EOF;
      */
     public function testMultipleDocumentsNotSupportedException()
     {
-        Yaml::parse(<<<EOL
+        Yaml::parse(<<<'EOL'
 # Ranking of 1998 home runs
 ---
 - Mark McGwire
@@ -527,7 +527,7 @@ EOL
      */
     public function testSequenceInAMapping()
     {
-        Yaml::parse(<<<EOF
+        Yaml::parse(<<<'EOF'
 yaml:
   hash: me
   - array stuff
@@ -540,7 +540,7 @@ EOF
      */
     public function testMappingInASequence()
     {
-        Yaml::parse(<<<EOF
+        Yaml::parse(<<<'EOF'
 yaml:
   - array stuff
   hash: me
@@ -550,7 +550,7 @@ EOF
 
     public function testEmptyValue()
     {
-        $input = <<<EOF
+        $input = <<<'EOF'
 hash:
 EOF;
 
@@ -568,7 +568,7 @@ EOF;
                     'class' => 'Bar',
                 ),
             ),
-        ), Yaml::parse(<<<EOF
+        ), Yaml::parse(<<<'EOF'
 # comment 1
 services:
 # comment 2
@@ -585,7 +585,7 @@ EOF
 
     public function testStringBlockWithComments()
     {
-        $this->assertEquals(array('content' => <<<EOT
+        $this->assertEquals(array('content' => <<<'EOT'
 # comment 1
 header
 
@@ -596,7 +596,7 @@ header
 
 footer # comment3
 EOT
-        ), Yaml::parse(<<<EOF
+        ), Yaml::parse(<<<'EOF'
 content: |
     # comment 1
     header
@@ -613,7 +613,7 @@ EOF
 
     public function testFoldedStringBlockWithComments()
     {
-        $this->assertEquals(array(array('content' => <<<EOT
+        $this->assertEquals(array(array('content' => <<<'EOT'
 # comment 1
 header
 
@@ -624,7 +624,7 @@ header
 
 footer # comment3
 EOT
-        )), Yaml::parse(<<<EOF
+        )), Yaml::parse(<<<'EOF'
 -
     content: |
         # comment 1
@@ -644,7 +644,7 @@ EOF
     {
         $this->assertEquals(array(array(
             'title' => 'some title',
-            'content' => <<<EOT
+            'content' => <<<'EOT'
 # comment 1
 header
 
@@ -655,7 +655,7 @@ header
 
 footer # comment3
 EOT
-        )), Yaml::parse(<<<EOF
+        )), Yaml::parse(<<<'EOF'
 -
     title: some title
     content: |
@@ -684,7 +684,7 @@ EOF
             'map' => array('key' => 'var-value'),
             'list_in_map' => array('key' => array('var-value')),
             'map_in_map' => array('foo' => array('bar' => 'var-value')),
-        ), Yaml::parse(<<<EOF
+        ), Yaml::parse(<<<'EOF'
 var:  &var var-value
 scalar: *var
 list: [ *var ]
@@ -700,7 +700,7 @@ EOF
 
     public function testYamlDirective()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 %YAML 1.2
 ---
 foo: 1
@@ -711,7 +711,7 @@ EOF;
 
     public function testFloatKeys()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 foo:
     1.2: "bar"
     1.3: "baz"
@@ -737,7 +737,7 @@ EOF;
 
     public function getCommentLikeStringInScalarBlockData()
     {
-        $yaml1 = <<<EOT
+        $yaml1 = <<<'EOT'
 pages:
     -
         title: some title
@@ -756,7 +756,7 @@ EOT;
             'pages' => array(
                 array(
                     'title' => 'some title',
-                    'content' => <<<EOT
+                    'content' => <<<'EOT'
 # comment 1
 header
 
@@ -772,7 +772,7 @@ EOT
             ),
         );
 
-        $yaml2 = <<<EOT
+        $yaml2 = <<<'EOT'
 test: |
     foo
     # bar
@@ -788,7 +788,7 @@ collection:
         baz
 EOT;
         $expected2 = array(
-            'test' => <<<EOT
+            'test' => <<<'EOT'
 foo
 # bar
 baz
@@ -797,7 +797,7 @@ EOT
             ,
             'collection' => array(
                 array(
-                    'one' => <<<EOT
+                    'one' => <<<'EOT'
 foo
 # bar
 baz
@@ -805,7 +805,7 @@ EOT
                     ,
                 ),
                 array(
-                    'two' => <<<EOT
+                    'two' => <<<'EOT'
 foo
 # bar
 baz

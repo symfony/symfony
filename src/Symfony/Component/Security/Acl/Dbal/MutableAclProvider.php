@@ -433,7 +433,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
             INSERT INTO %s (
                 class_id,
                 object_identity_id,
@@ -510,7 +510,7 @@ QUERY;
      */
     protected function getInsertObjectIdentitySql($identifier, $classId, $entriesInheriting)
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
               INSERT INTO %s (class_id, object_identifier, entries_inheriting)
               VALUES (%d, %s, %s)
 QUERY;

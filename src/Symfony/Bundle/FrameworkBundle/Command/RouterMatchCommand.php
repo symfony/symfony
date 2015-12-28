@@ -52,7 +52,7 @@ class RouterMatchCommand extends ContainerAwareCommand
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> simulates a path info match:
 
   <info>php %command.full_name% /foo</info>

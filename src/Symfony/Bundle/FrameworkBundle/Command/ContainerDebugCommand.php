@@ -49,7 +49,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
             ))
             ->setDescription('Displays current services for an application')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
   <info>php %command.full_name%</info>

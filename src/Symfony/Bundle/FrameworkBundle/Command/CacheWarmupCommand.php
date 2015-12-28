@@ -33,7 +33,7 @@ class CacheWarmupCommand extends ContainerAwareCommand
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Warms up an empty cache')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command warms up the cache.
 
 Before running this command, the cache must be empty.

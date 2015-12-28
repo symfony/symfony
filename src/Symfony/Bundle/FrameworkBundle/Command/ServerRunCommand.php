@@ -54,7 +54,7 @@ class ServerRunCommand extends ContainerAwareCommand
             ))
             ->setName('server:run')
             ->setDescription('Runs PHP built-in web server')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> runs PHP built-in web server:
 
   <info>%command.full_name%</info>

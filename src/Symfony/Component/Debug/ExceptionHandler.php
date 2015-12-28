@@ -141,7 +141,7 @@ class ExceptionHandler
                     $ind = $count - $position + 1;
                     $class = $this->abbrClass($e['class']);
                     $message = nl2br(htmlspecialchars($e['message'], $flags, $this->charset));
-                    $content .= sprintf(<<<EOF
+                    $content .= sprintf(<<<'EOF'
                         <div class="block_exception clear_fix">
                             <h2><span>%d/%d</span> %s: %s</h2>
                         </div>
@@ -196,7 +196,7 @@ EOF;
      */
     public function getStylesheet(FlattenException $exception)
     {
-        return <<<EOF
+        return <<<'EOF'
             .sf-reset { font: 11px Verdana, Arial, sans-serif; color: #333 }
             .sf-reset .clear { clear:both; height:0; font-size:0; line-height:0; }
             .sf-reset .clear_fix:after { display:block; height:0; clear:both; visibility:hidden; }

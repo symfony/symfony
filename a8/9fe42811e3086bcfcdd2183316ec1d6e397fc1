@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T08:51:49Z
+
+Personally, I'm `-0` on this. I see no value here in comparison to the merge conflicts and added pressure on authors...
+
+---------------------------------------------------------------------------
+
+by gharlan at 2015-12-22T08:57:18Z
+
+We already force single quotes instead of double quotes (when possible). So in my opinion it would be consistent to do it the same way with nowdoc vs. heredoc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T12:54:27Z
+
+:+1: (not a big one but still :) )
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-28T12:59:55Z
+
+:+1:

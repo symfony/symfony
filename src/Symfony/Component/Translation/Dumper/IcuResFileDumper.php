@@ -35,7 +35,7 @@ class IcuResFileDumper implements DumperInterface
             $path = $options['path'].'/'.$domain.'/';
 
             if (!is_dir($path) && !@mkdir($path) && !is_dir($path)) {
-                throw new \RuntimeException(sprintf('File Dumper was not able to create a directory "%s"', $path));
+                throw new \RuntimeException(sprintf('File Dumper was not able to create directory "%s"', $path));
             }
 
             // backup

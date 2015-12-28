@@ -26,7 +26,7 @@ class ConstraintViolationTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 Root.property.path:
     Array
 EOF;
@@ -45,7 +45,7 @@ EOF;
             null
         );
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 Array.some_value:
     42 cannot be used here
 EOF;

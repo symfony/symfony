@@ -215,7 +215,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/?foo', $request->getRequestUri());
         $this->assertEquals(array('foo' => ''), $request->query->all());
 
-        ## assume rewrite rule: (.*) --> app/app.php ; app/ is a symlink to a symfony web/ directory
+        // assume rewrite rule: (.*) --> app/app.php ; app/ is a symlink to a symfony web/ directory
         $request = Request::create('http://test.com/apparthotel-1234', 'GET', array(), array(), array(),
             array(
                 'DOCUMENT_ROOT' => '/var/www/www.test.com',

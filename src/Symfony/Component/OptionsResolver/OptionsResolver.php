@@ -16,6 +16,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsResolver\Exception\OptionFrozenException;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 /**
@@ -53,6 +54,13 @@ class OptionsResolver implements Options
      * @var array
      */
     private $resolved = array();
+
+    /**
+     * The frozen options.
+     *
+     * @var array
+     */
+    private $frozen = array();
 
     /**
      * A list of normalizer closures.
@@ -367,6 +375,53 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Freeze the option with the given name.
+     *
+     * @param string|string[] $optionNames One or more option names
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws AccessException If called from a lazy option or normalizer
+     */
+    public function setFrozen($optionNames)
+    {
+        if ($this->locked) {
+            throw new AccessException('Options cannot be freeze from a lazy option or normalizer.');
+        }
+
+        foreach ((array) $optionNames as $option) {
+            $this->frozen[$option] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns whether an option is frozen.
+     *
+     * @param string $option The option name
+     *
+     * @return bool Whether the option is frozen
+     */
+    public function isFrozen($option)
+    {
+        return isset($this->frozen[$option]);
+    }
+
+    /**
+     * Returns the names of all frozen options.
+     *
+     * @return string[] The names of the frozen options
+     *
+     * @see isFrozen()
+     */
+    public function getFrozenOptions()
+    {
+        return array_keys($this->frozen);
+    }
+
+
+    /**
      * Sets the normalizer for an option.
      *
      * The normalizer should be a closure with the following signature:
@@ -610,7 +665,7 @@ class OptionsResolver implements Options
         }
 
         foreach ((array) $optionNames as $option) {
-            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
+            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option], $this->frozen[$option]);
             unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
         }
 
@@ -633,6 +688,7 @@ class OptionsResolver implements Options
         $this->defined = array();
         $this->defaults = array();
         $this->required = array();
+        $this->frozen = array();
         $this->resolved = array();
         $this->lazy = array();
         $this->normalizers = array();
@@ -658,6 +714,7 @@ class OptionsResolver implements Options
      * @return array The merged and validated options
      *
      * @throws UndefinedOptionsException If an option name is undefined
+     * @throws OptionFrozenException     If a frozen option is setted
      * @throws InvalidOptionsException   If an option doesn't fulfill the
      *                                   specified validation rules
      * @throws MissingOptionsException   If a required option is missing
@@ -691,6 +748,13 @@ class OptionsResolver implements Options
 
         // Override options set by the user
         foreach ($options as $option => $value) {
+            if (isset($this->frozen[$option])) {
+                throw new OptionFrozenException(sprintf(
+                    'The option "%s" is frozen. You cannot change it\'s value.',
+                    $option
+                ));
+            }
+
             $clone->defaults[$option] = $value;
             unset($clone->resolved[$option], $clone->lazy[$option]);
         }

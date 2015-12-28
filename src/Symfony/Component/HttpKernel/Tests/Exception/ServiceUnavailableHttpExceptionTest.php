@@ -7,27 +7,8 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 /**
  * Test the ServiceUnavailableHttpException class.
  */
-class ServiceUnavailableHttpExceptionTest extends \PHPUnit_Framework_TestCase
+class ServiceUnavailableHttpExceptionTest extends HttpExceptionTest
 {
-    /**
-     * Provides header data for the tests.
-     *
-     * @return array
-     */
-    public function headerDataProvider()
-    {
-        return array(
-            array(array('X-Test' => 'Test')),
-            array(array('X-Test' => 1)),
-            array(
-                array(
-                    array('X-Test' => 'Test'),
-                    array('X-Test-2' => 'Test-2'),
-                ),
-            ),
-        );
-    }
-
     /**
      * Test that the default headers is an empty array.
      */
@@ -35,6 +16,16 @@ class ServiceUnavailableHttpExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $exception = new ServiceUnavailableHttpException();
         $this->assertSame(array(), $exception->getHeaders());
+    }
+
+    /**
+     * Test that the default headers are set correctly
+     * when the retryAfter parameter is set.
+     */
+    public function testHeadersDefaultRetryAfter()
+    {
+        $exception = new ServiceUnavailableHttpException(10);
+        $this->assertSame(array('Retry-After' => 10), $exception->getHeaders());
     }
 
     /**

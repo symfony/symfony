@@ -7,27 +7,8 @@ use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 /**
  * Test the PreconditionFailedHttpException class.
  */
-class PreconditionFailedHttpExceptionTest extends \PHPUnit_Framework_TestCase
+class PreconditionFailedHttpExceptionTest extends HttpExceptionTest
 {
-    /**
-     * Provides header data for the tests.
-     *
-     * @return array
-     */
-    public function headerDataProvider()
-    {
-        return array(
-            array(array('X-Test' => 'Test')),
-            array(array('X-Test' => 1)),
-            array(
-                array(
-                    array('X-Test' => 'Test'),
-                    array('X-Test-2' => 'Test-2'),
-                ),
-            ),
-        );
-    }
-
     /**
      * Test that the default headers is an empty array.
      */

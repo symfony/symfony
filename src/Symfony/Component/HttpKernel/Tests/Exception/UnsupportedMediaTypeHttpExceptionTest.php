@@ -7,27 +7,8 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 /**
  * Test the UnsupportedMediaTypeHttpException class.
  */
-class UnsupportedMediaTypeHttpExceptionTest extends \PHPUnit_Framework_TestCase
+class UnsupportedMediaTypeHttpExceptionTest extends HttpExceptionTest
 {
-    /**
-     * Provides header data for the tests.
-     *
-     * @return array
-     */
-    public function headerDataProvider()
-    {
-        return array(
-            array(array('X-Test' => 'Test')),
-            array(array('X-Test' => 1)),
-            array(
-                array(
-                    array('X-Test' => 'Test'),
-                    array('X-Test-2' => 'Test-2'),
-                ),
-            ),
-        );
-    }
-
     /**
      * Test that the default headers is an empty array.
      */

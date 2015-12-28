@@ -30,7 +30,7 @@ PHP
 
     public function testCommandLine()
     {
-        $process = new PhpProcess(<<<PHP
+        $process = new PhpProcess(<<<'PHP'
 <?php echo 'foobar';
 PHP
         );

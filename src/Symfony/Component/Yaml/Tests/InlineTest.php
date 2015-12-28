@@ -278,6 +278,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             "'off'" => 'off',
 
             // sequences
+            '[]' => array(),
             '[foo, bar, false, null, 12]' => array('foo', 'bar', false, null, 12),
             '[\'foo,bar\', \'foo bar\']' => array('foo,bar', 'foo bar'),
 

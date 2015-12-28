@@ -43,7 +43,6 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     {
         try {
             $metadata = $this->classMetadataFactory->getMetadataFor($class);
-
         } catch (MappingException $exception) {
             return;
         } catch (OrmMappingException $exception) {

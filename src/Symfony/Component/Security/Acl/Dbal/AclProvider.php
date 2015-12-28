@@ -369,7 +369,7 @@ FINDCHILDREN;
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
     {
-        $query = <<<QUERY
+        $query = <<<'QUERY'
             SELECT o.id
             FROM %s o
             INNER JOIN %s c ON c.id = o.class_id

@@ -7,6 +7,34 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.36 (2015-12-26)
+
+ * bug #16864 [Yaml] fix indented line handling in folded blocks (xabbuh)
+ * bug #16826 Embedded identifier support (mihai-stancu)
+ * bug #17129 [Config] Fix array sort on normalization in edge case (romainneutron)
+ * bug #17094 [Process] More robustness and deterministic tests (nicolas-grekas)
+ * bug #17112 [PropertyAccess] Reorder elements array after PropertyPathBuilder::replace (alekitto)
+ * bug #16797 [Filesystem] Recursivly widen non-executable directories (Slamdunk)
+ * bug #17040 [Console] Avoid extra blank lines when rendering exceptions (ogizanagi)
+ * bug #17055 [Security] Verify if a password encoded with bcrypt is no longer than 72 characters (jakzal)
+ * bug #16959 [Form] fix #15544 when a collection type attribute "required" is false, "prototype" should too (HeahDude)
+ * bug #16860 [Yaml] do not remove "comments" in scalar blocks (xabbuh)
+ * bug #16971 [HttpFoundation] Added the ability of using BinaryFileResponse with stream wrappers (jakzal, Sander-Toonen)
+ * bug #17048 Fix the logout path when not using the router (stof)
+ * bug #17057 [FrameworkBundle][HttpKernel] the finder is required to discover bundle commands (xabbuh)
+ * bug #16915 [Process] Enhance compatiblity with --enable-sigchild (nicolas-grekas)
+ * bug #16829 [FrameworkBundle] prevent cache:clear creating too long paths (Tobion)
+ * bug #16870 [FrameworkBundle] Disable the server:run command when Process component is missing (gnugat, xabbuh)
+ * bug #16799 Improve error message for undefined DIC aliases (mpdude)
+ * bug #16772 Refactoring EntityUserProvider::__construct() to not do work, cause cache warm error (weaverryan)
+ * bug #16753 [Process] Fix signaling/stopping logic on Windows (nicolas-grekas)
+ * bug #16733 [Console] do not encode backslashes in console default description (Tobion)
+ * bug #16312 [HttpKernel] clearstatcache() so the Cache sees when a .lck file has been released (mpdude)
+ * bug #16695 [SecurityBundle] disable the init:acl command if ACL is not used (Tobion)
+ * bug #16676 [HttpFoundation] Workaround HHVM rewriting HTTP response line (nicolas-grekas)
+ * bug #16668 [ClassLoader] Fix parsing namespace when token_get_all() is missing (nicolas-grekas)
+ * bug #16386 Bug #16343 [Router] Too many Routes ? (jelte)
+
 * 2.3.35 (2015-11-23)
 
  * security #16631 CVE-2015-8124: Session Fixation in the "Remember Me" Login Feature (xabbuh)

@@ -56,7 +56,7 @@ class RouterMatchCommand extends ContainerAwareCommand
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
   <info>php %command.full_name% /foo</info>

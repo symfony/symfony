@@ -52,7 +52,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         foreach ($this->headers as $name => $values) {
             $name = implode('-', array_map('ucfirst', explode('-', $name)));
             foreach ($values as $value) {
-                $content .= sprintf("%-${max}s %s\r\n", $name.':', $value);
+                $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
             }
         }
 

@@ -38,7 +38,7 @@ class CacheClearCommand extends ContainerAwareCommand
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Clears the cache')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:
 

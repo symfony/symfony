@@ -35,7 +35,7 @@ $argc = $_SERVER['argc'];
 $argv = $_SERVER['argv'];
 
 if ($argc > 3 || 2 === $argc && '-h' === $argv[1]) {
-    bailout(<<<MESSAGE
+    bailout(<<<'MESSAGE'
 Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 
 Updates the ICU data for Symfony to the latest version of ICU.

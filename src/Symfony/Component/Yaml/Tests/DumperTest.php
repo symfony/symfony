@@ -54,7 +54,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->dumper->setIndentation(7);
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -103,13 +103,13 @@ EOF;
 
     public function testInlineLevel()
     {
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -119,7 +119,7 @@ foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -134,7 +134,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -153,7 +153,7 @@ foobar:
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 '': bar
 foo: '#bar'
 'foo''bar': {  }

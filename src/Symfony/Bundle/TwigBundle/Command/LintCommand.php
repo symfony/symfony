@@ -43,7 +43,7 @@ final class LintCommand extends BaseLintCommand implements ContainerAwareInterfa
 
         $this
             ->setHelp(
-                $this->getHelp().<<<EOF
+                $this->getHelp().<<<'EOF'
 
 Or all template files in a bundle:
 

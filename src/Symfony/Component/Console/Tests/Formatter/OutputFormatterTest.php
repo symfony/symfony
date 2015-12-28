@@ -220,7 +220,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
 \033[32m
 some text\033[39m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text</info>
 EOF
@@ -230,7 +230,7 @@ EOF
 \033[32msome text
 \033[39m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>some text
 </info>
 EOF
@@ -241,7 +241,7 @@ EOF
 some text
 \033[39m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text
 </info>
@@ -254,7 +254,7 @@ some text
 more text
 \033[39m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text
 more text

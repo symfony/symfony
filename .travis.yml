@@ -58,7 +58,7 @@ install:
 script:
     - if [[ ! $deps ]]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [[ ! $deps ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
-    - if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | parallel --gnu 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
+    - if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | parallel --gnu --timeout 60 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
     - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi;
     - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
     - if [[ $deps = skip ]]; then echo This matrix line is skipped for pull requests.; fi;

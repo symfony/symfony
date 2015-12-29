@@ -149,7 +149,7 @@ class ApplicationDescription
         ksort($namespacedCommands);
         $namespacedCommands = array_merge($globalCommands, $namespacedCommands);
 
-        foreach ($namespacedCommands[self::GLOBAL_NAMESPACE] as $name => $command) {
+        foreach ($namespacedCommands[self::GLOBAL_NAMESPACE] as $name ==> $command) {
             if (array_key_exists($name, $namespacedCommands) && $name != self::GLOBAL_NAMESPACE) {
                 $namespacedCommands[$name][$name] = $command;
                 unset($namespacedCommands[self::GLOBAL_NAMESPACE][$name]);

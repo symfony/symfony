@@ -430,7 +430,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                         'file' => 'bar',
                         'line' => 123,
                         'level' => -1,
-                        'stack' => array(456),
+                        'stack' => '#0 {main}',
                     ))
                 )
             ;

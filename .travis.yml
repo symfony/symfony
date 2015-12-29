@@ -42,6 +42,7 @@ before_install:
     - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then pecl install -f memcached-2.1.0 || echo "Let's continue without memcached extension"; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then phpenv config-rm xdebug.ini; fi;
+    - if [[ $TRAVIS_REPO_SLUG = symfony/symfony ]]; then cp .composer-auth.json ~/.composer/auth.json; fi;
     - if [[ $deps != skip ]]; then composer self-update; fi;
     - if [[ $deps != skip ]]; then ./phpunit install; fi;
     - export PHPUNIT=$(readlink -f ./phpunit)
@@ -53,13 +54,13 @@ install:
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; fi;
     - if [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]]; then LEGACY=,legacy; fi;
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev;
-    - if [[ ! $deps ]]; then composer --prefer-source install; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi;
+    - if [[ ! $deps ]]; then composer update --prefer-dist; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi;
 
 script:
     - if [[ ! $deps ]]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi;
     - if [[ ! $deps ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi;
     - if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | parallel --gnu --timeout 60 'echo -e "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi;
-    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source update; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi;
-    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
+    - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --prefer-dist; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi;
+    - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --prefer-dist --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi;
     - if [[ $deps = skip ]]; then echo This matrix line is skipped for pull requests.; fi;

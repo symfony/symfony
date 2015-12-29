@@ -389,18 +389,30 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFrozen()
     {
-        $this->assertFalse($this->resolver->isFrozen('foo'));
+        $this->resolver->setDefault('foo', 'bar');
         $this->resolver->setFrozen('foo');
+
         $this->assertTrue($this->resolver->isFrozen('foo'));
+        $this->assertFalse($this->resolver->isFrozen('bar'));
     }
 
     public function testGetFrozenOptions()
     {
         $this->assertEquals(array(), $this->resolver->getFrozenOptions());
 
+        $this->resolver->setDefaults(array('foo' => 1, 'bar' => 2, 'baz' => 3));
         $this->resolver->setFrozen(array('foo', 'bar', 'baz'));
 
         $this->assertEquals(array('foo', 'bar', 'baz'), $this->resolver->getFrozenOptions());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingDefaultValueException
+     * @expectedExceptionMessage The option "foo" has not a default value. You can not freeze it.
+     */
+    public function testFailIfUnassignedOptionTryingToFrozen()
+    {
+        $this->resolver->setFrozen('foo');
     }
 
     ////////////////////////////////////////////////////////////////////////////

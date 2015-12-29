@@ -13,6 +13,7 @@ namespace Symfony\Component\OptionsResolver;
 
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingDefaultValueException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
@@ -390,6 +391,13 @@ class OptionsResolver implements Options
         }
 
         foreach ((array) $optionNames as $option) {
+            if (!$this->hasDefault($option)) {
+                throw new MissingDefaultValueException(sprintf(
+                    'The option "%s" has not a default value. You can not freeze it.',
+                    $option
+                ));
+            }
+
             $this->frozen[$option] = true;
         }
 

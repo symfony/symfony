@@ -403,7 +403,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo', 'bar', 'baz'), $this->resolver->getFrozenOptions());
     }
 
-
     ////////////////////////////////////////////////////////////////////////////
     // setDefined()/isDefined()/getDefinedOptions()
     ////////////////////////////////////////////////////////////////////////////

@@ -420,7 +420,6 @@ class OptionsResolver implements Options
         return array_keys($this->frozen);
     }
 
-
     /**
      * Sets the normalizer for an option.
      *

@@ -12,7 +12,7 @@
 namespace Symfony\Component\OptionsResolver\Exception;
 
 /**
- * Exception thrown when a frozen option is setted.
+ * Exception thrown when a frozen option is set.
  */
 class OptionFrozenException extends InvalidArgumentException
 {

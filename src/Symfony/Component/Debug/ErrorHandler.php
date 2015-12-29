@@ -465,7 +465,7 @@ class ErrorHandler
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'level' => error_reporting(),
-                'stack' => $exception->getTrace(),
+                'stack' => $exception->getTraceAsString(),
             );
             if ($exception instanceof FatalErrorException) {
                 if ($exception instanceof FatalThrowableError) {

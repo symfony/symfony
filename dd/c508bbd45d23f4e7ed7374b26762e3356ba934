@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-28T11:14:34Z
+
+Doctrine is missing to document the possible exception: https://github.com/doctrine/common/blob/master/lib/Doctrine/Common/Persistence/Mapping/ClassMetadataFactory.php#L47
+
+As it does not specify which exception can be thrown, it would make more sense the catch all exceptions (`\Exception`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T12:01:57Z
+
+Catching all exceptions to ignore them could start a debugging nightmare...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-28T12:32:39Z
+
+The ORM MappingException case here can happen when using older versions of the ORM (in newer versions, the ORM exceptions extends from the Common one and so is catched already).
+
+@Tobion an invalid mapping always throws a MappingException. Other exceptions could be thrown because of bugs, but these one should be kept uncaught here.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-28T12:44:48Z
+
+@stof I don't see that ORM MappingException extends the common one: https://github.com/doctrine/doctrine2/blob/master/lib/Doctrine/ORM/Mapping/MappingException.php#L27
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-28T12:52:54Z
+
+oh, I thought it did. This looks weird.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T14:28:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-29T14:35:01Z
+
+:+1:

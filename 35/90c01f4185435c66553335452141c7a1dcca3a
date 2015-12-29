@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-23T14:29:44Z
+
+``$this`` cannot be used in a closure in PHP 5.3 (and it would always be a ChoiceType class anyway, even if you were using the EntityType type, so this won't help much in 5.4+)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-23T14:42:01Z
+
+So `__CLASS__` instead is better!
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-23T14:43:57Z
+
+Changed `get_class()` usage to `__CLASS__`.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-23T14:46:41Z
+
+Does ``__CLASS__`` works fine in closures even in PHP 5.3 ?
+
+and btw, using the type name rather than the type class would be better in 2.7. People are referencing it by name, not by class in 2.7.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-23T14:48:00Z
+
+That's a good point! I'm gonna try to add the type name using the `getName()` method.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-23T14:50:41Z
+
+This snippet works on PHP 5.3.29.
+
+```php
+<?php
+
+namespace Foo\Bar;
+
+class A
+{
+    public function b($c)
+    {
+        $d = function () use ($c) {
+          return strtoupper($c).' ('.__CLASS__.')';
+        };
+
+        return sprintf('Hello %s!', $d());
+    }
+}
+
+$a = new A();
+echo $a->b('Hugo');
+```
+It correctly outputs `Hello HUGO (Foo\Bar\A)!`.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-24T09:30:29Z
+
+@nicolas-grekas @stof is it better now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T10:00:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-29T10:09:00Z
+
+:+1:

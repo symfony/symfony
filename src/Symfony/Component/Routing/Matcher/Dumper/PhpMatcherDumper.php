@@ -133,7 +133,7 @@ EOF;
         foreach ($groups as $collection) {
             if (null !== $regex = $collection->getAttribute('host_regex')) {
                 if (!$fetchedHost) {
-                    $code .= "        \$host = \$this->context->getHost();\n\n";
+                    $code .= "        \$host = \$context->getHost();\n\n";
                     $fetchedHost = true;
                 }
 
@@ -266,7 +266,7 @@ EOF;
         if ($methods) {
             if (1 === count($methods)) {
                 $code .= <<<EOF
-            if (\$this->context->getMethod() != '$methods[0]') {
+            if (\$context->getMethod() != '$methods[0]') {
                 \$allow[] = '$methods[0]';
                 goto $gotoname;
             }
@@ -276,7 +276,7 @@ EOF;
             } else {
                 $methods = implode("', '", $methods);
                 $code .= <<<EOF
-            if (!in_array(\$this->context->getMethod(), array('$methods'))) {
+            if (!in_array(\$context->getMethod(), array('$methods'))) {
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }
@@ -303,7 +303,7 @@ EOF;
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
                 return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 

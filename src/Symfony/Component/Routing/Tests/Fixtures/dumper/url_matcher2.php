@@ -35,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                if (!in_array($context->getMethod(), array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_bar;
                 }
@@ -46,7 +46,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                if (!in_array($context->getMethod(), array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_barhead;
                 }
@@ -91,7 +91,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() != 'POST') {
+                if ($context->getMethod() != 'POST') {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
@@ -102,7 +102,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() != 'PUT') {
+                if ($context->getMethod() != 'PUT') {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }
@@ -207,7 +207,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        $host = $this->context->getHost();
+        $host = $context->getHost();
 
         if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
             // route1
@@ -322,7 +322,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // secure
         if ($pathinfo === '/secure') {
             $requiredSchemes = array (  'https' => 0,);
-            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+            if (!isset($requiredSchemes[$context->getScheme()])) {
                 return $this->redirect($pathinfo, 'secure', key($requiredSchemes));
             }
 
@@ -332,7 +332,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         // nonsecure
         if ($pathinfo === '/nonsecure') {
             $requiredSchemes = array (  'http' => 0,);
-            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+            if (!isset($requiredSchemes[$context->getScheme()])) {
                 return $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes));
             }
 

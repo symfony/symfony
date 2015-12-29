@@ -292,9 +292,10 @@ class ChoiceType extends AbstractType
             return;
         };
 
-        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
+        $that = $this;
+        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory, $that) {
             if ($choiceList) {
-                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "choice_list" option of the "%s" form type (%s) is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
 
                 if ($choiceList instanceof LegacyChoiceListInterface) {
                     return new LegacyChoiceListAdapter($choiceList);
@@ -321,9 +322,9 @@ class ChoiceType extends AbstractType
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
-        $placeholderNormalizer = function (Options $options, $placeholder) {
+        $placeholderNormalizer = function (Options $options, $placeholder) use ($that) {
             if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('The form option "empty_value" of the "%s" form type (%s) is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
 
                 $placeholder = $options['empty_value'];
             }

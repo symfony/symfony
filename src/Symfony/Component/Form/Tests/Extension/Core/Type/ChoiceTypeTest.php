@@ -1887,4 +1887,68 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // Trigger data initialization
         $form->getViewData();
     }
+
+    /**
+     * @dataProvider simpleWidgetsProvider
+     */
+    public function testSubmitChoicesWithSimpleWidgets($widget)
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'widget' => $widget,
+            'multiple' => false,
+            'choices' => $this->choices,
+            'choices_as_values' => true,
+        ));
+
+        $form->submit('b');
+
+        $this->assertEquals('b', $form->getData());
+        $this->assertEquals('b', $form->getViewData());
+    }
+
+    /**
+     * @dataProvider simpleWidgetsProvider
+     */
+    public function testSubmitMultipleChoicesWithSimpleWidgets($widget)
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'widget' => $widget,
+            'multiple' => true,
+            'choices' => $this->choices,
+            'choices_as_values' => true,
+        ));
+
+        $form->submit('a,b');
+
+        $this->assertEquals(array('a', 'b'), $form->getData());
+        $this->assertEquals('a,b', $form->getViewData());
+    }
+
+    /**
+     * @dataProvider simpleWidgetsProvider
+     */
+    public function testSubmitMultipleChoicesDelimiterAndTrimWithSimpleWidgets($widget)
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'widget' => $widget,
+            'multiple' => true,
+            'delimiter' => '|',
+            'trim' => true,
+            'choices' => $this->choices,
+            'choices_as_values' => true,
+        ));
+
+        $form->submit('a| b ');
+
+        $this->assertEquals(array('a', 'b'), $form->getData());
+        $this->assertEquals('a|b', $form->getViewData());
+    }
+
+    public function simpleWidgetsProvider()
+    {
+        return array(
+            array('text'),
+            array('hidden'),
+        );
+    }
 }

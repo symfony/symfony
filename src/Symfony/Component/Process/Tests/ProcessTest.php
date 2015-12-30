@@ -193,7 +193,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         fwrite($stream, $expected);
         rewind($stream);
 
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)), null, null, null, 5);
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
         $p->setInput($stream);
         $p->run();
 

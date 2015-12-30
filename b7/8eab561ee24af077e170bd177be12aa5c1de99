@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-29T09:00:35Z
+
+The choice list normalizer does this:
+
+```php
+// Harden against NULL values (like in EntityType and ModelType)
+$choices = null !== $options['choices'] ? $options['choices'] : array();
+```
+
+What about using the same here?
+
+---------------------------------------------------------------------------
+
+by Gladhon at 2015-12-29T09:06:04Z
+
+If the choicesNormalizer have to make an array in every case, you're right.
+IMHO has the choicesNormalizer to normalize arrays to avoid bc's and leave everything else as it is.
+
+---------------------------------------------------------------------------
+
+by Gladhon at 2015-12-29T12:28:38Z
+
+@webmozart @nicolas-grekas
+Would be nice to merge these in, cause 2.7.8 is broken
+
+Depends on:
+#16685
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T12:53:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-12-29T16:48:18Z
+
+Surely checking if is null is more correct? If something else is passed that's not null or an array, we want the type error to happen, right?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-29T22:44:40Z
+
+This conflicts with #16796. I think #16796 should have been merged in 2.7 and not 2.8 and it also covers this case here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-30T08:13:58Z
+
+@Tobion you're right!
+@Gladhon can you then cherry-pick the patch in #16796 and keep your test case?
+
+---------------------------------------------------------------------------
+
+by Gladhon at 2015-12-30T08:26:38Z
+
+@nicolas-grekas  done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-30T08:39:58Z
+
+@Gladhon it looks like the phpdoc block wasn't formatted correctly (see fabbot's patch) can you please fix it and also squash all the commits in one?

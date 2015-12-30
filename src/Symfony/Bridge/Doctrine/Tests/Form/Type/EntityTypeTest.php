@@ -1127,6 +1127,69 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
+    public function testLoaderCachingWithParameters()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist(array($entity1, $entity2, $entity3));
+
+        $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $entityType = new EntityType(
+            $this->emRegistry,
+            PropertyAccess::createPropertyAccessor()
+        );
+
+        $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
+
+        $factory = Forms::createFormFactoryBuilder()
+            ->addType($entityType)
+            ->addTypeGuesser($entityTypeGuesser)
+            ->getFormFactory();
+
+        $formBuilder = $factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType');
+
+        $formBuilder->add('property1', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
+        ));
+
+        $formBuilder->add('property2', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
+            },
+        ));
+
+        $formBuilder->add('property3', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
+            },
+        ));
+
+        $form = $formBuilder->getForm();
+
+        $form->submit(array(
+            'property1' => 1,
+            'property2' => 1,
+            'property3' => 2,
+        ));
+
+        $choiceLoader1 = $form->get('property1')->getConfig()->getOption('choice_loader');
+        $choiceLoader2 = $form->get('property2')->getConfig()->getOption('choice_loader');
+        $choiceLoader3 = $form->get('property3')->getConfig()->getOption('choice_loader');
+
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface', $choiceLoader1);
+        $this->assertSame($choiceLoader1, $choiceLoader2);
+        $this->assertSame($choiceLoader1, $choiceLoader3);
+    }
+
     protected function createRegistryMock($name, $em)
     {
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');

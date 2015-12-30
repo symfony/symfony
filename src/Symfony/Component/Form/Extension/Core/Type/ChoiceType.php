@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
@@ -44,7 +45,11 @@ class ChoiceType extends AbstractType
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null)
     {
-        $this->choiceListFactory = $choiceListFactory ?: new PropertyAccessDecorator(new DefaultChoiceListFactory());
+        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(
+            new PropertyAccessDecorator(
+                new DefaultChoiceListFactory()
+            )
+        );
     }
 
     /**

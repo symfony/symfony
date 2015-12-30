@@ -415,6 +415,17 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver->setFrozen('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionFrozenException
+     * @expectedExceptionMessage The option "foo" is frozen. You cannot change its default value.
+     */
+    public function testFailIfTryingToSetDefaultForFrozenOption()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setFrozen('foo');
+        $this->resolver->setDefault('foo', 'baz');
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // setDefined()/isDefined()/getDefinedOptions()
     ////////////////////////////////////////////////////////////////////////////

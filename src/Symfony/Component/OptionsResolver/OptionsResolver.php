@@ -167,6 +167,13 @@ class OptionsResolver implements Options
             throw new AccessException('Default values cannot be set from a lazy option or normalizer.');
         }
 
+        if ($this->isFrozen($option)) {
+            throw new OptionFrozenException(sprintf(
+                'The option "%s" is frozen. You cannot change its default value.',
+                $option
+            ));
+        }
+
         // If an option is a closure that should be evaluated lazily, store it
         // in the "lazy" property.
         if ($value instanceof \Closure) {

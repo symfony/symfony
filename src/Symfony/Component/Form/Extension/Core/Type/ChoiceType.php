@@ -294,9 +294,10 @@ class ChoiceType extends AbstractType
             return;
         };
 
-        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
+        $that = $this;
+        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory, $that) {
             if ($choiceList) {
-                @trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "choice_list" option of the "%s" form type (%s) is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
 
                 if ($choiceList instanceof LegacyChoiceListInterface) {
                     return new LegacyChoiceListAdapter($choiceList);
@@ -323,17 +324,17 @@ class ChoiceType extends AbstractType
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
-        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) {
+        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) use ($that) {
             if (true !== $choicesAsValues) {
-                @trigger_error('The value "false" for the "choices_as_values" option is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('The value "false" for the "choices_as_values" option of the "%s" form type (%s) is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
             }
 
             return $choicesAsValues;
         };
 
-        $placeholderNormalizer = function (Options $options, $placeholder) {
+        $placeholderNormalizer = function (Options $options, $placeholder) use ($that) {
             if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('The form option "empty_value" of the "%s" form type (%s) is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
 
                 $placeholder = $options['empty_value'];
             }
@@ -522,10 +523,10 @@ class ChoiceType extends AbstractType
      * are lost. Store them in a utility array that is used from the
      * "choice_label" closure by default.
      *
-     * @param array|\Traversable  $choices      The choice labels indexed by choices.
-     * @param object              $choiceLabels The object that receives the choice labels
-     *                                          indexed by generated keys.
-     * @param int                 $nextKey      The next generated key.
+     * @param array|\Traversable $choices      The choice labels indexed by choices.
+     * @param object             $choiceLabels The object that receives the choice labels
+     *                                         indexed by generated keys.
+     * @param int                $nextKey      The next generated key.
      *
      * @return array The choices in a normalized array with labels replaced by generated keys.
      *

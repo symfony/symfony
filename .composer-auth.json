@@ -1,0 +1,7 @@
+{
+    "github-oauth": {
+        "github.com": "PLEASE DO NOT USE THIS TOKEN IN YOUR OWN PROJECTS/FORKS",
+        "github.com": "This token is reserved for testing the symfony/symfony repository",
+        "github.com": "52270bad1071a099c8d24629f2db2b7f07db960d"
+    }
+}

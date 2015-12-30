@@ -50,9 +50,11 @@ install:
     - appveyor DownloadFile https://getcomposer.org/composer.phar
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
+    - mkdir %APPDATA%\Composer
+    - IF %APPVEYOR_REPO_NAME%==symfony/symfony copy /Y .composer-auth.json %APPDATA%\Composer\auth.json
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - composer update --prefer-source --no-progress --ansi
+    - composer update --prefer-dist --no-progress --ansi
 
 test_script:
     - cd c:\projects\symfony

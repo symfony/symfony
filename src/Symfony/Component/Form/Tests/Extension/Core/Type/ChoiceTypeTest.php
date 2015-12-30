@@ -502,6 +502,21 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     /**
      * @group legacy
      */
+    public function testLegacyNullChoices()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => null,
+        ));
+        $this->assertNull($form->getConfig()->getOption('choices'));
+        $this->assertFalse($form->getConfig()->getOption('multiple'));
+        $this->assertFalse($form->getConfig()->getOption('expanded'));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testLegacySubmitSingleNonExpandedObjectChoices()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(

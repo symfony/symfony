@@ -377,7 +377,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionFrozenException
-     * @expectedExceptionMessage The option "foo" is frozen. You cannot change it's value.
+     * @expectedExceptionMessage The option "foo" is frozen. You cannot change its value.
      */
     public function testFailIfFrozenOptionSetted()
     {
@@ -408,7 +408,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingDefaultValueException
-     * @expectedExceptionMessage The option "foo" has not a default value. You can not freeze it.
+     * @expectedExceptionMessage The option "foo" has no default value. You cannot freeze it.
      */
     public function testFailIfUnassignedOptionTryingToFrozen()
     {

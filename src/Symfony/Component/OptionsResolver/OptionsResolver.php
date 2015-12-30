@@ -387,13 +387,13 @@ class OptionsResolver implements Options
     public function setFrozen($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('Options cannot be freeze from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be frozen from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $option) {
             if (!$this->hasDefault($option)) {
                 throw new MissingDefaultValueException(sprintf(
-                    'The option "%s" has not a default value. You can not freeze it.',
+                    'The option "%s" has no default value. You cannot freeze it.',
                     $option
                 ));
             }
@@ -721,7 +721,7 @@ class OptionsResolver implements Options
      * @return array The merged and validated options
      *
      * @throws UndefinedOptionsException If an option name is undefined
-     * @throws OptionFrozenException     If a frozen option is setted
+     * @throws OptionFrozenException     If a frozen option is set
      * @throws InvalidOptionsException   If an option doesn't fulfill the
      *                                   specified validation rules
      * @throws MissingOptionsException   If a required option is missing
@@ -757,7 +757,7 @@ class OptionsResolver implements Options
         foreach ($options as $option => $value) {
             if (isset($this->frozen[$option])) {
                 throw new OptionFrozenException(sprintf(
-                    'The option "%s" is frozen. You cannot change it\'s value.',
+                    'The option "%s" is frozen. You cannot change its value.',
                     $option
                 ));
             }

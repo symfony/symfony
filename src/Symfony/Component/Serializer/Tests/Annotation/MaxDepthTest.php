@@ -23,7 +23,7 @@ class MaxDepthTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotAnIntMaxDepthParameter()
     {
-        new MaxDepth(array('value' => 'coopTilleuls'));
+        new MaxDepth(array('value' => 'foo'));
     }
 
     public function testMaxDepthParameters()

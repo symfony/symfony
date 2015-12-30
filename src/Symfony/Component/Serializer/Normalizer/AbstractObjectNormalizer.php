@@ -46,10 +46,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $attributes = $this->getAttributes($object, $format, $context);
 
         foreach ($attributes as $attribute) {
-            if (in_array($attribute, $this->ignoredAttributes)) {
-                continue;
-            }
-
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
 
             if (isset($this->callbacks[$attribute])) {

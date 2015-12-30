@@ -137,8 +137,14 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
-            if ($this->isGetMethod($method)) {
-                $attributes[] = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+            if (!$this->isGetMethod($method)) {
+                continue;
+            }
+
+            $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
+
+            if ($this->isAllowedAttribute($object, $attributeName)) {
+                $attributes[] = $attributeName;
             }
         }
 

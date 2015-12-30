@@ -69,34 +69,23 @@ class PropertyNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * Ignores allowed attributes not applicable on properties (e.g. groups set on a getter method).
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
-
-        if (false === $allowedAttributes) {
+        if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
         }
 
-        $class = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
-
-        $attributes = array();
-        foreach ($allowedAttributes as $allowedAttribute) {
-            $propertyName = $attributesAsString ? $allowedAttribute : $allowedAttribute->getName();
-
-            try {
-                $reflectionProperty = new \ReflectionProperty($class, $propertyName);
-                if (!$reflectionProperty->isStatic()) {
-                    $attributes[] = $allowedAttribute;
-                }
-            } catch (\ReflectionException $reflectionException) {
-                // Ignore attributes not applicable for this normalizer
+        try {
+            $reflectionProperty = new \ReflectionProperty(is_string($classOrObject) ? $classOrObject : get_class($classOrObject), $attribute);
+            if ($reflectionProperty->isStatic()) {
+                return false;
             }
+        } catch (\ReflectionException $reflectionException) {
+            return false;
         }
 
-        return $attributes;
+        return true;
     }
 
     /**
@@ -108,7 +97,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         $attributes = array();
 
         foreach ($reflectionObject->getProperties() as $property) {
-            if ($property->isStatic()) {
+            if (!$this->isAllowedAttribute($object, $property->name)) {
                 continue;
             }
 

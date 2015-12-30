@@ -199,12 +199,32 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
         $allowedAttributes = array();
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
-            if (count(array_intersect($attributeMetadata->getGroups(), $context['groups']))) {
-                $allowedAttributes[] = $attributesAsString ? $attributeMetadata->getName() : $attributeMetadata;
+            $name = $attributeMetadata->getName();
+
+            if (
+                count(array_intersect($attributeMetadata->getGroups(), $context['groups'])) &&
+                $this->isAllowedAttribute($classOrObject, $name, null, $context)
+            ) {
+                $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }
 
         return $allowedAttributes;
+    }
+
+    /**
+     * Is this attribute allowed?
+     *
+     * @param object|string $classOrObject
+     * @param string        $attribute
+     * @param string|null   $format
+     * @param array         $context
+     *
+     * @return bool
+     */
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    {
+        return !in_array($attribute, $this->ignoredAttributes);
     }
 
     /**

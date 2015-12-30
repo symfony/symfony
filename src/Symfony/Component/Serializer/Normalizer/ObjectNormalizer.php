@@ -60,16 +60,20 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
             if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
                 // getters and hassers
-                $attributes[lcfirst(substr($name, 3))] = true;
+                $attributeName = lcfirst(substr($name, 3));
             } elseif (strpos($name, 'is') === 0) {
                 // issers
-                $attributes[lcfirst(substr($name, 2))] = true;
+                $attributeName = lcfirst(substr($name, 2));
+            }
+
+            if ($this->isAllowedAttribute($object, $attributeName)) {
+                $attributes[$attributeName] = true;
             }
         }
 
         // properties
         foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-            if ($reflProperty->isStatic()) {
+            if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name)) {
                 continue;
             }
 

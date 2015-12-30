@@ -69,7 +69,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
 
-            // Recursive call are done at the end of the process to allow @MaxDepth to work
+            // Recursive calls are done at the end of the process to allow @MaxDepth to work
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
                 $stack[$property->name] = $attributeValue;
                 continue;

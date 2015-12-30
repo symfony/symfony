@@ -32,7 +32,7 @@ services: mongodb
 
 before_install:
     - if [[ ! $deps && ! $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && $TRAVIS_PHP_VERSION != hhvm && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; fi;
-    - if [[ ! $deps && ! -d php-$MIN_PHP/sapi ]]; then wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj; (cd php-$MIN_PHP; ./configure --enable-sigchild --enable-pcntl; make -j2); fi;
+    - if [[ ! $deps && $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj; (cd php-$MIN_PHP; ./configure --enable-sigchild --enable-pcntl; make -j2); fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi;
     - echo memory_limit = -1 >> $INI_FILE
     - echo session.gc_probability = 0 >> $INI_FILE

@@ -1162,15 +1162,15 @@ class EntityTypeTest extends TypeTestCase
             ->addTypeGuesser($entityTypeGuesser)
             ->getFormFactory();
 
-        $formBuilder = $factory->createNamedBuilder('form', 'form');
+        $formBuilder = $factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType');
 
-        $formBuilder->add('property1', 'entity', array(
+        $formBuilder->add('property1', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
         ));
 
-        $formBuilder->add('property2', 'entity', array(
+        $formBuilder->add('property2', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function (EntityRepository $repo) {
@@ -1178,7 +1178,7 @@ class EntityTypeTest extends TypeTestCase
             },
         ));
 
-        $formBuilder->add('property3', 'entity', array(
+        $formBuilder->add('property3', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function (EntityRepository $repo) {

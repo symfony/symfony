@@ -34,12 +34,8 @@ class MaxDepth
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', get_class($this)));
         }
 
-        if (!is_int($data['value'])) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an int.', get_class($this)));
-        }
-
-        if ($data['value'] <= 0) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be greater than 0.', get_class($this)));
+        if (!is_int($data['value']) || $data['value'] <= 0) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a positive integer.', get_class($this)));
         }
 
         $this->maxDepth = $data['value'];

@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T15:29:33Z
+
+This saves ~4 minutes of cumulated test time (from ~20 minutes to ~16 minutes)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T15:42:23Z
+
+It also saves ~4 minutes on appveyor, going from ~8 minutes to ~4 minutes
+
+---------------------------------------------------------------------------
+
+by cs278 at 2015-12-29T15:44:25Z
+
+Might be worth commenting that the token is intended to be in there before people start reporting it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T16:57:56Z
+
+I moved the token to a dedicated file, with a comment inside
+
+---------------------------------------------------------------------------
+
+by EmanueleMinotto at 2015-12-29T17:26:07Z
+
+@nicolas-grekas a file just moves the problem (because people could still use the token for their own projects, with the side effect of reaching the Github API limit also for symfony/symfony).
+
+What about the solution below?
+
+*.travis.yml*
+``` yaml
+before_install:
+  - composer config preferred-install source
+  - 'if [[ -n "$GH_TOKEN" ]]; then composer config github-oauth.github.com ${GH_TOKEN}; fi;'
+  - 'if [[ -n "$GH_TOKEN" ]]; then composer config preferred-install dist; fi;'
+
+install:
+  - composer install --no-interaction --no-progress
+```
+
+Adding a `GH_TOKEN` in Settings on https://travis-ci.org/symfony/symfony/settings (as secure, of course).
+
+*appveyor.yml*
+``` yaml
+install:
+  - php composer.phar config preferred-install source
+  - IF %GH_TOKEN% php composer.phar config github-oauth.github.com %GH_TOKEN%
+  - IF %GH_TOKEN% php composer.phar config preferred-install dist
+  - php composer.phar install --no-interaction --no-progress
+```
+
+Adding a `GH_TOKEN` in Environment on https://ci.appveyor.com/project/fabpot/symfony/settings/environment (as secure too).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T17:30:10Z
+
+Secure env vars are not available on PR builds, which defeats the goal of this PR.
+I have absolutely no issue in making this token public. If people start ignoring the comment and copying it all over, we can change it.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-30T09:46:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-30T09:48:21Z
+
+:+1:

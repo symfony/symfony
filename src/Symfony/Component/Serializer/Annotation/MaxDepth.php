@@ -38,6 +38,10 @@ class MaxDepth
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an int.', get_class($this)));
         }
 
+        if ($data['value'] <= 0) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be greater than 0.', get_class($this)));
+        }
+
         $this->maxDepth = $data['value'];
     }
 

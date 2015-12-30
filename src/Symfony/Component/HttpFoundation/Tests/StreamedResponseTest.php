@@ -34,7 +34,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('1.1', $response->getProtocolVersion());
         $this->assertNotEquals('chunked', $response->headers->get('Transfer-Encoding'), 'Apache assumes responses with a Transfer-Encoding header set to chunked to already be encoded.');
-        $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('no-cache', $response->headers->get('Cache-Control'));
     }
 
     public function testPrepareWith10Protocol()
@@ -47,7 +47,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('1.0', $response->getProtocolVersion());
         $this->assertNull($response->headers->get('Transfer-Encoding'));
-        $this->assertEquals('no-cache, private', $response->headers->get('Cache-Control'));
+        $this->assertEquals('no-cache', $response->headers->get('Cache-Control'));
     }
 
     public function testPrepareWithHeadRequest()

@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ParameterBag implements ParameterBagInterface
 {
+    use ParameterResolverTrait;
+
     protected $parameters = array();
     protected $resolved = false;
 
@@ -158,36 +160,6 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * Replaces parameter placeholders (%name%) by their values.
-     *
-     * @param mixed $value     A value
-     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
-     *
-     * @return mixed The resolved value
-     *
-     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
-     * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException                    when a given parameter has a type problem.
-     */
-    public function resolveValue($value, array $resolving = array())
-    {
-        if (is_array($value)) {
-            $args = array();
-            foreach ($value as $k => $v) {
-                $args[$this->resolveValue($k, $resolving)] = $this->resolveValue($v, $resolving);
-            }
-
-            return $args;
-        }
-
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        return $this->resolveString($value, $resolving);
-    }
-
-    /**
      * Resolves parameters inside a string.
      *
      * @param string $value     The string to resolve
@@ -198,50 +170,21 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem.
+     *
+     * @deprecated since 3.2, to be removed in 4.0. Use {@link static::resolveValue()} instead.
      */
     public function resolveString($value, array $resolving = array())
     {
-        // we do this to deal with non string values (Boolean, integer, ...)
-        // as the preg_replace_callback throw an exception when trying
-        // a non-string in a parameter value
-        if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
-            $key = $match[1];
-            $lcKey = strtolower($key);
+        @trigger_error(sprintf('The %s method is deprecated since version 3.2 and will be removed in 4.0. Use %s::resolveValue() instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
-            if (isset($resolving[$lcKey])) {
-                throw new ParameterCircularReferenceException(array_keys($resolving));
-            }
-
-            $resolving[$lcKey] = true;
-
-            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
-        }
-
-        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($resolving, $value) {
-            // skip %%
-            if (!isset($match[1])) {
-                return '%%';
-            }
-
-            $key = $match[1];
-            $lcKey = strtolower($key);
-            if (isset($resolving[$lcKey])) {
-                throw new ParameterCircularReferenceException(array_keys($resolving));
-            }
-
-            $resolved = $this->get($key);
-
-            if (!is_string($resolved) && !is_numeric($resolved)) {
-                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
-            }
-
-            $resolved = (string) $resolved;
-            $resolving[$lcKey] = true;
-
-            return $this->isResolved() ? $resolved : $this->resolveString($resolved, $resolving);
-        }, $value);
+        return $this->resolveValue($value, $resolving);
     }
 
+    /**
+     * Whether the parameters are resolved or not (%parameter% replaced).
+     *
+     * @return bool
+     */
     public function isResolved()
     {
         return $this->resolved;
@@ -287,5 +230,10 @@ class ParameterBag implements ParameterBagInterface
         }
 
         return $value;
+    }
+
+    protected function getParameter($name, $resolving = array())
+    {
+        return $this->resolved ? $this->get($name) : $this->resolveValue($this->get($name), $resolving);
     }
 }

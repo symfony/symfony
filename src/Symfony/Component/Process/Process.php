@@ -1072,13 +1072,10 @@ class Process
 
         $callback = $this->callback;
         foreach ($result as $type => $data) {
-            if (3 === $type) {
-                $this->fallbackStatus['running'] = false;
-                if (!isset($this->fallbackStatus['signaled'])) {
-                    $this->fallbackStatus['exitcode'] = (int) $data;
-                }
-            } else {
+            if (3 !== $type) {
                 $callback($type === self::STDOUT ? self::OUT : self::ERR, $data);
+            } elseif (!isset($this->fallbackStatus['signaled'])) {
+                $this->fallbackStatus['exitcode'] = (int) $data;
             }
         }
     }

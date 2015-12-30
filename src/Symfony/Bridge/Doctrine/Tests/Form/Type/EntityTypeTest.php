@@ -1114,6 +1114,69 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame($choiceList1, $choiceList3);
     }
 
+    public function testLoaderCachingWithParameters()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist(array($entity1, $entity2, $entity3));
+
+        $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+
+        $entityType = new EntityType(
+            $this->emRegistry,
+            PropertyAccess::createPropertyAccessor()
+        );
+
+        $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
+
+        $factory = Forms::createFormFactoryBuilder()
+            ->addType($entityType)
+            ->addTypeGuesser($entityTypeGuesser)
+            ->getFormFactory();
+
+        $formBuilder = $factory->createNamedBuilder('form', 'form');
+
+        $formBuilder->add('property1', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
+        ));
+
+        $formBuilder->add('property2', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
+            },
+        ));
+
+        $formBuilder->add('property3', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1);
+            },
+        ));
+
+        $form = $formBuilder->getForm();
+
+        $form->submit(array(
+            'property1' => 1,
+            'property2' => 1,
+            'property3' => 2,
+        ));
+
+        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
+
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
+    }
+
     public function testCacheChoiceLists()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');

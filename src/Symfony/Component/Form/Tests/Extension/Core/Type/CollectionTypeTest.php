@@ -283,10 +283,12 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
             'entry_options' => array(
                 'data' => 'bar',
+                'label' => false,
             ),
         ));
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
+        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
     }
 
     public function testPrototypeDefaultRequired()

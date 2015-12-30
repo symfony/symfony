@@ -261,7 +261,7 @@ class ChoiceType extends AbstractType
 
             // Set by the user
             if (true !== $choicesAsValues) {
-                throw new \RuntimeException('The "choices_as_values" option should not be used. Remove it and flip the contents of the "choices" option instead.');
+                throw new \RuntimeException(sprintf('The "choices_as_values" option of the %s should not be used. Remove it and flip the contents of the "choices" option instead.', get_class($this)));
             }
 
             // To be uncommented in 3.1

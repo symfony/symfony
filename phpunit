@@ -53,7 +53,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update symfony/yaml");
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
-    passthru("$COMPOSER install --prefer-source --no-progress --ansi");
+    passthru("$COMPOSER install --prefer-dist --no-progress --ansi");
     file_put_contents('phpunit', <<<EOPHP
 <?php
 

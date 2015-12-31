@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by EVODelavega at 2015-12-21T10:04:39Z
+
+Please use `sprintf` for exception messages, instead of concatenating variables into the message:
+
+> Yes, using sprintf is what the coding standard should document. Can you
+submit a PR on the docs? And perhaps a PR on symfony/symfony to fix
+inlined exceptions?
+
+>Thanks,
+Fabien
+
+Also see [Symfony coding standards](http://symfony.com/doc/current/contributing/code/standards.html#structure) last item under structure:
+
+> Exception message strings should be concatenated using sprintf.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-21T13:04:04Z
+
+According to https://github.com/twigphp/Twig/issues/1944 this is not fully safe against race conditions either. And now we might throw exceptions in placed where it worked before.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-12-21T15:18:02Z
+
+@Tobion : the same as in #16292 - pattern and solution; I'm not sure if this breaks BC.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-12-21T16:53:11Z
+
+Exceptions message generation changed in favor of sprintf
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-31T09:03:50Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-31T10:50:35Z
+
+:+1:

@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
-    protected $attributesCache = array();
+    private $attributesCache = array();
 
     /**
      * {@inheritdoc}

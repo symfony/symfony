@@ -37,7 +37,7 @@ class TextDescriptor extends Descriptor
 
         $nameWidth = isset($options['name_width']) ? $options['name_width'] : strlen($argument->getName());
         $output = str_replace("\n", "\n".str_repeat(' ', $nameWidth + 2), $argument->getDescription());
-        $output = sprintf(" <info>%-${nameWidth}s</info> %s%s", $argument->getName(), $output, $default);
+        $output = sprintf(" <info>%-{$nameWidth}s</info> %s%s", $argument->getName(), $output, $default);
 
         return isset($options['raw_text']) && $options['raw_text'] ? strip_tags($output) : $output;
     }
@@ -56,7 +56,7 @@ class TextDescriptor extends Descriptor
         $nameWidth = isset($options['name_width']) ? $options['name_width'] : strlen($option->getName());
         $nameWithShortcutWidth = $nameWidth - strlen($option->getName()) - 2;
 
-        $output = sprintf(" <info>%s</info> %-${nameWithShortcutWidth}s%s%s%s",
+        $output = sprintf(" <info>%s</info> %-{$nameWithShortcutWidth}s%s%s%s",
             '--'.$option->getName(),
             $option->getShortcut() ? sprintf('(-%s) ', $option->getShortcut()) : '',
             str_replace("\n", "\n".str_repeat(' ', $nameWidth + 2), $option->getDescription()),
@@ -146,7 +146,7 @@ class TextDescriptor extends Descriptor
             $width = $this->getColumnWidth($description->getCommands());
 
             foreach ($description->getCommands() as $command) {
-                $messages[] = sprintf("%-${width}s %s", $command->getName(), $command->getDescription());
+                $messages[] = sprintf("%-{$width}s %s", $command->getName(), $command->getDescription());
             }
         } else {
             $width = $this->getColumnWidth($description->getCommands());
@@ -167,7 +167,7 @@ class TextDescriptor extends Descriptor
                 }
 
                 foreach ($namespace['commands'] as $name) {
-                    $messages[] = sprintf("  <info>%-${width}s</info> %s", $name, $description->getCommand($name)->getDescription());
+                    $messages[] = sprintf("  <info>%-{$width}s</info> %s", $name, $description->getCommand($name)->getDescription());
                 }
             }
         }

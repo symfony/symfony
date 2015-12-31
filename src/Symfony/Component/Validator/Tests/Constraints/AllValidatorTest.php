@@ -15,8 +15,9 @@ use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AllValidatorTest extends AbstractConstraintValidatorTest
+class AllValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

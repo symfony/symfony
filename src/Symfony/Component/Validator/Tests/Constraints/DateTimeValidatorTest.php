@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\DateTimeValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class DateTimeValidatorTest extends AbstractConstraintValidatorTest
+class DateTimeValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

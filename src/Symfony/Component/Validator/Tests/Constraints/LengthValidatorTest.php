@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LengthValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class LengthValidatorTest extends AbstractConstraintValidatorTest
+class LengthValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

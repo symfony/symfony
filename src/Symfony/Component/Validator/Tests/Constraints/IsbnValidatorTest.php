@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
  */
-class IsbnValidatorTest extends AbstractConstraintValidatorTest
+class IsbnValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

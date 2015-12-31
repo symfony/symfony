@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class RegexValidatorTest extends AbstractConstraintValidatorTest
+class RegexValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

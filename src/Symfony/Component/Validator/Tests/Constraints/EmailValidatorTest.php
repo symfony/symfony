@@ -14,11 +14,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @group dns-sensitive
  */
-class EmailValidatorTest extends AbstractConstraintValidatorTest
+class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

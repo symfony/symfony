@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NotBlankValidatorTest extends AbstractConstraintValidatorTest
+class NotBlankValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

@@ -31,4 +31,9 @@ class PropertyInfoExtractorCacheDecoratorTest extends AbstractPropertyInfoExtrac
         $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
         $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
     }
+
+    public function testNotSerializableContext()
+    {
+        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array('foo' => function () {})));
+    }
 }

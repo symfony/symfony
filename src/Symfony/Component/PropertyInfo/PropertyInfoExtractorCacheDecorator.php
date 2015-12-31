@@ -99,7 +99,14 @@ class PropertyInfoExtractorCacheDecorator implements PropertyInfoExtractorInterf
      */
     private function extract($method, array $arguments)
     {
-        $key = $method.serialize($arguments);
+        try {
+            $serializedArguments = serialize($arguments);
+        } catch (\Exception $exception) {
+            // If arguments are not serializable, skip the cache
+            return call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
+        }
+
+        $key = $method.$serializedArguments;
 
         if (isset($this->arrayCache[$key])) {
             return $this->arrayCache[$key];

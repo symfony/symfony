@@ -460,6 +460,15 @@ EOF;
         $this->assertEquals('cat', $result->fiz);
     }
 
+    public function testObjectForMapIsAppliedAfterParsing()
+    {
+        $expected = new \stdClass();
+        $expected->foo = 'bar';
+        $expected->baz = 'foobar';
+
+        $this->assertEquals($expected, $this->parser->parse("foo: bar\nbaz: foobar", false, false, true));
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */

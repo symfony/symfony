@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
+use Symfony\Bridge\Twig\Node\TransNamespaceNode;
 use Symfony\Bridge\Twig\Node\TransNode;
 
 class TwigNodeProvider
@@ -76,6 +77,13 @@ class TwigNodeProvider
     {
         return new TransDefaultDomainNode(
             new \Twig_Node_Expression_Constant($domain, 0)
+        );
+    }
+
+    public static function getTransNamespaceTag($namespace)
+    {
+        return new TransNamespaceNode(
+            new \Twig_Node_Expression_Constant($namespace, 0)
         );
     }
 }

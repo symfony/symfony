@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractNormalizer
 {
-    private static $attributesCache = array();
+    private $attributesCache = array();
 
     /**
      * @var PropertyAccessorInterface
@@ -136,20 +136,39 @@ class ObjectNormalizer extends AbstractNormalizer
      * @param object $object
      * @param array  $context
      *
-     * @return array
+     * @return string[]
      */
     private function getAttributes($object, array $context)
     {
-        $key = sprintf('%s-%s', get_class($object), serialize($context));
-
-        if (isset(self::$attributesCache[$key])) {
-            return self::$attributesCache[$key];
+        try {
+            $serializedContext = serialize($context);
+        } catch (\Exception $exception) {
+            // The context cannot be serialized, skip the cache
+            return $this->extractAttributes($object, $context);
         }
 
-        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
+        $key = sprintf('%s-%s', get_class($object), $serializedContext);
 
+        if (isset($this->attributesCache[$key])) {
+            return $this->attributesCache[$key];
+        }
+
+        return $this->attributesCache[$key] = $this->extractAttributes($object, $context);
+    }
+
+    /**
+     * Extracts attributes for this class and context.
+     *
+     * @param object $object
+     * @param array  $context
+     *
+     * @return string[]
+     */
+    private function extractAttributes($object, array $context)
+    {
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
         if (false !== $allowedAttributes) {
-            return self::$attributesCache[$key] = $allowedAttributes;
+            return $allowedAttributes;
         }
 
         // If not using groups, detect manually
@@ -167,9 +186,9 @@ class ObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $name = $reflMethod->getName();
+            $name = $reflMethod->name;
 
-            if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
+            if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
                 // getters and hassers
                 $attributes[lcfirst(substr($name, 3))] = true;
             } elseif (strpos($name, 'is') === 0) {
@@ -184,9 +203,9 @@ class ObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $attributes[$reflProperty->getName()] = true;
+            $attributes[$reflProperty->name] = true;
         }
 
-        return self::$attributesCache[$key] = array_keys($attributes);
+        return array_keys($attributes);
     }
 }

@@ -477,9 +477,9 @@ class Filesystem
             throw new IOException(sprintf('Failed to write file "%s".', $filename));
         }
 
-        $this->rename($tmpFile, $filename, true);
         if (null !== $mode) {
-            $this->chmod($filename, $mode);
+            $this->chmod($tmpFile, $mode);
         }
+        $this->rename($tmpFile, $filename, true);
     }
 }

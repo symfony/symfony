@@ -24,6 +24,7 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     private static $phpBin;
+    private static $process;
     private static $sigchild;
     private static $notEnhancedSigchild = false;
 
@@ -41,6 +42,14 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         ob_start();
         phpinfo(INFO_GENERAL);
         self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
+    }
+
+    protected function tearDown()
+    {
+        if (self::$process) {
+            self::$process->stop(0);
+            self::$process = null;
+        }
     }
 
     public function testThatProcessDoesNotThrowWarningDuringRun()
@@ -123,9 +132,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $h = new \ReflectionProperty($p, 'process');
         $h->setAccessible(true);
         $h = $h->getValue($p);
-        $s = proc_get_status($h);
+        $s = @proc_get_status($h);
 
-        while ($s['running']) {
+        while (!empty($s['running'])) {
             usleep(1000);
             $s = proc_get_status($h);
         }
@@ -1259,7 +1268,11 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        return $process;
+        if (self::$process) {
+            self::$process->stop(0);
+        }
+
+        return self::$process = $process;
     }
 
     private function skipIfNotEnhancedSigchild($expectException = true)

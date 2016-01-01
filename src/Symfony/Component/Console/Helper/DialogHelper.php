@@ -444,7 +444,7 @@ class DialogHelper extends Helper
      * @param callable        $interviewer A callable that will ask for a question and return the result
      * @param OutputInterface $output      An Output instance
      * @param callable        $validator   A PHP callback
-     * @param int|false       $attempts    Max number of times to ask before giving up ; false will ask infinitely
+     * @param int|false       $attempts    Max number of times to ask before giving up; false will ask infinitely
      *
      * @return string The validated response
      *

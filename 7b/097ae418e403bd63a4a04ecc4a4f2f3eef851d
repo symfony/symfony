@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-02T00:19:08Z
+
+ping @Tobion
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-01-02T09:26:53Z
+
+Why don't we remove the year from the copyright. Updating this every year is annoying, and makes unnecessary changes into all files.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2016-01-02T09:44:07Z
+
+because copyrights expire (theoretically). however, if a file hasn't even been updated, then the copyright probably shouldn't be touched.
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-02T15:24:44Z
+
+@mvrhov maybe this can help http://programmers.stackexchange.com/a/210491
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-01-02T21:17:03Z
+
+This should be done against `2.7` and `2.8` branches I guess.
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-02T21:39:58Z
+
+@hhamon see https://github.com/symfony/symfony/pull/17240#issuecomment-168316353

@@ -528,6 +528,7 @@ class Filesystem
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
 
+        $this->chmod($tmpFile, 0666);
         $this->rename($tmpFile, $filename, true);
     }
 

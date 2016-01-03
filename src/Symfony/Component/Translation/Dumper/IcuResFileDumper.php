@@ -79,11 +79,7 @@ class IcuResFileDumper extends FileDumper
             1, 4, 0, 0              // Unicode version
         );
 
-        $output = $header
-               .$root
-               .$data;
-
-        return $output;
+        return $header.$root.$data;
     }
 
     private function writePadding($data)
@@ -97,9 +93,7 @@ class IcuResFileDumper extends FileDumper
 
     private function getPosition($data)
     {
-        $position = (strlen($data) + 28) / 4;
-
-        return $position;
+        return (strlen($data) + 28) / 4;
     }
 
     /**

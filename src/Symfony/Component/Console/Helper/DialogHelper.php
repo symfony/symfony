@@ -56,7 +56,7 @@ class DialogHelper extends InputAwareHelper
 
         $messages = (array) $question;
         foreach ($choices as $key => $value) {
-            $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+            $messages[] = sprintf("  [<info>%-{$width}s</info>] %s", $key, $value);
         }
 
         $output->writeln($messages);

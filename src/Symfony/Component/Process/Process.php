@@ -780,8 +780,12 @@ class Process
             }
         }
 
-        $this->updateStatus(false);
-        if ($this->processInformation['running']) {
+        if ($this->isRunning()) {
+            if (isset($this->fallbackStatus['pid'])) {
+                unset($this->fallbackStatus['pid']);
+
+                return $this->stop(0, $signal);
+            }
             $this->close();
         }
 
@@ -1412,7 +1416,7 @@ class Process
      */
     private function doSignal($signal, $throwException)
     {
-        if (!$this->isRunning()) {
+        if (null === $pid = $this->getPid()) {
             if ($throwException) {
                 throw new LogicException('Can not send signal on a non running process.');
             }
@@ -1421,7 +1425,7 @@ class Process
         }
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            exec(sprintf('taskkill /F /T /PID %d 2>&1', $this->getPid()), $output, $exitCode);
+            exec(sprintf('taskkill /F /T /PID %d 2>&1', $pid), $output, $exitCode);
             if ($exitCode && $this->isRunning()) {
                 if ($throwException) {
                     throw new RuntimeException(sprintf('Unable to kill the process (%s).', implode(' ', $output)));
@@ -1433,8 +1437,8 @@ class Process
             if (!$this->enhanceSigchildCompatibility || !$this->isSigchildEnabled()) {
                 $ok = @proc_terminate($this->process, $signal);
             } elseif (function_exists('posix_kill')) {
-                $ok = @posix_kill($this->getPid(), $signal);
-            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $this->getPid()), array(2 => array('pipe', 'w')), $pipes)) {
+                $ok = @posix_kill($pid, $signal);
+            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $pid), array(2 => array('pipe', 'w')), $pipes)) {
                 $ok = false === fgets($pipes[2]);
             }
             if (!$ok) {

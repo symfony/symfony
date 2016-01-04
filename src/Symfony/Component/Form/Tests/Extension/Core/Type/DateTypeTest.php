@@ -197,6 +197,7 @@ class DateTypeTest extends TestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
+            'years' => array(2010),
         ));
 
         $text = array(

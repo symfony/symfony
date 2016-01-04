@@ -438,7 +438,7 @@ class QuestionHelper extends Helper
     private function readFromInput($stream)
     {
         if (STDIN === $stream && function_exists('readline')) {
-            $ret = readline();
+            $ret = readline('');
         } else {
             $ret = fgets($stream, 4096);
         }

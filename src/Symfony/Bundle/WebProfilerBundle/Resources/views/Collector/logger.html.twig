@@ -184,7 +184,7 @@
 
         {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
-                <ul class="sf-call-stack" id="{{ id }}" class="hidden">
+                <ul class="sf-call-stack hidden" id="{{ id }}">
             {% endif %}
 
             {% if call.class is defined %}

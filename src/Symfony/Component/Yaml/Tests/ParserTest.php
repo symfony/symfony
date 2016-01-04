@@ -839,7 +839,9 @@ EOT;
 
     public function getCommentLikeStringInScalarBlockData()
     {
-        $yaml1 = <<<'EOT'
+        $tests = array();
+
+        $yaml = <<<'EOT'
 pages:
     -
         title: some title
@@ -854,7 +856,7 @@ pages:
 
             footer # comment3
 EOT;
-        $expected1 = array(
+        $expected = array(
             'pages' => array(
                 array(
                     'title' => 'some title',
@@ -873,8 +875,9 @@ EOT
                 ),
             ),
         );
+        $tests[] = array($yaml, $expected);
 
-        $yaml2 = <<<'EOT'
+        $yaml = <<<'EOT'
 test: |
     foo
     # bar
@@ -889,7 +892,7 @@ collection:
         # bar
         baz
 EOT;
-        $expected2 = array(
+        $expected = array(
             'test' => <<<'EOT'
 foo
 # bar
@@ -916,11 +919,47 @@ EOT
                 ),
             ),
         );
+        $tests[] = array($yaml, $expected);
 
-        return array(
-            array($yaml1, $expected1),
-            array($yaml2, $expected2),
+        $yaml = <<<EOT
+foo:
+  bar:
+    scalar-block: >
+      line1
+      line2>
+  baz:
+# comment
+    foobar: ~
+EOT;
+        $expected = array(
+            'foo' => array(
+                'bar' => array(
+                    'scalar-block' => 'line1 line2>',
+                ),
+                'baz' => array(
+                    'foobar' => null,
+                ),
+            ),
         );
+        $tests[] = array($yaml, $expected);
+
+        $yaml = <<<'EOT'
+a:
+    b: hello
+#    c: |
+#        first row
+#        second row
+    d: hello
+EOT;
+        $expected = array(
+            'a' => array(
+                'b' => 'hello',
+                'd' => 'hello',
+            ),
+        );
+        $tests[] = array($yaml, $expected);
+
+        return $tests;
     }
 
     public function testBlankLinesAreParsedAsNewLinesInFoldedBlocks()

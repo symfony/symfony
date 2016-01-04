@@ -19,9 +19,11 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.8|~3.0",
-        "symfony/config": "~2.8|~3.0",
-        "symfony/property-access": "~2.8|~3.0",
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
+        "symfony/config": "~2.2|~3.0.0",
+        "symfony/property-access": "~2.3|~3.0.0",
+        "symfony/property-info": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
@@ -30,7 +32,8 @@
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
-        "symfony/property-access": "For using the ObjectNormalizer."
+        "symfony/property-access": "For using the ObjectNormalizer.",
+        "symfony/property-info": "For using recursive denormalizations"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },

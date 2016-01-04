@@ -15,7 +15,6 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -60,10 +59,11 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         $data = array();
+        $stack = array();
         $attributes = $this->getAttributes($object, $context);
 
         foreach ($attributes as $attribute) {
-            if (in_array($attribute, $this->ignoredAttributes)) {
+            if (!$this->isAttributeToNormalize($object, $attribute, $context)) {
                 continue;
             }
 
@@ -73,22 +73,16 @@ class ObjectNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
             }
 
+            // Recursive calls are done at the end of the process to allow @MaxDepth to work
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
-                }
-
-                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                $stack[$attribute] = $attributeValue;
+                continue;
             }
 
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->normalize($attribute);
-            }
-
-            $data[$attribute] = $attributeValue;
+            $data = $this->setAttribute($data, $attribute, $attributeValue);
         }
 
-        return $data;
+        return $this->normalizeComplexTypes($data, $stack, $format, $context);
     }
 
     /**

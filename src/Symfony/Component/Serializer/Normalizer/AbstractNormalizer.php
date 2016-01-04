@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -25,6 +27,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
+    const OBJECT_TO_POPULATE = 'object_to_populate';
+    const GROUPS = 'groups';
+    const ENABLE_MAX_DEPTH = 'enable_max_depth';
+    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+
     /**
      * @var int
      */
@@ -55,15 +63,21 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected $camelizedAttributes = array();
 
     /**
+     * @var PropertyInfoExtractorInterface
+     */
+    protected $propertyInfoExtractor;
+
+    /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
      * @param ClassMetadataFactoryInterface|null $classMetadataFactory
      * @param NameConverterInterface|null        $nameConverter
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyInfoExtractorInterface $propertyInfoExtractor = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
+        $this->propertyInfoExtractor = $propertyInfoExtractor;
     }
 
     /**
@@ -146,16 +160,16 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         $objectHash = spl_object_hash($object);
 
-        if (isset($context['circular_reference_limit'][$objectHash])) {
-            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context['circular_reference_limit'][$objectHash]);
+        if (isset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash])) {
+            if ($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] >= $this->circularReferenceLimit) {
+                unset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash]);
 
                 return true;
             }
 
-            ++$context['circular_reference_limit'][$objectHash];
+            ++$context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash];
         } else {
-            $context['circular_reference_limit'][$objectHash] = 1;
+            $context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] = 1;
         }
 
         return false;
@@ -193,13 +207,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        if (!$this->classMetadataFactory || !isset($context['groups']) || !is_array($context['groups'])) {
+        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !is_array($context[static::GROUPS])) {
             return false;
         }
 
         $allowedAttributes = array();
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
-            if (count(array_intersect($attributeMetadata->getGroups(), $context['groups']))) {
+            if (count(array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS]))) {
                 $allowedAttributes[] = $attributesAsString ? $attributeMetadata->getName() : $attributeMetadata;
             }
         }
@@ -239,52 +253,209 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
         if (
-            isset($context['object_to_populate']) &&
-            is_object($context['object_to_populate']) &&
-            $class === get_class($context['object_to_populate'])
+            isset($context[static::OBJECT_TO_POPULATE]) &&
+            is_object($context[static::OBJECT_TO_POPULATE]) &&
+            $class === get_class($context[static::OBJECT_TO_POPULATE])
         ) {
-            return $context['object_to_populate'];
+            return $context[static::OBJECT_TO_POPULATE];
+        }
+
+        $format = null;
+        if (isset($context['format'])) {
+            $format = $context['format'];
         }
 
         $constructor = $reflectionClass->getConstructor();
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
-
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
-                    if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                        if (!is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
-                        }
-
-                        $params = array_merge($params, $data[$paramName]);
-                    }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $params[] = $data[$key];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$key]);
-                } elseif ($constructorParameter->isDefaultValueAvailable()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new RuntimeException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
-                }
-            }
-
-            return $reflectionClass->newInstanceArgs($params);
+        if (!$constructor) {
+            return new $class();
         }
 
-        return new $class();
+        $constructorParameters = $constructor->getParameters();
+
+        $params = array();
+        foreach ($constructorParameters as $constructorParameter) {
+            $paramName = $constructorParameter->name;
+            $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+
+            $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+            $ignored = in_array($paramName, $this->ignoredAttributes);
+
+            if (!$allowed || $ignored) {
+                continue;
+            }
+
+            $missing = !isset($data[$key]) && !array_key_exists($key, $data);
+            $variadic = method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic();
+
+            if ($variadic && !$missing && !is_array($data[$paramName])) {
+                $message = 'Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.';
+                throw new RuntimeException(sprintf($message, $class, $constructorParameter->name));
+            }
+
+            if ($variadic && !$missing) {
+                $params = array_merge($params, $data[$paramName]);
+
+                continue;
+            }
+
+            if ($missing && !$variadic && !$constructorParameter->isDefaultValueAvailable()) {
+                $message = 'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.';
+                throw new RuntimeException(sprintf($message, $class, $constructorParameter->name));
+            }
+
+            if ($missing && $constructorParameter->isDefaultValueAvailable()) {
+                $params[] = $constructorParameter->getDefaultValue();
+
+                continue;
+            }
+
+            if (!$missing) {
+                $params[] = $this->denormalizeProperty($data[$key], $class, $key, $format, $context);
+
+                unset($data[$key]);
+            }
+        }
+
+        return $reflectionClass->newInstanceArgs($params);
+    }
+
+    /**
+     * @param mixed  $data
+     * @param string $class
+     * @param string $name
+     * @param string $format
+     * @param array  $context
+     *
+     * @return mixed|object
+     */
+    protected function denormalizeProperty($data, $class, $name, $format = null, array $context = array())
+    {
+        if (!$this->propertyInfoExtractor) {
+            return $data;
+        }
+
+        $types = $this->propertyInfoExtractor->getTypes($class, $name);
+
+        if (empty($types)) {
+            return $data;
+        }
+
+        foreach ($types as $type) {
+            if ($data === null && $type->isNullable()) {
+                return $data;
+            }
+
+            if (!$this->serializer instanceof DenormalizerInterface) {
+                $message = 'Cannot denormalize attribute "%s" because injected serializer is not a denormalizer';
+                throw new RuntimeException(sprintf($message, $name));
+            }
+
+            return $this->serializer->denormalize($data, $type->getClassName(), $format, $context);
+        }
+
+    }
+
+    /**
+     * Should this attribute be normalized?
+     *
+     * @param mixed  $object
+     * @param string $attributeName
+     * @param array  $context
+     *
+     * @return bool
+     */
+    protected function isAttributeToNormalize($object, $attributeName, &$context)
+    {
+        return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
+    }
+
+    /**
+     * Sets an attribute and apply the name converter if necessary.
+     *
+     * @param array  $data
+     * @param string $attribute
+     * @param mixed  $attributeValue
+     *
+     * @return array
+     */
+    protected function setAttribute(array $data, $attribute, $attributeValue)
+    {
+        if ($this->nameConverter) {
+            $attribute = $this->nameConverter->normalize($attribute);
+        }
+
+        $data[$attribute] = $attributeValue;
+
+        return $data;
+    }
+
+    /**
+     * Normalizes complex types at the end of the process (recursive call).
+     *
+     * @param array       $data
+     * @param array       $stack
+     * @param string|null $format
+     * @param array       $context
+     *
+     * @return array
+     *
+     * @throws LogicException
+     */
+    protected function normalizeComplexTypes(array $data, array $stack, $format, array &$context)
+    {
+        foreach ($stack as $attribute => $attributeValue) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
+            }
+
+            $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+
+            $data = $this->setAttribute($data, $attribute, $attributeValue);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Is the max depth reached for the given attribute?
+     *
+     * @param string $class
+     * @param string $attribute
+     * @param array  $context
+     *
+     * @return bool
+     */
+    private function isMaxDepthReached($class, $attribute, array &$context)
+    {
+        if (!$this->classMetadataFactory || !isset($context[static::ENABLE_MAX_DEPTH])) {
+            return false;
+        }
+
+        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        if (!isset($attributesMetadata[$attribute])) {
+            return false;
+        }
+
+        $maxDepth = $attributesMetadata[$attribute]->getMaxDepth();
+        if (null === $maxDepth) {
+            return false;
+        }
+
+        $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
+        $keyExist = isset($context[$key]);
+
+        if ($keyExist && $context[$key] === $maxDepth) {
+            return true;
+        }
+
+        if ($keyExist) {
+            ++$context[$key];
+        } else {
+            $context[$key] = 1;
+        }
+
+        return false;
     }
 }

@@ -306,7 +306,7 @@ class Locale
      *
      * @return bool true on success or false on failure
      *
-     * @see http://www.php.net/manual/en/locale.parselocale.php
+     * @see http://www.php.net/manual/en/locale.setdefault.php
      *
      * @throws MethodNotImplementedException
      */

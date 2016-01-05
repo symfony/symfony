@@ -52,6 +52,8 @@ class WebProfilerExtension extends Extension
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
+
+        $container->setParameter('web_profiler.debug_toolbar.options', $config['options']);
     }
 
     /**

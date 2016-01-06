@@ -158,9 +158,18 @@ EOF
         }
 
         // fix references to kernel/container related classes
-        $search = $tempKernel->getName().ucfirst($tempKernel->getEnvironment());
-        $replace = $realKernel->getName().ucfirst($realKernel->getEnvironment());
-        foreach (Finder::create()->files()->name($search.'*')->in($warmupDir) as $file) {
+        $fileSearch = $tempKernel->getName().ucfirst($tempKernel->getEnvironment()).'*';
+        $search = array(
+            $tempKernel->getName().ucfirst($tempKernel->getEnvironment()),
+            sprintf('\'kernel.name\' => \'%s\'', $tempKernel->getName()),
+            sprintf('key="kernel.name">%s<', $tempKernel->getName()),
+        );
+        $replace = array(
+            $realKernel->getName().ucfirst($realKernel->getEnvironment()),
+            sprintf('\'kernel.name\' => \'%s\'', $realKernel->getName()),
+            sprintf('key="kernel.name">%s<', $realKernel->getName()),
+        );
+        foreach (Finder::create()->files()->name($fileSearch)->in($warmupDir) as $file) {
             $content = str_replace($search, $replace, file_get_contents($file));
             file_put_contents(str_replace($search, $replace, $file), $content);
             unlink($file);

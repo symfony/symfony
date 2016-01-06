@@ -238,10 +238,6 @@ class Parser
                 if ($isRef) {
                     $this->refs[$isRef] = $data[$key];
                 }
-
-                if ($objectForMap && !is_object($data)) {
-                    $data = (object) $data;
-                }
             } else {
                 // multiple documents are not supported
                 if ('---' === $this->currentLine) {
@@ -303,6 +299,10 @@ class Parser
 
         if (isset($mbEncoding)) {
             mb_internal_encoding($mbEncoding);
+        }
+
+        if ($objectForMap && !is_object($data)) {
+            $data = (object) $data;
         }
 
         return empty($data) ? null : $data;

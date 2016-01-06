@@ -685,22 +685,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunProcessWithTimeout()
     {
-        $timeout = 0.1;
-        $process = $this->getProcess(self::$phpBin.' -r "sleep(1);"');
-        $process->setTimeout($timeout);
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(30);"');
+        $process->setTimeout(0.1);
         $start = microtime(true);
         try {
             $process->run();
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
         }
-        $duration = microtime(true) - $start;
 
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            // On Windows, timers are too transient
-            $maxDuration = $timeout + 2 * Process::TIMEOUT_PRECISION;
-            $this->assertLessThan($maxDuration, $duration);
-        }
+        $this->assertLessThan(15, microtime(true) - $start);
 
         throw $e;
     }

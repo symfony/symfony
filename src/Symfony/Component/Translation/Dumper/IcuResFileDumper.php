@@ -30,8 +30,8 @@ class IcuResFileDumper implements DumperInterface
         }
 
         // save a file for each domain
+        $file = $messages->getLocale().'.'.$this->getExtension();
         foreach ($messages->getDomains() as $domain) {
-            $file = $messages->getLocale().'.'.$this->getExtension();
             $path = $options['path'].'/'.$domain.'/';
 
             if (!is_dir($path) && !@mkdir($path) && !is_dir($path)) {

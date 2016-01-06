@@ -442,11 +442,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             foreach ($itemToRemove as $item) {
-                call_user_func(array($object, $access[self::ACCESS_REMOVER]), $item);
+                $object->{$access[self::ACCESS_REMOVER]}($item);
             }
 
             foreach ($itemsToAdd as $item) {
-                call_user_func(array($object, $access[self::ACCESS_ADDER]), $item);
+                $object->{$access[self::ACCESS_ADDER]}($item);
             }
         } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly

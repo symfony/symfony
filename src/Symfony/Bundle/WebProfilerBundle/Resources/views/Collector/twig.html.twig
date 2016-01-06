@@ -10,6 +10,10 @@
 
     {% set text %}
         <div class="sf-toolbar-info-piece">
+            <b>Main Template</b>
+            <span>{{ collector.templates|keys|first }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
             <b>Render Time</b>
             <span>{{ time }} ms</span>
         </div>

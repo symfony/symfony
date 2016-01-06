@@ -279,7 +279,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
-     * it is present in the context with the object_to_populate key.
+     * it is present in the context with the object_to_populate key then remove this key.
      *
      * @param array            $data
      * @param string           $class
@@ -298,7 +298,10 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             is_object($context['object_to_populate']) &&
             $class === get_class($context['object_to_populate'])
         ) {
-            return $context['object_to_populate'];
+            $object = $context['object_to_populate'];
+            unset($context['object_to_populate']);
+
+            return $object;
         }
 
         $constructor = $reflectionClass->getConstructor();

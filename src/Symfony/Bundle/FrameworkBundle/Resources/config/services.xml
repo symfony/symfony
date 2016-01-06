@@ -29,7 +29,9 @@
             <argument type="collection" />
         </service>
 
-        <service id="service_container" synthetic="true" />
+        <service id="service_container" synthetic="true">
+            <autowiring-type>Symfony\Component\DependencyInjection\ContainerInterface</autowiring-type>
+        </service>
 
         <service id="kernel" synthetic="true" />
 

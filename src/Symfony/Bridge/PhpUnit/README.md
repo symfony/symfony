@@ -5,7 +5,6 @@ Provides utilities for PHPUnit, especially user deprecation notices management.
 
 It comes with the following features:
 
- * disable the garbage collector;
  * enforce a consistent `C` locale;
  * auto-register `class_exists` to load Doctrine annotations;
  * print a user deprecation notices summary at the end of the test suite;

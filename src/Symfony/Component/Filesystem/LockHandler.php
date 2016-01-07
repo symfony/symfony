@@ -73,8 +73,8 @@ class LockHandler
         $errorLevel = error_reporting(0);
         set_error_handler('var_dump', 0);
 
-        // Remove lock file when ttl has expired
         if (null !== $ttl && filemtime($this->file) < (time() - $ttl)) {
+            // Remove lock file when ttl has expired
             unlink($this->file);
         }
 

@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-24T15:21:28Z
+
+To me this PR should be opened against the `2.3`, `2.7`, ` 2.8` and ` 3.0` branches as this behavior is already supported by the `XmlFileLoader` thanks to the provided XML definition file.
+
+Should we consider it a new feature and keep the PR opened against the `master` branch or should I reopen it against the older branches?
+
+@nicolas-grekas @stof @fabpot any ideas please?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-28T12:56:23Z
+
+> The problem is when you have a generic bundle that supports ``"symfony/symfony": "^2.3|^3.0"``, a solution to support the new api is to have the new and the deprecated keywords in its configuration files.
+This PR would force people to update their package in a minor version and it is against the [symfony BC policy](http://symfony.com/doc/current/contributing/code/bc.html). IMO this exception should be added in symfony 4.0 and unsupported keywords deprecated in symfony 3.1.
+
+I agree with @Ener-Getick here. Throwing an exception on unsupported keys in the service definition is indeed a BC break as it might break existing working config files.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-28T16:17:52Z
+
+I've changed the PR to raise a deprecation notice instead. Shall we also introduce an `UPGRADE-4.0.md` to start indexing the future changes in `4.x`?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-28T16:28:16Z
+
+I think that we should have an upgrade file for ``3.1`` which would advise to don't use unsupported keys anymore.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-28T16:46:51Z
+
+I guess this time, it's ok for another round of review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-29T09:53:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-29T10:03:12Z
+
+We should add a way to add additional custom keys. For example, the FOSRestBundle adds additional keys for defining REST related routes. With the current implementation we would have overridde the complete `checkDefinition()` method.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-12-29T10:05:07Z
+
+@xabbuh it's for service definitions routing. Does `FOSRestBundle` have extra parameters for services definitions?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-29T10:11:28Z
+
+@hhamon Sorry, forget about my comment.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-01-05T10:01:00Z
+
+Any news on this? @xabbuh @stof @nicolas-grekas @dunglas @weaverryan @webmozart
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-05T10:09:10Z
+
+:+1:, very useful when using autowiring (I often use the key `types` instead and `autowiring_types` and currently it silently fail).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-05T19:11:43Z
+
+:+1:

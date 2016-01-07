@@ -98,19 +98,16 @@ class AssetExtension extends \Twig_Extension
     {
         if ($version) {
             $package = $this->packages->getPackage($packageName);
-            $class = new \ReflectionClass($package);
 
-            while ('Symfony\Component\Asset\Package' !== $class->getName()) {
-                $class = $class->getParentClass();
-            }
-
-            $v = $class->getProperty('versionStrategy');
+            $v = new \ReflectionProperty('Symfony\Component\Asset\Package', 'versionStrategy');
             $v->setAccessible(true);
+
             $currentVersionStrategy = $v->getValue($package);
 
             if (property_exists($currentVersionStrategy, 'format')) {
                 $f = new \ReflectionProperty($currentVersionStrategy, 'format');
                 $f->setAccessible(true);
+
                 $format = $f->getValue($currentVersionStrategy);
 
                 $v->setValue($package, new StaticVersionStrategy($version, $format));

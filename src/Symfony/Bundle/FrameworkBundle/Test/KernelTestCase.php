@@ -79,8 +79,12 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
             if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
-            } elseif (strpos($testArg, '--configuration=') === 0) {
+            } elseif (0 === strpos($testArg, '--configuration=')) {
                 $argPath = substr($testArg, strlen('--configuration='));
+                $dir = realpath($argPath);
+                break;
+            } elseif (0 === strpos($testArg, '-c')) {
+                $argPath = substr($testArg, strlen('-c'));
                 $dir = realpath($argPath);
                 break;
             }

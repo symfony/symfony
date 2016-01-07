@@ -1076,7 +1076,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // skip mode check on Windows
         if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(600, $filename);
+            $this->assertFilePermissions(666, $filename);
         }
     }
 

@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-12-30T13:51:31Z
+
+If I understand it correctly, there has been a deprecation added in 2.8 which was never merged into 3.0 and the code was never fixed properly there. If you take a look at the [history of Filesystem.php](https://github.com/symfony/symfony/blob/faee0d714b611b54e2557ce8c7d25782e413590d/src/Symfony/Component/Filesystem/Filesystem.php#L482-L488):
+ - The 3rd option is marked as deprecated
+ - The default value is `0666`
+ - If the value is not `null`, it will set the permissions
+ - By passing 2 arguments you will _not_ trigger the deprecation notice but it will still set the permissions to `0666`
+
+This means that the only case where no permissions would be set, would be by passing `null` as third argument which was deprecated, but that's the exact behavior 3.0 has right now.
+
+When you take a look at the [3.0 Filesystem.php](https://github.com/symfony/symfony/blob/3.0/src/Symfony/Component/Filesystem/Filesystem.php#L531-L532), you can see that the permissions are not longer fixed. The only non-deprecated way, which is setting it `0666` afterwards is broken in 3.0.
+
+/cc @xabbuh
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T14:04:22Z
+
+@iltar I think your reasoning is correct and we need to always set the permissions as proposed here.
+
+By the way, the solution before Symfony 3.0 was not really atomic, was it? I mean the `chmod()` call was done after renaming the file. Shouldn't this happened the other way around (like proposed here)?
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2015-12-30T14:05:02Z
+
+@iltar, this is indeed the case.
+
+Code that ran in 2.8 without any deprication message stops working in 3.0 because the [`tempnam`](http://php.net/tempnam) function of php creates files with access permissions set to 0600. In 2.8 this was fixed by running a chmod with 0666 (ignoring system umask). In 3.0 however, nothing is done and only the creating user can read the file.
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2015-12-30T14:06:29Z
+
+@xabbuh I agree that the permissions should be changed after writing as @cs278 pointed out and before renaming to make this operation atomic.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T14:08:45Z
+
+@hboomsma Would you like to create a pull request for older Symfony versions that swaps the order of the calls?
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2015-12-30T14:12:10Z
+
+@xabbuh sure, which versions should we patch? I'll create a pull request for 2.8 right away.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T14:17:19Z
+
+Hm, I think we will get other issues when merging this on filesystems that don't allow to change permissions (see #8205).
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2015-12-30T14:26:40Z
+
+@xabbuh you are right, I'll fix it in the same way, it was fixed in the mentioned issue, because if `chmod` is not supported `tempnam` will not mess with permissions either.
+
+As for the request for 2.8 do you have an open issue for me to mention in the PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T14:28:13Z
+
+@hboomsma I think you can refer to the same issue (it's also talking about the (not)-atomic behaviour).
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2015-12-30T14:44:05Z
+
+@xabbuh #17184 for atomic behaviour in 2.8
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-12-30T14:54:53Z
+
+Looks like the failure is unrelated to the changes in this PR.
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2016-01-04T09:27:03Z
+
+@xabbuh @cs278 @iltar Updated with changes done in 2.3 and merged upward for atomic behaviour
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2016-01-04T14:34:49Z
+
+@xabbuh updated PR to not take the umask into account.
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2016-01-06T13:46:07Z
+
+@xabbuh updated pr to not enhance the unit tests, I will create a separate PR for taking the umask into account with the extra tests for 2.3 after this PR is finished.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-07T09:43:40Z
+
+:+1:
+
+Status: Reviewed

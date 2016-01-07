@@ -188,6 +188,7 @@
                     Sfjs.removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
                 } else if (state == 'error') {
                     Sfjs.addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
+                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 } else {
                     Sfjs.addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
                 }

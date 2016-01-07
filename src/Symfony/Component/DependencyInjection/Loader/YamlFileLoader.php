@@ -32,6 +32,30 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class YamlFileLoader extends FileLoader
 {
+    private static $keywords = array(
+        'alias' => 'alias',
+        'parent' => 'parent',
+        'class' => 'class',
+        'shared' => 'shared',
+        'synthetic' => 'synthetic',
+        'lazy' => 'lazy',
+        'public' => 'public',
+        'abstract' => 'abstract',
+        'deprecated' => 'deprecated',
+        'factory' => 'factory',
+        'file' => 'file',
+        'arguments' => 'arguments',
+        'properties' => 'properties',
+        'configurator' => 'configurator',
+        'calls' => 'calls',
+        'tags' => 'tags',
+        'decorates' => 'decorates',
+        'decoration_inner_name' => 'decoration_inner_name',
+        'decoration_priority' => 'decoration_priority',
+        'autowire' => 'autowire',
+        'autowiring_types' => 'autowiring_types',
+    );
+
     private $yamlParser;
 
     /**
@@ -146,6 +170,8 @@ class YamlFileLoader extends FileLoader
         if (!is_array($service)) {
             throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but %s found for service "%s" in %s. Check your YAML syntax.', gettype($service), $id, $file));
         }
+
+        static::checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
             $public = !array_key_exists('public', $service) || (bool) $service['public'];
@@ -430,6 +456,26 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->container->loadFromExtension($namespace, $values);
+        }
+    }
+
+    /**
+     * Checks the keywords used to define a service.
+     *
+     * @param string $id         The service name
+     * @param array  $definition The service definition to check
+     * @param string $file       The loaded YAML file
+     */
+    private static function checkDefinition($id, array $definition, $file)
+    {
+        foreach ($definition as $key => $value) {
+            if (!isset(static::$keywords[$key])) {
+                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', static::$keywords)), E_USER_DEPRECATED);
+                // @deprecated Uncomment the following statement in Symfony 4.0
+                // and also update the corresponding unit test to make it expect
+                // an InvalidArgumentException exception.
+                //throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', static::$keywords)));
+            }
         }
     }
 }

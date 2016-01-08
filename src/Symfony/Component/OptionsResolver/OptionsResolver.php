@@ -427,8 +427,6 @@ class OptionsResolver implements Options
      * Returns the names of all frozen options.
      *
      * @return string[] The names of the frozen options
-     *
-     * @see isFrozen()
      */
     public function getFrozenOptions()
     {

@@ -165,7 +165,7 @@ class QuestionHelper extends Helper
             $messages = (array) $question->getQuestion();
             foreach ($question->getChoices() as $key => $value) {
                 $width = $maxWidth - $this->strlen($key);
-                $messages[] = "  [<info>".$key.str_repeat(" ", $width)."</info>] ".$value;
+                $messages[] = '  [<info>'.$key.str_repeat(' ', $width).'</info>] '.$value;
             }
 
             $output->writeln($messages);

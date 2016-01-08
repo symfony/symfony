@@ -361,9 +361,9 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         );
         $outputShown = array(
             $question,
-            "  [<info>foo   </info>] foo",
-            "  [<info>żółw  </info>] bar",
-            "  [<info>łabądź</info>] baz",
+            '  [<info>foo   </info>] foo',
+            '  [<info>żółw  </info>] bar',
+            '  [<info>łabądź</info>] baz',
         );
         $output = $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
         $output->method('getFormatter')->willReturn(new OutputFormatter());

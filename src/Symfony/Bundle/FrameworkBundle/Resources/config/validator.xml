@@ -28,10 +28,6 @@
 
         <service id="validator.mapping.class_metadata_factory" alias="validator" public="false" />
 
-        <service id="validator.mapping.cache.apc" class="Symfony\Component\Validator\Mapping\Cache\ApcCache" public="false">
-            <argument>%validator.mapping.cache.prefix%</argument>
-        </service>
-
         <service id="validator.validator_factory" class="Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />

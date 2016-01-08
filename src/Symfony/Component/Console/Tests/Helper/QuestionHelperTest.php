@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -348,6 +349,34 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $dialog = new QuestionHelper();
         $question = new Question('Do you have a job?', 'not yet');
         $this->assertEquals('not yet', $dialog->ask($this->createInputInterfaceMock(false), $this->createOutputInterface(), $question));
+    }
+
+    public function testChoiceOutputFormattingQuestionForUtf8Keys()
+    {
+        $question = 'Lorem ipsum?';
+        $possibleChoices = array(
+            'foo' => 'foo',
+            'żółw' => 'bar',
+            'łabądź' => 'baz',
+        );
+        $outputShown = array(
+            $question,
+            '  [<info>foo   </info>] foo',
+            '  [<info>żółw  </info>] bar',
+            '  [<info>łabądź</info>] baz',
+        );
+        $output = $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
+        $output->method('getFormatter')->willReturn(new OutputFormatter());
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $output->expects($this->once())->method('writeln')->with($this->equalTo($outputShown));
+
+        $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
+        $dialog->ask($this->createInputInterfaceMock(), $output, $question);
     }
 
     protected function getInputStream($input)

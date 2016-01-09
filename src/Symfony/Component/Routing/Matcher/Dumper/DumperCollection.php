@@ -26,7 +26,7 @@ class DumperCollection implements \IteratorAggregate
     private $parent;
 
     /**
-     * @var (DumperCollection|DumperRoute)[]
+     * @var DumperCollection[]|DumperRoute[]
      */
     private $children = array();
 
@@ -38,7 +38,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Returns the children routes and collections.
      *
-     * @return (DumperCollection|DumperRoute)[] Array of DumperCollection|DumperRoute
+     * @return DumperCollection[]|DumperRoute[] Array of DumperCollection|DumperRoute
      */
     public function all()
     {

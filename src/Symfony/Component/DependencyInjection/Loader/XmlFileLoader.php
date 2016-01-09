@@ -132,6 +132,8 @@ class XmlFileLoader extends FileLoader
     private function parseDefinition(\DOMElement $service, $file)
     {
         if ($alias = $service->getAttribute('alias')) {
+            $this->validateAlias($service, $file);
+
             $public = true;
             if ($publicAttr = $service->getAttribute('public')) {
                 $public = XmlUtils::phpize($publicAttr);
@@ -488,6 +490,27 @@ EOF
         }
 
         return $valid;
+    }
+
+    /**
+     * Validates an alias.
+     *
+     * @param \DOMElement $alias
+     * @param string      $file
+     */
+    private function validateAlias(\DOMElement $alias, $file)
+    {
+        foreach ($alias->attributes as $name => $node) {
+            if (!in_array($name, array('alias', 'id', 'public'))) {
+                @trigger_error(sprintf('Using the attribute "%s" is deprecated for alias definition "%s" in "%s". Allowed attributes are "alias", "id" and "public". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $name, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+            }
+        }
+
+        foreach ($alias->childNodes as $child) {
+            if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
+                @trigger_error(sprintf('Using the element "%s" is deprecated for alias definition "%s" in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+            }
+        }
     }
 
     /**

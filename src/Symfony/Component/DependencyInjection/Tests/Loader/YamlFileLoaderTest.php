@@ -303,4 +303,30 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('legacy_invalid_definition.yml');
     }
+
+    /**
+     * @group legacy
+     */
+    public function testAliasDefinitionContainsUnsupportedKeywords()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $loader->load('legacy_invalid_alias_definition.yml');
+
+        $this->assertTrue($container->has('foo'));
+
+        $this->assertCount(2, $deprecations);
+        $this->assertContains('The configuration key "factory" is unsupported for alias definition "foo"', $deprecations[0]);
+        $this->assertContains('The configuration key "parent" is unsupported for alias definition "foo"', $deprecations[1]);
+
+        restore_error_handler();
+    }
 }

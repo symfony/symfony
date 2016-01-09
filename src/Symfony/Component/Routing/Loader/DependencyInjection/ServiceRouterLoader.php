@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Loader\DependencyInjection;
 
-use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Loader\ObjectRouteLoader;
 

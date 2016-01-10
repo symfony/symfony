@@ -324,6 +324,8 @@ class Application
     {
         if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
             return sprintf('<info>%s</info> version <comment>%s</comment>', $this->getName(), $this->getVersion());
+        } else if ('UNKNOWN' !== $this->getName()) {
+            return sprintf('<info>%s</info>', $this->getName());
         }
 
         return '<info>Console Tool</info>';

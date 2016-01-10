@@ -78,23 +78,36 @@
     float: left;
     width: 654px;
 }
-.sf-reset .error-count {
+.sf-reset .error-count, .sf-reset .support {
     float: right;
     width: 170px;
     text-align: right;
 }
 .sf-reset .error-count span {
+     display: inline-block;
+     background-color: #aacd4e;
+     -moz-border-radius: 6px;
+     -webkit-border-radius: 6px;
+     border-radius: 6px;
+     padding: 4px;
+     color: white;
+     margin-right: 2px;
+     font-size: 11px;
+     font-weight: bold;
+}
+
+.sf-reset .support a {
     display: inline-block;
-    background-color: #aacd4e;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
     padding: 4px;
-    color: white;
+    color: #000000;
     margin-right: 2px;
     font-size: 11px;
     font-weight: bold;
 }
+
 .sf-reset .toggle {
     vertical-align: middle;
 }

@@ -279,7 +279,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
-     * it is present in the context with the object_to_populate key then remove this key.
+     * it is present in the context with the object_to_populate. This object
+     * is removed from the context before being returned to avoid side effects
+     * when recursively normalizing an object graph.
      *
      * @param array            $data
      * @param string           $class

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-08T12:48:10Z
+
+This is a BC break, you need to manually escape the % char
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2016-01-08T12:50:31Z
+
+@dosten  How should this be a BC break? Kernel parameter `%` signs are resolved before. And all other `%` should be passed as is to the sprintf. In other case they cause Exception (see the bug attached)
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2016-01-08T12:52:43Z
+
+i.e if we have path `/var/www/some%2Fproject/` (which is `'/var/www/' . urlencode('some/project')`) we will have the exception. Passign `%` as is should not be a BC break as sprintf expects only one `%s` template in the path.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-09T01:00:05Z
+
+The better fix is to only apply the `sprintf` to `/Resources/%s/translations` and not the kernel root dir. This way there is no need to encode anything.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2016-01-09T06:11:03Z
+
+@Tobion Yes, and this would have more clear logic with sprifntf.
+
+Does this one looks better?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-09T13:20:49Z
+
+:+1:
+
+Status: Reviewed

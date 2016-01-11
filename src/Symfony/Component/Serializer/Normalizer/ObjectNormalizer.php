@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractNormalizer
 {
-    private static $attributesCache = array();
+    private $attributesCache = array();
 
     /**
      * @var PropertyAccessorInterface
@@ -140,16 +140,16 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     private function getAttributes($object, array $context)
     {
-        $key = sprintf('%s-%s', get_class($object), serialize($context));
-
-        if (isset(self::$attributesCache[$key])) {
-            return self::$attributesCache[$key];
-        }
-
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         if (false !== $allowedAttributes) {
-            return self::$attributesCache[$key] = $allowedAttributes;
+            return $allowedAttributes;
+        }
+
+        $key = get_class($object);
+
+        if (isset($this->attributesCache[$key])) {
+            return $this->attributesCache[$key];
         }
 
         // If not using groups, detect manually
@@ -187,6 +187,6 @@ class ObjectNormalizer extends AbstractNormalizer
             $attributes[$reflProperty->getName()] = true;
         }
 
-        return self::$attributesCache[$key] = array_keys($attributes);
+        return $this->attributesCache[$key] = array_keys($attributes);
     }
 }

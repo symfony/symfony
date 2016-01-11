@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-22T09:03:30Z
+
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by Disparity at 2015-12-27T07:07:49Z
+
+@nicolas-grekas, I added tests to check the functionality different types of "Collections".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T13:42:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-28T14:48:09Z
+
+Is this supposed to be a bugfix or a new feature?
+
+---------------------------------------------------------------------------
+
+by Disparity at 2015-12-28T15:10:02Z
+
+@xabbuh, these changes are closer to a new feature than to bug fixes.
+This allows the validator working with traversable results (which include doctrine collection), and not only with iterators and arrays.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-10T07:58:41Z
+
+:+1: I would consider this a bugfix rather than a new feature.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-11T09:27:46Z
+
+:+1: for merging this into Symfony 2.3

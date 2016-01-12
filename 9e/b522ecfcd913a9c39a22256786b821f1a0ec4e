@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-10T01:58:41Z
+
+I think this implementation is too specific. It should be solved generically. Something like ignore deprecated interfaces if the parent interface is from the Symfony namespace as well.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-10T11:16:52Z
+
+@Tobion Updated accordingly. I don't know if this might cause any unwanted side effects.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-10T13:21:40Z
+
+Lets see what @nicolas-grekas thinks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-11T14:30:49Z
+
+There is an issue, and I think we should not restrict the fix to `Symfony*` names.
+I propose this patch:
+```diff
+--- a/src/Symfony/Component/Debug/DebugClassLoader.php
++++ b/src/Symfony/Component/Debug/DebugClassLoader.php
+@@ -200,8 +200,23 @@ class DebugClassLoader
+                         @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                     }
+
++                    $parentInterfaces = array();
++                    $deprecatedInterfaces = array();
++                    if ($parent) {
++                        foreach ($parent->getInterfaceNames() as $interface) {
++                            $parentInterfaces[$interface] = 1;
++                        }
++                    }
+                     foreach ($refl->getInterfaceNames() as $interface) {
+-                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
++                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
++                            $deprecatedInterfaces[] = $interface;
++                        }
++                        foreach (class_implements($interface) as $interface) {
++                            $parentInterfaces[$interface] = 1;
++                        }
++                    }
++                    foreach ($deprecatedInterfaces as $interface) {
++                        if (!isset($parentInterfaces[$interface])) {
+                             @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                         }
+                     }
+```
+
+@peterrehm could you please also squash your PR and fix the commit message (and PR title)?
+This would help generating a useful changelog when releasing. Thanks!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-11T15:44:19Z
+
+Needs tests IMO
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-11T18:01:47Z
+
+Can you add a test covering this ?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-11T18:14:50Z
+
+Not sure yet, working on it.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-11T18:41:43Z
+
+Just added a test, please have a look at the test. @nicolas-grekas Otherwise all your comments should have been incorporated as well...

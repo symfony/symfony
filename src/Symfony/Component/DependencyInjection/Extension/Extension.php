@@ -91,9 +91,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
             $container->addResource(new FileResource($r->getFileName()));
 
             if (!method_exists($class, '__construct')) {
-                $configuration = new $class();
-
-                return $configuration;
+                return new $class();
             }
         }
     }

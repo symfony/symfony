@@ -111,6 +111,7 @@ class RouteCollectionBuilder
     /**
      * Add a RouteCollectionBuilder.
      *
+     * @param string                 $prefix
      * @param RouteCollectionBuilder $builder
      */
     public function mount($prefix, RouteCollectionBuilder $builder)

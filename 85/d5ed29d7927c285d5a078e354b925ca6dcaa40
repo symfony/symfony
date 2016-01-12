@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2015-12-29T19:29:01Z
+
+Updated to keep BC as suggested by @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T08:46:16Z
+
+Can we add a test that would fail when the caching was added again to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-30T08:50:19Z
+
+A meaningful test would be one implementing a (de)normalizer that uses the data as described above.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-01-03T17:15:01Z
+
+Tests added.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-03T18:58:25Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-11T21:11:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-11T21:12:40Z
+
+Btw, `$context` should be added as last argument of `supportNormalization`/`supportDenormalization` as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-12T09:26:53Z
+
+:+1:

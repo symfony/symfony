@@ -114,6 +114,10 @@ class UniqueEntityValidator extends ConstraintValidator
         $repository = $em->getRepository(get_class($entity));
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
+        if ($result instanceof \IteratorAggregate) {
+            $result = $result->getIterator();
+        }
+
         /* If the result is a MongoCursor, it must be advanced to the first
          * element. Rewinding should have no ill effect if $result is another
          * iterator implementation.

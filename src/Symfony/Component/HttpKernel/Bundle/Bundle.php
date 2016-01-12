@@ -179,7 +179,7 @@ abstract class Bundle implements BundleInterface
         foreach ($finder as $file) {
             $ns = $prefix;
             if ($relativePath = $file->getRelativePath()) {
-                $ns .= '\\'.strtr($relativePath, '/', '\\');
+                $ns .= '\\'.str_replace('/', '\\', $relativePath);
             }
             $class = $ns.'\\'.$file->getBasename('.php');
             if ($this->container) {

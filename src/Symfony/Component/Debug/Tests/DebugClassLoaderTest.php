@@ -199,6 +199,28 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testInterfaceExtendsDeprecatedInterface()
+    {
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\NonDeprecatedInterfaceClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_NOTICE,
+            'message' => '',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
     public function testDeprecatedSuperInSameNamespace()
     {
         set_error_handler('var_dump', 0);
@@ -285,6 +307,8 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\DeprecatedInterface {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\NonDeprecatedInterfaceClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class NonDeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\NonDeprecatedInterface {}');
         } elseif ('Test\\'.__NAMESPACE__.'\Float' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
         }

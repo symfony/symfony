@@ -55,6 +55,9 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
@@ -104,6 +107,9 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
@@ -130,6 +136,16 @@ class ObjectNormalizer extends AbstractNormalizer
         return $object;
     }
 
+    private function getCacheKey(array $context)
+    {
+        try {
+            return md5(serialize($context));
+        } catch (\Exception $exception) {
+            // The context cannot be serialized, skip the cache
+            return false;
+        }
+    }
+
     /**
      * Gets and caches attributes for this class and context.
      *
@@ -140,37 +156,39 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     private function getAttributes($object, array $context)
     {
-        try {
-            $serializedContext = serialize($context);
-        } catch (\Exception $exception) {
-            // The context cannot be serialized, skip the cache
-            return $this->extractAttributes($object, $context);
-        }
-
-        $key = sprintf('%s-%s', get_class($object), $serializedContext);
+        $class = get_class($object);
+        $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
             return $this->attributesCache[$key];
         }
 
-        return $this->attributesCache[$key] = $this->extractAttributes($object, $context);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
+
+        if (false !== $allowedAttributes) {
+            if ($context['cache_key']) {
+                $this->attributesCache[$key] = $allowedAttributes;
+            }
+
+            return $allowedAttributes;
+        }
+
+        if (isset($this->attributesCache[$class])) {
+            return $this->attributesCache[$class];
+        }
+
+        return $this->attributesCache[$class] = $this->extractAttributes($object);
     }
 
     /**
      * Extracts attributes for this class and context.
      *
      * @param object $object
-     * @param array  $context
      *
      * @return string[]
      */
-    private function extractAttributes($object, array $context)
+    private function extractAttributes($object)
     {
-        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
-        if (false !== $allowedAttributes) {
-            return $allowedAttributes;
-        }
-
         // If not using groups, detect manually
         $attributes = array();
 

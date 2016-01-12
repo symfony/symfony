@@ -70,7 +70,7 @@ class TableHelper extends Helper
 
             default:
                 throw new InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
-        };
+        }
 
         return $this;
     }

@@ -96,6 +96,50 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($serializer->normalize('test'));
     }
 
+    public function testNormalizeWithSupportOnData()
+    {
+        $normalizer1 = $this->getMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+        $normalizer1->method('supportsNormalization')
+            ->willReturnCallback(function ($data, $format) {
+                return isset($data->test);
+            });
+        $normalizer1->method('normalize')->willReturn('test1');
+
+        $normalizer2 = $this->getMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+        $normalizer2->method('supportsNormalization')
+            ->willReturn(true);
+        $normalizer2->method('normalize')->willReturn('test2');
+
+        $serializer = new Serializer(array($normalizer1, $normalizer2));
+
+        $data = new \stdClass();
+        $data->test = true;
+        $this->assertEquals('test1', $serializer->normalize($data));
+
+        $this->assertEquals('test2', $serializer->normalize(new \stdClass()));
+    }
+
+    public function testDenormalizeWithSupportOnData()
+    {
+        $denormalizer1 = $this->getMock('Symfony\Component\Serializer\Normalizer\DenormalizerInterface');
+        $denormalizer1->method('supportsDenormalization')
+            ->willReturnCallback(function ($data, $type, $format) {
+                return isset($data['test1']);
+            });
+        $denormalizer1->method('denormalize')->willReturn('test1');
+
+        $denormalizer2 = $this->getMock('Symfony\Component\Serializer\Normalizer\DenormalizerInterface');
+        $denormalizer2->method('supportsDenormalization')
+            ->willReturn(true);
+        $denormalizer2->method('denormalize')->willReturn('test2');
+
+        $serializer = new Serializer(array($denormalizer1, $denormalizer2));
+
+        $this->assertEquals('test1', $serializer->denormalize(array('test1' => true), 'test'));
+
+        $this->assertEquals('test2', $serializer->denormalize(array(), 'test'));
+    }
+
     public function testSerialize()
     {
         $serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));

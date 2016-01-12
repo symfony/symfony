@@ -129,7 +129,7 @@ abstract class Client
      */
     public function getServerParameter($key, $default = '')
     {
-        return (isset($this->server[$key])) ? $this->server[$key] : $default;
+        return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
     /**

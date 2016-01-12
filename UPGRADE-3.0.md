@@ -10,8 +10,8 @@ UPGRADE FROM 2.x to 3.0
    | -------- | ---
    | `registerNamespaces()` | `addPrefixes()`
    | `registerPrefixes()` | `addPrefixes()`
-   | `registerNamespaces()` | `addPrefix()`
-   | `registerPrefixes()` | `addPrefix()`
+   | `registerNamespace()` | `addPrefix()`
+   | `registerPrefix()` | `addPrefix()`
    | `getNamespaces()` | `getPrefixes()`
    | `getNamespaceFallbacks()` | `getFallbackDirs()`
    | `getPrefixFallbacks()` | `getFallbackDirs()`

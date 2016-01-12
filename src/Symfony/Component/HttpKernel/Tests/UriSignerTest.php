@@ -33,6 +33,7 @@ class UriSignerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo')));
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar')));
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer')));
 
         $this->assertTrue($signer->sign('http://example.com/foo?foo=bar&bar=foo') === $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
     }

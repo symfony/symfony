@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-01-06T14:15:59Z
+
+not sure if we should replace ``strtr()`` with ``str_replace()``
+
+---------------------------------------------------------------------------
+
+by kalessil at 2016-01-06T14:30:04Z
+
+@OskarStark : that wasn't a global replacement, only cases when `strtr()` is used as `str_replace()`. And `str_replace()` is more speaking name.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-12T09:18:15Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-12T11:09:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by kalessil at 2016-01-12T11:29:25Z
+
+\0/, now I can start checking 2.7 =)

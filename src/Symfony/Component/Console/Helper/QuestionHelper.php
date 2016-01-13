@@ -30,6 +30,7 @@ class QuestionHelper extends Helper
     private $inputStream;
     private static $shell;
     private static $stty;
+    private $readlinePrompt;
 
     /**
      * Asks a question to the user.
@@ -172,7 +173,11 @@ class QuestionHelper extends Helper
             $message = $question->getPrompt();
         }
 
-        $output->write($message);
+        if ($this->inputStream === STDIN && function_exists('readline')) {
+            $this->readlinePrompt = $message;
+        } else {
+            $output->write($message);
+        }
     }
 
     /**
@@ -438,7 +443,7 @@ class QuestionHelper extends Helper
     private function readFromInput($stream)
     {
         if (STDIN === $stream && function_exists('readline')) {
-            $ret = readline();
+            $ret = readline($this->readlinePrompt);
         } else {
             $ret = fgets($stream, 4096);
         }

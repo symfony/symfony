@@ -95,6 +95,7 @@ class ErrorHandler
 
     private $loggedTraces = array();
     private $isRecursive = 0;
+    private $isRoot = false;
     private $exceptionHandler;
 
     private static $reservedMemory;
@@ -134,7 +135,12 @@ class ErrorHandler
             $handler = new static();
         }
 
-        $prev = set_error_handler(array($handler, 'handleError'), $handler->thrownErrors | $handler->loggedErrors);
+        if (null === $prev = set_error_handler(array($handler, 'handleError'))) {
+            restore_error_handler();
+            // Specifying the error types earlier would expose us to https://bugs.php.net/63206
+            set_error_handler(array($handler, 'handleError'), $handler->thrownErrors | $handler->loggedErrors);
+            $handler->isRoot = true;
+        }
 
         if ($handlerIsNew && is_array($prev) && $prev[0] instanceof self) {
             $handler = $prev[0];
@@ -326,12 +332,16 @@ class ErrorHandler
     private function reRegister($prev)
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
-            $handler = set_error_handler('var_dump', 0);
+            $handler = set_error_handler('var_dump');
             $handler = is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler === $this) {
                 restore_error_handler();
-                set_error_handler(array($this, 'handleError'), $this->thrownErrors | $this->loggedErrors);
+                if ($this->isRoot) {
+                    set_error_handler(array($this, 'handleError'), $this->thrownErrors | $this->loggedErrors);
+                } else {
+                    set_error_handler(array($this, 'handleError'));
+                }
             }
         }
     }
@@ -527,7 +537,7 @@ class ErrorHandler
 
         self::$reservedMemory = null;
 
-        $handler = set_error_handler('var_dump', 0);
+        $handler = set_error_handler('var_dump');
         $handler = is_array($handler) ? $handler[0] : null;
         restore_error_handler();
 
@@ -672,7 +682,7 @@ class ErrorHandler
     {
         @trigger_error('The '.__METHOD__.' static method is deprecated since version 2.6 and will be removed in 3.0. Use the setLoggers() or setDefaultLogger() methods instead.', E_USER_DEPRECATED);
 
-        $handler = set_error_handler('var_dump', 0);
+        $handler = set_error_handler('var_dump');
         $handler = is_array($handler) ? $handler[0] : null;
         restore_error_handler();
         if (!$handler instanceof self) {

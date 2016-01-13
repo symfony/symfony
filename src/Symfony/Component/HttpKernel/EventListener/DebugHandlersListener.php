@@ -67,7 +67,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         $this->firstCall = false;
         if ($this->logger || null !== $this->throwAt) {
-            $handler = set_error_handler('var_dump', 0);
+            $handler = set_error_handler('var_dump');
             $handler = is_array($handler) ? $handler[0] : null;
             restore_error_handler();
             if ($handler instanceof ErrorHandler) {

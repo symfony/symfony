@@ -5,7 +5,9 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ProxyDummy;
 
 /**
  * Provides a dummy Normalizer which extends the AbstractNormalizer.
@@ -87,5 +89,17 @@ class AbstractNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', array('groups' => array('other')), false);
         $this->assertEquals(array($a3, $a4), $result);
+    }
+
+    public function testObjectToPopulateWithProxy()
+    {
+        $proxyDummy = new ProxyDummy();
+
+        $context = array('object_to_populate' => $proxyDummy);
+
+        $normalizer = new ObjectNormalizer();
+        $normalizer->denormalize(array('foo' => 'bar'), 'Symfony\Component\Serializer\Tests\Fixtures\ToBeProxyfiedDummy', null, $context);
+
+        $this->assertSame('bar', $proxyDummy->getFoo());
     }
 }

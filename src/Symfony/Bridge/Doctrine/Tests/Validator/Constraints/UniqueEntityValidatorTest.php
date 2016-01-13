@@ -398,7 +398,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
-            ->setInvalidValue(1)
+            ->setInvalidValue($entity1)
             ->assertRaised();
     }
 
@@ -422,10 +422,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage Associated entities are not allowed to have more than one identifier field
-     */
     public function testAssociatedCompositeEntity()
     {
         $constraint = new UniqueEntity(array(
@@ -443,6 +439,8 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->em->flush();
 
         $this->validator->validate($associated, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**

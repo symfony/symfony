@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by yapro at 2016-01-11T17:04:15Z
+
+@nicolas-grekas it does not work because kernel.debug is true
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-11T17:10:00Z
+
+@yapro I also changed the `kernel.debug is true` code path...
+
+---------------------------------------------------------------------------
+
+by yapro at 2016-01-12T11:48:48Z
+
+@nicolas-grekas https://github.com/symfony/symfony/pull/17202/files#diff-0e793081ceb720201745c982a568903fR145
+
+---------------------------------------------------------------------------
+
+by yapro at 2016-01-12T16:48:40Z
+
+@nicolas-grekas now it work, thank you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T08:35:52Z
+
+I just checkouted this on a 2.8 std-edition: works well in prod and dev (debug on/off)
+Without further comments, I'm going to merge this soon.
+ping @Tobion

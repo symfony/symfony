@@ -68,9 +68,8 @@ class LockHandler
             return true;
         }
 
-        // Silence both userland and native PHP error handlers
-        $errorLevel = error_reporting(0);
-        set_error_handler('var_dump', 0);
+        // Silence error reporting
+        set_error_handler(function() {});
 
         if (!$this->handle = fopen($this->file, 'r')) {
             if ($this->handle = fopen($this->file, 'x')) {
@@ -81,7 +80,6 @@ class LockHandler
             }
         }
         restore_error_handler();
-        error_reporting($errorLevel);
 
         if (!$this->handle) {
             $error = error_get_last();

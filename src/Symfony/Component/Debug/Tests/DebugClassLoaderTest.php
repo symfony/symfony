@@ -175,7 +175,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeprecatedSuper($class, $super, $type)
     {
-        set_error_handler('var_dump', 0);
+        set_error_handler(function() { return false; });
         $e = error_reporting(0);
         trigger_error('', E_USER_DEPRECATED);
 
@@ -205,7 +205,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testInterfaceExtendsDeprecatedInterface()
     {
-        set_error_handler('var_dump', 0);
+        set_error_handler(function() { return false; });
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
@@ -227,7 +227,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testDeprecatedSuperInSameNamespace()
     {
-        set_error_handler('var_dump', 0);
+        set_error_handler(function() { return false; });
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
@@ -253,7 +253,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('PHP7 already prevents using reserved names.');
         }
 
-        set_error_handler('var_dump', 0);
+        set_error_handler(function() { return false; });
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 

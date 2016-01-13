@@ -298,7 +298,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         if (
             isset($context['object_to_populate']) &&
             is_object($context['object_to_populate']) &&
-            $class === get_class($context['object_to_populate'])
+            $context['object_to_populate'] instanceof $class
         ) {
             $object = $context['object_to_populate'];
             unset($context['object_to_populate']);

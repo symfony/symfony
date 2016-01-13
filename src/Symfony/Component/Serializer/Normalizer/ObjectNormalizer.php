@@ -56,9 +56,9 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 continue;
             }
 
-            $name = $reflMethod->getName();
+            $name = $reflMethod->name;
 
-            if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
+            if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
                 // getters and hassers
                 $attributeName = lcfirst(substr($name, 3));
             } elseif (strpos($name, 'is') === 0) {
@@ -77,7 +77,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 continue;
             }
 
-            $attributes[$reflProperty->getName()] = true;
+            $attributes[$reflProperty->name] = true;
         }
 
         return array_keys($attributes);

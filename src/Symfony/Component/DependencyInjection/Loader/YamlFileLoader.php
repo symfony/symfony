@@ -119,12 +119,13 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "imports" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
+        $defaultDirectory = dirname($file);
         foreach ($content['imports'] as $import) {
             if (!is_array($import)) {
                 throw new InvalidArgumentException(sprintf('The values in the "imports" key should be arrays in %s. Check your YAML syntax.', $file));
             }
 
-            $this->setCurrentDir(dirname($file));
+            $this->setCurrentDir($defaultDirectory);
             $this->import($import['resource'], null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
         }
     }

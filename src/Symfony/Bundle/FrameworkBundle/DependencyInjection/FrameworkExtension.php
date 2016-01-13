@@ -137,6 +137,8 @@ class FrameworkExtension extends Extension
         }
 
         if ($container->getParameter('kernel.debug')) {
+            $definition->replaceArgument(2, E_ALL & ~(E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR));
+
             $loader->load('debug.xml');
 
             $definition = $container->findDefinition('http_kernel');
@@ -148,7 +150,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition('debug.event_dispatcher.parent', $definition);
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         } else {
-            $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
+            $definition->replaceArgument(1, null);
         }
 
         $this->addClassesToCompile(array(
@@ -664,16 +666,17 @@ class FrameworkExtension extends Extension
 
             $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
         }
-        $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
+        $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             $reflection = new \ReflectionClass($class);
             if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
                 $dirs[] = $dir;
             }
-            if (is_dir($dir = sprintf($overridePath, $bundle))) {
+            if (is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $bundle))) {
                 $dirs[] = $dir;
             }
         }
+
         foreach ($config['paths'] as $dir) {
             if (is_dir($dir)) {
                 $dirs[] = $dir;
@@ -681,7 +684,8 @@ class FrameworkExtension extends Extension
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
             }
         }
-        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
+
+        if (is_dir($dir = $rootDir.'/Resources/translations')) {
             $dirs[] = $dir;
         }
 

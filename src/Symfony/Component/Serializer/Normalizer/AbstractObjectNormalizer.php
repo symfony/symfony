@@ -38,6 +38,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
@@ -81,7 +84,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes($object, $format = null, array $context)
     {
-        $key = sprintf('%s-%s', get_class($object), serialize($context));
+        $class = get_class($object);
+        $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
             return $this->attributesCache[$key];
@@ -90,10 +94,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         if (false !== $allowedAttributes) {
-            return $this->attributesCache[$key] = $allowedAttributes;
+            if ($context['cache_key']) {
+                $this->attributesCache[$key] = $allowedAttributes;
+            }
+
+            return $allowedAttributes;
         }
 
-        return $this->attributesCache[$key] = $this->extractAttributes($object, $format, $context);
+        if (isset($this->attributesCache[$class])) {
+            return $this->attributesCache[$class];
+        }
+
+        return $this->attributesCache[$class] = $this->extractAttributes($object, $format, $context);
     }
 
     /**
@@ -132,6 +144,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
@@ -164,4 +179,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param array       $context
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
+
+    private function getCacheKey(array $context)
+    {
+        try {
+            return md5(serialize($context));
+        } catch (\Exception $exception) {
+            // The context cannot be serialized, skip the cache
+            return false;
+        }
+    }
 }

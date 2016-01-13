@@ -92,17 +92,6 @@ class UniqueEntityValidator extends ConstraintValidator
                  * getter methods in the Proxy are being bypassed.
                  */
                 $em->initializeObject($criteria[$fieldName]);
-
-                $relatedClass = $em->getClassMetadata($class->getAssociationTargetClass($fieldName));
-                $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
-
-                if (count($relatedId) > 1) {
-                    throw new ConstraintDefinitionException(
-                        'Associated entities are not allowed to have more than one identifier field to be '.
-                        'part of a unique constraint in: '.$class->getName().'#'.$fieldName
-                    );
-                }
-                $criteria[$fieldName] = array_pop($relatedId);
             }
         }
 

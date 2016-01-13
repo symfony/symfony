@@ -422,27 +422,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testAssociatedCompositeEntity()
-    {
-        $constraint = new UniqueEntity(array(
-            'message' => 'myMessage',
-            'fields' => array('composite'),
-            'em' => self::EM_NAME,
-        ));
-
-        $composite = new CompositeIntIdEntity(1, 1, 'test');
-        $associated = new AssociationEntity();
-        $associated->composite = $composite;
-
-        $this->em->persist($composite);
-        $this->em->persist($associated);
-        $this->em->flush();
-
-        $this->validator->validate($associated, $constraint);
-
-        $this->assertNoViolation();
-    }
-
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      * @expectedExceptionMessage Object manager "foo" does not exist.

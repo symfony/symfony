@@ -7,6 +7,10 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.13 (2016-01-14)
+
+ * security #17359 do not ship with a custom rng implementation (xabbuh, fabpot)
+
 * 2.6.12 (2015-11-23)
 
  * security #16631 CVE-2015-8124: Session Fixation in the "Remember Me" Login Feature (xabbuh)

@@ -81,7 +81,7 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function normalizeToken($token)
     {
-        if (is_array($token)) {
+        if (isset($token[1]) && 'b"' !== $token) {
             return $token[1];
         }
 
@@ -95,7 +95,7 @@ class PhpExtractor implements ExtractorInterface
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if (!is_array($t) || ($t[0] !== T_WHITESPACE)) {
+            if (T_WHITESPACE !== $t[0]) {
                 break;
             }
         }
@@ -112,7 +112,7 @@ class PhpExtractor implements ExtractorInterface
 
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if (!is_array($t)) {
+            if (!isset($t[1])) {
                 break;
             }
 

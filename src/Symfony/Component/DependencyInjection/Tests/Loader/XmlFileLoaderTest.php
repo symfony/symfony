@@ -505,7 +505,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('legacy_invalid_alias_definition.xml');
 
         $this->assertTrue($container->has('bar'));
-        
+
         $this->assertCount(3, $deprecations);
         $this->assertContains('Using the attribute "class" is deprecated for alias definition "bar"', $deprecations[0]);
         $this->assertContains('Using the element "tag" is deprecated for alias definition "bar"', $deprecations[1]);

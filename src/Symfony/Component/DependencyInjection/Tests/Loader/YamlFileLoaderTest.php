@@ -322,7 +322,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('legacy_invalid_alias_definition.yml');
 
         $this->assertTrue($container->has('foo'));
-        
+
         $this->assertCount(2, $deprecations);
         $this->assertContains('The configuration key "factory" is unsupported for alias definition "foo"', $deprecations[0]);
         $this->assertContains('The configuration key "parent" is unsupported for alias definition "foo"', $deprecations[1]);

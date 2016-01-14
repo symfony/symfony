@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-14T16:22:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-01-14T16:34:48Z
+
+Shouldn't [tests](https://github.com/symfony/symfony/blob/582f4753a343f230fbe18b4e9a0747d48351ddfb/src/Symfony/Component/ClassLoader/Tests/ApcClassLoaderTest.php#L45) be updated as well?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-14T16:42:01Z
+
+@jakzal this test class does not exist in 2.3, but yes you're right

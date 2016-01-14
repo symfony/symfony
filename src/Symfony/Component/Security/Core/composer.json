@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "paragonie/random_compat": "~1.0"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.1",

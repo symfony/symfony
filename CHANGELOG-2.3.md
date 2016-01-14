@@ -7,6 +7,21 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.37 (2016-01-14)
+
+ * security #17359 do not ship with a custom rng implementation (xabbuh, fabpot)
+ * bug #17326 [Console] Display console application name even when no version set (polc)
+ * bug #17140 [Serializer] Remove normalizer cache in Serializer class (jvasseur)
+ * bug #17307 [FrameworkBundle] Fix paths with % in it (like urlencoded) (scaytrase)
+ * bug #17078 [Bridge] [Doctrine] [Validator] Added support \IteratorAggregate for UniqueEntityValidator (Disparity)
+ * bug #17287 [HttpKernel] Forcing string comparison on query parameters sort in UriSigner (Tim van Densen)
+ * bug #17278 [FrameworkBundle] Add case in Kernel directory guess for PHPUnit (tgalopin)
+ * bug #17276 [Process] Fix potential race condition (nicolas-grekas)
+ * bug #17183 [FrameworkBundle] Set the kernel.name properly after a cache warmup (jakzal)
+ * bug #17159 [Yaml] recognize when a block scalar is left (xabbuh)
+ * bug #17195 bug #14246 [Filesystem] dumpFile() non atomic (Hidde Boomsma)
+ * bug #17177 [Process] Fix potential race condition leading to transient tests (nicolas-grekas)
+
 * 2.3.36 (2015-12-26)
 
  * bug #16864 [Yaml] fix indented line handling in folded blocks (xabbuh)

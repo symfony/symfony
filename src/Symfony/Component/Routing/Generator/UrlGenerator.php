@@ -153,18 +153,18 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         $url = '';
         $optional = true;
+        $message = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
                 if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement
                     if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
-                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
                         if ($this->strictRequirements) {
-                            throw new InvalidParameterException($message);
+                            throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                         }
 
                         if ($this->logger) {
-                            $this->logger->error($message);
+                            $this->logger->error($message, array('parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]));
                         }
 
                         return;
@@ -222,14 +222,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 foreach ($hostTokens as $token) {
                     if ('variable' === $token[0]) {
                         if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i', $mergedParams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
-
                             if ($this->strictRequirements) {
-                                throw new InvalidParameterException($message);
+                                throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                             }
 
                             if ($this->logger) {
-                                $this->logger->error($message);
+                                $this->logger->error($message, array('parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]));
                             }
 
                             return;

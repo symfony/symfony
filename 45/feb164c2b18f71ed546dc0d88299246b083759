@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-04T06:12:33Z
+
+Can you add a test to avoid regressions?
+
+---------------------------------------------------------------------------
+
+by mbutkereit at 2016-01-08T17:43:49Z
+
+@nicolas-grekas  i think you are right. (i have changed it)
+@xabbuh  i dont' know how i can write a test for readline().
+ Does it make sense to test stdin( readline() ) ?  i don't know.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-08T18:03:00Z
+
+Please also report it to HHVM as an incompatibility bug.
+
+---------------------------------------------------------------------------
+
+by mbutkereit at 2016-01-09T07:54:32Z
+
+@stof done see https://github.com/facebook/hhvm/issues/6731
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T09:36:51Z
+
+:+1:
+Status: reviewed

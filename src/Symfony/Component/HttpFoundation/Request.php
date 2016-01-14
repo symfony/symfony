@@ -1301,7 +1301,7 @@ class Request
      *
      * @return string The associated mime type (null if not found)
      */
-    public function getMimeType($format)
+    public static function getMimeType($format)
     {
         if (null === static::$formats) {
             static::initializeFormats();
@@ -1333,7 +1333,7 @@ class Request
      *
      * @return string|null The format (null if not found)
      */
-    public function getFormat($mimeType)
+    public static function getFormat($mimeType)
     {
         if (false !== $pos = strpos($mimeType, ';')) {
             $mimeType = substr($mimeType, 0, $pos);
@@ -1356,7 +1356,7 @@ class Request
      * @param string       $format    The format
      * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
-    public function setFormat($format, $mimeTypes)
+    public static function setFormat($format, $mimeTypes)
     {
         if (null === static::$formats) {
             static::initializeFormats();

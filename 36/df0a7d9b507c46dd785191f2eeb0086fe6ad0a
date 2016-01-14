@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by wildewouter at 2016-01-14T12:55:58Z
+
+Closed in favor of https://github.com/symfony/symfony/pull/17371
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T13:11:40Z
+
+Well, we could still additionally check for `DateTimeImmutable` instances on older Symfony versions.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T15:38:03Z
+
+:+1:
+
+Status: Reviewed

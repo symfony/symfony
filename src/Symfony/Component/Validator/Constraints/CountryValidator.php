@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -45,17 +44,10 @@ class CountryValidator extends ConstraintValidator
         $countries = Intl::getRegionBundle()->getCountryNames();
 
         if (!isset($countries[$value])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+                ->addViolation();
         }
     }
 }

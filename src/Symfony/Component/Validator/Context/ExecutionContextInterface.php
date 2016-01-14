@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * The context of a validation run.

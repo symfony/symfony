@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -42,47 +41,26 @@ class DateTimeValidator extends DateValidator
         $value = (string) $value;
 
         if (!preg_match(static::PATTERN, $value, $matches)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_FORMAT_ERROR)
+                ->addViolation();
 
             return;
         }
 
         if (!DateValidator::checkDate($matches[1], $matches[2], $matches[3])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_DATE_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_DATE_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_DATE_ERROR)
+                ->addViolation();
         }
 
         if (!TimeValidator::checkTime($matches[4], $matches[5], $matches[6])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_TIME_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_TIME_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_TIME_ERROR)
+                ->addViolation();
         }
     }
 }

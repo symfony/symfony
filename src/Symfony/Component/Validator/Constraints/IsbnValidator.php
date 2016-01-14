@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -50,17 +49,10 @@ class IsbnValidator extends ConstraintValidator
         // Explicitly validate against ISBN-10
         if ('isbn10' === $constraint->type) {
             if (true !== ($code = $this->validateIsbn10($canonical))) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode($code)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($this->getMessage($constraint, $constraint->type))
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode($code)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode($code)
+                    ->addViolation();
             }
 
             return;
@@ -69,17 +61,10 @@ class IsbnValidator extends ConstraintValidator
         // Explicitly validate against ISBN-13
         if ('isbn13' === $constraint->type) {
             if (true !== ($code = $this->validateIsbn13($canonical))) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode($code)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($this->getMessage($constraint, $constraint->type))
-                        ->setParameter('{{ value }}', $this->formatValue($value))
-                        ->setCode($code)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode($code)
+                    ->addViolation();
             }
 
             return;
@@ -102,17 +87,10 @@ class IsbnValidator extends ConstraintValidator
         }
 
         if (true !== $code) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($this->getMessage($constraint))
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode($code)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($this->getMessage($constraint))
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode($code)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($this->getMessage($constraint))
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode($code)
+                ->addViolation();
         }
     }
 

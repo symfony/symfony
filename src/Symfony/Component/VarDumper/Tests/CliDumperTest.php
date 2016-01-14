@@ -160,6 +160,38 @@ EOTXT
         );
     }
 
+    public function testFlags()
+    {
+        putenv('DUMP_LIGHT_ARRAY=1');
+        putenv('DUMP_STRING_LENGTH=1');
+
+        $var = array(
+            range(1,3),
+            array('foo', 2 => 'bar'),
+        );
+
+        $this->assertDumpEquals(
+            <<<EOTXT
+[
+  [
+    1
+    2
+    3
+  ]
+  [
+    0 => (3) "foo"
+    2 => (3) "bar"
+  ]
+]
+EOTXT
+            ,
+            $var
+        );
+
+        putenv('DUMP_LIGHT_ARRAY=');
+        putenv('DUMP_STRING_LENGTH=');
+    }
+
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');

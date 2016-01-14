@@ -52,7 +52,7 @@ class MockSplFileInfo extends \SplFileInfo
     {
         if (null === $this->type) {
             return false !== strpos($this->getFilename(), 'file');
-        };
+        }
 
         return self::TYPE_FILE === $this->type;
     }

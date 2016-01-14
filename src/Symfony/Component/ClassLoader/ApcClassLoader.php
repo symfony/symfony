@@ -67,8 +67,8 @@ class ApcClassLoader
      */
     public function __construct($prefix, $decorated)
     {
-        if (!extension_loaded('apc')) {
-            throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
+        if (!function_exists('apcu_fetch')) {
+            throw new \RuntimeException('Unable to use ApcClassLoader as APC is not installed.');
         }
 
         if (!method_exists($decorated, 'findFile')) {
@@ -122,8 +122,8 @@ class ApcClassLoader
      */
     public function findFile($class)
     {
-        if (false === $file = apc_fetch($this->prefix.$class)) {
-            apc_store($this->prefix.$class, $file = $this->decorated->findFile($class));
+        if (false === $file = apcu_fetch($this->prefix.$class)) {
+            apcu_store($this->prefix.$class, $file = $this->decorated->findFile($class));
         }
 
         return $file;

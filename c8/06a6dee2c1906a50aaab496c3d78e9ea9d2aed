@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-29T10:55:50Z
+
+Although this change is targeted to master, I don't know if Symfony Core members agree with using the short PHP array syntax. This would introduce inconsistency in the codebase.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-29T18:34:32Z
+
+We do not use short PHP array syntax in Symfony core.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T10:21:47Z
+
+:+1:
+Status: reviewed

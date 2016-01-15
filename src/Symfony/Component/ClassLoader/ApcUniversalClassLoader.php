@@ -71,7 +71,7 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      */
     public function __construct($prefix)
     {
-        if (!extension_loaded('apc')) {
+        if (!function_exists('apcu_fetch')) {
             throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
         }
 
@@ -87,8 +87,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      */
     public function findFile($class)
     {
-        if (false === $file = apc_fetch($this->prefix.$class)) {
-            apc_store($this->prefix.$class, $file = parent::findFile($class));
+        if (false === $file = apcu_fetch($this->prefix.$class)) {
+            apcu_store($this->prefix.$class, $file = parent::findFile($class));
         }
 
         return $file;

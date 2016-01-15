@@ -83,12 +83,17 @@ class SecurityExtension extends Extension
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
-        $container
-            ->getDefinition('security.access.decision_manager')
-            ->addArgument($config['access_decision_manager']['strategy'])
-            ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
-        ;
+
+        if (isset($config['access_decision_manager']['service'])) {
+            $container->setAlias('security.access.decision_manager', $config['access_decision_manager']['service']);
+        } else {
+            $container
+                ->getDefinition('security.access.decision_manager')
+                ->addArgument($config['access_decision_manager']['strategy'])
+                ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
+                ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
+        }
+
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 

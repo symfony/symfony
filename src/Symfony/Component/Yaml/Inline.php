@@ -146,6 +146,8 @@ class Inline
                 return $repr;
             case '' == $value:
                 return "''";
+            case strstr($value, "\n"):
+              return "|\n  ". preg_replace( '/\n/',"\n  " , $value );
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):

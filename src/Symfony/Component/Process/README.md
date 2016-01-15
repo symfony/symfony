@@ -19,7 +19,7 @@ if (!$process->isSuccessful()) {
 print $process->getOutput();
 ```
 
-You can think that this is easy to achieve with plain PHP but it's not especially
+You may think that this is easy to achieve with plain PHP but it's not especially
 if you want to take care of the subtle differences between the different platforms.
 
 You can simplify the code by using `mustRun()` instead of `run()`, which will
@@ -35,9 +35,9 @@ $process->mustRun();
 print $process->getOutput();
 ```
 
-And if you want to be able to get some feedback in real-time, just pass an
+If you want to be able to get some feedback in real-time, just pass an
 anonymous function to the ``run()`` method and you will get the output buffer
-as it becomes available:
+as it becomes available instead:
 
 ```php
 use Symfony\Component\Process\Process;

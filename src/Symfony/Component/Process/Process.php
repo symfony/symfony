@@ -1211,14 +1211,14 @@ class Process
     {
         $out = self::OUT;
         $callback = function ($type, $data) use ($callback, $out) {
-            if ($out == $type) {
-                $this->addOutput($data);
-            } else {
-                $this->addErrorOutput($data);
-            }
-
             if (null !== $callback) {
                 call_user_func($callback, $type, $data);
+            } else {
+                if ($out == $type) {
+                    $this->addOutput($data);
+                } else {
+                    $this->addErrorOutput($data);
+                }
             }
         };
 

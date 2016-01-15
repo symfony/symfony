@@ -193,7 +193,15 @@ class ClassCollectionLoader
             $rawChunk .= "}\n";
         }
 
-        return $output.self::compressCode($rawChunk);
+        $output .= self::compressCode($rawChunk);
+
+        if (PHP_VERSION_ID >= 70000) {
+            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+            unset($tokens, $rawChunk);
+            gc_mem_caches();
+        }
+
+        return $output;
     }
 
     /**

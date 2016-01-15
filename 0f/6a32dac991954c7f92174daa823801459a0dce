@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T19:30:35Z
+
+:+1: Is this the only place where we need to make this change?
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-01-14T19:36:25Z
+
+Not sure I'll take a look at the other files.
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-01-14T19:54:56Z
+
+@xabbuh Turns out we should do the same in the twig template for foundation 5. However since it is not present in 2.7 I can't include the change in this PR. Should I open a second one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T19:57:15Z
+
+@enumag Would be great if you were able to do that. :+1:
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-01-14T20:02:26Z
+
+@xabbuh No problem. https://github.com/symfony/symfony/pull/17382
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-14T20:22:00Z
+
+Ref #12050 for the original PR.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-01-14T20:25:45Z
+
+@Tobion You mean to prefix the commit message with "bug #12050" or something else?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-14T20:28:23Z
+
+No that was just for anyone reviewing the code

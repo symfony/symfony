@@ -653,6 +653,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => (string) $cache));
         if (!$this->debug) {
             $content = static::stripComments($content);
+            // reclaim memory for php7, as memory manager will not release after token_get_all()
+            if (function_exists('gc_mem_caches')) {
+                gc_mem_caches();
+            }
         }
 
         $cache->write($content, $container->getResources());

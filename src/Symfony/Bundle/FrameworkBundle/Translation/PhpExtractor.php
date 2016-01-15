@@ -61,6 +61,11 @@ class PhpExtractor implements ExtractorInterface
         $files = $finder->files()->name('*.php')->in($directory);
         foreach ($files as $file) {
             $this->parseTokens(token_get_all(file_get_contents($file)), $catalog);
+
+            if (PHP_VERSION_ID >= 70000) {
+                // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+                gc_mem_caches();
+            }
         }
     }
 
@@ -81,7 +86,7 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function normalizeToken($token)
     {
-        if (is_array($token)) {
+        if (isset($token[1]) && 'b"' !== $token) {
             return $token[1];
         }
 
@@ -95,7 +100,7 @@ class PhpExtractor implements ExtractorInterface
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if (!is_array($t) || ($t[0] !== T_WHITESPACE)) {
+            if (T_WHITESPACE !== $t[0]) {
                 break;
             }
         }
@@ -112,7 +117,7 @@ class PhpExtractor implements ExtractorInterface
 
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
-            if (!is_array($t)) {
+            if (!isset($t[1])) {
                 break;
             }
 

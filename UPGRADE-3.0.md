@@ -264,12 +264,12 @@ UPGRADE FROM 2.x to 3.0
        // ...
    }
    ```
-   
+
  * The option "options" of the CollectionType has been renamed to "entry_options".
 
  * The option "type" of the CollectionType has been renamed to "entry_type".
-   As a value for the option you must provide the fully-qualified class name (FQCN) 
-   now as well.   
+   As a value for the option you must provide the fully-qualified class name (FQCN)
+   now as well.
 
  * The `FormIntegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
 
@@ -317,8 +317,8 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList` class has been removed in
    favor of `Symfony\Component\Form\ChoiceList\ArrayChoiceList`.
-   
- * The `TimezoneType::getTimezones()` method was removed. You should not use 
+
+ * The `TimezoneType::getTimezones()` method was removed. You should not use
    this method.
 
  * The `Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList` class has been removed in
@@ -365,11 +365,11 @@ UPGRADE FROM 2.x to 3.0
        }
    }
    ```
-   
+
  * In Symfony 2.7 a small BC break was introduced with the new choices_as_values
    option. In order to have the choice values populated to the html value attribute
    you had to define the choice_value option. This is now not any more needed.
- 
+
    Before:
 
    ```php
@@ -389,9 +389,9 @@ UPGRADE FROM 2.x to 3.0
        },
    ));
    ```
-   
+
    After:
-   
+
    ```php
    $form->add('status', ChoiceType::class, array(
        'choices' => array(
@@ -400,7 +400,7 @@ UPGRADE FROM 2.x to 3.0
            'Ignored' => Status::IGNORED,
        )
    ));
-   ```   
+   ```
 
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
@@ -773,6 +773,16 @@ UPGRADE FROM 2.x to 3.0
        // ...
    }
    ```
+
+ * The `intention` option was renamed to `csrf_token_id` for all the authentication listeners.
+
+ * The `csrf_provider` option was renamed to `csrf_token_generator` for all the authentication listeners.
+
+### SecurityBundle
+
+ * The `intention` firewall listener setting was renamed to `csrf_token_id`.
+
+ * The `csrf_provider` firewall listener setting was renamed to `csrf_token_generator`.
 
 ### Translator
 

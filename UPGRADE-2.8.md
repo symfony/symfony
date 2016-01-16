@@ -18,6 +18,12 @@ All components
 Form
 ----
 
+ * The `intention` option was deprecated and will be removed in 3.0 in favor
+   of the new `csrf_token_id` option.
+
+ * The `csrf_provider` option was deprecated and will be removed in 3.0 in favor
+   of the new `csrf_token_generator` option.
+
  * The "cascade_validation" option was deprecated. Use the "constraints"
    option together with the `Valid` constraint instead. Contrary to
    "cascade_validation", "constraints" must be set on the respective child forms,
@@ -203,7 +209,7 @@ Form
  * In Symfony 2.7 a small BC break was introduced with the new choices_as_values
    option. In order to have the choice values populated to the html value attribute
    you had to define the choice_value option. This is now not any more needed.
- 
+
    Before:
 
    ```php
@@ -221,9 +227,9 @@ Form
        },
    ));
    ```
-   
+
    After (Symfony 2.8+):
-   
+
    ```php
    $form->add('status', ChoiceType::class, array(
        'choices' => array(
@@ -262,13 +268,13 @@ Form
        }
    }
    ```
-   
+
  * The option "options" of the CollectionType has been renamed to "entry_options".
    The usage of the option "options" is deprecated and will be removed in Symfony 3.0.
 
  * The option "type" of the CollectionType has been renamed to "entry_type".
    The usage of the option "type" is deprecated and will be removed in Symfony 3.0.
-   As a value for the option you should provide the fully-qualified class name (FQCN) 
+   As a value for the option you should provide the fully-qualified class name (FQCN)
    now as well.
 
  * Passing type instances to `Form::add()`, `FormBuilder::add()` and the
@@ -409,8 +415,8 @@ DependencyInjection
    </services>
    ```
 
- * `Symfony\Component\DependencyInjection\ContainerAware` has been deprecated, use 
-   `Symfony\Component\DependencyInjection\ContainerAwareTrait` or implement 
+ * `Symfony\Component\DependencyInjection\ContainerAware` has been deprecated, use
+   `Symfony\Component\DependencyInjection\ContainerAwareTrait` or implement
    `Symfony\Component\DependencyInjection\ContainerAwareInterface` manually
 
 WebProfiler
@@ -522,11 +528,17 @@ Security
  * The `intention` option is deprecated for all the authentication listeners,
    and will be removed in 3.0. Use the `csrf_token_id` option instead.
 
+ * The `csrf_provider` option is deprecated for all the authentication listeners,
+   and will be removed in 3.0. Use the `csrf_token_generator` option instead.
+
 SecurityBundle
 --------------
 
  * The `intention` firewall listener setting is deprecated, and will be removed in 3.0.
    Use the `csrf_token_id` option instead.
+
+ * The `csrf_provider` firewall listener setting is deprecated, and will be removed in 3.0.
+   Use the `csrf_token_generator` option instead.
 
 Config
 ------

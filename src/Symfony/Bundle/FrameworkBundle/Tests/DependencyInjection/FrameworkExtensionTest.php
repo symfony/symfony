@@ -309,9 +309,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = array())
     {
-        $cacheKey = md5(serialize($data));
+        $cacheKey = md5($file.serialize($data));
 
-        if (!isset(self::$containerCache[$file][$cacheKey])) {
+        if (!isset(self::$containerCache[$cacheKey])) {
             $container = $this->createContainer($data);
 
             $container->registerExtension(new FrameworkExtension());
@@ -321,9 +321,9 @@ abstract class FrameworkExtensionTest extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses(array());
             $container->compile();
 
-            self::$containerCache[$file][$cacheKey] = $container;
+            self::$containerCache[$cacheKey] = $container;
         }
 
-        return self::$containerCache[$file][$cacheKey];
+        return self::$containerCache[$cacheKey];
     }
 }

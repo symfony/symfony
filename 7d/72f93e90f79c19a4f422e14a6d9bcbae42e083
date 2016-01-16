@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-14T13:27:09Z
+
+In 2.7 the service definition has moved to the FrameworkBundle for some reason: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/Resources/config/security.xml
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-15T21:55:06Z
+
+:+1:
+
+Status: Reviewed

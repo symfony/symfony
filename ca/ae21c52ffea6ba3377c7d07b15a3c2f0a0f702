@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2016-01-10T12:00:10Z
+
+The yaml test is not in the scope of this PR...
+
+Anyway, I'm not sure we should cry if these attributees are set, they will be ignored anyway..
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-01-10T12:13:23Z
+
+@Taluu the goal is the same as described in #17133: avoid mistakes and simplify debugging.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T09:17:57Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T16:18:25Z
+
+I would remove "object" from "The YamlFileLoader object will [...]" (same for the XmlFileLoader messages).
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T18:04:09Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-01-16T14:09:09Z
+
+ping

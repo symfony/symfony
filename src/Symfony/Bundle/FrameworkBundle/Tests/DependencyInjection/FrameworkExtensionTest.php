@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
+    private static $containerCache = array();
+
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
     public function testCsrfProtection()
@@ -307,14 +309,22 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = array())
     {
-        $container = $this->createContainer($data);
-        $container->registerExtension(new FrameworkExtension());
-        $this->loadFromFile($container, $file);
+        $dataHash = md5(serialize($data));
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->compile();
+        if (!isset(self::$containerCache[$file][$dataHash])) {
 
-        return $container;
+            $container = $this->createContainer($data);
+
+            $container->registerExtension(new FrameworkExtension());
+            $this->loadFromFile($container, $file);
+
+            $container->getCompilerPassConfig()->setOptimizationPasses(array());
+            $container->getCompilerPassConfig()->setRemovingPasses(array());
+            $container->compile();
+
+            self::$containerCache[$file][$dataHash] = $container;
+        }
+
+        return self::$containerCache[$file][$dataHash];
     }
 }

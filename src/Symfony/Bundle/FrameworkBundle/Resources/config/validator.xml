@@ -38,7 +38,6 @@
         </service>
 
         <service id="validator.expression" class="Symfony\Component\Validator\Constraints\ExpressionValidator">
-            <argument type="service" id="property_accessor" />
             <tag name="validator.constraint_validator" alias="validator.expression" />
         </service>
 

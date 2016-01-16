@@ -312,7 +312,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $dataHash = md5(serialize($data));
 
         if (!isset(self::$containerCache[$file][$dataHash])) {
-
             $container = $this->createContainer($data);
 
             $container->registerExtension(new FrameworkExtension());

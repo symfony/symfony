@@ -9,11 +9,7 @@
     </parameters>
 
     <services>
-        <!-- Pseudo-Random Number Generator -->
-        <service id="security.secure_random" class="%security.secure_random.class%">
-            <tag name="monolog.logger" channel="security" />
-            <argument>%kernel.cache_dir%/secure_random.seed</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
-        </service>
+        <!-- Pseudorandom Number Generator -->
+        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom" />
     </services>
 </container>

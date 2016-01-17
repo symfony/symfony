@@ -98,11 +98,11 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
                 case 'SplFileInfo':
                     return new \SplFileObject($data);
             }
-
-            throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $class));
         } catch (\RuntimeException $exception) {
             throw new UnexpectedValueException($exception->getMessage(), $exception->getCode(), $exception);
         }
+
+        throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $class));
     }
 
     /**

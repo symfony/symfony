@@ -1911,7 +1911,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced
         // in the custom choice type, so $choiceLabels->labels remains empty array.
-        // In this case the 'choice_label' closure returns null.
+        // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
 }

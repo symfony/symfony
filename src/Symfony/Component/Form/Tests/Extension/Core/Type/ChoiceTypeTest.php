@@ -1907,21 +1907,11 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             )
         );
         $builder->add('subChoice', new ChoiceSubType());
-        $builder->add('choiceTwo', 'choice', array(
-                'choices' => array(
-                    '1' => '1',
-                    '2' => '2',
-                    '3' => '3',
-                ),
-            )
-        );
         $form = $builder->getForm();
 
-        $this->assertInstanceOf('\Closure', $form->get('choice')->getConfig()->getOption('choice_label'));
-        // Since a custom 'choices' normalizer is set in ChoiceSubType, the $choicesNormalizer closure
-        // in ChoiceType::configureOptions() is not resolved and the $choiceLabels->labels will be an empty array.
-        // In this case the $choiceLabel closure in ChoiceType::configureOptions() will return null.
+        // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced
+        // in the custom choice type, so $choiceLabels->labels remains empty array.
+        // In this case the 'choice_label' closure returns null.
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
-        $this->assertInstanceOf('\Closure', $form->get('choiceTwo')->getConfig()->getOption('choice_label'));
     }
 }

@@ -291,6 +291,9 @@ class ChoiceType extends AbstractType
                 // forms)
                 $labels = $choiceLabels->labels;
 
+                // Reset labels to prevent previous invocation
+                $choiceLabels->labels = array();
+
                 return function ($choice, $key) use ($labels) {
                     return $labels[$key];
                 };

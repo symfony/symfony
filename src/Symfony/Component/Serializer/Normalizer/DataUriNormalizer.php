@@ -49,17 +49,16 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         $mimeType = $this->getMimeType($object);
-        list($typeName) = explode('/', $mimeType, 2);
-        $object = $this->extractSplFileObject($object);
+        $splFileObject = $this->extractSplFileObject($object);
 
         $data = '';
 
-        $object->rewind();
-        while (!$object->eof()) {
-            $data .= $object->fgets();
+        $splFileObject->rewind();
+        while (!$splFileObject->eof()) {
+            $data .= $splFileObject->fgets();
         }
 
-        if ('text' === $typeName) {
+        if ('text' === explode('/', $mimeType, 2)[0]) {
             return sprintf('data:%s,%s', $mimeType, rawurlencode($data));
         }
 
@@ -100,7 +99,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
                     return new \SplFileObject($data);
             }
 
-            throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileInfo" or "Symfony\Component\HttpFoundation\File\File".', $class));
+            throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $class));
         } catch (\RuntimeException $exception) {
             throw new UnexpectedValueException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -112,8 +111,8 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
     public function supportsDenormalization($data, $type, $format = null)
     {
         $supportedTypes = array(
-            'SplFileInfo' => true,
-            'SplFileObject' => true,
+            \SplFileInfo::class => true,
+            \SplFileObject::class => true,
             'Symfony\Component\HttpFoundation\File\File' => true,
         );
 

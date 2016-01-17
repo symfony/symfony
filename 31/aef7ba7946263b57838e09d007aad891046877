@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-17T14:04:12Z
+
+:+1: Status: reviewed
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-17T14:04:23Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-17T16:08:59Z
+
+It would be useful to do the same for the `2.4`, `2.5`, and `2.6` upgrade files on this branch to, but we can do that in a separate PR if someone else wants to do it or if I do not find the time for it soon.

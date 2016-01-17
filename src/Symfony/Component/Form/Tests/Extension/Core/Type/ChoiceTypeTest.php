@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
 class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -1886,5 +1887,41 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         // Trigger data initialization
         $form->getViewData();
+    }
+
+    /**
+     * This covers the case when:
+     *  - Custom choice type added after a choice type.
+     *  - Custom type is expanded.
+     *  - Custom type replaces 'choices' normalizer with a custom one.
+     * In this case, custom type should not inherit labels from the first added choice type.
+     */
+    public function testCustomChoiceTypeDoesNotInheritChoiceLabels()
+    {
+        $builder = $this->factory->createBuilder();
+        $builder->add('choice', 'choice', array(
+                'choices' => array(
+                    '1' => '1',
+                    '2' => '2'
+                )
+            )
+        );
+        $builder->add('subChoice', new ChoiceSubType());
+        $builder->add('choiceTwo', 'choice', array(
+                'choices' => array(
+                    '1' => '1',
+                    '2' => '2',
+                    '3' => '3',
+                )
+            )
+        );
+        $form = $builder->getForm();
+
+        $this->assertInstanceOf('\Closure', $form->get('choice')->getConfig()->getOption('choice_label'));
+        // Since a custom 'choices' normalizer is set in ChoiceSubType, the $choicesNormalizer closure
+        // in ChoiceType::configureOptions() is not resolved and the $choiceLabels->labels will be an empty array.
+        // In this case the $choiceLabel closure in ChoiceType::configureOptions() will return null.
+        $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
+        $this->assertInstanceOf('\Closure', $form->get('choiceTwo')->getConfig()->getOption('choice_label'));
     }
 }

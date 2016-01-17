@@ -47,18 +47,31 @@ class Filesystem
         }
 
         if ($doCopy) {
-            // https://bugs.php.net/bug.php?id=64634
-            $source = fopen($originFile, 'r');
-            // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-            $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
-            stream_copy_to_stream($source, $target);
-            fclose($source);
-            fclose($target);
-            unset($source, $target);
+            $this->doCopy($originFile, $targetFile);
+        }
+    }
 
-            if (!is_file($targetFile)) {
-                throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
-            }
+    /**
+     * Makes of copy from the origin file to the target file.
+     *
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     *
+     * @throws IOException When copy fails
+     */
+    protected function doCopy($originFile, $targetFile)
+    {
+        // https://bugs.php.net/bug.php?id=64634
+        $source = fopen($originFile, 'r');
+        // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
+        $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
+        stream_copy_to_stream($source, $target);
+        fclose($source);
+        fclose($target);
+        unset($source, $target);
+
+        if (!is_file($targetFile)) {
+            throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
         }
     }
 

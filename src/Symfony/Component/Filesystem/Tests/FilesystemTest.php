@@ -152,17 +152,20 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
-    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToNotCopy()
+    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
         $sourceFilePath = 'http://symfony.com/images/common/logo/logo_symfony_header.png';
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($targetFilePath, 'TARGET FILE');
 
-        $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
-
-        $this->assertFileExists($targetFilePath);
-        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
+        $fileSystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')
+            ->setMethods(array('doCopy'))
+            ->getMock();
+        $fileSystem->expects($this->once())
+            ->method('doCopy')
+            ->with($this->equalTo($sourceFilePath), $this->equalTo($targetFilePath));
+        $fileSystem->copy($sourceFilePath, $targetFilePath, false);
     }
 
     public function testMkdirCreatesDirectoriesRecursively()

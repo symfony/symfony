@@ -44,19 +44,13 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        if ($object instanceof File) {
-            $mimeType = $object->getMimeType();
-        } elseif ($this->mimeTypeGuesser) {
-            $mimeType = $this->mimeTypeGuesser->guess($object->getPathname());
-        } else {
-            $mimeType = 'application/octet-stream';
+        if (!$object instanceof \SplFileInfo) {
+            throw new InvalidArgumentException('The object must be an instance of "\SplFileInfo".');
         }
 
+        $mimeType = $this->getMimeType($object);
         list($typeName) = explode('/', $mimeType, 2);
-
-        if (!$object instanceof \SplFileObject) {
-            $object = $object->openFile();
-        }
+        $object = $this->extractSplFileObject($object);
 
         $data = '';
 
@@ -124,5 +118,41 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
         );
 
         return isset($supportedTypes[$type]);
+    }
+
+    /**
+     * Gets the mime type of the object. Defaults to application/octet-stream.
+     *
+     * @param \SplFileInfo $object
+     *
+     * @return string
+     */
+    private function getMimeType(\SplFileInfo $object)
+    {
+        if ($object instanceof File) {
+            return $object->getMimeType();
+        }
+
+        if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
+            return $mimeType;
+        }
+
+        return 'application/octet-stream';
+    }
+
+    /**
+     * Returns the \SplFileObject instance associated with the given \SplFileInfo instance.
+     *
+     * @param \SplFileInfo $object
+     *
+     * @return \SplFileObject
+     */
+    private function extractSplFileObject(\SplFileInfo $object)
+    {
+        if ($object instanceof \SplFileObject) {
+            return $object;
+        }
+
+        return $object->openFile();
     }
 }

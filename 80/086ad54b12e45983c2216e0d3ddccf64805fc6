@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-16T15:06:15Z
+
+@paradajozsef this is really impressive. This change keeps code readable and, according to your stats, it saves around 20 seconds in total. Thanks for this contribution and for your perfectly explained pull request.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-16T15:15:47Z
+
+@javiereguiluz thank you. :) renamed ```$dataHash``` to ```$cacheKey```.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-16T22:41:34Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-17T10:08:47Z
+
+@fabpot Yes, it should have been done so for the first time. Anyway, I changed the if statement.

@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractType;

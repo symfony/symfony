@@ -1902,8 +1902,8 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $builder->add('choice', 'choice', array(
                 'choices' => array(
                     '1' => '1',
-                    '2' => '2'
-                )
+                    '2' => '2',
+                ),
             )
         );
         $builder->add('subChoice', new ChoiceSubType());
@@ -1912,7 +1912,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
                     '1' => '1',
                     '2' => '2',
                     '3' => '3',
-                )
+                ),
             )
         );
         $form = $builder->getForm();

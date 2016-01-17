@@ -350,8 +350,14 @@ class ErrorHandler
      *
      * @internal
      */
-    public function handleError($type, $message, $file, $line, array $context, array $backtrace = null)
+    public function handleError($type, $message = null, $file = null, $line = null, array $context = null, array $backtrace = null)
     {
+        if ($type instanceof \Throwable) {
+            $this->handleException($type);
+
+            return true;
+        }
+
         $level = error_reporting() | E_RECOVERABLE_ERROR | E_USER_ERROR;
         $log = $this->loggedErrors & $type;
         $throw = $this->thrownErrors & $type & $level;

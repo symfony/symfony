@@ -474,7 +474,7 @@ class Process
 
         $this->readPipes(false, '\\' === DIRECTORY_SEPARATOR ? !$this->processInformation['running'] : true);
 
-        return $this->stdout;
+        return (string) stream_get_contents($this->stdout, -1, 0);
     }
 
     /**
@@ -490,17 +490,14 @@ class Process
      */
     public function getIncrementalOutput()
     {
-        $this->requireProcessIsStarted(__FUNCTION__);
-
-        $data = $this->getOutput();
-
-        $latest = substr($data, $this->incrementalOutputOffset);
-
-        if (false === $latest) {
-            return '';
+        if ($this->outputDisabled) {
+            throw new LogicException('Output has been disabled.');
         }
 
-        $this->incrementalOutputOffset = strlen($data);
+        $this->requireProcessIsStarted(__FUNCTION__);
+
+        $latest = (string) stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
+        $this->incrementalOutputOffset = ftell($this->stdout);
 
         return $latest;
     }
@@ -512,7 +509,8 @@ class Process
      */
     public function clearOutput()
     {
-        $this->stdout = '';
+        ftruncate($this->stdout, 0);
+        fseek($this->stdout, 0);
         $this->incrementalOutputOffset = 0;
 
         return $this;
@@ -536,7 +534,7 @@ class Process
 
         $this->readPipes(false, '\\' === DIRECTORY_SEPARATOR ? !$this->processInformation['running'] : true);
 
-        return $this->stderr;
+        return (string) stream_get_contents($this->stderr, -1, 0);
     }
 
     /**
@@ -553,17 +551,14 @@ class Process
      */
     public function getIncrementalErrorOutput()
     {
-        $this->requireProcessIsStarted(__FUNCTION__);
-
-        $data = $this->getErrorOutput();
-
-        $latest = substr($data, $this->incrementalErrorOutputOffset);
-
-        if (false === $latest) {
-            return '';
+        if ($this->outputDisabled) {
+            throw new LogicException('Output has been disabled.');
         }
 
-        $this->incrementalErrorOutputOffset = strlen($data);
+        $this->requireProcessIsStarted(__FUNCTION__);
+
+        $latest = (string) stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
+        $this->incrementalErrorOutputOffset = ftell($this->stderr);
 
         return $latest;
     }
@@ -575,7 +570,8 @@ class Process
      */
     public function clearErrorOutput()
     {
-        $this->stderr = '';
+        ftruncate($this->stderr, 0);
+        fseek($this->stderr, 0);
         $this->incrementalErrorOutputOffset = 0;
 
         return $this;
@@ -795,23 +791,31 @@ class Process
     /**
      * Adds a line to the STDOUT stream.
      *
+     * @internal
+     *
      * @param string $line The line to append
      */
     public function addOutput($line)
     {
         $this->lastOutputTime = microtime(true);
-        $this->stdout .= $line;
+        fseek($this->stdout, 0, SEEK_END);
+        fwrite($this->stdout, $line);
+        fseek($this->stdout, $this->incrementalOutputOffset);
     }
 
     /**
      * Adds a line to the STDERR stream.
+     *
+     * @internal
      *
      * @param string $line The line to append
      */
     public function addErrorOutput($line)
     {
         $this->lastOutputTime = microtime(true);
-        $this->stderr .= $line;
+        fseek($this->stderr, 0, SEEK_END);
+        fwrite($this->stderr, $line);
+        fseek($this->stderr, $this->incrementalErrorOutputOffset);
     }
 
     /**
@@ -1393,8 +1397,8 @@ class Process
         $this->exitcode = null;
         $this->fallbackStatus = array();
         $this->processInformation = null;
-        $this->stdout = null;
-        $this->stderr = null;
+        $this->stdout = fopen('php://temp/maxmemory:'.(8 * 1024 * 1024), 'a+');
+        $this->stderr = fopen('php://temp/maxmemory:'.(8 * 1024 * 1024), 'a+');
         $this->process = null;
         $this->latestSignal = null;
         $this->status = self::STATUS_READY;

@@ -19,6 +19,7 @@
         "php": ">=5.5.9",
         "doctrine/common": "~2.4",
         "twig/twig": "~1.23|~2.0",
+        "psr/cache": "~1.0",
         "psr/log": "~1.0",
         "symfony/polyfill-apcu": "~1.0,>=1.0.2",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -30,6 +31,7 @@
     "replace": {
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
+        "symfony/cache": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
@@ -74,6 +76,8 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "cache/integration-tests": "^0.6",
+        "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",

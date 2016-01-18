@@ -305,6 +305,19 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
+    public function testCallbackIsExecutedForOutputWheneverOutputIsDisabled()
+    {
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('echo \'foo\';')));
+        $p->disableOutput();
+
+        $called = false;
+        $p->run(function ($type, $buffer) use (&$called) {
+            $called = $buffer === 'foo';
+        });
+
+        $this->assertTrue($called, 'The callback should be executed with the output');
+    }
+
     public function testGetErrorOutput()
     {
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
@@ -1106,29 +1119,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('foo');
         $process->disableOutput();
         $this->assertSame($process, $process->setIdleTimeout(null));
-    }
-
-    /**
-     * @dataProvider provideStartMethods
-     */
-    public function testStartWithACallbackAndDisabledOutput($startMethod, $exception, $exceptionMessage)
-    {
-        $p = $this->getProcess('foo');
-        $p->disableOutput();
-        $this->setExpectedException($exception, $exceptionMessage);
-        if ('mustRun' === $startMethod) {
-            $this->skipIfNotEnhancedSigchild();
-        }
-        $p->{$startMethod}(function () {});
-    }
-
-    public function provideStartMethods()
-    {
-        return array(
-            array('start', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
-            array('run', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
-            array('mustRun', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
-        );
     }
 
     /**

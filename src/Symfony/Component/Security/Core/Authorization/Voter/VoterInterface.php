@@ -27,7 +27,7 @@ interface VoterInterface
     /**
      * Checks if the voter supports the given attribute.
      *
-     * @param string $attribute An attribute
+     * @param mixed $attribute An attribute (usually the attribute name string)
      *
      * @return bool true if this Voter supports the attribute, false otherwise
      */

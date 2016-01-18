@@ -22,6 +22,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
      * @var array|null
      */
     private $attributes;
+
     /**
      * @var bool
      */

@@ -28,7 +28,7 @@ class ClassMetadata implements ClassMetadataInterface
     public $name;
 
     /**
-     * @var AttributeMetadataInterface[]
+     * @var array An array of {@see AttributeMetadataInterface} instances.
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use

@@ -41,18 +41,22 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var Encoder\ChainEncoder
      */
     protected $encoder;
+
     /**
      * @var Encoder\ChainDecoder
      */
     protected $decoder;
+
     /**
      * @var array
      */
     protected $normalizers = array();
+
     /**
      * @var array
      */
     protected $normalizerCache = array();
+
     /**
      * @var array
      */

@@ -6,6 +6,8 @@ CHANGELOG
 
 * added `ExceptionListener`
 * added `AddConsoleCommandPass` (originally in FrameworkBundle)
+* added console.error event to catch exceptions thrown by other listeners
+* deprecated console.exception event in favor of console.error
 
 3.2.0
 ------

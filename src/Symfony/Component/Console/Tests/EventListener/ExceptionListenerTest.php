@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\EventListener\ExceptionListener;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testOnConsoleException()
+    public function testOnConsoleError()
     {
         $exception = new \RuntimeException('An error occurred');
 
@@ -32,11 +32,11 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('Exception thrown while running command "{command}". Message: "{message}"', array('exception' => $exception, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'))
+            ->with('Error thrown while running command "{command}". Message: "{message}"', array('error' => $exception, 'command' => 'test:run --foo=baz buzz', 'message' => 'An error occurred'))
         ;
 
         $listener = new ExceptionListener($logger);
-        $listener->onConsoleException($this->getConsoleExceptionEvent($exception, new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), 1));
+        $listener->onConsoleError($this->getConsoleErrorEvent($exception, new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), 1));
     }
 
     public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
@@ -68,7 +68,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             array(
-                'console.exception' => array('onConsoleException', -128),
+                'console.error' => array('onConsoleError', -128),
                 'console.terminate' => array('onConsoleTerminate', -128),
             ),
             ExceptionListener::getSubscribedEvents()
@@ -108,9 +108,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMockForAbstractClass(LoggerInterface::class);
     }
 
-    private function getConsoleExceptionEvent(\Exception $exception, InputInterface $input, $exitCode)
+    private function getConsoleErrorEvent(\Exception $exception, InputInterface $input, $exitCode)
     {
-        return new ConsoleExceptionEvent(new Command('test:run'), $input, $this->getOutput(), $exception, $exitCode);
+        return new ConsoleErrorEvent(new Command('test:run'), $input, $this->getOutput(), $exception, $exitCode);
     }
 
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)

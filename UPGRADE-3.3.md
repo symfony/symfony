@@ -11,6 +11,13 @@ Debug
 
  * The `ContextErrorException` class is deprecated. `\ErrorException` will be used instead in 4.0.
 
+Console
+-------
+
+ * The `console.exception` event and the related `ConsoleExceptionEvent` class
+   have been deprecated in favor of the `console.error` event and the `ConsoleErrorEvent`
+   class. The deprecated event and class will be removed in 4.0.
+
 DependencyInjection
 -------------------
 

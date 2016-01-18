@@ -12,6 +12,9 @@ Console
  * Setting unknown style options is not supported anymore and throws an
    exception.
 
+ * The `console.exception` event and the related `ConsoleExceptionEvent` class have
+   been removed in favor of the `console.error` event and the `ConsoleErrorEvent` class.
+
 Debug
 -----
 

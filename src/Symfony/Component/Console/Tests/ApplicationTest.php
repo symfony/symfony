@@ -26,6 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -922,7 +923,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage caught
+     * @expectedExceptionMessage error
      */
     public function testRunWithExceptionAndDispatcher()
     {
@@ -953,7 +954,77 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
-        $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
+        $this->assertContains('before.foo.error.after.', $tester->getDisplay());
+    }
+
+    public function testRunDispatchesAllEventsWithExceptionInListener()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.command', function () {
+            throw new \RuntimeException('foo');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.error.after.', $tester->getDisplay());
+    }
+
+    public function testRunAllowsErrorListenersToSilenceTheException()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $event->getOutput()->write('silenced.');
+
+            $event->markErrorAsHandled();
+        });
+
+        $dispatcher->addListener('console.command', function () {
+            throw new \RuntimeException('foo');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.error.silenced.after.', $tester->getDisplay());
+        $this->assertEquals(0, $tester->getStatusCode());
+    }
+
+    public function testLegacyExceptionListenersAreStillTriggered()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
+            $event->getOutput()->write('caught.');
+
+            $event->setException(new \RuntimeException('replaced in caught.'));
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            throw new \RuntimeException('foo');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.caught.error.after.', $tester->getDisplay());
+        $this->assertContains('replaced in caught.', $tester->getDisplay());
     }
 
     public function testRunWithError()
@@ -976,7 +1047,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage caught
+     * @expectedExceptionMessage error
      */
     public function testRunWithErrorAndDispatcher()
     {
@@ -993,7 +1064,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'dym'));
-        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunDispatchesAllEventsWithError()
@@ -1010,7 +1081,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'dym'));
-        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+        $this->assertContains('before.dym.error.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
     }
 
     public function testRunWithErrorFailingStatusCode()
@@ -1121,32 +1192,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($width, 80), $application->getTerminalDimensions());
     }
 
-    protected function getDispatcher($skipCommand = false)
-    {
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use ($skipCommand) {
-            $event->getOutput()->write('before.');
-
-            if ($skipCommand) {
-                $event->disableCommand();
-            }
-        });
-        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($skipCommand) {
-            $event->getOutput()->writeln('after.');
-
-            if (!$skipCommand) {
-                $event->setExitCode(113);
-            }
-        });
-        $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
-            $event->getOutput()->write('caught.');
-
-            $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
-        });
-
-        return $dispatcher;
-    }
-
     public function testSetRunCustomDefaultCommand()
     {
         $command = new \FooCommand();
@@ -1202,6 +1247,32 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $inputStream = $tester->getInput()->getStream();
         $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
+    }
+
+    protected function getDispatcher($skipCommand = false)
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use ($skipCommand) {
+            $event->getOutput()->write('before.');
+
+            if ($skipCommand) {
+                $event->disableCommand();
+            }
+        });
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($skipCommand) {
+            $event->getOutput()->writeln('after.');
+
+            if (!$skipCommand) {
+                $event->setExitCode(113);
+            }
+        });
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            $event->getOutput()->write('error.');
+
+            $event->setError(new \LogicException('error.', $event->getExitCode(), $event->getError()));
+        });
+
+        return $dispatcher;
     }
 }
 

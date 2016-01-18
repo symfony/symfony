@@ -71,6 +71,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL))),
             array('e', null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')))),
+            array('donotexist', null),
         );
     }
 
@@ -89,6 +90,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
             array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),
             array('bar', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
+            array('donotexist', null),
         );
     }
 

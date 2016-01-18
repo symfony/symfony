@@ -51,7 +51,13 @@
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="max-depth" type="xsd:int" />
+        <xsd:attribute name="max-depth">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:integer">
+                    <xsd:minInclusive value="0" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:complexType>
 
 </xsd:schema>

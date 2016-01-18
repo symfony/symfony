@@ -65,7 +65,6 @@ class YamlFileLoader extends FileLoader
 
             if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
                 $attributesMetadata = $classMetadata->getAttributesMetadata();
-
                 foreach ($yaml['attributes'] as $attribute => $data) {
                     if (isset($attributesMetadata[$attribute])) {
                         $attributeMetadata = $attributesMetadata[$attribute];
@@ -76,12 +75,16 @@ class YamlFileLoader extends FileLoader
 
                     if (isset($data['groups'])) {
                         foreach ($data['groups'] as $group) {
-                            $attributeMetadata->addGroup((string) $group);
+                            $attributeMetadata->addGroup($group);
                         }
                     }
 
                     if (isset($data['max_depth'])) {
-                        $attributeMetadata->setMaxDepth((int) $data['max_depth']);
+                        if (!is_int($data['max_depth'])) {
+                            throw new MappingException('The "max_depth" value must an integer.');
+                        }
+
+                        $attributeMetadata->setMaxDepth($data['max_depth']);
                     }
                 }
             }

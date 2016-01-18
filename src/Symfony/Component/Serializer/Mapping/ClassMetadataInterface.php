@@ -41,7 +41,7 @@ interface ClassMetadataInterface
     /**
      * Gets the list of {@link AttributeMetadataInterface}.
      *
-     * @return array An array containing the attribute name as key and the related instance of AttributeMetadataInterface as value.
+     * @return @return AttributeMetadataInterface[]
      */
     public function getAttributesMetadata();
 

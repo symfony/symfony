@@ -75,6 +75,10 @@ class YamlFileLoader extends FileLoader
 
                     if (isset($data['groups'])) {
                         foreach ($data['groups'] as $group) {
+                            if (!is_string($group)) {
+                                throw new MappingException('Group names must be strings.');
+                            }
+
                             $attributeMetadata->addGroup($group);
                         }
                     }

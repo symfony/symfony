@@ -255,12 +255,27 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->start();
     }
 
+    public function testRegisterBagBeforeStarting()
+    {
+        $storage = $this->getStorage();
+        $bag = new AttributeBag('test_bag');
+        $bag->setName('test_bag');
+        $storage->registerBag($bag);
+
+        $storage->start();
+
+        // variable is set after session start, as the session handler overwrites $_SESSION
+        $_SESSION['test_bag']['some_key'] = 'some_value';
+
+        $this->assertSame('some_value', $bag->get('some_key'));
+    }
+
     public function testRegisterBagAfterStarting()
     {
         $storage = $this->getStorage();
         $storage->start();
 
-        // this is done after session start, as the session handler overwrites $_SESSION
+        // variable is set after session start, as the session handler overwrites $_SESSION
         $_SESSION['test_bag']['some_key'] = 'some_value';
 
         $bag = new AttributeBag('test_bag');

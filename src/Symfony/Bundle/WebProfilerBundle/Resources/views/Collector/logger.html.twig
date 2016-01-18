@@ -131,7 +131,7 @@
 
 {% macro render_table(logs, show_level = false, is_deprecation = false) %}
     {% import _self as helper %}
-    {% set channel_is_defined = (logs|first).channel is defined %}
+    {% set channel_is_defined = (logs.first()).channel is defined %}
 
     <table class="logs">
         <thead>

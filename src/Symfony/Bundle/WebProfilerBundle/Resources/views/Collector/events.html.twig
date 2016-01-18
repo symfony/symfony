@@ -58,7 +58,7 @@
             </tr>
         </thead>
 
-        {% set previous_event = (listeners|first).event %}
+        {% set previous_event = (listeners.first()).event %}
         {% for listener in listeners %}
             {% if loop.first or listener.event != previous_event %}
                 {% if not loop.first %}

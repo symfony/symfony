@@ -182,10 +182,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     private function getNormalizer($data, $format)
     {
-        if ($isObject = is_object($data)) {
-            $class = get_class($data);
-        }
-
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format)) {
                 return $normalizer;

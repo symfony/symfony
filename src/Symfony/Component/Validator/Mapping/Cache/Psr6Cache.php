@@ -36,7 +36,9 @@ class Psr6Cache implements CacheInterface
      */
     public function has($class)
     {
-        return $this->cacheItemPool->hasItem($this->escapeClassName($class));
+        $item = $this->cacheItemPool->getItem($this->escapeClassName($class));
+
+        return $item->isHit();
     }
 
     /**

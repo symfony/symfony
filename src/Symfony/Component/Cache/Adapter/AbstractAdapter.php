@@ -64,7 +64,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
      *
      * @param array $ids The cache identifiers to fetch.
      *
-     * @return array The corresponding values found in the cache.
+     * @return array|\Traversable The corresponding values found in the cache.
      */
     abstract protected function doFetch(array $ids);
 
@@ -80,9 +80,11 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     /**
      * Deletes all items in the pool.
      *
+     * @param string The prefix used for all identifiers managed by this pool.
+     *
      * @return bool True if the pool was successfully cleared, false otherwise.
      */
-    abstract protected function doClear();
+    abstract protected function doClear($namespace);
 
     /**
      * Removes multiple items from the pool.
@@ -108,14 +110,10 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
      */
     public function getItem($key)
     {
-        $id = $this->getId($key);
-
         if ($this->deferred) {
             $this->commit();
         }
-        if (isset($this->deferred[$key])) {
-            return $this->deferred[$key];
-        }
+        $id = $this->getId($key);
 
         $f = $this->createCacheItem;
         $isHit = false;
@@ -136,28 +134,15 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         if ($this->deferred) {
             $this->commit();
         }
-        $f = $this->createCacheItem;
         $ids = array();
-        $items = array();
 
         foreach ($keys as $key) {
-            $id = $this->getId($key);
-
-            if (isset($this->deferred[$key])) {
-                $items[$key] = $this->deferred[$key];
-            } else {
-                $ids[$key] = $id;
-            }
+            $ids[$key] = $this->getId($key);
         }
+        $items = $this->doFetch($ids);
+        $ids = array_flip($ids);
 
-        $values = $this->doFetch($ids);
-
-        foreach ($ids as $key => $id) {
-            $isHit = isset($values[$id]);
-            $items[$key] = $f($key, $isHit ? $values[$id] : null, $isHit);
-        }
-
-        return $items;
+        return $this->generateItems($items, $ids);
     }
 
     /**
@@ -165,11 +150,19 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
      */
     public function hasItem($key)
     {
-        if ($this->deferred) {
-            $this->commit();
+        $id = $this->getId($key);
+
+        if (isset($this->deferred[$key])) {
+            $item = (array) $this->deferred[$key];
+            $ok = $this->doSave(array($item[CacheItem::CAST_PREFIX.'key'] => $item[CacheItem::CAST_PREFIX.'value']), $item[CacheItem::CAST_PREFIX.'lifetime']);
+            unset($this->deferred[$key]);
+
+            if (true === $ok || array() === $ok) {
+                return true;
+            }
         }
 
-        return $this->doHave($this->getId($key));
+        return $this->doHave($id);
     }
 
     /**
@@ -179,7 +172,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     {
         $this->deferred = array();
 
-        return $this->doClear();
+        return $this->doClear($this->namespace);
     }
 
     /**
@@ -198,7 +191,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         $ids = array();
 
         foreach ($keys as $key) {
-            $ids[] = $this->getId($key);
+            $ids[$key] = $this->getId($key);
             unset($this->deferred[$key]);
         }
 
@@ -213,11 +206,12 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         if (!$item instanceof CacheItem) {
             return false;
         }
-        $key = $item->getKey();
-        $this->deferred[$key] = $item;
-        $this->commit();
+        if ($this->deferred) {
+            $this->commit();
+        }
+        $this->deferred[$item->getKey()] = $item;
 
-        return !isset($this->deferred[$key]);
+        return $this->commit();
     }
 
     /**
@@ -230,10 +224,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         }
         try {
             $item = clone $item;
-        } catch (\Error $e) {
         } catch (\Exception $e) {
-        }
-        if (isset($e)) {
             @trigger_error($e->__toString());
 
             return false;
@@ -250,7 +241,6 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     {
         $f = $this->mergeByLifetime;
         $ko = array();
-        $namespaceLen = strlen($this->namespace);
 
         foreach ($f($this->deferred, $this->namespace) as $lifetime => $values) {
             if (true === $ok = $this->doSave($values, $lifetime)) {
@@ -259,13 +249,28 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
             if (false === $ok) {
                 $ok = array_keys($values);
             }
-            foreach ($ok as $failedId) {
-                $key = substr($failedId, $namespaceLen);
-                $ko[$key] = $this->deferred[$key];
+            foreach ($ok as $id) {
+                $ko[$lifetime][] = array($id => $values[$id]);
             }
         }
 
-        return !$this->deferred = $ko;
+        $this->deferred = array();
+        $ok = true;
+
+        // When bulk-save failed, retry each item individually
+        foreach ($ko as $lifetime => $values) {
+            foreach ($values as $v) {
+                if (!in_array($this->doSave($v, $lifetime), array(true, array()), true)) {
+                    $ok = false;
+
+                    foreach ($v as $key => $value) {
+                        @trigger_error(sprintf('Failed to cache key "%s" of type "%s"', is_object($value) ? get_class($value) : gettype($value)));
+                    }
+                }
+            }
+        }
+
+        return $ok;
     }
 
     public function __destruct()
@@ -288,5 +293,19 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         }
 
         return $this->namespace.$key;
+    }
+
+    private function generateItems($items, &$keys)
+    {
+        $f = $this->createCacheItem;
+
+        foreach ($items as $id => $value) {
+            yield $keys[$id] => $f($keys[$id], $value, true);
+            unset($keys[$id]);
+        }
+
+        foreach ($keys as $key) {
+            yield $key => $f($key, null, false);
+        }
     }
 }

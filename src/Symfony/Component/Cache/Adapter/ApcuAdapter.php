@@ -48,7 +48,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear()
+    protected function doClear($namespace)
     {
         return apcu_clear_cache();
     }

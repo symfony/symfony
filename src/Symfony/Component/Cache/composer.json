@@ -23,7 +23,7 @@
         "psr/cache": "~1.0"
     },
     "require-dev": {
-        "cache/integration-tests": "^0.6",
+        "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6"
     },
     "autoload": {

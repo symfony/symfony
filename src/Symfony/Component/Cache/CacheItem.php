@@ -19,6 +19,11 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 final class CacheItem implements CacheItemInterface
 {
+    /**
+     * @internal
+     */
+    const CAST_PREFIX = "\0Symfony\Component\Cache\CacheItem\0";
+
     private $key;
     private $value;
     private $isHit;

@@ -1232,7 +1232,7 @@ class Process
             $this->processPipes = UnixPipes::create($this, $this->input);
         }
 
-        return $this->processPipes->getDescriptors($this->outputDisabled);
+        return $this->processPipes->getDescriptors();
     }
 
     /**

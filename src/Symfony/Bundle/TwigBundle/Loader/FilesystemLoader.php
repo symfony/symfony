@@ -91,7 +91,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         if (false === $file || null === $file) {
             try {
                 list($namespace, $name) = $this->parseName($logicalName);
-                $paths = sprintf(' (looked into: %s)', implode(', ', $this->getPaths($namespace)));;
+                $paths = sprintf(' (looked into: %s)', implode(', ', $this->getPaths($namespace)));
             } catch (\Twig_Error_Loader $e) {
                 $paths = '';
             }

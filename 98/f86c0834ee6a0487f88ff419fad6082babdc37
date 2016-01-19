@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-17T08:11:38Z
+
+Actually, I think that the AssetsHelper should be updated to use the new system in 2.8 already
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-12-17T13:31:24Z
+
+@stof Are you refering to the Asset component? Already in 2.8 we use the Asset component in the `AssetsHelper` and we provide a BC layer to keep the old behaviour. (see https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/Templating/Helper/AssetsHelper.php)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-12-28T15:44:24Z
+
+@WouterJ @jakzal comments addressed
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-04T18:38:18Z
+
+Any news on this? can be merged? @fabpot
+
+---------------------------------------------------------------------------
+
+by regularjack at 2016-01-07T19:38:44Z
+
+I just stumbled upon this issue, getting a `PHP Fatal error: Class 'Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper' not found` when using PHP templating.
+
+As mentioned in the PR description, according to the upgrade guides, the `templating.helper.assets` service was removed in 3.0. Instead of adding back the `AssetsHelper` class, shouldn't the service definition be removed?
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-07T21:52:26Z
+
+The UPGRADE file is wrong, in 3.0 the helper should provide integration with the Asset component.
+
+---------------------------------------------------------------------------
+
+by regularjack at 2016-01-19T18:24:26Z
+
+I just reviewed this PR and everything is fine, IMHO. Thanks for fixing this @dosten.
+
+I'm also creating a PR to fix the upgrade guides since those need to be fixed in 2.7.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-19T19:18:14Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-19T21:17:33Z
+
+:+1:

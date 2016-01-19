@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-14T16:10:43Z
+
+Returning an int doesn't respect the description of what the message is supposed to do:
+
+> This method should always return the same base URL for a given path.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2016-01-14T16:19:48Z
+
+Ah, I missed this. It should be
+> This method should always return the same base URL offset for a given path.
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-14T16:32:07Z
+
+I don't know if "offset" is the best word, IMO "index" is better.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2016-01-15T10:02:03Z
+
+I don't mind changing "offset" into "index". @xabbuh WDYT? Should I make change and squash commits?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-19T12:19:54Z
+
+index sounds better
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2016-01-19T15:17:56Z
+
+@xabbuh @fabpot Changed 'offset' to 'index'.

@@ -1,0 +1,265 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2016-01-17T12:00:18Z
+
+Interesting, like the simplistic approach, and especially that there is only one backend lookup for getItem call. But missing use of multi get / set / (...) to reduce backend roundtrips further. And calls to hasItem and getItem *(and opposite)* will result in two lookups here, but last point is maybe to be expected given the spec.
+
+I know @Nyholm, @aequasi  and others have been [working on this topic]( https://github.com/php-cache), and hope to be able to contribute from eZ as well.
+
+Could be an opportunity to join forces maybe.
+
+<hr>
+
+Side: Personally I would perhaps opt for following approach:
+- two layers, the service (api) psr6 layer, and the adapter/driver layer with more low level interface**s**
+ - Be able to add features and change interfaces in low level without affecting psr6 service api, also be able to adopt future changes from PSR w/o potential conflicts.
+ - Allow people that only want the key/value to use the low level adapter at own risk.
+- Fork or re factor *in sync with the given project* an existing adapter library that supports:
+ -  Multi get / set / .. => to be able to do as few calls to cache backend as possible, to reduce server roundtrips and thus application latency, can also avoid race conditions in some use cases.
+ - Already supporting lots of cache backends with full test suites  => avoid redoing bugs
+ - This could be `doctrine/cache`, with cleanup of structure and getting rid of extra cache lookup for namespace in favor of approach here, however this would be needed to be discussed with @Ocramius and others.
+ - Personally I also strongly think it should support Tagging* quite early on, or easily be able to add it, this can optionally be used by end users to solve the use case behind the doctrine cache namespace => clear all
+
+\* TL;DR; Tagging is a superior cache expiry strategy for any full scale applications, where a entity almost always is used several places that is cached, and tagging allows you to keep track of this to expire reliably on a given entity change. *See for instance @magnusnordlander's talk from Symfony Con., talks / blogs on Drupal8 cache impl., or talks on FOSHttpCache*
+
+\*\* Expire over clear to allow future stale cache scenarios.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-17T13:17:28Z
+
+Thank you for the ping.
+
+I ran this implementation on our [integration tests](https://github.com/php-cache/integration-tests) and found some issues. Like you do not protect for all the reserved characters and you have forgotten to clear the deferred items on `$pool->clear()`.
+
+The [php-cache](http://www.php-cache.com) supports tagging, hierarchal keys and have doctrine bridges in both directions. We are currently outperforming other PSR-6 caches with a factor of 2 and we have ideas for even more performance improvements.
+
+We would definitely like to join forces somehow. We are open for a discussion about that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-17T15:58:43Z
+
+Comments addressed, thank you @Nyholm for the link to the integration test, this will definitely help.
+As I tried to state in the README, I target a strict implementation of PSR-6 here. The goal is not to replace any existing caching libraries (php-cache, stash, doctrine/cache, etc.) but only provide the features that have be standardized, so that we can build interoperability on top. This means that adding more interfaces or features (tagging) is out of scope, unless a new PSR standardize them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-17T16:19:43Z
+
+I added testing with cache/integration-tests, I'll look at the failures asap. I already fixed the missing `:` reserved char.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-17T16:19:59Z
+
+> I target a strict implementation of PSR-6 here. The goal is not to replace any existing caching libraries (php-cache, stash, doctrine/cache, etc.) but only provide the features that have be standardized, so that we can build interoperability on top.
+
+If the goal is not to replace any existing cache libraries, why build another cache library? Wouldn't it be better if all Symfony components using cache relied on the PSR6 interface and then required the virtual package `psr/cache-implementation: ~1.0`?
+
+That way we use the benefit of PSRs and we can let the user decide what cache library to use. If they like to use feature X they install a library with feature X. If they want a strict implementation they would choose a strict implementation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-17T16:23:37Z
+
+@Nyholm ... and this component is a strict implementation that users can use if they want to, like any other ones. The goal of PSRs (if I get this right) is to allow several implementations with different philosophies, not to standardize on only one.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-17T16:28:24Z
+
+> @Nyholm ... and this component is a strict implementation that users can use if they want to, like any other ones. The goal of PSRs (if I get this right) is to allow several implementations with different philosophies, not to standardize on only one.
+
+You are correct. That is the goal of PSRs. But it was this sentence I reacted to:
+
+> The goal is not to replace any existing caching libraries
+
+If the goal **is** to provide a strict implementation of PSR-6 that **will** replace (or be an option to) any existing library, then I agree that we need this component. Otherwise I do not see the benefits at all.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-17T16:37:14Z
+
+Understood, we definitely want to provide a strict implementation that **can** replace existing libraries :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-17T16:40:04Z
+
+Okey, awesome.
+
+Im happy to help. @nicolas-grekas do you want PR's with more adapters now or once this is merged?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-17T17:48:57Z
+
+@Nyholm thank you that's much appreciated. Your test suite is already an amazing help. I think it would be easier to add more adapters after this one has been merge.
+For now I have the following failures:
+
+> 1) Symfony\Component\Cache\Tests\CacheTest::testSaveWithNoData
+> When saving an object with no data, we should generate an error.
+
+I didn't read anything about this in PSR-6, did I miss something?
+
+For the other ones, I'll check tomorrow hopefully:
+
+> 2) Symfony\Component\Cache\Tests\CacheTest::testDeferredSaveWithoutCommit
+> A deferred item should automatically be committed on CachePool::__destruct().
+
+> 3) Symfony\Component\Cache\Tests\CacheTest::testExpiration
+> Failed asserting that true is false.
+
+> 4) Symfony\Component\Cache\Tests\CacheTest::testIsHit
+> Failed asserting that false is true.
+
+> 5) Symfony\Component\Cache\Tests\CacheTest::testIsHitDeferred
+> Failed asserting that false is true.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-17T18:57:26Z
+
+Using a standardized interface for cache in Symfony will be very helpful!
+
+What do you think about using the PSR-6 interface instead of the Doctrine Cache one in #16838 and #16917?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-18T08:03:15Z
+
+1) When saving an object with no data, we should generate an error.
+
+We have given some thoughts in to this. The PSR doc block on `save` says "*True if the item was successfully persisted. False if there was an error.*". I claim it is an error because `null` is valid data.
+
+Consider this:
+```php
+$item = $pool->getItem('key');
+$pool->save($item); // Assume this is okey
+
+$pool->hasItem('key'); // Should return true, yes? Or else, what is the point of saving?
+
+/**
+ * Doc block for get():
+ * If isHit() returns false, this method MUST return null. Note that null
+ * is a legitimate cached value, so the isHit() method SHOULD be used to
+ * differentiate between "null value was found" and "no value was found."
+ *
+ * Doc block for isHit():
+ * Confirms if the cache item lookup resulted in a cache hit.
+ */
+$pool->getItem('key')->isHit(); // Must be false because "no value was found."
+
+// So ...
+$pool->hasItem('key') !== $pool->getItem('key')->isHit(); // This makes no sense.
+```
+
+The pool should not have an item that never can be a hit. That would be a stale item and should be removed.
+If you really want to store just the key you should just do `$item->set(null);`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-18T10:50:21Z
+
+@Nyholm I don't get your example, to me, assuming "key" is not already in the cache:
+```php
+$pool->hasItem('key'); // false
+$item = $pool->getItem('key');
+$item->get(); // null
+$item->isHit(); // false
+$pool->save($item); // true
+$item = $pool->getItem('key');
+$item->get(); // null
+$item->isHit(); // true -> a value has been found, we saved it before!
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-18T11:26:36Z
+
+You have not saved any value. Since: "*Note that null is a legitimate cached value, so the isHit() method SHOULD be used to differentiate between "null value was found" and "no value was found."*"
+
+The last two rows in you example:
+```php
+$item->get(); // null
+$item->isHit(); // true -> a value has been found, we saved it before!
+```
+If `$item->isHit() === true` and `$item->get()` returns `null` you assume that someone has done a `$item->set(null)` which is not the case.
+
+The point is, `null` should not be treated any special.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-18T12:38:56Z
+
+> If $item->isHit() === true and $item->get() returns null you assume that someone has done a $item->set(null) which is not the case.
+
+My example above clearly allows to differentiate between a null a "found" vs a null as "not found". Nothing in the spec says that `$item->set(null)` is the only way to get a "data" null. This still looks like a non standard requirement to me.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-18T14:10:18Z
+
+If you do not agree with it, [mark it as skipped](https://github.com/php-cache/void-adapter/blob/master/tests/IntegrationPoolTest.php) for now and we can have the discussion about it on the integration test repo.
+
+I think it make sense but I will ask the in the mailing list what the intention might have been and adjust the integration tests accordingly.
+
+Thank you for your input.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-18T14:55:04Z
+
+@Nyholm discussion about conformance tests can continue here: https://github.com/php-cache/integration-tests/pull/33
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-18T16:33:32Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-18T16:34:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-18T16:46:48Z
+
+I do also think this looks good. :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-18T17:43:12Z
+
+@Nyholm the only thing that is missing to turn tests green is a merge of https://github.com/php-cache/integration-tests/pull/33 :)
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-18T18:23:12Z
+
+Tests are green thank you @Nyholm
+I suggest merging this one asis and doing any further enhancements on next PRs (esp. adding adapters).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-18T18:34:48Z
+
+Thank you for your feedback on the tests.
+I agree. This should be merged now.
+
+---------------------------------------------------------------------------
+
+by JHGitty at 2016-01-18T21:35:17Z
+
+@nicolas-grekas Thank you for working on this - it is awesome! We should merge this.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-18T23:17:37Z
+
++1 to merge it now. It will allow to start migrating metadata systems and other places in Symfony using Doctrine Cache internally to PSR-6.

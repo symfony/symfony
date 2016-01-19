@@ -44,13 +44,13 @@ class Psr6Cache implements CacheInterface
      */
     public function read($class)
     {
-        $key = $this->escapeClassName($class);
+        $item = $this->cacheItemPool->getItem($this->escapeClassName($class));
 
-        if (!$this->cacheItemPool->hasItem($key)) {
+        if (!$item->isHit()) {
             return false;
         }
 
-        return $this->cacheItemPool->getItem($key)->get();
+        return $item->get();
     }
 
     /**

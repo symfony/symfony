@@ -74,6 +74,10 @@ class YamlFileLoader extends FileLoader
                     }
 
                     if (isset($data['groups'])) {
+                        if (!is_array($data['groups'])) {
+                            throw new MappingException('The "groups" key must be an array of strings.');
+                        }
+
                         foreach ($data['groups'] as $group) {
                             if (!is_string($group)) {
                                 throw new MappingException('Group names must be strings.');

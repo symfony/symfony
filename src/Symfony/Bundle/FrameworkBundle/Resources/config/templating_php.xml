@@ -34,8 +34,7 @@
 
         <service id="templating.helper.assets" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper">
             <tag name="templating.helper" alias="assets" />
-            <argument /> <!-- default package -->
-            <argument type="collection" /> <!-- named packages -->
+            <argument /> <!-- packages -->
         </service>
 
         <service id="templating.helper.actions" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper">

@@ -58,16 +58,11 @@ class ArrayAdapter implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
-        $f = $this->createCacheItem;
-        $items = array();
-        $now = time();
-
         foreach ($keys as $key) {
-            $isHit = isset($this->expiries[$this->validateKey($key)]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key));
-            $items[$key] = $f($key, $isHit ? $this->values[$key] : null, $isHit);
+            $this->validateKey($key);
         }
 
-        return $items;
+        return $this->generateItems($keys);
     }
 
     /**
@@ -175,5 +170,16 @@ class ArrayAdapter implements CacheItemPoolInterface
         }
 
         return $key;
+    }
+
+    private function generateItems(array $keys)
+    {
+        $f = $this->createCacheItem;
+
+        foreach ($keys as $key) {
+            $isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= time() || !$this->deleteItem($key));
+
+            yield $key => $f($key, $isHit ? $this->values[$key] : null, $isHit);
+        }
     }
 }

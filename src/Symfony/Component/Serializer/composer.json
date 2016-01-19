@@ -23,16 +23,18 @@
         "symfony/config": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/cache": "~3.1",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
     "suggest": {
-        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
-        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+        "symfony/cache": "For using the metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",
-        "symfony/http-foundation": "To use the DataUriNormalizer."
+        "symfony/http-foundation": "To use the DataUriNormalizer.",
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Serializer\\": "" },

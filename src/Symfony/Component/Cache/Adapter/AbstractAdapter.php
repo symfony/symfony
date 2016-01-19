@@ -12,23 +12,43 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements CacheItemPoolInterface
+abstract class AbstractAdapter implements AdapterInterface
 {
+    /**
+     * @var string
+     */
     private $namespace;
+
+    /**
+     * @var AdapterInterface
+     */
+    private $decorated;
+
+    /**
+     * @var array
+     */
     private $deferred = array();
+
+    /**
+     * @var \Closure
+     */
     private $createCacheItem;
+
+    /**
+     * @var \Closure
+     */
     private $mergeByLifetime;
 
-    protected function __construct($namespace = '', $defaultLifetime = 0)
+    protected function __construct($namespace = '', $defaultLifetime = 0, AdapterInterface $decorated = null)
     {
         $this->namespace = $namespace;
+        $this->decorated = $decorated;
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
@@ -109,7 +129,6 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     public function getItem($key)
     {
         $id = $this->getId($key);
-
         if ($this->deferred) {
             $this->commit();
         }
@@ -123,6 +142,10 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
 
         foreach ($this->doFetch(array($id)) as $value) {
             $isHit = true;
+        }
+
+        if (!$isHit && $this->decorated) {
+            return $this->decorated->getItem($key);
         }
 
         return $f($key, $value, $isHit);
@@ -154,6 +177,13 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
 
         foreach ($ids as $key => $id) {
             $isHit = isset($values[$id]);
+
+            if (!$isHit && $this->decorated) {
+                $items[$key] = $this->getItem($key);
+
+                continue;
+            }
+
             $items[$key] = $f($key, $isHit ? $values[$id] : null, $isHit);
         }
 
@@ -169,7 +199,13 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
             $this->commit();
         }
 
-        return $this->doHave($this->getId($key));
+        $got = $this->doHave($this->getId($key));
+
+        if ($got || !$this->decorated) {
+            return $got;
+        }
+
+        return $this->decorated->hasItem($key);
     }
 
     /**
@@ -178,8 +214,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     public function clear()
     {
         $this->deferred = array();
+        $cleared = $this->decorated ? $this->decorated->clear() : true;
 
-        return $this->doClear();
+        return $this->doClear() && $cleared;
     }
 
     /**
@@ -187,7 +224,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        return $this->deleteItems(array($key));
+        $deleted = $this->decorated ? $this->decorated->deleteItem($key) : true;
+
+        return $this->deleteItems(array($key)) && $deleted;
     }
 
     /**
@@ -202,7 +241,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
             unset($this->deferred[$key]);
         }
 
-        return $this->doDelete($ids);
+        $deleted = $this->decorated ? $this->decorated->deleteItems($keys) : true;
+
+        return $this->doDelete($ids) && $deleted;
     }
 
     /**
@@ -217,7 +258,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         $this->deferred[$key] = $item;
         $this->commit();
 
-        return !isset($this->deferred[$key]);
+        $saved = $this->decorated ? $this->decorated->save($item) : true;
+
+        return !isset($this->deferred[$key]) && $saved;
     }
 
     /**
@@ -240,7 +283,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         }
         $this->deferred[$item->getKey()] = $item;
 
-        return true;
+        return $this->decorated ? $this->decorated->saveDeferred($item) : true;
     }
 
     /**
@@ -265,7 +308,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
             }
         }
 
-        return !$this->deferred = $ko;
+        $committed = $this->decorated ? $this->decorated->commit() : true;
+
+        return !($this->deferred = $ko) && $committed;
     }
 
     public function __destruct()

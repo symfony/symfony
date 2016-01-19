@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Exception\CacheException;
  */
 class ApcuAdapter extends AbstractAdapter
 {
-    public function __construct($namespace = '', $defaultLifetime = 0)
+    public function __construct($namespace = '', $defaultLifetime = 0, AdapterInterface $decorated = null)
     {
         if (!function_exists('apcu_fetch') || !ini_get('apc.enabled') || ('cli' === PHP_SAPI && !ini_get('apc.enable_cli'))) {
             throw new CacheException('APCu is not enabled');
@@ -26,7 +26,7 @@ class ApcuAdapter extends AbstractAdapter
         if ('cli' === PHP_SAPI) {
             ini_set('apc.use_request_time', 0);
         }
-        parent::__construct($namespace, $defaultLifetime);
+        parent::__construct($namespace, $defaultLifetime, $decorated);
     }
 
     /**

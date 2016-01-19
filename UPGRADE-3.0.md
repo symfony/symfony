@@ -19,7 +19,7 @@ UPGRADE FROM 2.x to 3.0
  * The `DebugUniversalClassLoader` class has been removed in favor of
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
-   ```
+
 
 ### Config
 

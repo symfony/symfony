@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-17T08:05:42Z
+
+Can you please add a test to avoid regressions?
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-17T17:49:33Z
+
+@xabbuh I added a test, which covers this special case and also modified the PR comment a little bit.

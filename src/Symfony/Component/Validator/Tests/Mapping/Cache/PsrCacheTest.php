@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
-use Doctrine\Common\Cache\ArrayCache;
-use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Validator\Mapping\Cache\PsrCache;
 
-class DoctrineCacheTest extends AbstractCacheTest
+class PsrCacheTest extends AbstractCacheTest
 {
     /**
      * {@inheritdoc}
      */
     protected function getCache()
     {
-        return new DoctrineCache(new ArrayCache());
+        return new PsrCache(new ArrayAdapter());
     }
 }

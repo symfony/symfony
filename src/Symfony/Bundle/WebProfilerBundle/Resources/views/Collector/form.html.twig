@@ -437,7 +437,7 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type_class is defined %}[<abbr title="{{ data.type_class }}">{{ data.type_class|split('\\')|last }}</abbr>]{% endif %}
 
             {% if data.errors is defined and data.errors|length > 0 %}
                 <div class="badge-error">{{ data.errors|length }}</div>

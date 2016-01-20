@@ -17,11 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
-    {
-        $this->testInitialize();
-    }
-
     public function testInitialize()
     {
         $request = new Request();

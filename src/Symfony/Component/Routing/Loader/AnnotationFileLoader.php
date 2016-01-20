@@ -64,6 +64,10 @@ class AnnotationFileLoader extends FileLoader
             $collection->addResource(new FileResource($path));
             $collection->addCollection($this->loader->load($class, $type));
         }
+        if (PHP_VERSION_ID >= 70000) {
+            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+            gc_mem_caches();
+        }
 
         return $collection;
     }
@@ -88,10 +92,10 @@ class AnnotationFileLoader extends FileLoader
         $class = false;
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
-        for ($i = 0, $count = count($tokens); $i < $count; ++$i) {
+        for ($i = 0; isset($tokens[$i]); ++$i) {
             $token = $tokens[$i];
 
-            if (!is_array($token)) {
+            if (!isset($token[1])) {
                 continue;
             }
 
@@ -100,11 +104,11 @@ class AnnotationFileLoader extends FileLoader
             }
 
             if (true === $namespace && T_STRING === $token[0]) {
-                $namespace = '';
-                do {
-                    $namespace .= $token[1];
-                    $token = $tokens[++$i];
-                } while ($i < $count && is_array($token) && in_array($token[0], array(T_NS_SEPARATOR, T_STRING)));
+                $namespace = $token[1];
+                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_NS_SEPARATOR, T_STRING))) {
+                    $namespace .= $tokens[$i][1];
+                }
+                $token = $tokens[$i];
             }
 
             if (T_CLASS === $token[0]) {

@@ -25,6 +25,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
+    const OBJECT_TO_POPULATE = 'object_to_populate';
+    const GROUPS = 'groups';
+
     /**
      * @var int
      */
@@ -146,16 +150,16 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         $objectHash = spl_object_hash($object);
 
-        if (isset($context['circular_reference_limit'][$objectHash])) {
-            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context['circular_reference_limit'][$objectHash]);
+        if (isset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash])) {
+            if ($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] >= $this->circularReferenceLimit) {
+                unset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash]);
 
                 return true;
             }
 
-            ++$context['circular_reference_limit'][$objectHash];
+            ++$context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash];
         } else {
-            $context['circular_reference_limit'][$objectHash] = 1;
+            $context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] = 1;
         }
 
         return false;
@@ -193,7 +197,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        if (!$this->classMetadataFactory || !isset($context['groups']) || !is_array($context['groups'])) {
+        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !is_array($context[static::GROUPS])) {
             return false;
         }
 
@@ -202,7 +206,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             $name = $attributeMetadata->getName();
 
             if (
-                count(array_intersect($attributeMetadata->getGroups(), $context['groups'])) &&
+                count(array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS])) &&
                 $this->isAllowedAttribute($classOrObject, $name, null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
@@ -261,12 +265,12 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
         if (
-            isset($context['object_to_populate']) &&
-            is_object($context['object_to_populate']) &&
-            $context['object_to_populate'] instanceof $class
+            isset($context[static::OBJECT_TO_POPULATE]) &&
+            is_object($context[static::OBJECT_TO_POPULATE]) &&
+            $context[static::OBJECT_TO_POPULATE] instanceof $class
         ) {
-            $object = $context['object_to_populate'];
-            unset($context['object_to_populate']);
+            $object = $context[static::OBJECT_TO_POPULATE];
+            unset($context[static::OBJECT_TO_POPULATE]);
 
             return $object;
         }

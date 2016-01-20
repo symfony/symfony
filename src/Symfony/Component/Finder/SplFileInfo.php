@@ -38,6 +38,8 @@ class SplFileInfo extends \SplFileInfo
     /**
      * Returns the relative path.
      *
+     * This path does not contain the file name.
+     *
      * @return string the relative path
      */
     public function getRelativePath()
@@ -47,6 +49,8 @@ class SplFileInfo extends \SplFileInfo
 
     /**
      * Returns the relative path name.
+     *
+     * This path contains the file name.
      *
      * @return string the relative path name
      */

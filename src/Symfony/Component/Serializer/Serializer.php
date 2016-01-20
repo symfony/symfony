@@ -127,10 +127,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         if (null === $data || is_scalar($data)) {
             return $data;
         }
-        if (is_object($data) && $this->supportsNormalization($data, $format)) {
-            return $this->normalizeObject($data, $format, $context);
-        }
-        if ($data instanceof \Traversable) {
+
+        if (is_array($data) || $data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
@@ -138,16 +136,15 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
             return $normalized;
         }
+
         if (is_object($data)) {
-            return $this->normalizeObject($data, $format, $context);
-        }
-        if (is_array($data)) {
-            foreach ($data as $key => $val) {
-                $data[$key] = $this->normalize($val, $format, $context);
+            if (!$this->normalizers) {
+                throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            return $data;
+            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
         }
+
         throw new UnexpectedValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));
     }
 
@@ -185,10 +182,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     private function getNormalizer($data, $format)
     {
-        if ($isObject = is_object($data)) {
-            $class = get_class($data);
-        }
-
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format)) {
                 return $normalizer;
@@ -228,31 +221,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     final public function decode($data, $format, array $context = array())
     {
         return $this->decoder->decode($data, $format, $context);
-    }
-
-    /**
-     * Normalizes an object into a set of arrays/scalars.
-     *
-     * @param object $object  object to normalize
-     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
-     * @param array  $context The context data for this particular normalization
-     *
-     * @return array|string|bool|int|float|null
-     *
-     * @throws LogicException
-     * @throws UnexpectedValueException
-     */
-    private function normalizeObject($object, $format, array $context = array())
-    {
-        if (!$this->normalizers) {
-            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
-        }
-
-        if ($normalizer = $this->getNormalizer($object, $format)) {
-            return $normalizer->normalize($object, $format, $context);
-        }
-
-        throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($object)));
     }
 
     /**

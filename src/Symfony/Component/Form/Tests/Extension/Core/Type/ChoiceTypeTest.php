@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
 class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -1478,5 +1479,31 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         // Trigger data initialization
         $form->getViewData();
+    }
+
+    /**
+     * This covers the case when:
+     *  - Custom choice type added after a choice type.
+     *  - Custom type is expanded.
+     *  - Custom type replaces 'choices' normalizer with a custom one.
+     * In this case, custom type should not inherit labels from the first added choice type.
+     */
+    public function testCustomChoiceTypeDoesNotInheritChoiceLabels()
+    {
+        $builder = $this->factory->createBuilder();
+        $builder->add('choice', 'choice', array(
+                'choices' => array(
+                    '1' => '1',
+                    '2' => '2',
+                ),
+            )
+        );
+        $builder->add('subChoice', new ChoiceSubType());
+        $form = $builder->getForm();
+
+        // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced
+        // in the custom choice type, so $choiceLabels->labels remains empty array.
+        // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
+        $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
 }

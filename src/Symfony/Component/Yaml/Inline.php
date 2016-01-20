@@ -105,7 +105,7 @@ class Inline
                 return 'null';
             case is_object($value):
                 if ($objectSupport) {
-                    return '!!php/object:'.serialize($value);
+                    return '!php/object:'.serialize($value);
                 }
 
                 if ($exceptionOnInvalidType) {
@@ -477,8 +477,11 @@ class Inline
                     case 0 === strpos($scalar, '! '):
                         return (int) self::parseScalar(substr($scalar, 2));
                     case 0 === strpos($scalar, '!!php/object:'):
+                        @trigger_error('!!php/object is deprecated since version 3.0 and will be removed in 4.0. Use !php/object instead.', E_USER_DEPRECATED);
+                        $scalar = substr($scalar, 1);
+                    case 0 === strpos($scalar, '!php/object:'):
                         if (self::$objectSupport) {
-                            return unserialize(substr($scalar, 13));
+                            return unserialize(substr($scalar, 12));
                         }
 
                         if (self::$exceptionOnInvalidType) {

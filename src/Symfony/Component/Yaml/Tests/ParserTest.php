@@ -422,7 +422,7 @@ EOF;
     public function testObjectSupportEnabled()
     {
         $input = <<<EOF
-foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
@@ -431,7 +431,7 @@ EOF;
     public function testObjectSupportDisabledButNoExceptions()
     {
         $input = <<<EOF
-foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
+foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
 
@@ -474,7 +474,28 @@ EOF;
      */
     public function testObjectsSupportDisabledWithExceptions()
     {
-        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
+        $this->parser->parse('foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
+    }
+
+    public function testDeprecatedObjectNotation()
+    {
+        $input = <<<EOF
+foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+
+        $actual = $this->parser->parse($input, true, true);
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => '!!php/object is deprecated since version 3.0 and will be removed in 4.0. Use !php/object instead.',
+        );
+
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $actual, '->parse() is able to parse objects');
+        $this->assertSame($xError, $lastError);
     }
 
     /**

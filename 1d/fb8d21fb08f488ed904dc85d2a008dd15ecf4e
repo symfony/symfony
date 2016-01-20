@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-20T11:58:19Z
+
+Don't we have the problem in 2.8?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-20T11:59:57Z
+
+No. This is for example the Symfony Demo app (2.8.2):
+
+![form_types_2_8](https://cloud.githubusercontent.com/assets/73419/12448362/b086ec10-bf75-11e5-887b-9b29f091a852.png)

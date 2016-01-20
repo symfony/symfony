@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-01-18T21:38:02Z
+
+Comments addressed, PR updated
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-01-19T10:52:11Z
+
+I just updated the PR, I reduced the temp stream to 1M at max before switching on fs. I've also changed the streams mode from `a+` to `wb+`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-19T10:53:09Z
+
+:+1:

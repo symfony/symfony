@@ -63,8 +63,6 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
             return false;
         }
 
-        $class = new \ReflectionClass($type);
-
-        return $class->isSubclassOf('Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
+        return is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
     }
 }

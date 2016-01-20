@@ -291,6 +291,10 @@ class ChoiceType extends AbstractType
                 // forms)
                 $labels = $choiceLabels->labels;
 
+                // The $choiceLabels object is shared with the 'choices' closure.
+                // Since that normalizer can be replaced, labels have to be cleared here.
+                $choiceLabels->labels = array();
+
                 return function ($choice, $key) use ($labels) {
                     return $labels[$key];
                 };

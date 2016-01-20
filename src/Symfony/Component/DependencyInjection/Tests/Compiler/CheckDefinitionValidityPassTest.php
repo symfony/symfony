@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase

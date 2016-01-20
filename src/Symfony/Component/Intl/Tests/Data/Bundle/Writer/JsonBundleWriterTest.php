@@ -13,7 +13,6 @@ namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
-use Symfony\Component\Intl\Intl;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

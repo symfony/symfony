@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\CountValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

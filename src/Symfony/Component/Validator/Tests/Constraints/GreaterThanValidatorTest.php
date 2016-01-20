@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>

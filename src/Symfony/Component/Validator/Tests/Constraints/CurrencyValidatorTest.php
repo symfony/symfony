@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Currency;
 use Symfony\Component\Validator\Constraints\CurrencyValidator;
-use Symfony\Component\Validator\Validation;
 
 class CurrencyValidatorTest extends AbstractConstraintValidatorTest
 {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
-use Symfony\Component\Validator\Validation;
 
 class EmailValidatorTest extends AbstractConstraintValidatorTest
 {

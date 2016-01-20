@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
-use Symfony\Component\Validator\Validation;
 
 class TimeValidatorTest extends AbstractConstraintValidatorTest
 {

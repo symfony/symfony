@@ -67,6 +67,7 @@ class PhpDocExtractorTest extends \PHPUnit_Framework_TestCase
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL)), null, null),
             array('e', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))), null, null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
+            array('donotexist', null, null, null),
         );
     }
 }

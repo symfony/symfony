@@ -49,12 +49,8 @@ class DbalLogger implements SQLLogger
             $this->stopwatch->start('doctrine', 'doctrine');
         }
 
-        if (is_array($params)) {
-            $params = $this->normalizeParams($params);
-        }
-
         if (null !== $this->logger) {
-            $this->log($sql, null === $params ? array() : $params);
+            $this->log($sql, null === $params ? array() : $this->normalizeParams($params));
         }
     }
 

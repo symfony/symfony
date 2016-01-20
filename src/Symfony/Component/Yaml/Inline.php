@@ -488,6 +488,8 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
+                            @trigger_error('The !!php/object tag to indicate dumped PHP objects is deprecated since version 3.1 and will be removed in 4.0. Use the !php/object tag instead.', E_USER_DEPRECATED);
+
                             return unserialize(substr($scalar, 13));
                         }
 

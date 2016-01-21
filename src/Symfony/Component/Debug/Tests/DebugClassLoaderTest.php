@@ -205,7 +205,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testInterfaceExtendsDeprecatedInterface()
     {
-        set_error_handler(function() { return false; });
+        set_error_handler(function () { return false; });
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 

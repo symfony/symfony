@@ -74,7 +74,7 @@ class ProxyDumper implements DumperInterface
             if (defined('Symfony\Component\DependencyInjection\ContainerInterface::SCOPE_CONTAINER') && ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
                 $instantiation .= " \$this->scopedServices['$scope']['$id'] =";
             }
-    }
+        }
 
         $methodName = 'get'.Container::camelize($id).'Service';
         $proxyClass = $this->getProxyClassName($definition);

@@ -237,7 +237,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface
                 && $normalizer->supportsNormalization($object, $format)) {
-
                 return $normalizer->normalize($object, $format, $context);
             }
         }
@@ -271,7 +270,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface
                 && $normalizer->supportsDenormalization($data, $class, $format)) {
-
                 return $normalizer->denormalize($data, $class, $format, $context);
             }
         }

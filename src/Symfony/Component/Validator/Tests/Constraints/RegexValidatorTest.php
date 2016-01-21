@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
-use Symfony\Component\Validator\Validation;
 
 class RegexValidatorTest extends AbstractConstraintValidatorTest
 {

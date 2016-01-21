@@ -1005,7 +1005,6 @@ class FilesystemTest extends FilesystemTestCase
 
         // The compress.zlib:// stream does not support mode x: creates the file, errors "failed to open stream: operation failed" and returns false
         $this->filesystem->tempnam($dirname, 'bar');
-
     }
 
     public function testTempnamWithPHPTempSchemeFails()

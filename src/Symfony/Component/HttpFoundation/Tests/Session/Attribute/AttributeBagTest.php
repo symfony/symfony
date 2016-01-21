@@ -43,8 +43,9 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
             'category' => array(
                 'fishing' => array(
                     'first' => 'cod',
-                    'second' => 'sole',),
+                    'second' => 'sole',
                 ),
+            ),
         );
         $this->bag = new AttributeBag('_sf2');
         $this->bag->initialize($this->array);

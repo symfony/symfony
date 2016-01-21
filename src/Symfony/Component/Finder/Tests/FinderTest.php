@@ -526,8 +526,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'r+e.gex[c]a(r)s')
             ->path('/^dir/');
 
-        $expected = array('r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir',
-            'r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'bar.dat',);
+        $expected = array('r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir', 'r+e.gex[c]a(r)s'.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'bar.dat');
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 

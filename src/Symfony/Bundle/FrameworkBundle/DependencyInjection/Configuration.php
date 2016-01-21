@@ -645,7 +645,15 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache')
                             ->beforeNormalization()
                                 // Can be removed in 3.0, once ApcCache support is dropped
-                                ->ifString()->then(function ($v) { return 'apc' === $v ? 'validator.mapping.cache.apc' : $v; })
+                                ->ifString()->then(function ($v) {
+                                    if ('apc' === $v) {
+                                        @trigger_error('The ability to pass "apc" as the framework.validation.cache configuration key value is deprecated since version 2.8 and will be removed in 3.0. Use the "validator.mapping.cache.doctrine.apc" service id instead.', E_USER_DEPRECATED);
+
+                                        return 'validator.mapping.cache.apc';
+                                    }
+
+                                    return $v;
+                                })
                             ->end()
                         ->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()

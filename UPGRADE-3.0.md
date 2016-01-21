@@ -744,6 +744,27 @@ UPGRADE FROM 2.x to 3.0
    interface.
    The `security.csrf.token_manager` should be used instead.
 
+ * The `validator.mapping.cache.apc` service has been removed in favor of the `validator.mapping.cache.doctrine.apc` one.
+   
+ * The ability to pass `apc` as the `framework.validation.cache` configuration key value has been removed.
+   Use `validator.mapping.cache.doctrine.apc` instead:
+
+   Before:
+
+   ```yaml
+   framework:
+       validation:
+           cache: apc
+   ```
+
+   After:
+
+   ```yaml
+   framework:
+       validation:
+           cache: validator.mapping.cache.doctrine.apc
+   ```
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in

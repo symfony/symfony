@@ -132,7 +132,7 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
             ->method('isOutputDisabled')
             ->will($this->returnValue(true));
 
-		$process->expects($this->once())
+        $process->expects($this->once())
             ->method('getWorkingDirectory')
             ->will($this->returnValue($workingDirectory));
 

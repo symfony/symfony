@@ -249,7 +249,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface
                 && $normalizer->supportsDenormalization($data, $class, $format)) {
-
                 return $normalizer->denormalize($data, $class, $format, $context);
             }
         }

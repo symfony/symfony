@@ -26,7 +26,7 @@ class Unescaper
     /**
      * Regex fragment that matches an escaped character in a double quoted string.
      */
-    const REGEX_ESCAPED_CHARACTER = "\\\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)";
+    const REGEX_ESCAPED_CHARACTER = '\\\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)';
 
     /**
      * Unescapes a single quoted string.

@@ -602,7 +602,6 @@ EOF;
      *
      * This service is autowired.
 EOF;
-
         }
 
         if ($definition->isLazy()) {

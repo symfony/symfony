@@ -439,4 +439,3 @@ class StaticPropertyDummy
 {
     private static $property = 'value';
 }
-

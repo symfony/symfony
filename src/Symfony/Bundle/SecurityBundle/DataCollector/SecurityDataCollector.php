@@ -89,7 +89,7 @@ class SecurityDataCollector extends DataCollector
                 if (null !== $this->logoutUrlGenerator) {
                     $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
                 }
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 // fail silently when the logout URL cannot be generated
             }
 

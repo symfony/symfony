@@ -151,4 +151,19 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
             'AUTHORIZATION' => $headerContent,
         ), $bag->getHeaders());
     }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/17345
+     */
+    public function testItDoesNotOverwriteTheAuthorizationHeaderIfItIsAlreadySet()
+    {
+        $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
+        $bag = new ServerBag(array('PHP_AUTH_USER' => 'foo', 'HTTP_AUTHORIZATION' => $headerContent));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $headerContent,
+            'PHP_AUTH_USER' => 'foo',
+            'PHP_AUTH_PW' => '',
+        ), $bag->getHeaders());
+    }
 }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
 class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -1491,14 +1490,15 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testCustomChoiceTypeDoesNotInheritChoiceLabels()
     {
         $builder = $this->factory->createBuilder();
-        $builder->add('choice', 'choice', array(
+        $builder->add('choice', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
                 'choices' => array(
                     '1' => '1',
                     '2' => '2',
                 ),
+                'choices_as_values' => true,
             )
         );
-        $builder->add('subChoice', new ChoiceSubType());
+        $builder->add('subChoice', 'Symfony\Component\Form\Tests\Fixtures\ChoiceSubType');
         $form = $builder->getForm();
 
         // The default 'choices' normalizer would fill the $choiceLabels, but it has been replaced

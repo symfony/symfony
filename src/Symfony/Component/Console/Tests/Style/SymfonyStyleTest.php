@@ -13,6 +13,8 @@ namespace Symfony\Component\Console\Tests\Style;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -69,6 +71,42 @@ class SymfonyStyleTest extends PHPUnit_Framework_TestCase
         $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
         $expectedCount = (int) ceil($wordLength / ($maxLineLength)) + (int) ($wordLength > $maxLineLength - 5);
         $this->assertSame($expectedCount, substr_count($this->tester->getDisplay(true), ' § '));
+    }
+
+    public function testCanSetQuestionHelper()
+    {
+        $questionHelper = new QuestionHelper();
+
+        $this->command->setHelperSet(new HelperSet([
+            'question' => $questionHelper,
+        ]));
+
+        $this->command->setCode(function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
+
+            $questionHelper = $this->command->getHelper('question');
+
+            $io->setQuestionHelper($questionHelper);
+
+            if ($io->ask('Are you really sure?') !== 'yes') {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        $questionHelper->setInputStream($this->getInputStream("yes\n"));
+
+        $this->assertSame(0, $this->tester->execute([]));
+    }
+
+    private function getInputStream($input)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+        fputs($stream, $input);
+        rewind($stream);
+
+        return $stream;
     }
 }
 

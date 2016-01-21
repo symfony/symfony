@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-03T14:24:54Z
+
+IMO both `validator.mapping.cache.apc` and `validator.mapping.cache.doctrine.apc` (as it has been) should be deprecated. There is no point if providing an apc service but not any other cache driver like filesystem, redis etc. So it's better to be let developers define them themselves.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-03T14:41:57Z
+
+@Tobion : If we remove those services accordingly to what you say, then we should remove the `serializer.mapping.cache.apc` one too, or any other persistent cache layer implementation from Symfony.
+
+The main benefit of proposing such an implementation is that it only requires the APCu php extension and allow to suggest optimizations from the Standard Edition.
+If we don't, [those lines](https://github.com/symfony/symfony-standard/blob/master/app/config/config_prod.yml#L4-L8) should be removed, and we loose an opportunity to promote ways to improve performances.
+
+Some refs about related discussions:
+- https://github.com/symfony/symfony/pull/14429#issuecomment-112682332
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-03T15:47:32Z
+
+@ogizanagi yes I would suggest to deprecate `serializer.mapping.cache.apc` in 3.1 then.
+
+The standard-edition should IMO actually configure the caching using filesystem. So if the caching is really a performance gain, just use a filesystem one by default (filesystem access required by default anyway due to logging). For this, we can use the doctrine-cache-bundle, which is a dependecy as well and then just use it's service. If somebody wants to use a different cache adapter, it's really easy to change as the template is already there for the filesystem.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-04T23:26:34Z
+
+@Tobion, most loggers including Monolog can be configured to log on `stderr`. On Heroku, LogPlex automatically catches and centralizes logs outputted that way.
+
+IMO it's better to keep default APCu implementations as they are the best for such jobs: https://github.com/symfony/symfony/pull/16838#discussion_r46742532
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-04T23:47:57Z
+
+@dunglas I don't see the relation to loggers?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-04T23:57:25Z
+
+@Tobion it was about "filesystem access required by default anyway due to logging" but I maybe I've missed something.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T00:02:05Z
+
+I see but again, I was talking about the standard-edition, which currently logs to a filesystem by default. That is why I said, we should IMO also configure filesystem caches in SE for most stuff by default as well, e.g. your property-accessor cache, validator etc. If people want to use APC or anything else, they only need to change the service definition very easily (or doctrine-cache-bundle config).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:00:36Z
+
+It is too late to add such deprecation in 2.8 anyway, given that 2.8 and 3.0 are already released.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T10:57:57Z
+
+@stof it's not too late because 3.0 is broken with ApcCache. See #16795
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-10T07:30:15Z
+
+:-1: we need a decent cache system in the core or it will be painful to get correct performance with many components (including - at least - Validator, Serializer, PropertyInfo and PropertyAccess) in prod. This is a regression.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-15T10:23:43Z
+
+Second commit removed to finally keep the the APCu cache service in 3.0.
+To be eventually deprecated in 3.1 and removed in 4.0, but for now, only fix the deprecation on the wrong service.
+
+---------------------------------------------------------------------------
+
+by layanto at 2015-12-16T06:23:23Z
+
+Now that there is ApcuCache in doctrine cache (https://github.com/doctrine/cache/pull/115) and ApcCache deprecated, should validator.mapping.cache.doctrine.apc becomes validator.mapping.cache.doctrine.apcu?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-16T06:40:40Z
+
+@layanto it will be a BC break. I'm working on APCu support. Except a PR when this one will be merged.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-16T06:43:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-12-28T09:11:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-28T12:22:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by layanto at 2015-12-28T21:16:08Z
+
+Dumb question, but since symfony requires doctrine\common and doctrine\common requires doctrine\cache, why not just retain the use of validator.mapping.cache.apc but point to DoctrineCache instead of ApcCache? Still using apc just via doctrine\cache so not really BC break? No change required from users who use apc for validator as apc will continue to work, via doctrine\cache.
+
+---------------------------------------------------------------------------
+
+by layanto at 2015-12-28T21:18:42Z
+
+Benefit of above: no change required from user, shorter and consistent naming with serializer.mapping.cache.apc which already points to DoctrineCache.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-01-16T20:25:16Z
+
+:+1:
+
+In summary, this:
+
+1) Deprecates using `apc` as the `cache` key - you must use a service
+2) Re-adds the `validator.mapping.cache.doctrine.apc` service, so you can use it for convenience (and we will discuss later if we want to deprecate this service for 4.0 removal).
+
+After this is merged into 3.0, the ability to pass `apc` as the key to `cache` can be completely removed (https://github.com/symfony/symfony/pull/16795/files#diff-5e7347edce37c5886ec67b7ba02f3a9cL439). This is *not* a BC break, because it's impossible to use this already on 3.0, because using this config key gives you the `validator.mapping.cache.apc` service, which is connected with the `ApcCache` that no longer exists in 3.0: https://github.com/symfony/symfony/pull/16795/files#diff-c2459e2c1a786adcaaab00b70630b67fL31
+
+So, we need to:
+
+A) merge this PR (and merge up to 3.0)
+B) remove the Configuration code that allowed you to use the `apc` key in 3.0 (e.g. cherry-pick https://github.com/symfony/symfony/pull/16795/files#diff-5e7347edce37c5886ec67b7ba02f3a9cL439).
+
+And I think we're ready to do this now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-19T11:26:45Z
+
+What about @Tobion comments?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-01-19T15:20:17Z
+
+@fabpot : Those comments are "outdated" after the decisions taken in this PR & #16795  (I answered to them in first place, but then remove the commit fixing it, in order to deprecate the apc implementations in 3.1 and remove them in 4.0).
+
+@Tobion : Can you please validate the situation ? :)

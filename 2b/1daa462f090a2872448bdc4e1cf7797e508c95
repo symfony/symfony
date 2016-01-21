@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-20T22:02:24Z
+
+Do all these changes only apply to the `3.0` branch?
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-01-20T22:03:41Z
+
+Most of them yes, because `Validation` class no more required it tests because of skipping BC layer in `3.0`. Will check other.

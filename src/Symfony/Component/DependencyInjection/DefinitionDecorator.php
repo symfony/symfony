@@ -78,7 +78,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
      */
     public function setFactoryClass($class)
     {

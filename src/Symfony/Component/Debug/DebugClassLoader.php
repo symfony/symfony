@@ -224,7 +224,7 @@ class DebugClassLoader
                 $i = count($tail) - 1;
                 $j = count($real) - 1;
 
-                 while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
+                while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
                     --$i;
                     --$j;
                 }

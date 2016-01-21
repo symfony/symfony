@@ -1102,7 +1102,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setNormalizer('catcher', function (Options $options) {
             try {
                 return $options['thrower'];
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return false;
             }
         });
@@ -1126,7 +1126,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('catcher', function (Options $options) {
             try {
                 return $options['thrower'];
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return false;
             }
         });

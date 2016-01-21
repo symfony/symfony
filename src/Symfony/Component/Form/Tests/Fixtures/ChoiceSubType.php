@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Paráda József <joczy.parada@gmail.com>
- */ 
+ */
 class ChoiceSubType extends AbstractType
 {
     /**

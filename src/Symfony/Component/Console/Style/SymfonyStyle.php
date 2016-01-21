@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -335,6 +336,11 @@ class SymfonyStyle extends OutputStyle
         }
 
         return $answer;
+    }
+
+    public function setQuestionHelper(QuestionHelper $questionHelper)
+    {
+        $this->questionHelper = $questionHelper;
     }
 
     /**

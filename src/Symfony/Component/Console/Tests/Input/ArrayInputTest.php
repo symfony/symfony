@@ -111,7 +111,7 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
                 array(),
                 array(),
                 '->parse() does not choke on end of options signal',
-            )
+            ),
         );
     }
 

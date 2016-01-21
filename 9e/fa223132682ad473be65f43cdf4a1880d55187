@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-20T20:21:51Z
+
+@xabbuh Thank you!! (you were faster than me with this PR) :) It was my mistake. The test I created here: #17406 was only compatible with 2.7, but was merged to 2.8 and 3.0 too. Next time I have to check test in newer versions also. Sorry for that! (Also interesting, that the AppVeyor build was successful when there was a failing test. I create an issue for that.)
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-20T20:24:25Z
+
+@paradajozsef There was nothing wrong with your pull request. Referencing form types by their qualified class names does only work since Symfony 2.8 so we exactly had to do what you did in your PR. :)
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-20T21:02:42Z
+
+@xabbuh  I see. Thanks for the reply! :)

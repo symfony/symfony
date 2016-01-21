@@ -30,7 +30,13 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     {
         $headers = array('Bundle name', 'Extension alias');
         $rows = array();
-        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+
+        $bundles = $this->getContainer()->get('kernel')->getBundles();
+        usort($bundles, function($bundleA, $bundleB) {
+            return strcmp($bundleA->getName(), $bundleB->getName());
+        });
+
+        foreach ($bundles as $bundle) {
             $extension = $bundle->getContainerExtension();
             $rows[] = array($bundle->getName(), $extension ? $extension->getAlias() : '');
         }

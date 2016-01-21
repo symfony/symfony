@@ -45,26 +45,25 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 
     protected function findExtension($name)
     {
-        $extension = null;
         $bundles = $this->initializeBundles();
         foreach ($bundles as $bundle) {
+            if ($name === $bundle->getName()) {
+                return $bundle->getContainerExtension();
+            }
+
             $extension = $bundle->getContainerExtension();
-
-            if ($extension && ($name === $extension->getAlias() || $name === $bundle->getName())) {
-                break;
+            if ($extension && $name === $extension->getAlias()) {
+                return $extension;
             }
         }
 
-        if (!$extension) {
+        if ('Bundle' !== substr($name, -6)) {
+            $message = sprintf('No extensions with configuration available for "%s"', $name);
+        } else {
             $message = sprintf('No extension with alias "%s" is enabled', $name);
-            if (preg_match('/Bundle$/', $name)) {
-                $message = sprintf('No extensions with configuration available for "%s"', $name);
-            }
-
-            throw new \LogicException($message);
         }
 
-        return $extension;
+        throw new \LogicException($message);
     }
 
     public function validateConfiguration(ExtensionInterface $extension, $configuration)

@@ -83,7 +83,7 @@
     width: 170px;
     text-align: right;
 }
-.sf-reset .error-count span, .sf-reset .support span {
+.sf-reset .error-count span {
      display: inline-block;
      background-color: #aacd4e;
      -moz-border-radius: 6px;
@@ -95,10 +95,19 @@
      font-size: 11px;
      font-weight: bold;
 }
+
 .sf-reset .support a {
-    color: #fff;
-    text-decoration: none;
+    display: inline-block;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    padding: 4px;
+    color: #aacd4e;
+    margin-right: 2px;
+    font-size: 11px;
+    font-weight: bold;
 }
+
 .sf-reset .toggle {
     vertical-align: middle;
 }

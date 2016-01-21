@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by kix at 2016-01-20T12:43:25Z
+
+The build failure seems unrelated to this PR: https://travis-ci.org/symfony/symfony/jobs/103599240#L3252
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-20T13:10:34Z
+
+What about rewriting this like:
+
+```php
+    $bundles = $this->initializeBundles();
+    foreach ($bundles as $bundle) {
+        if ($name === $bundle->getName()) {
+            return $bundle->getContainerExtension();
+        }
+
+        $extension = $bundle->getContainerExtension();
+        if ($extension && $name === $extension->getAlias()) {
+            return $extension;
+        }
+    }
+
+    if ('Bundle' !== substr($name -6)) {
+        $message = sprintf('No extensions with configuration available for "%s"', $name);
+    } else {
+        $message = sprintf('No extension with alias "%s" is enabled', $name);
+    }
+
+    throw new \LogicException($message);
+}
+```
+
+---------------------------------------------------------------------------
+
+by kix at 2016-01-20T13:14:02Z
+
+@WouterJ, good idea, will update the PR. I just thought it could be better if less code was rewritten, but now I have to agree your code looks better :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-20T23:31:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-20T23:35:08Z
+
+Status: reviewed

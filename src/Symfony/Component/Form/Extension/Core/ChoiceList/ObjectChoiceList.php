@@ -90,7 +90,7 @@ class ObjectChoiceList extends ChoiceList
      *                                                    are generated instead.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
      */
-    public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct($choices, $labelPath = null, $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
@@ -112,7 +112,7 @@ class ObjectChoiceList extends ChoiceList
      * @throws InvalidArgumentException When passing a hierarchy of choices and using
      *                                  the "groupPath" option at the same time.
      */
-    protected function initialize($choices, array $labels, array $preferredChoices)
+    protected function initialize($choices, $labels, $preferredChoices)
     {
         if (null !== $this->groupPath) {
             $groupedChoices = array();

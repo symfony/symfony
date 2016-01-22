@@ -90,6 +90,8 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
         ));
 
+        $resolver->setAllowedTypes('options', 'array');
+
         $resolver->setNormalizer('options', $optionsNormalizer);
     }
 

@@ -274,4 +274,14 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidOptions()
+    {
+        $this->factory->create('collection', null, array(
+            'options' => 'bad value',
+        ));
+    }
 }

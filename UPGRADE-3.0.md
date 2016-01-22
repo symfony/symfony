@@ -307,6 +307,8 @@ UPGRADE FROM 2.x to 3.0
    ```php
    echo $form->getErrors(true, false);
    ```
+  * The array type hints for `ChoiceList::initialize()` method's `$labels` and
+    `$preferredChoices` parameters were removed.
 
 ### FrameworkBundle
 

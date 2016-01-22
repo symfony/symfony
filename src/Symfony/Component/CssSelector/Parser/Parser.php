@@ -266,9 +266,9 @@ class Parser implements ParserInterface
                             $arguments[] = $next;
                         } elseif ($next->isDelimiter(array(')'))) {
                             break;
-                        } else {
+                        }  
                             throw SyntaxErrorException::unexpectedToken('an argument', $next);
-                        }
+                        
                     }
 
                     if (empty($arguments)) {

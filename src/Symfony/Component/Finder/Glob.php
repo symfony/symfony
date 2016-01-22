@@ -92,9 +92,9 @@ class Glob
                 }
 
                 continue;
-            } else {
+            }  
                 $regex .= $car;
-            }
+            
             $escaping = false;
         }
 

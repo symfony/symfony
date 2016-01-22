@@ -145,10 +145,10 @@ class AclProvider implements AclProviderInterface
                             if (isset($this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()])) {
                                 $acl->setParentAcl($this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()]);
                                 break;
-                            } else {
+                            }  
                                 $this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()] = $parentAcl;
                                 $this->updateAceIdentityMap($parentAcl);
-                            }
+                            
 
                             $parentAcl = $parentAcl->getParentAcl();
                         }

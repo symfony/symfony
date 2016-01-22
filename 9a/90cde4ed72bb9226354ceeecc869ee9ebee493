@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2016-01-21T17:56:04Z
+
+This bug AFAIK exists on 2.3+ so it should be merged in lowest branch not highest.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-01-21T18:05:22Z
+
+@stloyd yes, it should be merged on 2.3. That's what I based my branch on. I selected the wrong target branch when sending the PR :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-21T23:22:53Z
+
+:+1:

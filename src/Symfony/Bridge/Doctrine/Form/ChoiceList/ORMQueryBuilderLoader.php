@@ -100,7 +100,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             // Filter out non-uuid values (e.g. "", 1, "asdf"). If we don't, some
             // databases such as PostgreSQL fail.
             $values = array_values(array_filter($values, function ($v) {
-                return (bool)preg_match('/^\{?[a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12}\}?$/', $v);
+                return (bool) preg_match('/^\{?[a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12}\}?$/', $v);
             }));
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;

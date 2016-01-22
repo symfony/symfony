@@ -115,7 +115,7 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 
         $query->expects($this->once())
             ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array("f0b928bd-e471-4870-9f99-430a005e3897", "e586ff90-222e-4a86-ac82-82627e84adfb"), Connection::PARAM_STR_ARRAY)
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array('f0b928bd-e471-4870-9f99-430a005e3897', 'e586ff90-222e-4a86-ac82-82627e84adfb'), Connection::PARAM_STR_ARRAY)
             ->willReturn($query);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')

@@ -94,7 +94,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             $values = array_values(array_filter($values, function ($v) {
                 return (string) $v === (string) (int) $v;
             }));
-        } elseif (in_array($identifierFieldType, array('guid'))) {
+        } elseif ('guid' === $identifierFieldType) {
             $parameterType = Connection::PARAM_STR_ARRAY;
 
             // Filter out non-uuid values (e.g. "", 1, "asdf"). If we don't, some

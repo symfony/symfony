@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-20T19:27:27Z
+
+Support for the old tag must be deprecated with Symfony 3.1 (see #17462 for it).

@@ -87,6 +87,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected_parent, $parent_metadata);
     }
+
     /**
      * Test MetaData merge with parent annotation.
      */

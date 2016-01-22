@@ -187,7 +187,6 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         if (isset(self::$containerCache[$file])) {
             return self::$containerCache[$file];
         }
-
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
         $container->registerExtension($security);

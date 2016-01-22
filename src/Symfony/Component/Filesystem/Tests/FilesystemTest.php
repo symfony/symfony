@@ -957,6 +957,97 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals(fileinode($file), fileinode($link));
     }
 
+    public function testReadRelativeLink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Relative symbolic links are not supported on Windows');
+        }
+
+        $file = $this->workspace.'/file';
+        $link1 = $this->workspace.'/dir/link';
+        $link2 = $this->workspace.'/dir/link2';
+        touch($file);
+
+        $this->filesystem->symlink('../file', $link1);
+        $this->filesystem->symlink('link', $link2);
+
+        $this->assertEquals($this->normalize('../file'), $this->filesystem->readlink($link1));
+        $this->assertEquals('link', $this->filesystem->readlink($link2));
+        $this->assertEquals($file, $this->filesystem->readlink($link1, true));
+        $this->assertEquals($file, $this->filesystem->readlink($link2, true));
+        $this->assertEquals($file, $this->filesystem->readlink($file, true));
+    }
+
+    public function testReadAbsoluteLink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->normalize($this->workspace.'/file');
+        $link1 = $this->normalize($this->workspace.'/dir/link');
+        $link2 = $this->normalize($this->workspace.'/dir/link2');
+        touch($file);
+
+        $this->filesystem->symlink($file, $link1);
+        $this->filesystem->symlink($link1, $link2);
+
+        $this->assertEquals($file, $this->filesystem->readlink($link1));
+        $this->assertEquals($link1, $this->filesystem->readlink($link2));
+        $this->assertEquals($file, $this->filesystem->readlink($link1, true));
+        $this->assertEquals($file, $this->filesystem->readlink($link2, true));
+        $this->assertEquals($file, $this->filesystem->readlink($file, true));
+    }
+
+    public function testReadBrokenLink()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
+        }
+
+        $file = $this->workspace.'/file';
+        $link = $this->workspace.'/link';
+
+        $this->filesystem->symlink($file, $link);
+
+        $this->assertEquals($file, $this->filesystem->readlink($link));
+        $this->assertNull($this->filesystem->readlink($link, true));
+
+        touch($file);
+        $this->assertEquals($file, $this->filesystem->readlink($link, true));
+    }
+
+    public function testReadLinkDefaultPathDoesNotExist()
+    {
+        $this->assertNull($this->filesystem->readlink($this->normalize($this->workspace.'/invalid')));
+    }
+
+    public function testReadLinkDefaultPathNotLink()
+    {
+        $file = $this->normalize($this->workspace.'/file');
+        touch($file);
+
+        $this->assertNull($this->filesystem->readlink($file));
+    }
+
+    public function testReadLinkCanonicalizePath()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $file = $this->normalize($this->workspace.'/file');
+        mkdir($this->normalize($this->workspace.'/dir'));
+        touch($file);
+
+        $this->assertEquals($file, $this->filesystem->readlink($this->normalize($this->workspace.'/dir/../file'), true));
+    }
+
+    public function testReadLinkCanonicalizedPathDoesNotExist()
+    {
+        $this->assertNull($this->filesystem->readlink($this->normalize($this->workspace.'invalid'), true));
+    }
+
     /**
      * @dataProvider providePathsForMakePathRelative
      */
@@ -1320,5 +1411,17 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFilePermissions(767, $targetFilePath);
+    }
+
+    /**
+     * Normalize the given path (transform each blackslash into a real directory separator).
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    private function normalize($path)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 }

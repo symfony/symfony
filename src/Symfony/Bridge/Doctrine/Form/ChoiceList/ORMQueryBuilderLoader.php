@@ -85,13 +85,22 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
-        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
+        $identifierFieldType = $metadata->getTypeOfField($identifier);
+        if (in_array($identifierFieldType, array('integer', 'bigint', 'smallint'))) {
             $parameterType = Connection::PARAM_INT_ARRAY;
 
             // Filter out non-integer values (e.g. ""). If we don't, some
             // databases such as PostgreSQL fail.
             $values = array_values(array_filter($values, function ($v) {
                 return (string) $v === (string) (int) $v;
+            }));
+        } elseif (in_array($identifierFieldType, array('guid'))) {
+            $parameterType = Connection::PARAM_STR_ARRAY;
+
+            // Filter out non-uuid values (e.g. "", 1, "asdf"). If we don't, some
+            // databases such as PostgreSQL fail.
+            $values = array_values(array_filter($values, function ($v) {
+                return (bool)preg_match('/^\{?[a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12}\}?$/', $v);
             }));
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;

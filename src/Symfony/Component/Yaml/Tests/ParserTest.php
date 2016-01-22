@@ -422,19 +422,29 @@ EOF;
     public function testObjectSupportEnabled()
     {
         $input = <<<EOF
+foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledWithDeprecatedTag()
+    {
+        $input = <<<EOF
 foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
     }
 
-    public function testObjectSupportDisabledButNoExceptions()
+    /**
+     * @dataProvider invalidDumpedObjectProvider
+     */
+    public function testObjectSupportDisabledButNoExceptions($input)
     {
-        $input = <<<EOF
-foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
-bar: 1
-EOF;
-
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
     }
 
@@ -470,11 +480,29 @@ EOF;
     }
 
     /**
+     * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
-    public function testObjectsSupportDisabledWithExceptions()
+    public function testObjectsSupportDisabledWithExceptions($yaml)
     {
-        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
+        $this->parser->parse($yaml, true, false);
+    }
+
+    public function invalidDumpedObjectProvider()
+    {
+        $yamlTag = <<<EOF
+foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+        $localTag = <<<EOF
+foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+
+        return array(
+            'yaml-tag' => array($yamlTag),
+            'local-tag' => array($localTag),
+        );
     }
 
     /**

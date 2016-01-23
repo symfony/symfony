@@ -19,6 +19,9 @@
         "php": ">=5.5.9",
         "nikic/php-parser": "~2.0"
     },
+    "require-dev": {
+        "symfony/serializer": "~2.8|~3.0"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\AstGenerator\\": "" },
         "exclude-from-classmap": [

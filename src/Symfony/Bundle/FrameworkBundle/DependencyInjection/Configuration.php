@@ -43,6 +43,14 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return !isset($v['assets']) && isset($v['templating']); })
+                ->then(function ($v) {
+                    $v['assets'] = array();
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')

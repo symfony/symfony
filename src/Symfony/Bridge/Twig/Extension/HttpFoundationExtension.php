@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * Twig extension for the Symfony HttpFoundation component.
@@ -22,10 +23,12 @@ use Symfony\Component\HttpFoundation\Request;
 class HttpFoundationExtension extends \Twig_Extension
 {
     private $requestStack;
+    private $requestContext;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, RequestContext $requestContext = null)
     {
         $this->requestStack = $requestStack;
+        $this->requestContext = $requestContext;
     }
 
     /**
@@ -57,6 +60,23 @@ class HttpFoundationExtension extends \Twig_Extension
         }
 
         if (!$request = $this->requestStack->getMasterRequest()) {
+            if (null !== $this->requestContext && '' !== $host = $this->requestContext->getHost()) {
+                $scheme = $this->requestContext->getScheme();
+                $port = '';
+
+                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                    $port = ':'.$this->requestContext->getHttpPort();
+                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                    $port = ':'.$this->requestContext->getHttpsPort();
+                }
+
+                if ('/' !== $path[0]) {
+                    $path = rtrim($this->requestContext->getBaseUrl(), '/').'/'.$path;
+                }
+
+                return $scheme.'://'.$host.$port.$path;
+            }
+
             return $path;
         }
 

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-22T16:49:03Z
+
+:+1:
+
+Status: Reviewed
+
+I think we should do something similar in the [ConfigDumpReferenceCommand](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bundle/FrameworkBundle/Command/ConfigDumpReferenceCommand.php#L69) for the `2.3` branch.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-22T17:00:58Z
+
+:+1:

@@ -18,7 +18,22 @@ namespace Symfony\Component\AstGenerator;
  */
 interface AstGeneratorInterface
 {
-    public function generate();
+    /**
+     * Generate an object into an AST given a specific context
+     *
+     * @param mixed $object  Object to generate AST from
+     * @param array $context Context for the generator
+     *
+     * @return \PhpParser\Node[] An array of statements (AST Node)
+     */
+    public function generate($object, array $context = []);
 
-    public function supportsGeneration();
+    /**
+     * Check whether the given object is supported for generation by this generator
+     *
+     * @param mixed $object Object to generate AST from
+     *
+     * @return boolean
+     */
+    public function supportsGeneration($object);
 }

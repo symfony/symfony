@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-22T17:00:01Z
+
+@paradajozsef :+1:
+
+These are the results in my machine:
+
+```
+BEFORE
+Time: 12.29 seconds, Memory: 88.00Mb
+OK (77 tests, 227 assertions)
+
+AFTER
+Time: 10.42 seconds, Memory: 88.50Mb
+OK (77 tests, 227 assertions)
+```
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-22T17:02:32Z
+
+@javiereguiluz thanks for checking it! :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-22T23:14:33Z
+
+:+1:

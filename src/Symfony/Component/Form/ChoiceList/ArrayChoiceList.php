@@ -141,7 +141,7 @@ class ArrayChoiceList implements ChoiceListInterface
         $choices = array();
 
         foreach ($values as $i => $givenValue) {
-            if (isset($this->choices[$givenValue])) {
+            if (array_key_exists($givenValue, $this->choices)) {
                 $choices[$i] = $this->choices[$givenValue];
             }
         }

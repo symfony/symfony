@@ -898,11 +898,6 @@ UPGRADE FROM 2.x to 3.0
 
 ### Security
 
- * The `AbstractVoter` class was removed in favor of the new `Voter` class.
-
- * The `VoterInterface::supportsClass` and `supportsAttribute` methods were
-   removed from the interface.
-
  * The `Resources/` directory was moved to `Core/Resources/`
 
  * The `key` settings of `anonymous`, `remember_me` and `http_digest` are
@@ -994,8 +989,15 @@ UPGRADE FROM 2.x to 3.0
    ));
   ```
 
- * The `AbstractVoter::getSupportedAttributes()` and `AbstractVoter::getSupportedClasses()`
-   methods have been removed in favor of `AbstractVoter::supports()`.
+ * The `AbstractVoter` class was removed. Instead, extend the new `Voter` class,
+   introduced in 2.8, and move your voting logic to the to the `supports($attribute, $subject)`
+   and `voteOnAttribute($attribute, $object, TokenInterface $token)` methods.
+
+ * The `vote()` method from the `VoterInterface` was changed to now accept arbitrary
+   types, and not only objects.
+
+ * The `supportsClass` and `supportsAttribute` methods were
+   removed from the `VoterInterface` interface.
 
    Before:
 
@@ -1019,14 +1021,19 @@ UPGRADE FROM 2.x to 3.0
    After:
 
    ```php
-   class MyVoter extends AbstractVoter
+   use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+   
+   class MyVoter extends Voter
    {
        protected function supports($attribute, $object)
        {
            return $object instanceof Post && in_array($attribute, array('CREATE', 'EDIT'));
        }
 
-       // ...
+       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+       {
+           // Return true or false
+       }
    }
    ```
 

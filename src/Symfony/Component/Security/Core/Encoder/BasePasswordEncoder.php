@@ -81,6 +81,10 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      */
     protected function comparePasswords($password1, $password2)
     {
+        if ($password1 === null || $password2 === null) {
+            return false;
+        }
+
         return hash_equals($password1, $password2);
     }
 

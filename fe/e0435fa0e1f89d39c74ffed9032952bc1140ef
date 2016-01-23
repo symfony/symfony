@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-22T09:04:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-23T10:42:34Z
+
+Failing tests seem unrelated:
+
+```
+1) Symfony\Component\Form\Tests\Extension\Core\Type\ChoiceTypeTest::testCustomChoiceTypeDoesNotInheritChoiceLabels
+Symfony\Component\Form\Exception\InvalidArgumentException: Could not load type "choice"
+
+2) Symfony\Component\Process\Tests\ProcessTest::testGetEmptyIncrementalOutput
+Failed asserting that two strings are identical.
+```
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-23T11:26:04Z
+
+The first failing test has been fixed since then. I don't know about the second one.

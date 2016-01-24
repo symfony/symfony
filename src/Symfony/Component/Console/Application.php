@@ -588,10 +588,11 @@ class Application
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
         do {
-            $title = $output->isVerbose() && ($code = $e->getCode()) > 0
-                ? sprintf('  [%s - code %s]  ', get_class($e), $code)
-                : sprintf('  [%s]  ', get_class($e))
-            ;
+            $title = sprintf(
+                '  [%s%s]  ',
+                get_class($e),
+                $output->isVerbose() && ($code = $e->getCode()) !== 0 ? ' ('.$code.')' : ''
+            );
 
             $len = $this->stringWidth($title);
 

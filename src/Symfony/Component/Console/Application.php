@@ -591,7 +591,7 @@ class Application
             $title = sprintf(
                 '  [%s%s]  ',
                 get_class($e),
-                $output->isVerbose() && ($code = $e->getCode()) !== 0 ? ' ('.$code.')' : ''
+                $output->isVerbose() && 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : ''
             );
 
             $len = $this->stringWidth($title);

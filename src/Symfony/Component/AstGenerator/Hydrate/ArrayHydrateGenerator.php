@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\AstGenerator\Hydrate;
 
-use PhpParser\Node\Name;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar;
 
 /**
- * Create AST Statement to normalize a Class into a stdClassObject
+ * Create AST Statement to normalize a Class into a stdClassObject.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */

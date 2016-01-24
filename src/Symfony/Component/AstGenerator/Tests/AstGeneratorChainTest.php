@@ -20,62 +20,62 @@ class AstGeneratorChainTest extends \PHPUnit_Framework_TestCase
     {
         $generator = new AstGeneratorChain();
 
-        $this->assertFalse($generator->supportsGeneration("dummy"));
-        $this->assertEmpty($generator->generate("dummy"));
+        $this->assertFalse($generator->supportsGeneration('dummy'));
+        $this->assertEmpty($generator->generate('dummy'));
     }
 
     public function testSupports()
     {
         $generatorSub = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub->generate("dummy", [])->willReturn(["ast"]);
+        $generatorSub->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub->generate('dummy', [])->willReturn(['ast']);
 
         $generator = new AstGeneratorChain([$generatorSub->reveal()]);
-        $this->assertTrue($generator->supportsGeneration("dummy"));
-        $this->assertEquals(["ast"], $generator->generate("dummy"));
+        $this->assertTrue($generator->supportsGeneration('dummy'));
+        $this->assertEquals(['ast'], $generator->generate('dummy'));
     }
 
     public function testMultiSupports()
     {
         $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub1->generate("dummy", [])->willReturn(["ast1"]);
+        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
 
         $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub2->generate("dummy", [])->willReturn(["ast2"]);
+        $generatorSub2->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub2->generate('dummy', [])->willReturn(['ast2']);
 
         $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()]);
-        $this->assertTrue($generator->supportsGeneration("dummy"));
-        $this->assertEquals(["ast1", "ast2"], $generator->generate("dummy"));
+        $this->assertTrue($generator->supportsGeneration('dummy'));
+        $this->assertEquals(['ast1', 'ast2'], $generator->generate('dummy'));
     }
 
     public function testPartialSupports()
     {
         $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub1->generate("dummy", [])->willReturn(["ast1"]);
+        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
 
         $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration("dummy")->willReturn(false);
+        $generatorSub2->supportsGeneration('dummy')->willReturn(false);
 
         $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()]);
-        $this->assertTrue($generator->supportsGeneration("dummy"));
-        $this->assertEquals(["ast1"], $generator->generate("dummy"));
+        $this->assertTrue($generator->supportsGeneration('dummy'));
+        $this->assertEquals(['ast1'], $generator->generate('dummy'));
     }
 
     public function testMultiSupportsWithFirstReturn()
     {
         $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub1->generate("dummy", [])->willReturn(["ast1"]);
+        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
 
         $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration("dummy")->willReturn(true);
-        $generatorSub2->generate("dummy", [])->willReturn(["ast2"]);
+        $generatorSub2->supportsGeneration('dummy')->willReturn(true);
+        $generatorSub2->generate('dummy', [])->willReturn(['ast2']);
 
         $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()], true);
-        $this->assertTrue($generator->supportsGeneration("dummy"));
-        $this->assertEquals(["ast1"], $generator->generate("dummy"));
+        $this->assertTrue($generator->supportsGeneration('dummy'));
+        $this->assertEquals(['ast1'], $generator->generate('dummy'));
     }
 }

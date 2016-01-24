@@ -15,7 +15,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Expr;
 
 /**
- * Create AST Statement to normalize a Class into a stdClassObject
+ * Create AST Statement to normalize a Class into a stdClassObject.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
@@ -26,7 +26,7 @@ class StdClassHydrateGenerator extends HydrateFromObjectGenerator
      */
     protected function getAssignStatement($dataVariable)
     {
-        return new Expr\Assign($dataVariable, new Expr\New_(new Name("\\stdClass")));
+        return new Expr\Assign($dataVariable, new Expr\New_(new Name('\\stdClass')));
     }
 
     /**

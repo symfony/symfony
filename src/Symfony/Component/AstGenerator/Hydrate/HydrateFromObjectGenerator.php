@@ -12,11 +12,9 @@
 namespace Symfony\Component\AstGenerator\Hydrate;
 
 use PhpParser\Node\Name;
-use PhpParser\Node\Stmt;
 use PhpParser\Node\Expr;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Exception\MissingContextException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
@@ -67,7 +65,7 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
             }
 
             // If there is multiple types, we need to know which one we must normalize
-            $conditionNeeded = (boolean)(count($types) > 1);
+            $conditionNeeded = (boolean) (count($types) > 1);
             $noAssignment = true;
 
             foreach ($types as $type) {
@@ -79,7 +77,7 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
                 $statements = array_merge($statements, $this->typeHydrateAstGenerator->generate($type, array_merge($context, [
                     'input' => $input,
                     'output' => $output,
-                    'condition' => $conditionNeeded
+                    'condition' => $conditionNeeded,
                 ])));
             }
 
@@ -97,11 +95,11 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
      */
     public function supportsGeneration($object)
     {
-        return (is_string($object) && class_exists($object));
+        return is_string($object) && class_exists($object);
     }
 
     /**
-     * Create the assign statement
+     * Create the assign statement.
      *
      * @param Expr\Variable $dataVariable Variable to use
      *
@@ -109,9 +107,8 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
      */
     abstract protected function getAssignStatement($dataVariable);
 
-
     /**
-     * Create the sub assign variable statement
+     * Create the sub assign variable statement.
      *
      * @param Expr\Variable $dataVariable Variable to use
      * @param string        $property     Property name for object or array dimension

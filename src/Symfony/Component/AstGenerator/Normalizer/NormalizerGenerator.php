@@ -20,7 +20,7 @@ use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\UniqueVariableScope;
 
 /**
- * Generate a Normalizer given a Class
+ * Generate a Normalizer given a Class.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
@@ -61,23 +61,23 @@ class NormalizerGenerator implements AstGeneratorInterface
                     $this->createSupportsNormalizationMethod($object),
                     $this->createSupportsDenormalizationMethod($object),
                     $this->createNormalizeMethod($object, array_merge($context, [
-                        'unique_variable_scope' => new UniqueVariableScope()
+                        'unique_variable_scope' => new UniqueVariableScope(),
                     ])),
                     $this->createDenormalizeMethod($object, array_merge($context, [
-                        'unique_variable_scope' => new UniqueVariableScope()
+                        'unique_variable_scope' => new UniqueVariableScope(),
                     ])),
                 ],
                 'implements' => [
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerInterface'),
-                    new Name('\Symfony\Component\Serializer\Normalizer\NormalizerInterface')
+                    new Name('\Symfony\Component\Serializer\Normalizer\NormalizerInterface'),
                 ],
-                'extends' => new Name('\Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer')
+                'extends' => new Name('\Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'),
             ]
         )];
     }
 
     /**
-     * Create method to check if normalization is supported
+     * Create method to check if normalization is supported.
      *
      * @param string $class Fully Qualified name of the model class
      *
@@ -93,24 +93,24 @@ class NormalizerGenerator implements AstGeneratorInterface
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
             'params' => [
                 new Param('data'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
             ],
             'stmts' => [
                 new Stmt\If_(
                     new Expr\Instanceof_(new Expr\Variable('data'), new Name($class)),
                     [
                         'stmts' => [
-                            new Stmt\Return_(new Expr\ConstFetch(new Name("true")))
-                        ]
+                            new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),
+                        ],
                     ]
                 ),
-                new Stmt\Return_(new Expr\ConstFetch(new Name("false")))
-            ]
+                new Stmt\Return_(new Expr\ConstFetch(new Name('false'))),
+            ],
         ]);
     }
 
     /**
-     * Create method to check if denormalization is supported
+     * Create method to check if denormalization is supported.
      *
      * @param string $class Fully Qualified name of the model class
      *
@@ -123,24 +123,24 @@ class NormalizerGenerator implements AstGeneratorInterface
             'params' => [
                 new Param('data'),
                 new Param('type'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
             ],
             'stmts' => [
                 new Stmt\If_(
                     new Expr\BinaryOp\NotIdentical(new Expr\Variable('type'), new Scalar\String_($class)),
                     [
                         'stmts' => [
-                            new Stmt\Return_(new Expr\ConstFetch(new Name("false")))
-                        ]
+                            new Stmt\Return_(new Expr\ConstFetch(new Name('false'))),
+                        ],
                     ]
                 ),
-                new Stmt\Return_(new Expr\ConstFetch(new Name("true")))
-            ]
+                new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),
+            ],
         ]);
     }
 
     /**
-     * Create the normalization method
+     * Create the normalization method.
      *
      * @param string $class   Class to create normalization from
      * @param array  $context Context of generation
@@ -153,17 +153,17 @@ class NormalizerGenerator implements AstGeneratorInterface
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
             'params' => [
                 new Param('object'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
             'stmts' => $this->normalizeStatementsGenerator->generate($class, array_merge($context, [
-                'input' => new Expr\Variable('object')
-            ]))
+                'input' => new Expr\Variable('object'),
+            ])),
         ]);
     }
 
     /**
-     * Create the denormalization method
+     * Create the denormalization method.
      *
      * @param string $class   Class to create denormalization from
      * @param array  $context Context of generation
@@ -180,15 +180,15 @@ class NormalizerGenerator implements AstGeneratorInterface
             'params' => [
                 new Param('data'),
                 new Param('class'),
-                new Param('format', new Expr\ConstFetch(new Name("null"))),
+                new Param('format', new Expr\ConstFetch(new Name('null'))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
             'stmts' => array_merge($this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
                 'input' => $input,
-                'output' => $output
+                'output' => $output,
             ])), [
-                new Stmt\Return_($output)
-            ])
+                new Stmt\Return_($output),
+            ]),
         ]);
     }
 
@@ -197,6 +197,6 @@ class NormalizerGenerator implements AstGeneratorInterface
      */
     public function supportsGeneration($object)
     {
-        return (is_string($object) && class_exists($object));
+        return is_string($object) && class_exists($object);
     }
 }

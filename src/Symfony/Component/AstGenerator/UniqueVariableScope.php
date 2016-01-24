@@ -12,14 +12,14 @@
 namespace Symfony\Component\AstGenerator;
 
 /**
- * Allow to get a unique variable name for a scope (like a method)
+ * Allow to get a unique variable name for a scope (like a method).
  */
 class UniqueVariableScope
 {
     private $registry = [];
 
     /**
-     * Return an unique name for a variable
+     * Return an unique name for a variable.
      *
      * @param string $name Name of the variable
      *
@@ -33,7 +33,7 @@ class UniqueVariableScope
             return $name;
         }
 
-        $this->registry[$name]++;
+        ++$this->registry[$name];
 
         return sprintf('%s_%s', $name, $this->registry[$name]);
     }

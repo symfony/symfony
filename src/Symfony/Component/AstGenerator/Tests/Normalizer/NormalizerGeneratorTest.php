@@ -37,13 +37,13 @@ class NormalizerGeneratorTest extends \PHPUnit_Framework_TestCase
         $normalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
         $normalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
         $normalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
-            new Stmt\Return_(new Expr\New_(new Name("\\stdClass")))
+            new Stmt\Return_(new Expr\New_(new Name('\\stdClass'))),
         ]);
 
         $denormalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
         $denormalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
         $denormalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
-            new Stmt\Return_(new Expr\New_(new Name('\\'. Dummy::class)))
+            new Stmt\Return_(new Expr\New_(new Name('\\'.Dummy::class))),
         ]);
 
         $normalizerGenerator = new NormalizerGenerator($normalizerStatementsGenerator->reveal(), $denormalizerStatementsGenerator->reveal());

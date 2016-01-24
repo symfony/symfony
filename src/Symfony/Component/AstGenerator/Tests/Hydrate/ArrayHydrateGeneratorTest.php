@@ -36,18 +36,18 @@ class ArrayHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $propertyInfoExtractor->isReadable(Dummy::class, 'foo', Argument::type('array'))->willReturn(true);
         $propertyInfoExtractor->isReadable(Dummy::class, 'bar', Argument::type('array'))->willReturn(false);
         $propertyInfoExtractor->getTypes(Dummy::class, 'foo', Argument::type('array'))->willReturn([
-            new Type('string')
+            new Type('string'),
         ]);
         $hydrateGenerator = new ArrayHydrateGenerator($propertyInfoExtractor->reveal(), new DummyTypeGenerator());
 
         $this->assertTrue($hydrateGenerator->supportsGeneration(Dummy::class));
 
         $dummyObject = new Dummy();
-        $dummyObject->foo = "test";
+        $dummyObject->foo = 'test';
 
         eval($this->printer->prettyPrint($hydrateGenerator->generate(Dummy::class, [
             'input' => new Expr\Variable('dummyObject'),
-            'output' => new Expr\Variable('dummyArray')
+            'output' => new Expr\Variable('dummyArray'),
         ])));
 
         $this->assertInternalType('array', $dummyArray);
@@ -72,7 +72,7 @@ class ArrayHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
         $hydrateGenerator = new ArrayHydrateGenerator($propertyInfoExtractor->reveal(), new DummyTypeGenerator());
-        $hydrateGenerator->generate(Dummy::class, ['input' => new Expr\Variable("test")]);
+        $hydrateGenerator->generate(Dummy::class, ['input' => new Expr\Variable('test')]);
     }
 }
 

@@ -36,18 +36,18 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $propertyInfoExtractor->isReadable(Foo::class, 'foo', Argument::type('array'))->willReturn(true);
         $propertyInfoExtractor->isReadable(Foo::class, 'bar', Argument::type('array'))->willReturn(false);
         $propertyInfoExtractor->getTypes(Foo::class, 'foo', Argument::type('array'))->willReturn([
-            new Type('string')
+            new Type('string'),
         ]);
         $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
 
         $this->assertTrue($hydrateGenerator->supportsGeneration(Foo::class));
 
         $fooObject = new Foo();
-        $fooObject->foo = "test";
+        $fooObject->foo = 'test';
 
         eval($this->printer->prettyPrint($hydrateGenerator->generate(Foo::class, [
             'input' => new Expr\Variable('fooObject'),
-            'output' => new Expr\Variable('dummyStdClass')
+            'output' => new Expr\Variable('dummyStdClass'),
         ])));
 
         $this->assertInstanceOf('stdClass', $dummyStdClass);
@@ -72,7 +72,7 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
         $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
-        $hydrateGenerator->generate(Foo::class, ['input' => new Expr\Variable("test")]);
+        $hydrateGenerator->generate(Foo::class, ['input' => new Expr\Variable('test')]);
     }
 }
 

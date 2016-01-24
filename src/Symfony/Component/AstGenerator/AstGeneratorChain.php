@@ -21,7 +21,7 @@ class AstGeneratorChain implements AstGeneratorInterface
     /** @var AstGeneratorInterface[] A list of generators */
     protected $generators;
 
-    /** @var boolean Whether the generation must return as soon as possible or use all generators, default to false */
+    /** @var bool Whether the generation must return as soon as possible or use all generators, default to false */
     protected $returnOnFirst;
 
     public function __construct(array $generators = [], $returnOnFirst = false)

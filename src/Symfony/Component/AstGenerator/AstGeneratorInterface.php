@@ -12,14 +12,14 @@
 namespace Symfony\Component\AstGenerator;
 
 /**
- * An AstGeneratorInterface is a contract to transform an object into an AST
+ * An AstGeneratorInterface is a contract to transform an object into an AST.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
 interface AstGeneratorInterface
 {
     /**
-     * Generate an object into an AST given a specific context
+     * Generate an object into an AST given a specific context.
      *
      * @param mixed $object  Object to generate AST from
      * @param array $context Context for the generator
@@ -29,11 +29,11 @@ interface AstGeneratorInterface
     public function generate($object, array $context = []);
 
     /**
-     * Check whether the given object is supported for generation by this generator
+     * Check whether the given object is supported for generation by this generator.
      *
      * @param mixed $object Object to generate AST from
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsGeneration($object);
 }

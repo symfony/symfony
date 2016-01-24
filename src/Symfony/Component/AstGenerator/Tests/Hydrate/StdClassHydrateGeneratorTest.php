@@ -45,8 +45,9 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $fooObject = new Foo();
         $fooObject->foo = "test";
 
-        $dummyStdClass = eval($this->printer->prettyPrint($hydrateGenerator->generate(Foo::class, [
-            'input' => new Expr\Variable('fooObject')
+        eval($this->printer->prettyPrint($hydrateGenerator->generate(Foo::class, [
+            'input' => new Expr\Variable('fooObject'),
+            'output' => new Expr\Variable('dummyStdClass')
         ])));
 
         $this->assertInstanceOf('stdClass', $dummyStdClass);
@@ -62,6 +63,16 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
         $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
         $hydrateGenerator->generate(Foo::class);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\AstGenerator\Exception\MissingContextException
+     */
+    public function testNoOutput()
+    {
+        $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
+        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
+        $hydrateGenerator->generate(Foo::class, ['input' => new Expr\Variable("test")]);
     }
 }
 

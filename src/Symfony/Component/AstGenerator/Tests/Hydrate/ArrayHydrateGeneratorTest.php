@@ -45,8 +45,9 @@ class ArrayHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $dummyObject = new Dummy();
         $dummyObject->foo = "test";
 
-        $dummyArray = eval($this->printer->prettyPrint($hydrateGenerator->generate(Dummy::class, [
-            'input' => new Expr\Variable('dummyObject')
+        eval($this->printer->prettyPrint($hydrateGenerator->generate(Dummy::class, [
+            'input' => new Expr\Variable('dummyObject'),
+            'output' => new Expr\Variable('dummyArray')
         ])));
 
         $this->assertInternalType('array', $dummyArray);
@@ -62,6 +63,16 @@ class ArrayHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
         $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
         $hydrateGenerator = new ArrayHydrateGenerator($propertyInfoExtractor->reveal(), new DummyTypeGenerator());
         $hydrateGenerator->generate(Dummy::class);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\AstGenerator\Exception\MissingContextException
+     */
+    public function testNoOutput()
+    {
+        $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
+        $hydrateGenerator = new ArrayHydrateGenerator($propertyInfoExtractor->reveal(), new DummyTypeGenerator());
+        $hydrateGenerator->generate(Dummy::class, ['input' => new Expr\Variable("test")]);
     }
 }
 

@@ -172,6 +172,9 @@ class NormalizerGenerator implements AstGeneratorInterface
      */
     protected function createDenormalizeMethod($class, array $context = [])
     {
+        $input = new Expr\Variable('data');
+        $output = new Expr\Variable('output');
+
         return new Stmt\ClassMethod('denormalize', [
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
             'params' => [
@@ -180,9 +183,12 @@ class NormalizerGenerator implements AstGeneratorInterface
                 new Param('format', new Expr\ConstFetch(new Name("null"))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
-            'stmts' => $this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
-                'input' => new Expr\Variable('data')
-            ]))
+            'stmts' => array_merge($this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
+                'input' => $input,
+                'output' => $output
+            ])), [
+                new Stmt\Return_($output)
+            ])
         ]);
     }
 

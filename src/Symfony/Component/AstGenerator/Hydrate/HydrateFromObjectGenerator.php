@@ -38,12 +38,15 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
      */
     public function generate($object, array $context = [])
     {
-        if (!isset($context['input'])) {
-            throw new MissingContextException('Input variable not defined in context');
+        if (!isset($context['input']) || !($context['input'] instanceof Expr\Variable)) {
+            throw new MissingContextException('Input variable not defined or not a Expr\Variable in generation context');
         }
 
-        $dataVariable = new Expr\Variable('data');
-        $statements = [$this->getAssignStatement($dataVariable)];
+        if (!isset($context['output']) || !($context['output'] instanceof Expr\Variable)) {
+            throw new MissingContextException('Output variable not defined or not a Expr\Variable in generation context');
+        }
+
+        $statements = [$this->getAssignStatement($context['output'])];
 
         foreach ($this->propertyInfoExtractor->getProperties($object, $context) as $property) {
             // Only normalize readable property
@@ -53,7 +56,7 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
 
             // @TODO Have property info extractor extract the way of reading a property (public or method with method name)
             $input = new Expr\MethodCall($context['input'], 'get'.ucfirst($property));
-            $output = $this->getSubAssignVariableStatement($dataVariable, $property);
+            $output = $this->getSubAssignVariableStatement($context['output'], $property);
             $types = $this->propertyInfoExtractor->getTypes($object, $property, $context);
 
             // If no type can be extracted, directly assign output to input
@@ -85,8 +88,6 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
                 $statements[] = new Expr\Assign($output, $input);
             }
         }
-
-        $statements[] = new Stmt\Return_($dataVariable);
 
         return $statements;
     }

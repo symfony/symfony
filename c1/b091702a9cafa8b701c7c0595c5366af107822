@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-12T21:14:32Z
+
+Won't the version be `null` when you omitted the `version` attribute in the XML format (instead of setting it to an empty string)?
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-12T21:20:24Z
+
+There is a case, if version is omitted - then default strategy used.
+
+If we change it and if in xml omitted version considered as empty strategy (also as we need sync same logic for php, yml then) - we will have broken BC.
+
+There is also legacy code (framework templating configuration) that have different logic - omitted considered as empty.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-11-12T21:21:36Z
+
+There is no possible to set attribute in xml to null as far as I know :(
+
+---------------------------------------------------------------------------
+
+by XWB at 2015-11-24T11:53:15Z
+
+Ping @fabpot Any feedback on this? This bug was introduced with Symfony 2.7 and has not been resolved yet.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2015-12-09T12:57:28Z
+
+ping @fabpot @xabbuh any comments?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-23T11:25:16Z
+
+:+1:
+
+@ewgRa Can you rebase to get rid of the 2 merge commit that prevents me from merging? Or even better, squash all commits. Thanks.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2016-01-23T23:07:13Z
+
+@fabpot done

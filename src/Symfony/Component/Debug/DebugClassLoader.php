@@ -200,8 +200,25 @@ class DebugClassLoader
                         @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
                     }
 
+                    $parentInterfaces = array();
+                    $deprecatedInterfaces = array();
+                    if ($parent) {
+                        foreach ($parent->getInterfaceNames() as $interface) {
+                            $parentInterfaces[$interface] = 1;
+                        }
+                    }
+
                     foreach ($refl->getInterfaceNames() as $interface) {
-                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
+                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len)) {
+                            $deprecatedInterfaces[] = $interface;
+                        }
+                        foreach (class_implements($interface) as $interface) {
+                            $parentInterfaces[$interface] = 1;
+                        }
+                    }
+
+                    foreach ($deprecatedInterfaces as $interface) {
+                        if (!isset($parentInterfaces[$interface])) {
                             @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }
@@ -224,7 +241,7 @@ class DebugClassLoader
                 $i = count($tail) - 1;
                 $j = count($real) - 1;
 
-                 while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
+                while (isset($tail[$i], $real[$j]) && $tail[$i] === $real[$j]) {
                     --$i;
                     --$j;
                 }

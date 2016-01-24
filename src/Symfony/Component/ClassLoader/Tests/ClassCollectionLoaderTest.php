@@ -241,26 +241,26 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 
         spl_autoload_unregister($r);
 
-        $this->assertEquals(<<<EOF
+        $this->assertEquals(<<<'EOF'
 namespace Namespaced
 {
 class WithComments
 {
-public static \$loaded = true;
+public static $loaded = true;
 }
-\$string ='string should not be   modified {\$string}';
-\$heredoc = (<<<HD
+$string ='string should not be   modified {$string}';
+$heredoc = (<<<HD
 
 
-Heredoc should not be   modified {\$string}
+Heredoc should not be   modified {$string}
 
 
 HD
 );
-\$nowdoc =<<<'ND'
+$nowdoc =<<<'ND'
 
 
-Nowdoc should not be   modified {\$string}
+Nowdoc should not be   modified {$string}
 
 
 ND
@@ -270,7 +270,7 @@ namespace
 {
 class Pearlike_WithComments
 {
-public static \$loaded = true;
+public static $loaded = true;
 }
 }
 EOF

@@ -30,24 +30,20 @@ PHP
 
     public function testCommandLine()
     {
-        if ('phpdbg' === PHP_SAPI) {
-            $this->markTestSkipped('phpdbg SAPI is not supported by this test.');
-        }
-
-        $process = new PhpProcess(<<<PHP
+        $process = new PhpProcess(<<<'PHP'
 <?php echo 'foobar';
 PHP
         );
 
-        $f = new PhpExecutableFinder();
-        $commandLine = $f->find();
+        $commandLine = $process->getCommandLine();
 
-        $this->assertSame($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP before start');
+        $f = new PhpExecutableFinder();
+        $this->assertContains($f->find(), $commandLine, '::getCommandLine() returns the command line of PHP before start');
 
         $process->start();
-        $this->assertSame($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
+        $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
 
         $process->wait();
-        $this->assertSame($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
+        $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -334,6 +335,44 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($entity, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider resultTypesProvider
+     */
+    public function testValidateResultTypes($entity1, $result)
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name'),
+            'em' => self::EM_NAME,
+            'repositoryMethod' => 'findByCustom',
+        ));
+
+        $repository = $this->createRepositoryMock();
+        $repository->expects($this->once())
+            ->method('findByCustom')
+            ->will($this->returnValue($result))
+        ;
+        $this->em = $this->createEntityManagerMock($repository);
+        $this->registry = $this->createRegistryMock($this->em);
+        $this->validator = $this->createValidator();
+        $this->validator->initialize($this->context);
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function resultTypesProvider()
+    {
+        $entity = new SingleIntIdEntity(1, 'foo');
+
+        return array(
+            array($entity, array($entity)),
+            array($entity, new \ArrayIterator(array($entity))),
+            array($entity, new ArrayCollection(array($entity))),
+        );
     }
 
     public function testAssociatedEntity()

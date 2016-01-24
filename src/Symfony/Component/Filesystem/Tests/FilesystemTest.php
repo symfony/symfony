@@ -483,6 +483,22 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(753, $directory);
     }
 
+    public function testChmodChangesZeroModeOnSubdirectoriesOnRecursive()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
+        $subdirectory = $directory.DIRECTORY_SEPARATOR.'subdirectory';
+
+        mkdir($directory);
+        mkdir($subdirectory);
+        chmod($subdirectory, 0000);
+
+        $this->filesystem->chmod($directory, 0753, 0000, true);
+
+        $this->assertFilePermissions(753, $subdirectory);
+    }
+
     public function testChown()
     {
         $this->markAsSkippedIfPosixIsMissing();
@@ -989,7 +1005,6 @@ class FilesystemTest extends FilesystemTestCase
 
         // The compress.zlib:// stream does not support mode x: creates the file, errors "failed to open stream: operation failed" and returns false
         $this->filesystem->tempnam($dirname, 'bar');
-
     }
 
     public function testTempnamWithPHPTempSchemeFails()

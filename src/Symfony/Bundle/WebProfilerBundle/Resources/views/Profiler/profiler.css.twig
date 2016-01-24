@@ -7,6 +7,9 @@
     'subtle_border_and_shadow': 'background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgba(128, 128, 128, .2);'
 } %}
 
+{# when updating any of these colors, do the same in toolbar.css.twig #}
+{% set colors = { 'success': '#4F805D', 'warning': '#A46A1F', 'error': '#B0413E' } %}
+
 {# Normalization
    (normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css)
    ========================================================================= #}
@@ -232,9 +235,9 @@ table tbody ul {
     padding: 3px 7px;
     white-space: nowrap;
 }
-.label.status-success { background: #5E976E; color: #FFF; }
-.label.status-warning { background: #BC8034; color: #FFF; }
-.label.status-error   { background: #B0413E; color: #FFF; }
+.label.status-success { background: {{ colors.success|raw }}; color: #FFF; }
+.label.status-warning { background: {{ colors.warning|raw }}; color: #FFF; }
+.label.status-error   { background: {{ colors.error|raw }}; color: #FFF; }
 
 {# Metrics
    ------------------------------------------------------------------------- #}
@@ -276,8 +279,8 @@ table tbody ul {
 }
 
 .metrics-horizontal .metric {
-    min-height: auto;
-    min-width: auto;
+    min-height: 0;
+    min-width: 0;
 }
 .metrics-horizontal .metric .value,
 .metrics-horizontal .metric .label {
@@ -341,11 +344,11 @@ tr.status-warning td {
     border-top: 1px solid #FAFAFA;
 }
 
-.status-warning .colored  {
-    color: #BC8034;
+.status-warning .colored {
+    color: {{ colors.warning|raw }};
 }
 .status-error .colored  {
-    color: #B0413E;
+    color: {{ colors.error|raw }};
 }
 
 {# Syntax highlighting
@@ -469,9 +472,9 @@ tr.status-warning td {
     text-decoration: underline;
 }
 
-#summary .status-success { background: #5E976E; }
-#summary .status-warning { background: #BC8034; }
-#summary .status-error   { background: #B0413E; }
+#summary .status-success { background: {{ colors.success|raw }}; }
+#summary .status-warning { background: {{ colors.warning|raw }}; }
+#summary .status-error   { background: {{ colors.error|raw }};   }
 
 #summary .status-success h2,
 #summary .status-success h2 a,
@@ -670,10 +673,10 @@ tr.status-warning td {
 }
 
 #menu-profiler .label-status-warning .count {
-    background: #BC8034;
+    background: {{ colors.warning|raw }};
 }
 #menu-profiler .label-status-error .count {
-    background: #B0413E;
+    background: {{ colors.error|raw }};
 }
 
 {# Timeline panel

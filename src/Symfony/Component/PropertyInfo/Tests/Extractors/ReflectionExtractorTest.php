@@ -36,18 +36,19 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
                 'bal',
                 'parent',
                 'collection',
+                'B',
                 'foo',
                 'foo2',
                 'foo3',
                 'foo4',
                 'foo5',
                 'files',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F',
+                'a',
+                'DOB',
+                'c',
+                'd',
+                'e',
+                'f',
             ),
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
@@ -70,6 +71,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL))),
             array('e', null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')))),
+            array('donotexist', null),
         );
     }
 
@@ -88,6 +90,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
             array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),
             array('bar', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
+            array('donotexist', null),
         );
     }
 

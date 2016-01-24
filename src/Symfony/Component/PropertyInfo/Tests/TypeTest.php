@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\PropertyInfo\PropertyInfo\Tests;
+namespace Symfony\Component\PropertyInfo\Tests;
 
 use Symfony\Component\PropertyInfo\Type;
 

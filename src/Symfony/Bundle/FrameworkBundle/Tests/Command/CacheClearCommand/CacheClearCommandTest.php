@@ -81,5 +81,6 @@ class CacheClearCommandTest extends TestCase
             }
         }
         $this->assertTrue($found, 'Kernel file should present as resource');
+        $this->assertRegExp(sprintf('/\'kernel.name\'\s*=>\s*\'%s\'/', $this->kernel->getName()), file_get_contents($containerFile), 'kernel.name is properly set on the dumped container');
     }
 }

@@ -131,7 +131,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
             PHP_OS,
         );
 
-        return false !== stristr(implode(';', $checks), 'OS400');
+        return false !== stripos(implode(';', $checks), 'OS400');
     }
 
     /**

@@ -60,7 +60,6 @@ interface ConstraintViolationInterface
      *               that appear in the message template.
      *
      * @see getMessageTemplate()
-     *
      * @deprecated since version 2.7, to be replaced by getParameters() in 3.0.
      */
     public function getMessageParameters();

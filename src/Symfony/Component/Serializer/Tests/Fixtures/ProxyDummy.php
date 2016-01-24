@@ -9,14 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Process\Tests;
+namespace Symfony\Component\Serializer\Tests\Fixtures;
 
-use Symfony\Component\Process\Process;
-
-class ProcessInSigchildEnvironment extends Process
+/**
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class ProxyDummy extends ToBeProxyfiedDummy
 {
-    protected function isSigchildEnabled()
-    {
-        return true;
-    }
 }

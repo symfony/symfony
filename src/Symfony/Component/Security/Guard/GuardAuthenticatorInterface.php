@@ -83,6 +83,8 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @param mixed         $credentials
      * @param UserInterface $user
+     * 
+     * @return bool
      *
      * @throws AuthenticationException
      */

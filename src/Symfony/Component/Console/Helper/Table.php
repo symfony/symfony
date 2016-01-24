@@ -384,7 +384,7 @@ class Table
             $columns[] = $this->getNumberOfColumns($row);
         }
 
-        return $this->numberOfColumns = max($columns);
+        $this->numberOfColumns = max($columns);
     }
 
     private function buildTableRows($rows)
@@ -395,7 +395,6 @@ class Table
 
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
-                $rows[$rowKey] = $this->fillCells($rows[$rowKey], $column);
                 if (!strstr($cell, "\n")) {
                     continue;
                 }
@@ -415,7 +414,7 @@ class Table
 
         $tableRows = array();
         foreach ($rows as $rowKey => $row) {
-            $tableRows[] = $row;
+            $tableRows[] = $this->fillCells($row);
             if (isset($unmergedRows[$rowKey])) {
                 $tableRows = array_merge($tableRows, $unmergedRows[$rowKey]);
             }
@@ -481,21 +480,23 @@ class Table
      * fill cells for a row that contains colspan > 1.
      *
      * @param array $row
-     * @param int   $column
      *
      * @return array
      */
-    private function fillCells($row, $column)
+    private function fillCells($row)
     {
-        $cell = $row[$column];
-        if ($cell instanceof TableCell && $cell->getColspan() > 1) {
-            foreach (range($column + 1, $column + $cell->getColspan() - 1) as $position) {
-                // insert empty value into rows at column position
-                array_splice($row, $position, 0, '');
+        $newRow = array();
+        foreach ($row as $column => $cell) {
+            $newRow[] = $cell;
+            if ($cell instanceof TableCell && $cell->getColspan() > 1) {
+                foreach (range($column + 1, $column + $cell->getColspan() - 1) as $position) {
+                    // insert empty value at column position
+                    $newRow[] = '';
+                }
             }
         }
 
-        return $row;
+        return $newRow ?: $row;
     }
 
     /**
@@ -539,7 +540,7 @@ class Table
      *
      * @param array $row
      *
-     * @return array()
+     * @return array
      */
     private function getRowColumns($row)
     {
@@ -555,11 +556,9 @@ class Table
     }
 
     /**
-     * Gets column width.
+     * Calculates columns widths.
      *
-     * @param int $column
-     *
-     * @return int
+     * @param array $rows
      */
     private function calculateColumnsWidth($rows)
     {
@@ -579,8 +578,6 @@ class Table
 
     /**
      * Gets column width.
-     *
-     * @param int $column
      *
      * @return int
      */

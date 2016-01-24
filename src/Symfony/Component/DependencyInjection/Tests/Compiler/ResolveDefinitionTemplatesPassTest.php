@@ -101,6 +101,25 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ContainerInterface::SCOPE_CONTAINER, $def->getScope());
     }
 
+    public function testProcessDoesNotCopyShared()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+            ->setShared(false)
+        ;
+
+        $container
+            ->setDefinition('child', new DefinitionDecorator('parent'))
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertTrue($def->isShared());
+    }
+
     public function testProcessDoesNotCopyTags()
     {
         $container = new ContainerBuilder();
@@ -137,6 +156,25 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $def = $container->getDefinition('child');
         $this->assertNull($def->getDecoratedService());
+    }
+
+    public function testProcessDoesNotDropShared()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('parent')
+        ;
+
+        $container
+            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setShared(false)
+        ;
+
+        $this->process($container);
+
+        $def = $container->getDefinition('child');
+        $this->assertFalse($def->isShared());
     }
 
     public function testProcessHandlesMultipleInheritance()

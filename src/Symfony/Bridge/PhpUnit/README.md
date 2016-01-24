@@ -5,18 +5,17 @@ Provides utilities for PHPUnit, especially user deprecation notices management.
 
 It comes with the following features:
 
- * disable the garbage collector;
  * enforce a consistent `C` locale;
  * auto-register `class_exists` to load Doctrine annotations;
  * print a user deprecation notices summary at the end of the test suite;
  * display the stack trace of a deprecation on-demand.
 
 By default any non-legacy-tagged or any non-@-silenced deprecation notices will
-make tests fail.
-This can be changed by setting the `SYMFONY_DEPRECATIONS_HELPER` environment
-variable to `weak` or `weak-verbose`. This will make the bridge ignore
-deprecation notices and is useful to projects that must use deprecated interfaces
-for backward compatibility reasons.
+make tests fail. This can be changed by setting the `SYMFONY_DEPRECATIONS_HELPER`
+environment variable to the maximum number of deprecations that are allowed to be
+triggered before making the test suite fail. Alternatively, setting it to `weak`
+will make the bridge ignore any deprecation notices and is useful to projects
+that must use deprecated interfaces for backward compatibility reasons.
 
 A summary of deprecation notices is displayed at the end of the test suite:
 

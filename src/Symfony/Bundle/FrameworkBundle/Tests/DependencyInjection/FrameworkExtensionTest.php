@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Validation;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
+    private static $containerCache = array();
+
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
     public function testCsrfProtection()
@@ -213,32 +215,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyAssetsDefaultVersionStrategyAsService()
-    {
-        $container = $this->createContainerFromFile('legacy_templating_assets_version_strategy_as_service');
-        $packages = $container->getDefinition('assets.packages');
-
-        // default package
-        $defaultPackage = $container->getDefinition($packages->getArgument(0));
-        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
-    }
-
     public function testAssets()
     {
         $this->checkAssetsPackages($this->createContainerFromFile('assets'));
-    }
-
-    public function testAssetsDefaultVersionStrategyAsService()
-    {
-        $container = $this->createContainerFromFile('assets_version_strategy_as_service');
-        $packages = $container->getDefinition('assets.packages');
-
-        // default package
-        $defaultPackage = $container->getDefinition($packages->getArgument(0));
-        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testTranslator()
@@ -316,7 +295,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('addMethodMapping', $calls[4][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
-        $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.doctrine.apc')), $calls[5][1]);
     }
 
     /**
@@ -534,6 +513,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file, $data = array())
     {
+        $cacheKey = md5($file.serialize($data));
+        if (isset(self::$containerCache[$cacheKey])) {
+            return self::$containerCache[$cacheKey];
+        }
         $container = $this->createContainer($data);
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);
@@ -542,7 +525,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
-        return $container;
+        return self::$containerCache[$cacheKey] = $container;
     }
 
     protected function createContainerFromClosure($closure, $data = array())
@@ -569,7 +552,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount($legacy ? 4 : 5, $packages);
+        $this->assertCount($legacy ? 5 : 6, $packages);
 
         if (!$legacy) {
             $package = $container->getDefinition($packages['images_path']);
@@ -583,7 +566,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
 
         $package = $container->getDefinition($packages['bar']);
-        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? null : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+
+        $this->assertEquals($legacy ? 'assets.empty_version_strategy' : 'assets._version__default', (string) $container->getDefinition('assets._package_bar')->getArgument(1));
+        $this->assertEquals('assets.empty_version_strategy', (string) $container->getDefinition('assets._package_bar_null_version')->getArgument(1));
 
         $this->assertEquals('assets.custom_version_strategy', (string) $container->getDefinition('assets._package_bar_version_strategy')->getArgument(1));
     }

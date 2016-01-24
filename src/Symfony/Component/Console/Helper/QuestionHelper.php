@@ -160,11 +160,12 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $width = max(array_map('strlen', array_keys($question->getChoices())));
+            $maxWidth = max(array_map(array($this, 'strlen'), array_keys($question->getChoices())));
 
             $messages = (array) $question->getQuestion();
             foreach ($question->getChoices() as $key => $value) {
-                $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+                $width = $maxWidth - $this->strlen($key);
+                $messages[] = '  [<info>'.$key.str_repeat(' ', $width).'</info>] '.$value;
             }
 
             $output->writeln($messages);
@@ -438,7 +439,7 @@ class QuestionHelper extends Helper
     private function readFromInput($stream)
     {
         if (STDIN === $stream && function_exists('readline')) {
-            $ret = readline();
+            $ret = readline('');
         } else {
             $ret = fgets($stream, 4096);
         }

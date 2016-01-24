@@ -32,7 +32,7 @@ interface AuthenticationEntryPointInterface
      *
      * Examples:
      *  A) For a form login, you might redirect to the login page
-     *      return new Response('/login');
+     *      return new RedirectResponse('/login');
      *  B) For an API token authentication system, you return a 401 response
      *      return new Response('Auth header required', 401);
      *

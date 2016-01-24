@@ -47,7 +47,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMElement');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNode');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
@@ -61,16 +61,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     {
         $crawler = new Crawler();
         $crawler->add(1);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Nodes set in a Crawler must be DOMElement or DOMDocument instances, "DOMNode" given.
-     */
-    public function testAddInvalidNode()
-    {
-        $crawler = new Crawler();
-        $crawler->add(new \DOMNode());
     }
 
     public function testAddHtmlContent()
@@ -136,7 +126,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $internalErrors = libxml_use_internal_errors(true);
 
         $crawler = new Crawler();
-        $crawler->addHtmlContent(<<<EOF
+        $crawler->addHtmlContent(<<<'EOF'
 <!DOCTYPE html>
 <html>
     <head>
@@ -177,7 +167,7 @@ EOF
         $internalErrors = libxml_use_internal_errors(true);
 
         $crawler = new Crawler();
-        $crawler->addXmlContent(<<<EOF
+        $crawler->addXmlContent(<<<'EOF'
 <!DOCTYPE html>
 <html>
     <head>
@@ -264,7 +254,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMElement');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
     }
 
     public function testClear()
@@ -527,7 +517,7 @@ EOF
 
     public function testFilterXPathWithAttributeAxisAfterElementAxis()
     {
-        $this->assertCount(0, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
+        $this->assertCount(3, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
     }
 
     public function testFilterXPathWithChildAxis()
@@ -687,7 +677,7 @@ EOF
 
     public function testSelectButtonWithSingleQuotesInNameAttribute()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -708,7 +698,7 @@ HTML;
 
     public function testSelectButtonWithDoubleQuotesInNameAttribute()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -745,9 +735,29 @@ HTML;
         }
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The selected node should be instance of DOMElement
+     */
+    public function testInvalidLink()
+    {
+        $crawler = $this->createTestCrawler('http://example.com/bar/');
+        $crawler->filterXPath('//li/text()')->link();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The selected node should be instance of DOMElement
+     */
+    public function testInvalidLinks()
+    {
+        $crawler = $this->createTestCrawler('http://example.com/bar/');
+        $crawler->filterXPath('//li/text()')->link();
+    }
+
     public function testSelectLinkAndLinkFiltered()
     {
-        $html = <<<HTML
+        $html = <<<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -815,6 +825,16 @@ HTML;
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->form() throws an \InvalidArgumentException if the node list is empty');
         }
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The selected node should be instance of DOMElement
+     */
+    public function testInvalidForm()
+    {
+        $crawler = $this->createTestCrawler('http://example.com/bar/');
+        $crawler->filterXPath('//li/text()')->form();
     }
 
     public function testLast()

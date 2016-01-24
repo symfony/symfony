@@ -57,6 +57,19 @@
         <!-- CoreExtension -->
         <service id="form.property_accessor" alias="property_accessor" public="false" />
 
+        <service id="form.choice_list_factory.default" class="Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory" public="false"/>
+
+        <service id="form.choice_list_factory.property_access" class="Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator" public="false">
+            <argument type="service" id="form.choice_list_factory.default"/>
+            <argument type="service" id="form.property_accessor"/>
+        </service>
+
+        <service id="form.choice_list_factory.cached" class="Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator" public="false">
+            <argument type="service" id="form.choice_list_factory.property_access"/>
+        </service>
+
+        <service id="form.choice_list_factory" alias="form.choice_list_factory.cached" public="false"/>
+
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <argument type="service" id="form.property_accessor" />
             <tag name="form.type" alias="form" />
@@ -69,6 +82,7 @@
         </service>
         <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" alias="choice" />
+            <argument type="service" id="form.choice_list_factory"/>
         </service>
         <service id="form.type.collection" class="Symfony\Component\Form\Extension\Core\Type\CollectionType">
             <tag name="form.type" alias="collection" />

@@ -65,6 +65,17 @@ col-sm-2
 {% endspaceless %}
 {% endblock submit_row %}
 
+{% block reset_row -%}
+{% spaceless %}
+    <div class="form-group">
+        <div class="{{ block('form_label_class') }}"></div>
+        <div class="{{ block('form_group_class') }}">
+            {{ form_widget(form) }}
+        </div>
+    </div>
+{% endspaceless %}
+{% endblock reset_row %}
+
 {% block form_group_class -%}
 col-sm-10
 {%- endblock form_group_class %}

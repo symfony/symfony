@@ -27,4 +27,4 @@ $container->loadFromExtension('framework', array(
             ),
         ),
     ),
-));
+), );

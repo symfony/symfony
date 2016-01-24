@@ -17,6 +17,7 @@ use PhpParser\Node\Stmt;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
+use Symfony\Component\AstGenerator\UniqueVariableScope;
 
 /**
  * Generate a Normalizer given a Class
@@ -59,8 +60,12 @@ class NormalizerGenerator implements AstGeneratorInterface
                 'stmts' => [
                     $this->createSupportsNormalizationMethod($object),
                     $this->createSupportsDenormalizationMethod($object),
-                    $this->createNormalizeMethod($object, $context),
-                    $this->createDenormalizeMethod($object, $context),
+                    $this->createNormalizeMethod($object, array_merge($context, [
+                        'unique_variable_scope' => new UniqueVariableScope()
+                    ])),
+                    $this->createDenormalizeMethod($object, array_merge($context, [
+                        'unique_variable_scope' => new UniqueVariableScope()
+                    ])),
                 ],
                 'implements' => [
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerInterface'),
@@ -151,7 +156,9 @@ class NormalizerGenerator implements AstGeneratorInterface
                 new Param('format', new Expr\ConstFetch(new Name("null"))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
-            'stmts' => $this->normalizeStatementsGenerator->generate($class, $context)
+            'stmts' => $this->normalizeStatementsGenerator->generate($class, array_merge($context, [
+                'input' => new Expr\Variable('object')
+            ]))
         ]);
     }
 
@@ -173,7 +180,9 @@ class NormalizerGenerator implements AstGeneratorInterface
                 new Param('format', new Expr\ConstFetch(new Name("null"))),
                 new Param('context', new Expr\Array_(), 'array'),
             ],
-            'stmts' => $this->denormalizeStatementsGenerator->generate($class, $context)
+            'stmts' => $this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
+                'input' => new Expr\Variable('data')
+            ]))
         ]);
     }
 

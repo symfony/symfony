@@ -13,10 +13,9 @@ namespace Symfony\Component\AstGenerator\Tests\Normalizer;
 
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\Node\Name;
-use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Expr;
-use PhpParser\Node\Scalar;
+use Prophecy\Argument;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Normalizer\NormalizerGenerator;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -37,13 +36,13 @@ class NormalizerGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $normalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
         $normalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
-        $normalizerStatementsGenerator->generate(Dummy::class, ['name' => 'DummyNormalizer'])->willReturn([
+        $normalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
             new Stmt\Return_(new Expr\New_(new Name("\\stdClass")))
         ]);
 
         $denormalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
         $denormalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
-        $denormalizerStatementsGenerator->generate(Dummy::class, ['name' => 'DummyNormalizer'])->willReturn([
+        $denormalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
             new Stmt\Return_(new Expr\New_(new Name('\\'. Dummy::class)))
         ]);
 

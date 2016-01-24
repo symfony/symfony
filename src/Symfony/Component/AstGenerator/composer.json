@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "nikic/php-parser": "~2.0"
+        "nikic/php-parser": "~2.0",
+        "symfony/property-info": "~2.8|~3.0"
     },
     "require-dev": {
         "symfony/serializer": "~2.8|~3.0"

@@ -215,9 +215,32 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyAssetsDefaultVersionStrategyAsService()
+    {
+        $container = $this->createContainerFromFile('legacy_templating_assets_version_strategy_as_service');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
+    }
+
     public function testAssets()
     {
         $this->checkAssetsPackages($this->createContainerFromFile('assets'));
+    }
+
+    public function testAssetsDefaultVersionStrategyAsService()
+    {
+        $container = $this->createContainerFromFile('assets_version_strategy_as_service');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testTranslator()

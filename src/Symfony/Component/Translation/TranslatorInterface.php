@@ -26,9 +26,9 @@ interface TranslatorInterface
      * @param string $domain     The domain for the message
      * @param string $locale     The locale
      *
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     *
      * @return string The translated string
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null);
 
@@ -41,9 +41,9 @@ interface TranslatorInterface
      * @param string $domain     The domain for the message
      * @param string $locale     The locale
      *
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     *
      * @return string The translated string
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
 

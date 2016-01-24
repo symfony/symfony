@@ -24,9 +24,9 @@ interface SessionStorageInterface
     /**
      * Starts the session.
      *
-     * @throws \RuntimeException If something goes wrong starting the session.
-     *
      * @return bool True if started.
+     *
+     * @throws \RuntimeException If something goes wrong starting the session.
      */
     public function start();
 

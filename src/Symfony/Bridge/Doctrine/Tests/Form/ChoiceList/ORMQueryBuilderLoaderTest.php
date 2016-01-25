@@ -105,6 +105,35 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->getEntitiesByIds('id', array(1, '', 2, 3, 'foo'));
     }
 
+    public function testFilterNonGuidValues()
+    {
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getMockBuilder('QueryMock')
+            ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
+            ->getMock();
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array('f0b928bd-e471-4870-9f99-430a005e3897', 'e586ff90-222e-4a86-ac82-82627e84adfb'), Connection::PARAM_STR_ARRAY)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setConstructorArgs(array($em))
+            ->setMethods(array('getQuery'))
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleGuidIdEntity', 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id', array(1, '', 'f0b928bd-e471-4870-9f99-430a005e3897', 'g0b928bd-e471-4870-9f99-430a005e3897', 'e586ff90-222e-4a86-ac82-82627e84adfb', 'foo'));
+    }
+
     public function testEmbeddedIdentifierName()
     {
         if (Version::compare('2.5.0') > 0) {

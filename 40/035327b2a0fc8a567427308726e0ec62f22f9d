@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-15T00:51:54Z
+
+@jakzal I see you've enhanced the test - but I'm confused (in part, because I honestly haven't spent much time looking into the template name parsing stuff): this doesn't contain a fix for #14804 or add a failing test case. Was this just a step 1 to enhance to test? Or am I missing something (or perhaps I haven't answered your questions well yet on #14804).
+
+Thanks for taking this on - I see PR's from you fixing issues. It's awesome.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-15T06:43:52Z
+
+@weaverryan indeed. That's why it's marked WIP. I updated PR's description.
+
+Few test cases are either wrong ("name.twig" and "name"), or we should treat them differently then templates that follow the "name.html.twig" pattern.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-15T07:04:23Z
+
+Are "name.twig" and "name" even valid template names?  I went with the second option for now to avoid changing existing cases.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-07-15T14:36:54Z
+
+@jakzal I don't know if `name` or `name.twig` should be valid (`name.twig` should in my opinion). Best to keep these as they are for BC.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-23T15:14:20Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-29T07:35:29Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-10-30T20:14:13Z
+
+I have some hard time wrapping my head around these changes, but the result looks like what we expect.

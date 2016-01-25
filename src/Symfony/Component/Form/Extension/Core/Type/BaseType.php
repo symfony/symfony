@@ -32,8 +32,10 @@ abstract class BaseType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->setDisabled($options['disabled']);
-        $builder->setAutoInitialize($options['auto_initialize']);
+        $builder
+            ->setDisabled($options['disabled'])
+            ->setAutoInitialize($options['auto_initialize'])
+            ->setPosition($options['position']);
     }
 
     /**
@@ -117,6 +119,7 @@ abstract class BaseType extends AbstractType
             'attr' => array(),
             'translation_domain' => null,
             'auto_initialize' => true,
+            'position' => null,
         ));
 
         $resolver->setAllowedTypes('attr', 'array');

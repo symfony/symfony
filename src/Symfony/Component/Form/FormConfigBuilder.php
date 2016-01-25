@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfigBuilder implements FormConfigBuilderInterface
+class FormConfigBuilder implements FormConfigBuilderInterface, OrderedFormConfigBuilderInterface
 {
     /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
@@ -171,6 +172,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var bool
      */
     private $autoInitialize = false;
+
+    /**
+     * @var null|string|array
+     */
+    private $position;
 
     /**
      * @var array
@@ -516,6 +522,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -827,6 +841,28 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->autoInitialize = (bool) $initialize;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPosition($position)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
+            throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+        }
+
+        if (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
+        }
+
+        $this->position = $position;
 
         return $this;
     }

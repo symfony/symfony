@@ -53,6 +53,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         $this->innerType = $innerType;
         $this->typeExtensions = $typeExtensions;
         $this->parent = $parent;
+        $this->orderer = new FormOrderer();
     }
 
     /**
@@ -172,6 +173,22 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         foreach ($this->typeExtensions as $extension) {
             /* @var FormTypeExtensionInterface $extension */
             $extension->finishView($view, $form, $options);
+        }
+
+        $children = $view->children;
+        $view->children = array();
+
+        foreach ($this->orderer->order($form) as $name) {
+            if (!isset($children[$name])) {
+                continue;
+            }
+
+            $view->children[$name] = $children[$name];
+            unset($children[$name]);
+        }
+
+        foreach ($children as $name => $child) {
+            $view->children[$name] = $child;
         }
     }
 

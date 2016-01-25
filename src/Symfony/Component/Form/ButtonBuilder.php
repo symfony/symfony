@@ -12,15 +12,16 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 /**
  * A builder for {@link Button} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
+class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface, OrderedFormConfigBuilderInterface
 {
     /**
      * @var bool
@@ -46,6 +47,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @var array
      */
     private $attributes = array();
+
+    /**
+     * @var null|string|array
+     */
+    private $position;
 
     /**
      * @var array
@@ -504,6 +510,28 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setPosition($position)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
+            throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+        }
+
+        if (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
+        }
+
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
      * Unsupported method.
      *
      * @param bool $inheritData
@@ -750,6 +778,14 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getAutoInitialize()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 
     /**

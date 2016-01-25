@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-23T17:20:47Z
+
+Note, this must be merged into the `3.0` branch (I forgot to switch the target branch).
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-01-23T17:46:59Z
+
+Would this require `enabled: false` to turn it off if I don't want to use it?

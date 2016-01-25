@@ -15,7 +15,7 @@ use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader;
 
 /**
- * @requires extension apc
+ * @requires extension apcu
  */
 class ApcClassLoaderTest extends \PHPUnit_Framework_TestCase
 {

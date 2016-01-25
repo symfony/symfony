@@ -1103,6 +1103,16 @@ UPGRADE FROM 2.x to 3.0
  * The `supportsAttribute()` and `supportsClass()` methods of classes `AuthenticatedVoter`, `ExpressionVoter`
    and `RoleVoter` have been removed.
 
+ * The `intention` option was renamed to `csrf_token_id` for all the authentication listeners.
+
+ * The `csrf_provider` option was renamed to `csrf_token_generator` for all the authentication listeners.
+
+### SecurityBundle
+
+ * The `intention` firewall listener setting was renamed to `csrf_token_id`.
+
+ * The `csrf_provider` firewall listener setting was renamed to `csrf_token_generator`.
+
 ### Serializer
 
  * The `setCamelizedAttributes()` method of the

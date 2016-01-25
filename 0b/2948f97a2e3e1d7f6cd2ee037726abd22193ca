@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T12:42:43Z
+
+I'm not sure it makes sense to tests all children classes of HttpException. I'd say only HttpExceptionTest is required here. If you really think it's worth, then I suggest using a data provider instead of duplicating the test cases for every type.
+
+---------------------------------------------------------------------------
+
+by smatyas at 2015-12-28T18:42:25Z
+
+I've reorganized the test classes to use the same data provider, and rebased my changes to the latest 2.8
+
+`MethodNotAllowedHttpException`, `ServiceUnavailableHttpException`, `TooManyRequestsHttpException` and `UnauthorizedHttpException` do set default headers in certain circumstances, that's why I started writing tests for all classes. Also I think it's better to have at least these tests on these classes than nothing.

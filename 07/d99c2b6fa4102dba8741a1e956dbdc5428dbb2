@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-10T14:15:02Z
+
+Can you add a test case please?
+
+---------------------------------------------------------------------------
+
+by DZunke at 2015-12-10T16:19:56Z
+
+@jakzal hope the test is ok. needed to get my own FormBuilder Instance cause the default "getBuilder" method used by all other tests has default options including the constraints index.

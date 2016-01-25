@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by jperovic at 2015-07-14T23:53:09Z
+
+Just wanted to ask quick question here, to which I didn't find any answer in CONTRIBUTING document.
+
+When I run "phpunit" command, it works until it gets stuck with `QuestionHelperTest::testAskChoice` test. I did a little bit of research and it seems that it gets stuck due to `interactive` argument being set to `true` in `InputStream` instance. After that, code hits this infinite `while` loop (`$attempts` is `NULL`):
+
+```php
+# Symfony\Component\Console\Helper\QuestionHelper::validateAttempts()
+while (null === $attempts || $attempts--) {
+            if (null !== $error) {
+                $this->writeError($output, $error);
+            }
+
+            try {
+                return call_user_func($question->getValidator(), $interviewer());
+            } catch (\Exception $error) {
+            }
+        }
+```
+
+Is this known limitation? I have `Centos 6.5` and `PHP 5.6`...
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-07-15T07:45:57Z
+
+@jperovic that's a bug. I'm looking into this.
+
+---------------------------------------------------------------------------
+
+by jperovic at 2015-07-15T18:22:46Z
+
+@jakzal Cool, thanks :)
+
+---------------------------------------------------------------------------
+
+by Minishlink at 2015-07-19T20:51:42Z
+
+Hello, thanks for this ! :+1:
+
+Just a quick note: UniqueEntityValidator can have several fields. As such, one should be able to refer to all these fields in the validation message eg. "The combination of {{ field1 }} and {{ field2 }} should be unique.".
+
+Also, see #15201. You both address the same issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-10-19T12:11:28Z
+
+@jakzal Are you still looking at this bug?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-10-21T06:46:04Z
+
+@fabpot I fixed it in #15280. Looks like I forgot to update this ticket (which is actually not related to the issue with tests).

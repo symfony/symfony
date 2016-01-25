@@ -59,6 +59,55 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
+    public function testHelpersRegisteredInTheContainerAreAddedToTheHelperSet()
+    {
+        $helper = $this->getMock('Symfony\\Component\\Console\\Helper\\HelperInterface');
+        $helper->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('application_test_helper'));
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher->expects($this->atLeastOnce())
+            ->method('dispatch');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->atLeastOnce())
+            ->method('get')
+            ->with($this->logicalOr($this->equalTo('event_dispatcher'), $this->equalTo('testhelper')))
+            ->will($this->returnCallback(function ($key) use ($dispatcher, $helper) {
+                return 'event_dispatcher' === $key ? $dispatcher : $helper;
+            }));
+        $container->expects($this->exactly(2))
+            ->method('hasParameter')
+            ->with($this->logicalOr(
+                $this->equalTo('console.command.ids'),
+                $this->equalTo('console.helper.ids')
+            ))
+            ->will($this->returnValue(true));
+        $container->expects($this->exactly(2))
+            ->method('getParameter')
+            ->with($this->logicalOr(
+                $this->equalTo('console.command.ids'),
+                $this->equalTo('console.helper.ids')
+            ))
+            ->will($this->returnCallback(function ($key) {
+                return 'console.helper.ids' === $key ? array('testhelper' => 'ath') : array();
+            }));
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel->expects($this->any())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+        $kernel->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($container));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+
+        $this->assertTrue($application->getHelperSet()->has('application_test_helper'));
+        $this->assertTrue($application->getHelperSet()->has('ath'));
+        $this->assertSame($helper, $application->getHelperSet()->get('application_test_helper'));
+        $this->assertSame($helper, $application->getHelperSet()->get('ath'));
+    }
+
     private function getKernel(array $bundles)
     {
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -75,15 +124,21 @@ class ApplicationTest extends TestCase
             ->will($this->returnValue($dispatcher))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('hasParameter')
-            ->with($this->equalTo('console.command.ids'))
+            ->with($this->logicalOr(
+                $this->equalTo('console.command.ids'),
+                $this->equalTo('console.helper.ids')
+            ))
             ->will($this->returnValue(true))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getParameter')
-            ->with($this->equalTo('console.command.ids'))
+            ->with($this->logicalOr(
+                $this->equalTo('console.command.ids'),
+                $this->equalTo('console.helper.ids')
+            ))
             ->will($this->returnValue(array()))
         ;
 

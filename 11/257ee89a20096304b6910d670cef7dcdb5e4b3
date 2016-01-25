@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by gapple at 2016-01-16T00:12:51Z
+
+Additionally
+ - While master got the `apc_*` to `apcu_*` changes, the 3.0 branch did not.
+ - APC is PHP <=5.4, so symfony/polyfill-apcu shouldn't be a dependency on 3.0 or master
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-16T04:10:10Z
+
+> While master got the apc_* to apcu_* changes, the 3.0 branch did not.
+
+Because 2.8 did not get merged in 3.0 yet

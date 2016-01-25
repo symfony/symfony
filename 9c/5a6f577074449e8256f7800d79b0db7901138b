@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-10T20:18:09Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-10T20:42:01Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T11:29:28Z
+
+Would it make sense to create an interface for setBackup on 3.1? method_exists is quite fragile imho

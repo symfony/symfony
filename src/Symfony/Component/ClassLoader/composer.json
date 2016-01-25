@@ -18,7 +18,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
-        "symfony/polyfill-apcu": "~1.0,>=1.0.2"
+        "symfony/polyfill-apcu": "~1.1"
     },
     "require-dev": {
         "symfony/finder": "~2.0,>=2.0.5"

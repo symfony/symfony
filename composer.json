@@ -19,7 +19,7 @@
         "php": ">=5.3.3",
         "doctrine/common": "~2.4",
         "paragonie/random_compat": "~1.0",
-        "symfony/polyfill-apcu": "~1.0,>=1.0.2",
+        "symfony/polyfill-apcu": "~1.1",
         "twig/twig": "~1.23|~2.0",
         "psr/log": "~1.0"
     },

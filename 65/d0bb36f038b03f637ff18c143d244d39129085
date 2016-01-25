@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-01-20T17:10:07Z
+
+@c960657 what is the lower Symfony version where this patch can be applied ? The bug seems to impact 2.7+
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-01-20T17:24:42Z
+
+@stof The patch applies cleanly to 2.7+. The bug seems to have always been there, even back in 2.3 when TraceableEventDispatcher belonged to HttpKernel.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-21T08:41:54Z
+
+@c960657 If the bug is present in 2.3, we need to fix it there first. Can you work on creating a PR for 2.3?
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-01-21T23:02:21Z
+
+I have made separate pull requests for the 2.3 (#17482) and 2.7 (#17483) branches.
+
+The patch for master applies cleanly to the 2.7 branch (i.e. git does not complain), but it would break BC, because EventDispatcherInterface::getListenerPriority() is not defined prior to 3.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T09:43:45Z
+
+@c960657 Sorry for that but I've closed the other PRs as the listener priority is only available as of 2.8, so I'm going to merge this one on 2.8.

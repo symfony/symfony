@@ -863,6 +863,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
             // client IP with port
             array(array('88.88.88.88'), '127.0.0.1', '88.88.88.88:12345, 127.0.0.1', array('127.0.0.1')),
+
+            // invalid forwarded IP is ignored
+            array(array('88.88.88.88'), '127.0.0.1', 'unknown,88.88.88.88', array('127.0.0.1')),
         );
     }
 

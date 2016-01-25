@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-25T14:46:39Z
+
+You forgot https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/ClassLoader/composer.json#L21
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T14:47:11Z
+
+@Tobion fixed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-25T14:48:18Z
+
+Merging. Will also merge it upwards

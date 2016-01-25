@@ -1,4 +1,4 @@
-{% if link %}
+{% if link|default(true) %}
     {% set icon %}
         <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
     {% endset %}

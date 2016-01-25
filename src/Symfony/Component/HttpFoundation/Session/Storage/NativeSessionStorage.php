@@ -440,7 +440,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param SessionBagInterface $bag
      * @param array|null          $session
      */
-    protected function loadSessionBag(SessionBagInterface $bag, array &$session = null)
+    private function loadSessionBag(SessionBagInterface $bag, array &$session = null)
     {
         if (null === $session) {
             $session = &$_SESSION;

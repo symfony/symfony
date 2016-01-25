@@ -458,7 +458,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      * Searching in multiple locations involves AppendIterator which does an unnecessary rewind which leaves FilterIterator
      * with inner FilesystemIterator in an invalid state.
      *
-     * @see https://bugs.php.net/bug.php?id=49104
+     * @see https://bugs.php.net/68557
      */
     public function testMultipleLocations()
     {
@@ -468,8 +468,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
 
         // it is expected that there are test.py test.php in the tmpDir
-        $finder = $this->buildFinder();
-        $finder->in($locations)->depth('< 1')->name('test.php');
+        $finder = new Finder();
+        $finder->in($locations)
+            // the default flag IGNORE_DOT_FILES fixes the problem indirectly
+            // so we set it to false for better isolation
+            ->ignoreDotFiles(false)
+            ->depth('< 1')->name('test.php');
 
         $this->assertCount(1, $finder);
     }
@@ -479,7 +483,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      * AppendIterator which does an unnecessary rewind which leaves
      * FilterIterator with inner FilesystemIterator in an invalid state.
      *
-     * @see https://bugs.php.net/bug.php?id=49104
+     * @see https://bugs.php.net/68557
      */
     public function testMultipleLocationsWithSubDirectories()
     {

@@ -12,9 +12,10 @@
 namespace Symfony\Component\Finder\Iterator;
 
 /**
- * This iterator just overrides the rewind method in order to correct a PHP bug.
+ * This iterator just overrides the rewind method in order to correct a PHP bug,
+ * which existed before version 5.5.23/5.6.7.
  *
- * @see https://bugs.php.net/bug.php?id=49104
+ * @see https://bugs.php.net/68557
  *
  * @author Alex Bogomazov
  */
@@ -28,18 +29,19 @@ abstract class FilterIterator extends \FilterIterator
      */
     public function rewind()
     {
+        if (PHP_VERSION_ID > 50607 || (PHP_VERSION_ID > 50523 && PHP_VERSION_ID < 50600)) {
+            parent::rewind();
+
+            return;
+        }
+
         $iterator = $this;
         while ($iterator instanceof \OuterIterator) {
             $innerIterator = $iterator->getInnerIterator();
 
-            if ($innerIterator instanceof RecursiveDirectoryIterator) {
-                if ($innerIterator->isRewindable()) {
-                    $innerIterator->next();
-                    $innerIterator->rewind();
-                }
-            } elseif ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
-                $iterator->getInnerIterator()->next();
-                $iterator->getInnerIterator()->rewind();
+            if ($innerIterator instanceof \FilesystemIterator) {
+                $innerIterator->next();
+                $innerIterator->rewind();
             }
             $iterator = $iterator->getInnerIterator();
         }

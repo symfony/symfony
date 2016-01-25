@@ -223,7 +223,7 @@
                         path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
                     }
 
-                    if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                    if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var stackElement = {
                             loading: true,
                             error: false,

@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by mheki at 2015-11-25T09:08:57Z
+
+Travis build fails on PHP5.3: https://travis-ci.org/symfony/symfony/jobs/92963577#L2268
+Result of the test suggests `substr` has been used instead of `mb_substr`. Is php5.3 on travis running with `--enable-mbstring` config option?
+
+What should I do in that case?
+
+---------------------------------------------------------------------------
+
+by mheki at 2015-12-11T08:46:51Z
+
+If that's a bigger issue, I can propose a pull request to the `3.0` branch instead, which doesn't support php 5.3.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-11T15:58:49Z
+
+@mheki as a new feature, this should go to master (3.1)
+
+P.S. don't worry about it though. Even though you submitted it to 2.8, it can still be merged to another branch by a merger.
+
+---------------------------------------------------------------------------
+
+by mheki at 2015-12-11T16:01:11Z
+
+:+1:  thanks @jakzal - will make a separate pr then and close this one
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-11T16:05:39Z
+
+I was trying to say you don't need a new one :)
+
+---------------------------------------------------------------------------
+
+by mheki at 2015-12-11T16:29:57Z
+
+Sorry, missed your post scriptum, I will leave it as is then
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-15T22:43:01Z
+
+Looks good to me but we need to check why the tests are falling.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T10:27:38Z
+
+Failures on 5.3 can be ignored: this PR will be merged on master, which require 5.5

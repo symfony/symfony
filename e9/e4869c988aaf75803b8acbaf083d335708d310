@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T14:32:37Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-28T14:44:22Z
+
+We miss a test for the case where a collection item is removed.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-28T17:26:23Z
+
+@xabbuh : What do you mean ? In https://github.com/symfony/symfony/pull/17132/files#diff-d60628dabdfe82babfcdd500cbe16712R48, `bar` is removed from the collection.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-28T17:31:50Z
+
+Hm, you're right. I thought it was `NULL_ON_INVALID_REFERENCE`.
+
+:+1:

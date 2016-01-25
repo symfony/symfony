@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-25T15:54:59Z
+
+Any reason why we do not use `preg_quote($car, $delimiter);` to replace the complete if statement?

@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-01-10T20:12:19Z
+
+If the "Symfony support" should be the link (not sure, can be a heading, based on screenshot), I'd add action verb. E.g.:
+
+"Find help at Symfony support"
+"Get help at Symfony support"
+"Need support?"
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-10T20:18:31Z
+
+@TomasVotruba What do you mean with "try link"? Somehow the link should be more visible.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-01-12T20:51:23Z
+
+@peterrehm Sorry, I meant "the link". The point was better visibility, yes. Stackoverflow icon might help as well.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-13T09:02:48Z
+
+@javiereguiluz What are your opinions on that?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-13T09:16:58Z
+
+The idea would be to redesign the exception page in the near term to match the new Symfon style. So for now, I like the current proposal.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-13T19:29:22Z
+
+@javiereguiluz Do you want for the current one the top link more visible or are you okay with it as it is?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-16T13:30:25Z
+
+I agree with @TomasVotruba the label should include an action instead of just a subject. I like "Need support?".
+
+Btw, common design standards are to use buttons for on-page actions and links for actions that load a new page. Seems like this should be a link instead.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-21T19:14:32Z
+
+Updated:
+
+<img width="1023" alt="bildschirmfoto 2016-01-21 um 20 13 24" src="https://cloud.githubusercontent.com/assets/2010989/12491461/73ede4f0-c07b-11e5-9957-bbb01c12ab57.png">
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T07:46:47Z
+
+The link color should probably be just black as the contrast between grey and green seems very low.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-25T09:16:58Z
+
+@fabpot Updated accordingly.

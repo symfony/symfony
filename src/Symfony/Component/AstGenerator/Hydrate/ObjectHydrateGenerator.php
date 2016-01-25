@@ -11,18 +11,20 @@
 
 namespace Symfony\Component\AstGenerator\Hydrate;
 
+use PhpParser\Node\Arg;
 use PhpParser\Node\Name;
 use PhpParser\Node\Expr;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Exception\MissingContextException;
+use Symfony\Component\AstGenerator\UniqueVariableScope;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 /**
- * Abstract class to generate hydration of data from object
+ * Abstract class to generate hydration of object from data
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
-abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
+abstract class ObjectHydrateGenerator implements AstGeneratorInterface
 {
     /** @var PropertyInfoExtractorInterface Extract list of properties from a class */
     protected $propertyInfoExtractor;
@@ -49,22 +51,27 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
             throw new MissingContextException('Output variable not defined or not a Expr\Variable in generation context');
         }
 
-        $statements = [$this->getAssignStatement($context['output'])];
+        $uniqueVariableScope = isset($context['unique_variable_scope']) ? $context['unique_variable_scope'] : new UniqueVariableScope();
+        $statements = [
+            new Expr\Assign($context['output'], new Expr\New_(new Name("\\".$object))),
+        ];
 
         foreach ($this->propertyInfoExtractor->getProperties($object, $context) as $property) {
-            // Only normalize readable property
-            if (!$this->propertyInfoExtractor->isReadable($object, $property, $context)) {
+            // Only hydrate writable property
+            if (!$this->propertyInfoExtractor->isWritable($object, $property, $context)) {
                 continue;
             }
 
-            // @TODO Have property info extractor extract the way of reading a property (public or method with method name)
-            $input = new Expr\MethodCall($context['input'], 'get'.ucfirst($property));
-            $output = $this->getSubAssignVariableStatement($context['output'], $property);
+            $output = new Expr\Variable($uniqueVariableScope->getUniqueName('output'));
+            $input = $this->createInputExpr($context['input'], $property);
             $types = $this->propertyInfoExtractor->getTypes($object, $property, $context);
 
             // If no type can be extracted, directly assign output to input
             if (null === $types || count($types) == 0) {
-                $statements[] = new Expr\Assign($output, $input);
+                // @TODO Have property info extractor extract the way of writing a property (public or method with method name)
+                $statements[] = new Expr\MethodCall($context['output'], 'set'.ucfirst($property), [
+                    new Arg($input)
+                ]);
 
                 continue;
             }
@@ -88,7 +95,14 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
 
             // If nothing has been assigned, we directly put input into output
             if ($noAssignment) {
-                $statements[] = new Expr\Assign($output, $input);
+                // @TODO Have property info extractor extract the way of writing a property (public or method with method name)
+                $statements[] = new Expr\MethodCall($context['output'], 'set'.ucfirst($property), [
+                    new Arg($input)
+                ]);
+            } else {
+                $statements[] = new Expr\MethodCall($context['output'], 'set'.ucfirst($property), [
+                    new Arg($output)
+                ]);
             }
         }
 
@@ -104,21 +118,12 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
     }
 
     /**
-     * Create the assign statement.
+     * Create the input expression for a specific property
      *
-     * @param Expr\Variable $dataVariable Variable to use
+     * @param Expr\Variable $inputVariable Input variable of data
+     * @param string        $property      Property to fetch
      *
-     * @return Expr\Assign An assignment for the variable
+     * @return Expr
      */
-    abstract protected function getAssignStatement($dataVariable);
-
-    /**
-     * Create the sub assign variable statement.
-     *
-     * @param Expr\Variable $dataVariable Variable to use
-     * @param string        $property     Property name for object or array dimension
-     *
-     * @return Expr\ArrayDimFetch|Expr\PropertyFetch
-     */
-    abstract protected function getSubAssignVariableStatement($dataVariable, $property);
+    abstract protected function createInputExpr(Expr\Variable $inputVariable, $property);
 }

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-10-30T19:04:32Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-14T20:50:50Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-12T21:31:36Z
+
+Should be ok now.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-01-16T20:04:05Z
+
+I added some comments, but this generally looks quite good and interesting
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-17T10:34:04Z
+
+@weaverryan just introduced private methods as you suggested.
+
+I also added a check for the type as suggested by you and @xabbuh
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-01-17T18:03:19Z
+
+I left some very very minor comments, but
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-17T18:37:08Z
+
+@weaverryan Thanks for the review! Last comments fixed.

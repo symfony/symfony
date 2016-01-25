@@ -235,7 +235,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $dom->validateOnParse = true;
 
         if ('' !== trim($content)) {
-            @$dom->loadXML($content, LIBXML_NONET);
+            @$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_PARSEHUGE') ? LIBXML_PARSEHUGE : 0));
         }
 
         libxml_use_internal_errors($internalErrors);

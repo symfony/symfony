@@ -28,5 +28,6 @@ abstract class AbstractNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract public function getToStringConversionTestData();
+
     abstract public function getSpecificityValueTestData();
 }

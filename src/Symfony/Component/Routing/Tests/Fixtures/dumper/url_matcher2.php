@@ -24,8 +24,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
-        $isPathMissingTrailingSlash = substr($pathinfo, -1) !== '/';
-        $pathWithTrailingSlash = $isPathMissingTrailingSlash ? $pathinfo.'/' : $pathinfo;
         $pathWithoutTrailingSlash = rtrim($pathinfo, '/');
 
         // foo
@@ -72,8 +70,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // baz3
                 if ($pathWithoutTrailingSlash === '/test/baz3') {
-                    if ($isPathMissingTrailingSlash) {
-                        return $this->redirect($pathWithTrailingSlash, 'baz3');
+                    if (substr($pathinfo, -1) !== '/') {
+                        return $this->redirect($pathinfo.'/', 'baz3');
                     }
 
                     return array('_route' => 'baz3');
@@ -83,8 +81,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz4
             if (preg_match('#^/test/(?P<foo>[^/]++)/?$#s', $pathinfo, $matches)) {
-                if ($isPathMissingTrailingSlash) {
-                    return $this->redirect($pathWithTrailingSlash, 'baz4');
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'baz4');
                 }
 
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
@@ -176,8 +174,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // hey
             if ($pathWithoutTrailingSlash === '/multi/hey') {
-                if ($isPathMissingTrailingSlash) {
-                    return $this->redirect($pathWithTrailingSlash, 'hey');
+                if (substr($pathinfo, -1) !== '/') {
+                    return $this->redirect($pathinfo.'/', 'hey');
                 }
 
                 return array('_route' => 'hey');

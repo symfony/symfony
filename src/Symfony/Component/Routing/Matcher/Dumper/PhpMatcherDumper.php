@@ -91,8 +91,6 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
-        \$isPathMissingTrailingSlash = substr(\$pathinfo, -1) !== '/';
-        \$pathWithTrailingSlash = \$isPathMissingTrailingSlash ? \$pathinfo.'/' : \$pathinfo;
         \$pathWithoutTrailingSlash = rtrim(\$pathinfo, '/');
 
 $code
@@ -275,8 +273,8 @@ EOF;
 
         if ($hasTrailingSlash) {
             $code .= <<<EOF
-            if (\$isPathMissingTrailingSlash) {
-                return \$this->redirect(\$pathWithTrailingSlash, '$name');
+            if (substr(\$pathinfo, -1) !== '/') {
+                return \$this->redirect(\$pathinfo.'/', '$name');
             }
 
 

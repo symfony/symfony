@@ -24,8 +24,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
-        $isPathMissingTrailingSlash = substr($pathinfo, -1) !== '/';
-        $pathWithTrailingSlash = $isPathMissingTrailingSlash ? $pathinfo.'/' : $pathinfo;
         $pathWithoutTrailingSlash = rtrim($pathinfo, '/');
 
         if (0 === strpos($pathinfo, '/rootprefix')) {

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @internal
  */
-class JsonDescriptor extends Descriptor
+final class JsonDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}

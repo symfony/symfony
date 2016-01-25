@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class BinaryNode extends Node
+final class BinaryNode extends Node
 {
     private static $operators = array(
         '~' => '.',

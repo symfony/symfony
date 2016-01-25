@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  *
  * @internal
  */
-class PhpBundleReader implements BundleReaderInterface
+final class PhpBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}

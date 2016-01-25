@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Node;
  *
  * @internal
  */
-class ElementNode extends AbstractNode
+final class ElementNode extends AbstractNode
 {
     /**
      * @var string|null

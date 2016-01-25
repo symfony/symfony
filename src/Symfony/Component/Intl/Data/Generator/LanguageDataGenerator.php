@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
  *
  * @internal
  */
-class LanguageDataGenerator extends AbstractDataGenerator
+final class LanguageDataGenerator extends AbstractDataGenerator
 {
     /**
      * Source: http://www-01.sil.org/iso639-3/codes.asp.

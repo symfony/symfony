@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
  *
  * @internal
  */
-class Unescaper
+final class Unescaper
 {
     /**
      * Regex fragment that matches an escaped character in a double quoted string.

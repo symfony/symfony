@@ -28,7 +28,7 @@ namespace Symfony\Component\Intl\Data\Util;
  *
  * @internal
  */
-class LocaleScanner
+final class LocaleScanner
 {
     /**
      * Returns all locales found in the given directory.

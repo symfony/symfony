@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class UnaryNode extends Node
+final class UnaryNode extends Node
 {
     private static $operators = array(
         '!' => '!',

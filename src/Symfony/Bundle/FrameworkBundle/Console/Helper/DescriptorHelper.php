@@ -22,7 +22,7 @@ use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
  *
  * @internal
  */
-class DescriptorHelper extends BaseDescriptorHelper
+final class DescriptorHelper extends BaseDescriptorHelper
 {
     /**
      * Constructor.

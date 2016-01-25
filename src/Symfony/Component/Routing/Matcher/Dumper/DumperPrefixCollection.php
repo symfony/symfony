@@ -18,7 +18,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  *
  * @internal
  */
-class DumperPrefixCollection extends DumperCollection
+final class DumperPrefixCollection extends DumperCollection
 {
     /**
      * @var string

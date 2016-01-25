@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
  *
  * @internal
  */
-class PhpBundleWriter implements BundleWriterInterface
+final class PhpBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}

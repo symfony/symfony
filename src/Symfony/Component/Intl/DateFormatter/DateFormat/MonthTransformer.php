@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  *
  * @internal
  */
-class MonthTransformer extends Transformer
+final class MonthTransformer extends Transformer
 {
     /**
      * @var array

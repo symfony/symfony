@@ -20,7 +20,7 @@ use Symfony\Component\Process\Process;
  *
  * @internal
  */
-class UnixPipes extends AbstractPipes
+final class UnixPipes extends AbstractPipes
 {
     /** @var bool */
     private $ttyMode;

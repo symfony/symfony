@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class ConstantNode extends Node
+final class ConstantNode extends Node
 {
     public function __construct($value)
     {

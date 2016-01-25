@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
  *
  * @internal
  */
-class IntlBundleReader implements BundleReaderInterface
+final class IntlBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}

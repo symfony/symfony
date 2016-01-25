@@ -24,7 +24,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *
  * @internal
  */
-class WindowsPipes extends AbstractPipes
+final class WindowsPipes extends AbstractPipes
 {
     /** @var array */
     private $files = array();

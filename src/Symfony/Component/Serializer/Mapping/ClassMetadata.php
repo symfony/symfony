@@ -15,8 +15,10 @@ namespace Symfony\Component\Serializer\Mapping;
  * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
-class ClassMetadata implements ClassMetadataInterface
+final class ClassMetadata implements ClassMetadataInterface
 {
     /**
      * @var string

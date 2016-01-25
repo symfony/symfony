@@ -20,7 +20,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
  *
  * @internal
  */
-class ApplicationDescription
+final class ApplicationDescription
 {
     const GLOBAL_NAMESPACE = '_global';
 

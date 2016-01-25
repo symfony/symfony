@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\Data\Bundle\Writer;
  *
  * @internal
  */
-class JsonBundleWriter implements BundleWriterInterface
+final class JsonBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}

@@ -25,7 +25,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  *
  * @internal
  */
-class RegionDataGenerator extends AbstractDataGenerator
+final class RegionDataGenerator extends AbstractDataGenerator
 {
     const UNKNOWN_REGION_ID = 'ZZ';
 

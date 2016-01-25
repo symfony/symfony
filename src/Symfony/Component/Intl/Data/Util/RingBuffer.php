@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  *
  * @internal
  */
-class RingBuffer implements \ArrayAccess
+final class RingBuffer implements \ArrayAccess
 {
     private $values = array();
 

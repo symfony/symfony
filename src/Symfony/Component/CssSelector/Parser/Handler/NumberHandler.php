@@ -26,7 +26,7 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  *
  * @internal
  */
-class NumberHandler implements HandlerInterface
+final class NumberHandler implements HandlerInterface
 {
     /**
      * @var TokenizerPatterns

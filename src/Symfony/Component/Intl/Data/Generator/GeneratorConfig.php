@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Data\Bundle\Writer\BundleWriterInterface;
  *
  * @internal
  */
-class GeneratorConfig
+final class GeneratorConfig
 {
     /**
      * @var string

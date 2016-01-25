@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @internal You should not instantiate or use this class. Code against
  *           {@link ExecutionContextFactoryInterface} instead.
  */
-class ExecutionContextFactory implements ExecutionContextFactoryInterface
+final class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
     /**
      * @var TranslatorInterface

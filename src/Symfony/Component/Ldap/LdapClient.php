@@ -21,7 +21,7 @@ use Symfony\Component\Ldap\Exception\LdapException;
  *
  * @internal
  */
-class LdapClient implements LdapClientInterface
+final class LdapClient implements LdapClientInterface
 {
     private $host;
     private $port;

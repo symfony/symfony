@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  *
  * @internal
  */
-class GenrbCompiler implements BundleCompilerInterface
+final class GenrbCompiler implements BundleCompilerInterface
 {
     /**
      * @var string The path to the "genrb" executable.

@@ -21,7 +21,7 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  *
  * @internal
  */
-class TokenizerPatterns
+final class TokenizerPatterns
 {
     /**
      * @var string

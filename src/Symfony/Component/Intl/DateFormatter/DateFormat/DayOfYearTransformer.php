@@ -18,7 +18,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  *
  * @internal
  */
-class DayOfYearTransformer extends Transformer
+final class DayOfYearTransformer extends Transformer
 {
     /**
      * {@inheritdoc}

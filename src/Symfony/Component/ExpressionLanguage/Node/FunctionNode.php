@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class FunctionNode extends Node
+final class FunctionNode extends Node
 {
     public function __construct($name, Node $arguments)
     {

@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @internal
  */
-class ArgumentsNode extends ArrayNode
+final class ArgumentsNode extends ArrayNode
 {
     public function compile(Compiler $compiler)
     {

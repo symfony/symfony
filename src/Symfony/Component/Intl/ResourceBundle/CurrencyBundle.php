@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  *
  * @internal
  */
-class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
+final class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
 {
     /**
      * @var LocaleDataProvider

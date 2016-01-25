@@ -27,7 +27,7 @@ use Symfony\Component\Intl\Locale;
  *
  * @internal
  */
-class LocaleDataGenerator
+final class LocaleDataGenerator
 {
     /**
      * @var string

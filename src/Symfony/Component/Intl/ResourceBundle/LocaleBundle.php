@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  *
  * @internal
  */
-class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
+final class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
 {
     /**
      * {@inheritdoc}

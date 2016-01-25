@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Route;
  *
  * @internal
  */
-class DumperRoute
+final class DumperRoute
 {
     /**
      * @var string

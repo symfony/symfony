@@ -26,7 +26,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  *
  * @internal
  */
-class Tokenizer
+final class Tokenizer
 {
     /**
      * @var Handler\HandlerInterface[]

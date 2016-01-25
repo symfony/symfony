@@ -26,7 +26,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  *
  * @internal
  */
-class HtmlExtension extends AbstractExtension
+final class HtmlExtension extends AbstractExtension
 {
     /**
      * Constructor.

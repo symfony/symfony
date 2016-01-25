@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-01-19T15:21:05Z
+
+@nicolas-grekas is this subject to race conditions between reading items and updating the cache during the iteration ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-19T15:23:19Z
+
+@stof I'd say it's up to the concrete adapter to deal with this. If one adapter chooses to return an iterator/generator, it's up to it to deal with this kind of consequences. Would you agree?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-19T15:37:05Z
+
+@nicolas-grekas even if they don't return a generator, the cache system still use one, and performs ``doFetch`` in the middle of the generator iteration. So it may also be impacted.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-19T15:45:09Z
+
+If they do return an array (like Apcu/Doctrine adapters) then the result set is "frozen" in the generator. The behavior is well defined, so not subject to race conditions. PSR-6 doesn't specify if returned traversable are "live" or not, but we could argue that the "array" requirement means they should be frozen. We maybe should add this in our test suite, don't you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-19T15:51:59Z
+
+@nicolas-grekas adding this to the testsuite is a good idea (and is what I suggested in https://github.com/php-cache/integration-tests/pull/34#issuecomment-172880337)
+
+Are you sure that adapters cannot be affected ? doFetch is not at the beginning of the iteration
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-19T16:10:54Z
+
+@stof I moved the doFetch first and also added an isset check around deferred.
+About deferred, this should be always empty since we commit them before fetching.
+$deferred can still be non empty if saving some deferred failed.
+Could you review the failure handling logic around deferred? It's a complex topic and you may have some ideas for the better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-19T16:17:19Z
+
+@stof btw adding the test we're talking about should maybe not be included in the integration tests but only in our own test suite, since psr-6 has no requirements here (unless someone explains that there are?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-19T21:39:26Z
+
+@stof PR is ready. Please note that I'm now AFK until the end of January, so feel free to take over this PR as I won't be able to resolve any comments until then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-23T10:22:59Z
+
+No comment? Ping @symfony/deciders

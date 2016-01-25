@@ -142,11 +142,13 @@ class UniqueEntityValidator extends ConstraintValidator
         if ($this->context instanceof ExecutionContextInterface) {
             $this->context->buildViolation($constraint->message)
                 ->atPath($errorPath)
+                ->setParameter('{{ value }}', $invalidValue)
                 ->setInvalidValue($invalidValue)
                 ->addViolation();
         } else {
             $this->buildViolation($constraint->message)
                 ->atPath($errorPath)
+                ->setParameter('{{ value }}', $invalidValue)
                 ->setInvalidValue($invalidValue)
                 ->addViolation();
         }

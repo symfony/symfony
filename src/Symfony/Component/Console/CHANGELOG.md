@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added truncate method to FormatterHelper
+
 2.8.0
 -----
 

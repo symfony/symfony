@@ -20,9 +20,9 @@ class DoctrineAdapter extends AbstractAdapter
 {
     private $provider;
 
-    public function __construct(CacheProvider $provider, $defaultLifetime = null)
+    public function __construct(CacheProvider $provider, $defaultLifetime = null, AdapterInterface $decorated = null)
     {
-        parent::__construct('', $defaultLifetime);
+        parent::__construct('', $defaultLifetime, $decorated);
         $this->provider = $provider;
     }
 

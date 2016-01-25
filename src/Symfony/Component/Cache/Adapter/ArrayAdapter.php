@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements CacheItemPoolInterface
+class ArrayAdapter implements AdapterInterface
 {
     private $values = array();
     private $expiries = array();

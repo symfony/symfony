@@ -123,7 +123,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testNotExistingConstraintIndex()
+    public function testMissingConstraintIndex()
     {
         $object = new \stdClass();
         $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);

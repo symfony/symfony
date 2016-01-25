@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-01-16T20:27:02Z
+
+@xabbuh what was the purpose of this PR? It just seems to make the code less readable. Forcing a boolean `link` variable that means "do you want a link" (as it is now) makes sense to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-16T22:50:34Z
+
+@weaverryan I thought about that when removing a hint in the docs which said that the default value was `true` (so it looks like there was some kind of expectation about desired behaviour). So this change would make it a bit easier for developers using the template (in case we think that showing something in the panel would be an opt-in feature as beside setting `link` to `true` you would also have to provide some more markup).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-01-17T17:56:28Z
+
+@xabbuh I understand. How does the current `link` value default to `true`? I don't see it in the code - I just see how you include this `toolbar_item.html.twig` template manually (like is shown in the docs): http://symfony.com/doc/current/cookbook/profiler/data_collector.html#adding-web-profiler-templates
+
+Currently, it looks like you must pass `link` (else you'd get an undefined variable error). Am I wrong?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-01-18T16:31:27Z
+
+There is any way to check if `menu` and `panel` blocks are defined in the collector template? if possible, this could remove the `link` parameter and everything would be easier.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-18T18:25:06Z
+
+@weaverryan It does not (that's why the description was wrong). And this change just makes it possible that you only have to pass the variable at all if you want to have the profiler link included.

@@ -1,0 +1,169 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-11T11:16:38Z
+
+Thank you @javiereguiluz You are awesome.
+
+I can confirm that this resolves the issue on the profiler page.
+
+This does **not** however address the issue in the toolbar. The "q." is outside the of the box. See attached screen shots
+
+![screen shot 2016-01-11 at 10 19 40](https://cloud.githubusercontent.com/assets/1275206/12232163/1b6b44e2-b85d-11e5-9b4b-b44d4171a2bc.png)
+![screen shot 2016-01-11 at 12 15 14](https://cloud.githubusercontent.com/assets/1275206/12232164/1b724350-b85d-11e5-956a-b90164f51b25.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-11T11:27:22Z
+
+Regarding the pending bug, is your HTML code similar to this?
+
+```html
+<div class="sf-toolbar-block">
+    <a href="...">
+        <div class="sf-toolbar-icon">
+            <svg ...></svg>
+
+            <span class="sf-toolbar-value">1</span>
+            <span class="sf-toolbar-label">req</span>
+        </div>
+    </a>
+
+    <div class="sf-toolbar-info">
+        ...
+    </div>
+</div>
+```
+
+Because I cannot reproduce the bug:
+
+![debug_toolbar](https://cloud.githubusercontent.com/assets/73419/12232412/a610ec4a-b85e-11e5-9ab3-c33bf00799b8.gif)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-11T11:39:21Z
+
+Yes, my HTML was similar to that.
+
+With HTML copied from the documentation:
+```twig
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as macro %}
+
+{% block toolbar %}
+    {% if collector.totalRequests > 0 %}
+        {% set icon %}
+            {{ include('@Httplug/Icon/httplug.svg') }}
+            <span class="sf-toolbar-status">Request</span>
+        {% endset %}
+
+        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { link: false } %}
+    {% endif %}
+{% endblock %}
+```
+
+![screen shot 2016-01-11 at 12 37 52](https://cloud.githubusercontent.com/assets/1275206/12232595/3f62b29c-b860-11e5-9937-955af4263f57.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-11T11:48:41Z
+
+We don't use `sf-toolbar-status` in the toolbar for the built-in Symfony panels, but I did some quick test and it should work:
+
+![debug_toolbar_status](https://cloud.githubusercontent.com/assets/73419/12232747/8e51664a-b861-11e5-9daa-f94c63f5ae77.gif)
+
+In some bundle I use the `.*-status` class and it also works as expected:
+
+![debug_status](https://cloud.githubusercontent.com/assets/73419/12232748/9c30861a-b861-11e5-985f-84aa53bd1e09.png)
+
+This is very strange.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-11T15:14:55Z
+
+I think I made some progress. I removed my bundle from the equation and started with the twig icon.
+
+The twig.svg file looks like this:
+```svg
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" height="24" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+<path fill="#AAAAAA" d="M20.1,1H3.9C2.3,1,1,2.3,1,3.9v16.3C1,21.7,2.3,23,3.9,23h16.3c1.6,0,2.9-1.3,2.9-2.9V3.9
+    C23,2.3,21.7,1,20.1,1z M21,20.1c0,0.5-0.4,0.9-0.9,0.9H3.9C3.4,21,3,20.6,3,20.1V3.9C3,3.4,3.4,3,3.9,3h16.3C20.6,3,21,3.4,21,3.9
+    V20.1z M5,5h14v3H5V5z M5,10h3v9H5V10z M10,10h9v9h-9V10z"/>
+</svg>
+```
+And renders as we expect.
+
+If I edit the twig.svg by removing `height="24"` so it looks like this:
+```svg
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
+<path fill="#AAAAAA" d="M20.1,1H3.9C2.3,1,1,2.3,1,3.9v16.3C1,21.7,2.3,23,3.9,23h16.3c1.6,0,2.9-1.3,2.9-2.9V3.9
+    C23,2.3,21.7,1,20.1,1z M21,20.1c0,0.5-0.4,0.9-0.9,0.9H3.9C3.4,21,3,20.6,3,20.1V3.9C3,3.4,3.4,3,3.9,3h16.3C20.6,3,21,3.4,21,3.9
+    V20.1z M5,5h14v3H5V5z M5,10h3v9H5V10z M10,10h9v9h-9V10z"/>
+</svg>
+```
+
+Then we will see the bug.
+
+![screen shot 2016-01-11 at 16 12 24](https://cloud.githubusercontent.com/assets/1275206/12237333/7084c888-b87e-11e5-8577-9e8616567796.png)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-11T20:33:04Z
+
+This will solve the issue:
+```css
+.sf-toolbar-block .sf-toolbar-icon img,
+.sf-toolbar-block .sf-toolbar-icon svg {
+    height: 20px;
+}
+```
+But I'm not sure we should use a fix height.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-20T11:25:30Z
+
+Sorry for the delay. After several tests, I think @Nyholm's solution is the best one. Thanks for sharing it!
+
+I did these changes:
+
+```diff
+.sf-toolbarreset svg,
+.sf-toolbarreset img {
+-    max-height: 20px;
+-    max-width: 20px;
++    height: 20px;
+}
+
+#menu-profiler .label .icon img,
+#menu-profiler .label .icon svg {
+-    max-height: 24px;
++    height: 24px;
+     max-width: 24px;
+}
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-20T11:32:59Z
+
+Thank you for getting back.
+
+You all probably know this but I just want to highlight this. The sizes of the icons in the toolbar has changed from 2.7 to 2.8. Which means that this fix should not be merged "as is" to 2.7.
+
+Symfony 2.7 uses 28px toolbar icons if i remember correctly.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-20T14:10:52Z
+
+@Nyholm this PR does not target Symfony 2.7 at all currently
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-01-20T14:20:23Z
+
+> @Nyholm this PR does not target Symfony 2.7 at all currently
+
+Yeah, I know. My point was to highlight the fact that this PR should not be merged to 2.7

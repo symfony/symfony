@@ -62,7 +62,7 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against the constraints defined
             // in the form
-            $constraints = $config->getOption('constraints');
+            $constraints = $config->getOption('constraints', array());
             foreach ($constraints as $constraint) {
                 // For the "Valid" constraint, validate the data in all groups
                 if ($constraint instanceof Valid) {

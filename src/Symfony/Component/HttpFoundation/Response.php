@@ -1023,11 +1023,12 @@ class Response
         return $notModified;
     }
 
-    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     /**
      * Is response invalid?
      *
      * @return bool
+     *
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      */
     public function isInvalid()
     {

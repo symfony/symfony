@@ -54,6 +54,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         $bundles = $this->initializeBundles();
         foreach ($bundles as $bundle) {
             if ($name === $bundle->getName()) {
+                if (!$bundle->getContainerExtension()) {
+                    throw new \LogicException(sprintf('Bundle "%s" does not have a container extension.', $name));
+                }
+
                 return $bundle->getContainerExtension();
             }
 

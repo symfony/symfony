@@ -631,6 +631,7 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')
+                                        ->defaultNull()
                                         ->beforeNormalization()
                                         ->ifTrue(function ($v) { return '' === $v; })
                                         ->then(function ($v) { return; })

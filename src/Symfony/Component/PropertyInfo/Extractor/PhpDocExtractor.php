@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use phpDocumentor\Reflection\ClassReflector;
 use phpDocumentor\Reflection\DocBlock;
-use phpDocumentor\Reflection\FileReflector;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\ContextFactory;
+use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -30,35 +32,48 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     const MUTATOR = 2;
 
     /**
-     * @var FileReflector[]
-     */
-    private $fileReflectors = array();
-
-    /**
      * @var DocBlock[]
      */
     private $docBlocks = array();
+
+    /**
+     * @var DocBlockFactory
+     */
+    private $docBlockFactory;
+
+    /**
+     * @var ContextFactory
+     */
+    private $contextFactory;
+
+    public function __construct()
+    {
+        $this->docBlockFactory = DocBlockFactory::createInstance();
+        $this->contextFactory = new ContextFactory();
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getShortDescription($class, $property, array $context = array())
     {
+        /** @var $docBlock DocBlock */
         list($docBlock) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return;
         }
 
-        $shortDescription = $docBlock->getShortDescription();
-        if ($shortDescription) {
+        $shortDescription = $docBlock->getSummary();
+
+        if (!empty($shortDescription)) {
             return $shortDescription;
         }
 
         foreach ($docBlock->getTagsByName('var') as $var) {
-            $parsedDescription = $var->getParsedDescription();
+            $varDescription = $var->getDescription()->render();
 
-            if (isset($parsedDescription[0]) && '' !== $parsedDescription[0]) {
-                return $parsedDescription[0];
+            if (!empty($varDescription)) {
+                return $varDescription;
             }
         }
     }
@@ -68,12 +83,13 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     public function getLongDescription($class, $property, array $context = array())
     {
+        /** @var $docBlock DocBlock */
         list($docBlock) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return;
         }
 
-        $contents = $docBlock->getLongDescription()->getContents();
+        $contents = $docBlock->getDescription()->render();
 
         return '' === $contents ? null : $contents;
     }
@@ -83,6 +99,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     public function getTypes($class, $property, array $context = array())
     {
+        /** @var $docBlock DocBlock */
         list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return;
@@ -103,8 +120,31 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         $types = array();
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
-            $varTypes = $tag->getTypes();
+            $varType = $tag->getType();
+            $nullable = false;
+
+            if (!$varType instanceof Compound) {
+                if ($varType instanceof Null_) {
+                    $nullable = true;
+                }
+
+                $type = $this->createType((string) $varType, $nullable);
+
+                if (null !== $type) {
+                    $types[] = $type;
+                }
+
+                continue;
+            }
+
+            $typeIndex = 0;
+            $varTypes = array();
+            while ($varType->has($typeIndex)) {
+                $varTypes[] = (string) $varType->get($typeIndex);
+                ++$typeIndex;
+            }
 
             // If null is present, all types are nullable
             $nullKey = array_search(Type::BUILTIN_TYPE_NULL, $varTypes);
@@ -132,29 +172,6 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         return array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0]));
-    }
-
-    /**
-     * Gets the FileReflector associated with the class.
-     *
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return FileReflector|null
-     */
-    private function getFileReflector(\ReflectionClass $reflectionClass)
-    {
-        if (!($fileName = $reflectionClass->getFileName()) || 'hh' === pathinfo($fileName, PATHINFO_EXTENSION)) {
-            return;
-        }
-
-        if (isset($this->fileReflectors[$fileName])) {
-            return $this->fileReflectors[$fileName];
-        }
-
-        $this->fileReflectors[$fileName] = new FileReflector($fileName);
-        $this->fileReflectors[$fileName]->process();
-
-        return $this->fileReflectors[$fileName];
     }
 
     /**
@@ -212,27 +229,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        $reflectionCLass = $reflectionProperty->getDeclaringClass();
-
-        $fileReflector = $this->getFileReflector($reflectionCLass);
-        if (!$fileReflector) {
-            return;
-        }
-
-        foreach ($fileReflector->getClasses() as $classReflector) {
-            $className = $this->getClassName($classReflector);
-
-            if ($className === $reflectionCLass->name) {
-                foreach ($classReflector->getProperties() as $propertyReflector) {
-                    // strip the $ prefix
-                    $propertyName = substr($propertyReflector->getName(), 1);
-
-                    if ($propertyName === $property) {
-                        return $propertyReflector->getDocBlock();
-                    }
-                }
-            }
-        }
+        return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty));
     }
 
     /**
@@ -242,11 +239,12 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string $ucFirstProperty
      * @param int    $type
      *
-     * @return DocBlock|null
+     * @return array
      */
     private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
     {
         $prefixes = $type === self::ACCESSOR ? ReflectionExtractor::$accessorPrefixes : ReflectionExtractor::$mutatorPrefixes;
+        $prefix = null;
 
         foreach ($prefixes as $prefix) {
             $methodName = $prefix.$ucFirstProperty;
@@ -269,39 +267,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        $reflectionClass = $reflectionMethod->getDeclaringClass();
-        $fileReflector = $this->getFileReflector($reflectionClass);
-
-        if (!$fileReflector) {
-            return;
-        }
-
-        foreach ($fileReflector->getClasses() as $classReflector) {
-            $className = $this->getClassName($classReflector);
-
-            if ($className === $reflectionClass->name) {
-                if ($methodReflector = $classReflector->getMethod($methodName)) {
-                    return array($methodReflector->getDocBlock(), $prefix);
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the normalized class name (without trailing backslash).
-     *
-     * @param ClassReflector $classReflector
-     *
-     * @return string
-     */
-    private function getClassName(ClassReflector $classReflector)
-    {
-        $className = $classReflector->getName();
-        if ('\\' === $className[0]) {
-            return substr($className, 1);
-        }
-
-        return $className;
+        return array($this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix);
     }
 
     /**

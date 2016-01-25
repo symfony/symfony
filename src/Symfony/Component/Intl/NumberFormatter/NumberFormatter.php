@@ -709,11 +709,9 @@ class NumberFormatter
     private function round($value, $precision)
     {
         $precision = $this->getUnitializedPrecision($value, $precision);
-
         $roundingMode = self::$phpRoundingMap[$this->getAttribute(self::ROUNDING_MODE)];
-        $value = round($value, $precision, $roundingMode);
 
-        return $value;
+        return round($value, $precision, $roundingMode);
     }
 
     /**

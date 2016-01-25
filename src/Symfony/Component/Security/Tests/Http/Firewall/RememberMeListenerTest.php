@@ -140,7 +140,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionStrategy()
     {
-        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, true, true);
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
         $tokenStorage
             ->expects($this->once())

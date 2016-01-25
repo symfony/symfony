@@ -856,7 +856,7 @@ QUERY;
      */
     private function updateNewAceProperty($name, array $changes)
     {
-        list($old, $new) = $changes;
+        list(, $new) = $changes;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();

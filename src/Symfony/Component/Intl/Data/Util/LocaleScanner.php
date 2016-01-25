@@ -67,7 +67,7 @@ class LocaleScanner
      */
     public function scanAliases($sourceDir)
     {
-        $locales = $this->scanLocales($sourceDir, '.txt');
+        $locales = $this->scanLocales($sourceDir);
         $aliases = array();
 
         // Delete locales that are no aliases

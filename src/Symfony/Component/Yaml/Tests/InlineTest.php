@@ -255,7 +255,6 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '12.30e+02' => 12.30e+02,
             '1234' => 0x4D2,
             '1243' => 02333,
-            '.Inf' => -log(0),
             '-.Inf' => log(0),
             "'686e444'" => '686e444',
             '.Inf' => 646e444,

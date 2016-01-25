@@ -1707,8 +1707,6 @@ class Request
             return '/';
         }
 
-        $pathInfo = '/';
-
         // Remove the query string from REQUEST_URI
         if ($pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);

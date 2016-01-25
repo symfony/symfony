@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -104,5 +105,25 @@ final class CacheItem implements CacheItemInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Internal logging helper.
+     *
+     * @internal
+     */
+    public function log(LoggerInterface $logger = null, $message, $context = array())
+    {
+        if ($logger) {
+            $logger->warning($message, $context);
+        } else {
+            $replace = array();
+            foreach ($context as $k => $v) {
+                if (is_scalar($v)) {
+                    $replace['{'.$k.'}'] = $v;
+                }
+            }
+            @trigger_error(strtr($message, $replace), E_USER_WARNING);
+        }
     }
 }

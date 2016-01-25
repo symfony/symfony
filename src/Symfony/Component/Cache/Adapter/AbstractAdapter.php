@@ -13,14 +13,18 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements CacheItemPoolInterface
+abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private $namespace;
     private $deferred = array();
     private $createCacheItem;
@@ -119,8 +123,12 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         $isHit = false;
         $value = null;
 
-        foreach ($this->doFetch(array($id)) as $value) {
-            $isHit = true;
+        try {
+            foreach ($this->doFetch(array($id)) as $value) {
+                $isHit = true;
+            }
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', array('key' => $key, 'exception' => $e));
         }
 
         return $f($key, $value, $isHit);
@@ -139,7 +147,12 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         foreach ($keys as $key) {
             $ids[$key] = $this->getId($key);
         }
-        $items = $this->doFetch($ids);
+        try {
+            $items = $this->doFetch($ids);
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to fetch requested items', array('keys' => $keys, 'exception' => $e));
+            $items = array();
+        }
         $ids = array_flip($ids);
 
         return $this->generateItems($items, $ids);
@@ -154,15 +167,28 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
 
         if (isset($this->deferred[$key])) {
             $item = (array) $this->deferred[$key];
-            $ok = $this->doSave(array($item[CacheItem::CAST_PREFIX.'key'] => $item[CacheItem::CAST_PREFIX.'value']), $item[CacheItem::CAST_PREFIX.'lifetime']);
-            unset($this->deferred[$key]);
+            try {
+                $e = null;
+                $value = $item[CacheItem::CAST_PREFIX.'value'];
+                $ok = $this->doSave(array($key => $value), $item[CacheItem::CAST_PREFIX.'lifetime']);
+                unset($this->deferred[$key]);
 
-            if (true === $ok || array() === $ok) {
-                return true;
+                if (true === $ok || array() === $ok) {
+                    return true;
+                }
+            } catch (\Exception $e) {
             }
+            $type = is_object($value) ? get_class($value) : gettype($value);
+            CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
         }
 
-        return $this->doHave($id);
+        try {
+            return $this->doHave($id);
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', array('key' => $key, 'exception' => $e));
+
+            return false;
+        }
     }
 
     /**
@@ -172,7 +198,13 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
     {
         $this->deferred = array();
 
-        return $this->doClear($this->namespace);
+        try {
+            return $this->doClear($this->namespace);
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to clear the cache', array('exception' => $e));
+
+            return false;
+        }
     }
 
     /**
@@ -195,7 +227,29 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
             unset($this->deferred[$key]);
         }
 
-        return $this->doDelete($ids);
+        try {
+            if ($this->doDelete($ids)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+        }
+
+        $ok = true;
+
+        // When bulk-save failed, retry each item individually
+        foreach ($ids as $key => $id) {
+            try {
+                $e = null;
+                if ($this->doDelete(array($id))) {
+                    continue;
+                }
+            } catch (\Exception $e) {
+            }
+            CacheItem::log($this->logger, 'Failed to delete key "{key}"', array('key' => $key, 'exception' => $e));
+            $ok = false;
+        }
+
+        return $ok;
     }
 
     /**
@@ -225,9 +279,9 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         try {
             $item = clone $item;
         } catch (\Exception $e) {
-            @trigger_error($e->__toString());
-
-            return false;
+            $value = $item->get();
+            $type = is_object($value) ? get_class($value) : gettype($value);
+            CacheItem::log($this->logger, 'Failed to clone key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
         }
         $this->deferred[$item->getKey()] = $item;
 
@@ -243,8 +297,12 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         $ko = array();
 
         foreach ($f($this->deferred, $this->namespace) as $lifetime => $values) {
-            if (true === $ok = $this->doSave($values, $lifetime)) {
-                continue;
+            try {
+                if (true === $ok = $this->doSave($values, $lifetime)) {
+                    continue;
+                }
+            } catch (\Exception $e) {
+                $ok = false;
             }
             if (false === $ok) {
                 $ok = array_keys($values);
@@ -260,11 +318,15 @@ abstract class AbstractAdapter implements CacheItemPoolInterface
         // When bulk-save failed, retry each item individually
         foreach ($ko as $lifetime => $values) {
             foreach ($values as $v) {
-                if (!in_array($this->doSave($v, $lifetime), array(true, array()), true)) {
+                try {
+                    $e = $this->doSave($v, $lifetime);
+                } catch (\Exception $e) {
+                }
+                if (true !== $e && array() !== $e) {
                     $ok = false;
-
                     foreach ($v as $key => $value) {
-                        @trigger_error(sprintf('Failed to cache key "%s" of type "%s"', is_object($value) ? get_class($value) : gettype($value)));
+                        $type = is_object($value) ? get_class($value) : gettype($value);
+                        CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
                     }
                 }
             }

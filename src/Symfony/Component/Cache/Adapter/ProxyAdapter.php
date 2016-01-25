@@ -56,14 +56,7 @@ class ProxyAdapter implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
-        $f = $this->createCacheItem;
-        $items = array();
-
-        foreach ($this->pool->getItems($keys) as $key => $item) {
-            $items[$key] = $f($key, $item->get(), $item->isHit());
-        }
-
-        return $items;
+        return $this->generateItems($this->pool->getItems($keys));
     }
 
     /**
@@ -127,12 +120,20 @@ class ProxyAdapter implements CacheItemPoolInterface
         if (!$item instanceof CacheItem) {
             return false;
         }
-        static $prefix = "\0Symfony\Component\Cache\CacheItem\0";
         $item = (array) $item;
-        $poolItem = $this->pool->getItem($item[$prefix.'key']);
-        $poolItem->set($item[$prefix.'value']);
-        $poolItem->expiresAfter($item[$prefix.'lifetime']);
+        $poolItem = $this->pool->getItem($item[CacheItem::CAST_PREFIX.'key']);
+        $poolItem->set($item[CacheItem::CAST_PREFIX.'value']);
+        $poolItem->expiresAfter($item[CacheItem::CAST_PREFIX.'lifetime']);
 
         return $this->pool->$method($poolItem);
+    }
+
+    private function generateItems($items)
+    {
+        $f = $this->createCacheItem;
+
+        foreach ($items as $key => $item) {
+            yield $key => $f($key, $item->get(), $item->isHit());
+        }
     }
 }

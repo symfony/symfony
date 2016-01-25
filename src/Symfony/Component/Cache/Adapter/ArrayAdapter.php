@@ -118,11 +118,10 @@ class ArrayAdapter implements CacheItemPoolInterface
         if (!$item instanceof CacheItem) {
             return false;
         }
-        static $prefix = "\0Symfony\Component\Cache\CacheItem\0";
         $item = (array) $item;
-        $key = $item[$prefix.'key'];
-        $value = $item[$prefix.'value'];
-        $lifetime = $item[$prefix.'lifetime'];
+        $key = $item[CacheItem::CAST_PREFIX.'key'];
+        $value = $item[CacheItem::CAST_PREFIX.'value'];
+        $lifetime = $item[CacheItem::CAST_PREFIX.'lifetime'];
 
         if (0 > $lifetime) {
             return true;

@@ -45,7 +45,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear()
+    protected function doClear($namespace)
     {
         return $this->provider->flushAll();
     }

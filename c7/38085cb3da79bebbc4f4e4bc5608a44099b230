@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-12-10T11:09:24Z
+
+is this actually necessary ? This computes it once instead of twice, but it happens at warmup time any way
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-10T11:30:40Z
+
+With the new cache system of PropertyAccess and PropertyInfo it will do it 4 times (and the code will be copy/pasted 4 times too).

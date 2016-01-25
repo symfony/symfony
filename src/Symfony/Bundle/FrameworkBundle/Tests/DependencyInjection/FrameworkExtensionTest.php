@@ -209,7 +209,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         // packages
         $packages = $packages->getArgument(1);
-        $this->assertCount(4, $packages);
+        $this->assertCount(5, $packages);
 
         $package = $container->getDefinition($packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
@@ -222,6 +222,19 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition($packages['bar']);
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+
+        $package = $container->getDefinition($packages['bar_version_strategy']);
+        $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
+    }
+
+    public function testAssetsDefaultVersionStrategyAsService()
+    {
+        $container = $this->createContainerFromFile('assets_version_strategy_as_service');
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 
     public function testTranslator()

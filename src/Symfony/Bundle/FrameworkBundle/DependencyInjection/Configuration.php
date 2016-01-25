@@ -364,6 +364,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->fixXmlConfig('base_url')
                     ->children()
+                        ->scalarNode('version_strategy')->defaultNull()->end()
                         ->scalarNode('version')->defaultNull()->end()
                         ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
                         ->scalarNode('base_path')->defaultValue('')->end()
@@ -376,6 +377,12 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return (null !== $v['version_strategy'] && null !== $v['version']);
+                        })
+                        ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets".')
+                    ->end()
                     ->fixXmlConfig('package')
                     ->children()
                         ->arrayNode('packages')
@@ -383,6 +390,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')
                                 ->children()
+                                    ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')->defaultNull()->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()
@@ -394,6 +402,12 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                         ->prototype('scalar')->end()
                                     ->end()
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return (null !== $v['version_strategy'] && null !== $v['version']);
+                                    })
+                                    ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
                         ->end()

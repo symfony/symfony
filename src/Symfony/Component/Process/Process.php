@@ -253,9 +253,6 @@ class Process
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
         }
-        if ($this->outputDisabled && null !== $callback) {
-            throw new LogicException('Output has been disabled, enable it to allow the use of a callback.');
-        }
 
         $this->resetProcessData();
         $this->starttime = $this->lastOutputTime = microtime(true);
@@ -353,7 +350,12 @@ class Process
         $this->requireProcessIsStarted(__FUNCTION__);
 
         $this->updateStatus(false);
+
         if (null !== $callback) {
+            if (!$this->processPipes->haveReadSupport()) {
+                $this->stop(0);
+                throw new \LogicException('Pass the callback to the Process:start method or enableOutput to use a callback with Process::wait');
+            }
             $this->callback = $this->buildCallback($callback);
         }
 
@@ -1201,6 +1203,18 @@ class Process
     }
 
     /**
+     * Returns whether a callback is used on underlying process output.
+     *
+     * @internal
+     *
+     * @return bool
+     */
+    public function hasCallback()
+    {
+        return (bool) $this->callback;
+    }
+
+    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
@@ -1226,10 +1240,19 @@ class Process
      *
      * @return \Closure A PHP closure
      */
-    protected function buildCallback($callback)
+    protected function buildCallback(callable $callback = null)
     {
+        if ($this->outputDisabled) {
+            return function ($type, $data) use ($callback) {
+                if (null !== $callback) {
+                    call_user_func($callback, $type, $data);
+                }
+            };
+        }
+
         $out = self::OUT;
-        $callback = function ($type, $data) use ($callback, $out) {
+
+        return function ($type, $data) use ($callback, $out) {
             if ($out == $type) {
                 $this->addOutput($data);
             } else {

@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T11:14:01Z
+
+ping @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-18T11:19:52Z
+
+I can't reproduce the issue (Sf 3.0, Chrome 47, Mac):
+
+![panel_right](https://cloud.githubusercontent.com/assets/73419/11895783/90cb9b04-a581-11e5-83b3-6d09187b8648.gif)
+
+---------------------------------------------------------------------------
+
+by aschempp at 2015-12-21T21:28:28Z
+
+@javiereguiluz Looks like your panel popup is opening to the left. That's because the Doctrine panel seems not to be wide enough to have room for the width of the popup. Please try to add another panel that floats to the right so that the config panel should open to the right.
+Also be aware that the rule is only active if the screen size is at least 768px.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2016-01-13T20:35:22Z
+
+Here's a follow-up screencast to show the problem.
+
+![uls4fk8jke](https://cloud.githubusercontent.com/assets/1073273/12307102/8a3bfd76-ba3d-11e5-872d-80bf3518fe97.gif)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T08:09:07Z
+
+What's the status of this PR? @javiereguiluz Can you have a look at this one?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-25T08:32:01Z
+
+I can confirm that this PR fixes the issue:
+
+| Before | After
+| --- | ---
+| ![before](https://cloud.githubusercontent.com/assets/73419/12545903/5cb604ac-c346-11e5-8865-364750420705.gif) | ![after](https://cloud.githubusercontent.com/assets/73419/12545911/649cadf6-c346-11e5-99d1-d8603e20ad8b.gif)
+
+Thanks @aschempp.

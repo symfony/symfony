@@ -150,7 +150,7 @@ EOF
             return;
         }
 
-        $resultMessage = 'Translation files were successfully updated.';
+        $resultMessage = 'Translation files were successfully updated';
 
         // show compiled list of messages
         if (true === $input->getOption('dump-messages')) {
@@ -206,10 +206,10 @@ EOF
             $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
 
             if (true === $input->getOption('dump-messages')) {
-                $resultMessage .= ' and translation files were updated.';
+                $resultMessage .= ' and translation files were updated';
             }
         }
 
-        $io->success($resultMessage);
+        $io->success($resultMessage.'.');
     }
 }

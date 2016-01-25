@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by rvanlaak at 2015-12-18T09:38:48Z
+
+Libxml introduced [XML_MAX_TEXT_LENGTH](http://www.xmlsoft.org/html/libxml-parserInternals.html#XML_MAX_TEXT_LENGTH) in `2.9.0` and results in a limit of ~10MB per node. Libxml's `MAX_TEXT_LENGTH` cannot be changed via PHP, it is compiled in the library.
+
+We recently updated the library to `2.9.2` from `2.8.0` and aren't able to parse big xml files with the Serializer because of this. So, I think this should also be configurable for the Serializer component. Our problem is that the decoding happens before controller in the `FOS\RestBundle\EventListener\BodyListener:114`, but we only want to enable this setting for a couple of specific requests.
+
+Please also mention http://symfony.com/blog/security-release-symfony-2-0-17-released about the `LIBXML_PARSEHUGE` constant, it should definitely not be there by default.

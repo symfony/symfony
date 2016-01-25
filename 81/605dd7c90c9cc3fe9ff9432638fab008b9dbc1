@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by zerkms at 2015-10-08T03:18:44Z
+
+Guys, anyone?
+
+---------------------------------------------------------------------------
+
+by zerkms at 2015-11-12T03:51:22Z
+
+A traditional monthly reminder: guys, could someone please put some attention here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-12T21:43:40Z
+
+looks good to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-11-13T08:02:35Z
+
+Out of curiosity, why would you want to do that? Is it only for development purpose?
+
+---------------------------------------------------------------------------
+
+by zerkms at 2015-11-13T08:11:29Z
+
+@fabpot it's for production:
+
+I have the following configuration:
+
+1. haproxy terminates https and accepts incoming connections. It puts the original IP address to the X-Forwarded-For and sets x-forwarded-proto to https. So at this point in the remote address - the ip of haproxy, and the client's ip is in the header.
+2. nginx configured with `ngx_http_realip_module` replaces the remote adress with what we have X-Forwarded-For. This simplifies configuration - we can use white/black-lists using the remote ip address and we can use the standard log formats, etc.
+
+So far so good. But as you remember the application is served via HTTPS while symfony runs behind nginx http. Thankfully the x-forwarded-proto is there but for symfony to respect it the remote ip address must be trusted.
+
+What we have: all the requests to nginx come from a trusted proxy (everything is passed through haproxy) but the remote ip address is replaced with ngx_http_realip_module.
+
+Which means that for everything to work as we expected - we need to tell symfony to trust all ip's, hence to `0.0.0.0/0`.
+
+So in my implementation it's nginx that need to know who to trust to, and symfony just need to trust anyone, since everything was already constrained by haproxy and nginx.

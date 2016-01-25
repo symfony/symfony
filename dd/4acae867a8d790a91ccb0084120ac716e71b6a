@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-03T12:44:38Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by jderusse at 2015-12-03T22:24:23Z
+
+Notice that service `validator.mapping.cache.doctrine.apc `had been previously declared and merged (https://github.com/symfony/symfony/pull/14429/files) and documented (http://symfony.com/doc/current/reference/configuration/framework.html#reference-validation-cache) but then removed by @nicolas-grekas https://github.com/symfony/symfony/commit/5aa4a3b64c132d115ebecfbda16acfcaa076c458
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-03T22:59:58Z
+
+Yes, we can also notice that the `validator.mapping.cache.doctrine.apc` was a [feature of 2.8](https://github.com/symfony/symfony/pull/16550/files#diff-20927e8128c41c1ca78ff83d92cab550R139). It would have been really strange to make this feature and deprecate it directly.
+So everything seems to confirm [this line](https://github.com/symfony/symfony/commit/87e8e8fbff507cf5e8f805f19870c839318b044b#diff-c2459e2c1a786adcaaab00b70630b67fR50) was unintentional and logically targeting the `validator.mapping.cache.apc` service instead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-07T21:07:52Z
+
+:+1: but the `serializer.mapping.cache.apc` service should have be deprecated has well and new `serializer.mapping.cache.doctrine.apc` created.
+
+As the serializer and the validator only support Doctrine Cache, I don't see what the `doctrine` in the service name brings.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-08T13:46:55Z
+
+Something went wrong here. The `validator.mapping.cache.doctrine.apc` service [exists in 2.8](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bundle/FrameworkBundle/Resources/config/validator.xml#L42-L51). Looks like it was deprecated in 2.8 instead of `validator.mapping.cache.apc`, and then removed in master.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-08T14:12:38Z
+
+@jakzal : Yes, it's exactly what happened. But let's forget about this PR for now.
+Instead, a decision should be taken first on  #16822 where we should either:
+
+- Fix the deprecation on the right service (first commit)
+- Or let `validator.mapping.cache.doctrine.apc` deprecated in 2.8 and removed in 3.0 as @Tobion suggested in https://github.com/symfony/symfony/pull/16822#issuecomment-161654573 (second commit)
+
+What bothers me however is to deprecate a service in the same version it appeared. Maybe we should only fix the deprecation on the right service in 2.8, and then deprecate `validator.mapping.cache.doctrine.apc` as well as `serializer.mapping.cache.doctrine.apc` in 3.1, for a complete removal in 4.0...
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-10T07:32:22Z
+
+:+1: to merge this one.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-15T07:45:34Z
+
+Any update regarding this PR? This is a blocker to use Symfony 3 in prod.
+
+/cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-15T07:54:22Z
+
+I would be in favour of merging this one and trigger a deprecation in 2.8.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-12-15T10:13:02Z
+
+I suggest removing the second commit in #16822 (I'll do it right now) and merge it first. The deprecation should be fixed in 2.8 anyway. Then merge this one if necessary, but everything should be properly updated during the merge of 2.8 into 3.0.
+
+---------------------------------------------------------------------------
+
+by jonathanbull at 2015-12-27T14:13:47Z
+
+Any update regarding this PR? It looks like a fresh Symfony project still features an invalid `validator.mapping.cache.apc` setting.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-27T14:36:24Z
+
+Isn't it better to just quickly fix this error by merging this or mine PRs and then later decide on whether more actions should be taken? Currently, Symfony 3 with validator mapping cache just doesn't work as it should: bad dev experience...
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-01-15T10:36:54Z
+
+Any update on this?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-01-25T18:27:13Z
+
+@fabpot : Since #16822 is now merged, this one can be merged too in order to remove the last leftover of the `framework.validation.cache.apc` service :)

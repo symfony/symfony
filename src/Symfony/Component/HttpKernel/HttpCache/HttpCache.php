@@ -566,7 +566,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 $wait += 50000;
             }
 
-            if ($wait < 2000000) {
+            if ($wait < 5000000) {
                 // replace the current entry with the fresh one
                 $new = $this->lookup($request);
                 $entry->headers = $new->headers;

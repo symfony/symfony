@@ -15,14 +15,13 @@ use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 
 /**
  * @group legacy
- * @requires extension apc
  */
 class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
-            apc_clear_cache('user');
+            apcu_clear_cache('user');
         } else {
             $this->markTestSkipped('APC is not enabled.');
         }
@@ -31,7 +30,7 @@ class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
-            apc_clear_cache('user');
+            apcu_clear_cache('user');
         }
     }
 
@@ -40,7 +39,7 @@ class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ApcUniversalClassLoader('test.prefix.');
         $loader->registerNamespace('LegacyApc\Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
 
-        $this->assertEquals($loader->findFile('\LegacyApc\Namespaced\FooBar'), apc_fetch('test.prefix.\LegacyApc\Namespaced\FooBar'), '__construct() takes a prefix as its first argument');
+        $this->assertEquals($loader->findFile('\LegacyApc\Namespaced\FooBar'), apcu_fetch('test.prefix.\LegacyApc\Namespaced\FooBar'), '__construct() takes a prefix as its first argument');
     }
 
    /**

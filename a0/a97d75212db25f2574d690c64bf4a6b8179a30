@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-29T10:07:08Z
+
+:+1: as it fixes a fatal error and is only about moving things around.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-29T11:10:17Z
+
+As I said, the real problem is the locator. And depending on how the locator is fixed, this fix here applies or does not apply. If the locator really works with mixed, then the `is_string` can be dropped completely.
+
+---------------------------------------------------------------------------
+
+by Tischoi at 2014-06-29T11:35:41Z
+
+So how do i continue? Should I create an issue to discuss the FileLocator?
+
+---------------------------------------------------------------------------
+
+by Tischoi at 2015-02-05T14:16:39Z
+
+Since the FileLocatorInterface has been recently changed to only "allow" strings, it'd be nice if this change could be implemented.

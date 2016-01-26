@@ -407,7 +407,7 @@ class Configuration implements ConfigurationInterface
                                     ->ifTrue(function ($v) {
                                         return (null !== $v['version_strategy'] && null !== $v['version']);
                                     })
-                                    ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" for the "%s" package.')
+                                    ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
                         ->end()

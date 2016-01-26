@@ -139,7 +139,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage  You cannot use both "version_strategy" and "version" at the same time under "assets" for the "{"base_urls":["\/\/example.com"],"version":1,"version_strategy":"foo","version_format":null,"base_path":""}" package.
+     * @expectedExceptionMessage  You cannot use both "version_strategy" and "version" at the same time under "assets" packages.
      */
     public function testInvalidPackageVersionStrategy()
     {

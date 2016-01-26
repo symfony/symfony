@@ -28,7 +28,7 @@
         "doctrine/cache": "~1.0"
     },
     "suggest": {
-        "symfony/cache": "For using the metadata cache.",
+        "psr/cache-implementation": "For using the metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",

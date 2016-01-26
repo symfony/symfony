@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-18T21:44:23Z
+
+:+1:
+
+One more thing to note. If such a yml is provided to the loader:
+
+```yml
+Acme\MyObj:
+    attributes:
+        foo:
+            groups: 'group1'
+```
+
+```Invalid argument supplied for foreach()``` warning raises, because it is [not ensured here](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Serializer/Mapping/Loader/YamlFileLoader.php#L76).
+
+If you think this should be in another PR, than sorry. :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-19T08:08:32Z
+
+Good catch @paradajozsef, I've added a separate commit in this PR.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-19T08:40:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-01-19T20:57:35Z
+
+This is more a bug fix than a new feature ;-)
+
+:+1: debugging is easier with this kind of check :smile:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-19T21:06:00Z
+
+We should include the name of the file and probably some other related information (class name, property or something like that) to make it easier to spot the place where the configuration is wrong.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T11:03:15Z
+
+I agree with @xabbuh
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T06:48:51Z
+
+Status: Need Review
+
+@xabbuh @fabpot done

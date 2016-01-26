@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-22T21:23:29Z
+
+:+1: to merge this.
+Just needs to take a decision about the interface.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2015-12-22T22:02:37Z
+
+Sounds good to me
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-30T10:41:24Z
+
+ping @symfony/deciders
+
+Would be nice to merge soon to be able to work on #16143 without creating conflicts.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-30T13:30:12Z
+
+I wonder if we could move some more code from the different normalizer implementations into the `AbstractNormalizer` class. They look quite similar.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-11T15:59:50Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-18T21:05:15Z
+
+Status: needs review
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T13:36:14Z
+
+Made some small comments, :+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T11:19:47Z
+
+Should be ok now.

@@ -14,3 +14,6 @@ framework:
                 version_format: %%s-%%s
             bar:
                 base_urls: ["https://bar2.example.com"]
+            bar_version_strategy:
+                base_urls: ["https://bar_version_strategy.example.com"]
+                version_strategy: assets.custom_version_strategy

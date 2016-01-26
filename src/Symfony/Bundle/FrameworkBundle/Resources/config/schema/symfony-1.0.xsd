@@ -126,6 +126,7 @@
         </xsd:sequence>
 
         <xsd:attribute name="base-path" type="xsd:string" />
+        <xsd:attribute name="version-strategy" type="xsd:string" />
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
     </xsd:complexType>
@@ -137,6 +138,7 @@
 
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="base-path" type="xsd:string" />
+        <xsd:attribute name="version-strategy" type="xsd:string" />
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
     </xsd:complexType>

@@ -67,7 +67,7 @@ class Psr6Cache implements CacheInterface
     }
 
     /**
-     * Replaces anteslashes by underscores in a class name.
+     * Replaces backslashes by underscores in a class name.
      *
      * @param string $class
      *

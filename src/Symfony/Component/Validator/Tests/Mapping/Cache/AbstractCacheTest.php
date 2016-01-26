@@ -29,13 +29,13 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('bar'));
+            ->will($this->returnValue('Foo\\Bar'));
 
         $this->cache->write($meta);
 
         $this->assertInstanceOf(
             'Symfony\\Component\\Validator\\Mapping\\ClassMetadata',
-            $this->cache->read('bar'),
+            $this->cache->read('Foo\\Bar'),
             'write() stores metadata'
         );
     }
@@ -49,12 +49,12 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('bar'));
+            ->will($this->returnValue('Foo\\Bar'));
 
-        $this->assertFalse($this->cache->has('bar'), 'has() returns false when there is no entry');
+        $this->assertFalse($this->cache->has('Foo\\Bar'), 'has() returns false when there is no entry');
 
         $this->cache->write($meta);
-        $this->assertTrue($this->cache->has('bar'), 'has() returns true when the is an entry');
+        $this->assertTrue($this->cache->has('Foo\\Bar'), 'has() returns true when the is an entry');
     }
 
     public function testRead()
@@ -66,15 +66,15 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
         $meta->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue('bar'));
+            ->will($this->returnValue('Foo\\Bar'));
 
-        $this->assertFalse($this->cache->read('bar'), 'read() returns false when there is no entry');
+        $this->assertFalse($this->cache->read('Foo\\Bar'), 'read() returns false when there is no entry');
 
         $this->cache->write($meta);
 
         $this->assertInstanceOf(
             'Symfony\\Component\\Validator\\Mapping\\ClassMetadata',
-            $this->cache->read('bar'),
+            $this->cache->read('Foo\\Bar'),
             'read() returns metadata'
         );
     }

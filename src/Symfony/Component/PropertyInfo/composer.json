@@ -35,7 +35,7 @@
         "phpdocumentor/reflection": "<1.0.7"
     },
     "suggest": {
-        "symfony/cache": "To cache results",
+        "psr/cache-implementation": "To cache results",
         "symfony/doctrine-bridge": "To use Doctrine metadata",
         "phpdocumentor/reflection": "To use the PHPDoc",
         "symfony/serializer": "To use Serializer metadata"

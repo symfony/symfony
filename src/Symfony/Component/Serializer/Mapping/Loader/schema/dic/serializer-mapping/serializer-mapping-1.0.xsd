@@ -44,13 +44,20 @@
     <xsd:complexType name="attribute">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
-        Contains serialization groups for a attributes. The name of the attribute should be given in the "name" option.
+        Contains serialization groups and max depth for attributes. The name of the attribute should be given in the "name" option.
       ]]></xsd:documentation>
         </xsd:annotation>
-        <xsd:sequence>
+        <xsd:sequence minOccurs="0">
             <xsd:element name="group" type="xsd:string" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="max-depth">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:integer">
+                    <xsd:minInclusive value="0" />
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:complexType>
 
 </xsd:schema>

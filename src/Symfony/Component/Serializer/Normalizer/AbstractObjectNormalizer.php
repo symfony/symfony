@@ -21,6 +21,9 @@ use Symfony\Component\Serializer\Exception\LogicException;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
+    const ENABLE_MAX_DEPTH = 'enable_max_depth';
+    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+
     private $attributesCache = array();
 
     /**
@@ -41,14 +44,21 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($context);
         }
+
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
 
         $data = array();
+        $stack = array();
         $attributes = $this->getAttributes($object, $format, $context);
+        $class = get_class($object);
 
         foreach ($attributes as $attribute) {
+            if ($this->isMaxDepthReached($class, $attribute, $context)) {
+                continue;
+            }
+
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
 
             if (isset($this->callbacks[$attribute])) {
@@ -56,18 +66,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
-                }
-
-                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                $stack[$attribute] = $attributeValue;
             }
 
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->normalize($attribute);
+            $data = $this->updateData($data, $attribute, $attributeValue);
+        }
+
+        foreach ($stack as $attribute => $attributeValue) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
             }
 
-            $data[$attribute] = $attributeValue;
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $context));
         }
 
         return $data;
@@ -180,6 +190,90 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
 
+    /**
+     * Should this attribute be normalized?
+     *
+     * @param mixed  $object
+     * @param string $attributeName
+     * @param array  $context
+     *
+     * @return bool
+     */
+    protected function isAttributeToNormalize($object, $attributeName, &$context)
+    {
+        return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
+    }
+
+    /**
+     * Sets an attribute and apply the name converter if necessary.
+     *
+     * @param array  $data
+     * @param string $attribute
+     * @param mixed  $attributeValue
+     *
+     * @return array
+     */
+    private function updateData(array $data, $attribute, $attributeValue)
+    {
+        if ($this->nameConverter) {
+            $attribute = $this->nameConverter->normalize($attribute);
+        }
+
+        $data[$attribute] = $attributeValue;
+
+        return $data;
+    }
+
+    /**
+     * Is the max depth reached for the given attribute?
+     *
+     * @param string $class
+     * @param string $attribute
+     * @param array  $context
+     *
+     * @return bool
+     */
+    private function isMaxDepthReached($class, $attribute, array &$context)
+    {
+        if (!$this->classMetadataFactory || !isset($context[static::ENABLE_MAX_DEPTH])) {
+            return false;
+        }
+
+        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        if (!isset($attributesMetadata[$attribute])) {
+            return false;
+        }
+
+        $maxDepth = $attributesMetadata[$attribute]->getMaxDepth();
+        if (null === $maxDepth) {
+            return false;
+        }
+
+        $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
+        $keyExist = isset($context[$key]);
+
+        if ($keyExist && $context[$key] === $maxDepth) {
+            return true;
+        }
+
+        if ($keyExist) {
+            ++$context[$key];
+        } else {
+            $context[$key] = 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the cache key to use.
+     *
+     * @param array $context
+     *
+     * @return bool|string
+     */
     private function getCacheKey(array $context)
     {
         try {

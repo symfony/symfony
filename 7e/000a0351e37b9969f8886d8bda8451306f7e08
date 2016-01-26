@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-25T22:49:07Z
+
+Forr my information, what PHP 7 functions made this extension obsolete?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-25T23:31:12Z
+
+I was thinking about Error that replace fatal errors and have a backtrace now, and about ref mismatches, which are almost gone in php7 and were prevented by this ext also. The other feat are minor ones (not required for VarDumper which is the only referenced use case I know about)

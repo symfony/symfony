@@ -20,11 +20,15 @@
     },
     "require": {
         "php": ">=5.5.9",
-        "psr/cache": "~1.0"
+        "psr/cache": "~1.0",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
         "doctrine/cache": "~1.6"
+    },
+    "suggest": {
+        "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },

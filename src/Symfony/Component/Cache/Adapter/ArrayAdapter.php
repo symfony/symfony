@@ -13,14 +13,18 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements CacheItemPoolInterface
+class ArrayAdapter implements CacheItemPoolInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private $values = array();
     private $expiries = array();
     private $createCacheItem;
@@ -125,11 +129,9 @@ class ArrayAdapter implements CacheItemPoolInterface
         if (is_object($value)) {
             try {
                 $value = clone $value;
-            } catch (\Error $e) {
             } catch (\Exception $e) {
-            }
-            if (isset($e)) {
-                @trigger_error($e->__toString());
+                $type = is_object($value) ? get_class($value) : gettype($value);
+                CacheItem::log($this->logger, 'Failed to clone key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
 
                 return false;
             }

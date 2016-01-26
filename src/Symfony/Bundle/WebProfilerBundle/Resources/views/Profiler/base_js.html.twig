@@ -113,7 +113,7 @@
                             var statusCodeCell = document.createElement('td');
                             var statusCode = document.createElement('span');
                             if (request.statusCode < 300) {
-                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-green');
+                                statusCode.setAttribute('class', 'sf-toolbar-status');
                             } else if (request.statusCode < 400) {
                                 statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
                             } else {

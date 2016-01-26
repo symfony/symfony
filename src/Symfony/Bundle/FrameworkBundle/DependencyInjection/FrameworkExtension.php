@@ -576,7 +576,7 @@ class FrameworkExtension extends Extension
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
-            } else if (null === $package['version']) {
+            } elseif (null === $package['version']) {
                 $version = $defaultVersion;
             } else {
                 $format = $package['version_format'] ?: $config['version_format'];

@@ -91,6 +91,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
+
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -119,46 +120,47 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use version_strategy and version settings in assets configuration.
+     * @expectedExceptionMessage You cannot use both "version_strategy" and "version" at the same time under "assets".
      */
     public function testInvalidVersionStrategy()
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
-                array(
-                    'assets' => array(
-                        'base_urls' => '//example.com',
-                        'version' => 1,
-                        'version_strategy' => 'foo',
-                    ),
+            array(
+                'assets' => array(
+                    'base_urls' => '//example.com',
+                    'version' => 1,
+                    'version_strategy' => 'foo',
                 ),
-            ));
+            ),
+        ));
     }
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use version_strategy and version settings in same package.
+     * @expectedExceptionMessage  You cannot use both "version_strategy" and "version" at the same time under "assets" for the "{"base_urls":["\/\/example.com"],"version":1,"version_strategy":"foo","version_format":null,"base_path":""}" package.
      */
     public function testInvalidPackageVersionStrategy()
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
+
         $processor->processConfiguration($configuration, array(
-                array(
-                    'assets' => array(
-                        'base_urls' => '//example.com',
-                        'version' => 1,
-                        'packages' => array(
-                            'foo' => array(
-                                'base_urls' => '//example.com',
-                                'version' => 1,
-                                'version_strategy' => 'foo',
-                            ),
+            array(
+                'assets' => array(
+                    'base_urls' => '//example.com',
+                    'version' => 1,
+                    'packages' => array(
+                        'foo' => array(
+                            'base_urls' => '//example.com',
+                            'version' => 1,
+                            'version_strategy' => 'foo',
                         ),
                     ),
                 ),
-            ));
+            ),
+        ));
     }
 
     protected static function getBundleDefaultConfig()

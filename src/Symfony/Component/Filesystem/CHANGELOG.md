@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed `$mode` argument from `Filesystem::dumpFile()`
+ * added isDir() and isFile() methods
 
 2.8.0
 -----

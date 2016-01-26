@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-01-19T20:28:00Z
+
+Ok I did not see your PR before I started working on mine ;P
+https://github.com/symfony/symfony/pull/17451
+
+Closing mine as this looks very similar :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T13:10:19Z
+
+@dunglas Can you finish this one?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T11:20:42Z
+
+Should be ok now.

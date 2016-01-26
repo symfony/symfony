@@ -111,11 +111,16 @@
                             row.appendChild(methodCell);
 
                             var statusCodeCell = document.createElement('td');
-                            if (request.statusCode) {
-                                statusCodeCell.textContent = request.statusCode;
+                            var statusCode = document.createElement('span');
+                            if (request.statusCode < 300) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-green');
+                            } else if (request.statusCode < 400) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
                             } else {
-                                statusCodeCell.textContent = '-';
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
                             }
+                            statusCode.textContent = request.statusCode || '-';
+                            statusCodeCell.appendChild(statusCode);
                             row.appendChild(statusCodeCell);
 
                             var pathCell = document.createElement('td');

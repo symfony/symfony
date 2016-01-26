@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testWrite()
     {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+        $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getClassName'))
             ->getMock();
@@ -34,7 +35,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->write($meta);
 
         $this->assertInstanceOf(
-            'Symfony\\Component\\Validator\\Mapping\\ClassMetadata',
+            ClassMetadata::class,
             $this->cache->read('Foo\\Bar'),
             'write() stores metadata'
         );
@@ -42,7 +43,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testHas()
     {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+        $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getClassName'))
             ->getMock();
@@ -59,7 +60,7 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testRead()
     {
-        $meta = $this->getMockBuilder('Symfony\\Component\\Validator\\Mapping\\ClassMetadata')
+        $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getClassName'))
             ->getMock();
@@ -72,10 +73,6 @@ abstract class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->cache->write($meta);
 
-        $this->assertInstanceOf(
-            'Symfony\\Component\\Validator\\Mapping\\ClassMetadata',
-            $this->cache->read('Foo\\Bar'),
-            'read() returns metadata'
-        );
+        $this->assertInstanceOf(ClassMetadata::class, $this->cache->read('Foo\\Bar'), 'read() returns metadata');
     }
 }

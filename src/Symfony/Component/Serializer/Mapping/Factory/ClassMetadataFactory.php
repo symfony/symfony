@@ -48,7 +48,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         $this->cache = $cache;
 
         if (null !== $cache) {
-            @trigger_error('Passing a Doctrine Cache instance as 2nd parameter of the "Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface" is deprecated. This parameter will be removed in Symfony 4.0. Use the "Symfony\Component\Serializer\Mapping\Factory\CacheMetadataFactory" class instead.', E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a Doctrine Cache instance as 2nd parameter of the "%s" constructor is deprecated. This parameter will be removed in Symfony 4.0. Use the "%s" class instead.', __CLASS__, CacheClassMetadataFactory::class), E_USER_DEPRECATED);
         }
     }
 

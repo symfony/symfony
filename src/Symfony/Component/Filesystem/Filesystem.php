@@ -577,6 +577,7 @@ class Filesystem
 
     /**
      * Checks if given path is a file.
+     *
      * @param string $path
      *
      * @return bool

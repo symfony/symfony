@@ -55,5 +55,12 @@
 
         <!-- Name converter -->
         <service id="serializer.name_converter.camel_case_to_snake_case" class="Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter" public="false" />
+
+        <!-- PropertyInfo extractor -->
+        <service id="property_info.serializer_extractor" class="Symfony\Component\PropertyInfo\Extractor\SerializerExtractor" public="false">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+
+            <tag name="property_info.list_extractor" priority="-999" />
+        </service>
     </services>
 </container>

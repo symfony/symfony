@@ -73,44 +73,4 @@ class PropertyInfoPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(), $actual);
     }
-
-    public function testRegisterSerializerExtractor()
-    {
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('register', 'hasDefinition', 'getDefinition')
-        );
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('hasDefinition')
-            ->will($this->returnValue(true))
-        ;
-
-        $serializerExtractorDefinition = new Definition('Symfony\Component\PropertyInfo\Extractor\SerializerExtractor');
-        $container
-            ->expects($this->exactly(1))
-            ->method('register')
-            ->will($this->returnValue($serializerExtractorDefinition))
-        ;
-
-        $propertyInfoDefinition = new Definition(
-            'Symfony\Component\PropertyInfo\PropertyInfoExtractor',
-            array(null, null, null, null)
-        );
-        $container
-            ->expects($this->exactly(1))
-            ->method('getDefinition')
-            ->will($this->returnValue($propertyInfoDefinition))
-        ;
-
-        $propertyInfoPass = new PropertyInfoPass();
-        $propertyInfoPass->process($container);
-
-        $this->assertEquals('serializer.mapping.class_metadata_factory', $serializerExtractorDefinition->getArgument(0)->__toString());
-        $this->assertFalse($serializerExtractorDefinition->isPublic());
-
-        $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
-        $this->assertEquals(array('priority' => -999), $tag[0]);
-    }
 }

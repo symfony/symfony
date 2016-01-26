@@ -441,6 +441,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
     }
 
+    public function testRegisterSerializerExtractor()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $serializerExtractorDefinition = $container->getDefinition('property_info.serializer_extractor');
+
+        $this->assertEquals('serializer.mapping.class_metadata_factory', $serializerExtractorDefinition->getArgument(0)->__toString());
+        $this->assertFalse($serializerExtractorDefinition->isPublic());
+        $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
+        $this->assertEquals(array('priority' => -999), $tag[0]);
+    }
+
     public function testAssetHelperWhenAssetsAreEnabled()
     {
         $container = $this->createContainerFromFile('full');

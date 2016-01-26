@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T07:14:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2016-01-26T07:57:16Z
+
+@fabpot done, test fails seems unrelated (also appveyor marked as green, but it have failed tests)
+
+Are you expect invalid message like this - "for the "{"base_urls":["\/\/example.com"],"version":1,"version_strategy":"foo","version_format":null,"base_path":""}" package" ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T08:04:38Z
+
+Packages have names, right?
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2016-01-26T08:06:12Z
+
+@fabpot right. But "thenInvalid" function just json encode node.
+
+If you want package name under %s, I can check how it can be done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T08:11:54Z
+
+If getting the package name is possible, that would be better, if not, just keep it without anything. Having the config in there would look weird.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2016-01-26T08:45:22Z
+
+@fabpot I remove package name, maybe in next PR provide solution. On first look it is not so easy to output there package name.

@@ -37,6 +37,7 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
+                new InputOption('serviceId', null, InputOption::VALUE_REQUIRED, 'The service id of your event dispatcher', 'event_dispatcher'),
             ))
             ->setDescription('Displays configured listeners for an application')
             ->setHelp(<<<EOF
@@ -47,6 +48,10 @@ The <info>%command.name%</info> command displays all configured listeners:
 To get specific listeners for an event, specify its name:
 
   <info>php %command.full_name% kernel.request</info>
+
+To get events of another event dispatcher, specify your service id:
+
+  <info>php %command.full_name% --serviceId=my.event_dispatcher</info>
 EOF
             )
         ;
@@ -60,7 +65,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $dispatcher = $this->getEventDispatcher();
+        $dispatcher = $this->getEventDispatcher($input->getOption('serviceId'));
 
         $options = array();
         if ($event = $input->getArgument('event')) {
@@ -83,10 +88,18 @@ EOF
     /**
      * Loads the Event Dispatcher from the container.
      *
+     * @param string $serviceId
+     *
      * @return EventDispatcherInterface
      */
-    protected function getEventDispatcher()
+    protected function getEventDispatcher($serviceId)
     {
-        return $this->getContainer()->get('event_dispatcher');
+        $eventDispatcher = $this->getContainer()->get($serviceId);
+
+        if (!$eventDispatcher instanceOf EventDispatcherInterface) {
+            throw new \RuntimeException(sprintf('The service id "%s" does not reference an event dispatcher.', $serviceId));
+        }
+
+        return $eventDispatcher;
     }
 }

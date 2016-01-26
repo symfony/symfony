@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\PropertyInfo;
 
-use Doctrine\Common\Cache\Cache;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Adds a cache layer on top of an extractor.
+ * Adds a PSR-6 cache layer on top of an extractor.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyInfoExtractorCacheDecorator implements PropertyInfoExtractorInterface
+class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 {
     /**
      * @var PropertyInfoExtractorInterface
@@ -26,19 +26,19 @@ class PropertyInfoExtractorCacheDecorator implements PropertyInfoExtractorInterf
     private $propertyInfoExtractor;
 
     /**
-     * @var Cache
+     * @var CacheItemPoolInterface
      */
-    private $cache;
+    private $cacheItemPool;
 
     /**
      * @var array
      */
     private $arrayCache = array();
 
-    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, Cache $cache)
+    public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
     {
         $this->propertyInfoExtractor = $propertyInfoExtractor;
-        $this->cache = $cache;
+        $this->cacheItemPool = $cacheItemPool;
     }
 
     /**
@@ -106,19 +106,28 @@ class PropertyInfoExtractorCacheDecorator implements PropertyInfoExtractorInterf
             return call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
         }
 
-        $key = $method.$serializedArguments;
+        $key = $this->escape($method.'.'.$serializedArguments);
 
         if (isset($this->arrayCache[$key])) {
             return $this->arrayCache[$key];
         }
 
-        if ($value = $this->cache->fetch($key)) {
+        if ($value = $this->cacheItemPool->getItem($key)) {
             return $this->arrayCache[$key] = $value;
         }
 
         $value = call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
-        $this->cache->save($key, $value);
+        $this->cacheItemPool->save($key, $value);
 
         return $this->arrayCache[$key] = $value;
+    }
+
+    private function escape($key)
+    {
+        str_replace(
+            array('_', '{', '}', '(', ')', '/', '\\', '@', ':'),
+            array('_95', '_123', '_125', '_40', '_41', '_47', '_92', '_64', '_58'),
+            $key
+        );
     }
 }

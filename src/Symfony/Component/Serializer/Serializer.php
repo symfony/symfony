@@ -15,6 +15,8 @@ use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -67,6 +69,14 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         foreach ($normalizers as $normalizer) {
             if ($normalizer instanceof SerializerAwareInterface) {
                 $normalizer->setSerializer($this);
+            }
+
+            if ($normalizer instanceof DenormalizerAwareInterface) {
+                $normalizer->setDenormalizer($this);
+            }
+
+            if ($normalizer instanceof NormalizerAwareInterface) {
+                $normalizer->setNormalizer($this);
             }
         }
         $this->normalizers = $normalizers;

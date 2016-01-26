@@ -16,6 +16,18 @@ namespace Symfony\Component\Filesystem\Tests;
  */
 class FilesystemTest extends FilesystemTestCase
 {
+    public function testIsDir()
+    {
+        $this->assertFalse($this->filesystem->isDir(__FILE__));
+        $this->assertTrue($this->filesystem->isDir(__DIR__));
+    }
+
+    public function testIsFile()
+    {
+        $this->assertTrue($this->filesystem->isFile(__FILE__));
+        $this->assertFalse($this->filesystem->isFile(__DIR__));
+    }
+
     public function testCopyCreatesNewFile()
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';

@@ -37,14 +37,14 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $override = false)
     {
-        if (stream_is_local($originFile) && !is_file($originFile)) {
+        if (stream_is_local($originFile) && !$this->isFile($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }
 
         $this->mkdir(dirname($targetFile));
 
         $doCopy = true;
-        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
+        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && $this->isFile($targetFile)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         }
 
@@ -64,7 +64,7 @@ class Filesystem
             fclose($target);
             unset($source, $target);
 
-            if (!is_file($targetFile)) {
+            if (!$this->isFile($targetFile)) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
 
@@ -88,13 +88,13 @@ class Filesystem
     public function mkdir($dirs, $mode = 0777)
     {
         foreach ($this->toIterator($dirs) as $dir) {
-            if (is_dir($dir)) {
+            if ($this->isDir($dir)) {
                 continue;
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
                 $error = error_get_last();
-                if (!is_dir($dir)) {
+                if (!$this->isDir($dir)) {
                     // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message if we have one
                     if ($error) {
                         throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']), 0, null, $dir);
@@ -158,7 +158,7 @@ class Filesystem
                 continue;
             }
 
-            if (is_dir($file) && !is_link($file)) {
+            if ($this->isDir($file) && !is_link($file)) {
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
@@ -166,7 +166,7 @@ class Filesystem
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
-                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
+                if ('\\' === DIRECTORY_SEPARATOR && $this->isDir($file)) {
                     if (true !== @rmdir($file)) {
                         throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
@@ -195,7 +195,7 @@ class Filesystem
             if (true !== @chmod($file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
             }
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDir($file) && !is_link($file)) {
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
         }
@@ -213,7 +213,7 @@ class Filesystem
     public function chown($files, $user, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDir($file) && !is_link($file)) {
                 $this->chown(new \FilesystemIterator($file), $user, true);
             }
             if (is_link($file) && function_exists('lchown')) {
@@ -240,7 +240,7 @@ class Filesystem
     public function chgrp($files, $group, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDir($file) && !is_link($file)) {
                 $this->chgrp(new \FilesystemIterator($file), $group, true);
             }
             if (is_link($file) && function_exists('lchgrp')) {
@@ -413,9 +413,9 @@ class Filesystem
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
             if ($copyOnWindows) {
-                if (is_link($file) || is_file($file)) {
+                if (is_link($file) || $this->isFile($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
-                } elseif (is_dir($file)) {
+                } elseif ($this->isDir($file)) {
                     $this->mkdir($target);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
@@ -423,9 +423,9 @@ class Filesystem
             } else {
                 if (is_link($file)) {
                     $this->symlink($file->getLinkTarget(), $target);
-                } elseif (is_dir($file)) {
+                } elseif ($this->isDir($file)) {
                     $this->mkdir($target);
-                } elseif (is_file($file)) {
+                } elseif ($this->isFile($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
@@ -516,7 +516,7 @@ class Filesystem
     {
         $dir = dirname($filename);
 
-        if (!is_dir($dir)) {
+        if (!$this->isDir($dir)) {
             $this->mkdir($dir);
         } elseif (!is_writable($dir)) {
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
@@ -561,5 +561,29 @@ class Filesystem
         $components = explode('://', $filename, 2);
 
         return 2 === count($components) ? array($components[0], $components[1]) : array(null, $components[0]);
+    }
+
+    /**
+     * Checks if given path is a directory.
+     *
+     * @param string $path Path to test
+     *
+     * @return bool
+     */
+    public function isDir($path)
+    {
+        return is_dir($path);
+    }
+
+    /**
+     * Checks if given path is a file.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function isFile($path)
+    {
+        return is_file($path);
     }
 }

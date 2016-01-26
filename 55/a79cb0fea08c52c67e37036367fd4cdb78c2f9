@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T07:39:15Z
+
+As we are using this convention everywhere in the codebase, I'm :-1: to change this just here.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T11:45:39Z
+
+I reverted PHPDoc changes and only kept minor CS fixes.

@@ -112,22 +112,41 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
             return $this->arrayCache[$key];
         }
 
-        if ($value = $this->cacheItemPool->getItem($key)) {
-            return $this->arrayCache[$key] = $value;
+        $item = $this->cacheItemPool->getItem($key);
+
+        if ($item->isHit()) {
+            return $this->arrayCache[$key] = $item->get();
         }
 
         $value = call_user_func_array(array($this->propertyInfoExtractor, $method), $arguments);
-        $this->cacheItemPool->save($key, $value);
+        $item->set($value);
+        $this->cacheItemPool->save($item);
 
         return $this->arrayCache[$key] = $value;
     }
 
+    /**
+     * Escapes a key according to PSR-6.
+     *
+     * Replaces characters forbidden by PSR-6 and the _ char by the _ char followed by the ASCII
+     * code of the escaped char.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
     private function escape($key)
     {
-        str_replace(
-            array('_', '{', '}', '(', ')', '/', '\\', '@', ':'),
-            array('_95', '_123', '_125', '_40', '_41', '_47', '_92', '_64', '_58'),
-            $key
-        );
+        return strtr($key, array(
+            '{' => '_123',
+            '}' => '_125',
+            '(' => '_40',
+            ')' => '_41',
+            '/' => '_47',
+            '\\' => '_92',
+            '@' => '_64',
+            ':' => '_58',
+            '_' => '_95',
+        ));
     }
 }

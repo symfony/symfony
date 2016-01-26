@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Tests;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
 
 /**
@@ -22,7 +23,7 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
     {
         parent::setUp();
 
-        $this->propertyInfo = new PropertyInfoCacheExtractor($this->propertyInfo, new ArrayCac);
+        $this->propertyInfo = new PropertyInfoCacheExtractor($this->propertyInfo, new ArrayAdapter());
     }
 
     public function testCache()
@@ -36,18 +37,28 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
         $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array('foo' => function () {})));
     }
 
-    public function testEscape()
+    /**
+     * @dataProvider escapeDataProvider
+     */
+    public function testEscape($toEscape, $expected)
     {
         $reflectionMethod = new \ReflectionMethod($this->propertyInfo, 'escape');
         $reflectionMethod->setAccessible(true);
 
-        $this->assertSame('foo_bar', $this->propertyInfo->escape('foo_95bar'));
-        $this->assertSame('foo_95bar', $this->propertyInfo->escape('foo_9595bar'));
-        $this->assertSame('foo{bar}', $this->propertyInfo->escape('foo_123bar_125'));
-        $this->assertSame('foo(bar)', $this->propertyInfo->escape('foo_40bar_41'));
-        $this->assertSame('foo/bar', $this->propertyInfo->escape('foo_47bar'));
-        $this->assertSame('foo\bar', $this->propertyInfo->escape('foo_92bar'));
-        $this->assertSame('foo@bar', $this->propertyInfo->escape('foo_64bar'));
-        $this->assertSame('foo:bar', $this->propertyInfo->escape('foo_58bar'));
+        $this->assertSame($expected, $reflectionMethod->invoke($this->propertyInfo, $toEscape));
+    }
+
+    public function escapeDataProvider()
+    {
+        return array(
+            array('foo_bar', 'foo_95bar'),
+            array('foo_95bar', 'foo_9595bar'),
+            array('foo{bar}', 'foo_123bar_125'),
+            array('foo(bar)', 'foo_40bar_41'),
+            array('foo/bar', 'foo_47bar'),
+            array('foo\bar', 'foo_92bar'),
+            array('foo@bar', 'foo_64bar'),
+            array('foo:bar', 'foo_58bar'),
+        );
     }
 }

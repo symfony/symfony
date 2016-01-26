@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-26T09:13:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-26T09:56:26Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-26T10:21:07Z
+
+IIRC, when dumping the reference, we never use an inline notation (but we generate the Yaml by hand). So I would suggest using a bigger value than that, to ensure that the expanded notation is used (what do you think of using ``10``?)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-26T11:13:23Z
+
+I am not convinced that we should keep doing the dump manually in the `config:dump-reference` command. What was the initial reason to do that? But anyway, that's a different topic imo.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T11:33:30Z
+
+@stof good idea. I increased the level to `10`.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-26T12:11:13Z
+
+@xabbuh supporting comments, prototype nodes, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T12:37:56Z
+
+I propose to merge it in 2.3 instead. As the output is still valid YAML, the only change is visual for our users, who will love to get this ASAP. WDYT?

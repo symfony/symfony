@@ -88,14 +88,20 @@ class Inline
      *
      * @param mixed $value                  The PHP variable to convert
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param int   $flags                  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @return string The YAML string representing the PHP array
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($value, $exceptionOnInvalidType = false, $flags = 0)
     {
+        if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
+
+            $flags = (int) $flags;
+        }
+
         switch (true) {
             case is_resource($value):
                 if ($exceptionOnInvalidType) {
@@ -104,7 +110,7 @@ class Inline
 
                 return 'null';
             case is_object($value):
-                if ($objectSupport) {
+                if (Yaml::DUMP_OBJECT & $flags) {
                     return '!php/object:'.serialize($value);
                 }
 
@@ -114,7 +120,7 @@ class Inline
 
                 return 'null';
             case is_array($value):
-                return self::dumpArray($value, $exceptionOnInvalidType, $objectSupport);
+                return self::dumpArray($value, $exceptionOnInvalidType, $flags);
             case null === $value:
                 return 'null';
             case true === $value:

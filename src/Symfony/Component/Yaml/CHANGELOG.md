@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * Added support for customizing the dumped YAML string through an optional bit field:
+
+   ```php
+   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+   ```
+
 3.0.0
 -----
 

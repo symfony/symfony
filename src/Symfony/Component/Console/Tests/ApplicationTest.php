@@ -484,6 +484,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
 
         $application->setCatchExceptions(true);
+        $this->assertTrue($application->areExceptionsCaught());
         $tester->run(array('command' => 'foo'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(true), '->setCatchExceptions() sets the catch exception flag');
 
@@ -495,6 +496,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }
+    }
+
+    public function testAutoExitSetting()
+    {
+        $application = new Application();
+        $this->assertTrue($application->isAutoExitEnabled());
+
+        $application->setAutoExit(false);
+        $this->assertFalse($application->isAutoExitEnabled());
     }
 
     public function testRenderException()

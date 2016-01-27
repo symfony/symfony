@@ -39,7 +39,7 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue(array('xliff' => array(array('alias' => 'xliff', 'legacy-alias' => 'xlf')))));
-        $container->expects($this->once())
+        $container->expects($this->any())
             ->method('findDefinition')
             ->will($this->returnValue($this->getMock('Symfony\Component\DependencyInjection\Definition')));
         $pass = new TranslatorPass();

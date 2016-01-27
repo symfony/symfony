@@ -283,8 +283,9 @@ abstract class Client
         }
 
         if (empty($server['HTTP_HOST'])) {
-          $server['HTTP_HOST'] = $this->extractHost($uri);
+            $server['HTTP_HOST'] = $this->extractHost($uri);
         }
+
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);

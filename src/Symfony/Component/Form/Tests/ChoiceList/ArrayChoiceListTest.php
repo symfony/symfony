@@ -122,4 +122,11 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(2 => 'value2'), $choiceList->getValuesForChoices(array(2 => $obj2)));
         $this->assertSame(array(2 => 'value2'), $choiceList->getValuesForChoices(array(2 => (object) array('value' => 'value2'))));
     }
+
+    public function testGetChoicesForValuesWithContainingNull()
+    {
+        $choiceList = new ArrayChoiceList(array('Null' => null));
+
+        $this->assertSame(array(0 => null), $choiceList->getChoicesForValues(array('0')));
+    }
 }

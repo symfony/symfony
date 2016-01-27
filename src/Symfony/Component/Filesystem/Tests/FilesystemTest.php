@@ -893,7 +893,7 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testMirrorCopiesLinkedDirectoryContents()
     {
-        $this->markAsSkippedIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing(true);
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
@@ -913,7 +913,7 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testMirrorCopiesRelativeLinkedContents()
     {
-        $this->markAsSkippedIfSymlinkIsMissing();
+        $this->markAsSkippedIfSymlinkIsMissing(true);
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
         $oldPath = getcwd();
@@ -1121,8 +1121,8 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+        $sourceFilePath = $this->workspace . DIRECTORY_SEPARATOR . 'copy_source_file';
+        $targetFilePath = $this->workspace . DIRECTORY_SEPARATOR . 'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         chmod($sourceFilePath, 0745);

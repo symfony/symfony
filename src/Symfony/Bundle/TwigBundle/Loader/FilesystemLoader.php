@@ -78,6 +78,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
             $file = parent::findTemplate($logicalName);
         } catch (\Twig_Error_Loader $e) {
             $previous = $e;
+            $errorMessage = $e->getMessage();
 
             // for BC
             try {
@@ -89,14 +90,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         }
 
         if (false === $file || null === $file) {
-            try {
-                list($namespace, $name) = $this->parseName($logicalName);
-                $paths = sprintf(' (looked into: %s)', implode(', ', $this->getPaths($namespace)));
-            } catch (\Twig_Error_Loader $e) {
-                $paths = '';
-            }
-
-            throw new \Twig_Error_Loader(sprintf('Unable to find template "%s"%s.', $name, $paths, -1, null, $previous));
+            throw new \Twig_Error_Loader($errorMessage, -1, null, $previous);
         }
 
         return $this->cache[$logicalName] = $file;

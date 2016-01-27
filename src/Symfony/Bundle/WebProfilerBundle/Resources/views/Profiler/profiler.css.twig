@@ -134,7 +134,7 @@ pre, code {
 }
 #menu-profiler li a span.label {
     display: block;
-    padding: 20px 0px 16px 65px;
+    padding: 20px 0 16px 65px;
     min-height: 16px;
     overflow: hidden;
 }
@@ -285,7 +285,6 @@ ul.alt li.scream, ul.alt li.scream strong {
     color: gray;
 }
 ul.sf-call-stack li {
-    text-size: small;
     padding: 0 0 0 20px;
 }
 td.main, td.menu {
@@ -385,13 +384,12 @@ td.main, td.menu {
     line-height: 1.5em;
 }
 .sf-profiler-timeline .legends span {
-    border-left-width: 10px;
-    border-left-style: solid;
+    border-left: 10px solid;
     padding: 0 10px 0 5px;
 }
 .sf-profiler-timeline canvas {
-    border: 1px solid #999;
-    border-width: 1px 0;
+    border: 1px #999;
+    border-style: solid none;
 }
 .collapsed-menu-parents #resume,
 .collapsed-menu-parents #collector-content {

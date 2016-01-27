@@ -63,8 +63,7 @@
     <script>//<![CDATA[
 
         function toggleMenuPanels(state, doSave) {
-            var menu = document.getElementById('navigation'), savedState = Sfjs.getPreference('menu/displayState'),
-                displayState, elem, className;
+            var menu = document.getElementById('navigation'), savedState = Sfjs.getPreference('menu/displayState'), displayState;
 
             if (null === savedState) {
                 savedState = 'block';

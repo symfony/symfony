@@ -133,8 +133,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
-
-        return;
     }
 
     /**
@@ -142,7 +140,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir)
     {
-        return;
     }
 
     /**

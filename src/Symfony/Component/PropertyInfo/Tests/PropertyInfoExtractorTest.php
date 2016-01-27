@@ -26,7 +26,7 @@ class PropertyInfoExtractorTest extends \PHPUnit_Framework_TestCase
      */
     private $propertyInfo;
 
-    public function setUp()
+    protected function setUp()
     {
         $extractors = array(new NullExtractor(), new DummyExtractor());
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);

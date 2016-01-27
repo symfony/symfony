@@ -24,7 +24,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
      */
     private $extractor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->extractor = new ReflectionExtractor();
     }

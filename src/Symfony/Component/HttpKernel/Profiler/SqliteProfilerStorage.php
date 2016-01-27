@@ -82,7 +82,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         $return = array();
 
         if ($db instanceof \SQLite3) {
-            $stmt = $this->prepareStatement($db, $query, true);
+            $stmt = $this->prepareStatement($db, $query);
             foreach ($args as $arg => $val) {
                 $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
             }

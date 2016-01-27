@@ -650,9 +650,8 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
             $method = 'set'.$key;
             $context->$method($value);
         }
-        $generator = new UrlGenerator($routes, $context, $logger);
 
-        return $generator;
+        return new UrlGenerator($routes, $context, $logger);
     }
 
     protected function getRoutes($name, Route $route)

@@ -482,6 +482,6 @@ class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
         unset($map[0]);
         $map[] = 3;
 
-        $this->assertSame(2, count($map));
+        $this->assertCount(2, $map);
     }
 }

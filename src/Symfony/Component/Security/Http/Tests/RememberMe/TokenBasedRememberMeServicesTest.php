@@ -172,9 +172,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo'));
         $request = new Request();
-        $response = new Response();
 
-        $service->loginFail($request, $response);
+        $service->loginFail($request);
 
         $cookie = $request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME);
         $this->assertTrue($cookie->isCleared());

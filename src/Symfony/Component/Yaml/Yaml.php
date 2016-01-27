@@ -21,10 +21,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Yaml
 {
     /**
-     * Parses YAML into a PHP array.
-     *
-     * The parse method, when supplied with a YAML stream (string or file),
-     * will do its best to convert YAML in a file into a PHP array.
+     * Parses a YAML string into a PHP array, a scalar or an stdClass object.
      *
      *  Usage:
      *  <code>
@@ -35,9 +32,9 @@ class Yaml
      * @param string $input                  A string containing YAML
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
-     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
+     * @param bool   $objectForMap           True if maps should return an stdClass instead of array()
      *
-     * @return array The YAML converted to a PHP array
+     * @return mixed The YAML converted to a PHP value
      *
      * @throws ParseException If the YAML is not valid
      */

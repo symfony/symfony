@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by unkind at 2015-04-09T19:59:33Z
+
+> for example when creating a Console exception listener - then you need information about how the application was run
+
+What's the use case?
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2015-04-10T07:20:50Z
+
+When the console application is run internally, you probably don't want to log anything - or probably at least in a different manner. By internally I mean that your code invokes a command (something like [this](http://symfony.com/doc/current/components/console/introduction.html#calling-an-existing-command)) and in this situation, you want to turn off the autoExit feature and also set catchExceptions to false.
+
+When an exception occurres you don't want to log this exception as error, because it still might be a valid case which is handled by the calling code. Or even if it isn't, then you would log this error twice - from the internal run and also when it reaches the point from which it was really run - like a controller or another console application run.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T12:41:31Z
+
+These two flags should only be used for testing commands, and that's why we don't have any getters. I'm :-1: for adding those methods.
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2015-05-16T13:55:11Z
+
+@fabpot what about the cases when you [invoke the application internally](http://symfony.com/doc/current/components/console/introduction.html#calling-an-existing-command)? Tests are just a special example of this. I think that reusing existing commands is super useful, but inability to reason about the application state complicates the tooling around it (the only way right now is to check via reflection or pass the settings somehow separately through a different channel).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T14:02:32Z
+
+:+1: for master
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2016-01-25T14:31:18Z
+
+@fabpot thanks for resurfacing this :) I made the chanes you proposed, although I am not sure about the renamings, I tried for them to be as close to the respective setters as possible, which certainly no longer holds with `setCatchExceptions` vs `areExceptionsCatched` (even if you guess `are`, the word order is different). But if this is in alignment with other SF APIs, then it's of course, just wasn't sure.
+
+Btw since this PR is so old, it was created against `2.7`, should I try to open it against another version or `master` as you wrote? I could easily rebase this although it seems there is no way to change the branch here on GitHub.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T07:54:07Z
+
+@VasekPurchart Can you fix the typo?
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2016-01-27T11:09:48Z
+
+@fabpot sure, it's fixed. Should I rebase this somewhere else, as I asked above, or is it fine here?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T11:13:47Z
+
+@VasekPurchart Can you fix the fabbot issues? No need to rebase, the PR is fine as is.
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2016-01-27T11:16:14Z
+
+@fabpot even if they are completely unrelated to this issue/PR? I thought this would be confusing for the diff. I can do it in a separate commit probably.
+
+---------------------------------------------------------------------------
+
+by VasekPurchart at 2016-01-27T11:20:43Z
+
+Fixed.

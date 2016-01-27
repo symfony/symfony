@@ -3,7 +3,7 @@
 {# Widgets #}
 
 {% block form_widget_simple -%}
-    {% if type is not defined or 'file' != type %}
+    {% if type is not defined or type not in ['file', 'hidden'] %}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
     {% endif %}
     {{- parent() -}}

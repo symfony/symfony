@@ -343,7 +343,6 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             array(
                 array(
                     'bar' => function ($bar) {
-                        return;
                     },
                 ),
                 'baz',

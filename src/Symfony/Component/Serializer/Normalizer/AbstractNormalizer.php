@@ -33,26 +33,32 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @var int
      */
     protected $circularReferenceLimit = 1;
+
     /**
      * @var callable
      */
     protected $circularReferenceHandler;
+
     /**
      * @var ClassMetadataFactoryInterface|null
      */
     protected $classMetadataFactory;
+
     /**
      * @var NameConverterInterface|null
      */
     protected $nameConverter;
+
     /**
      * @var array
      */
     protected $callbacks = array();
+
     /**
      * @var array
      */
     protected $ignoredAttributes = array();
+
     /**
      * @var array
      */

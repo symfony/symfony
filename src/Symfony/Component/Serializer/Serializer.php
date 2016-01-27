@@ -41,18 +41,22 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var Encoder\ChainEncoder
      */
     protected $encoder;
+
     /**
      * @var Encoder\ChainDecoder
      */
     protected $decoder;
+
     /**
      * @var array
      */
     protected $normalizers = array();
+
     /**
      * @var array
      */
     protected $normalizerCache = array();
+
     /**
      * @var array
      */
@@ -247,8 +251,10 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface
-                && $normalizer->supportsDenormalization($data, $class, $format)) {
+            if (
+                $normalizer instanceof DenormalizerInterface &&
+                $normalizer->supportsDenormalization($data, $class, $format)
+            ) {
                 return $normalizer->denormalize($data, $class, $format, $context);
             }
         }

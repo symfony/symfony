@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-09T21:21:21Z
+
+Switched to an implementation to a Decorator as requested. Should the decorator belong to the Doctrine Bridge? IMO no because when PSR-6 will be ready we will switch to this interface instead of Doctrine Cache but I'm open to suggestions. Same if you find a better name for the decorator.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-14T21:26:23Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-15T16:52:26Z
+
+Looks like you need to rebase here (the namespace changes have been done in another PR).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-16T07:36:40Z
+
+Rebased and typo fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-31T10:32:16Z
+
+Committed a better way to handle context not serializable. /cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-18T15:18:22Z
+
+Status: needs work
+
+Should be ported to PSR-6
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T12:07:37Z
+
+Status: Needs review
+
+Moved to PSR-6.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T17:47:22Z
+
+@fabpot `symfony/cache` replaced by `psr/cache-implementation` in suggest.

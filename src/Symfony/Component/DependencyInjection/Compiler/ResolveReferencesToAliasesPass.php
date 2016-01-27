@@ -44,6 +44,10 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
             $definition->setProperties($this->processArguments($definition->getProperties()));
             $definition->setFactory($this->processFactory($definition->getFactory()));
+
+            if (null !== $factoryService = $definition->getFactoryService(false)) {
+                $definition->setFactoryService($this->processFactoryService($factoryService));
+            }
         }
 
         foreach ($container->getAliases() as $id => $alias) {
@@ -76,6 +80,15 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         }
 
         return $arguments;
+    }
+
+    private function processFactoryService($factoryService)
+    {
+        if (null === $factoryService) {
+            return;
+        }
+
+        return $this->getDefinitionId($factoryService);
     }
 
     private function processFactory($factory)

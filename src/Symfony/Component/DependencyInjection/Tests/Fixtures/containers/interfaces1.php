@@ -11,15 +11,3 @@ $definition = new Definition('%cla%o%ss%');
 $container->setDefinition('foo', $definition);
 
 return $container;
-
-if (!class_exists('FooClass')) {
-    class FooClass
-    {
-        public $bar;
-
-        public function setBar($bar)
-        {
-            $this->bar = $bar;
-        }
-    }
-}

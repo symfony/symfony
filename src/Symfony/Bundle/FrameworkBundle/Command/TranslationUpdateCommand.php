@@ -95,7 +95,7 @@ EOF
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
         foreach ($bundleTransPaths as $path) {
-            $path = $path.'views';
+            $path .= 'views';
             if (is_dir($path)) {
                 $extractor->extract($path, $extractedCatalogue);
             }
@@ -106,7 +106,7 @@ EOF
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
         foreach ($bundleTransPaths as $path) {
-            $path = $path.'translations';
+            $path .= 'translations';
             if (is_dir($path)) {
                 $loader->loadMessages($path, $currentCatalogue);
             }
@@ -151,7 +151,7 @@ EOF
             $output->writeln('Writing files');
             $bundleTransPath = false;
             foreach ($bundleTransPaths as $path) {
-                $path = $path.'translations';
+                $path .= 'translations';
                 if (is_dir($path)) {
                     $bundleTransPath = $path;
                 }

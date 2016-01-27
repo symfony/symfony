@@ -52,6 +52,18 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->with($event)
         ;
 
+        $service
+            ->expects($this->once())
+            ->method('onEventWithPriority')
+            ->with($event)
+        ;
+
+        $service
+            ->expects($this->once())
+            ->method('onEventNested')
+            ->with($event)
+        ;
+
         $container = new Container();
         $container->set('service.subscriber', $service);
 
@@ -59,6 +71,8 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->addSubscriberService('service.subscriber', 'Symfony\Component\EventDispatcher\Tests\SubscriberService');
 
         $dispatcher->dispatch('onEvent', $event);
+        $dispatcher->dispatch('onEventWithPriority', $event);
+        $dispatcher->dispatch('onEventNested', $event);
     }
 
     public function testPreventDuplicateListenerService()
@@ -233,12 +247,20 @@ class SubscriberService implements EventSubscriberInterface
     {
         return array(
             'onEvent' => 'onEvent',
-            'onEvent' => array('onEvent', 10),
-            'onEvent' => array('onEvent'),
+            'onEventWithPriority' => array('onEventWithPriority', 10),
+            'onEventNested' => array(array('onEventNested')),
         );
     }
 
     public function onEvent(Event $e)
+    {
+    }
+
+    public function onEventWithPriority(Event $e)
+    {
+    }
+
+    public function onEventNested(Event $e)
     {
     }
 }

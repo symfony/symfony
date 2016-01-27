@@ -337,7 +337,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = new MagicianCall();
 
-        $this->propertyAccessor->getValue($value, 'foobar', 'bam');
+        $this->propertyAccessor->getValue($value, 'foobar');
     }
 
     public function testGetValueReadsMagicCall()

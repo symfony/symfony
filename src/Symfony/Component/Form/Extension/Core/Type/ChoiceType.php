@@ -71,10 +71,10 @@ class ChoiceType extends AbstractType
 
             if ($options['multiple']) {
                 $builder->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
-                $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10);
+                $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']));
             } else {
                 $builder->addViewTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list'], $builder->has('placeholder')));
-                $builder->addEventSubscriber(new FixRadioInputListener($options['choice_list'], $builder->has('placeholder')), 10);
+                $builder->addEventSubscriber(new FixRadioInputListener($options['choice_list'], $builder->has('placeholder')));
             }
         } else {
             if ($options['multiple']) {

@@ -569,11 +569,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         return array('group1', 'group2');
     }
 
-    private function getMockExecutionContext()
-    {
-        return $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
-    }
-
     /**
      * @param string $name
      * @param string $dataClass

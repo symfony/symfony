@@ -57,7 +57,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'bad_name'));
         $this->setExpectedException('RuntimeException');
-        $storage->read('foo', 'bar');
+        $storage->read('foo');
     }
 
     public function testWriteRead()

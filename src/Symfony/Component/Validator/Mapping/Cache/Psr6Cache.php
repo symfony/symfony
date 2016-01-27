@@ -67,7 +67,7 @@ class Psr6Cache implements CacheInterface
     }
 
     /**
-     * Replaces backslashes by underscores in a class name.
+     * Replaces backslashes by dots in a class name.
      *
      * @param string $class
      *
@@ -75,6 +75,6 @@ class Psr6Cache implements CacheInterface
      */
     private function escapeClassName($class)
     {
-        return strtr($class, '\\', '_');
+        return strtr($class, '\\', '.');
     }
 }

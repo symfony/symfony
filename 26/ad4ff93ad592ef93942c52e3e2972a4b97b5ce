@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-23T22:58:34Z
+
+I like the idea. Maybe the format should be changed to`[Exception (404)]`, especially considering the long exception FQC names out there. However, I'm not sure if it's very clear that the number is the exception code in such case.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-01-24T11:16:03Z
+
+Thank you for your feedback @WouterJ, I did changes.
+About long exception FQC names, maybe it's better for readability to show code in new line, like :
+
+```
+  [Exception]
+  Code 404
+  Not Found
+```
+
+No ?
+
+---------------------------------------------------------------------------
+
+by mheki at 2016-01-26T16:35:21Z
+
+@maidmaid good idea :+1: Could you also add a test for that please? ref: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Tests/ApplicationTest.php
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-01-26T22:18:43Z
+
+Thank you @mheki, I done tests but I don't understand why it fail...
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-26T22:37:43Z
+
+@maidmaid not related to your changes. We have a bug in our testsuite.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-01-26T22:46:18Z
+
+@stof thank you for this information. Maybe list the errors can help you a little bit :
+
+``FrameworkBundle``:
+```
+Fatal error: Call to undefined method Symfony\Component\DependencyInjection\Definition::getParent() in /home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php on line 535
+PHP Fatal error:  Call to undefined method Symfony\Component\DependencyInjection\Definition::getParent() in /home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php on line 535
+```
+``Form``:
+```
+Fatal error: Call to a member function validate() on null in /home/travis/build/symfony/symfony/src/Symfony/Component/Form/Extension/Validator/Constraints/FormValidator.php on line 55
+PHP Fatal error:  Call to a member function validate() on null in /home/travis/build/symfony/symfony/src/Symfony/Component/Form/Extension/Validator/Constraints/FormValidator.php on line 55
+```
+Only on Travis PHP 5.6.

@@ -23,7 +23,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     private $normalizer;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->normalizer = new DateTimeNormalizer();
     }

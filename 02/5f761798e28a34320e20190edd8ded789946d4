@@ -1,0 +1,191 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-12T20:01:29Z
+
+According to https://github.com/composer/composer/pull/4690#issuecomment-163906240 `mklink` could be used to create relative symbolic links. Would it make sense to fall back to using this command on Windows instead?
+
+---------------------------------------------------------------------------
+
+by flip111 at 2015-12-12T21:09:22Z
+
+If you feel comfortable using `exec()` sure
+
+For your reference, a possible bug fix in core seems to be stuck here https://github.com/php/php-src/pull/1243
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-13T07:14:32Z
+
+:+1: for skipping relative symlinks on Windows
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-13T16:02:27Z
+
+Those tests succeed for me. So skipping them doesn't seem like the right solution.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-13T17:32:36Z
+
+Hmm, @Tobion, that's pretty weird as there is a bug in all PHP versions regarding relative symlinks on Windows. See the discussion in https://github.com/php/php-src/pull/1243
+
+In short, PHP and Windows use another definition of relative. PHP defines it as relative to the created link, which is how it's done in Unix, but Windows defines it as relative to the cwd.
+
+Using `chdir()` doesn't change anything for the cwd that Windows uses. This means that this works:
+```php
+// test.php
+mkdir('one');
+
+symlink('one', 'two');
+```
+```
+C:\> php test.php
+```
+(paths are now correct, both relative to the root and the cwd of the PHP cli)
+
+But this doesn't:
+```php
+// bar/test.php
+mkdir(__DIR__.'/one');
+
+chdir(__DIR__.'/one');
+symlink('one', 'two');
+```
+```
+C:\> php bar/test.php
+Warning: symlink(): Could not fetch file information(error 2) in C:\bar\foo1.php on line 6
+```
+(as cwd is now `C:\` while the link is at `C:\bar\`)
+
+This is at least how it's working on my system (Windows 8.1, PHP 5.5.12 and 7.0.0 (thread safe)).
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2015-12-14T08:18:25Z
+
+@Tobion @WouterJ did you run PHP as an Apache Module or under (Fast)CGI?
+
+---------------------------------------------------------------------------
+
+by flip111 at 2015-12-14T12:42:22Z
+
+@fritzmg i ran this from the console, see output here https://github.com/symfony/symfony/issues/16985
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-21T23:50:49Z
+
+PHP 7.0.0 and PHP 5.6, Windows 10, git bash, Symfony branch 2.7
+```
+ phpunit src/Symfony/Component/Filesystem/
+PHPUnit 5.1.3 by Sebastian Bergmann and contributors.
+
+......S...S..............S....SSSSSSSSSSSSSSSS....SSSSS.......  62 / 104 ( 59%)
+.....................SSS...........SSS....                     104 / 104 (100%)
+
+Time: 550 ms, Memory: 4.00Mb
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 103, Assertions: 116, Skipped: 30.
+```
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-21T23:55:17Z
+
+@Tobion that explains why you don't see these failures. This is the output on my Windows 8.1 PC (with PHP 7.0.0 and Symfony branch 2.7):
+```
+C:\sf-world\symfony>php ./phpunit src/Symfony/Component/Filesystem
+PHPUnit 5.1.3 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Component/Filesystem
+......S...S...................SSSSSSSSS.SSSS.S....SS..........  62 / 104 ( 59%)
+.....................EE...........SSS....
+
+Time: 1.43 seconds, Memory: 4.00Mb
+
+There were 2 errors:
+
+1) Symfony\Component\Filesystem\Tests\FilesystemTest::testMirrorCopiesLinkedDirectoryContents
+Symfony\Component\Filesystem\Exception\IOException: Failed to remove file "C:\Users\s147105\AppData\Local\Temp\145074197344\source\link1".
+
+C:\sf-world\symfony\src\Symfony\Component\Filesystem\Filesystem.php:175
+C:\sf-world\symfony\src\Symfony\Component\Filesystem\Filesystem.php:162
+C:\sf-world\symfony\src\Symfony\Component\Filesystem\Filesystem.php:162
+C:\sf-world\symfony\src\Symfony\Component\Filesystem\Tests\FilesystemTestCase.php:55
+
+2) Symfony\Component\Filesystem\Tests\FilesystemTest::testMirrorCopiesRelativeLinkedContents
+symlink(): Could not fetch file information(error 2)
+
+C:\sf-world\symfony\.phpunit\phpunit-5.1\vendor\symfony\phpunit-bridge\DeprecationErrorHandler.php:40
+C:\sf-world\symfony\src\Symfony\Component\Filesystem\Tests\FilesystemTest.php:909
+
+FAILURES!
+Tests: 103, Assertions: 137, Errors: 2, Skipped: 21.
+
+Legacy deprecation notices (1)
+KO src/Symfony/Component/Filesystem
+```
+
+As you see, the failing tests are skipped on your machine. This is probably because you executed it in a console without admin access? (you can see by running PHPunit with `-v`).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-22T00:00:30Z
+
+Ah I actually checked that when first reporting it passes for me and I indeed forgot to run it as admin this time. If I run as admin, I still have no failures and only 21 skipped tests and these tests are not skipped.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-22T10:54:52Z
+
+I found out why: The tests pass when running with a non-thread-safe version of PHP, but it fails when using a thread-safe version.
+
+I don't think it's worth implementing hacks to discover if the PHP version used to execute the test is thread-safe or not, I think we can just ignore it. Wdyt?
+
+---------------------------------------------------------------------------
+
+by flip111 at 2015-12-22T12:24:41Z
+
+No hack needed to discover that, PHP has a build in constant `PHP_ZTS`
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-22T12:29:24Z
+
+Updated PR.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-22T12:55:29Z
+
+What does thread-safety has to do with if Windows supports relative-symlinks? Doesn't make sense to me.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2015-12-22T13:02:45Z
+
+That's why I was asking before about `mod_php` and `CGI` - when running PHP as an Apache Module, which is thread-safe, relative symlinks cannot be created under Windows with PHP's `symlink()` function due to this bug: https://bugs.php.net/bug.php?id=69473
+
+Why it works with non-thread-safe versions of PHP (e.g. when running under a CGI environment) - I have no idea yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T16:46:19Z
+
+What do we do here?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-26T09:10:40Z
+
+As long as the bug in PHP is not fixed (and it's a hard one to fix), this PR makes sense to me and should be merged.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2016-01-26T09:30:16Z
+
+> As long as the bug in PHP is not fixed (and it's a hard one to fix), this PR makes sense to me and should be merged.
+
+It's not hard to fix. I don't know why they didn't do anything about it in PHP 7 yet.

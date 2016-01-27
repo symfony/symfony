@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-23T22:54:21Z
+
+I propose to merge "The `AbstractVoter` class was removed in favor of the new `Voter` class." and the edited upgrade notes to the [upgrade note in the 2.8 file](https://github.com/symfony/symfony/blob/2.8/UPGRADE-2.8.md#security):
+
+ > * The AbstractVoter class was deprecated. Instead, extend the Voter class and move your voting logic in the supports($attribute, $subject) and voteOnAttribute($attribute, $object, TokenInterface $token) methods.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by jbafford at 2016-01-23T23:08:17Z
+
+@WouterJ Just to be clear: you'd like me to copy the relevant section from the 3.0 upgrade to the 2.8 section so it's available in both places?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-23T23:23:13Z
+
+@jbafford what I mean updating the `UPGRADE-3.0.md` file to be more similar to the `UPGRADE-2.8.md` file. I think the note from the 2.8 upgrade guide is nicer.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T08:05:19Z
+
+@jbafford Can you make the needed changes so that we can merge this before the next 3.0 patch release? Thank you.
+
+---------------------------------------------------------------------------
+
+by jbafford at 2016-01-27T16:18:11Z
+
+I've updated the PR by reorganizing the AbstractVoter/VoterInterface notes so that they're all next to each other and the example, and improved the language and the example slightly using the 2.8 upgrade file as a base. Will this work?

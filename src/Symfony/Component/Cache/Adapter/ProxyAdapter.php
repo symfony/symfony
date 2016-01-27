@@ -18,7 +18,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ProxyAdapter implements CacheItemPoolInterface
+class ProxyAdapter implements AdapterInterface
 {
     private $pool;
     private $createCacheItem;

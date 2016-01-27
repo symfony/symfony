@@ -29,6 +29,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
         ;
 

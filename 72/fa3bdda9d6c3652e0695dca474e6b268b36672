@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T07:20:55Z
+
+@Triiistan thanks for this fix. However, in addition to removing the wrong value, I'd like to replace it by the right property/value:
+
+```css
+word-break: break-all;
+```
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Triiistan at 2016-01-27T08:29:47Z
+
+@javiereguiluz I've tested it and here are my results:
+- Without `word-break: break-all;` (current situation)
+<img width="948" alt="without break-all" src="https://cloud.githubusercontent.com/assets/4671739/12607839/3beb13e6-c4d8-11e5-818c-aa311b801b2a.png">
+- With `word-break: break-all;`
+<img width="945" alt="with break-all" src="https://cloud.githubusercontent.com/assets/4671739/12607861/58f66d14-c4d8-11e5-9356-083b3b26c637.png">
+
+I feel like cutting inside words removes readability, what do you think?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T08:33:56Z
+
+@Triiistan the screenshots show an edge-case (the second line of the second log contains just a letter and it's weird). But in most cases, you see big gaps (like the second line of your first screenshot) because class namespaces are very long and browsers don't want to break them.
+
+But honestly I don't have strong opinions for either side. The both have pros and cons.
+
+---------------------------------------------------------------------------
+
+by Triiistan at 2016-01-27T08:36:53Z
+
+Where it really changes things for example is on SQL query logs for example which can often spans on multiple lines. Cutting between words looks difficult to read IMHO, but I'm ok for doing that change if you don't feel the same way :smiley:

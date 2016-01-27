@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,6 +59,21 @@ class ResolveReferencesToAliasesPassTest extends \PHPUnit_Framework_TestCase
         $container->setAlias('bar', 'foo');
         $container->setAlias('foo', 'bar');
         $this->process($container);
+    }
+
+    public function testResolveFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('factory', 'Factory');
+        $container->setAlias('factory_alias', new Alias('factory'));
+        $foo = new Definition();
+        $foo->setFactoryService('factory_alias');
+        $foo->setFactoryMethod('createFoo');
+        $container->setDefinition('foo', $foo);
+
+        $this->process($container);
+
+        $this->assertSame('factory', $foo->getFactoryService());
     }
 
     protected function process(ContainerBuilder $container)

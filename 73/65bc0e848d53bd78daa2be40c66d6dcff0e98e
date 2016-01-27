@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T10:05:57Z
+
+Looks like a bug to me and as such should be merged in 2.3 (@Naktibalda no need to re-create another PR as I can do the switch when merging). ping @dunglas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T10:06:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-27T10:24:23Z
+
+:+1:, but maybe should we emulate `$_SERVER['SERVER_NAME']` as well (they are not the same thing): http://shiflett.org/blog/2006/mar/server-name-versus-http-host

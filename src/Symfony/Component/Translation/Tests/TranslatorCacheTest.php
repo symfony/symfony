@@ -17,6 +17,9 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 
+/**
+ * @group legacy
+ */
 class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 {
     protected $tmpDir;
@@ -148,36 +151,6 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> the cache was overwritten by another translator instance in '.($debug ? 'debug' : 'production'));
     }
 
-    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
-    {
-        /*
-         * Because the cache file contains a catalogue including all of its fallback
-         * catalogues, we must take the set of fallback locales into consideration when
-         * loading a catalogue from the cache.
-         */
-        $translator = new Translator('a', null, $this->tmpDir);
-        $translator->setFallbackLocales(array('b'));
-
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
-        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
-
-        $this->assertEquals('bar (b)', $translator->trans('bar'));
-
-        // Remove fallback locale
-        $translator->setFallbackLocales(array());
-        $this->assertEquals('bar', $translator->trans('bar'));
-
-        // Use a fresh translator with no fallback locales, result should be the same
-        $translator = new Translator('a', null, $this->tmpDir);
-
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
-        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
-
-        $this->assertEquals('bar', $translator->trans('bar'));
-    }
-
     public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
     {
         /*
@@ -224,6 +197,36 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 
         $fallback = $catalogue->getFallbackCatalogue();
         $this->assertTrue($fallback->defines('foo'));
+    }
+
+    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
+    {
+        /*
+         * Because the cache file contains a catalogue including all of its fallback
+         * catalogues, we must take the set of fallback locales into consideration when
+         * loading a catalogue from the cache.
+         */
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $this->assertEquals('bar (b)', $translator->trans('bar'));
+
+        // Remove fallback locale
+        $translator->setFallbackLocales(array());
+        $this->assertEquals('bar', $translator->trans('bar'));
+
+        // Use a fresh translator with no fallback locales, result should be the same
+        $translator = new Translator('a', null, $this->tmpDir);
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $this->assertEquals('bar', $translator->trans('bar'));
     }
 
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()

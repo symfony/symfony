@@ -223,8 +223,53 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
-        $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
-        $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $this->assertTrue($container->hasDefinition('translation.translator'), '->registerTranslatorConfiguration() loads translation.xml');
+        $this->assertEquals('translation.translator', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+
+        $resources = $container->getDefinition('translation.message_catalogue_provider.resource')->getArgument(2);
+        $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
+        $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
+        $this->assertContains(
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Validator translation resources'
+        );
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
+        $this->assertContains(
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Form translation resources'
+        );
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
+        $this->assertContains(
+            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Security translation resources'
+        );
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/translations/test_paths.en.yml', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds translation resources in custom paths'
+        );
+
+        $this->assertEquals(array('fr'), $container->getDefinition('translation.message_catalogue_provider.resource')->getArgument(3));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyTranslator()
+    {
+        $container = $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', array(
+                'translator' => array(
+                    'fallback' => 'fr',
+                    'paths' => array('%kernel.root_dir%/Fixtures/translations'),
+                    'paths' => array('%kernel.root_dir%/Fixtures/translations'),
+                ),
+            ));
+        });
+
         $options = $container->getDefinition('translator.default')->getArgument(3);
 
         $files = array_map(function ($resource) { return realpath($resource); }, $options['resource_files']['en']);
@@ -256,12 +301,28 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('fr'), $calls[1][1][0]);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyTranslatorMultipleFallbacks()
+    {
+        $container = $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', array(
+                'translator' => array(
+                    'fallbacks' => array('en', 'fr'),
+                ),
+            ));
+        });
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+        $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
+    }
+
     public function testTranslatorMultipleFallbacks()
     {
         $container = $this->createContainerFromFile('translator_fallbacks');
 
-        $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('en', 'fr'), $calls[1][1][0]);
+        $this->assertEquals(array('en', 'fr'), $container->getDefinition('translation.message_catalogue_provider.resource')->getArgument(3));
     }
 
     /**

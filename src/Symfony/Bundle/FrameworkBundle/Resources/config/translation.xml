@@ -158,7 +158,33 @@
 
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer" public="false">
             <argument type="service" id="translator" />
+            <argument type="service" id="translation.message_catalogue_provider.warmable" />
             <tag name="kernel.cache_warmer" />
         </service>
+
+        <service id="translation.translator" class="Symfony\Component\Translation\Translator">
+            <argument>%kernel.debug%</argument>
+            <argument type="service" id="translation.message_catalogue_provider" />
+            <argument type="service" id="translator.selector" />
+        </service>
+
+        <service id="translation.message_catalogue_provider.warmable" class="Symfony\Bundle\FrameworkBundle\Translation\WarmableMessageCatalogueProvider" public="false">
+            <argument type="service" id="translation.message_catalogue_provider" />
+            <argument type="service" id="translation.message_catalogue_provider.resource" />
+        </service>
+
+        <service id="translation.message_catalogue_provider.resource" class="Symfony\Component\Translation\MessageCatalogueProvider\ContainerAwareMessageCatalogueProvider" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- translation loaders -->
+            <argument type="collection" /> <!-- translation resources -->
+            <argument type="collection" /> <!-- fallback locales -->
+        </service>
+
+        <service id="translation.message_catalogue_provider.cache" class="Symfony\Component\Translation\MessageCatalogueProvider\CachedMessageCatalogueProvider" public="false">
+            <argument type="service" id="translation.message_catalogue_provider.resource" />
+            <argument type="service" id="config_cache_factory" />
+            <argument>%kernel.cache_dir%/translations</argument> <!-- cache directory -->
+        </service>
+        <service id="translation.message_catalogue_provider" alias="translation.message_catalogue_provider.cache"/>
     </services>
 </container>

@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProviderInterface;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
+use Symfony\Component\Translation\MessageCatalogueProvider\CachedMessageCatalogueProvider;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
 
@@ -26,6 +28,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 {
     /**
      * @var MessageCatalogueInterface[]
+     *
+     * Deprecated since version 2.8, to be removed in 3.0. Use Translator::getCatalogue instead.
      */
     protected $catalogues = array();
 
@@ -33,21 +37,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @var string
      */
     protected $locale;
-
-    /**
-     * @var array
-     */
-    private $fallbackLocales = array();
-
-    /**
-     * @var LoaderInterface[]
-     */
-    private $loaders = array();
-
-    /**
-     * @var array
-     */
-    private $resources = array();
 
     /**
      * @var MessageSelector
@@ -65,36 +54,68 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $debug;
 
     /**
-     * @var ConfigCacheFactoryInterface|null
+     * @var MessageCatalogueProviderInterface
      */
-    private $configCacheFactory;
+    private $messageCatalogueProvider;
 
     /**
-     * Constructor.
-     *
-     * @param string               $locale   The locale
-     * @param MessageSelector|null $selector The message selector for pluralization
-     * @param string|null          $cacheDir The directory to use for the cache
-     * @param bool                 $debug    Use cache in debug mode ?
+     * @var MessageCatalogueProvider
+     */
+    private $resourceMessageCatalogueProvider;
+
+    /**
+     * @var CachedMessageCatalogueProvider
+     */
+    private $cacheMessageCatalogueProvider;
+
+    /**
+     * @param string                                                 $locale                   The locale
+     * @param MessageCatalogueProviderInterface|MessageSelector|null $messageCatalogueProvider The MessageCatalogueProviderInterface or MessageSelector
+     *                                                                                         Passing the MessageSelector or null as a second parameter is deprecated since version 2.8.
+     * @param MessageSelector|string|null                            $selector                 The MessageSelector or cache directory
+     *                                                                                         Passing the cache directory as a third parameter is deprecated since version 2.8.
+     * @param bool                                                   $debug                    Use cache in debug mode ?
+     *                                                                                         Deprecated since version 2.8, to be removed in 3.0.
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
+    public function __construct($locale, $messageCatalogueProvider = null, $selector = null, $debug = false)
     {
         $this->setLocale($locale);
-        $this->selector = $selector ?: new MessageSelector();
-        $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
+
+        if ($messageCatalogueProvider instanceof MessageCatalogueProviderInterface) {
+            $this->messageCatalogueProvider = $messageCatalogueProvider;
+            $this->selector = $selector ?: new MessageSelector();
+        } else {
+            @trigger_error('The '.__CLASS__.' constructor will require a MessageCatalogueProviderInterface for its second argument since 3.0.', E_USER_DEPRECATED);
+
+            // Parameters are shifted of one offset
+            $this->selector = $messageCatalogueProvider ?: new MessageSelector();
+            $this->cacheDir = $selector;
+            $this->debug = $debug;
+        }
+
+        if (!$this->selector instanceof MessageSelector) {
+            throw new \InvalidArgumentException(sprintf('The message selector "%s" must be an instance of MessageSelector.', get_class($this->selector)));
+        }
+
+        if ($this->isMethodOverwritten('assertValidLocale')) {
+            @trigger_error('The Translator::assertValidLocale method is deprecated since version 2.8 and will be removed in 3.0. Use Translator::assertLocale method instead.', E_USER_DEPRECATED);
+        }
     }
 
     /**
      * Sets the ConfigCache factory to use.
      *
      * @param ConfigCacheFactoryInterface $configCacheFactory
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on CachedMessageCatalogueProvider instead.
      */
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
-        $this->configCacheFactory = $configCacheFactory;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Rely on CachedMessageCatalogueProvider instead.', E_USER_DEPRECATED);
+
+        $this->getCachedMessageCatalogueProvider()->setConfigCacheFactory($configCacheFactory);
     }
 
     /**
@@ -102,10 +123,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::addLoader instead.
      */
     public function addLoader($format, LoaderInterface $loader)
     {
-        $this->loaders[$format] = $loader;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::addLoader instead.', E_USER_DEPRECATED);
+
+        $this->getResourceMessageCatalogueProvider()->addLoader($format, $loader);
     }
 
     /**
@@ -117,22 +142,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string $domain   The domain
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::addResource instead.
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::addResource instead.', E_USER_DEPRECATED);
 
-        $this->assertValidLocale($locale);
-
-        $this->resources[$locale][] = array($format, $resource, $domain);
-
-        if (in_array($locale, $this->fallbackLocales)) {
-            $this->catalogues = array();
-        } else {
-            unset($this->catalogues[$locale]);
-        }
+        $this->getResourceMessageCatalogueProvider()->addResource($format, $resource, $locale, $domain);
     }
 
     /**
@@ -174,27 +191,28 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param array $locales The fallback locales
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::setFallbackLocales instead.
      */
     public function setFallbackLocales(array $locales)
     {
-        // needed as the fallback locales are linked to the already loaded catalogues
-        $this->catalogues = array();
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::setFallbackLocales instead.', E_USER_DEPRECATED);
 
-        foreach ($locales as $locale) {
-            $this->assertValidLocale($locale);
-        }
-
-        $this->fallbackLocales = $locales;
+        $this->getResourceMessageCatalogueProvider()->setFallbackLocales($locales);
     }
 
     /**
      * Gets the fallback locales.
      *
      * @return array $locales The fallback locales
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProvider::getFallbackLocales instead.
      */
     public function getFallbackLocales()
     {
-        return $this->fallbackLocales;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProvider::getFallbackLocales instead.', E_USER_DEPRECATED);
+
+        return $this->getResourceMessageCatalogueProvider()->getFallbackLocales();
     }
 
     /**
@@ -244,21 +262,38 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $this->assertValidLocale($locale);
         }
 
-        if (!isset($this->catalogues[$locale])) {
+        // check if the Translator class is overwritten
+        if ('Symfony\Component\Translation\Translator' !== get_class($this) && !$this->messageCatalogueProvider) {
+            if (isset($this->catalogues[$locale])) {
+                return $this->catalogues[$locale];
+            }
+
+            if ($this->isMethodOverwritten('loadCatalogue')) {
+                @trigger_error('The Translator::loadCatalogue method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProviderInterface::getCatalogue() instead.', E_USER_DEPRECATED);
+            }
+
+            if ($this->isMethodOverwritten('getLoaders')) {
+                @trigger_error('The Translator::getLoaders method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProvider::getLoaders instead.', E_USER_DEPRECATED);
+            }
+
             $this->loadCatalogue($locale);
+
+            return $this->catalogues[$locale];
         }
 
-        return $this->catalogues[$locale];
+        return $this->catalogues[$locale] = $this->getMessageCatalogueProvider()->getCatalogue($locale);
     }
 
     /**
      * Gets the loaders.
      *
      * @return array LoaderInterface[]
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProvider::getLoaders instead.
      */
     protected function getLoaders()
     {
-        return $this->loaders;
+        return $this->getResourceMessageCatalogueProvider()->getLoaders();
     }
 
     /**
@@ -268,11 +303,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array[array] indexed by catalog
      *
-     * @deprecated since version 2.8, to be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.
+     * @deprecated since version 2.8, to be removed in 3.0. Use MessageCatalogueProviderInterface::getCatalogue() method instead.
      */
     public function getMessages($locale = null)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use MessageCatalogueProviderInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
 
         $catalogue = $this->getCatalogue($locale);
         $messages = $catalogue->all();
@@ -285,9 +320,15 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param string $locale
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProviderInterface::getCatalogue instead.
      */
     protected function loadCatalogue($locale)
     {
+        if ($this->isMethodOverwritten('initializeCatalogue')) {
+            @trigger_error('The Translator::initializeCatalogue method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProviderInterface::getCatalogue() instead.', E_USER_DEPRECATED);
+        }
+
         if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
         } else {
@@ -297,19 +338,47 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param string $locale
+     *
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProviderInterface::getCatalogue instead.
      */
     protected function initializeCatalogue($locale)
     {
         $this->assertValidLocale($locale);
 
+        if ($this->isMethodOverwritten('computeFallbackLocales')) {
+            @trigger_error('The Translator::computeFallbackLocales method is deprecated since version 2.8 and will be removed in 3.0. Rely on MessageCatalogueProvider instead.', E_USER_DEPRECATED);
+        }
+
         try {
-            $this->doLoadCatalogue($locale);
+            $this->catalogues[$locale] = $this->getResourceMessageCatalogueProvider()->loadCatalogue($locale);
         } catch (NotFoundResourceException $e) {
             if (!$this->computeFallbackLocales($locale)) {
                 throw $e;
             }
         }
-        $this->loadFallbackCatalogues($locale);
+        // load Fallback Catalogues
+        $current = $this->catalogues[$locale];
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->catalogues[$fallback] = $this->getResourceMessageCatalogueProvider()->loadCatalogue($fallback);
+            }
+
+            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            $current->addFallbackCatalogue($fallbackCatalogue);
+            $current = $fallbackCatalogue;
+        }
+    }
+
+    /**
+     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be removed in 3.0.
+     *
+     * @internal
+     */
+    public function initializeAndGetCatalogue($locale)
+    {
+        $this->initializeCatalogue($locale);
+
+        return $this->catalogues[$locale];
     }
 
     /**
@@ -323,12 +392,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-        $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
-            function (ConfigCacheInterface $cache) use ($self, $locale) {
-                $self->dumpCatalogue($locale, $cache);
-            }
-        );
+        $self = $this; // required for PHP 5.3 where "$this" cannot be used in anonymous functions. Change in Symfony 3.0.
+        $cache = $this->getCachedMessageCatalogueProvider()->cache($locale, function () use ($self, $locale) {
+            return $self->initializeAndGetCatalogue($locale);
+        });
 
         if (isset($this->catalogues[$locale])) {
             /* Catalogue has been initialized as it was written out to cache. */
@@ -336,119 +403,15 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         /* Read catalogue from cache. */
-        $this->catalogues[$locale] = include $cache->getPath();
+        $this->catalogues[$locale] = $cache;
     }
 
     /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
-     *
-     * @internal
+     * @deprecated since version 2.8, to be removed in 3.0. Rely on MessageCatalogueProvider instead.
      */
-    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
-    {
-        $this->initializeCatalogue($locale);
-        $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
-
-        $content = sprintf(<<<EOF
-<?php
-
-use Symfony\Component\Translation\MessageCatalogue;
-
-\$catalogue = new MessageCatalogue('%s', %s);
-
-%s
-return \$catalogue;
-
-EOF
-            ,
-            $locale,
-            var_export($this->catalogues[$locale]->all(), true),
-            $fallbackContent
-        );
-
-        $cache->write($content, $this->catalogues[$locale]->getResources());
-    }
-
-    private function getFallbackContent(MessageCatalogue $catalogue)
-    {
-        $fallbackContent = '';
-        $current = '';
-        $replacementPattern = '/[^a-z0-9_]/i';
-        $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-        while ($fallbackCatalogue) {
-            $fallback = $fallbackCatalogue->getLocale();
-            $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
-            $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
-
-            $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
-
-EOF
-                ,
-                $fallbackSuffix,
-                $fallback,
-                var_export($fallbackCatalogue->all(), true),
-                $currentSuffix,
-                $fallbackSuffix
-            );
-            $current = $fallbackCatalogue->getLocale();
-            $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-        }
-
-        return $fallbackContent;
-    }
-
-    private function getCatalogueCachePath($locale)
-    {
-        return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->fallbackLocales)).'.php';
-    }
-
-    private function doLoadCatalogue($locale)
-    {
-        $this->catalogues[$locale] = new MessageCatalogue($locale);
-
-        if (isset($this->resources[$locale])) {
-            foreach ($this->resources[$locale] as $resource) {
-                if (!isset($this->loaders[$resource[0]])) {
-                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
-                }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
-            }
-        }
-    }
-
-    private function loadFallbackCatalogues($locale)
-    {
-        $current = $this->catalogues[$locale];
-
-        foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
-            }
-
-            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
-            $current->addFallbackCatalogue($fallbackCatalogue);
-            $current = $fallbackCatalogue;
-        }
-    }
-
     protected function computeFallbackLocales($locale)
     {
-        $locales = array();
-        foreach ($this->fallbackLocales as $fallback) {
-            if ($fallback === $locale) {
-                continue;
-            }
-
-            $locales[] = $fallback;
-        }
-
-        if (strrchr($locale, '_') !== false) {
-            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
-        }
-
-        return array_unique($locales);
+        return $this->getResourceMessageCatalogueProvider()->computeFallbackLocales($locale);
     }
 
     /**
@@ -460,23 +423,66 @@ EOF
      */
     protected function assertValidLocale($locale)
     {
+        self::assertLocale($locale);
+    }
+
+    /**
+     * Asserts that the locale is valid, throws an Exception if not.
+     *
+     * @param string $locale Locale to tests
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     */
+    public static function assertLocale($locale)
+    {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
     }
 
-    /**
-     * Provides the ConfigCache factory implementation, falling back to a
-     * default implementation if necessary.
-     *
-     * @return ConfigCacheFactoryInterface $configCacheFactory
-     */
-    private function getConfigCacheFactory()
+    private function getMessageCatalogueProvider()
     {
-        if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
+        if ($this->messageCatalogueProvider) {
+            return $this->messageCatalogueProvider;
         }
 
-        return $this->configCacheFactory;
+        if (null !== $this->cacheDir) {
+            return $this->getCachedMessageCatalogueProvider();
+        }
+
+        return $this->getResourceMessageCatalogueProvider();
+    }
+
+    private function getResourceMessageCatalogueProvider()
+    {
+        if ($this->messageCatalogueProvider instanceof MessageCatalogueProvider) {
+            return $this->messageCatalogueProvider;
+        }
+
+        if ($this->resourceMessageCatalogueProvider) {
+            return $this->resourceMessageCatalogueProvider;
+        }
+
+        return $this->resourceMessageCatalogueProvider = new MessageCatalogueProvider();
+    }
+
+    private function getCachedMessageCatalogueProvider()
+    {
+        if ($this->messageCatalogueProvider instanceof CachedMessageCatalogueProvider) {
+            return $this->messageCatalogueProvider;
+        }
+
+        if ($this->cacheMessageCatalogueProvider) {
+            return $this->cacheMessageCatalogueProvider;
+        }
+
+        return $this->cacheMessageCatalogueProvider = new CachedMessageCatalogueProvider($this->getResourceMessageCatalogueProvider(), new ConfigCacheFactory($this->debug), $this->cacheDir);
+    }
+
+    private function isMethodOverwritten($name)
+    {
+        $reflector = new \ReflectionMethod($this, $name);
+
+        return ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Translation\Translator');
     }
 }

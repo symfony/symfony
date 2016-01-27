@@ -673,9 +673,13 @@ class FrameworkExtension extends Extension
         $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default
-        $container->setAlias('translator', 'translator.default');
+        $container->setAlias('translator', 'translation.translator');
         $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
+        $resourceMessageCatalogueProvider = $container->findDefinition('translation.message_catalogue_provider.resource');
+        if ($config['fallbacks']) {
+            $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
+            $resourceMessageCatalogueProvider->replaceArgument(3, $config['fallbacks']);
+        }
 
         $container->setParameter('translator.logging', $config['logging']);
 
@@ -726,6 +730,7 @@ class FrameworkExtension extends Extension
             }
 
             $files = array();
+            $resources = array();
             $finder = Finder::create()
                 ->files()
                 ->filter(function (\SplFileInfo $file) {
@@ -741,6 +746,7 @@ class FrameworkExtension extends Extension
                     $files[$locale] = array();
                 }
 
+                $resources[] = array($format, (string) $file, $locale, $domain);
                 $files[$locale][] = (string) $file;
             }
 
@@ -750,6 +756,7 @@ class FrameworkExtension extends Extension
             );
 
             $translator->replaceArgument(3, $options);
+            $resourceMessageCatalogueProvider->replaceArgument(2, $resources);
         }
     }
 

@@ -14,14 +14,13 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 
 class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollectMessages()
     {
         $collector = $this->createCollector();
-        $collector->setFallbackLocales(array('fr', 'ru'));
-
         $collector->trans('foo');
         $collector->trans('bar');
         $collector->transChoice('choice', 0);
@@ -80,14 +79,23 @@ class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
 
     private function createCollector()
     {
-        $translator = new Translator('en');
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (en)'), 'en');
-        $translator->addResource('array', array('bar' => 'bar (fr)'), 'fr');
-        $translator->addResource('array', array('bar_ru' => 'bar (ru)'), 'ru');
+        $loaders = array('array' => new ArrayLoader());
+        $resources = array(
+            array('array', array('foo' => 'foo (en)'), 'en'),
+            array('array', array('bar' => 'bar (fr)'), 'fr'),
+            array('array', array('bar_ru' => 'bar (ru)'), 'ru'),
+        );
+        $translator = $this->getTranslator('en', $loaders, $resources, array('fr', 'ru'));
 
         $collector = new DataCollectorTranslator($translator);
 
         return $collector;
+    }
+
+    private function getTranslator($locale, $loaders = array(), $resources = array(), $fallbackLocales = array())
+    {
+        $resourceCatalogue = new MessageCatalogueProvider($loaders, $resources, $fallbackLocales);
+
+        return new Translator($locale, $resourceCatalogue);
     }
 }

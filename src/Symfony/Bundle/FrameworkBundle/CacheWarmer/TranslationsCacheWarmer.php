@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProviderInterface;
 
 /**
  * Generates the catalogues for translations.
@@ -23,10 +24,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TranslationsCacheWarmer implements CacheWarmerInterface
 {
     private $translator;
+    private $messageCatalogueProvider;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, MessageCatalogueProviderInterface $messageCatalogueProvider = null)
     {
         $this->translator = $translator;
+        $this->messageCatalogueProvider = $messageCatalogueProvider;
     }
 
     /**
@@ -36,6 +39,8 @@ class TranslationsCacheWarmer implements CacheWarmerInterface
     {
         if ($this->translator instanceof WarmableInterface) {
             $this->translator->warmUp($cacheDir);
+        } elseif ($this->messageCatalogueProvider instanceof WarmableInterface) {
+            $this->messageCatalogueProvider->warmUp($cacheDir);
         }
     }
 

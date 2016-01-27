@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\MessageCatalogueProvider\MessageCatalogueProvider;
 
 class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
             ->with('Translation not found.')
         ;
 
-        $translator = new Translator('ar');
+        $translator = $this->getTranslator('ar');
         $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
         $loggableTranslator->trans('bar');
@@ -39,11 +40,19 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
             ->with('Translation use fallback catalogue.')
         ;
 
-        $translator = new Translator('ar');
-        $translator->setFallbackLocales(array('en'));
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
+        $loaders = array('array' => new ArrayLoader());
+        $resources = array(
+            array('array', array('some_message2' => 'one thing|%count% things'), 'en'),
+        );
+        $translator = $this->getTranslator('ar', $loaders, $resources, array('en'));
         $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
+    }
+
+    private function getTranslator($locale, $loaders = array(), $resources = array(), $fallbackLocales = array())
+    {
+        $resourceCatalogue = new MessageCatalogueProvider($loaders, $resources, $fallbackLocales);
+
+        return new Translator($locale, $resourceCatalogue);
     }
 }

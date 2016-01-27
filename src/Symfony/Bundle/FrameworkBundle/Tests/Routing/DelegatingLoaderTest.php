@@ -12,7 +12,7 @@ class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
     /** @var ControllerNameParser */
     private $controllerNameParser;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->controllerNameParser = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')
             ->disableOriginalConstructor()

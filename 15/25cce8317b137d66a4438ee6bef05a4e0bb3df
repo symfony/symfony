@@ -1,0 +1,130 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T09:42:09Z
+
+@kucharovic I just tested your pull request and it works perfect! Thanks for working on this.
+
+![ajax_status_before](https://cloud.githubusercontent.com/assets/73419/12577203/32f6ccd6-c419-11e5-93e3-639d0bcd5dfd.gif)
+
+However, to make errors stand out more prominently, what do you think of using the `sf-toolbar-status` CSS classes that we use elsewhere in the toolbar. This way we could show the HTTP status like this:
+
+![ajax_status_after](https://cloud.githubusercontent.com/assets/73419/12577222/4ef39cac-c419-11e5-947c-d293684c257e.gif)
+
+If you like the idea, the code would be something like this:
+
+```js
+var statusCodeCell = document.createElement('td');
+var statusCode = document.createElement('span');
+if (request.statusCode > 299) {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+} else {
+    statusCode.setAttribute('class', 'sf-toolbar-status');
+}
+statusCode.textContent = request.statusCode || '-';
+statusCodeCell.appendChild(statusCode);
+row.appendChild(statusCodeCell);
+```
+
+---------------------------------------------------------------------------
+
+by kucharovic at 2016-01-26T09:49:18Z
+
+@javiereguiluz it looks better. Are you sure, that [redirects](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection) should be red?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T09:51:26Z
+
+@kucharovic I trusted [this comment](https://github.com/symfony/symfony/issues/17518#issuecomment-174899043) from @Jean85 who said that in Ajax there are no redirections. We probably need more comments about this or some verification.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2016-01-26T09:52:11Z
+
+IMO it should be:
+```js
+if (request.statusCode < 300) {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-green');
+} else if (request.statusCode < 400) {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+} else {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+}
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T09:52:30Z
+
+@kucharovic anyway, to be completely safe, we could change `if (request.statusCode > 299)` by `if (request.statusCode > 399)` and this will always work no matter what.
+
+---------------------------------------------------------------------------
+
+by kucharovic at 2016-01-26T10:01:50Z
+
+@javiereguiluz [he's right](https://www.w3.org/TR/XMLHttpRequest/#the-send()-method). A XMLHttpRequest should either get the resource or be told why not.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2016-01-26T10:06:45Z
+
+Hmmm, then maybe:
+```js
+if (request.statusCode < 400) {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-green');
+} else if (request.statusCode < 500) {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+} else {
+    statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+}
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T10:08:14Z
+
+@stloyd I like your proposal ... except for the last comment. Showing 4xx errors in yellow is inconsistent with the current toolbar. 4xx and 5xx are treated as errors and showed in red.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-01-26T10:10:07Z
+
+Yeah, I posted that comment because I stumbled on it.. I had an issue in my code, since I was trying to catch redirects with `jQuery.ajax()` and I was getting always 200, didn't understand why :D
+
+I agree with @javiereguiluz , consistency with the rest of the toolbar is better.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T15:23:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-26T15:42:19Z
+
+should we really put the 2xx in green or keep it in gray instead ? I think putting colors only on errors make them stand out more than if everything is colored
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-26T15:47:48Z
+
+For comparison:
+
+### Color on Errors
+
+![ajax_status_after](https://cloud.githubusercontent.com/assets/73419/12585433/5ca70946-c44c-11e5-98a1-732dbb318322.gif)
+
+### Color on Everything
+
+![ajax_status_after_colors](https://cloud.githubusercontent.com/assets/73419/12585431/5c385e6a-c44c-11e5-8c81-ee8532e9bd87.gif)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T15:50:25Z
+
++1 for gray instead of green
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2016-01-26T22:55:45Z
+
+:+1:

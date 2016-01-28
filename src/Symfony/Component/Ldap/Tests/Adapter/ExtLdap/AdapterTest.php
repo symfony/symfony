@@ -11,18 +11,18 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
-use Symfony\Component\Ldap\LdapClient;
-use Symfony\Polyfill\Php56\Php56 as p;
+use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
+use Symfony\Component\Ldap\LdapInterface;
 
 /**
  * @requires extension ldap
  */
-class LdapClientTest extends \PHPUnit_Framework_TestCase
+class AdapterTest extends \PHPUnit_Framework_TestCase
 {
     public function testLdapEscape()
     {
-        $ldap = new LdapClient();
+        $ldap = new Adapter();
 
-        $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", null, p::LDAP_ESCAPE_DN));
+        $this->assertEquals('\20foo\3dbar\0d(baz)*\20', $ldap->escape(" foo=bar\r(baz)* ", null, LdapInterface::ESCAPE_DN));
     }
 }

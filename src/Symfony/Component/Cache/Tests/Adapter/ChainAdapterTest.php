@@ -15,6 +15,7 @@ use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,6 +37,22 @@ class ChainAdapterTest extends CachePoolTest
             $this->markTestSkipped('APCu extension is required.');
         }
 
-        return new ChainAdapter(array(new ArrayAdapter(), new ApcuAdapter(__CLASS__)));
+        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new ApcuAdapter(__CLASS__)));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
+     */
+    public function testLessThanTwoAdapterException()
+    {
+        new ChainAdapter(array());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
+     */
+    public function testInvalidAdapterException()
+    {
+        new ChainAdapter(array(new \stdClass(), new \stdClass()));
     }
 }

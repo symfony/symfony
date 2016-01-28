@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -24,24 +25,28 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 class ChainAdapter implements AdapterInterface
 {
-    private $adapters;
+    private $adapters = array();
 
     /**
      * @param AdapterInterface[] $adapters
      */
     public function __construct(array $adapters)
     {
-        if (2 < count($adapters)) {
+        if (2 > count($adapters)) {
             throw new InvalidArgumentException('At least two adapters must be chained.');
         }
 
         foreach ($adapters as $adapter) {
-            if (!$adapter instanceof AdapterInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_class($adapter), AdapterInterface::class));
+            if (!$adapter instanceof CacheItemPoolInterface) {
+                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', get_class($adapter), CacheItemPoolInterface::class));
+            }
+
+            if ($adapter instanceof AdapterInterface) {
+                $this->adapters[] = $adapter;
+            } else {
+                $this->adapters[] = new ProxyAdapter($adapter);
             }
         }
-
-        $this->adapters = $adapters;
     }
 
     /**

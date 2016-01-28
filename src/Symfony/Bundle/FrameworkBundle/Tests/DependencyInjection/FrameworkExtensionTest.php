@@ -548,7 +548,7 @@ abstract class FrameworkExtensionTest extends TestCase
     private function assertVersionStrategy(ContainerBuilder $container, Reference $reference, $version, $format)
     {
         $versionStrategy = $container->getDefinition($reference);
-        if ($version && $versionStrategy instanceof DefinitionDecorator) {
+        if ($versionStrategy instanceof DefinitionDecorator) {
             $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));

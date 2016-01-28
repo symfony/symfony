@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap;
 
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
@@ -18,11 +19,12 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
- *
- * @internal
  */
-interface LdapClientInterface
+interface LdapInterface
 {
+    const ESCAPE_FILTER = 0x01;
+    const ESCAPE_DN = 0x02;
+
     /**
      * Return a connection bound to the ldap.
      *
@@ -33,16 +35,16 @@ interface LdapClientInterface
      */
     public function bind($dn = null, $password = null);
 
-    /*
-     * Find a username into ldap connection.
+    /**
+     * Queries a ldap server for entries matching the given criteria.
      *
      * @param string $dn
      * @param string $query
-     * @param mixed  $filter
+     * @param array  $options
      *
-     * @return array|null
+     * @return QueryInterface
      */
-    public function find($dn, $query, $filter = '*');
+    public function query($dn, $query, array $options = array());
 
     /**
      * Escape a string for use in an LDAP filter or DN.

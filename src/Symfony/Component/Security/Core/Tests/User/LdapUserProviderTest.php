@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
+use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 
@@ -24,7 +28,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMock(LdapInterface::class);
         $ldap
             ->expects($this->once())
             ->method('bind')
@@ -40,11 +44,28 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMock(CollectionInterface::class);
+        $query = $this->getMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($result))
+        ;
+        $result
+            ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(0))
+        ;
+        $ldap = $this->getMock(LdapInterface::class);
         $ldap
             ->expects($this->once())
             ->method('escape')
             ->will($this->returnValue('foo'))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($query))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
@@ -56,7 +77,19 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMock(CollectionInterface::class);
+        $query = $this->getMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($result))
+        ;
+        $result
+            ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(2))
+        ;
+        $ldap = $this->getMock(LdapInterface::class);
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -64,12 +97,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue(array(
-                array(),
-                array(),
-                'count' => 2,
-            )))
+            ->method('query')
+            ->will($this->returnValue($query))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
@@ -78,7 +107,29 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessfulLoadUserByUsername()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $result = $this->getMock(CollectionInterface::class);
+        $query = $this->getMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($result))
+        ;
+        $ldap = $this->getMock(LdapInterface::class);
+        $result
+            ->expects($this->once())
+            ->method('offsetGet')
+            ->with(0)
+            ->will($this->returnValue(new Entry('foo', array(
+                    'sAMAccountName' => 'foo',
+                    'userpassword' => 'bar',
+                )
+            )))
+        ;
+        $result
+            ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(1))
+        ;
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -86,14 +137,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue(array(
-                array(
-                    'sAMAccountName' => 'foo',
-                    'userpassword' => 'bar',
-                ),
-                'count' => 1,
-            )))
+            ->method('query')
+            ->will($this->returnValue($query))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');

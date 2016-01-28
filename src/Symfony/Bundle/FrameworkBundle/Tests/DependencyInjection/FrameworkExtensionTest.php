@@ -553,7 +553,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));
         } else {
-            $this->assertEquals('assets.empty_version_strategy', (string)$reference);
+            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
         }
     }
 }

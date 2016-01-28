@@ -19,6 +19,30 @@
                             {% endif %}
                         </h2>
 
+                        {% if profile.collectors.request is defined and profile.collectors.request.redirect -%}
+                            {%- set redirect = profile.collectors.request.redirect -%}
+                            {%- set controller = redirect.controller -%}
+                            {%- set redirect_route = '@' ~ redirect.route %}
+                            <dl class="metadata">
+                                <dt>
+                                    <span class="label">{{ redirect.status_code }}</span>
+                                    Redirect from
+                                </dt>
+                                <dd>
+                                    {{ 'GET' != redirect.method ? redirect.method }}
+                                    {% if redirect.controller.class is defined -%}
+                                        {%- set link = controller.file|file_link(controller.line) -%}
+                                        {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+                                            {{ redirect_route }}
+                                        {%- if link %}</a>{% endif -%}
+                                    {%- else -%}
+                                            {{ redirect_route }}
+                                    {%- endif %}
+                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
+                                </dd>
+                            </dl>
+                        {%- endif %}
+
                         <dl class="metadata">
                             <dt>Method</dt>
                             <dd>{{ profile.method|upper }}</dd>

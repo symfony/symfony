@@ -66,7 +66,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                 '"Regular" callable',
                 array($this, 'testControllerInspection'),
                 array(
-                    'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
+                    'class' => __NAMESPACE__.'\RequestDataCollectorTest',
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
                     'line' => $r1->getStartLine(),
@@ -86,8 +86,13 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 
             array(
                 'Static callback as string',
-                'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest::staticControllerMethod',
-                'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest::staticControllerMethod',
+                __NAMESPACE__.'\RequestDataCollectorTest::staticControllerMethod',
+                array(
+                    'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
+                    'method' => 'staticControllerMethod',
+                    'file' => __FILE__,
+                    'line' => $r2->getStartLine(),
+                ),
             ),
 
             array(

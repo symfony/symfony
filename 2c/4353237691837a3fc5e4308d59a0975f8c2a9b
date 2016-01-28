@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T02:40:21Z
+
+Could you change https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Tests/Fixtures/yaml/badtag2.yml#L6 to use
+```
+tags:
+    - { foo: bar }
+````
+
+because it was confusing me. In theory with a hash structure like in
+
+```
+tags:
+    foo_tag:   { foo: bar }
+```
+
+`foo_tag` could be used as name IMO. It's just not implemented like this yet so far.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-11T09:08:01Z
+
+@Tobion this would be a bad idea, because it is perfectly valid to have multiple tags with the same name on a service
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-11T10:23:31Z
+
+@stof it would not be a bad idea because it would be optional and most of the time you don't have the same tag multiple times.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-11T11:04:41Z
+
+We should also add a check to ensure that the loading fails when the tag name is present but an empty string.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-12-14T08:13:28Z
+
+I would say no to
+
+```yaml
+tags:
+    foo_tag:   { foo: bar }
+```
+
+It's a new feature that adds nothing special, and introduces an inconsistency.
+If you look at the php and xml loader, then yaml would be only one to support this 'strange' format.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-12-19T19:01:53Z
+
+Tests are updated and I added some more checks for empty tag names.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-21T19:07:09Z
+
+Why this strange naming and numbering `badtag2.xml` and `badtag5.xml` for fixtures? Please use more descriptive names.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T12:02:40Z
+
+@xabbuh Can you finish this one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-27T19:37:27Z
+
+I addressed all comments.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-27T23:47:24Z
+
+:+1:
+Status: Reviewed

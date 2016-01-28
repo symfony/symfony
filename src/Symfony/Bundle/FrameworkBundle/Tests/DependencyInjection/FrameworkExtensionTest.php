@@ -518,6 +518,9 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
         }
 
+//        var_dump($packages['images']);die;
+
+
         $package = $container->getDefinition($packages['images']);
         $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', $legacy ? '%%s?%%s' : '%%s?version=%%s');
 
@@ -548,12 +551,12 @@ abstract class FrameworkExtensionTest extends TestCase
     private function assertVersionStrategy(ContainerBuilder $container, Reference $reference, $version, $format)
     {
         $versionStrategy = $container->getDefinition($reference);
-        if (null === $version || !$versionStrategy instanceof DefinitionDecorator) {
-            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
-        } else {
+        if ($version && $versionStrategy instanceof DefinitionDecorator) {
             $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));
+        } else {
+            $this->assertEquals('assets.empty_version_strategy', (string)$reference);
         }
     }
 }

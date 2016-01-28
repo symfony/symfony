@@ -518,9 +518,6 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
         }
 
-//        var_dump($packages['images']);die;
-
-
         $package = $container->getDefinition($packages['images']);
         $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', $legacy ? '%%s?%%s' : '%%s?version=%%s');
 

@@ -32,7 +32,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function getPersistentSqliteDsn()
     {
-        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_sessions');
+        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf3_sqlite_sessions');
 
         return 'sqlite:'.$this->dbFile;
     }

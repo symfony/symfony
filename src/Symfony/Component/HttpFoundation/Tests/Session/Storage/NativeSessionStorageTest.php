@@ -126,7 +126,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->regenerate();
         $storage->getBag('attributes')->set('lucky', 42);
 
-        $this->assertEquals(42, $_SESSION['_sf2_attributes']['lucky']);
+        $this->assertEquals(42, $_SESSION['_sf3_attributes']['lucky']);
     }
 
     public function testRegenerationFailureDoesNotFlagStorageAsStarted()

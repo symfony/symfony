@@ -19,7 +19,7 @@ class CacheWarmerTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
+        self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf3_cache_warmer_dir');
     }
 
     public static function tearDownAfterClass()

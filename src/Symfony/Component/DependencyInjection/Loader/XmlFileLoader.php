@@ -186,6 +186,10 @@ class XmlFileLoader extends FileLoader
                 $parameters[$name] = SimpleXMLElement::phpize($value);
             }
 
+            if ('' === (string) $tag['name']) {
+                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', $id, $file));
+            }
+
             $definition->addTag((string) $tag['name'], $parameters);
         }
 

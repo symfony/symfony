@@ -115,7 +115,7 @@
 {%- endblock choice_widget_expanded %}
 
 {% block checkbox_widget -%}
-    {% set parent_label_class = parent_label_class|default('') -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {% if 'checkbox-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
     {% else -%}
@@ -126,7 +126,7 @@
 {%- endblock checkbox_widget %}
 
 {% block radio_widget -%}
-    {%- set parent_label_class = parent_label_class|default('') -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {% if 'radio-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
     {% else -%}

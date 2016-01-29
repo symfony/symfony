@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -912,6 +913,13 @@ class FrameworkExtension extends Extension
             $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -910));
+        }
+
+        if (class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
+            // Run before serializer.normalizer.object
+            $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.normalizer', array('priority' => -900));
         }
 
         $loader->load('serializer.xml');

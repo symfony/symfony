@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -483,6 +484,21 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals(DateTimeNormalizer::class, $definition->getClass());
         $this->assertEquals(-910, $tag[0]['priority']);
+    }
+
+    public function testJsonNormalizerRegistered()
+    {
+        if (!class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
+            $this->markTestSkipped('The JsonSerializableNormalizer has been introduced in the Serializer Component version 3.1.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.json');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals(JsonSerializableNormalizer::class, $definition->getClass());
+        $this->assertEquals(-900, $tag[0]['priority']);
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

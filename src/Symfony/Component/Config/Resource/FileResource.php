@@ -29,10 +29,16 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      * Constructor.
      *
      * @param string $resource The file path to the resource
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($resource)
     {
         $this->resource = realpath($resource);
+
+        if (!file_exists($this->resource)) {
+            throw new \InvalidArgumentException(sprintf('The "%s" file does not exist.', $resource));
+        }
     }
 
     /**

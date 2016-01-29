@@ -26,11 +26,17 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
      *
      * @param string      $resource The file path to the resource
      * @param string|null $pattern  A pattern to restrict monitored files
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($resource, $pattern = null)
     {
-        $this->resource = $resource;
+        $this->resource = realpath($resource);
         $this->pattern = $pattern;
+
+        if (!is_dir($this->resource)) {
+            throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $resource));
+        }
     }
 
     /**

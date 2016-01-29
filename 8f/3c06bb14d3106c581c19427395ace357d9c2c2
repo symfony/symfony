@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-28T10:04:56Z
+
+Can you add line breaks like done in the other UPGRADE files?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-28T10:15:28Z
+
+@fabpot Sorry, not sure I understand what you mean.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-28T10:16:38Z
+
+I mean wrapping at around 80 chars.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-28T10:24:01Z
+
+Oh sure, it seems I wrapped around 100 characters instead.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-29T08:09:03Z
+
+:+1:
+Status: Reviewed

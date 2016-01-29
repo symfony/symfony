@@ -48,7 +48,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The ".*" file does not exist./
+     * @expectedExceptionMessageRegExp /The file ".*" does not exist./
      */
     public function testResourceDoesNotExist()
     {

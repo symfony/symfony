@@ -37,7 +37,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
         $this->resource = realpath($resource);
 
         if (false === $this->resource) {
-            throw new \InvalidArgumentException(sprintf('The "%s" file does not exist.', $resource));
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $resource));
         }
     }
 

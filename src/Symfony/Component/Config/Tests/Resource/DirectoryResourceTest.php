@@ -64,7 +64,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The ".*" directory does not exist./
+     * @expectedExceptionMessageRegExp /The directory ".*" does not exist./
      */
     public function testResourceDoesNotExist()
     {

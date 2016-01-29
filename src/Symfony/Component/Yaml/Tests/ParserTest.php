@@ -788,6 +788,18 @@ EOF
         ));
     }
 
+    public function testFoldedBinaryBlock()
+    {
+        $this->assertEquals(array(array('name' => 'Hello, world.', 'desc' => 'Hello, world.')), Yaml::parse(<<<'EOF'
+-
+    name: !!binary "SGVsbG8sIHdvcmxkLg=="
+    desc: !!binary |
+        SGVsbG8sIH
+        dvcmxkLg==
+EOF
+        ));
+    }
+
     public function testReferenceResolvingInInlineStrings()
     {
         $this->assertEquals(array(

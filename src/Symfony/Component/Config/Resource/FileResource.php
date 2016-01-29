@@ -36,7 +36,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
     {
         $this->resource = realpath($resource);
 
-        if (!file_exists($this->resource)) {
+        if (false === $this->resource) {
             throw new \InvalidArgumentException(sprintf('The "%s" file does not exist.', $resource));
         }
     }
@@ -46,11 +46,11 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return $this->resource;
     }
 
     /**
-     * @return string|false The canonicalized, absolute path to the resource or false if the resource does not exist.
+     * @return string The canonicalized, absolute path to the resource.
      */
     public function getResource()
     {
@@ -62,7 +62,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function isFresh($timestamp)
     {
-        if (false === $this->resource || !file_exists($this->resource)) {
+        if (!file_exists($this->resource)) {
             return false;
         }
 

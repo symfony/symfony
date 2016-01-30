@@ -103,7 +103,7 @@ class DefinitionDecorator extends Definition
     {
         $this->changes['factory_service'] = true;
 
-        return parent::setFactoryService($service);
+        return parent::setFactoryService($service, $triggerDeprecationError);
     }
 
     /**

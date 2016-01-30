@@ -396,7 +396,6 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version')
-                                        ->defaultNull()
                                         ->beforeNormalization()
                                         ->ifTrue(function ($v) { return '' === $v; })
                                         ->then(function ($v) { return; })

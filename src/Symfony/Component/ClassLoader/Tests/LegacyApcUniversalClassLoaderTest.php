@@ -21,7 +21,7 @@ class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
-            apcu_clear_cache('user');
+            apcu_clear_cache();
         } else {
             $this->markTestSkipped('APC is not enabled.');
         }
@@ -30,7 +30,7 @@ class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         if (ini_get('apc.enabled') && ini_get('apc.enable_cli')) {
-            apcu_clear_cache('user');
+            apcu_clear_cache();
         }
     }
 

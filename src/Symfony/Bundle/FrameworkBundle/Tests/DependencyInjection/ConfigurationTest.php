@@ -190,6 +190,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'base_urls' => array(),
                 'packages' => array(),
             ),
+            'warm_up_class_cache' => true,
         );
     }
 }

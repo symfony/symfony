@@ -42,6 +42,7 @@
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="test" type="xsd:boolean" />
+        <xsd:attribute name="warm-up-class-cache" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

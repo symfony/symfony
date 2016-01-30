@@ -499,6 +499,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info'));
     }
 
+    public function testClassCacheCacheWarmerEnabled()
+    {
+        $container = $this->createContainerFromFile('default_config');
+        $this->assertTrue($container->has('kernel.class_cache.cache_warmer'));
+    }
+
+    public function testClassCacheCacheWarmerDisabled()
+    {
+        $container = $this->createContainerFromFile('class_cache_cache_warmer');
+        $this->assertFalse($container->has('kernel.class_cache.cache_warmer'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

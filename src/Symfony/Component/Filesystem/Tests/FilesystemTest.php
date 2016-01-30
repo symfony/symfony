@@ -159,13 +159,11 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         file_put_contents($targetFilePath, 'TARGET FILE');
 
-        $fileSystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')
-            ->setMethods(array('doCopy'))
-            ->getMock();
-        $fileSystem->expects($this->once())
-            ->method('doCopy')
-            ->with($this->equalTo($sourceFilePath), $this->equalTo($targetFilePath));
-        $fileSystem->copy($sourceFilePath, $targetFilePath, false);
+        $fileSystem = new Filesystem();
+        $r = new \ReflectionMethod($fileSystem, 'doCopy');
+        $r->setAccessible(true);
+
+        $this->assertTrue($r->invoke($fileSystem, $sourceFilePath, $targetFilePath, false));
     }
 
     public function testMkdirCreatesDirectoriesRecursively()

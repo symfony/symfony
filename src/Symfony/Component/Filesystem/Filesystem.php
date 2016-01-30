@@ -41,37 +41,19 @@ class Filesystem
 
         $this->mkdir(dirname($targetFile));
 
-        $doCopy = true;
-        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
-            $doCopy = filemtime($originFile) > filemtime($targetFile);
-        }
+        if ($this->doCopy($originFile, $targetFile, $override)) {
+            // https://bugs.php.net/bug.php?id=64634
+            $source = fopen($originFile, 'r');
+            // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
+            $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
+            stream_copy_to_stream($source, $target);
+            fclose($source);
+            fclose($target);
+            unset($source, $target);
 
-        if ($doCopy) {
-            $this->doCopy($originFile, $targetFile);
-        }
-    }
-
-    /**
-     * Makes of copy from the origin file to the target file.
-     *
-     * @param string $originFile The original filename
-     * @param string $targetFile The target filename
-     *
-     * @throws IOException When copy fails
-     */
-    protected function doCopy($originFile, $targetFile)
-    {
-        // https://bugs.php.net/bug.php?id=64634
-        $source = fopen($originFile, 'r');
-        // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-        $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
-        stream_copy_to_stream($source, $target);
-        fclose($source);
-        fclose($target);
-        unset($source, $target);
-
-        if (!is_file($targetFile)) {
-            throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+            if (!is_file($targetFile)) {
+                throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+            }
         }
     }
 
@@ -494,5 +476,24 @@ class Filesystem
             $this->chmod($tmpFile, $mode);
         }
         $this->rename($tmpFile, $filename, true);
+    }
+
+    /**
+     * Decides if an actual copy is needed or not.
+     *
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     * @param bool   $override   Whether to override an existing file or not
+     *
+     * @return bool
+     */
+    private function doCopy($originFile, $targetFile, $override)
+    {
+        $doCopy = true;
+        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
+            $doCopy = filemtime($originFile) > filemtime($targetFile);
+        }
+
+        return $doCopy;
     }
 }

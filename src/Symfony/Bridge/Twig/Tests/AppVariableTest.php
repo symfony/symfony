@@ -13,7 +13,7 @@ class AppVariableTest extends \PHPUnit_Framework_TestCase
      */
     protected $appVariable;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->appVariable = new AppVariable();
     }

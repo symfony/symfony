@@ -21,7 +21,7 @@ class ExtensionCompilerPassTest extends \PHPUnit_Framework_TestCase
     private $container;
     private $pass;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $this->pass = new ExtensionCompilerPass();

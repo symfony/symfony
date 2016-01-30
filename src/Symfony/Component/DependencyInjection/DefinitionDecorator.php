@@ -99,11 +99,11 @@ class DefinitionDecorator extends Definition
     /**
      * {@inheritdoc}
      */
-    public function setFactoryService($service)
+    public function setFactoryService($service, $triggerDeprecationError = true)
     {
         $this->changes['factory_service'] = true;
 
-        return parent::setFactoryService($service);
+        return parent::setFactoryService($service, $triggerDeprecationError);
     }
 
     /**

@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-27T23:26:59Z
+
+Other tests are failing too. (They didn't show until this was fixed) In progress..
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-28T03:25:11Z
+
+@xabbuh Could you take a look please? Only 5.3 failes now on Travis but for some other reason, not related to tests:
+https://travis-ci.org/symfony/symfony/jobs/105325452
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-01-30T12:03:50Z
+
+After #17605 merged, this PR fixes the remaining failing tests.

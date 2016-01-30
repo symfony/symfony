@@ -184,6 +184,19 @@
     {% endif %}
 {%- endblock choice_widget_expanded %}
 
+{% block choice_widget_empty -%}
+    {%- if empty_choices is empty %}
+        {%- set empty_choices = 'No choice available' %}
+        {%- set choice_translation_domain = 'sf_form' %}
+    {%- endif -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        <p>
+            {{- choice_translation_domain is same as(false) ? empty_choices : empty_choices|trans({}, choice_translation_domain) -}}
+        </p>
+    </div>
+{%- endblock %}
+
 {% block checkbox_widget -%}
     {% set parent_label_class = parent_label_class|default('') %}
     {% if errors|length > 0 -%}

@@ -216,10 +216,56 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
+        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
+'/table
+    [
+        ./tr
+            [
+                ./td[@colspan="2"]/em[.="[trans]No fields[/trans]"]
+            ]
+    ]
+    [@id="my&id"]
+    [@class="my&class"]
+/following-sibling::tr[@style="display: none"]
+    [
+        ./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]
+    ]
+'
+        );
+    }
+
+    public function testSingleChoiceWithoutChoices()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'choices' => array(),
+            'multiple' => false,
+            'expanded' => false,
+            'required' => true,
+        ));
+
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
-    [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]]]
-    [count(./tr[./td/input])=1]
+    [
+        ./tr/td[@colspan="2"]/em[.="[trans]No choice available[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithoutChoices()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'choices' => array(),
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [
+        ./tr/td[@colspan="2"]/em[.="[trans]No choice available[/trans]"]
+    ]
 '
         );
     }

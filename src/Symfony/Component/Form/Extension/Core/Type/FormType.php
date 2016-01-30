@@ -113,6 +113,10 @@ class FormType extends BaseType
         }
 
         $view->vars['multipart'] = $multipart;
+
+        if ($form->getConfig()->getCompound()) {
+            $view->vars['empty_view'] = (bool) $view->count() ? false : $options['empty_view'];
+        }
     }
 
     /**
@@ -142,6 +146,12 @@ class FormType extends BaseType
             };
         };
 
+        // For any compound form which has no children, show some text
+        // instead of an empty HTML tag by default
+        $emptyView = function (Options $options) {
+            return $options['compound'] ? 'No fields' : false;
+        };
+
         // For any form that is not represented by a single HTML control,
         // errors should bubble up by default
         $errorBubbling = function (Options $options) {
@@ -157,6 +167,7 @@ class FormType extends BaseType
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
+            'empty_view' => $emptyView,
             'trim' => true,
             'required' => true,
             'property_path' => null,
@@ -175,6 +186,7 @@ class FormType extends BaseType
         ));
 
         $resolver->setAllowedTypes('label_attr', 'array');
+        $resolver->setAllowedTypes('empty_view', array('null', 'string', 'bool'));
     }
 
     /**

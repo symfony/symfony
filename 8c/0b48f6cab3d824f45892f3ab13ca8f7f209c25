@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-30T08:07:59Z
+
+This will make tests of the FrameworkBundle pass again.
+
+@ewgRa Can you have a look here as you initially added the default value in #17514 and I want to make sure not to break anything here which you intended to fix?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-30T08:42:37Z
+
+There are more broken tests in the FrameworkBundle which are not related to the Asset component. :(

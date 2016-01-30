@@ -527,7 +527,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $package = $container->getDefinition($packages['bar']);
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? null : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
 
-        $this->assertEquals('assets.empty_version_strategy', (string) $container->getDefinition('assets._package_bar')->getArgument(1));
+        $this->assertEquals($legacy ? 'assets.empty_version_strategy' : 'assets._version__default', (string) $container->getDefinition('assets._package_bar')->getArgument(1));
         $this->assertEquals('assets.empty_version_strategy', (string) $container->getDefinition('assets._package_bar_null_version')->getArgument(1));
     }
 
@@ -548,12 +548,12 @@ abstract class FrameworkExtensionTest extends TestCase
     private function assertVersionStrategy(ContainerBuilder $container, Reference $reference, $version, $format)
     {
         $versionStrategy = $container->getDefinition($reference);
-        if ($versionStrategy instanceof DefinitionDecorator) {
+        if (null === $version) {
+            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
+        } else {
             $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));
-        } else {
-            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
         }
     }
 }

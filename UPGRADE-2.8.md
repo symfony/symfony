@@ -22,7 +22,7 @@ Form
    of the new `csrf_token_id` option.
 
  * The `csrf_provider` option was deprecated and will be removed in 3.0 in favor
-   of the new `csrf_token_generator` option.
+   of the new `csrf_token_manager` option.
 
  * The "cascade_validation" option was deprecated. Use the "constraints"
    option together with the `Valid` constraint instead. Contrary to

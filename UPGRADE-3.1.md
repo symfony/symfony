@@ -16,6 +16,13 @@ Form
  * The `choices_as_values` option of the `ChoiceType` has been deprecated and
    will be removed in Symfony 4.0.
 
+HttpKernel
+----------
+
+ * Passing objects as URI attributes to the ESI and SSI renderers has been
+   deprecated and will be removed in Symfony 4.0. The inline fragment
+   renderer should be used with object attributes.
+
 Serializer
 ----------
 

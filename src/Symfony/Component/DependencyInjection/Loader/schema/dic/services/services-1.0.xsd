@@ -103,7 +103,7 @@
   </xsd:complexType>
 
   <xsd:complexType name="tag">
-    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="name" type="xsd:string" use="required" />
     <xsd:anyAttribute namespace="##any" processContents="lax" />
   </xsd:complexType>
 

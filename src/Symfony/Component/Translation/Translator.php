@@ -424,6 +424,9 @@ EOF
             }
 
             $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            foreach ($this->catalogues[$fallback]->getResources() as $resource) {
+                $fallbackCatalogue->addResource($resource);
+            }
             $current->addFallbackCatalogue($fallbackCatalogue);
             $current = $fallbackCatalogue;
         }

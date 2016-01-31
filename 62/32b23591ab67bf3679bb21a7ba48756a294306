@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-30T20:09:38Z
+
+see https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Form/Extension/Csrf/Type/FormTypeCsrfExtension.php#L88 (introduced in #9216)

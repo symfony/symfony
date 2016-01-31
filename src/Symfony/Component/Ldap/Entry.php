@@ -31,6 +31,11 @@ class Entry
         $this->attributes = $attributes;
     }
 
+    public function getDn()
+    {
+        return $this->dn;
+    }
+
     public function getAttribute($name)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;

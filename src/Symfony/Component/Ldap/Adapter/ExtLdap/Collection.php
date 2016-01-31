@@ -12,6 +12,7 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
+use Symfony\Component\Ldap\Entry;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>

@@ -18,17 +18,17 @@ use Symfony\Component\Ldap\Exception\DriverNotFoundException;
  */
 final class LdapFactory
 {
-    private $adapterMap = array(
+    private static $adapterMap = array(
         'ext_ldap' => 'Symfony\Component\Ldap\Driver\ExtLdap\Adapter',
     );
 
-    public function create($adapter, $options)
+    public static function create($adapter, $options)
     {
-        if (!isset($this->adapterMap[$adapter])) {
+        if (!isset(self::$adapterMap[$adapter])) {
             throw new DriverNotFoundException(sprintf('Adapter "%s" not found', $adapter));
         }
 
-        $class = $this->adapterMap[$adapter];
+        $class = self::$adapterMap[$adapter];
 
         return new Ldap(new $class($options));
     }

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -451,6 +452,21 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($serializerExtractorDefinition->isPublic());
         $tag = $serializerExtractorDefinition->getTag('property_info.list_extractor');
         $this->assertEquals(array('priority' => -999), $tag[0]);
+    }
+
+    public function testDataUriNormalizerRegistered()
+    {
+        if (!class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
+            $this->markTestSkipped('The DataUriNormalizer has been introduced in the Serializer Component version 3.1.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.data_uri');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals(DataUriNormalizer::class, $definition->getClass());
+        $this->assertEquals(-920, $tag[0]['priority']);
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+    <body>
+      <trans-unit id="88183b946cc5f0e8c96b2e66e1c74a7e" resname="Unknown">
+        <source>Unknown</source>
+        <target>Unknown City</target>
+      </trans-unit>
+      <trans-unit id="c21af64788307c2a625ddf063b16434c" resname="DumontDUrville">
+        <source>DumontDUrville</source>
+        <target>Dumont d’Urville</target>
+      </trans-unit>
+      <trans-unit id="ac699d4b11782cfe863fe22ac5297811" resname="St Barthelemy">
+        <source>St Barthelemy</source>
+        <target>St. Barthélemy</target>
+      </trans-unit>
+      <trans-unit id="0d2268d462cd08b20b7508c3fc0fde5e" resname="Curacao">
+        <source>Curacao</source>
+        <target>Curaçao</target>
+      </trans-unit>
+      <trans-unit id="8410f16f69626640a58f6c75509b068b" resname="Asuncion">
+        <source>Asuncion</source>
+        <target>Asunción</target>
+      </trans-unit>
+      <trans-unit id="939c3c13a3d058c4c53109d7f804b631" resname="Reunion">
+        <source>Reunion</source>
+        <target>Réunion</target>
+      </trans-unit>
+      <trans-unit id="ff8d0d21141bd958cb19055812caa5a5" resname="Sao Tome">
+        <source>Sao Tome</source>
+        <target>São Tomé</target>
+      </trans-unit>
+      <trans-unit id="bde8acaf5b357c3ab4410292428a22a7" resname="Uzhgorod">
+        <source>Uzhgorod</source>
+        <target>Uzhhorod</target>
+      </trans-unit>
+      <trans-unit id="40d76e9f62624ae13d97fabdf6e201ca" resname="Saigon">
+        <source>Saigon</source>
+        <target>Ho Chi Minh City</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

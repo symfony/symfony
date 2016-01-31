@@ -897,8 +897,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
-        mkdir($sourcePath.'nested/', 0777, true);
-        file_put_contents($sourcePath.'/nested/file1.txt', 'FILE1');
+        mkdir($sourcePath.'nested'.DIRECTORY_SEPARATOR, 0777, true);
+        file_put_contents($sourcePath.'nested'.DIRECTORY_SEPARATOR.'file1.txt', 'FILE1');
         // Note: We symlink directory, not file
         symlink($sourcePath.'nested', $sourcePath.'link1');
 
@@ -907,8 +907,8 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
-        $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
+        $this->assertFileEquals($sourcePath.'nested'.DIRECTORY_SEPARATOR.'file1.txt', $targetPath.'link1'.DIRECTORY_SEPARATOR.'file1.txt');
+        $this->assertTrue(is_link($targetPath.'link1'));
     }
 
     public function testMirrorCopiesRelativeLinkedContents()
@@ -918,8 +918,8 @@ class FilesystemTest extends FilesystemTestCase
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
         $oldPath = getcwd();
 
-        mkdir($sourcePath.'nested/', 0777, true);
-        file_put_contents($sourcePath.'/nested/file1.txt', 'FILE1');
+        mkdir($sourcePath.'nested'.DIRECTORY_SEPARATOR, 0777, true);
+        file_put_contents($sourcePath.'nested'.DIRECTORY_SEPARATOR.'file1.txt', 'FILE1');
         // Note: Create relative symlink
         chdir($sourcePath);
         symlink('nested', 'link1');
@@ -931,9 +931,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'nested'.DIRECTORY_SEPARATOR.'file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1'.DIRECTORY_SEPARATOR.'file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
-        $this->assertEquals('\\' === DIRECTORY_SEPARATOR ? realpath($sourcePath.'\nested') : 'nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
+        $this->assertEquals('\\' === DIRECTORY_SEPARATOR ? realpath($sourcePath.'nested') : 'nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
     /**

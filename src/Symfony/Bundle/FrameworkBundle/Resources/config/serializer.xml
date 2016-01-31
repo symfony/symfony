@@ -26,6 +26,11 @@
             <tag name="serializer.normalizer" priority="-1000" />
         </service>
 
+        <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <!-- Run after serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-920" />
+        </service>
+
         <!-- Loader -->
         <service id="serializer.mapping.chain_loader" class="Symfony\Component\Serializer\Mapping\Loader\LoaderChain" public="false">
             <argument type="collection" />

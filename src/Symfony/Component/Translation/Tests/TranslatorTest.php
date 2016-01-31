@@ -283,15 +283,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // force catalogue loading
         $this->assertEquals('bar', $translator->trans('foo', array()));
 
-        $cataloguesProperty = new \ReflectionProperty($translator, 'catalogues');
-        $cataloguesProperty->setAccessible(true);
-        $catalogues = $cataloguesProperty->getValue($translator);
-
-        $resources = $catalogues['en']->getResources();
+        $resources = $translator->getCatalogue('en')->getResources();
         $this->assertCount(1, $resources);
         $this->assertContains( __DIR__.'/fixtures/resources.yml', $resources);
 
-        $resources = $catalogues['en_GB']->getResources();
+        $resources = $translator->getCatalogue('en_GB')->getResources();
         $this->assertCount(2, $resources);
         $this->assertContains( __DIR__.'/fixtures/empty.yml', $resources);
         $this->assertContains( __DIR__.'/fixtures/resources.yml', $resources);

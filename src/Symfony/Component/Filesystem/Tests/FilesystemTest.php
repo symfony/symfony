@@ -913,6 +913,10 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testMirrorCopiesRelativeLinkedContents()
     {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not support creating relative symlinks');
+        }
+
         $this->markAsSkippedIfSymlinkIsMissing();
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="da" datatype="plaintext" original="file.ext">
+    <body>
+      <trans-unit id="1">
+        <source>Africa</source>
+        <target>Afrika</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source>Antarctica</source>
+        <target>Antarktis</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source>Arctic</source>
+        <target>Arktis</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source>Atlantic</source>
+        <target>Atlanterhavet</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source>Australia</source>
+        <target>Australien</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source>Europe</source>
+        <target>Europa</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source>Indian</source>
+        <target>Indiske Ocean</target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source>Pacific</source>
+        <target>Stillehavet</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source>Other</source>
+        <target>Øvrige</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-01T14:01:08Z
+
+Status: needs review
+PR is ready, and shows that we have a broken 2.3...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-01T15:57:41Z
+
+PR now embeds fixes for our lowest supported PHP version and for Windows.
+Green.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-01T20:15:46Z
+
+:+1: (but I'm not confortable at all with Regedit.exe so I blindly trust you).

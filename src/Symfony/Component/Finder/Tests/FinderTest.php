@@ -248,6 +248,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             __DIR__.DIRECTORY_SEPARATOR.'BsdFinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'GnuFinderTest.php',
+            __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php',
         );
 
         $this->assertIterator($expected, $iterator);

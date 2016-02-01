@@ -1669,7 +1669,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->headers->set('host', $host);
         $this->assertEquals($host, $request->getHost());
-        $this->assertLessThan(1, microtime(true) - $start);
+        $this->assertLessThan(3, microtime(true) - $start);
     }
 
     /**

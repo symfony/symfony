@@ -1,0 +1,17 @@
+{
+    "Version": "2.1.7.39",
+    "Names": {
+        "America\/Anchorage": "Анкорыдж",
+        "America\/Campo_Grande": "Кампа Грандэ",
+        "America\/Chicago": "Чыкага",
+        "America\/Denver": "Дэнвэр",
+        "America\/Indianapolis": "Індыянапаліс",
+        "America\/Los_Angeles": "Лос-Анджэлас",
+        "America\/New_York": "Нью-Ёрк",
+        "America\/Phoenix": "Фэнікс",
+        "America\/Rio_Branco": "Рыё Бранка",
+        "America\/Sao_Paulo": "Сан-Паўлу",
+        "Etc\/Unknown": "Невядомы",
+        "Pacific\/Honolulu": "Ганалулу"
+    }
+}

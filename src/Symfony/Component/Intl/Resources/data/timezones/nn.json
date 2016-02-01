@@ -1,0 +1,18 @@
+{
+    "Version": "2.1.7.72",
+    "Names": {
+        "America\/Belem": "Belém",
+        "America\/Cancun": "Cancún",
+        "America\/Godthab": "Godthåb",
+        "America\/Mexico_City": "Mexico by",
+        "America\/North_Dakota\/Center": "Center, Nord-Dakota",
+        "Asia\/Tashkent": "Tasjkent",
+        "Asia\/Ulaanbaatar": "Ulan Bator",
+        "Atlantic\/Azores": "Azorane",
+        "Atlantic\/Canary": "Kanariøyane",
+        "Etc\/Unknown": "ukjend",
+        "Europe\/Lisbon": "Lisboa",
+        "Europe\/Moscow": "Moskva",
+        "Pacific\/Easter": "Påskeøya"
+    }
+}

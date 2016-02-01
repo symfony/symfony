@@ -1,0 +1,14 @@
+{
+    "Version": "2.1.8.87",
+    "Names": {
+        "Africa\/Sao_Tome": "São Tomé",
+        "America\/Asuncion": "Asunción",
+        "America\/Curacao": "Curaçao",
+        "America\/St_Barthelemy": "St. Barthélemy",
+        "Antarctica\/DumontDUrville": "Dumont d’Urville",
+        "Asia\/Saigon": "Ho Chi Minh City",
+        "Etc\/Unknown": "Unknown City",
+        "Europe\/Uzhgorod": "Uzhhorod",
+        "Indian\/Reunion": "Réunion"
+    }
+}

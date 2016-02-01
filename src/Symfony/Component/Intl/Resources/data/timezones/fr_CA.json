@@ -1,0 +1,23 @@
+{
+    "Version": "2.1.8.19",
+    "Names": {
+        "Africa\/Ndjamena": "Ndjamena",
+        "America\/Barbados": "Barbade (La)",
+        "America\/Cayman": "Îles Caïmans",
+        "America\/North_Dakota\/New_Salem": "New Salem, Dakota du Nord",
+        "America\/St_Kitts": "Saint-Christophe-et-Niévès",
+        "America\/St_Thomas": "Saint Thomas",
+        "Asia\/Baghdad": "Baghdad",
+        "Asia\/Dhaka": "Dacca",
+        "Asia\/Thimphu": "Thimphou",
+        "Atlantic\/Faeroe": "Îles Féroé",
+        "Europe\/Vatican": "Vatican",
+        "Indian\/Chagos": "Archipel des Chagos",
+        "Indian\/Christmas": "Île Christmas",
+        "Indian\/Cocos": "Îles Cocos",
+        "Indian\/Comoro": "Union des Comores",
+        "Indian\/Kerguelen": "Îles Kerguelen",
+        "Pacific\/Pitcairn": "Île Pitcairn",
+        "Pacific\/Wallis": "Uvéa"
+    }
+}

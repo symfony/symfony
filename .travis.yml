@@ -6,6 +6,8 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
+        - ldap-utils
+        - slapd
 
 env:
     global:

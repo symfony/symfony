@@ -724,6 +724,8 @@ class Form implements \IteratorAggregate, FormInterface
     public function isValid()
     {
         if (!$this->submitted) {
+            @trigger_error('Call Form::isValid() with an unsubmitted form is deprecated since version 3.2 and will throw an exception in 4.0. Use Form::isSubmitted() before Form::isValid() instead.', E_USER_DEPRECATED);
+
             return false;
         }
 

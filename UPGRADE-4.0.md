@@ -42,6 +42,25 @@ Form
  * Caching of the loaded `ChoiceListInterface` in the `LazyChoiceList` has been removed,
    it must be cached in the `ChoiceLoaderInterface` implementation instead.
 
+ * Calling `isValid()` on a `Form` instance before submitting it is not supported
+   anymore and raises an exception.
+
+   Before:
+
+   ```php
+   if ($form->isValid()) {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   if ($form->isSubmitted() && $form->isValid()) {
+       // ...
+   }
+   ```
+
 FrameworkBundle
 ---------------
 

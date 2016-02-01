@@ -255,12 +255,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $resources = $catalogues['en']->getResources();
         $this->assertCount(1, $resources);
-        $this->assertContains( __DIR__.'/fixtures/resources.yml', $resources);
+        $this->assertContains( __DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'resources.yml', $resources);
 
         $resources = $catalogues['en_GB']->getResources();
         $this->assertCount(2, $resources);
-        $this->assertContains( __DIR__.'/fixtures/empty.yml', $resources);
-        $this->assertContains( __DIR__.'/fixtures/resources.yml', $resources);
+        $this->assertContains( __DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'empty.yml', $resources);
+        $this->assertContains( __DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'resources.yml', $resources);
     }
 
     /**

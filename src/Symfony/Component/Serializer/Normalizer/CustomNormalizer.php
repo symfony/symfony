@@ -59,6 +59,10 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
+        if (PHP_VERSION_ID < 50307) {
+            return class_exists($type) && in_array('Symfony\Component\Serializer\Normalizer\DenormalizableInterface', class_implements($type), true);
+        }
+
         return is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
     }
 }

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-01T12:49:46Z
+
+Fixed a typo.
+
+Let's wait for the tests to run, but it should be good to go, @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-01T12:54:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-01T14:40:48Z
+
+Tests are broken, for another reason.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-01T17:49:45Z
+
+By the way, this currently blocks #17560 and #17577.
+
+It will also make it possible to merge both PRs in a single PR.

@@ -27,7 +27,7 @@ if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
 }
 
-$COMPOSER = file_exists($COMPOSER = __DIR__.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? `where.exe composer.phar` : `which composer.phar`))
+$COMPOSER = file_exists($COMPOSER = __DIR__.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
     ? $PHP.' '.ProcessUtils::escapeArgument($COMPOSER)
     : 'composer';
 

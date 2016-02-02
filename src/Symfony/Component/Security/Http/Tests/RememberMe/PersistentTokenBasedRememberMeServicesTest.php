@@ -23,6 +23,15 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
 class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        try {
+            random_bytes(1);
+        } catch (\Exception $e) {
+            throw new \PHPUnit_Framework_SkippedTestError($e->getMessage());
+        }
+    }
+
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
         $service = $this->getService(null, array('name' => 'foo'));

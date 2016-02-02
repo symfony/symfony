@@ -100,8 +100,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Checks if the definition is inlineable.
      *
-     * @param string           $id
-     * @param Definition       $definition
+     * @param string     $id
+     * @param Definition $definition
      *
      * @return bool If the definition is inlineable
      */

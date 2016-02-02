@@ -331,27 +331,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
     }
 
-    public function testGetIncrementalErrorOutput()
-    {
-        // use a lock file to toggle between writing ("W") and reading ("R") the
-        // error stream
-        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
-        file_put_contents($lock, 'W');
-
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
-
-        $p->start();
-        while ($p->isRunning()) {
-            if ('R' === file_get_contents($lock)) {
-                $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalErrorOutput(), $matches));
-                file_put_contents($lock, 'W');
-            }
-            usleep(100);
-        }
-
-        unlink($lock);
-    }
-
     public function testFlushErrorOutput()
     {
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
@@ -361,35 +340,40 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($p->getErrorOutput());
     }
 
-    public function testGetEmptyIncrementalErrorOutput()
+    /**
+     * @dataProvider provideIncrementalOutput
+     */
+    public function testIncrementalOutput($getOutput, $getIncrementalOutput, $uri)
     {
-        // use a lock file to toggle between writing ("W") and reading ("R") the
-        // output stream
-        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
-        file_put_contents($lock, 'W');
+        $lock = tempnam(sys_get_temp_dir(), __FUNCTION__);
 
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('file_put_contents($s = \''.$uri.'\', \'foo\'); flock(fopen('.var_export($lock, true).', \'r\'), LOCK_EX); file_put_contents($s, \'bar\');')));
+
+        $h = fopen($lock, 'w');
+        flock($h, LOCK_EX);
 
         $p->start();
 
-        $shouldWrite = false;
-
-        while ($p->isRunning()) {
-            if ('R' === file_get_contents($lock)) {
-                if (!$shouldWrite) {
-                    $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalOutput(), $matches));
-                    $shouldWrite = true;
-                } else {
-                    $this->assertSame('', $p->getIncrementalOutput());
-
-                    file_put_contents($lock, 'W');
-                    $shouldWrite = false;
-                }
+        foreach (array('foo', 'bar') as $s) {
+            while (false === strpos($p->$getOutput(), $s)) {
+                usleep(1000);
             }
-            usleep(100);
+
+            $this->assertSame($s, $p->$getIncrementalOutput());
+            $this->assertSame('', $p->$getIncrementalOutput());
+
+            flock($h, LOCK_UN);
         }
 
-        unlink($lock);
+        fclose($h);
+    }
+
+    public function provideIncrementalOutput()
+    {
+        return array(
+            array('getOutput', 'getIncrementalOutput', 'php://stdout'),
+            array('getErrorOutput', 'getIncrementalErrorOutput', 'php://stderr'),
+        );
     }
 
     public function testGetOutput()
@@ -400,27 +384,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
     }
 
-    public function testGetIncrementalOutput()
-    {
-        // use a lock file to toggle between writing ("W") and reading ("R") the
-        // output stream
-        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
-        file_put_contents($lock, 'W');
-
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
-
-        $p->start();
-        while ($p->isRunning()) {
-            if ('R' === file_get_contents($lock)) {
-                $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
-                file_put_contents($lock, 'W');
-            }
-            usleep(100);
-        }
-
-        unlink($lock);
-    }
-
     public function testFlushOutput()
     {
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
@@ -428,37 +391,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $p->run();
         $p->clearOutput();
         $this->assertEmpty($p->getOutput());
-    }
-
-    public function testGetEmptyIncrementalOutput()
-    {
-        // use a lock file to toggle between writing ("W") and reading ("R") the
-        // output stream
-        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
-        file_put_contents($lock, 'W');
-
-        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
-
-        $p->start();
-
-        $shouldWrite = false;
-
-        while ($p->isRunning()) {
-            if ('R' === file_get_contents($lock)) {
-                if (!$shouldWrite) {
-                    $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
-                    $shouldWrite = true;
-                } else {
-                    $this->assertSame('', $p->getIncrementalOutput());
-
-                    file_put_contents($lock, 'W');
-                    $shouldWrite = false;
-                }
-            }
-            usleep(100);
-        }
-
-        unlink($lock);
     }
 
     public function testZeroAsOutput()

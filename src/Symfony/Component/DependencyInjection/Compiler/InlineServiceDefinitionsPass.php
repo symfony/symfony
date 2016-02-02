@@ -72,7 +72,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                     continue;
                 }
 
-                if ($this->isInlineableDefinition($container, $id, $definition = $container->getDefinition($id))) {
+                if ($this->isInlineableDefinition($id, $definition = $container->getDefinition($id))) {
                     $this->compiler->addLogMessage($this->formatter->formatInlineService($this, $id, $this->currentId));
 
                     if ($definition->isShared()) {
@@ -100,13 +100,12 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Checks if the definition is inlineable.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param Definition       $definition
+     * @param string     $id
+     * @param Definition $definition
      *
      * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
+    private function isInlineableDefinition($id, Definition $definition)
     {
         if (!$definition->isShared()) {
             return true;

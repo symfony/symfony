@@ -14,12 +14,14 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ControllerTest extends TestCase
 {
@@ -124,6 +126,85 @@ class ControllerTest extends TestCase
 
         return $container;
     }
+
+    public function testJson()
+    {
+        $container = $this->getMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('serializer')
+            ->will($this->returnValue(false));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $response = $controller->json(array());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals('[]', $response->getContent());
+    }
+
+    public function testJsonWithSerializer()
+    {
+        $container = $this->getMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('serializer')
+            ->will($this->returnValue(true));
+
+        $serializer = $this->getMock(SerializerInterface::class);
+        $serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
+            ->will($this->returnValue('[]'));
+
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('serializer')
+            ->will($this->returnValue($serializer));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $response = $controller->json(array());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals('[]', $response->getContent());
+    }
+
+    public function testJsonWithSerializerContextOverride()
+    {
+        $container = $this->getMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('serializer')
+            ->will($this->returnValue(true));
+
+        $serializer = $this->getMock(SerializerInterface::class);
+        $serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
+            ->will($this->returnValue('[]'));
+
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('serializer')
+            ->will($this->returnValue($serializer));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $response = $controller->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals('[]', $response->getContent());
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+        $this->assertEquals('{}', $response->getContent());
+    }
 }
 
 class TestController extends Controller
@@ -136,5 +217,10 @@ class TestController extends Controller
     public function getUser()
     {
         return parent::getUser();
+    }
+
+    public function json($data, $status = 200, $headers = array(), $context = array())
+    {
+        return parent::json($data, $status, $headers, $context);
     }
 }

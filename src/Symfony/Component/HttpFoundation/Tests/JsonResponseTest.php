@@ -75,6 +75,18 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
 
+    public function testConstructorWithPreEncoded()
+    {
+        $response = new JsonResponse('1', 200, array(), true);
+        $this->assertEquals('1', $response->getContent());
+
+        $response = new JsonResponse('[1]', 200, array(), true);
+        $this->assertEquals('[1]', $response->getContent());
+
+        $response = new JsonResponse('true', 200, array(), true);
+        $this->assertEquals('true', $response->getContent());
+    }
+
     public function testCreate()
     {
         $response = JsonResponse::create(array('foo' => 'bar'), 204);

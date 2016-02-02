@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * Added `Controller::json` to simplify creating JSON responses when using the Serializer component
+
 3.0.0
 -----
 

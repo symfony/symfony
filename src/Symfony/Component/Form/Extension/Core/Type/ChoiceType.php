@@ -61,7 +61,7 @@ class ChoiceType extends AbstractType
         $choiceList = $this->createChoiceList($options);
         $builder->setAttribute('choice_list', $choiceList);
 
-        if ($options['expanded'] && !in_array($options['widget'], array('text', 'hidden'))) {
+        if ($options['expanded'] && !in_array($options['widget'], array('text', 'hidden'), true)) {
             $builder->setDataMapper($options['multiple']
                 ? new CheckboxListMapper($choiceList)
                 : new RadioListMapper($choiceList));
@@ -151,7 +151,7 @@ class ChoiceType extends AbstractType
             $builder->addViewTransformer(new ChoicesToValuesTransformer($choiceList));
 
             // for "text" / "hidden" widget, view data uses a delimiter
-            if (in_array($options['widget'], array('text', 'hidden'))) {
+            if (in_array($options['widget'], array('text', 'hidden'), true)) {
                 $builder->addViewTransformer(new ValuesToStringTransformer($options['delimiter'], $options['trim']));
             }
         } else {
@@ -195,7 +195,7 @@ class ChoiceType extends AbstractType
             'choice_translation_domain' => $choiceTranslationDomain,
         ));
 
-        if (in_array($options['widget'], array('text', 'hidden'))) {
+        if (in_array($options['widget'], array('text', 'hidden'), true)) {
             return;
         }
 
@@ -237,7 +237,7 @@ class ChoiceType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if (in_array($options['widget'], array('text', 'hidden'))) {
+        if (in_array($options['widget'], array('text', 'hidden'), true)) {
             return;
         }
 
@@ -318,8 +318,8 @@ class ChoiceType extends AbstractType
         };
 
         $multipleNormalizer = function (Options $options, $multiple) {
-            if (in_array($options['widget'], array('radio', 'checkbox'))) {
-                return 'checkbox' == $options['widget'];
+            if (in_array($options['widget'], array('radio', 'checkbox'), true)) {
+                return 'checkbox' === $options['widget'];
             }
 
             return $multiple;
@@ -332,7 +332,7 @@ class ChoiceType extends AbstractType
                 $expanded = false;
             }
 
-            return in_array($options['widget'], array('radio', 'checkbox')) ?: $expanded;
+            return in_array($options['widget'], array('radio', 'checkbox'), true) ?: $expanded;
         };
 
         $resolver->setDefaults(array(
@@ -376,6 +376,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('group_by', array('null', 'array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
+        $resolver->setAllowedValues('widget', array(null, 'hidden', 'text', 'select', 'checkbox', 'radio'));
     }
 
     /**

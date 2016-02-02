@@ -35,9 +35,9 @@
 {%- endblock textarea_widget -%}
 
 {%- block choice_widget -%}
-    {% if 'hidden' == widget %}
+    {% if widget is defined and 'hidden' == widget %}
         {{- block('hidden_widget') -}}
-    {% elseif 'text' == widget %}
+    {% elseif widget is defined and 'text' == widget %}
         {{- block('form_widget_simple') -}}
     {% elseif expanded %}
         {{- block('choice_widget_expanded') -}}

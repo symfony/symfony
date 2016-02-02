@@ -34,6 +34,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 
+/**
+ * @group legacy
+ */
 class EntityTypeTest extends TypeTestCase
 {
     const ITEM_GROUP_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity';

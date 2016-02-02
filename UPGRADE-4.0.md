@@ -14,6 +14,44 @@ Form
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
 
+ * The `expanded` option of the `ChoiceType` has been removed.
+   Use instead the `widget` option with `select`, `checkbox`, `radio`, `text` or `hidden`.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
+   $form = $this->createFormBuilder()
+      ->add('isAttending', ChoiceType::class, array(
+         'choices'  => array(
+            'Maybe' => null,
+            'Yes' => true,
+            'No' => false,
+         ),
+         'expanded' => true,
+         'multiple' => true,
+      ))
+      ->getForm();
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
+   $form = $this->createFormBuilder()
+      ->add('isAttending', ChoiceType::class, array(
+         'choices'  => array(
+            'Maybe' => null,
+            'Yes' => true,
+            'No' => false,
+         ),
+         'widget' => 'checkbox',
+      ))
+      ->getForm();
+   ```
+
 Serializer
 ----------
 

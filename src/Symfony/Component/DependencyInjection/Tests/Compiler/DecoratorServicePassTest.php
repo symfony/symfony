@@ -42,7 +42,7 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $this->assertEquals('foo.extended', $container->getAlias('foo'));
-        $this->assertFalse($container->getAlias('foo')->isPublic());
+        $this->assertTrue($container->getAlias('foo')->isPublic());
 
         $this->assertEquals('bar.extended', $container->getAlias('bar'));
         $this->assertTrue($container->getAlias('bar')->isPublic());
@@ -74,7 +74,7 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $this->assertEquals('foo.extended', $container->getAlias('foo.alias'));
-        $this->assertFalse($container->getAlias('foo.alias')->isPublic());
+        $this->assertTrue($container->getAlias('foo.alias')->isPublic());
 
         $this->assertEquals('foo', $container->getAlias('foo.extended.inner'));
         $this->assertFalse($container->getAlias('foo.extended.inner')->isPublic());
@@ -108,7 +108,7 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $this->assertEquals('bar', $container->getAlias('foo'));
-        $this->assertFalse($container->getAlias('foo')->isPublic());
+        $this->assertTrue($container->getAlias('foo')->isPublic());
 
         $this->assertSame($fooDefinition, $container->getDefinition('baz.inner'));
         $this->assertFalse($container->getDefinition('baz.inner')->isPublic());

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * This class tests the integration of the different compiler passes.
@@ -112,5 +113,25 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('a'));
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+    }
+
+    public function testDecoratePrivateServiceDontThrowException()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+
+        $foo = $container->register('foo', '\stdClass');
+        $foo->setPublic(false);
+
+        $bar = $container->register('bar', '\stdClass');
+        $bar->setDecoratedService('foo');
+
+        $container->compile();
+
+        try {
+            $container->get('foo');
+        } catch (InvalidArgumentException $e) {
+            $this->fail('The service foo should exists, but it doesn\'t.');
+        }
     }
 }

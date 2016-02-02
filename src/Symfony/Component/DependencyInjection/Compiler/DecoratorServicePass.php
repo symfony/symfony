@@ -48,16 +48,14 @@ class DecoratorServicePass implements CompilerPassInterface
             // to be able to reference it in the new one
             if ($container->hasAlias($inner)) {
                 $alias = $container->getAlias($inner);
-                $public = $alias->isPublic();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
                 $definition = $container->getDefinition($inner);
-                $public = $definition->isPublic();
                 $definition->setPublic(false);
                 $container->setDefinition($renamedId, $definition);
             }
 
-            $container->setAlias($inner, new Alias($id, $public));
+            $container->setAlias($inner, new Alias($id));
         }
     }
 }

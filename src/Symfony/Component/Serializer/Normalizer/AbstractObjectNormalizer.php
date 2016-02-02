@@ -15,6 +15,10 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -26,7 +30,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
 
+    private $propertyTypeExtractor;
     private $attributesCache = array();
+
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
+    {
+        parent::__construct($classMetadataFactory, $nameConverter);
+
+        $this->propertyTypeExtractor = $propertyTypeExtractor;
+    }
 
     /**
      * {@inheritdoc}
@@ -76,7 +88,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         foreach ($stack as $attribute => $attributeValue) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attribute));
+                throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
             }
 
             $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $context));
@@ -173,12 +185,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
-            if ($allowed && !$ignored) {
-                try {
-                    $this->setAttributeValue($object, $attribute, $value, $format, $context);
-                } catch (InvalidArgumentException $e) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
+            if (!$allowed || $ignored) {
+                continue;
+            }
+
+            $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context);
+            try {
+                $this->setAttributeValue($object, $attribute, $value, $format, $context);
+            } catch (InvalidArgumentException $e) {
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             }
         }
 
@@ -208,6 +223,54 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     protected function isAttributeToNormalize($object, $attributeName, &$context)
     {
         return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
+    }
+
+    /**
+     * Validates the submitted data and denormalizes it.
+     *
+     * @param string      $currentClass
+     * @param string      $attribute
+     * @param mixed       $data
+     * @param string|null $format
+     * @param array       $context
+     *
+     * @return mixed
+     *
+     * @throws UnexpectedValueException
+     * @throws LogicException
+     */
+    private function validateAndDenormalize($currentClass, $attribute, $data, $format, array $context)
+    {
+        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)){
+            return $data;
+        }
+
+        $expectedTypes = array();
+        foreach ($types as $type) {
+            if (null === $data && $type->isNullable()) {
+                return;
+            }
+
+            $builtinType = $type->getBuiltinType();
+            $class = $type->getClassName();
+            $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
+
+            if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
+                }
+
+                if ($this->serializer->supportsDenormalization($data, $class, $format)) {
+                    return $this->serializer->denormalize($data, $class, $format, $context);
+                }
+            }
+
+            if (call_user_func('is_'.$builtinType, $data)) {
+                return $data;
+            }
+        }
+
+        throw new UnexpectedValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));
     }
 
     /**

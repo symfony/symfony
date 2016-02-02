@@ -33,7 +33,7 @@
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
-        "symfony/property-info": "To harden the component and deserialize relations.",
+        "symfony/property-info": "To deserialize relations.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",

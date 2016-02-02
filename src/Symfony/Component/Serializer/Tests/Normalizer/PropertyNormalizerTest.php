@@ -349,7 +349,7 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage Cannot normalize attribute "bar" because injected serializer is not a normalizer
+     * @expectedExceptionMessage Cannot normalize attribute "bar" because the injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
     {

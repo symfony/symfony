@@ -12,7 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -372,7 +375,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
+     * @expectedExceptionMessage Cannot normalize attribute "object" because the injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
     {
@@ -505,6 +508,29 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testThrowUnexpectedValueException()
     {
         $this->normalizer->denormalize(array('foo' => 'bar'), ObjectTypeHinted::class);
+    }
+
+    public function testDenomalizeRecursive()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer(array(new DateTimeNormalizer(), $normalizer));
+
+        $obj = $serializer->denormalize(array('inner' => array('foo' => 'foo', 'bar' => 'bar'), 'date' => '1988/01/21'), ObjectOuter::class);
+        $this->assertEquals('foo', $obj->getInner()->foo);
+        $this->assertEquals('bar', $obj->getInner()->bar);
+        $this->assertEquals('1988-01-21', $obj->getDate()->format('Y-m-d'));
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     * @expectedExceptionMessage The type of the "date" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "DateTimeInterface" ("string" given).
+     */
+    public function testRejectInvalidType()
+    {
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer(array($normalizer));
+
+        $serializer->denormalize(array('date' => 'foo'), ObjectOuter::class);
     }
 }
 
@@ -672,4 +698,36 @@ class ObjectTypeHinted
     public function setFoo(array $f)
     {
     }
+}
+
+class ObjectOuter
+{
+    private $inner;
+    private $date;
+
+    public function getInner()
+    {
+        return $this->inner;
+    }
+
+    public function setInner(ObjectInner $inner)
+    {
+        $this->inner = $inner;
+    }
+
+    public function setDate(\DateTimeInterface $date)
+    {
+        $this->date = $date;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+}
+
+class ObjectInner
+{
+    public $foo;
+    public $bar;
 }

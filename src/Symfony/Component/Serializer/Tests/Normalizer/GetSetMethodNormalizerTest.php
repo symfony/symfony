@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -392,7 +390,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\LogicException
-     * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
+     * @expectedExceptionMessage Cannot normalize attribute "object" because the injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
     {
@@ -490,24 +488,6 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNoStaticGetSetSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
-    }
-
-    public function testDenormalizeWithTypehint()
-    {
-        /* need a serializer that can recurse denormalization $normalizer */
-        $normalizer = new GetSetMethodNormalizer(null, null, new PropertyInfoExtractor(array(), array(new ReflectionExtractor())));
-        $serializer = new Serializer(array($normalizer));
-        $normalizer->setSerializer($serializer);
-
-        $obj = $normalizer->denormalize(
-            array(
-                'object' => array('foo' => 'foo', 'bar' => 'bar'),
-            ),
-            __NAMESPACE__.'\GetTypehintedDummy',
-            'any'
-        );
-        $this->assertEquals('foo', $obj->getObject()->getFoo());
-        $this->assertEquals('bar', $obj->getObject()->getBar());
     }
 
     public function testPrivateSetter()
@@ -775,59 +755,6 @@ class GetCamelizedDummy
     public function getBar_foo()
     {
         return $this->bar_foo;
-    }
-}
-
-class GetTypehintedDummy
-{
-    protected $object;
-
-    public function getObject()
-    {
-        return $this->object;
-    }
-
-    public function setObject(GetTypehintDummy $object)
-    {
-        $this->object = $object;
-    }
-}
-
-class GetTypehintDummy
-{
-    protected $foo;
-    protected $bar;
-
-    /**
-     * @return mixed
-     */
-    public function getFoo()
-    {
-        return $this->foo;
-    }
-
-    /**
-     * @param mixed $foo
-     */
-    public function setFoo($foo)
-    {
-        $this->foo = $foo;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getBar()
-    {
-        return $this->bar;
-    }
-
-    /**
-     * @param mixed $bar
-     */
-    public function setBar($bar)
-    {
-        $this->bar = $bar;
     }
 }
 

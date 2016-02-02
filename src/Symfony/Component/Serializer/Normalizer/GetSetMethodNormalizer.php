@@ -47,8 +47,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $subcontext = array_merge($context, array('format' => $format));
-        $object = $this->instantiateObject($normalizedData, $class, $subcontext, $reflectionClass, $allowedAttributes);
+        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
         $classMethods = get_class_methods($object);
         foreach ($normalizedData as $attribute => $value) {
@@ -61,33 +60,8 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
             if ($allowed && !$ignored) {
                 $setter = 'set'.ucfirst($attribute);
+
                 if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
-                    if ($this->propertyInfoExtractor) {
-                        $types = (array) $this->propertyInfoExtractor->getTypes($class, $attribute);
-
-                        foreach ($types as $type) {
-                            if ($type && (!empty($value) || !$type->isNullable())) {
-                                if (!$this->serializer instanceof DenormalizerInterface) {
-                                    throw new RuntimeException(
-                                        sprintf(
-                                            'Cannot denormalize attribute "%s" because injected serializer is not a denormalizer',
-                                            $attribute
-                                        )
-                                    );
-                                }
-
-                                $value = $this->serializer->denormalize(
-                                    $value,
-                                    $type->getClassName(),
-                                    $format,
-                                    $context
-                                );
-
-                                break;
-                            }
-                        }
-                    }
-
                     $object->$setter($value);
                 }
             }

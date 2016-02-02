@@ -31,13 +31,6 @@ final class CacheItem implements CacheItemInterface
     private $lifetime;
     private $defaultLifetime;
 
-    public function __clone()
-    {
-        if (is_object($this->value)) {
-            $this->value = clone $this->value;
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -112,7 +105,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @internal
      */
-    public function log(LoggerInterface $logger = null, $message, $context = array())
+    public static function log(LoggerInterface $logger = null, $message, $context = array())
     {
         if ($logger) {
             $logger->warning($message, $context);

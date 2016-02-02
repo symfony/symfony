@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-14T21:27:33Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-18T10:46:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-22T10:05:09Z
+
+Switched from Prophecy to the PHPUnit old mock system.
+
+Travis errors look unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T10:10:37Z
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-02T07:38:41Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-02T09:01:40Z
+
+How do we deal with dependencies now? The Serializer configuration would now require to have the PropertyInfo component in 3.1 or higher. Should we remove the service when an older version of the component is present?

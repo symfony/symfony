@@ -87,30 +87,69 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
              ->will($this->returnValue($repositoryMock))
         ;
 
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-        $classMetadata
+        $metadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+
+        $metadata = [];
+
+        $metadataFactory
             ->expects($this->any())
-            ->method('hasField')
-            ->will($this->returnValue(true))
+            ->method('getMetadataFor')
+            ->will($this->returnCallback(function($className) use (&$metadata) {
+                if (isset($metadata[$className])) {
+                    return $metadata[$className];
+                }
+
+                $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+
+                $classMetadata
+                    ->expects($this->any())
+                    ->method('getName')
+                    ->will($this->returnValue($className))
+                ;
+
+                $classMetadata
+                    ->expects($this->any())
+                    ->method('hasField')
+                    ->will($this->returnValue(true))
+                ;
+                $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
+                    ->disableOriginalConstructor()
+                    ->getMock()
+                ;
+                $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
+                    ->setConstructorArgs(array($reflParser, 'property-name'))
+                    ->setMethods(array('getValue'))
+                    ->getMock()
+                ;
+                $refl
+                    ->expects($this->any())
+                    ->method('getValue')
+                    ->will($this->returnValue(true))
+                ;
+                $classMetadata->reflFields = array('name' => $refl);
+
+                $classMetadata->isMappedSuperclass = false !== strpos($className, 'MappedSuperClass');
+
+                return $metadata[$className] = $classMetadata;
+            }))
         ;
-        $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
-            ->setConstructorArgs(array($reflParser, 'property-name'))
-            ->setMethods(array('getValue'))
-            ->getMock()
-        ;
-        $refl
+
+        $metadataFactory
             ->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnValue(true))
+            ->method('isTransient')
+            ->will($this->returnCallback(function($className) {
+                return false !== strpos($className, 'Transient');
+            }))
         ;
-        $classMetadata->reflFields = array('name' => $refl);
+
+        $em->expects($this->any())
+           ->method('getMetadataFactory')
+           ->will($this->returnValue($metadataFactory))
+        ;
+
         $em->expects($this->any())
              ->method('getClassMetadata')
-             ->will($this->returnValue($classMetadata))
+             ->will($this->returnCallback([$metadataFactory, 'getMetadataFor']))
         ;
 
         return $em;

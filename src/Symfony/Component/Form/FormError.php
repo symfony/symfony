@@ -194,11 +194,11 @@ class FormError implements \Serializable, \JsonSerializable
     public function jsonSerialize()
     {
         return array(
-            'message'              => $this->message,
-            'messageTemplate'      => $this->messageTemplate,
-            'messageParameters'    => $this->messageParameters,
+            'message' => $this->message,
+            'messageTemplate' => $this->messageTemplate,
+            'messageParameters' => $this->messageParameters,
             'messagePluralization' => $this->messagePluralization,
-            'cause'                => $this->cause,
+            'cause' => $this->cause,
         );
     }
 }

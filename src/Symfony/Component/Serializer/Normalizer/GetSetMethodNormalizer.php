@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /**
  * Converts between objects with getter and setter methods and arrays.
  *

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-03T06:35:12Z
+
+Shouldnt we put it again in require? Otherwise this is a bc break on HHVM, isn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-03T07:30:26Z
+
+Yes, if we treat it strictly, we must add it back.
+
+@symfony/deciders What's your opinion?

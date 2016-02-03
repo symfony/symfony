@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-29T13:09:07Z
+
+1. phpdoc of FiileResource::getResource is not correct anymore
+2. string cast in __toString doesnt make sense anymore
+3. the check in isFresh `false === $this->resource` does not make sense
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-29T13:59:53Z
+
+@Tobion I've fixed everything you said. Thanks for the review!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-29T14:48:56Z
+
+FileResource::isFresh is not safe against race conditions (when it's deleted between file_exists and filemtime). So it probably need error supression instead with `@filemtime`.
+Similar problem in DirectoryResource::isFresh.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-29T14:54:52Z
+
+Should I replace this:
+
+```php
+public function isFresh($timestamp)
+{
+    if (!file_exists($this->resource)) {
+        return false;
+    }
+
+    return filemtime($this->resource) <= $timestamp;
+}
+```
+
+by this?
+
+```php
+public function isFresh($timestamp)
+{
+    return file_exists($this->resource) && filemtime($this->resource) <= $timestamp;
+}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-03T08:49:10Z
+
+This PR just needs a final boost to finish it. Should I do the change mentioned in my previous comment? Thanks!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-03T10:00:55Z
+
+@javiereguiluz I say go for it! Personally, I find the one liner more readable.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-03T10:05:55Z
+
+@jakzal OK. Changed. Thanks.

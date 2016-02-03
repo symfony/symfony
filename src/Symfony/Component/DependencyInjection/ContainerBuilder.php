@@ -243,7 +243,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         do {
-            $this->addResource(new FileResource($class->getFileName()));
+            if (is_file($class->getFileName())) {
+                $this->addResource(new FileResource($class->getFileName()));
+            }
         } while ($class = $class->getParentClass());
 
         return $this;

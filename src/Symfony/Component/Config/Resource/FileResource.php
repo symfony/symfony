@@ -62,7 +62,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function isFresh($timestamp)
     {
-        return file_exists($this->resource) && filemtime($this->resource) <= $timestamp;
+        return file_exists($this->resource) && @filemtime($this->resource) <= $timestamp;
     }
 
     public function serialize()

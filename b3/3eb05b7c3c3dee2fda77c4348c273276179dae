@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-02-02T15:55:30Z
+
+@nicolas-grekas it would be great to look at fixing deps=high jobs (in all affected branches).
+
+This PR looks good to me. The constructor flag allows a performance increase when storing only immutable values (scalars are immutable, references are mutable, arrays are immutable when they contain only immutable values, and objects depend on the class).
+I suggest documenting the limitation of disabling serialization though (storing mutable values in such case can lead to a cache corruption)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-02T16:35:30Z
+
+@stof comment added. For the failures, I looked quickly but I'm not familiar enough with the related code. Could someone else have a look at them?

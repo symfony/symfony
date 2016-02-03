@@ -276,13 +276,6 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
         if (!$item instanceof CacheItem) {
             return false;
         }
-        try {
-            $item = clone $item;
-        } catch (\Exception $e) {
-            $value = $item->get();
-            $type = is_object($value) ? get_class($value) : gettype($value);
-            CacheItem::log($this->logger, 'Failed to clone key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
-        }
         $this->deferred[$item->getKey()] = $item;
 
         return true;

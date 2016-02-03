@@ -25,12 +25,11 @@ Form
    $form = $this->createFormBuilder()
       ->add('isAttending', ChoiceType::class, array(
          'choices'  => array(
-            'Maybe' => null,
             'Yes' => true,
             'No' => false,
          ),
          'expanded' => true,
-         'multiple' => true,
+         'multiple' => false,
       ))
       ->getForm();
    ```
@@ -43,11 +42,10 @@ Form
    $form = $this->createFormBuilder()
       ->add('isAttending', ChoiceType::class, array(
          'choices'  => array(
-            'Maybe' => null,
             'Yes' => true,
             'No' => false,
          ),
-         'widget' => 'checkbox',
+         'widget' => 'radio',
       ))
       ->getForm();
    ```

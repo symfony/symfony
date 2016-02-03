@@ -176,7 +176,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     {
         $setter = 'set'.ucfirst($attribute);
 
-        if (is_callable(array($object, $setter))) {
+        if (is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic()) {
             $object->$setter($value);
         }
     }

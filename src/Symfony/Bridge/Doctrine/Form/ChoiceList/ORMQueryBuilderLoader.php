@@ -85,7 +85,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
-        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
+        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint', 'guid'))) {
             $parameterType = Connection::PARAM_INT_ARRAY;
 
             // Filter out non-integer values (e.g. ""). If we don't, some

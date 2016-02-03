@@ -547,11 +547,7 @@ class FrameworkExtension extends Extension
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
 
-            if ($container->hasDefinition('assets.packages')) {
-                $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
-            } else {
-                $container->removeDefinition('templating.helper.assets');
-            }
+            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
         }
     }
 

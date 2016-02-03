@@ -1,3 +1,0 @@
-framework:
-    templating:
-        engines:          [php, twig]

@@ -19,7 +19,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().'/symfonyDirectoryIterator';
+        $this->directory = realpath(sys_get_temp_dir()).'/symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }
@@ -58,8 +58,17 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPattern()
     {
-        $resource = new DirectoryResource('foo', 'bar');
+        $resource = new DirectoryResource($this->directory, 'bar');
         $this->assertEquals('bar', $resource->getPattern());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The directory ".*" does not exist./
+     */
+    public function testResourceDoesNotExist()
+    {
+        $resource = new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
     }
 
     public function testIsFresh()
@@ -67,8 +76,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new DirectoryResource($this->directory);
         $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if the resource has not changed');
         $this->assertFalse($resource->isFresh(time() - 86400), '->isFresh() returns false if the resource has been updated');
+    }
 
-        $resource = new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
+    public function testIsFreshForDeletedResources()
+    {
+        $resource = new DirectoryResource($this->directory);
+        $this->removeDirectory($this->directory);
+
         $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the resource does not exist');
     }
 

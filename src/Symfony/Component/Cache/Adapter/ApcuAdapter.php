@@ -70,6 +70,6 @@ class ApcuAdapter extends AbstractAdapter
      */
     protected function doSave(array $values, $lifetime)
     {
-        return apcu_store($values, null, $lifetime);
+        return array_keys(apcu_store($values, null, $lifetime));
     }
 }

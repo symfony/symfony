@@ -16,10 +16,6 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 
 class ApcuAdapterTest extends CachePoolTest
 {
-    protected $skippedTests = array(
-        'testDeferredExpired' => 'Failing for now, needs to be fixed.',
-    );
-
     public function createCachePool()
     {
         if (defined('HHVM_VERSION')) {

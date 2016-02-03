@@ -28,7 +28,7 @@ final class CacheItem implements CacheItemInterface
     private $key;
     private $value;
     private $isHit;
-    private $lifetime;
+    private $expiry;
     private $defaultLifetime;
 
     /**
@@ -71,9 +71,9 @@ final class CacheItem implements CacheItemInterface
     public function expiresAt($expiration)
     {
         if (null === $expiration) {
-            $this->lifetime = $this->defaultLifetime;
+            $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->lifetime = $expiration->format('U') - time() ?: -1;
+            $this->expiry = $expiration->format('U');
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', is_object($expiration) ? get_class($expiration) : gettype($expiration)));
         }
@@ -87,12 +87,11 @@ final class CacheItem implements CacheItemInterface
     public function expiresAfter($time)
     {
         if (null === $time) {
-            $this->lifetime = $this->defaultLifetime;
+            $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
-            $now = time();
-            $this->lifetime = \DateTime::createFromFormat('U', $now)->add($time)->format('U') - $now ?: -1;
+            $this->expiry = \DateTime::createFromFormat('U', time())->add($time)->format('U');
         } elseif (is_int($time)) {
-            $this->lifetime = $time ?: -1;
+            $this->expiry = $time + time();
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
         }

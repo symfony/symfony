@@ -37,8 +37,8 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalize()
     {
-        $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTime('2016/01/01')));
-        $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTimeImmutable('2016/01/01')));
+        $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
+        $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
     public function testContextFormat()
@@ -48,7 +48,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorFormat()
     {
-        $this->assertEquals('16', (new DateTimeNormalizer('y'))->normalize(new \DateTime('2016/01/01')));
+        $this->assertEquals('16', (new DateTimeNormalizer('y'))->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
     /**
@@ -70,9 +70,9 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalize()
     {
-        $this->assertEquals(new \DateTimeImmutable('2016/01/01'), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
-        $this->assertEquals(new \DateTimeImmutable('2016/01/01'), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeImmutable::class));
-        $this->assertEquals(new \DateTime('2016/01/01'), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTime::class));
+        $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
+        $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeImmutable::class));
+        $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTime::class));
     }
 
     /**

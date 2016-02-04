@@ -19,7 +19,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().'/symfonyDirectoryIterator';
+        $this->directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }

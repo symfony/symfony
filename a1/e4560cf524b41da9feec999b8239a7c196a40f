@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2016-02-03T12:14:31Z
+
+As the `RequestContext` object can be initialized with a Symfony `Request` instance, it seems legit to have a suggestion for the HttpFoundation component as well in the `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-03T12:34:28Z
+
+Honestly, and that's not the first time I'm mentioning this, I don't understand how those suggestions are useful for anyone. So, I'm -0 on this one.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-03T12:56:26Z
+
+I think it could be useful, for example when working with a standalone symfony component, looking at his `composer.json` you can know what other library needs to be installed in order to use some dedicated functionality. Everybody might not start with a full stack framework.
+The fact that it is needed in `require-dev` only says "it can work with this library and it's tested" but not what is the benefit of it.
+:+1:
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-02-03T13:56:04Z
+
+Maybe @nicolas-grekas and @stof have provide their opinion on Composer suggestions.

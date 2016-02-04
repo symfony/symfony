@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -32,6 +33,40 @@ class UniqueEntityValidator extends ConstraintValidator
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
+    }
+
+    /**
+     * @param ClassMetadataFactory $metadataFactory
+     * @param string               $target
+     * @param string               $entityClass
+     *
+     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
+    private function findHighestEntityMetadata(ClassMetadataFactory $metadataFactory, $target, $entityClass)
+    {
+        if (!$metadataFactory->isTransient($target)) {
+            $metadata = $metadataFactory->getMetadataFor($target);
+
+            if (!$metadata->isMappedSuperclass) {
+                return $metadata;
+            }
+        }
+
+        $highestEntity = null;
+
+        while (is_subclass_of($entityClass, $target)) {
+            if (!$metadataFactory->isTransient($entityClass)) {
+                $metadata = $metadataFactory->getMetadataFor($entityClass);
+
+                if (!$metadata->isMappedSuperclass) {
+                    $highestEntity = $metadata;
+                }
+            }
+
+            $entityClass = get_parent_class($entityClass);
+        }
+
+        return $highestEntity;
     }
 
     /**
@@ -61,6 +96,13 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 
+        $target = $constraint->target;
+        /* @var $target string */
+        if (!$target) {
+            @trigger_error('Not providing a target for a UniqueEntity constraint is deprecated since version 3.1 and will be removed in 4.0.', E_USER_DEPRECATED);
+            $target = get_class($entity);
+        }
+
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
 
@@ -68,15 +110,14 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
             }
         } else {
-            $em = $this->registry->getManagerForClass(get_class($entity));
+            $em = $this->registry->getManagerForClass($target);
 
             if (!$em) {
                 throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', get_class($entity)));
             }
         }
 
-        $class = $em->getClassMetadata(get_class($entity));
-        /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
+        $class = $this->findHighestEntityMetadata($em->getMetadataFactory(), $target, get_class($entity));
 
         $criteria = array();
         foreach ($fields as $fieldName) {
@@ -110,7 +151,7 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository(get_class($entity));
+        $repository = $em->getRepository($class->getName());
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         if ($result instanceof \IteratorAggregate) {

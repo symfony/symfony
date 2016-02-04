@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\TargetAwareConstraintInterface;
+use Symfony\Component\Validator\Constraints\TargetAwareConstraintTrait;
 
 /**
  * Constraint for the Unique Entity validator.
@@ -21,8 +23,10 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class UniqueEntity extends Constraint
+class UniqueEntity extends Constraint implements TargetAwareConstraintInterface
 {
+    use TargetAwareConstraintTrait;
+
     public $message = 'This value is already used.';
     public $service = 'doctrine.orm.validator.unique';
     public $em = null;
@@ -44,14 +48,6 @@ class UniqueEntity extends Constraint
     public function validatedBy()
     {
         return $this->service;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
-    {
-        return self::CLASS_CONSTRAINT;
     }
 
     public function getDefaultOption()

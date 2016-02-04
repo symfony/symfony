@@ -34,6 +34,8 @@ namespace Symfony\Component\Serializer\Normalizer;
  */
 class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
+    private static $setterAccessibleCache = array();
+
     /**
      * {@inheritdoc}
      */
@@ -139,8 +141,13 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
         $setter = 'set'.ucfirst($attribute);
+        $key = get_class($object).':'.$setter;
 
-        if (is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic()) {
+        if (!isset(self::$setterAccessibleCache[$setter])) {
+            self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
+        }
+
+        if (self::$setterAccessibleCache[$key]) {
             $object->$setter($value);
         }
     }

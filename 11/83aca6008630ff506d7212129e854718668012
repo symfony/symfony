@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by valeriangalliat at 2016-01-28T14:27:14Z
+
+About the tests, the only error I can see is about the framework bundle, any idea what I can do?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-29T08:38:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by valeriangalliat at 2016-02-02T15:36:20Z
+
+@jakzal I got two other comments notification that you seem to have removed, I assume everything's okay? It was about existing code that I just moved around but still, if we can improve stuff here, I can update the PR. :)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-02T15:45:38Z
+
+@valeriangalliat yeah, sorry for the noise. I noticed the code was moved and removed those comments.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-03T09:08:22Z
+
+Final remark: why do we need the `UriElementInterface`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-03T09:43:31Z
+
+Indeed, I would remove the interface.
+
+---------------------------------------------------------------------------
+
+by valeriangalliat at 2016-02-03T15:22:23Z
+
+@jakzal @fabpot Not sure why I added the interface, I just removed it.
+
+Also updated the PR according to comments. Just the `Constructor.` comment to be removed, but since it's present in files not affected by this PR, I aggree with @stof [that this should be done in another PR](https://github.com/symfony/symfony/pull/17585#discussion_r51733371).

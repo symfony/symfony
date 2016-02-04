@@ -271,7 +271,15 @@ class ExecutionContext implements ExecutionContextInterface
      */
     private function executeConstraintValidators($value, array $constraints)
     {
+        // Filter constraints with the context group.
+        $filteredConstraints = array();
         foreach ($constraints as $constraint) {
+            if (in_array($this->getGroup(), $constraint->groups)) {
+                $filteredConstraints[] = $constraint;
+            }
+        }
+
+        foreach ($filteredConstraints as $constraint) {
             $validator = $this->globalContext->getValidatorFactory()->getInstance($constraint);
             $validator->initialize($this);
             $validator->validate($value, $constraint);

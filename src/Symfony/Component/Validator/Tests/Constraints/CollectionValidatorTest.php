@@ -386,4 +386,64 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'foo' => 3,
         ), (array) $value);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testGroupShouldBePassedToTheContainingConstraint()
+    {
+        $value = array('baz' => 2);
+
+        $constraint = new Collection(
+            array(
+                'fields' => array(
+                    'baz' => array(
+                        new Range(array('min' => 1, 'groups' => 'bar')),
+                    ),
+                ),
+                'groups' => 'foo',
+            )
+        );
+
+        $data = $this->prepareTestData($value);
+        $this->validator->validate($data, $constraint);
+    }
+
+    /**
+     * @dataProvider multipleGroupsForCollectionProvider
+     */
+    public function testValidateMultipleGroupsForCollectionConstraint($fooGroups, $barGroups, $collectionGroups, $expectedGroups)
+    {
+        $value = array('baz' => 2);
+
+        $constraint = new Collection(
+            array(
+                'fields' => array(
+                    'baz' => array(
+                        $fooConstraint = new Range(array('min' => 3, 'minMessage' => 'Group foo', 'groups' => $fooGroups)),
+                        $barConstraint = new Range(array('min' => 5, 'minMessage' => 'Group bar', 'groups' => $barGroups)),
+                    ),
+                ),
+                'groups' => $collectionGroups,
+            )
+        );
+
+        $data = $this->prepareTestData($value);
+
+        $this->expectValidateValueAt(0, '[baz]', $value['baz'], array($fooConstraint, $barConstraint), $expectedGroups);
+
+        $this->validator->validate($data, $constraint);
+    }
+
+    public static function multipleGroupsForCollectionProvider()
+    {
+        return array(
+            array(array('foo', 'bar'), array('foo', 'bar'), array('foo', 'bar'), array('foo', 'bar')),
+            array(array('foo', 'bar'), array('bar'), array('foo', 'bar'), array('foo', 'bar')),
+            array(array('foo'), array('foo', 'bar'), array('foo', 'bar'), array('foo', 'bar')),
+            array(array('foo'), array('bar'), array('foo', 'bar'), array('foo', 'bar')),
+            array(array('foo'), array('foo'), array('foo', 'bar'), array('foo')),
+            array(array('foo'), array('foo'), array('foo'), array('foo')),
+        );
+    }
 }

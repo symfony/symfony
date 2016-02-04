@@ -224,7 +224,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
             ->with($value, $this->logicalOr(null, array()), $group);
     }
 
-    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
+    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = array(Constraint::DEFAULT_GROUP))
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expects($this->at(2 * $i))

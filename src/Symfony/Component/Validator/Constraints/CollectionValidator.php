@@ -60,10 +60,10 @@ class CollectionValidator extends ConstraintValidator
                         $context->getValidator()
                             ->inContext($context)
                             ->atPath('['.$field.']')
-                            ->validate($value[$field], $fieldConstraint->constraints);
+                            ->validate($value[$field], $fieldConstraint->constraints, $fieldConstraint->groups);
                     } else {
                         // 2.4 API
-                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']');
+                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']', $context->getGroup());
                     }
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {

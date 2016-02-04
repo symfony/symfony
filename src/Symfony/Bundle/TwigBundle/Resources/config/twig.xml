@@ -112,6 +112,7 @@
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension" public="false">
             <argument type="service" id="request_stack" />
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
         <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">

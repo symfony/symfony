@@ -130,7 +130,11 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = $this->readFromInput($inputStream);
+                $ret = fgets($inputStream, 4096);
+                if (false === $ret) {
+                    throw new \RuntimeException('Aborted');
+                }
+                $ret = trim($ret);
             }
         } else {
             $ret = trim($this->autocomplete($output, $question, $inputStream));
@@ -421,30 +425,6 @@ class QuestionHelper extends Helper
         }
 
         return self::$shell;
-    }
-
-    /**
-     * Reads user input.
-     *
-     * @param resource $stream The input stream
-     *
-     * @return string User input
-     *
-     * @throws RuntimeException
-     */
-    private function readFromInput($stream)
-    {
-        if (STDIN === $stream && function_exists('readline')) {
-            $ret = readline('');
-        } else {
-            $ret = fgets($stream, 4096);
-        }
-
-        if (false === $ret) {
-            throw new RuntimeException('Aborted');
-        }
-
-        return trim($ret);
     }
 
     /**

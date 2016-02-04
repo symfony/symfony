@@ -36,6 +36,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
              trim($compiler->compile($node)->getSource())
         );
     }
+
     protected function getVariableGetterWithoutStrictCheck($name)
     {
         return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);

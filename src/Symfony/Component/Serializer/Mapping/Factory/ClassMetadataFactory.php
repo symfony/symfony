@@ -29,10 +29,12 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      * @var LoaderInterface
      */
     private $loader;
+
     /**
      * @var Cache
      */
     private $cache;
+
     /**
      * @var array
      */

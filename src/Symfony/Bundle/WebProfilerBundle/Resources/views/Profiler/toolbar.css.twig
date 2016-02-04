@@ -45,6 +45,7 @@
     position: fixed;
     right: 0;
     text-align: left;
+    text-transform: none;
     z-index: 99999;
 }
 .sf-toolbarreset abbr {
@@ -53,13 +54,11 @@
 }
 .sf-toolbarreset svg,
 .sf-toolbarreset img {
-    max-height: 20px;
-    max-width: 20px;
+    height: 20px;
 }
 
 .sf-toolbarreset .hide-button {
     background: #444;
-    cursor: pointer;
     display: block;
     position: absolute;
     top: 0;
@@ -423,9 +422,6 @@
     .sf-toolbar-block .sf-toolbar-icon img,
     .sf-toolbar-block .sf-toolbar-icon svg {
         top: 6px;
-    }
-    .sf-toolbar-block-config:hover .sf-toolbar-info {
-        right: 0;
     }
     .sf-toolbar-block-time .sf-toolbar-icon svg,
     .sf-toolbar-block-memory .sf-toolbar-icon svg {

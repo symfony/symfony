@@ -43,6 +43,14 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return !isset($v['assets']) && isset($v['templating']); })
+                ->then(function ($v) {
+                    $v['assets'] = array();
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -62,6 +70,10 @@ class Configuration implements ConfigurationInterface
                                 }
 
                                 if (false !== strpos($v, '/')) {
+                                    if ('0.0.0.0/0' === $v) {
+                                        return false;
+                                    }
+
                                     list($v, $mask) = explode('/', $v, 2);
 
                                     if (strcmp($mask, (int) $mask) || $mask < 1 || $mask > (false !== strpos($v, ':') ? 128 : 32)) {
@@ -379,7 +391,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return (null !== $v['version_strategy'] && null !== $v['version']);
+                            return isset($v['version_strategy']) && isset($v['version']);
                         })
                         ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets".')
                     ->end()
@@ -391,7 +403,12 @@ class Configuration implements ConfigurationInterface
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version_strategy')->defaultNull()->end()
-                                    ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version')
+                                        ->beforeNormalization()
+                                        ->ifTrue(function ($v) { return '' === $v; })
+                                        ->then(function ($v) { return; })
+                                        ->end()
+                                    ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()
                                     ->arrayNode('base_urls')
@@ -405,7 +422,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return (null !== $v['version_strategy'] && null !== $v['version']);
+                                        return isset($v['version_strategy']) && isset($v['version']);
                                     })
                                     ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets" packages.')
                                 ->end()
@@ -450,20 +467,7 @@ class Configuration implements ConfigurationInterface
                     ->info('validation configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('cache')
-                            ->beforeNormalization()
-                                // Can be removed in 3.0, once ApcCache support is dropped
-                                ->ifString()->then(function ($v) {
-                                    if ('apc' === $v) {
-                                        @trigger_error('The ability to pass "apc" as the framework.validation.cache configuration key value is deprecated since version 2.8 and will be removed in 3.0. Use the "validator.mapping.cache.doctrine.apc" service id instead.', E_USER_DEPRECATED);
-
-                                        return 'validator.mapping.cache.apc';
-                                    }
-
-                                    return $v;
-                                })
-                            ->end()
-                        ->end()
+                        ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(array('loadValidatorMetadata'))

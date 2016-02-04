@@ -351,6 +351,9 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('not yet', $dialog->ask($this->createInputInterfaceMock(false), $this->createOutputInterface(), $question));
     }
 
+    /**
+     * @requires function mb_strwidth
+     */
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';

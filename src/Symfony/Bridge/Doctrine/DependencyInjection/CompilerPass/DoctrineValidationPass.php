@@ -60,7 +60,7 @@ class DoctrineValidationPass implements CompilerPassInterface
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/'.$validationPath)) {
+            if (is_file($file = dirname($reflection->getFileName()).'/'.$validationPath)) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

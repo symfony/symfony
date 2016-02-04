@@ -29,7 +29,13 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     {
         $headers = array('Bundle name', 'Extension alias');
         $rows = array();
-        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+
+        $bundles = $this->getContainer()->get('kernel')->getBundles();
+        usort($bundles, function($bundleA, $bundleB) {
+            return strcmp($bundleA->getName(), $bundleB->getName());
+        });
+
+        foreach ($bundles as $bundle) {
             $extension = $bundle->getContainerExtension();
             $rows[] = array($bundle->getName(), $extension ? $extension->getAlias() : '');
         }
@@ -48,6 +54,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         $bundles = $this->initializeBundles();
         foreach ($bundles as $bundle) {
             if ($name === $bundle->getName()) {
+                if (!$bundle->getContainerExtension()) {
+                    throw new \LogicException(sprintf('Bundle "%s" does not have a container extension.', $name));
+                }
+
                 return $bundle->getContainerExtension();
             }
 

@@ -26,7 +26,7 @@ class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/foo'));
 
         // create some callable object
-        $service = $this->getMockBuilder('stdClass')
+        $service = $this->getMockBuilder(__CLASS__)
             ->setMethods(array('loadRoutes'))
             ->getMock();
         $service->expects($this->once())

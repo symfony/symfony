@@ -87,7 +87,9 @@ abstract class ObjectRouteLoader extends Loader
     private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
     {
         do {
-            $collection->addResource(new FileResource($class->getFileName()));
+            if (file_exists($class->getFileName())) {
+                $collection->addResource(new FileResource($class->getFileName()));
+            }
         } while ($class = $class->getParentClass());
     }
 }

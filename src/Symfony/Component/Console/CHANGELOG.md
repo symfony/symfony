@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.3
+-----
+
+ * remove readline support from the question helper as it caused issues
+
 2.8.0
 -----
 

@@ -160,8 +160,8 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
                 unlink($file);
             }
 
-            // Fail on any individual component failures but ignore STATUS_STACK_BUFFER_OVERRUN (-1073740791) on Windows when APCu is enabled
-            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || -1073740791 !== $procStatus)) {
+            // Fail on any individual component failures but ignore STATUS_STACK_BUFFER_OVERRUN (-1073740791/0xC0000409) and STATUS_ACCESS_VIOLATION (-1073741819/0xC0000005) on Windows when APCu is enabled
+            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || (-1073740791 !== $procStatus && -1073741819 !== $procStatus))) {
                 $exit = $procStatus;
                 echo "\033[41mKO\033[0m $component\n\n";
             } else {

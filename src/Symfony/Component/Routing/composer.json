@@ -31,6 +31,7 @@
         "symfony/config": "<2.8"
     },
     "suggest": {
+        "symfony/http-foundation": "For using a Symfony Request object",
         "symfony/config": "For using the all-in-one router or any loader",
         "symfony/yaml": "For using the YAML loader",
         "symfony/expression-language": "For using expression matching",

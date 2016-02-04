@@ -90,6 +90,9 @@ class CacheWarmingKernel extends Kernel
         $loader->load(function ($container) {
             $container->loadFromExtension('framework', array(
                 'secret' => '$ecret',
+                
+                // @todo remove this in 4.0
+                'property_access' => false,
             ));
         });
 

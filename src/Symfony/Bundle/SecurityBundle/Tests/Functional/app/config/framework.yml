@@ -10,6 +10,7 @@ framework:
     session:
         storage_id: session.storage.mock_file
     profiler: { only_exceptions: false }
+    property_access: ~
 
 services:
     logger: { class: Psr\Log\NullLogger }

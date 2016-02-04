@@ -523,10 +523,20 @@ class Configuration implements ConfigurationInterface
     private function addPropertyAccessSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            ->beforeNormalization()
+                ->always(function ($v) {
+                    if (!isset($v['property_access'])) {
+                        $v['property_access']['enabled'] = true;
+                        @trigger_error('You must explicitly define wheter to enable "framework.property_access" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('property_access')
-                    ->addDefaultsIfNotSet()
                     ->info('Property access configuration')
+                    ->canBeEnabled()
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()

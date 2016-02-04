@@ -68,9 +68,6 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
-        // Property access is used by both the Form and the Validator component
-        $loader->load('property_access.xml');
-
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -116,7 +113,7 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
-        $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        $this->registerValidationConfiguration($config, $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
@@ -128,10 +125,13 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+
+        if($this->isConfigEnabled($container, $config['property_access'])) {
+            $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        }
 
         if (isset($config['serializer'])) {
-            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
+            $this->registerSerializerConfiguration($config, $container, $loader);
         }
 
         if (isset($config['property_info'])) {
@@ -208,6 +208,10 @@ class FrameworkExtension extends Extension
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if(!$this->isConfigEnabled($container, $config['property_access'])) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.form" is enabled.');
+        }
+
         $loader->load('form.xml');
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
@@ -748,9 +752,15 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$this->isConfigEnabled($container, $config['validation'])) {
             return;
         }
+
+        if(!$this->isConfigEnabled($container, $config['property_access'])) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.validator" is enabled.');
+        }
+
+        $config = $config['validation'];
 
         $loader->load('validator.xml');
 
@@ -857,8 +867,11 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        // Property access is used by the Form, the Validator and the Serializer component
+        $loader->load('property_access.xml');
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
@@ -898,9 +911,15 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$config['serializer']['enabled']) {
             return;
         }
+
+        if(!$this->isConfigEnabled($container, $config['property_access'])) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.serializer" is enabled.');
+        }
+
+        $config = $config['serializer'];
 
         if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
             // Run after serializer.normalizer.object

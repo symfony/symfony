@@ -25,17 +25,8 @@ class ObjectRouteLoaderTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
-        // create some callable object
-        $service = $this->getMockBuilder('stdClass')
-            ->setMethods(array('loadRoutes'))
-            ->getMock();
-        $service->expects($this->once())
-            ->method('loadRoutes')
-            ->with($loader)
-            ->will($this->returnValue($collection));
-
         $loader->loaderMap = array(
-            'my_route_provider_service' => $service,
+            'my_route_provider_service' => new RouteService($collection),
         );
 
         $actualRoutes = $loader->load(
@@ -112,5 +103,20 @@ class ObjectRouteLoaderForTest extends ObjectRouteLoader
     protected function getServiceObject($id)
     {
         return isset($this->loaderMap[$id]) ? $this->loaderMap[$id] : null;
+    }
+}
+
+class RouteService
+{
+    private $collection;
+
+    public function __construct($collection)
+    {
+        $this->collection = $collection;
+    }
+
+    public function loadRoutes()
+    {
+        return $this->collection;
     }
 }

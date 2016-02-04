@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-04T11:30:10Z
+
+ping @symfony/deciders (we need this to make the test suite pass again for all branches on Travis)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-04T11:31:50Z
+
+This fix looks correct at first sight:
+
+```diff
++if (is_file($class->getFileName())) {
+    $collection->addResource(new FileResource($class->getFileName()));
++}
+```
+
+But my question is: do we want to fix problems silently or do we want to fail hard and notify the user?

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-04T11:30:15Z
+
+ping @symfony/deciders (we need this to make the test suite pass again for all branches on Travis)

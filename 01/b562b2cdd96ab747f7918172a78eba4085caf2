@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-02-05T10:06:10Z
+
+:+1:
+
+We may even want to apply this in older branches
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-05T10:14:17Z
+
+Indeed, I missed that the requirement is only in `require-dev` (in older versions test won't be executed with 3.1). But this should apply cleanly on older branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-05T10:17:15Z
+
+Why backporting to older branches ? Their composer.json make them not compatible with 3.1, so this would always evaluate to false, isn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-05T10:21:04Z
+
+@nicolas-grekas I do not see what would prevent someone to use the TwigBridge in Symfony 2.3 together with the Yaml component from 3.1. Do I miss something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-05T10:32:35Z
+
+Nevermind, I didn't understand you above statement about the req being in `require-dev`, now I do :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-05T10:42:52Z
+
+oh okay :)

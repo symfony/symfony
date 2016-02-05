@@ -45,6 +45,9 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->normalizer->supportsNormalization(new \SplFileObject('data:,Hello%2C%20World!')));
     }
 
+    /**
+     * @requires extension fileinfo
+     */
     public function testNormalizeHttpFoundationFile()
     {
         $file = new File(__DIR__.'/../Fixtures/test.gif');
@@ -52,6 +55,9 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
+    /**
+     * @requires extension fileinfo
+     */
     public function testNormalizeSplFileInfo()
     {
         $file = new \SplFileInfo(__DIR__.'/../Fixtures/test.gif');
@@ -59,6 +65,9 @@ class DataUriNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
+    /**
+     * @requires extension fileinfo
+     */
     public function testNormalizeText()
     {
         $file = new \SplFileObject(__DIR__.'/../Fixtures/test.txt');

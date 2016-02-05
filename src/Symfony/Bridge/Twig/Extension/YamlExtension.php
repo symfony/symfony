@@ -39,7 +39,8 @@ class YamlExtension extends \Twig_Extension
             $dumper = new YamlDumper();
         }
 
-        if (defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+        if (defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT') && is_bool($dumpObjects)) {
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
             $dumpObjects = (int) $dumpObjects;
         }
 

@@ -92,12 +92,16 @@ class StreamOutput extends Output
      */
     protected function hasColorSupport()
     {
-        // @codeCoverageIgnoreStart
-        if (DIRECTORY_SEPARATOR === '\\') {
-            return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI') || 'xterm' === getenv('TERM');
+        if (DIRECTORY_SEPARATOR == '\\') {
+            return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
+        } elseif (!function_exists('posix_isatty')){
+            return false;
         }
 
-        return function_exists('posix_isatty') && @posix_isatty($this->stream);
-        // @codeCoverageIgnoreEnd
+        try {
+            return posix_isatty($this->stream);
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 }

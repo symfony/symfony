@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Tests;
 
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Yaml;
 
 class DumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -178,6 +179,16 @@ EOF;
 
     public function testObjectSupportEnabled()
     {
+        $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+
+        $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledPassingTrue()
+    {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
 
         $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
@@ -195,7 +206,7 @@ EOF;
      */
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true, false);
+        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true);
     }
 
     /**

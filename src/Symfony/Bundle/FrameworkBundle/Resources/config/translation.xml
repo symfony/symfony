@@ -58,6 +58,8 @@
 
         <service id="translator" class="%translator.identity.class%">
             <argument type="service" id="translator.selector" />
+
+            <autowiring-type>Symfony\Component\Translation\TranslatorInterface</autowiring-type>
         </service>
 
         <service id="translator.selector" class="%translator.selector.class%" public="false" />

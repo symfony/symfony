@@ -143,7 +143,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $setter = 'set'.ucfirst($attribute);
         $key = get_class($object).':'.$setter;
 
-        if (!isset(self::$setterAccessibleCache[$setter])) {
+        if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
         }
 

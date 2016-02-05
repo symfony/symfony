@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-01T08:46:08Z
+
+@xabbuh thanks for working on this nice feature!
+
+I have a proposal regarding the new constants. You propose to define the constants in `Dumper` class, which forces you to add a new `use` and to remember in which Yaml class the constant is defined:
+
+```php
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Dumper;
+
+Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Dumper::DUMP_OBJECT);
+```
+
+I propose to define these constants in the main `Yaml` class. This saves you one `use` and eases the learning curve, because Yaml constants are .... in Yaml class:
+
+```php
+use Symfony\Component\Yaml\Yaml;
+
+Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+```
+
+What do you think about this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-01T09:05:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-01T09:18:53Z
+
+@javiereguiluz Your suggestion sounds reasonable to me as the `Yaml` class should be the main class users of the component deal with. What do the others think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-01T09:40:53Z
+
+Good suggestion
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-01T16:38:47Z
+
+@javiereguiluz I moved the constant to the `Yaml` class.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-02-05T06:28:45Z
+
+:+1:

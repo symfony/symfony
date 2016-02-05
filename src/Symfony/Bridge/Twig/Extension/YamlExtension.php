@@ -39,6 +39,10 @@ class YamlExtension extends \Twig_Extension
             $dumper = new YamlDumper();
         }
 
+        if (defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+            $dumpObjects = (int) $dumpObjects;
+        }
+
         return $dumper->dump($input, $inline, 0, false, $dumpObjects);
     }
 

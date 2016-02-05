@@ -42,6 +42,7 @@ class FrameworkExtension extends Extension
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
     private $propertyAccessConfigEnabled = false;
+    private $annotationsConfigEnabled = false;
 
     /**
      * @var string|null
@@ -90,9 +91,14 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
-        if($this->isConfigEnabled($container, $config['property_access'])) {
+        if ($this->isConfigEnabled($container, $config['property_access'])) {
             $this->propertyAccessConfigEnabled = true;
             $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['annotations'])) {
+            $this->annotationsConfigEnabled = true;
+            $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['request'])) {
@@ -121,23 +127,23 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
-        if($this->isConfigEnabled($container, $config['validation'])) {
+        if ($this->isConfigEnabled($container, $config['validation'])) {
             $this->registerValidationConfiguration($config['validation'], $container, $loader);
         }
 
-        if($this->isConfigEnabled($container, $config['esi'])) {
+        if ($this->isConfigEnabled($container, $config['esi'])) {
             $loader->load('esi.xml');
         }
 
-        if($this->isConfigEnabled($container, $config['ssi'])) {
+        if ($this->isConfigEnabled($container, $config['ssi'])) {
             $loader->load('ssi.xml');
         }
 
-        if($this->isConfigEnabled($container, $config['fragments'])) {
+        if ($this->isConfigEnabled($container, $config['fragments'])) {
             $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         }
 
-        if($this->isConfigEnabled($container, $config['translator'])) {
+        if ($this->isConfigEnabled($container, $config['translator'])) {
             $this->translationConfigEnabled = true;
             $this->registerTranslatorConfiguration($config['translator'], $container);
         }
@@ -148,10 +154,8 @@ class FrameworkExtension extends Extension
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-
         if ($this->isConfigEnabled($container, $config['serializer'])) {
-            $this->registerSerializerConfiguration($config, $container, $loader);
+            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['property_info'])) {
@@ -228,7 +232,7 @@ class FrameworkExtension extends Extension
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if(!$this->propertyAccessConfigEnabled) {
+        if (!$this->propertyAccessConfigEnabled) {
             throw new LogicException('"framework.property_access" must be enabled when "framework.form" is enabled.');
         }
 
@@ -755,7 +759,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if(!$this->propertyAccessConfigEnabled) {
+        if (!$this->propertyAccessConfigEnabled) {
             throw new LogicException('"framework.property_access" must be enabled when "framework.validator" is enabled.');
         }
 
@@ -778,6 +782,9 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"framework.annotations" must be enabled when "framework.serializer.enable_annotations" is set to true.');
+            }
             $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
         }
 
@@ -904,11 +911,9 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if(!$this->propertyAccessConfigEnabled) {
+        if (!$this->propertyAccessConfigEnabled) {
             throw new LogicException('"framework.property_access" must be enabled when "framework.serializer" is enabled.');
         }
-
-        $config = $config['serializer'];
 
         if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
             // Run after serializer.normalizer.object
@@ -936,6 +941,9 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"framework.annotations" must be enabled when "framework.serializer.enable_annotations" is set to true.');
+            }
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
                  array(new Reference('annotation_reader'))

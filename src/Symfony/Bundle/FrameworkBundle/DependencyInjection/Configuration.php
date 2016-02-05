@@ -489,10 +489,20 @@ class Configuration implements ConfigurationInterface
     private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            ->beforeNormalization()
+                ->always(function ($v) {
+                    if (!isset($v['annotations'])) {
+                        $v['annotations']['enabled'] = true;
+                        @trigger_error('You must explicitly define wheter to enable "framework.annotations" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('annotations')
                     ->info('annotation configuration')
-                    ->addDefaultsIfNotSet()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('cache')->defaultValue('file')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()

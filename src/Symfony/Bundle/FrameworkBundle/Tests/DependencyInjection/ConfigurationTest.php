@@ -16,18 +16,10 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-    // @todo remove this in 4.0
-    private $explicitConfigurationNeeded = array(
-        'property_access' => true,
-    );
-
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array(
-            $this->explicitConfigurationNeeded,
-            array('secret' => 's3cr3t'),
-        ));
+        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
             array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
@@ -43,7 +35,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array($this->explicitConfigurationNeeded, $input));
+        $config = $processor->processConfiguration(new Configuration(true), array($input));
 
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
@@ -55,7 +47,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, array($this->explicitConfigurationNeeded, array(
+        $config = $processor->processConfiguration($configuration, array(array(
             'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
         )));
@@ -86,7 +78,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
-            $this->explicitConfigurationNeeded,
             array(
                 'secret' => 's3cr3t',
                 'trusted_proxies' => 'Not an IP address',
@@ -103,7 +94,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration(true);
 
         $processor->processConfiguration($configuration, array(
-            $this->explicitConfigurationNeeded,
             array(
                 'secret' => 's3cr3t',
                 'trusted_proxies' => array('Not an IP address'),
@@ -115,7 +105,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, array($this->explicitConfigurationNeeded, array('assets' => null)));
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
 
         $defaultConfig = array(
             'enabled' => true,
@@ -139,7 +129,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
-            $this->explicitConfigurationNeeded,
             array(
                 'assets' => array(
                     'base_urls' => '//example.com',
@@ -160,7 +149,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration(true);
 
         $processor->processConfiguration($configuration, array(
-            $this->explicitConfigurationNeeded,
             array(
                 'assets' => array(
                     'base_urls' => '//example.com',
@@ -225,6 +213,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'strict_email' => false,
             ),
             'annotations' => array(
+                'enabled' => true,
                 'cache' => 'file',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,

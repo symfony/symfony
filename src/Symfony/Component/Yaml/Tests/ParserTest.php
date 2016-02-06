@@ -496,6 +496,17 @@ YAML;
         $this->assertSame('two', $actual->array[1]->key);
     }
 
+    public function testWillObjectForMapOptionWillIgnoreEmptyArrays()
+    {
+        $yaml = <<<YAML
+array: []
+YAML;
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+
+        $this->assertInternalType('array', $actual->array);
+    }
+
     /**
      * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException

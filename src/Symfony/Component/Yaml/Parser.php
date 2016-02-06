@@ -301,12 +301,10 @@ class Parser
             mb_internal_encoding($mbEncoding);
         }
 
-        if ($objectForMap && !is_object($data)) {
-            if (is_array($data)) {
-                foreach (array_keys($data) as $index => $key) {
-                    if ($index !== $key) {
-                        return empty($data) ? null : (object) $data;
-                    }
+        if ($objectForMap && is_array($data)) {
+            foreach (array_keys($data) as $index => $key) {
+                if ($index !== $key) {
+                    return (object) $data;
                 }
             }
         }

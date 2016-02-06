@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * A base class to make form login authentication easier!
@@ -25,6 +26,8 @@ use Symfony\Component\Security\Core\Security;
  */
 abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 {
+    use TargetPathTrait;
+
     /**
      * Return the URL to the login page.
      *
@@ -71,7 +74,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     {
         // if the user hit a secure page and start() was called, this was
         // the URL they were on, and probably where you want to redirect to
-        $targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path');
+        $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
 
         if (!$targetPath) {
             $targetPath = $this->getDefaultSuccessRedirectUrl();

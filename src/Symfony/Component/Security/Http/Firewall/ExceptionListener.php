@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
@@ -39,6 +40,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ExceptionListener
 {
+    use TargetPathTrait;
+
     private $tokenStorage;
     private $providerKey;
     private $accessDeniedHandler;
@@ -210,7 +213,7 @@ class ExceptionListener
     {
         // session isn't required when using HTTP basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
-            $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
+            $this->saveTargetPath($request->getSession(), $this->providerKey, $request->getUri());
         }
     }
 }

@@ -486,7 +486,6 @@ array:
   - key: one
   - key: two
 YAML;
-
         $actual = $this->parser->parse($yaml, true, false, true);
         $this->assertInternalType('object', $actual);
 

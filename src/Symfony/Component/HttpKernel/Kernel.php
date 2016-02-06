@@ -543,7 +543,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,
                 'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
-                'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
+                'kernel.logs_dir' => false !== $this->getLogDir() && realpath($this->getLogDir()) ? realpath($this->getLogDir()) : $this->getLogDir(),
                 'kernel.bundles' => $bundles,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
@@ -581,7 +581,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function buildContainer()
     {
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
-            if (!is_dir($dir)) {
+            if (false === $dir && 'logs' === $name) {
+                continue;
+            } elseif (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                     throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
                 }

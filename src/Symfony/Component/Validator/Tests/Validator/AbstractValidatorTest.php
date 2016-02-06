@@ -1126,6 +1126,31 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Group bar', $violations[1]->getMessage());
     }
 
+    public function testValidateGroupSequenceForCollectionConstraint()
+    {
+        $entity = new Entity();
+        $entity->firstName = array('baz' => 2);
+
+        $sequence = new GroupSequence(array('Entity', 'bar', 'foo'));
+        $this->metadata->setGroupSequence($sequence);
+
+        $this->metadata->addPropertyConstraint('firstName', new Collection(
+            array(
+                'fields' => array(
+                    'baz' => array(
+                        new Range(array('min' => 3, 'minMessage' => 'Group foo', 'groups' => 'foo')),
+                        new Range(array('min' => 5, 'minMessage' => 'Group bar', 'groups' => 'bar')),
+                    ),
+                ),
+            )
+        ));
+
+        $violations = $this->validate($entity, null, 'Default');
+
+        $this->assertCount(1, $violations);
+        $this->assertSame('Group bar', $violations[0]->getMessage());
+    }
+
     public function testReplaceDefaultGroupByGroupSequenceObject()
     {
         $entity = new Entity();

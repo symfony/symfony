@@ -479,6 +479,24 @@ EOF;
         $this->assertEquals($expected, $this->parser->parse("foo: bar\nbaz: foobar", false, false, true));
     }
 
+    public function testWillObjectForMapOptionWillIgnoreArrays()
+    {
+        $yaml = <<<YAML
+array:
+  - key: one
+  - key: two
+YAML;
+
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+
+        $this->assertInternalType('array', $actual->array);
+        $this->assertInternalType('object', $actual->array[0]);
+        $this->assertInternalType('object', $actual->array[1]);
+        $this->assertSame('one', $actual->array[0]->key);
+        $this->assertSame('two', $actual->array[1]->key);
+    }
+
     /**
      * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException

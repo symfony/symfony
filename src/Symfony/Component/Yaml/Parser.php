@@ -302,7 +302,13 @@ class Parser
         }
 
         if ($objectForMap && !is_object($data)) {
-            $data = (object) $data;
+            if (is_array($data)) {
+                foreach (array_keys($data) as $index => $key) {
+                    if ($index !== $key) {
+                        return empty($data) ? null : (object) $data;
+                    }
+                }
+            }
         }
 
         return empty($data) ? null : $data;

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /**
  * Converts between objects with getter and setter methods and arrays.
  *
@@ -36,39 +34,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class GetSetMethodNormalizer extends AbstractObjectNormalizer
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @throws RuntimeException
-     */
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
-        $normalizedData = $this->prepareForDenormalization($data);
-
-        $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
-
-        $classMethods = get_class_methods($object);
-        foreach ($normalizedData as $attribute => $value) {
-            if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
-            }
-
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
-
-            if ($allowed && !$ignored) {
-                $setter = 'set'.ucfirst($attribute);
-
-                if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
-                    $object->$setter($value);
-                }
-            }
-        }
-
-        return $object;
-    }
+    private static $setterAccessibleCache = array();
 
     /**
      * {@inheritdoc}
@@ -175,8 +141,13 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
         $setter = 'set'.ucfirst($attribute);
+        $key = get_class($object).':'.$setter;
 
-        if (is_callable(array($object, $setter))) {
+        if (!isset(self::$setterAccessibleCache[$key])) {
+            self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
+        }
+
+        if (self::$setterAccessibleCache[$key]) {
             $object->$setter($value);
         }
     }

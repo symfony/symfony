@@ -304,7 +304,11 @@ class Parser
         if ($objectForMap && is_array($data)) {
             foreach (array_keys($data) as $index => $key) {
                 if ($index !== $key) {
-                    return (object) $data;
+                    $object = new \stdClass;
+                    foreach ($data as $key => $value) {
+                        $object->$key = $value;
+                    }
+                    return $object;
                 }
             }
         }

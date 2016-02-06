@@ -507,6 +507,22 @@ YAML;
         $this->assertInternalType('array', $actual->array);
     }
 
+    public function testCanParseNumericMap()
+    {
+        $yaml = <<<YAML
+map:
+  1: one
+  2: two
+YAML;
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+        $this->assertInternalType('object', $actual->map);
+        $this->assertTrue(property_exists($actual->map, '1'));
+        $this->assertTrue(property_exists($actual->map, '2'));
+        $this->assertSame('one', $actual->map->{'1'});
+        $this->assertSame('two', $actual->map->{'2'});
+    }
+
     /**
      * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException

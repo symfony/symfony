@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-16T03:51:01Z
+
+@webmozart I need you to look over this please.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T10:36:00Z
+
+@Tobion I propose to merge this one as @webmozart does not reply anyway to pings.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-27T17:21:39Z
+
+@fabpot What do you think about deprecating the unneeded argument in Symfony 3.1 (see https://github.com/symfony/symfony/pull/17398#discussion_r49938630)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T17:27:41Z
+
+I'm not a big fan as this is a big BC break and makes supporting several versions difficult.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-02-05T06:42:48Z
+
+Looks good to me. @fabpot you think deprecating the argument is too much of a hassle even if we keep it until 4.0?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-05T06:48:43Z
+
+@webmozart For ExpressionValidator, yes. It means that the constructor signature is going to be different for 3.4 and 4.0, which makes writing libraries/projects compatible with both versions more difficult (think Silex for instance).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-05T15:02:11Z
+
+I think it's good to merge. If we want to deprecate the ExpressionValidator argument or the `validator.expression` service, we would need to do it in the master branch anyway.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-05T15:37:21Z
+
+:+1:
+
+Status: Reviewed

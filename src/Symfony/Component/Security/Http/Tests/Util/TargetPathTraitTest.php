@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Security\Http\Tests\Util;
 
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 

@@ -25,7 +25,7 @@ trait TargetPathTrait
      *
      * @param SessionInterface $session
      * @param string           $providerKey The name of your firewall
-     * @param string           $uri The URI to set as the target path
+     * @param string           $uri         The URI to set as the target path
      */
     private function saveTargetPath(SessionInterface $session, $providerKey, $uri)
     {

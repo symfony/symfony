@@ -45,6 +45,7 @@ Yaml
 
    ```php
    Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+   ```
 
  * The `!!php/object` tag to indicate dumped PHP objects has been deprecated
    and will be removed in Symfony 4.0. Use the `!php/object` tag instead.

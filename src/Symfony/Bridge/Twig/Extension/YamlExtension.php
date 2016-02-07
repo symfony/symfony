@@ -31,7 +31,7 @@ class YamlExtension extends \Twig_Extension
         );
     }
 
-    public function encode($input, $inline = 0, $dumpObjects = false)
+    public function encode($input, $inline = 0, $dumpObjects = 0)
     {
         static $dumper;
 

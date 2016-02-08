@@ -55,7 +55,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             $this->fail('->getDefinition() throws a ServiceNotFoundException if the service definition does not exist');
         } catch (ServiceNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent service "baz".', $e->getMessage(), '->getDefinition() throws a ServiceNotFoundException if the service definition does not exist');
-
         }
     }
 

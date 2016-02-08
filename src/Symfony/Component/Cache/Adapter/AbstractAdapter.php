@@ -49,10 +49,13 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace) {
                 $byLifetime = array();
+                $now = time();
 
                 foreach ($deferred as $key => $item) {
-                    if (0 <= $item->lifetime) {
-                        $byLifetime[(int) $item->lifetime][$namespace.$key] = $item->value;
+                    if (null === $item->expiry) {
+                        $byLifetime[0][$namespace.$key] = $item->value;
+                    } elseif ($item->expiry > $now) {
+                        $byLifetime[$item->expiry - $now][$namespace.$key] = $item->value;
                     }
                 }
 
@@ -166,20 +169,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
         $id = $this->getId($key);
 
         if (isset($this->deferred[$key])) {
-            $item = (array) $this->deferred[$key];
-            try {
-                $e = null;
-                $value = $item[CacheItem::CAST_PREFIX.'value'];
-                $ok = $this->doSave(array($key => $value), $item[CacheItem::CAST_PREFIX.'lifetime']);
-                unset($this->deferred[$key]);
-
-                if (true === $ok || array() === $ok) {
-                    return true;
-                }
-            } catch (\Exception $e) {
-            }
-            $type = is_object($value) ? get_class($value) : gettype($value);
-            CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
+            $this->commit();
         }
 
         try {
@@ -286,44 +276,50 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
      */
     public function commit()
     {
-        $f = $this->mergeByLifetime;
-        $ko = array();
+        $ok = true;
+        $byLifetime = $this->mergeByLifetime;
+        $byLifetime = $byLifetime($this->deferred, $this->namespace);
+        $retry = $this->deferred = array();
 
-        foreach ($f($this->deferred, $this->namespace) as $lifetime => $values) {
+        foreach ($byLifetime as $lifetime => $values) {
             try {
-                if (true === $ok = $this->doSave($values, $lifetime)) {
-                    continue;
-                }
+                $e = $this->doSave($values, $lifetime);
             } catch (\Exception $e) {
-                $ok = false;
             }
-            if (false === $ok) {
-                $ok = array_keys($values);
+            if (true === $e || array() === $e) {
+                continue;
             }
-            foreach ($ok as $id) {
-                $ko[$lifetime][] = array($id => $values[$id]);
+            if (is_array($e) || 1 === count($values)) {
+                foreach (is_array($e) ? $e : array_keys($values) as $id) {
+                    $ok = false;
+                    $v = $values[$id];
+                    $type = is_object($v) ? get_class($v) : gettype($v);
+                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
+                }
+            } else {
+                foreach ($values as $id => $v) {
+                    $retry[$lifetime][] = $id;
+                }
             }
         }
-
-        $this->deferred = array();
-        $ok = true;
 
         // When bulk-save failed, retry each item individually
-        foreach ($ko as $lifetime => $values) {
-            foreach ($values as $v) {
+        foreach ($retry as $lifetime => $ids) {
+            foreach ($ids as $id) {
                 try {
-                    $e = $this->doSave($v, $lifetime);
+                    $v = $byLifetime[$lifetime][$id];
+                    $e = $this->doSave(array($id => $v), $lifetime);
                 } catch (\Exception $e) {
                 }
-                if (true !== $e && array() !== $e) {
-                    $ok = false;
-                    foreach ($v as $key => $value) {
-                        $type = is_object($value) ? get_class($value) : gettype($value);
-                        CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
-                    }
+                if (true === $e || array() === $e) {
+                    continue;
                 }
+                $ok = false;
+                $type = is_object($v) ? get_class($v) : gettype($v);
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
             }
         }
+        $this->deferred = array();
 
         return $ok;
     }

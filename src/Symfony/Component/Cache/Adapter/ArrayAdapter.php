@@ -78,7 +78,7 @@ class ArrayAdapter implements CacheItemPoolInterface, LoggerAwareInterface
             $this->validateKey($key);
         }
 
-        return $this->generateItems($keys);
+        return $this->generateItems($keys, time());
     }
 
     /**
@@ -132,9 +132,9 @@ class ArrayAdapter implements CacheItemPoolInterface, LoggerAwareInterface
         $item = (array) $item;
         $key = $item[CacheItem::CAST_PREFIX.'key'];
         $value = $item[CacheItem::CAST_PREFIX.'value'];
-        $lifetime = $item[CacheItem::CAST_PREFIX.'lifetime'];
+        $expiry = $item[CacheItem::CAST_PREFIX.'expiry'];
 
-        if (0 > $lifetime) {
+        if (null !== $expiry && $expiry <= time()) {
             return true;
         }
         if ($this->storeSerialized) {
@@ -149,7 +149,7 @@ class ArrayAdapter implements CacheItemPoolInterface, LoggerAwareInterface
         }
 
         $this->values[$key] = $value;
-        $this->expiries[$key] = $lifetime ? $lifetime + time() : PHP_INT_MAX;
+        $this->expiries[$key] = null !== $expiry ? $expiry : PHP_INT_MAX;
 
         return true;
     }
@@ -185,12 +185,12 @@ class ArrayAdapter implements CacheItemPoolInterface, LoggerAwareInterface
         return $key;
     }
 
-    private function generateItems(array $keys)
+    private function generateItems(array $keys, $now)
     {
         $f = $this->createCacheItem;
 
         foreach ($keys as $key) {
-            if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= time() || !$this->deleteItem($key))) {
+            if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key))) {
                 $value = null;
             } elseif ($this->storeSerialized) {
                 $value = unserialize($this->values[$key]);

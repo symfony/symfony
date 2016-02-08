@@ -153,13 +153,6 @@ interface StyleInterface
     public function progressAdvance($step = 1);
 
     /**
-     * Sets the progress redraw frequency.
-     *
-     * @param int $step The frequency in steps
-     */
-    public function progressRedrawFrequency($step = 1);
-
-    /**
      * Finishes the progress output.
      */
     public function progressFinish();

@@ -102,7 +102,6 @@ class ResizeFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-
         if ($data instanceof \Traversable){
             @trigger_error('Support for Traversable is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
         }

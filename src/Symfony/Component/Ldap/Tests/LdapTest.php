@@ -18,7 +18,7 @@ use Symfony\Component\Ldap\Ldap;
 
 class LdapTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AdapterInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $adapter;
 
     /** @var Ldap */

@@ -11,26 +11,26 @@
 
 namespace Symfony\Component\Ldap;
 
-use Symfony\Component\Ldap\Adapter\QueryInterface;
-
 /**
  * Ldap interface.
  *
+ * This interface is used for the BC layer with branch 2.8 and 3.0.
+ *
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @deprecated You should use LdapInterface instead
  */
-interface LdapInterface extends BaseLdapInterface
+interface LdapClientInterface extends BaseLdapInterface
 {
-    const ESCAPE_FILTER = 0x01;
-    const ESCAPE_DN = 0x02;
-
-    /**
-     * Queries a ldap server for entries matching the given criteria.
+    /*
+     * Find a username into ldap connection.
      *
      * @param string $dn
      * @param string $query
-     * @param array  $options
+     * @param mixed  $filter
      *
-     * @return QueryInterface
+     * @return array|null
      */
-    public function query($dn, $query, array $options = array());
+    public function find($dn, $query, $filter = '*');
 }

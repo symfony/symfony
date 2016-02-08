@@ -15,8 +15,6 @@ use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 
 /**
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- * @author Francis Besset <francis.besset@gmail.com>
  * @author Charles Sarrazin <charles@sarraz.in>
  */
 final class Ldap implements LdapInterface

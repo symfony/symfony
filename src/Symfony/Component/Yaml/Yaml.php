@@ -21,6 +21,9 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Yaml
 {
     const DUMP_OBJECT = 1;
+    const PARSE_EXCEPTION_ON_INVALID_TYPE = 2;
+    const PARSE_OBJECT = 4;
+    const PARSE_OBJECT_FOR_MAP = 8;
 
     /**
      * Parses YAML into a PHP value.
@@ -31,20 +34,44 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
-     * @param string $input                  A string containing YAML
-     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param bool   $objectSupport          True if object support is enabled, false otherwise
-     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
+     * @param string $input A string containing YAML
+     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @return mixed The YAML converted to a PHP value
      *
      * @throws ParseException If the YAML is not valid
      */
-    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
+    public static function parse($input, $flags = 0)
     {
+        if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+
+            if ($flags) {
+                $flags = self::PARSE_EXCEPTION_ON_INVALID_TYPE;
+            } else {
+                $flags = 0;
+            }
+        }
+
+        if (func_num_args() >= 3) {
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
+
+            if (func_get_arg(2)) {
+                $flags |= self::PARSE_OBJECT;
+            }
+        }
+
+        if (func_num_args() >= 4) {
+            @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
+
+            if (func_get_arg(3)) {
+                $flags |= self::PARSE_OBJECT_FOR_MAP;
+            }
+        }
+
         $yaml = new Parser();
 
-        return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+        return $yaml->parse($input, $flags);
     }
 
     /**

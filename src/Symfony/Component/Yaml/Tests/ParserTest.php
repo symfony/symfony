@@ -425,6 +425,18 @@ EOF;
 foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledPassingTrue()
+    {
+        $input = <<<EOF
+foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
     }
 
@@ -437,7 +449,7 @@ EOF;
 foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
     }
 
     /**
@@ -454,6 +466,22 @@ EOF;
 foo:
     fiz: [cat]
 EOF;
+        $result = $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertInstanceOf('stdClass', $result->foo);
+        $this->assertEquals(array('cat'), $result->foo->fiz);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectForMapEnabledWithMappingUsingBooleanToggles()
+    {
+        $yaml = <<<EOF
+foo:
+    fiz: [cat]
+EOF;
         $result = $this->parser->parse($yaml, false, false, true);
 
         $this->assertInstanceOf('stdClass', $result);
@@ -462,6 +490,18 @@ EOF;
     }
 
     public function testObjectForMapEnabledWithInlineMapping()
+    {
+        $result = $this->parser->parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_OBJECT_FOR_MAP);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals('bar', $result->foo);
+        $this->assertEquals('cat', $result->fiz);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectForMapEnabledWithInlineMappingUsingBooleanToggles()
     {
         $result = $this->parser->parse('{ "foo": "bar", "fiz": "cat" }', false, false, true);
 
@@ -476,6 +516,18 @@ EOF;
         $expected->foo = 'bar';
         $expected->baz = 'foobar';
 
+        $this->assertEquals($expected, $this->parser->parse("foo: bar\nbaz: foobar", Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectForMapIsAppliedAfterParsingUsingBooleanToggles()
+    {
+        $expected = new \stdClass();
+        $expected->foo = 'bar';
+        $expected->baz = 'foobar';
+
         $this->assertEquals($expected, $this->parser->parse("foo: bar\nbaz: foobar", false, false, true));
     }
 
@@ -485,7 +537,17 @@ EOF;
      */
     public function testObjectsSupportDisabledWithExceptions($yaml)
     {
-        $this->parser->parse($yaml, true, false);
+        $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider invalidDumpedObjectProvider
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testObjectsSupportDisabledWithExceptionsUsingBooleanToggles($yaml)
+    {
+        $this->parser->parse($yaml, true);
     }
 
     public function invalidDumpedObjectProvider()

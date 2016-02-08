@@ -479,6 +479,50 @@ EOF;
         $this->assertEquals($expected, $this->parser->parse("foo: bar\nbaz: foobar", false, false, true));
     }
 
+    public function testWillObjectForMapOptionWillIgnoreArrays()
+    {
+        $yaml = <<<YAML
+array:
+  - key: one
+  - key: two
+YAML;
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+
+        $this->assertInternalType('array', $actual->array);
+        $this->assertInternalType('object', $actual->array[0]);
+        $this->assertInternalType('object', $actual->array[1]);
+        $this->assertSame('one', $actual->array[0]->key);
+        $this->assertSame('two', $actual->array[1]->key);
+    }
+
+    public function testWillObjectForMapOptionWillIgnoreEmptyArrays()
+    {
+        $yaml = <<<YAML
+array: []
+YAML;
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+
+        $this->assertInternalType('array', $actual->array);
+    }
+
+    public function testCanParseNumericMap()
+    {
+        $yaml = <<<YAML
+map:
+  1: one
+  2: two
+YAML;
+        $actual = $this->parser->parse($yaml, true, false, true);
+        $this->assertInternalType('object', $actual);
+        $this->assertInternalType('object', $actual->map);
+        $this->assertTrue(property_exists($actual->map, '1'));
+        $this->assertTrue(property_exists($actual->map, '2'));
+        $this->assertSame('one', $actual->map->{'1'});
+        $this->assertSame('two', $actual->map->{'2'});
+    }
+
     /**
      * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException

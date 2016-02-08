@@ -301,8 +301,17 @@ class Parser
             mb_internal_encoding($mbEncoding);
         }
 
-        if ($objectForMap && !is_object($data)) {
-            $data = (object) $data;
+        if ($objectForMap && is_array($data)) {
+            foreach (array_keys($data) as $index => $key) {
+                if ($index !== $key) {
+                    $object = new \stdClass();
+                    foreach ($data as $key => $value) {
+                        $object->$key = $value;
+                    }
+
+                    return $object;
+                }
+            }
         }
 
         return empty($data) ? null : $data;

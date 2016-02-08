@@ -192,7 +192,9 @@ EOF
             throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
-        return $io->choice('Select one of the following services to display its information', $matchingServices);
+        $default = 1 === count($matchingServices) ? $matchingServices[0] : null;
+
+        return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

@@ -276,6 +276,46 @@ EOF;
             'paragraph-separator' => array("\t\\P", '"\t\\\\P"'),
         );
     }
+
+    /**
+     * @dataProvider objectAsMapProvider
+     */
+    public function testDumpObjectAsMap($object, $expected)
+    {
+
+        $yaml = $this->dumper->dump($object, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
+
+        $this->assertEquals($expected, Yaml::parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    public function objectAsMapProvider()
+    {
+        $tests = array();
+
+        $bar = new \stdClass();
+        $bar->class = 'classBar';
+        $bar->args = array('bar');
+        $zar = new \stdClass();
+        $foo = new \stdClass();
+        $foo->bar = $bar;
+        $foo->zar = $zar;
+        $object = new \stdClass();
+        $object->foo = $foo;
+        $tests['stdClass'] = array($object, $object);
+
+        $arrayObject = new \ArrayObject();
+        $arrayObject['foo'] = 'bar';
+        $arrayObject['baz'] = 'foobar';
+        $parsedArrayObject = new \stdClass();
+        $parsedArrayObject->foo = 'bar';
+        $parsedArrayObject->baz = 'foobar';
+        $tests['ArrayObject'] = array($arrayObject, $parsedArrayObject);
+
+        $a = new A();
+        $tests['arbitrary-object'] = array($a, null);
+
+        return $tests;
+    }
 }
 
 class A

@@ -1040,6 +1040,74 @@ EOT
             $this->parser->parse($yaml)
         );
     }
+
+    /**
+     * @param $lineNumber
+     * @param $yaml
+     * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
+     */
+    public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
+    {
+        $this->setExpectedException(
+            '\Symfony\Component\Yaml\Exception\ParseException',
+            sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber)
+        );
+
+        $this->parser->parse($yaml);
+    }
+
+    public function parserThrowsExceptionWithCorrectLineNumberProvider()
+    {
+        return array(
+            array(
+                4,
+                <<<YAML
+foo:
+    -
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                5,
+                <<<YAML
+foo:
+    -
+        # bar
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                8,
+                <<<YAML
+foo:
+    -
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                10,
+                <<<YAML
+foo:
+    -
+        # foobar
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        # bar
+        bar: "123",
+YAML
+            ),
+        );
+    }
 }
 
 class B

@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by WhiteEagle88 at 2016-01-31T08:56:27Z
+
+@fabpot, No. If you inspect logo in chrome, you can see 40x40. Maybe need change height?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-31T09:23:48Z
+
+@WhiteEagle88 As the logo is square, both width and height should be the same IMHO.
+
+---------------------------------------------------------------------------
+
+by WhiteEagle88 at 2016-01-31T09:41:59Z
+
+@fabpot
+Yes, I agree with you. I fixed this.
+
+For symfony 3.0 will need to create pull request?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-31T20:38:36Z
+
+Could any Windows user please verify this fix? Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-07T18:45:15Z
+
+We need some Windows user to verify this fix before merging. @WouterJ? @iltar? Thanks!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-02-07T18:54:56Z
+
+I'm sorry, I don't have Windows 10 so no Edge for me.
+
+---------------------------------------------------------------------------
+
+by AlexandrePavy at 2016-02-07T18:59:16Z
+
+Works well for me, Windows 10 Microsoft Edge 25.10586.0.0 with EdgeHTML 13.10586
+
+<img width="1059" alt="profiler" src="https://cloud.githubusercontent.com/assets/6603411/12874492/3da00d80-cdd5-11e5-823a-db4c712cec80.png">
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-07T19:14:37Z
+
+@AlexandrePavy thanks for confirming the fix! And thanks to @WhiteEagle88 for fixing it.

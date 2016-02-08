@@ -110,7 +110,7 @@ class ResizeFormListener implements EventSubscriberInterface
             $data = array();
         }
 
-        if (!is_array($data) && !$data instanceof \ArrayAccess) {
+        if (!is_array($data)) {
             $data = array();
         }
 

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated support for Traversable in `ResizeFormListener::PreSubmit` method
 
 3.0.0
 -----

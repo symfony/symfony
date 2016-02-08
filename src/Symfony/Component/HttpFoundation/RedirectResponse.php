@@ -23,9 +23,10 @@ class RedirectResponse extends Response
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
-     * @param string $url     The URL to redirect to
-     * @param int    $status  The status code (302 by default)
-     * @param array  $headers The headers (Location is always set to the given URL)
+     * @param string  $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
+     *                         but pratically every browser redirects on paths only as well.
+     * @param integer $status  The status code (302 by default)
+     * @param array   $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
      *

@@ -543,6 +543,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If the property does not exist or is not
      *                                 public.
+     * @throws \TypeError
      */
     private function writeProperty(&$object, $property, $value)
     {
@@ -553,7 +554,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access = $this->getWriteAccessInfo($object, $property, $value);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]} = $value;
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
@@ -567,9 +568,45 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $object->$property = $value;
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+        }
+    }
+
+    /**
+     * Throws a {@see \TypeError} as in PHP 7 when using PHP 5.
+     *
+     * @param object $object
+     * @param string $method
+     * @param mixed  $value
+     *
+     * @throws \TypeError
+     * @throws \Exception
+     */
+    private function callMethod($object, $method, $value) {
+        if (PHP_MAJOR_VERSION >= 7) {
+            $object->{$method}($value);
+
+            return;
+        }
+
+        set_error_handler(function ($errno, $errstr) use ($object, $method) {
+            if (E_RECOVERABLE_ERROR === $errno && false !== strpos($errstr, sprintf('passed to %s::%s() must', get_class($object), $method))) {
+                throw new \TypeError($errstr);
+            }
+
+            return false;
+        });
+
+        try {
+            $object->{$method}($value);
+            restore_error_handler();
+        } catch (\Exception $e) {
+            // Cannot use finally in 5.5 because of https://bugs.php.net/bug.php?id=67047
+            restore_error_handler();
+
+            throw $e;
         }
     }
 
@@ -582,6 +619,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param array|\Traversable $collection   The collection to write
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
+     *
+     * @throws \TypeError
      */
     private function writeCollection($object, $property, $collection, $addMethod, $removeMethod)
     {
@@ -613,11 +652,11 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         foreach ($itemToRemove as $item) {
-            $object->{$removeMethod}($item);
+            $this->callMethod($object, $removeMethod, $item);
         }
 
         foreach ($itemsToAdd as $item) {
-            $object->{$addMethod}($item);
+            $this->callMethod($object, $addMethod, $item);
         }
     }
 

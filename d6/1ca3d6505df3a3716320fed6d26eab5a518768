@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2016-02-05T11:14:23Z
+
+This seems to not working:
+
+```
+Unable to autowire argument of type "Symfony\Component\Translation\TranslatorInterface" for the service "twig.ssl_certificate_extension".
+```
+
+My service definition:
+
+```yaml
+    twig.ssl_certificate_extension:
+        class: AppBundle\Twig\SslCertificateExtension
+        autowire: true
+        tags:
+            - { name: twig.extension }
+```
+
+My service class:
+
+```php
+class SslCertificateExtension extends \Twig_Extension
+{
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+// [...]
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-05T11:23:30Z
+
+This may be because this service is replaced by another one when enabling the translator
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2016-02-05T12:51:23Z
+
+@stof indeed:
+
+```bash
+$ ./docker-console app/console container:debug | grep translator
+  translator                                                                       Symfony\Component\Translation\DataCollectorTranslator
+  translator.default                                                               Symfony\Bundle\FrameworkBundle\Translation\Translator
+  translator_listener                                                              Symfony\Component\HttpKernel\EventListener\TranslatorListener
+```
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2016-02-09T16:56:49Z
+
+Works like a charm now! :green_heart:

@@ -78,6 +78,21 @@ Yaml
    Yaml::parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_OBJECT_FOR_MAP);
    ```
 
+ * Deprecated support for passing `true`/`false` as the fourth argument to the
+   `dump()` method to trigger exceptions when an invalid type was passed.
+
+   Before:
+
+   ```php
+   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, true);
+   ```
+
+   After:
+
+   ```php
+   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
+   ```
+
  * Deprecated support for passing `true`/`false` as the fifth argument to the `dump()` method to toggle object support.
 
    Before:

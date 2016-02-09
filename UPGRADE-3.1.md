@@ -45,7 +45,7 @@ Yaml
    After:
 
    ```php
-   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', YAML::PARSE_EXCEPTION_ON_INVALID_TYPE);
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
    ```
 
  * Deprecated support for passing `true`/`false` as the third argument to the
@@ -78,7 +78,7 @@ Yaml
    Yaml::parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_OBJECT_FOR_MAP);
    ```
 
- * Deprecated support for passing `true`/`false` as the third argument to the `dump()` methods to toggle object support.
+ * Deprecated support for passing `true`/`false` as the fifth argument to the `dump()` method to toggle object support.
 
    Before:
 

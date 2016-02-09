@@ -214,7 +214,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -236,7 +236,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
             'choice_translation_domain' => false,
         ));
 
@@ -259,7 +259,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
             'required' => false,
             'translation_domain' => false,
             'placeholder' => 'Placeholder&Not&Translated',
@@ -286,7 +286,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -309,7 +309,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '-- sep --', 'attr' => array('class' => 'my&class')),
@@ -333,7 +333,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => null, 'attr' => array('class' => 'my&class')),
@@ -356,7 +356,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '', 'attr' => array('class' => 'my&class')),
@@ -380,7 +380,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'preferred_choices' => array('&a', '&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -397,7 +397,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => false,
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -421,7 +421,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => false,
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -444,7 +444,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
             'required' => false,
             'placeholder' => 'Select&Anything&Not&Me',
         ));
@@ -470,7 +470,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => true,
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
             'placeholder' => 'Test&Me',
         ));
 
@@ -495,7 +495,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => true,
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('placeholder' => '', 'attr' => array('class' => 'my&class')),
@@ -521,7 +521,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
                 'Group&2' => array('Choice&C' => '&c'),
             ),
             'multiple' => false,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -550,7 +550,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => true,
             'multiple' => true,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -575,7 +575,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'required' => true,
             'multiple' => true,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -598,7 +598,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => true,
-            'expanded' => false,
+            'widget' => 'select',
             'placeholder' => 'Test&Me',
         ));
 
@@ -622,7 +622,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'required' => false,
             'multiple' => true,
-            'expanded' => false,
+            'widget' => 'select',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
@@ -643,8 +643,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -678,8 +677,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
             'choice_translation_domain' => false,
         ));
 
@@ -715,8 +713,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -750,8 +747,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
             'placeholder' => 'Test&Me',
         ));
 
@@ -795,8 +791,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
             'translation_domain' => false,
             'placeholder' => 'Placeholder&Not&Translated',
         ));
@@ -841,8 +836,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', true, array(
             'choices' => array('Choice&A' => '1', 'Choice&B' => '0'),
-            'multiple' => false,
-            'expanded' => true,
+            'widget' => 'radio',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -876,8 +870,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
-            'multiple' => true,
-            'expanded' => true,
+            'widget' => 'checkbox',
             'required' => true,
         ));
 
@@ -921,8 +914,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
-            'multiple' => true,
-            'expanded' => true,
+            'widget' => 'checkbox',
             'required' => true,
             'choice_translation_domain' => false,
         ));
@@ -968,8 +960,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
-            'multiple' => true,
-            'expanded' => true,
+            'widget' => 'checkbox',
             'required' => true,
         ));
 

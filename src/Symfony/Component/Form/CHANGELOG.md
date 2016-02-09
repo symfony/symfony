@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated the "expanded" option of ChoiceType
 
 3.0.0
 -----

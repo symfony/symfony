@@ -24,7 +24,7 @@ class ChoiceSubType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array('expanded' => true));
+        $resolver->setDefaults(array('widget' => 'radio'));
         $resolver->setNormalizer('choices', function () {
             return array(
                 'attr1' => 'Attribute 1',

@@ -33,6 +33,51 @@ Serializer
 Yaml
 ----
 
+ * Deprecated support for passing `true`/`false` as the second argument to the
+   `parse()` method to trigger exceptions when an invalid type was passed.
+
+   Before:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', true);
+   ```
+
+   After:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', YAML::PARSE_EXCEPTION_ON_INVALID_TYPE);
+   ```
+
+ * Deprecated support for passing `true`/`false` as the third argument to the
+   `parse()` method to toggle object support.
+
+   Before:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', false, true);
+   ```
+
+   After:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_OBJECT);
+   ```
+
+ * Deprecated support for passing `true`/`false` as the fourth argument to the
+   `parse()` method to parse objects as maps.
+
+   Before:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', false, false, true);
+   ```
+
+   After:
+
+   ```php
+   Yaml::parse('{ "foo": "bar", "fiz": "cat" }', Yaml::PARSE_OBJECT_FOR_MAP);
+   ```
+
  * Deprecated support for passing `true`/`false` as the third argument to the `dump()` methods to toggle object support.
 
    Before:

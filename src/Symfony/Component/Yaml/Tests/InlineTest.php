@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use Symfony\Component\Yaml\Inline;
+use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +28,17 @@ class InlineTest extends \PHPUnit_Framework_TestCase
      * @dataProvider getTestsForParseWithMapObjects
      */
     public function testParseWithMapObjects($yaml, $value)
+    {
+        $actual = Inline::parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP);
+
+        $this->assertSame(serialize($value), serialize($actual));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getTestsForParseWithMapObjects
+     */
+    public function testParseWithMapObjectsPassingTrue($yaml, $value)
     {
         $actual = Inline::parse($yaml, false, false, true);
 
@@ -143,6 +155,15 @@ class InlineTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseReferences($yaml, $expected)
     {
+        $this->assertSame($expected, Inline::parse($yaml, 0, array('var' => 'var-value')));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getDataForParseReferences
+     */
+    public function testParseReferencesAsFifthArgument($yaml, $expected)
+    {
         $this->assertSame($expected, Inline::parse($yaml, false, false, false, array('var' => 'var-value')));
     }
 
@@ -161,6 +182,19 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testParseMapReferenceInSequence()
+    {
+        $foo = array(
+            'a' => 'Steve',
+            'b' => 'Clark',
+            'c' => 'Brian',
+        );
+        $this->assertSame(array($foo), Inline::parse('[*foo]', 0, array('foo' => $foo)));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testParseMapReferenceInSequenceAsFifthArgument()
     {
         $foo = array(
             'a' => 'Steve',

@@ -96,8 +96,7 @@ class Yaml
             $flags = (int) $flags;
         }
 
-        $yaml = new Dumper();
-        $yaml->setIndentation($indent);
+        $yaml = new Dumper($indent);
 
         return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $flags);
     }

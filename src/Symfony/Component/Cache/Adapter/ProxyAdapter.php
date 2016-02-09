@@ -22,6 +22,8 @@ class ProxyAdapter implements CacheItemPoolInterface
 {
     private $pool;
     private $createCacheItem;
+    private $hits = 0;
+    private $misses = 0;
 
     public function __construct(CacheItemPoolInterface $pool)
     {
@@ -47,8 +49,13 @@ class ProxyAdapter implements CacheItemPoolInterface
     {
         $f = $this->createCacheItem;
         $item = $this->pool->getItem($key);
+        if ($isHit = $item->isHit()) {
+            ++$this->hits;
+        } else {
+            ++$this->misses;
+        }
 
-        return $f($key, $item->get(), $item->isHit());
+        return $f($key, $item->get(), $isHit);
     }
 
     /**
@@ -134,7 +141,33 @@ class ProxyAdapter implements CacheItemPoolInterface
         $f = $this->createCacheItem;
 
         foreach ($items as $key => $item) {
-            yield $key => $f($key, $item->get(), $item->isHit());
+            if ($isHit = $item->isHit()) {
+                ++$this->hits;
+            } else {
+                ++$this->misses;
+            }
+
+            yield $key => $f($key, $item->get(), $isHit);
         }
+    }
+
+    /**
+     * Returns the number of cache read hits.
+     *
+     * @return int
+     */
+    public function getHits()
+    {
+        return $this->hits;
+    }
+
+    /**
+     * Returns the number of cache read misses.
+     *
+     * @return int
+     */
+    public function getMisses()
+    {
+        return $this->misses;
     }
 }

@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by oktapodia at 2015-12-23T18:00:58Z
+
+Following the PR https://github.com/symfony/symfony/pull/15111
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-12-26T09:56:37Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2015-12-26T15:27:26Z
+
+@sstok Oops ! Mistake after the rebase, FIxed.
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2016-01-11T04:16:06Z
+
+ping @sstok Can I have some news please ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-28T07:48:28Z
+
+@oktapodia your pull request looks good and the proposed feature is nice! We just need a final push to finish it. Do you think you can add the test asked for by Fabien? Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-28T10:13:55Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2016-02-01T14:19:15Z
+
+I think there are some problems with your tests.
+
+![screen](https://i.gyazo.com/72a945910d639844d31a147a08d305ba.png)
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-02-01T14:38:29Z
+
+Try to rebase on master.
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2016-02-01T14:42:30Z
+
+@Ener-Getick Thanks but my PR is not mergeable if I rebase on master
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-02-01T14:52:13Z
+
+This is a new feature so it will be merged in master anyway. Try to rebase it on 3.0 otherwise.
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2016-02-01T15:00:32Z
+
+Same problem :(
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-02-01T17:13:18Z
+
+It's apparently not related to your PR (see https://github.com/symfony/symfony/branches). So don't worry ;)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-09T19:10:20Z
+
+Failed tests have been fixed. I've played with this feature and it works as expected:
+
+![200](https://cloud.githubusercontent.com/assets/73419/12927547/139acbca-cf69-11e5-8e12-35aa98a57ebb.png)
+
+![404](https://cloud.githubusercontent.com/assets/73419/12927548/1518454a-cf69-11e5-999d-2848a693264d.png)
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T19:35:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by oktapodia at 2016-02-09T19:38:41Z
+
+Thanks @javiereguiluz

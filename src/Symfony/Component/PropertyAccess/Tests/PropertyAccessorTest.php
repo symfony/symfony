@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
@@ -509,5 +510,22 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testIsWritableForReferenceChainIssue($object, $path, $value)
     {
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConvertTypeErrorToInvalidArgumentException()
+    {
+        $this->propertyAccessor->setValue(new TestClass('Kévin'), 'date', 'This is a string, \DateTime excepted.');
+    }
+
+    public function testSetTypeHint()
+    {
+        $date = new \DateTimeImmutable();
+        $object = new TestClass('Kévin');
+
+        $this->propertyAccessor->setValue($object, 'date', $date);
+        $this->assertSame($date, $object->getDate());
     }
 }

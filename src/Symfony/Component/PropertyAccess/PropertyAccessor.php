@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -553,7 +554,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access = $this->getWriteAccessInfo($object, $property, $value);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]} = $value;
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
@@ -567,9 +568,38 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $object->$property = $value;
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+        }
+    }
+
+    /**
+     * Call a method and convert {@see \TypeError} to {@see InvalidArgumentException}.
+     *
+     * @param object $object
+     * @param string $method
+     * @param mixed  $value
+     */
+    private function callMethod($object, $method, $value) {
+        if (class_exists('TypeError')) {
+            // PHP 7
+            try {
+                $object->{$method}($value);
+            } catch (\TypeError $e) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
+
+        // PHP 5
+        set_error_handler(function ($errno, $errstr) {
+            throw new InvalidArgumentException($errstr);
+        });
+
+        try {
+            $object->{$method}($value);
+        } finally {
+            restore_error_handler();
         }
     }
 
@@ -613,11 +643,11 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         foreach ($itemToRemove as $item) {
-            $object->{$removeMethod}($item);
+            $this->callMethod($object, $removeMethod, $item);
         }
 
         foreach ($itemsToAdd as $item) {
-            $object->{$addMethod}($item);
+            $this->callMethod($object, $addMethod, $item);
         }
     }
 

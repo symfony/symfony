@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-08T14:25:31Z
+
+:+1: I can't test it on Windows, but this is the same fix we recently applied in other PR. I've tested it in non-Windows systems and doesn't affect them in any way.
+
+Status: reviewed

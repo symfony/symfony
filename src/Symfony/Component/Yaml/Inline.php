@@ -18,6 +18,8 @@ use Symfony\Component\Yaml\Exception\DumpException;
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
  */
 class Inline
 {

@@ -48,6 +48,8 @@
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>
+
+            <autowiring-type>Symfony\Component\Translation\TranslatorInterface</autowiring-type>
         </service>
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">

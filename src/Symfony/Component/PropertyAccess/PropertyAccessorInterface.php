@@ -45,7 +45,6 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      * @throws Exception\UnexpectedTypeException If a value within the path is neither object
-     *                                           nor array
      */
     public function setValue(&$objectOrArray, $propertyPath, $value);
 

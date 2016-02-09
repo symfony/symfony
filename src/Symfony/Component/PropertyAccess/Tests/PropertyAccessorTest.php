@@ -16,6 +16,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\Author;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Magician;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\MagicianCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -402,5 +403,23 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(array('index' => array()), '[index][firstName]', null),
             array(array('root' => array('index' => array())), '[root][index][firstName]', null),
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
+     */
+    public function testThrowTypeError()
+    {
+        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime excepted.');
+    }
+
+    public function testSetTypeHint()
+    {
+        $date = new \DateTime();
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date', $date);
+        $this->assertSame($date, $object->getDate());
     }
 }

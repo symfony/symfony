@@ -589,6 +589,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             } catch (\TypeError $e) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             }
+
+            return;
         }
 
         // PHP 5

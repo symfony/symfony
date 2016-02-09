@@ -43,7 +43,7 @@ interface PropertyAccessorInterface
      * @param string|PropertyPathInterface $propertyPath  The property path to modify
      * @param mixed                        $value         The value to set at the end of the property path
      *
-     * @throws Exception\InvalidArgumentException If the property path is invalid
+     * @throws Exception\InvalidArgumentException If the property path is invalid or the value type do not match with the setter type hint
      * @throws Exception\AccessException          If a property/index does not exist or is not public
      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
      *                                            nor array

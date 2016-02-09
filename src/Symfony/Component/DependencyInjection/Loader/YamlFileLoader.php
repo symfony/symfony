@@ -288,7 +288,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['decorates'])) {
-            if ('@' === $service['decorates']{0}) {
+            if ('' !== $service['decorates'] && '@' === $service['decorates'][0]) {
                 throw new InvalidArgumentException(sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" by "%s").', $id, $service['decorates'], substr($service['decorates'], 1)));
             }
 

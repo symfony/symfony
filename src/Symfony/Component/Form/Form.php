@@ -344,7 +344,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Treat data as strings unless a value transformer exists
-        if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && is_scalar($modelData)) {
+        if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && !is_bool($modelData) && is_scalar($modelData)) {
             $modelData = (string) $modelData;
         }
 

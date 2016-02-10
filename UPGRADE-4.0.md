@@ -14,6 +14,12 @@ Form
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
 
+HttpKernel
+----------
+
+ * Possibility to pass objects as URI attributes to the ESI and SSI renderers
+   has been removed. The inline fragment renderer should be used with object attributes.
+
 Serializer
 ----------
 

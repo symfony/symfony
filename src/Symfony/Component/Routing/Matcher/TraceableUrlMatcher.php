@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -33,11 +34,12 @@ class TraceableUrlMatcher extends UrlMatcher
 
         try {
             $this->match($pathinfo);
+        } catch (ExceptionInterface $e) {
         } catch (\Exception $e) {
             $this->traces = array(array(
-                'name' => sprintf('[ERROR] The following exception prevented the route to be matched against application routes: "%s" (in %s line %d)', $e->getMessage(), $e->getFile(), $e->getLine()),
-                'log' => '-',
                 'level' => -1,
+                'log' => sprintf('[ERROR] The following exception prevented the route to be matched against application routes: "%s" (in %s line %d)', $e->getMessage(), $e->getFile(), $e->getLine()),
+                'name' => '-',
                 'path' => '-',
             ));
         }

@@ -98,4 +98,19 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         return $levels;
     }
+
+    public function testExceptionOnRouteCondition()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), 'baz', array(), array(), "request.headers.get('User-Agent') matches '/firefox/i'"));
+
+        $context = new RequestContext();
+        $context->setHost('baz');
+
+        $matcher = new TraceableUrlMatcher($coll, $context);
+        $traces = $matcher->getTraces('/foo');
+
+        $this->assertEquals(-1, $traces[0]['level']);
+        $this->assertRegExp('/\[ERROR\] The following exception prevented the route to be matched against application routes: "Unable to get a property on a non-object\." \(in .* line \d+\)/', $traces[0]['log']);
+    }
 }

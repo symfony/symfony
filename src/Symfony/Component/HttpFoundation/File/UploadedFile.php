@@ -290,4 +290,14 @@ class UploadedFile extends File
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }
+
+    /**
+     * Checks if the file is using test mode.
+     *
+     * @return bool
+     */
+    public function isForTesting()
+    {
+        return $this->test;
+    }
 }

@@ -66,7 +66,7 @@ class DateValidator extends ConstraintValidator
             return;
         }
 
-        if (!self::checkDate($matches[1], $matches[2], $matches[3])) {
+        if (!$this::checkDate($matches[1], $matches[2], $matches[3])) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Date::INVALID_DATE_ERROR)

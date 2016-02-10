@@ -951,16 +951,6 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @deprecated Using the SplObjectStorage API on the Crawler is deprecated as of 2.8 and will be removed in 3.0.
-     */
-    public function getHash($object)
-    {
-        $this->triggerDeprecation(__METHOD__, true);
-
-        return parent::getHash($object);
-    }
-
-    /**
      * Filters the list of nodes with an XPath expression.
      *
      * The XPath expression should already be processed to apply it in the context of each node.

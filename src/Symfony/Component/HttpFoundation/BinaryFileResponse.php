@@ -27,6 +27,9 @@ class BinaryFileResponse extends Response
 {
     protected static $trustXSendfileTypeHeader = false;
 
+    /**
+     * @var File
+     */
     protected $file;
     protected $offset;
     protected $maxlen;
@@ -179,7 +182,7 @@ class BinaryFileResponse extends Response
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
         }
 
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' !== $request->server->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 
@@ -196,17 +199,17 @@ class BinaryFileResponse extends Response
             if (false === $path) {
                 $path = $this->file->getPathname();
             }
-            if (strtolower($type) == 'x-accel-redirect') {
+            if (strtolower($type) === 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.
                 // @link http://wiki.nginx.org/X-accel#X-Accel-Redirect
                 foreach (explode(',', $request->headers->get('X-Accel-Mapping', '')) as $mapping) {
                     $mapping = explode('=', $mapping, 2);
 
-                    if (2 == count($mapping)) {
+                    if (2 === count($mapping)) {
                         $pathPrefix = trim($mapping[0]);
                         $location = trim($mapping[1]);
 
-                        if (substr($path, 0, strlen($pathPrefix)) == $pathPrefix) {
+                        if (substr($path, 0, strlen($pathPrefix)) === $pathPrefix) {
                             $path = $location.substr($path, strlen($pathPrefix));
                             break;
                         }
@@ -217,7 +220,7 @@ class BinaryFileResponse extends Response
             $this->maxlen = 0;
         } elseif ($request->headers->has('Range')) {
             // Process the range headers.
-            if (!$request->headers->has('If-Range') || $this->getEtag() == $request->headers->get('If-Range')) {
+            if (!$request->headers->has('If-Range') || $this->getEtag() === $request->headers->get('If-Range')) {
                 $range = $request->headers->get('Range');
                 $fileSize = $this->file->getSize();
 
@@ -252,17 +255,17 @@ class BinaryFileResponse extends Response
 
     /**
      * Sends the file.
+     *
+     * {@inheritdoc}
      */
     public function sendContent()
     {
         if (!$this->isSuccessful()) {
-            parent::sendContent();
-
-            return;
+            return parent::sendContent();
         }
 
         if (0 === $this->maxlen) {
-            return;
+            return $this;
         }
 
         $out = fopen('php://output', 'wb');
@@ -272,6 +275,8 @@ class BinaryFileResponse extends Response
 
         fclose($out);
         fclose($file);
+
+        return $this;
     }
 
     /**

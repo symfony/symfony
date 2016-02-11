@@ -51,14 +51,14 @@ class CheckboxType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $emptyData = function (FormInterface $form, $viewData) {
+        $forceSubmit = function (FormInterface $form, $viewData) {
             return $viewData;
         };
 
         $resolver->setDefaults(array(
             'value' => '1',
-            'empty_data' => $emptyData,
             'compound' => false,
+            'force_submit' => $forceSubmit, // internal
         ));
     }
 

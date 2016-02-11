@@ -562,8 +562,11 @@ class Form implements \IteratorAggregate, FormInterface
 
                 foreach ($this->children as $name => $child) {
                     $isSubmitted = array_key_exists($name, $submittedData);
+                    // Some form types like {@link \Symfony\Component\Form\Extension\Core\Type\CheckboxType}
+                    // need to force submission of null, so the form is properly updated.
+                    $forceSubmit = $child->getConfig()->getOption('force_submit', false);
 
-                    if ($isSubmitted || $clearMissing) {
+                    if ($isSubmitted || $clearMissing || $forceSubmit) {
                         $child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
                         unset($submittedData[$name]);
 

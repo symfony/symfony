@@ -28,6 +28,7 @@ class Parser
     private $currentLineNb = -1;
     private $currentLine = '';
     private $refs = array();
+    private $skippedCommentLines = 0;
 
     /**
      * Constructor.
@@ -154,7 +155,7 @@ class Parser
                 try {
                     $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
-                    $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                    $e->setParsedLine($this->getRealCurrentLineNb() + $this->skippedCommentLines + 1);
                     $e->setSnippet($this->currentLine);
 
                     throw $e;

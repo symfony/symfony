@@ -1239,6 +1239,19 @@ foo:
         bar: "123",
 YAML
             ),
+            array(
+                8,
+                <<<YAML
+foo:
+    -
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        bar: "123",
+YAML
+            ),
         );
     }
 }

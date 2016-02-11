@@ -67,6 +67,13 @@ class Table
      */
     private $columnStyles = array();
 
+    /**
+     * Predefined fixed column widths.
+     *
+     * @var array
+     */
+    private $columnFixedWidths = array();
+
     private static $styles;
 
     public function __construct(OutputInterface $output)
@@ -184,6 +191,51 @@ class Table
         }
 
         return $this->getStyle();
+    }
+
+    /**
+     * Sets the fixed width for a column.
+     *
+     * If the width is set to 0, it will be reset to auto.
+     *
+     * @param int $columnIndex Column index
+     * @param int $width       Column with in characters
+     *
+     * @return Table
+     */
+    public function setColumnFixedWidth($columnIndex, $width)
+    {
+        $columnIndex = intval($columnIndex);
+        $width = intval($width);
+
+        if (0 < $width) {
+            $this->columnFixedWidths[$columnIndex] = $width;
+
+        } elseif (0 === $width) {
+            unset($this->columnFixedWidths[$columnIndex]);
+
+        } else {
+            throw new InvalidArgumentException(sprintf('Width "%d" is not a valid column width.', $width));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the column's declared fixed width.
+     *
+     * If no fixed width is set, it returns 0 and must be interpreted as auto.
+     *
+     * @param $columnIndex
+     * @return int
+     */
+    public function getColumnFixedWidth($columnIndex)
+    {
+        if (isset($this->columnFixedWidths[$columnIndex])) {
+            return $this->columnFixedWidths[$columnIndex];
+        }
+
+        return 0;
     }
 
     public function setHeaders(array $headers)
@@ -596,6 +648,8 @@ class Table
      */
     private function getCellWidth(array $row, $column)
     {
+        $cellWidth = 0;
+
         if (isset($row[$column])) {
             $cell = $row[$column];
             $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
@@ -603,11 +657,9 @@ class Table
                 // we assume that cell value will be across more than one column.
                 $cellWidth = $cellWidth / $cell->getColspan();
             }
-
-            return $cellWidth;
         }
 
-        return 0;
+        return max($cellWidth, $this->getColumnFixedWidth($column));
     }
 
     /**

@@ -58,7 +58,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $loadClassCache;
-    protected $httpKernel;
 
     const VERSION = '3.1.0-DEV';
     const VERSION_ID = 30100;
@@ -123,7 +122,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         $this->booted = true;
-        $this->httpKernel = $this->getHttpKernel();
     }
 
     /**
@@ -135,8 +133,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             return;
         }
 
-        if ($this->httpKernel instanceof TerminableInterface) {
-            $this->httpKernel->terminate($request, $response);
+        $httpKernel = $this->getHttpKernel();
+        if ($httpKernel instanceof TerminableInterface) {
+            $thttpKernel->terminate($request, $response);
         }
     }
 
@@ -168,7 +167,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $this->boot();
         }
 
-        return $this->httpKernel->handle($request, $type, $catch);
+        return $this->getHttpKernel()->handle($request, $type, $catch);
     }
 
     /**

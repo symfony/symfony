@@ -33,6 +33,9 @@ Serializer
 Yaml
 ----
 
+ * The `Dumper::setIndentation()` method is deprecated and will be removed in
+   Symfony 4.0. Pass the indentation level to the constructor instead.
+
  * Deprecated support for passing `true`/`false` as the second argument to the
    `parse()` method to trigger exceptions when an invalid type was passed.
 

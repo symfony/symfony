@@ -51,6 +51,34 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $this->array = null;
     }
 
+    public function testIndentationInConstructor()
+    {
+        $dumper = new Dumper(7);
+        $expected = <<<'EOF'
+'': bar
+foo: '#bar'
+'foo''bar': {  }
+bar:
+       - 1
+       - foo
+foobar:
+       foo: bar
+       bar:
+              - 1
+              - foo
+       foobar:
+              foo: bar
+              bar:
+                     - 1
+                     - foo
+
+EOF;
+        $this->assertEquals($expected, $dumper->dump($this->array, 4, 0));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testSetIndentation()
     {
         $this->dumper->setIndentation(7);

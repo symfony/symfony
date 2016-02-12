@@ -24,6 +24,9 @@ Serializer
 Yaml
 ----
 
+ * The `Dumper::setIndentation()` method was removed. Pass the indentation
+   level to the constructor instead.
+
  * Removed support for passing `true`/`false` as the second argument to the
    `parse()` method to trigger exceptions when an invalid type was passed.
 

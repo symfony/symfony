@@ -23,7 +23,15 @@ class Dumper
      *
      * @var int
      */
-    protected $indentation = 4;
+    protected $indentation;
+
+    /**
+     * @param int $indentation
+     */
+    public function __construct($indentation = 4)
+    {
+        $this->indentation = $indentation;
+    }
 
     /**
      * Sets the indentation.
@@ -32,6 +40,8 @@ class Dumper
      */
     public function setIndentation($num)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.1 and will be removed in 4.0. Pass the indentation to the constructor instead.', E_USER_DEPRECATED);
+
         $this->indentation = (int) $num;
     }
 

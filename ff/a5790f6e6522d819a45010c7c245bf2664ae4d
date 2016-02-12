@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-08T16:17:56Z
+
+I don't think that it is a good idea to automatically display the information for the first service that looks similar as you won't notice that you made a mistake.
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-02-08T16:52:18Z
+
+@xabbuh, what about to use the default value?
+```php
+$default = 1 === count($matchingServices) ? 0 : null;
+
+return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-08T23:41:18Z
+
+@voronkovich sounds better
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-02-09T12:24:33Z
+
+@xabbuh, I've changed the command behavior as I proposed below.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-12T14:22:01Z
+
+:+1:
+Status: reviewed

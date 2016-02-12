@@ -157,8 +157,12 @@ class Form extends Link implements \ArrayAccess
      *
      * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
+     * The returned array is consistent with the array for field values
+     * (@see getPhpValues), rather than uploaded files found in $_FILES.
+     * For a compound file field foo[bar] it will create foo[bar][name],
+     * instead of foo[name][bar] which would be found in $_FILES.
      *
-     * @return array An array of field values.
+     * @return array An array of file field values.
      */
     public function getPhpFiles()
     {

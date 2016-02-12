@@ -53,6 +53,32 @@ class CliDumperTest extends VarDumperTestCase
 EOTXT;
         }
 
+        if (PHP_VERSION_ID >= 70000) {
+            $resource = <<<EOTXT
+    timed_out: false
+    blocked: true
+    eof: false
+    wrapper_type: "plainfile"
+    stream_type: "STDIO"
+    mode: "r"
+    unread_bytes: 0
+    seekable: true
+    options: []
+EOTXT;
+        } else {
+            $resource = <<<EOTXT
+    wrapper_type: "plainfile"
+    stream_type: "STDIO"
+    mode: "r"
+    unread_bytes: 0
+    seekable: true
+    timed_out: false
+    blocked: true
+    eof: false
+    options: []
+EOTXT;
+        }
+
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -69,15 +95,7 @@ array:24 [
   7 => b"é\\x00"
   "[]" => []
   "res" => stream resource {@{$res}
-    wrapper_type: "plainfile"
-    stream_type: "STDIO"
-    mode: "r"
-    unread_bytes: 0
-    seekable: true
-    timed_out: false
-    blocked: true
-    eof: false
-    options: []
+{$resource}
   }
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
     +foo: "foo"
@@ -194,8 +212,39 @@ EOTXT
         $out = stream_get_contents($out);
 
         $r = defined('HHVM_VERSION') ? '' : '#%d';
-        $this->assertStringMatchesFormat(
-            <<<EOTXT
+
+        if (PHP_VERSION_ID >= 70000) {
+            $this->assertStringMatchesFormat(
+                <<<EOTXT
+stream resource {@{$ref}
+  timed_out: false
+  blocked: true
+  eof: false
+  wrapper_type: "PHP"
+  stream_type: "MEMORY"
+  mode: "%s+b"
+  unread_bytes: 0
+  seekable: true
+  uri: "php://memory"
+  options: []
+  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
+    #message: "Unexpected Exception thrown from a caster: Foobar"
+    trace: array:1 [
+      0 => array:2 [
+        "call" => "%slosure%s()"
+        "file" => "{$file}:{$line}"
+      ]
+    ]
+  }
+}
+
+EOTXT
+                ,
+                $out
+            );
+        } else {
+            $this->assertStringMatchesFormat(
+                <<<EOTXT
 stream resource {@{$ref}
   wrapper_type: "PHP"
   stream_type: "MEMORY"
@@ -219,9 +268,10 @@ stream resource {@{$ref}
 }
 
 EOTXT
-            ,
-            $out
-        );
+                ,
+                $out
+            );
+        }
     }
 
     public function testRefsInProperties()

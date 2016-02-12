@@ -116,25 +116,36 @@ class Inline
     /**
      * Dumps a given PHP variable to a YAML string.
      *
-     * @param mixed $value                  The PHP variable to convert
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param int   $flags                  A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
+     * @param mixed $value The PHP variable to convert
+     * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @return string The YAML string representing the PHP array
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $flags = 0)
+    public static function dump($value, $flags = 0)
     {
         if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+
+            if ($flags) {
+                $flags = Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE;
+            } else {
+                $flags = 0;
+            }
+        }
+
+        if (func_num_args() >= 3) {
             @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
 
-            $flags = (int) $flags;
+            if (func_get_arg(2)) {
+                $flags |= Yaml::DUMP_OBJECT;
+            }
         }
 
         switch (true) {
             case is_resource($value):
-                if ($exceptionOnInvalidType) {
+                if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
                     throw new DumpException(sprintf('Unable to dump PHP resources in a YAML file ("%s").', get_resource_type($value)));
                 }
 
@@ -144,13 +155,13 @@ class Inline
                     return '!php/object:'.serialize($value);
                 }
 
-                if ($exceptionOnInvalidType) {
+                if (Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE & $flags) {
                     throw new DumpException('Object support when dumping a YAML file has been disabled.');
                 }
 
                 return 'null';
             case is_array($value):
-                return self::dumpArray($value, $exceptionOnInvalidType, $flags);
+                return self::dumpArray($value, $flags);
             case null === $value:
                 return 'null';
             case true === $value:
@@ -196,13 +207,12 @@ class Inline
     /**
      * Dumps a PHP array to a YAML string.
      *
-     * @param array $value                  The PHP array to dump
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param array $value The PHP array to dump
+     * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
      * @return string The YAML string representing the PHP array
      */
-    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
+    private static function dumpArray($value, $flags)
     {
         // array
         $keys = array_keys($value);
@@ -212,7 +222,7 @@ class Inline
         ) {
             $output = array();
             foreach ($value as $val) {
-                $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport);
+                $output[] = self::dump($val, $flags);
             }
 
             return sprintf('[%s]', implode(', ', $output));
@@ -221,7 +231,7 @@ class Inline
         // mapping
         $output = array();
         foreach ($value as $key => $val) {
-            $output[] = sprintf('%s: %s', self::dump($key, $exceptionOnInvalidType, $objectSupport), self::dump($val, $exceptionOnInvalidType, $objectSupport));
+            $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
 
         return sprintf('{ %s }', implode(', ', $output));

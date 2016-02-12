@@ -24,6 +24,7 @@ class Yaml
     const PARSE_EXCEPTION_ON_INVALID_TYPE = 2;
     const PARSE_OBJECT = 4;
     const PARSE_OBJECT_FOR_MAP = 8;
+    const DUMP_EXCEPTION_ON_INVALID_TYPE = 16;
 
     /**
      * Parses YAML into a PHP value.
@@ -80,24 +81,35 @@ class Yaml
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
      *
-     * @param array $array                  PHP array
-     * @param int   $inline                 The level where you switch to inline YAML
-     * @param int   $indent                 The amount of spaces to use for indentation of nested nodes.
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param int   $flags                  A bit field of DUMP_* constants to customize the dumped YAML string
+     * @param array $array  PHP array
+     * @param int   $inline The level where you switch to inline YAML
+     * @param int   $indent The amount of spaces to use for indentation of nested nodes.
+     * @param int   $flags  A bit field of DUMP_* constants to customize the dumped YAML string
      *
      * @return string A YAML string representing the original PHP array
      */
-    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $flags = 0)
+    public static function dump($array, $inline = 2, $indent = 4, $flags = 0)
     {
         if (is_bool($flags)) {
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+
+            if ($flags) {
+                $flags = self::DUMP_EXCEPTION_ON_INVALID_TYPE;
+            } else {
+                $flags = 0;
+            }
+        }
+
+        if (func_num_args() >= 5) {
             @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
 
-            $flags = (int) $flags;
+            if (func_get_arg(4)) {
+                $flags |= self::DUMP_OBJECT;
+            }
         }
 
         $yaml = new Dumper($indent);
 
-        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $flags);
+        return $yaml->dump($array, $inline, 0, $flags);
     }
 }

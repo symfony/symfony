@@ -74,7 +74,7 @@ class LdapUserProvider implements UserProviderInterface
 
         $user = $search[0];
 
-        return $this->loadUser($username, $user);
+        return $this->loadUser($user['dn'], $user);
     }
 
     public function loadUser($username, $user)

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-04T20:29:20Z
+
+AppVeyor build failed (not related)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-11T10:21:38Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-11T11:43:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-11T12:00:57Z
+
+This one should be merged in 2.7, but first, we need a PR on 2.3 as the bug probably exists there as well.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-11T13:27:43Z
+
+`ValueExporter.php` has been inserted from 2.4 version ([commit](https://github.com/symfony/symfony/commit/f56c5774a8ae0717c264f61af2ec0f9aa9f125f7))
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-11T13:28:55Z
+
+@yceruto but the bug also exists in 2.3. It is just not extracted to a separate class
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-11T13:30:39Z
+
+@stof right, I'll create a PR to 2.3
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-11T14:24:31Z
+
+I've opened a PR for 2.3 branch (https://github.com/symfony/symfony/pull/17766)

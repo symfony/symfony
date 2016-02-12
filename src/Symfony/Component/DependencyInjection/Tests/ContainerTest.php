@@ -152,6 +152,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $services['foo']['foo']);
     }
 
+    public function testSetReplacesAlias()
+    {
+        $c = new ProjectServiceContainer();
+
+        $c->set('alias', $foo = new \stdClass());
+        $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();

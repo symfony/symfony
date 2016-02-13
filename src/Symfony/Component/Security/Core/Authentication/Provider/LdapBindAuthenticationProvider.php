@@ -70,14 +70,12 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
-        $username = $token->getUsername();
         $password = $token->getCredentials();
 
         try {
-            $username = $this->ldap->escape($username, '', LDAP_ESCAPE_DN);
-            $dn = str_replace('{username}', $username, $this->dnString);
+            $username = $user->getUsername();
 
-            $this->ldap->bind($dn, $password);
+            $this->ldap->bind($username, $password);
         } catch (ConnectionException $e) {
             throw new BadCredentialsException('The presented password is invalid.');
         }

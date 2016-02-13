@@ -822,7 +822,7 @@ class Parser
     {
         $ltrimmedLine = ltrim($this->currentLine, ' ');
 
-        return '' !== $ltrimmedLine && $ltrimmedLine[0] === '-';
+        return '' !== $ltrimmedLine && '-' === $ltrimmedLine[0];
     }
 
     /**

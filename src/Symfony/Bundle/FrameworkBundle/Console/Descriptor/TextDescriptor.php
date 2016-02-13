@@ -429,17 +429,6 @@ class TextDescriptor extends Descriptor
     }
 
     /**
-     * @param string $section
-     * @param string $message
-     *
-     * @return string
-     */
-    private function formatSection($section, $message)
-    {
-        return sprintf('<info>[%s]</info> %s', $section, $message);
-    }
-
-    /**
      * @param callable $callable
      *
      * @return string

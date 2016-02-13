@@ -253,6 +253,16 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($aliases['foobar']));
     }
 
+    public function testSetReplacesAlias()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setAlias('alias', 'aliased');
+        $builder->set('aliased', new \stdClass());
+
+        $builder->set('alias', $foo = new \stdClass());
+        $this->assertSame($foo, $builder->get('alias'), '->set() replaces an existing alias');
+    }
+
     public function testAddGetCompilerPass()
     {
         $builder = new ContainerBuilder();

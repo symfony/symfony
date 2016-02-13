@@ -47,8 +47,9 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command extract translation strings from templates
+The <info>%command.name%</info> command extracts translation strings from templates
 of a given bundle or the app folder. It can display them or merge the new ones into the translation files.
+
 When new translation strings are found it can automatically add a prefix to the translation
 message.
 

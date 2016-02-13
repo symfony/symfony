@@ -200,6 +200,10 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
             $this->scopedServices[$scope][$id] = $service;
         }
 
+        if (isset($this->aliases[$id])) {
+            unset($this->aliases[$id]);
+        }
+
         $this->services[$id] = $service;
 
         if (method_exists($this, $method = 'synchronize'.strtr($id, $this->underscoreMap).'Service')) {

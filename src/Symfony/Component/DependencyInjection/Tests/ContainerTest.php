@@ -184,6 +184,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($c->synchronized, '->set() calls synchronize*Service() if it is defined for the service');
     }
 
+    public function testSetReplacesAlias()
+    {
+        $c = new ProjectServiceContainer();
+
+        $c->set('alias', $foo = new \stdClass());
+        $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();

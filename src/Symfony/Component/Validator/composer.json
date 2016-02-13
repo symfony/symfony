@@ -24,7 +24,6 @@
         "symfony/intl": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
-        "symfony/property-access": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/cache": "~3.1",
         "doctrine/annotations": "~1.0",

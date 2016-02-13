@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -38,11 +37,8 @@ class FormValidator extends ConstraintValidator
 
         /* @var FormInterface $form */
         $config = $form->getConfig();
-        $validator = null;
 
-        if ($this->context instanceof ExecutionContextInterface) {
-            $validator = $this->context->getValidator()->inContext($this->context);
-        }
+        $validator = $this->context->getValidator()->inContext($this->context);
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
@@ -51,12 +47,7 @@ class FormValidator extends ConstraintValidator
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 foreach ($groups as $group) {
-                    if ($validator) {
-                        $validator->atPath('data')->validate($form->getData(), null, $group);
-                    } else {
-                        // 2.4 API
-                        $this->context->validate($form->getData(), 'data', $group, true);
-                    }
+                    $validator->atPath('data')->validate($form->getData(), null, $group);
                 }
             }
 
@@ -66,12 +57,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 // For the "Valid" constraint, validate the data in all groups
                 if ($constraint instanceof Valid) {
-                    if ($validator) {
-                        $validator->atPath('data')->validate($form->getData(), $constraint, $groups);
-                    } else {
-                        // 2.4 API
-                        $this->context->validateValue($form->getData(), $constraint, 'data', $groups);
-                    }
+                    $validator->atPath('data')->validate($form->getData(), $constraint, $groups);
 
                     continue;
                 }
@@ -80,12 +66,7 @@ class FormValidator extends ConstraintValidator
                 // matching group
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        if ($validator) {
-                            $validator->atPath('data')->validate($form->getData(), $constraint, $group);
-                        } else {
-                            // 2.4 API
-                            $this->context->validateValue($form->getData(), $constraint, 'data', $group);
-                        }
+                        $validator->atPath('data')->validate($form->getData(), $constraint, $group);
 
                         // Prevent duplicate validation
                         continue 2;

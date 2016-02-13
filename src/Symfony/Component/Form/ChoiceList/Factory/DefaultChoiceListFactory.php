@@ -246,7 +246,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
         $groupLabel = (string) $groupLabel;
 
-        // Initialize the group views if necessary. Unnnecessarily built group
+        // Initialize the group views if necessary. Unnecessarily built group
         // views will be cleaned up at the end of createView()
         if (!isset($preferredViews[$groupLabel])) {
             $preferredViews[$groupLabel] = new ChoiceGroupView($groupLabel);

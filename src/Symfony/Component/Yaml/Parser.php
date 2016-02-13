@@ -448,7 +448,7 @@ class Parser
             }
 
             // we ignore "comment" lines only when we are not inside a scalar block
-            if (empty($blockScalarIndentations) && $this->isCurrentLineComment()) {
+            if (empty($blockScalarIndentations) && $this->isCurrentLineComment() && false === $this->isPreviousNonCommentLineIsCollectionItem()) {
                 continue;
             }
 

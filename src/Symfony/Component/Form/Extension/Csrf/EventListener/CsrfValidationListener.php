@@ -85,9 +85,10 @@ class CsrfValidationListener implements EventSubscriberInterface
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
-        $data = $event->getData();
 
         if ($form->isRoot() && $form->getConfig()->getOption('compound')) {
+            $data = $event->getData();
+
             if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
                 $errorMessage = $this->errorMessage;
 
@@ -100,9 +101,8 @@ class CsrfValidationListener implements EventSubscriberInterface
 
             if (is_array($data)) {
                 unset($data[$this->fieldName]);
+                $event->setData($data);
             }
         }
-
-        $event->setData($data);
     }
 }

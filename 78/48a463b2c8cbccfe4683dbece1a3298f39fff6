@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by ChadSikorra at 2016-01-27T15:27:59Z
+
+Is support for paging planned to be implemented in the query? For many corporate LDAP implementations a max page size is enforced as a best practice, and large queries will fail without paging.
+
+However, I guess adding that might be a bit cumbersome as paging support for LDAP was added in PHP 5.4 and the min requirement for this component is 5.3.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-01-27T17:14:19Z
+
+There's no issue with supporting paging, especially as version 3.0 of Symfony only supports PHP 5.5+. Thus, we could implement this.
+
+However, I won't support this right now, but maybe in a later PR.
+
+The goal of this PR is to be able to make the component more flexible, and make the correct abstractions, so different implementations can be used (using the PHP extension, for example). This way, we could support a userland ldap client, or even third-party libraries to provide such capability.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-01-27T18:44:17Z
+
+By the way, as this PR breaks compatibility, the code from the Security component will be updated in another PR.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-05T23:08:11Z
+
+Ping @fabpot @nicolas-grekas
+
+This PR is now stable, and a functional tests have been bootstrapped.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-05T23:23:35Z
+
+The only build failing is the Appveyor build, as the CI does not have a LDAP server.
+
+Does anyone have a solution?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-05T23:28:41Z
+
+For now, I'm disabling the `ldap` extension for the Windows build. The component will be unsupported on Windows, until we have a way to run functional tests on the platform.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-08T15:14:27Z
+
+@fabpot Anything remaining?
+
+We could further improve this PR by back-porting the previous interface, and adding a small BC layer. What do you think about this?
+
+Edit: Or this could be done in another PR.
+
+There is no real BC break in the interface, apart from the `query()` method, which now replaces the `find()` method (and the initialization of the service itself, but that's another story).
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-08T18:59:27Z
+
+@nicolas-grekas Any "good" way of throwing deprecation notices in tests for fixing those that break.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-08T20:37:15Z
+
+@csarrazi Tests for deprecated before should be addedto the `legacy` group.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-09T07:58:57Z
+
+Yes, I know. But nevermind, that's just me having made a typo for the test's annotation. \o/
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-09T10:48:15Z
+
+Okay, everything seems good, now!
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-10T12:04:18Z
+
+Ping @fabpot @dunglas @nicolas-grekas @xabbuh
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-11T18:14:16Z
+
+All done!
+
+It seems some tests fail because of VarDumper.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-11T18:32:26Z
+
+Ping @xabbuh @fabpot @dunglas @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-12T08:23:09Z
+
+:+1:

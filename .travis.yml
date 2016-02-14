@@ -6,6 +6,8 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
+        - ldap-utils
+        - slapd
 
 env:
     global:
@@ -48,6 +50,11 @@ before_install:
     - if [[ $deps != skip ]]; then composer self-update; fi;
     - if [[ $deps != skip ]]; then ./phpunit install; fi;
     - export PHPUNIT=$(readlink -f ./phpunit)
+    - mkdir /tmp/slapd
+    - slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
+    - sleep 3
+    - ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif
+    - ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
 
 install:
     - if [[ $deps != skip ]]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi;

@@ -11,53 +11,29 @@
 
 namespace Symfony\Component\Ldap;
 
-use Symfony\Component\Ldap\Exception\ConnectionException;
-use Symfony\Component\Ldap\Exception\LdapException;
-
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Charles Sarrazin <charles@sarraz.in>
  *
- * @internal
+ * @deprecated The LdapClient class will be removed in Symfony 4.0. You should use the Ldap class instead.
  */
-class LdapClient implements LdapClientInterface
+final class LdapClient implements LdapClientInterface
 {
-    private $host;
-    private $port;
-    private $version;
-    private $useSsl;
-    private $useStartTls;
-    private $optReferrals;
-    private $connection;
+    private $ldap;
 
-    /**
-     * Constructor.
-     *
-     * @param string $host
-     * @param int    $port
-     * @param int    $version
-     * @param bool   $useSsl
-     * @param bool   $useStartTls
-     * @param bool   $optReferrals
-     */
-    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false)
+    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false, LdapInterface $ldap = null)
     {
-        if (!extension_loaded('ldap')) {
-            throw new LdapException('The ldap module is needed.');
-        }
+        $config = array(
+            'host' => $host,
+            'port' => $port,
+            'version' => $version,
+            'useSsl' => (bool) $useSsl,
+            'useStartTls' => (bool) $useStartTls,
+            'optReferrals' => (bool) $optReferrals,
+        );
 
-        $this->host = $host;
-        $this->port = $port;
-        $this->version = $version;
-        $this->useSsl = (bool) $useSsl;
-        $this->useStartTls = (bool) $useStartTls;
-        $this->optReferrals = (bool) $optReferrals;
-    }
-
-    public function __destruct()
-    {
-        $this->disconnect();
+        $this->ldap = null !== $ldap ? $ldap : Ldap::create('ext_ldap', $config);
     }
 
     /**
@@ -65,13 +41,7 @@ class LdapClient implements LdapClientInterface
      */
     public function bind($dn = null, $password = null)
     {
-        if (!$this->connection) {
-            $this->connect();
-        }
-
-        if (false === @ldap_bind($this->connection, $dn, $password)) {
-            throw new ConnectionException(ldap_error($this->connection));
-        }
+        $this->ldap->bind($dn, $password);
     }
 
     /**
@@ -79,18 +49,30 @@ class LdapClient implements LdapClientInterface
      */
     public function find($dn, $query, $filter = '*')
     {
-        if (!is_array($filter)) {
-            $filter = array($filter);
+        @trigger_error('The "find" method is deprecated since version 3.1 and will be removed in 4.0. Use the "query" method instead.', E_USER_DEPRECATED);
+
+        $query = $this->ldap->query($dn, $query, array('filter' => $filter));
+        $entries = $query->execute();
+        $result = array();
+
+        foreach ($entries as $entry) {
+            $resultEntry = array();
+
+            foreach ($entry->getAttributes() as $attribute => $values) {
+                $resultAttribute = $values;
+
+                $resultAttribute['count'] = count($values);
+                $resultEntry[] = $resultAttribute;
+                $resultEntry[$attribute] = $resultAttribute;
+            }
+
+            $resultEntry['count'] = count($resultEntry) / 2;
+            $result[] = $resultEntry;
         }
 
-        $search = ldap_search($this->connection, $dn, $query, $filter);
-        $infos = ldap_get_entries($this->connection, $search);
+        $result['count'] = count($result);
 
-        if (0 === $infos['count']) {
-            return;
-        }
-
-        return $infos;
+        return $result;
     }
 
     /**
@@ -98,48 +80,6 @@ class LdapClient implements LdapClientInterface
      */
     public function escape($subject, $ignore = '', $flags = 0)
     {
-        $value = ldap_escape($subject, $ignore, $flags);
-
-        // Per RFC 4514, leading/trailing spaces should be encoded in DNs, as well as carriage returns.
-        if ((int) $flags & LDAP_ESCAPE_DN) {
-            if (!empty($value) && $value[0] === ' ') {
-                $value = '\\20'.substr($value, 1);
-            }
-            if (!empty($value) && $value[strlen($value) - 1] === ' ') {
-                $value = substr($value, 0, -1).'\\20';
-            }
-            $value = str_replace("\r", '\0d', $value);
-        }
-
-        return $value;
-    }
-
-    private function connect()
-    {
-        if (!$this->connection) {
-            $host = $this->host;
-
-            if ($this->useSsl) {
-                $host = 'ldaps://'.$host;
-            }
-
-            $this->connection = ldap_connect($host, $this->port);
-
-            ldap_set_option($this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->version);
-            ldap_set_option($this->connection, LDAP_OPT_REFERRALS, $this->optReferrals);
-
-            if ($this->useStartTls) {
-                ldap_start_tls($this->connection);
-            }
-        }
-    }
-
-    private function disconnect()
-    {
-        if ($this->connection && is_resource($this->connection)) {
-            ldap_unbind($this->connection);
-        }
-
-        $this->connection = null;
+        return $this->ldap->escape($subject, $ignore, $flags);
     }
 }

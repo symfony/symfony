@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-14T10:10:08Z
+
+As this is bug fix, can you submit the same PR for the 2.3 branch?
+
+---------------------------------------------------------------------------
+
+by valisj at 2016-02-14T11:29:50Z
+
+@fabpot See https://github.com/symfony/symfony/pull/17795

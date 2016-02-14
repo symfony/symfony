@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -438,9 +440,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object The associated service
      *
-     * @throws InvalidArgumentException when no definitions are available
-     * @throws InactiveScopeException   when the current scope is not active
-     * @throws LogicException           when a circular dependency is detected
+     * @throws InvalidArgumentException          when no definitions are available
+     * @throws ServiceCircularReferenceException When a circular reference is detected
+     * @throws ServiceNotFoundException          When the service is not defined
      * @throws \Exception
      *
      * @see Reference
@@ -459,7 +461,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         try {
             $definition = $this->getDefinition($id);
-        } catch (InvalidArgumentException $e) {
+        } catch (ServiceNotFoundException $e) {
             if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                 return;
             }
@@ -807,14 +809,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition A Definition instance
      *
-     * @throws InvalidArgumentException if the service definition does not exist
+     * @throws ServiceNotFoundException if the service definition does not exist
      */
     public function getDefinition($id)
     {
         $id = strtolower($id);
 
         if (!array_key_exists($id, $this->definitions)) {
-            throw new InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
+            throw new ServiceNotFoundException($id);
         }
 
         return $this->definitions[$id];
@@ -829,7 +831,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition A Definition instance
      *
-     * @throws InvalidArgumentException if the service definition does not exist
+     * @throws ServiceNotFoundException if the service definition does not exist
      */
     public function findDefinition($id)
     {

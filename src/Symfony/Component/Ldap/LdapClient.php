@@ -30,6 +30,7 @@ class LdapClient implements LdapClientInterface
     private $useStartTls;
     private $optReferrals;
     private $connection;
+    private $charmaps;
 
     /**
      * Constructor.
@@ -68,7 +69,17 @@ class LdapClient implements LdapClientInterface
         if (!$this->connection) {
             $this->connect();
         }
-
+		
+		$dnArr = explode(";",$dn);
+		if(count($dnArr) > 1)
+		{
+			$searchResult = $this->find($dnArr[1], $dnArr[0], '*');
+			
+			if(count($searchResult))
+			{
+				$dn = $searchResult[0]['dn'];
+			}
+		}
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));
         }

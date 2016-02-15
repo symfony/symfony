@@ -43,7 +43,7 @@ class Table
      *
      * @var array
      */
-    private $columnWidths = array();
+    private $effectiveColumnWidths = array();
 
     /**
      * Number of columns cache.
@@ -68,11 +68,11 @@ class Table
     private $columnStyles = array();
 
     /**
-     * Predefined fixed column widths.
+     * User set column widths.
      *
      * @var array
      */
-    private $columnFixedWidths = array();
+    private $columnWidths = array();
 
     private static $styles;
 
@@ -194,48 +194,63 @@ class Table
     }
 
     /**
-     * Sets the fixed width for a column.
+     * Sets the width for a column.
      *
-     * If the width is set to 0, it will be reset to auto.
-     *
-     * @param int $columnIndex Column index
-     * @param int $width       Column with in characters
+     * @param int        $columnIndex Column index.
+     * @param int|string $width       Column with in characters. Set to 'auto' to auto-fit the content.
      *
      * @return Table
      */
-    public function setColumnFixedWidth($columnIndex, $width)
+    public function setColumnWidth($columnIndex, $width)
     {
         $columnIndex = intval($columnIndex);
-        $width = intval($width);
 
-        if (0 < $width) {
-            $this->columnFixedWidths[$columnIndex] = $width;
+        if ('auto' !== $width) {
+            $width = intval($width);
+        }
 
-        } elseif (0 === $width) {
-            unset($this->columnFixedWidths[$columnIndex]);
+        if ('auto' !== $width && 0 >= $width) {
+            throw new InvalidArgumentException(sprintf(
+                'Width "%d" is not a valid column width for column %d. Expected width > 0 or \'auto\'.',
+                $width,
+                $columnIndex
+            ));
+        }
 
-        } else {
-            throw new InvalidArgumentException(sprintf('Width "%d" is not a valid column width.', $width));
+        $this->columnWidths[$columnIndex] = $width;
+
+        return $this;
+    }
+
+    /**
+     * Set all column widths. Use 'auto' to auto-fit the content.
+     *
+     * @param array $widths
+     *
+     * @return Table
+     */
+    public function setColumnWidths(array $widths)
+    {
+        $this->columnWidths = array();
+        foreach ($widths as $index => $width) {
+            $this->setColumnWidth($index, $width);
         }
 
         return $this;
     }
 
     /**
-     * Gets the column's declared fixed width.
+     * Gets the column's declared width.
      *
-     * If no fixed width is set, it returns 0 and must be interpreted as auto.
+     * If no width was set, it returns the default 'auto'.
      *
-     * @param $columnIndex
-     * @return int
+     * @param int $columnIndex
+     *
+     * @return int|string
      */
-    public function getColumnFixedWidth($columnIndex)
+    public function getColumnWidth($columnIndex)
     {
-        if (isset($this->columnFixedWidths[$columnIndex])) {
-            return $this->columnFixedWidths[$columnIndex];
-        }
-
-        return 0;
+        return isset($this->columnWidths[$columnIndex]) ? $this->columnWidths[$columnIndex] : 'auto';
     }
 
     public function setHeaders(array $headers)
@@ -348,7 +363,7 @@ class Table
 
         $markup = $this->style->getCrossingChar();
         for ($column = 0; $column < $count; ++$column) {
-            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->columnWidths[$column]).$this->style->getCrossingChar();
+            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->effectiveColumnWidths[$column]).$this->style->getCrossingChar();
         }
 
         $this->output->writeln(sprintf($this->style->getBorderFormat(), $markup));
@@ -394,11 +409,11 @@ class Table
     private function renderCell(array $row, $column, $cellFormat)
     {
         $cell = isset($row[$column]) ? $row[$column] : '';
-        $width = $this->columnWidths[$column];
+        $width = $this->effectiveColumnWidths[$column];
         if ($cell instanceof TableCell && $cell->getColspan() > 1) {
             // add the width of the following columns(numbers of colspan).
             foreach (range($column + 1, $column + $cell->getColspan() - 1) as $nextColumn) {
-                $width += $this->getColumnSeparatorWidth() + $this->columnWidths[$nextColumn];
+                $width += $this->getColumnSeparatorWidth() + $this->effectiveColumnWidths[$nextColumn];
             }
         }
 
@@ -624,7 +639,7 @@ class Table
                 $lengths[] = $this->getCellWidth($row, $column);
             }
 
-            $this->columnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
+            $this->effectiveColumnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
         }
     }
 
@@ -659,7 +674,7 @@ class Table
             }
         }
 
-        return max($cellWidth, $this->getColumnFixedWidth($column));
+        return max($cellWidth, $this->getColumnWidth($column));
     }
 
     /**
@@ -667,7 +682,7 @@ class Table
      */
     private function cleanup()
     {
-        $this->columnWidths = array();
+        $this->effectiveColumnWidths = array();
         $this->numberOfColumns = null;
     }
 

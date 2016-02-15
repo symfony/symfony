@@ -33,6 +33,8 @@ Serializer
 Yaml
 ----
 
+ * Deprecated usage of `%` at the beginning of an unquoted string.
+
  * The `Dumper::setIndentation()` method is deprecated and will be removed in
    Symfony 4.0. Pass the indentation level to the constructor instead.
 

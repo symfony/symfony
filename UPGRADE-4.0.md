@@ -30,6 +30,8 @@ Serializer
 Yaml
 ----
 
+ * Starting an unquoted string with `%` leads to a `ParseException`.
+
  * The `Dumper::setIndentation()` method was removed. Pass the indentation
    level to the constructor instead.
 

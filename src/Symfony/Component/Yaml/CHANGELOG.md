@@ -4,6 +4,8 @@ CHANGELOG
 3.1.0
 -----
 
+ * Deprecated usage of `%` at the beginning of an unquoted string.
+
  * Added support for customizing the YAML parser behavior through an optional bit field:
 
    ```php

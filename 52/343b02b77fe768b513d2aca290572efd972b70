@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-04T20:59:48Z
+
+Before :
+```
+Time: 10.1 seconds, Memory: 65.50Mb
+
+There was 1 failure:
+
+1) Symfony\Bridge\Doctrine\Tests\Form\Type\EntityTypeTest::testOverrideChoicesValues
+Field should be synchronized.
+Failed asserting that false is true.
+
+/Users/Heah/Sites/dev/symfony/src/Symfony/Bridge/Doctrine/Tests/Form/Type/EntityTypeTest.php:761
+
+FAILURES!
+Tests: 431, Assertions: 625, Failures: 1, Skipped: 11.
+
+Legacy deprecation notices (212)
+KO ./src/Symfony/Bridge/Doctrine
+```
+
+After :
+
+```
+Time: 8.92 seconds, Memory: 65.25Mb
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 431, Assertions: 627, Skipped: 11.
+
+Legacy deprecation notices (212)
+OK ./src/Symfony/Bridge/Doctrine
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-04T21:04:33Z
+
+Please revert the indentation changes...
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-04T21:10:42Z
+
+@nicolas-grekas oupssss
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-04T21:17:29Z
+
+Done
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-02-05T06:13:55Z
+
+Thanks for that PR! Looks good to me.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-05T06:28:12Z
+
+thanks @webmozart, just added #13964 as fixed though.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-05T07:41:46Z
+
+@fabpot @webmozart. Tests in 2.8 need renaming `entity` to `Symfony\Bridge\Doctrine\Form\Type\EntityType`, should I make a PR on 2.8 to update only this once 2.7 is merged in 2.8 or do another version of this one right now for the greater branches ?
+
+Also I suggest to use a constant for the fqnc of `EntityType` in `EntityTypeTest` as for the fixtures.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-02-05T07:45:30Z
+
+@HeahDude I would create a separate PR and rebase this one once that is merged.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-11T00:43:36Z
+
+Updated description with link to the doc PR and tests are ready for 2.8 with #17699.
+
+ping __@symfony/deciders__
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-15T07:47:51Z
+
+:+1:

@@ -59,7 +59,7 @@ class ChoiceFormField extends FormField
      */
     public function isDisabled()
     {
-        if (parent::isDisabled() && 'radio' !== $this->type) {
+        if (parent::isDisabled() && 'select' === $this->type) {
             return true;
         }
 

@@ -773,7 +773,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'choice_label' => 'name',
@@ -795,7 +795,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choice_label' => 'name',

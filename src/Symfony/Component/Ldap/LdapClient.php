@@ -69,12 +69,12 @@ class LdapClient implements LdapClientInterface
         if (!$this->connection) {
             $this->connect();
         }
-		
-		$dnArr = explode(";",$dn);
+
+		$dnArr = explode(';',$dn);
 		if(count($dnArr) > 1)
 		{
 			$searchResult = $this->find($dnArr[1], $dnArr[0], '*');
-			
+
 			if(count($searchResult))
 			{
 				$dn = $searchResult[0]['dn'];

@@ -23,16 +23,16 @@ services:
         arguments: [foo, '@foo.baz', '%foo_bar%']
         configurator: ['@foo.baz', configure]
     foo.baz:
-        class: %baz_class%
-        factory_class: %baz_class%
+        class: '%baz_class%'
+        factory_class: '%baz_class%'
         factory_method: getInstance
         configurator: ['%baz_class%', configureStatic1]
     foo_bar:
-        class: %foo_class%
+        class: '%foo_class%'
         scope: prototype
     method_call1:
         class: FooClass
-        file: %path%foo.php
+        file: '%path%foo.php'
         calls:
             - [setBar, ['@foo']]
             - [setBar, ['@?foo2']]

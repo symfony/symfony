@@ -64,7 +64,7 @@ class YamlDumper extends Dumper
                 $class = substr($class, 1);
             }
 
-            $code .= sprintf("        class: %s\n", $class);
+            $code .= sprintf("        class: %s\n", $this->dumper->dump($class));
         }
 
         if (!$definition->isPublic()) {
@@ -100,7 +100,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->getFactoryClass()) {
-            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
+            $code .= sprintf("        factory_class: %s\n", $this->dumper->dump($definition->getFactoryClass()));
         }
 
         if ($definition->isLazy()) {

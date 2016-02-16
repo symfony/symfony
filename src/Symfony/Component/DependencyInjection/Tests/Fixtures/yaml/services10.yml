@@ -6,4 +6,4 @@ services:
         class: BAR
 
 project:
-    test: %project.parameter.foo%
+    test: '%project.parameter.foo%'

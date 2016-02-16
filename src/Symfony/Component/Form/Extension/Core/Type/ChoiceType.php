@@ -210,9 +210,6 @@ class ChoiceType extends AbstractType
             $view->vars['placeholder'] = $options['placeholder'];
         }
 
-        // BC
-        $view->vars['empty_value_in_choices'] = $view->vars['placeholder_in_choices'];
-
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the

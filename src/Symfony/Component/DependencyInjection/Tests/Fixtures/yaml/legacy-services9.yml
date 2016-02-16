@@ -18,8 +18,8 @@ services:
 
         configurator: sc_configure
     foo.baz:
-        class: %baz_class%
-        factory_class: %baz_class%
+        class: '%baz_class%'
+        factory_class: '%baz_class%'
         factory_method: getInstance
         configurator: ['%baz_class%', configureStatic1]
     factory_service:

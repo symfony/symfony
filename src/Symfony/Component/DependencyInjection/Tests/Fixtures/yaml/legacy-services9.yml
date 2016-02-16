@@ -19,8 +19,8 @@ services:
 
         configurator: sc_configure
     foo.baz:
-        class: %baz_class%
-        factory_class: %baz_class%
+        class: '%baz_class%'
+        factory_class: '%baz_class%'
         factory_method: getInstance
         configurator: ['%baz_class%', configureStatic1]
     factory_service:
@@ -28,6 +28,6 @@ services:
         factory_method: getInstance
         factory_service: foo.baz
     foo_bar:
-        class: %foo_class%
+        class: '%foo_class%'
         shared: false
         scope: prototype

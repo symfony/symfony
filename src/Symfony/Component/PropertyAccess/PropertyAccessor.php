@@ -600,7 +600,11 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         // PHP 5
         set_error_handler(function ($errno, $errstr) {
-            throw new InvalidArgumentException($errstr);
+            if (E_RECOVERABLE_ERROR === $errno) {
+                throw new InvalidArgumentException($errstr);
+            }
+
+            return false;
         });
 
         try {

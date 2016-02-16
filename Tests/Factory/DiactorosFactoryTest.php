@@ -111,6 +111,17 @@ class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('2.8'), $psrRequest->getHeader('X-Symfony'));
     }
 
+    public function testGetContentCanBeCalledAfterRequestCreation()
+    {
+        $header = array('HTTP_HOST' => 'dunglas.fr');
+        $request = new Request(array(), array(), array(), array(), array(), $header, 'Content');
+
+        $psrRequest = $this->factory->createRequest($request);
+
+        $this->assertEquals('Content', $psrRequest->getBody()->__toString());
+        $this->assertEquals('Content', $request->getContent());
+    }
+
     private function createUploadedFile($content, $originalName, $mimeType, $error)
     {
         $path = tempnam($this->tmpDir, uniqid());

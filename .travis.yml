@@ -2,6 +2,10 @@ language: php
 
 sudo: false
 
+cache:
+    directories:
+        - $HOME/.composer/cache/files
+
 matrix:
     include:
         - php: 5.3
@@ -12,10 +16,9 @@ matrix:
           env: deps=low
         - php: 5.6
           env: deps=high
-        - php: nightly
+        - php: 7.0
         - php: hhvm
     allow_failures:
-        - php: nightly
         - php: hhvm
     fast_finish: true
 
@@ -25,8 +28,8 @@ env:
         - SYMFONY_DEPRECATIONS_HELPER=weak
 
 before_install:
-    - composer self-update
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
+    - composer self-update
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != "nightly" ]] && [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then php -i; fi;
     # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built

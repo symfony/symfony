@@ -14,7 +14,7 @@ framework:
         only_exceptions: true
         enabled: false
     router:
-        resource:     %kernel.root_dir%/config/routing.xml
+        resource:     '%kernel.root_dir%/config/routing.xml'
         type:         xml
     session:
         storage_id:      session.storage.native
@@ -45,7 +45,7 @@ framework:
     annotations:
         cache:   file
         debug:   true
-        file_cache_dir: %kernel.cache_dir%/annotations
+        file_cache_dir: '%kernel.cache_dir%/annotations'
     serializer: { enabled: true }
     ide: file%%link%%format
     request:

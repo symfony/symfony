@@ -18,7 +18,7 @@ services:
         factory: [Bar\FooClass, getInstance]
         configurator: sc_configure
     foo.baz:
-        class: %baz_class%
+        class: '%baz_class%'
         factory: ['%baz_class%', getInstance]
         configurator: ['%baz_class%', configureStatic1]
     bar:
@@ -26,11 +26,11 @@ services:
         arguments: [foo, '@foo.baz', '%foo_bar%']
         configurator: ['@foo.baz', configure]
     foo_bar:
-        class: %foo_class%
+        class: '%foo_class%'
         shared: false
     method_call1:
         class: Bar\FooClass
-        file: %path%foo.php
+        file: '%path%foo.php'
         calls:
             - [setBar, ['@foo']]
             - [setBar, ['@?foo2']]

@@ -65,7 +65,7 @@ class YamlDumper extends Dumper
                 $class = substr($class, 1);
             }
 
-            $code .= sprintf("        class: %s\n", $class);
+            $code .= sprintf("        class: %s\n", $this->dumper->dump($class));
         }
 
         if (!$definition->isPublic()) {

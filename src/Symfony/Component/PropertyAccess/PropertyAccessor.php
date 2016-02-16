@@ -542,8 +542,9 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string $property The property to write
      * @param mixed  $value    The value to write
      *
-     * @throws NoSuchPropertyException If the property does not exist or is not
-     *                                 public.
+     * @throws NoSuchPropertyException  If the property does not exist or is not
+     *                                  public.
+     * @throws InvalidArgumentException
      */
     private function writeProperty(&$object, $property, $value)
     {
@@ -580,9 +581,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param object $object
      * @param string $method
      * @param mixed  $value
+     *
+     * @throws InvalidArgumentException
+     * @throws \Exception
      */
     private function callMethod($object, $method, $value) {
-        if (class_exists('TypeError')) {
+        // Cannot use class_exists because the PHP 7 polyfill defines \TypeError
+        if (PHP_MAJOR_VERSION >= 7) {
             // PHP 7
             try {
                 $object->{$method}($value);
@@ -600,8 +605,12 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         try {
             $object->{$method}($value);
-        } finally {
             restore_error_handler();
+        } catch (\Exception $e) {
+            // Cannot use finally in 5.5 because of https://bugs.php.net/bug.php?id=67047
+            restore_error_handler();
+
+            throw $e;
         }
     }
 
@@ -614,6 +623,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param array|\Traversable $collection   The collection to write
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
+     *
+     * @throws InvalidArgumentException
      */
     private function writeCollection($object, $property, $collection, $addMethod, $removeMethod)
     {

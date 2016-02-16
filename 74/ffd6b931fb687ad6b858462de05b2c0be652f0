@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-09T19:55:24Z
+
+the Dumper and Parser should probably be kept as not-internal as I find it useful to create one parser/dumper and reuse it in more than one place. But we can probably mark some public methods as internal.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T23:06:06Z
+
+okay, then let's only mark the `Inline` class as internal and deprecate the `Dumper::setIndentation()` method (see #17746)

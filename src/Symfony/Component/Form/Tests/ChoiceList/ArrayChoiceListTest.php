@@ -22,9 +22,9 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->object = new \stdClass();
+
+        parent::setUp();
     }
 
     protected function createChoiceList()
@@ -34,12 +34,12 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
 
     protected function getChoices()
     {
-        return array(0, 1, '1', 'a', false, true, $this->object);
+        return array(0, 1, '1', 'a', false, true, $this->object, null);
     }
 
     protected function getValues()
     {
-        return array('0', '1', '2', '3', '4', '5', '6');
+        return array('0', '1', '2', '3', '4', '5', '6', '7');
     }
 
     /**

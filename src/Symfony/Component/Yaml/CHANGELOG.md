@@ -4,6 +4,14 @@ CHANGELOG
 3.1.0
 -----
 
+ * Added support for parsing timestamps as `\DateTime` objects:
+
+   ```php
+   Yaml::parse('2001-12-15 21:59:43.10 -5', Yaml::PARSE_DATETIME);
+   ```
+
+ * `\DateTime` and `\DateTimeImmutable` objects are dumped as YAML timestamps.
+
  * Deprecated usage of `%` at the beginning of an unquoted string.
 
  * Added support for customizing the YAML parser behavior through an optional bit field:

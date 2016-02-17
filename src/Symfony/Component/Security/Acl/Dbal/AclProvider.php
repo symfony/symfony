@@ -124,10 +124,10 @@ class AclProvider implements AclProviderInterface
                     //        reached by the default implementation, since we do not
                     //        filter by SID
                     throw new \RuntimeException('This is not supported by the default implementation.');
-                } else {
+                }  
                     $result->attach($oid, $acl);
                     $aclFound = true;
-                }
+                
             }
 
             // check if we can locate the ACL in the cache
@@ -145,10 +145,10 @@ class AclProvider implements AclProviderInterface
                             if (isset($this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()])) {
                                 $acl->setParentAcl($this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()]);
                                 break;
-                            } else {
+                            }  
                                 $this->loadedAcls[$parentOid->getType()][$parentOid->getIdentifier()] = $parentAcl;
                                 $this->updateAceIdentityMap($parentAcl);
-                            }
+                            
 
                             $parentAcl = $parentAcl->getParentAcl();
                         }
@@ -182,9 +182,9 @@ class AclProvider implements AclProviderInterface
                         $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');
                         $partialResultException->setPartialResult($result);
                         throw $partialResultException;
-                    } else {
+                    }  
                         throw $e;
-                    }
+                    
                 }
                 foreach ($loadedBatch as $loadedOid) {
                     $loadedAcl = $loadedBatch->offsetGet($loadedOid);

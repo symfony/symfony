@@ -143,7 +143,7 @@ class Question
         }
 
         if (null !== $values && !is_array($values)) {
-            if (!$values instanceof \Traversable || $values instanceof \Countable) {
+            if (!$values instanceof \Traversable || !$values instanceof \Countable) {
                 throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
             }
         }

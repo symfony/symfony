@@ -35,6 +35,13 @@ interface AdapterInterface
     public function createQuery($dn, $query, array $options = array());
 
     /**
+     * Fetches the entry manager instance.
+     *
+     * @return EntryManagerInterface
+     */
+    public function getEntryManager();
+
+    /**
      * Escape a string for use in an LDAP filter or DN.
      *
      * @param string $subject

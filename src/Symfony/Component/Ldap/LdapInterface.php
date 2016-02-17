@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap;
 
+use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 
 /**
@@ -33,4 +34,9 @@ interface LdapInterface extends BaseLdapInterface
      * @return QueryInterface
      */
     public function query($dn, $query, array $options = array());
+
+    /**
+     * @return EntryManagerInterface
+     */
+    public function getEntryManager();
 }

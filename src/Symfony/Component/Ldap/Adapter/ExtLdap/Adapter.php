@@ -21,6 +21,7 @@ class Adapter implements AdapterInterface
 {
     private $config;
     private $connection;
+    private $entryManager;
 
     public function __construct(array $config = array())
     {
@@ -41,6 +42,18 @@ class Adapter implements AdapterInterface
         }
 
         return $this->connection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntryManager()
+    {
+        if (null === $this->entryManager) {
+            $this->entryManager = new EntryManager($this->connection);
+        }
+
+        return $this->entryManager;
     }
 
     /**

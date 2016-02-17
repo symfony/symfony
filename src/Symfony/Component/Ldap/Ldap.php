@@ -49,6 +49,14 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
+    public function getEntryManager()
+    {
+        return $this->adapter->getEntryManager();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function escape($subject, $ignore = '', $flags = 0)
     {
         return $this->adapter->escape($subject, $ignore, $flags);

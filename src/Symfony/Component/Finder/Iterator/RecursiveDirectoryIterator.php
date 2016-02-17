@@ -103,9 +103,9 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             if ($this->ignoreUnreadableDirs) {
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
                 return new \RecursiveArrayIterator(array());
-            }  
-                throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
-            
+            }
+
+            throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

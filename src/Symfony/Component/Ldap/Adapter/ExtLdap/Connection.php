@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
@@ -30,6 +31,9 @@ class Connection extends AbstractConnection
         $this->disconnect();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isBound()
     {
         return $this->bound;
@@ -55,6 +59,8 @@ class Connection extends AbstractConnection
      * Returns a link resource.
      *
      * @return resource
+     *
+     * @internal
      */
     public function getResource()
     {
@@ -66,6 +72,7 @@ class Connection extends AbstractConnection
         if ($this->connection) {
             return;
         }
+
         $host = $this->config['host'];
 
         ldap_set_option($this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->config['version']);
@@ -73,8 +80,12 @@ class Connection extends AbstractConnection
 
         $this->connection = ldap_connect($host, $this->config['port']);
 
-        if ($this->config['useStartTls']) {
-            ldap_start_tls($this->connection);
+        if (false === $this->connection) {
+            throw new LdapException(sprintf('Could not connect to Ldap server: %s', ldap_error($this->connection)));
+        }
+
+        if ($this->config['useStartTls'] && false === ldap_start_tls($this->connection)) {
+            throw new LdapException(sprintf('Could not initiate TLS connection: %s', ldap_error($this->connection)));
         }
     }
 
@@ -85,5 +96,6 @@ class Connection extends AbstractConnection
         }
 
         $this->connection = null;
+        $this->bound = false;
     }
 }

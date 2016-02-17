@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
@@ -84,7 +85,13 @@ class Collection implements CollectionInterface
             return;
         }
 
-        $entries = ldap_get_entries($this->connection->getResource(), $this->search->getResource());
+        $con = $this->connection->getResource();
+
+        $entries = ldap_get_entries($con, $this->search->getResource());
+
+        if (false === $entries) {
+            throw new LdapException(sprintf('Could not load entries: %s', ldap_error($con)));
+        }
 
         if (0 === $entries['count']) {
             return array();
@@ -94,15 +101,22 @@ class Collection implements CollectionInterface
 
         $this->entries = array_map(function (array $entry) {
             $dn = $entry['dn'];
-            $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + array(
-                'count' => null,
-                'dn' => null,
-            ));
-            array_walk($attributes, function (&$value) {
-                unset($value['count']);
-            });
+            $attributes = $this->cleanupAttributes($entry);
 
             return new Entry($dn, $attributes);
         }, $entries);
+    }
+
+    private function cleanupAttributes(array $entry = array())
+    {
+        $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + array(
+                'count' => null,
+                'dn' => null,
+            ));
+        array_walk($attributes, function (&$value) {
+            unset($value['count']);
+        });
+
+        return $attributes;
     }
 }

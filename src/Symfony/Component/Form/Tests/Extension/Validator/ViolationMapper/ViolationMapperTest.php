@@ -1552,12 +1552,14 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $parent->add($child2);
         $child2->add($grandChild);
 
+        $parent->submit(array());
+
         $this->mapper->mapViolation($violation, $parent);
 
         // The error occurred on the child of the second form with the same path
         $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
         $this->assertCount(0, $child1->getErrors(), $child1->getName().' should not have an error, but has one');
         $this->assertCount(0, $child2->getErrors(), $child2->getName().' should not have an error, but has one');
-        $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChild->getName().' should have an error, but has none');
+        $this->assertEquals(array($this->getFormError($violation, $grandChild)), iterator_to_array($grandChild->getErrors()), $grandChild->getName().' should have an error, but has none');
     }
 }

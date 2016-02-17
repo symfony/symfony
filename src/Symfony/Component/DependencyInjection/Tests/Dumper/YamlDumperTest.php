@@ -28,14 +28,14 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
     {
         $dumper = new YamlDumper($container = new ContainerBuilder());
 
-        $this->assertEqualYamlStructure(self::$fixturesPath.'/yaml/services1.yml', $dumper->dump(), '->dump() dumps an empty container as an empty YAML file');
+        $this->assertEqualYamlStructure(file_get_contents(self::$fixturesPath.'/yaml/services1.yml'), $dumper->dump(), '->dump() dumps an empty container as an empty YAML file');
     }
 
     public function testAddParameters()
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
         $dumper = new YamlDumper($container);
-        $this->assertEqualYamlStructure(self::$fixturesPath.'/yaml/services8.yml', $dumper->dump(), '->dump() dumps parameters');
+        $this->assertEqualYamlStructure(file_get_contents(self::$fixturesPath.'/yaml/services8.yml'), $dumper->dump(), '->dump() dumps parameters');
     }
 
     public function testAddService()

@@ -88,7 +88,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("        file: %s\n", $definition->getFile());
+            $code .= sprintf("        file: %s\n", $this->dumper->dump($definition->getFile()));
         }
 
         if ($definition->isSynthetic()) {
@@ -108,11 +108,11 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->getFactoryMethod()) {
-            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
+            $code .= sprintf("        factory_method: %s\n", $this->dumper->dump($definition->getFactoryMethod()));
         }
 
         if ($definition->getFactoryService()) {
-            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
+            $code .= sprintf("        factory_service: %s\n", $this->dumper->dump($definition->getFactoryService()));
         }
 
         if ($definition->getArguments()) {
@@ -128,7 +128,7 @@ class YamlDumper extends Dumper
         }
 
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("        scope: %s\n", $scope);
+            $code .= sprintf("        scope: %s\n", $this->dumper->dump($scope));
         }
 
         if ($callable = $definition->getConfigurator()) {

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-02-17T10:44:33Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-17T11:01:19Z
+
+Some other calls don't use `dump` as well like `$definition->getFactoryMethod()`. Shouldn't they be wrapped as well?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T11:23:30Z
+
+If I am not mistaken parameters aren't supported for the other options. Though wrapping all these places doesn't hurt at all. I'll update.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-17T13:24:32Z
+
+I thought it's about properly wrapping strings in quotation marks so they don't start with invalid `@` etc.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T16:37:51Z
+
+Exactly, though I think the places were I added this then too usually wouldn't contain forbidden characters anyway. But it shouldn't hurt to have this handling here.

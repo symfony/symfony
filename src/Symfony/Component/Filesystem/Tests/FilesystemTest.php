@@ -19,6 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesystemTest extends \PHPUnit_Framework_TestCase
 {
     private $umask;
+    private $longPathNamesWindows = array();
 
     /**
      * @var string
@@ -56,6 +57,12 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        if (!empty($this->longPathNamesWindows)) {
+            foreach ($this->longPathNamesWindows as $path) {
+                exec('DEL '.$path);
+            }
+        }
+
         $this->filesystem->remove($this->workspace);
         umask($this->umask);
     }
@@ -352,6 +359,28 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->filesystem->exists($basePath.'file1'));
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testFilesExistsFails()
+    {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Test covers edge case on Windows only.');
+        }
+
+        $basePath = $this->workspace.'\\directory\\';
+
+        $oldPath = getcwd();
+        mkdir($basePath);
+        chdir($basePath);
+        $file = str_repeat('T', 259 - strlen($basePath));
+        $path = $basePath.$file;
+        exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
+        $this->longPathNamesWindows[] = $path; // save this so we can clean up later
+        chdir($oldPath);
+        $this->filesystem->exists($path);
     }
 
     public function testFilesExistsTraversableObjectOfFilesAndDirectories()

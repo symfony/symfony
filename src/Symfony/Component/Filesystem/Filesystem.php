@@ -100,6 +100,10 @@ class Filesystem
     public function exists($files)
     {
         foreach ($this->toIterator($files) as $file) {
+            if ('\\' === DIRECTORY_SEPARATOR AND strlen($file) > 258) {
+                throw new IOException(sprintf('Could not check if file exist because path length exceeds 258 characters for file "%s"', $file));
+            }
+
             if (!file_exists($file)) {
                 return false;
             }
@@ -139,7 +143,7 @@ class Filesystem
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!file_exists($file) && !is_link($file)) {
+            if (!$this->exists($file) && !is_link($file)) {
                 continue;
             }
 
@@ -157,7 +161,8 @@ class Filesystem
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new IOException(sprintf('Failed to remove file %s', $file));
+                        $error = error_get_last();
+                        throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
                     }
                 }
             }
@@ -253,13 +258,29 @@ class Filesystem
     public function rename($origin, $target, $overwrite = false)
     {
         // we check that target does not exist
-        if (!$overwrite && is_readable($target)) {
+        if (!$overwrite && $this->isReadable($target)) {
             throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
         if (true !== @rename($origin, $target)) {
             throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
+    }
+
+    /**
+     * Tells whether a file exists and is readable.
+     *
+     * @param string $filename Path to the file.
+     *
+     * @throws IOException When windows path is longer than 258 characters
+     */
+    private function isReadable($filename)
+    {
+        if ('\\' === DIRECTORY_SEPARATOR AND strlen($filename) > 258) {
+            throw new IOException(sprintf('Could not check if file is readable because path length exceeds 258 characters for file "%s"', $filename));
+        }
+
+        return is_readable($filename);
     }
 
     /**

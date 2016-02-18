@@ -13,6 +13,7 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Security\Core\User\LdapUserProvider;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -42,7 +43,7 @@ class LdapClient implements LdapClientInterface
      * @param bool   $useStartTls
      * @param bool   $optReferrals
      */
-    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false)
+    public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false, $ldapBaseDn = null, $ldapSearchDn = null, $ldapSearchPassword = null, $ldapUidKey = null, $ldapFilter = null)
     {
         if (!extension_loaded('ldap')) {
             throw new LdapException('The ldap module is needed.');
@@ -54,6 +55,11 @@ class LdapClient implements LdapClientInterface
         $this->useSsl = (bool) $useSsl;
         $this->useStartTls = (bool) $useStartTls;
         $this->optReferrals = (bool) $optReferrals;
+		$this->ldapBaseDn = $ldapBaseDn;
+		$this->ldapSearchDn = $ldapSearchDn;
+		$this->ldapSearchPassword = $ldapSearchPassword;
+		$this->ldapUidKey = $ldapUidKey;
+		$this->ldapFilter = $ldapFilter;
     }
 
     public function __destruct()
@@ -70,16 +76,14 @@ class LdapClient implements LdapClientInterface
             $this->connect();
         }
 
-		$dnArr = explode(';',$dn);
-		if(count($dnArr) > 1)
-		{
-			$searchResult = $this->find($dnArr[1], $dnArr[0], '*');
-
-			if(count($searchResult))
-			{
-				$dn = $searchResult[0]['dn'];
+		if($this->ldapBaseDn && $this->ldapSearchDn){
+			$ldapUserProvider = new LdapUserProvider($this, $this->ldapBaseDn, $this->ldapSearchDn, $this->ldapSearchPassword, null, $this->ldapUidKey, $this->ldapFilter);
+			$ldapUser = $ldapUserProvider->getUser($dn);
+			if(count($ldapUser)){
+				$dn = $ldapUser['dn'];
 			}
 		}
+		
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));
         }

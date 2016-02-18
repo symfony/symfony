@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-15T17:39:01Z
+
+Looks like we first need to fix the dumper on lower versions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-16T07:22:02Z
+
+@xabbuh The other PRs have been merged now. Can you merge 2.8 into master and rebase this one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-16T09:01:11Z
+
+@fabpot Unfortunately, my fix in #17814 broke our test suite when being executed with newer versions of the Yaml component. I think we should fix the test suite for all branches first (see #17816 for the start).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-18T09:43:48Z
+
+Tests finally pass. This is ready to be reviewed.
+
+ping @symfony/deciders

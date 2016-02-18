@@ -59,4 +59,25 @@ class Entry
     {
         return $this->attributes;
     }
+
+    /**
+     * Sets a value for the given attribute.
+     *
+     * @param $name
+     * @param array $value
+     */
+    public function setAttribute($name, array $value)
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
+     * Removes a given attribute.
+     *
+     * @param $name
+     */
+    public function removeAttribute($name)
+    {
+        unset($this->attributes[$name]);
+    }
 }

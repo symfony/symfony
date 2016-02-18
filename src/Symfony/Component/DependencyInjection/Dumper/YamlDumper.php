@@ -89,7 +89,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("        file: %s\n", $definition->getFile());
+            $code .= sprintf("        file: %s\n", $this->dumper->dump($definition->getFile()));
         }
 
         if ($definition->isSynthetic()) {

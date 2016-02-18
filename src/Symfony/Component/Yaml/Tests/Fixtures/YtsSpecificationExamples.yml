@@ -754,7 +754,7 @@ yaml: |
     Billsmer @ 338-4338.
 php: |
   array(
-     'invoice' => 34843, 'date' => mktime(0, 0, 0, 1, 23, 2001),
+     'invoice' => 34843, 'date' => gmmktime(0, 0, 0, 1, 23, 2001),
      'bill-to' =>
       array( 'given' => 'Chris', 'family' => 'Dumars', 'address' => array( 'lines' => "458 Walkman Dr.\nSuite #292\n", 'city' => 'Royal Oak', 'state' => 'MI', 'postal' => 48046 ) )
      , 'ship-to' =>
@@ -879,7 +879,7 @@ yaml: |
 php: |
    array(
       'invoice' => 34843,
-      'date' => mktime(0, 0, 0, 1, 23, 2001),
+      'date' => gmmktime(0, 0, 0, 1, 23, 2001),
       'total' => 4443.52
    )
 ---

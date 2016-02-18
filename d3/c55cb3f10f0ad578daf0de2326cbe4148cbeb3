@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-13T05:07:02Z
+
+In theory these fixes could be done in 2.3 but would cause merging pain with the renaming of empty_value to placeholder. Not sure if it's worth.
+
+In 2.8 the small template adjustments also need to be made to foundation_5_layout.html.twig
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-16T01:09:28Z
+
+:+1: Thanks for that PR.
+
+What about the actual case where you got a `placeholder` __and__ an empty string value standing for a `null` choice, then submitting the `placeholder` behaves like submitting `null` even if `required` is true ? Does this PR would help to fix the handling of `placeholder` discussed in #17760 if it's merged ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-17T14:47:08Z
+
+This PR is rather independent of #17760.
+If the final choices  collection (with preferred choices logic in place) has as first item a choice with an empty value, then a placeholder is not added (like before). But if the empty choice is not the first choice, but comes later, then the placeholder is added anyway. In the backend it would just not be distinuishable between placeholder and an explicit empty choices, but that is expected if you do not have unique choices.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-17T15:06:25Z
+
+Thanks for this precision.
+
+But it seems that the last issue with the placeholder in #17760 (not totally related though) is that the pre selection is done on the `null` choice over the placeholder. And submitting the placeholder makes the submission fallback on the `null` choice.
+
+Is that an expected behaviour in your opinion ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-17T17:56:04Z
+
+> But it seems that the last issue with the placeholder in #17760 (not totally related though) is that the pre selection is done on the null choice over the placeholder.
+
+This makes sense when the `data` option is null (which it is by default basically). Since the initial data = null choice, it is selected. If `'data' => ''` then the null choice should not be preselected anymore.
+
+> And submitting the placeholder makes the submission fallback on the null choice.
+
+This is unexpected and not the way it should be which is think is caused because `null` and `''` both map to the `''` value with the changes done in #17760. This should be solved when null does not map to an empty string.

@@ -102,6 +102,10 @@ class ResizeFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
+        if ($data instanceof \Traversable && $data instanceof \ArrayAccess) {
+            @trigger_error('Support for objects implementing both \Traversable and \ArrayAccess is deprecated since version 3.1 and will be removed in 4.0. Use an array instead.', E_USER_DEPRECATED);
+        }
+
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             $data = array();
         }

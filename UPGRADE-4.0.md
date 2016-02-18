@@ -13,6 +13,8 @@ Form
 ----
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
+ * Support for data objects that implements both `Traversable` and
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed
 
 HttpKernel
 ----------

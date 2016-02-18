@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-12T18:43:40Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-21T23:43:17Z
+
+These changes are not correct as some functions work with length 259 while others don't. See https://bugs.php.net/bug.php?id=70943
+
+---------------------------------------------------------------------------
+
+by flip111 at 2015-12-22T00:19:03Z
+
+@Tobion this PR only addresses the `file_exists` and `is_readable` functions and does not interfere with other functions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T08:06:30Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by flip111 at 2016-01-25T08:22:26Z
+
+ready to merge
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T08:24:05Z
+
+@flip111 `AND` should be changed to `&&`

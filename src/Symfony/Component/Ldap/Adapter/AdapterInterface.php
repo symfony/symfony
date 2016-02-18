@@ -26,9 +26,9 @@ interface AdapterInterface
     /**
      * Creates a new Query.
      *
-     * @param $dn
-     * @param $query
-     * @param array $options
+     * @param string $dn
+     * @param string $query
+     * @param array  $options
      *
      * @return QueryInterface
      */

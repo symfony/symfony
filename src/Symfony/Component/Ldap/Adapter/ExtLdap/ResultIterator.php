@@ -12,9 +12,12 @@
 namespace Symfony\Component\Ldap\Adapter\ExtLdap;
 
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
+ *
+ * @internal
  */
 class ResultIterator implements \Iterator
 {
@@ -37,45 +40,42 @@ class ResultIterator implements \Iterator
     public function current()
     {
         $attributes = ldap_get_attributes($this->connection, $this->current);
+
+        if (false === $attributes) {
+            throw new LdapException(sprintf('Could not fetch attributes: %s', ldap_error($this->connection)));
+        }
+
         $dn = ldap_get_dn($this->connection, $this->current);
+
+        if (false === $dn) {
+            throw new LdapException(sprintf('Could not fetch DN: %s', ldap_error($this->connection)));
+        }
 
         return new Entry($dn, $attributes);
     }
 
-    /**
-     * Sets the cursor to the next entry.
-     */
     public function next()
     {
         $this->current = ldap_next_entry($this->connection, $this->current);
         ++$this->key;
     }
 
-    /**
-     * Returns the current key.
-     *
-     * @return int
-     */
     public function key()
     {
         return $this->key;
     }
 
-    /**
-     * Checks whether the current entry is valid or not.
-     *
-     * @return bool
-     */
     public function valid()
     {
         return false !== $this->current;
     }
 
-    /**
-     * Rewinds the iterator to the first entry.
-     */
     public function rewind()
     {
         $this->current = ldap_first_entry($this->connection, $this->search);
+
+        if (false === $this->current) {
+            throw new LdapException(sprintf('Could not rewind entries array: %s', ldap_error($this->connection)));
+        }
     }
 }

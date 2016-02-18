@@ -695,11 +695,6 @@ EOF;
             ->expects($this->never())
             ->method('terminate');
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
-        $kernel->expects($this->once())
-            ->method('getHttpKernel')
-            ->will($this->returnValue($httpKernelMock));
-
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());
 
@@ -712,11 +707,6 @@ EOF;
         $httpKernelMock
             ->expects($this->once())
             ->method('terminate');
-
-        $kernel = $this->getKernel(array('getHttpKernel'));
-        $kernel->expects($this->exactly(2))
-            ->method('getHttpKernel')
-            ->will($this->returnValue($httpKernelMock));
 
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());

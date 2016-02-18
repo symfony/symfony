@@ -289,6 +289,10 @@ class Inline
                 throw new ParseException(sprintf('The reserved indicator "%s" cannot start a plain scalar; you need to quote the scalar.', $output[0]));
             }
 
+            if ($output && '%' === $output[0]) {
+                @trigger_error('Not quoting a scalar starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);
+            }
+
             if ($evaluate) {
                 $output = self::evaluateScalar($output, $references);
             }

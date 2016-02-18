@@ -436,7 +436,7 @@ class Application
     public function getNamespaces()
     {
         $namespaces = array();
-        foreach ($this->commands as $command) {
+        foreach ($this->all() as $command) {
             $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
 
             foreach ($command->getAliases() as $alias) {
@@ -530,7 +530,7 @@ class Application
 
         // name
         $commands = array();
-        foreach ($this->commands as $command) {
+        foreach ($this->all() as $command) {
             $extractedNamespace = $this->extractNamespace($command->getName());
             if ($extractedNamespace === $namespace
                || !empty($namespace) && 0 === strpos($extractedNamespace, $namespace)
@@ -556,7 +556,7 @@ class Application
 
         // aliases
         $aliases = array();
-        foreach ($this->commands as $command) {
+        foreach ($this->all() as $command) {
             foreach ($command->getAliases() as $alias) {
                 $extractedNamespace = $this->extractNamespace($alias);
                 if ($extractedNamespace === $namespace
@@ -1028,7 +1028,7 @@ class Application
             return $item->getName();
         };
 
-        return $this->findAlternatives($name, $this->commands, $abbrevs, $callback);
+        return $this->findAlternatives($name, $this->all(), $abbrevs, $callback);
     }
 
     /**

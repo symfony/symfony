@@ -19,6 +19,9 @@
         "php": ">=5.3.9",
         "symfony/filesystem": "~2.3|~3.0.0"
     },
+    "suggest": {
+        "symfony/yaml": "To use the yaml reference dumper"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" },
         "exclude-from-classmap": [

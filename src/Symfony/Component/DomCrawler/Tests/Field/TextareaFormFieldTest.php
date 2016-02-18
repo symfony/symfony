@@ -43,4 +43,5 @@ class TextareaFormFieldTest extends FormFieldTestCase
 
         $this->assertEquals('foo bar <h1>Baz</h2>', $field->getValue(), '->initialize() sets the value of the field to the textarea node value');
     }
+
 }

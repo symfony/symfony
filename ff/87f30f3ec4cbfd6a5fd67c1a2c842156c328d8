@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by netickfr at 2016-02-09T09:38:10Z
+
+Thanks Yannick :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T11:35:31Z
+
+should also be documented in the upgrade files
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-09T15:03:33Z
+
+@HeahDude I think that do not worth it because at the moment of remove deprecated features I search for "trigger_error" or "E_USER_DEPRECATED" for example.
+
+---------------------------------------------------------------------------
+
+by ybensacq at 2016-02-09T15:24:35Z
+
+Ok thanks, all is ok now.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-09T15:51:57Z
+
+@dosten yes and then you have to search the code to remove or edit, so maybe a comment can be useful at this time.
+
+Besides that :+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-09T19:20:41Z
+
+:+1:
+
+Status: Reviewed

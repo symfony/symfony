@@ -100,7 +100,7 @@ class Filesystem
     public function exists($files)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ('\\' === DIRECTORY_SEPARATOR AND strlen($file) > 258) {
+            if ('\\' === DIRECTORY_SEPARATOR && strlen($file) > 258) {
                 throw new IOException(sprintf('Could not check if file exist because path length exceeds 258 characters for file "%s"', $file));
             }
 
@@ -276,7 +276,7 @@ class Filesystem
      */
     private function isReadable($filename)
     {
-        if ('\\' === DIRECTORY_SEPARATOR AND strlen($filename) > 258) {
+        if ('\\' === DIRECTORY_SEPARATOR && strlen($filename) > 258) {
             throw new IOException(sprintf('Could not check if file is readable because path length exceeds 258 characters for file "%s"', $filename));
         }
 

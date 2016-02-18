@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Application.

@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-17T18:50:32Z
+
+:+1: great!
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-17T19:08:58Z
+
+Do you know how this works? If the `PULL_REQUEST_TEMPLATE.md` is present in 2.7+ but not in 2.3 and I open a PR in 2.3 the PR body will be empty?
+
+---------------------------------------------------------------------------
+
+by colinodell at 2016-02-17T20:14:20Z
+
+Github has made an official post on this feature: https://github.com/blog/2111-issue-and-pull-request-templates
+
+---------------------------------------------------------------------------
+
+by stloyd at 2016-02-17T20:49:33Z
+
+IMO this should land as suggested by GitHub team in the `.github/` folder (also with other GH related files).
+
+---------------------------------------------------------------------------
+
+by colinodell at 2016-02-17T21:13:00Z
+
+@Tobion I've made those two changes.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-17T21:19:28Z
+
+IMO the template should be removed from https://github.com/symfony/symfony/blob/master/CONTRIBUTING.md then
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-02-17T22:18:14Z
+
+:+1: for moving the file to `.github/`, as mentioned by the official blog post.
+
+---------------------------------------------------------------------------
+
+by colinodell at 2016-02-17T22:22:56Z
+
+Alright I've moved the file to `.github/` and removed the template from `CONTRIBUTING`.  Let me know if you'd like to see any other changes.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2016-02-17T22:24:22Z
+
+You should also move the `CONTRIBUTING` inside the `.github` directory
+
+---------------------------------------------------------------------------
+
+by colinodell at 2016-02-17T22:30:03Z
+
+@Taluu While GitHub does support that, I personally like seeing the `CONTRIBUTING` file in the root.  I tend to check that first instead of relying on GitHub to display the notice when creating the issue/PR later on.  Just my $0.02.

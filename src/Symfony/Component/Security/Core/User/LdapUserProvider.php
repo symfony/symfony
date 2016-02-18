@@ -92,7 +92,7 @@ class LdapUserProvider implements UserProviderInterface
 	/**
      * {@inheritdoc}
      */
-	private function getUser($username)
+	public function getUser($username)
 	{
 		try {
             $this->ldap->bind($this->searchDn, $this->searchPassword);

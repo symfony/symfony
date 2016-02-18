@@ -75,14 +75,6 @@ class LdapClient implements LdapClientInterface
         if (!$this->connection) {
             $this->connect();
         }
-
-		if($this->ldapBaseDn && $this->ldapSearchDn){
-			$ldapUserProvider = new LdapUserProvider($this, $this->ldapBaseDn, $this->ldapSearchDn, $this->ldapSearchPassword, null, $this->ldapUidKey, $this->ldapFilter);
-			$ldapUser = $ldapUserProvider->getUser($dn);
-			if(count($ldapUser)){
-				$dn = $ldapUser['dn'];
-			}
-		}
 		
         if (false === @ldap_bind($this->connection, $dn, $password)) {
             throw new ConnectionException(ldap_error($this->connection));

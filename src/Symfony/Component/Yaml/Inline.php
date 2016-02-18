@@ -519,7 +519,12 @@ class Inline
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
-                        return strtotime($scalar);
+                        $timeZone = date_default_timezone_get();
+                        date_default_timezone_set('UTC');
+                        $time = strtotime($scalar);
+                        date_default_timezone_set($timeZone);
+
+                        return $time;
                 }
             default:
                 return (string) $scalar;

@@ -69,12 +69,6 @@ class Application extends BaseApplication
     {
         $this->kernel->boot();
 
-        if (!$this->commandsRegistered) {
-            $this->registerCommands();
-
-            $this->commandsRegistered = true;
-        }
-
         $container = $this->kernel->getContainer();
 
         foreach ($this->all() as $command) {
@@ -96,8 +90,36 @@ class Application extends BaseApplication
         return parent::doRun($input, $output);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function get($name)
+    {
+        $this->registerCommands();
+
+        return parent::get($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all($namespace = null)
+    {
+        $this->registerCommands();
+
+        return parent::all($namespace);
+    }
+
     protected function registerCommands()
     {
+        if ($this->commandsRegistered) {
+            return;
+        }
+
+        $this->commandsRegistered = true;
+
+        $this->kernel->boot();
+
         $container = $this->kernel->getContainer();
 
         foreach ($this->kernel->getBundles() as $bundle) {

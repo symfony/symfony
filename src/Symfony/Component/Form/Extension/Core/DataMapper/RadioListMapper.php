@@ -38,13 +38,11 @@ class RadioListMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($choice, $radios)
+    public function mapDataToForms($data, $radios)
     {
-        $valueMap = array_flip($this->choiceList->getValuesForChoices(array($choice)));
-
         foreach ($radios as $radio) {
             $value = $radio->getConfig()->getOption('value');
-            $radio->setData(isset($valueMap[$value]) ? true : false);
+            $radio->setData($value === $data ? true : false);
         }
     }
 

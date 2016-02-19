@@ -76,7 +76,7 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(info_and_error_logs, true) }}
+                        {{ helper.render_table(info_and_error_logs, 'info', true) }}
                     {% endif %}
                 </div>
             </div>
@@ -92,7 +92,7 @@
                             <p>There are no log messages about deprecated features.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(deprecation_logs, false, true) }}
+                        {{ helper.render_table(deprecation_logs, 'deprecation', false, true) }}
                     {% endif %}
                 </div>
             </div>
@@ -106,7 +106,7 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(debug_logs) }}
+                        {{ helper.render_table(debug_logs, 'debug') }}
                     {% endif %}
                 </div>
             </div>
@@ -120,7 +120,7 @@
                             <p>There are no log messages of this level.</p>
                         </div>
                     {% else %}
-                        {{ helper.render_table(silenced_logs) }}
+                        {{ helper.render_table(silenced_logs, 'silenced') }}
                     {% endif %}
                 </div>
             </div>
@@ -129,7 +129,7 @@
     {% endif %}
 {% endblock %}
 
-{% macro render_table(logs, show_level = false, is_deprecation = false) %}
+{% macro render_table(logs, category = '', show_level = false, is_deprecation = false) %}
     {% import _self as helper %}
     {% set channel_is_defined = (logs|first).channel is defined %}
 
@@ -160,31 +160,31 @@
                         <td class="font-normal text-small text-bold nowrap">{{ log.channel }}</td>
                     {% endif %}
 
-                    <td class="font-normal">{{ helper.render_log_message(loop.index, log, is_deprecation) }}</td>
+                    <td class="font-normal">{{ helper.render_log_message(category, loop.index, log, is_deprecation) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 {% endmacro %}
 
-{% macro render_log_message(log_index, log, is_deprecation = false) %}
+{% macro render_log_message(category, log_index, log, is_deprecation = false) %}
     {{ log.message }}
 
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
-        {% set id = 'sf-call-stack-' ~ log_index %}
+        {% set stack_id = 'sf-call-stack-' ~ category ~ '-' ~ log_index %}
 
         {% if log.context.errorCount is defined %}
             <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>
         {% endif %}
 
         {% if stack %}
-            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
+            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ stack_id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
         {% endif %}
 
         {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
-                <ul class="sf-call-stack hidden" id="{{ id }}">
+                <ul class="sf-call-stack hidden" id="{{ stack_id }}">
             {% endif %}
 
             {% if call.class is defined %}
@@ -212,11 +212,24 @@
         {% endfor %}
     {% else %}
         {% if log.context is defined and log.context is not empty %}
-            <span class="metadata">
-                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256)|replace({
-                    '{"' : '{ "', '"}' : '" }', '":{' : '": {', '":"' : '": "', '","' : '", "'
-                }) }}
-            </span>
+            {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
+            {% set context_dump = profiler_dump(log.context) %}
+
+            <div class="metadata">
+                <strong>Context</strong>:
+
+                {% if context_dump|length > 120 %}
+                    {{ context_dump[:120] }} ...
+
+                    <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide full context">Show full context</a>
+
+                    <div id="{{ context_id }}" class="context">
+                        <pre>{{ context_dump }}</pre>
+                    </div>
+                {% else %}
+                    {{ context_dump }}
+                {% endif %}
+            </div>
         {% endif %}
     {% endif %}
 {% endmacro %}

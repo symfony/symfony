@@ -224,9 +224,7 @@
                     <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Collapse context">Expand context</a>
 
                     <div id="{{ context_id }}" class="context">
-                        <pre>
-                            {{- profiler_dump(log.context) -}}
-                        </pre>
+                        <pre>{{ profiler_dump(log.context) }}</pre>
                     </div>
                 {% endif %}
             </div>

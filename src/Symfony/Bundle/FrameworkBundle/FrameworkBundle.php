@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CacheAdapterPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ControllerArgumentValueResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
@@ -89,6 +90,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new SerializerPass());
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
+        $container->addCompilerPass(new CacheAdapterPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);

@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -136,6 +139,10 @@ class FrameworkExtension extends Extension
 
         if (isset($config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
+        if (isset($config['cache'])) {
+            $this->registerCacheConfiguration($config['cache'], $container);
         }
 
         $loader->load('debug_prod.xml');
@@ -1013,6 +1020,46 @@ class FrameworkExtension extends Extension
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+        }
+    }
+
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container)
+    {
+        foreach ($config['adapters'] as $name => $adapter) {
+            $class = null;
+            $arguments = array();
+            $namespaceArgumentIndex = null;
+
+            switch ($adapter['type']) {
+                case 'apcu':
+                    $class = ApcuAdapter::class;
+                    $arguments[] = null;
+                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : 0;
+                    $namespaceArgumentIndex = 0;
+                    break;
+                case 'doctrine':
+                    $class = DoctrineAdapter::class;
+                    $arguments[] = isset($adapter['options']['cache_provider_service']) ? new Reference($adapter['options']['cache_provider_service']) : null;
+                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : null;
+                    break;
+                case 'filesystem':
+                    $class = FilesystemAdapter::class;
+                    $arguments[] = isset($adapter['options']['directory']) ? $adapter['options']['directory'] : null;
+                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : null;
+                    break;
+            }
+
+            $tagAttributes = array('id' => $name);
+
+            if (null !== $namespaceArgumentIndex) {
+                $tagAttributes['namespace-arg-index'] = $namespaceArgumentIndex;
+            }
+
+            $adapterDefinition = new Definition($class);
+            $adapterDefinition->setArguments($arguments);
+            $adapterDefinition->setAbstract(true);
+            $adapterDefinition->addTag('cache.adapter', $tagAttributes);
+            $container->setDefinition('cache.adapter.'.$name, $adapterDefinition);
         }
     }
 

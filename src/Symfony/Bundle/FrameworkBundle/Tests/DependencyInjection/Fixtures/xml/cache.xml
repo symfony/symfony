@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:cache>
+            <framework:adapter name="foo" type="apcu" default-lifetime="30" />
+            <framework:adapter name="bar" type="doctrine" default-lifetime="5" cache-provider-service="app.doctrine_cache_provider" />
+            <framework:adapter name="baz" type="filesystem" default-lifetime="7" directory="app/cache/psr" />
+        </framework:cache>
+    </framework:config>
+</container>

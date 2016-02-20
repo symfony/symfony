@@ -114,6 +114,7 @@ class Configuration implements ConfigurationInterface
         $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
         $this->addPropertyInfoSection($rootNode);
+        $this->addCacheSection($rootNode);
 
         return $treeBuilder;
     }
@@ -543,6 +544,55 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
                     ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addCacheSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('cache')
+                    ->info('Cache configuration')
+                    ->fixXmlConfig('adapter')
+                    ->children()
+                        ->arrayNode('adapters')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->always(function ($v) {
+                                        if (!isset($v['options'])) {
+                                            $v['options'] = array();
+                                        }
+
+                                        foreach ($v as $key => $value) {
+                                            if (!in_array($key, array('type', 'name', 'options'))) {
+                                                $v['options'][$key] = $value;
+                                                unset($v[$key]);
+                                            }
+                                        }
+
+                                        return $v;
+                                    })
+                                ->end()
+                                ->children()
+                                    ->enumNode('type')
+                                        ->info('The cache adapter type (one of "apcu", "doctrine", "filesystem")')
+                                        ->isRequired()
+                                        ->values(array('apcu', 'doctrine', 'filesystem'))
+                                    ->end()
+                                    ->arrayNode('options')
+                                        ->children()
+                                            ->integerNode('default_lifetime')->end()
+                                            ->scalarNode('cache_provider_service')->end()
+                                            ->scalarNode('directory')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

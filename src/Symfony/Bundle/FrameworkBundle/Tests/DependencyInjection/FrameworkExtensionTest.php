@@ -13,6 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -568,6 +571,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info'));
     }
 
+    public function testCacheAdaptersAbstractServices()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $this->assertCacheAdapterIsRegistered($container, 'foo', 'apcu', array(null, 30), 0);
+        $this->assertCacheAdapterIsRegistered($container, 'bar', 'doctrine', array(new Reference('app.doctrine_cache_provider'), 5));
+        $this->assertCacheAdapterIsRegistered($container, 'baz', 'filesystem', array('app/cache/psr', 7));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
@@ -634,6 +646,41 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));
+        }
+    }
+
+    private function assertCacheAdapterIsRegistered(ContainerBuilder $container, $name, $type, array $arguments, $namespaceArgumentIndex = null)
+    {
+        $id = 'cache.adapter.'.$name;
+
+        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache adapter of type "%s" is registered', $id, $type));
+
+        $adapterDefinition = $container->getDefinition($id);
+
+        switch ($type) {
+            case 'apcu':
+                $this->assertSame(ApcuAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'doctrine':
+                $this->assertSame(DoctrineAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'filesystem':
+                $this->assertSame(FilesystemAdapter::class, $adapterDefinition->getClass());
+                break;
+        }
+
+        $this->assertTrue($adapterDefinition->isAbstract(), sprintf('Service definition "%s" for cache adapter "%s" is abstract', $id, $name));
+        $this->assertEquals($arguments, $adapterDefinition->getArguments());
+        $this->assertTrue($adapterDefinition->hasTag('cache.adapter'), sprintf('Service definition "%s" is tagged with the "cache.adapter" tag.', $id));
+
+        $tag = $adapterDefinition->getTag('cache.adapter');
+
+        $this->assertTrue(isset($tag[0]['id']), 'The adapter name is the "id" attribute of the "cache.adapter" tag.');
+        $this->assertSame($name, $tag[0]['id'], 'The adapter name is the "id" attribute of the "cache.adapter" tag.');
+
+        if (null !== $namespaceArgumentIndex) {
+            $this->assertTrue(isset($tag[0]['namespace-arg-index']), 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
+            $this->assertSame($namespaceArgumentIndex, $tag[0]['namespace-arg-index'], 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
         }
     }
 }

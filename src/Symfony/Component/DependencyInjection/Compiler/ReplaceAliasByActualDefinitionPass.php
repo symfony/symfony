@@ -95,6 +95,8 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             $definition->setProperties(
                 $this->updateArgumentReferences($definition->getProperties(), $currentId, $newId)
             );
+
+            $definition->setFactory($this->updateFactoryReference($definition->getFactory(), $currentId, $newId));
         }
     }
 
@@ -121,5 +123,18 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         }
 
         return $arguments;
+    }
+
+    private function updateFactoryReference($factory, $currentId, $newId)
+    {
+        if (null === $factory || !is_array($factory) || !$factory[0] instanceof Reference) {
+            return $factory;
+        }
+
+        if ($currentId === (string) $factory[0]) {
+            $factory[0] = new Reference($newId, $factory[0]->getInvalidBehavior());
+        }
+
+        return $factory;
     }
 }

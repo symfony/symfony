@@ -436,12 +436,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('assets.packages', (string) $packages);
     }
 
-    public function testAssetHelperWhenTemplatesAreEnabledAndAssetsAreDisabled()
+    public function testAssetHelperWhenTemplatesAreEnabledAndNoAssetsConfiguration()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('templating_no_assets');
         $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
 
         $this->assertSame('assets.packages', (string) $packages);
+    }
+
+    public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
+    {
+        $container = $this->createContainerFromFile('templating_php_assets_disabled');
+
+        $this->assertTrue(!$container->has('templating.helper.assets'), 'The templating.helper.assets helper service is removed when assets are disabled.');
     }
 
     public function testAssetHelperWhenAssetsAndTemplatesAreDisabled()

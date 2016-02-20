@@ -4,6 +4,12 @@ CHANGELOG
 3.1.0
 -----
 
+ * Added support for parsing base64 encoded binary data when they are tagged
+   with the `!!binary` tag.
+
+ * Added support for dumping binary data as base64 encoded strings by passing
+   the `Yaml::DUMP_BASE64_BINARY_DATA` flag.
+
  * Added support for parsing timestamps as `\DateTime` objects:
 
    ```php

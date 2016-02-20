@@ -532,4 +532,41 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
         return $tests;
     }
+
+    /**
+     * @dataProvider getBinaryData
+     */
+    public function testParseBinaryData($data)
+    {
+        $this->assertSame('Hello world', Inline::parse($data));
+    }
+
+    public function getBinaryData()
+    {
+        return array(
+            'enclosed with double quotes' => array('!!binary "SGVsbG8gd29ybGQ="'),
+            'enclosed with single quotes' => array("!!binary 'SGVsbG8gd29ybGQ='"),
+            'containing spaces' => array('!!binary  "SGVs bG8gd 29ybGQ="'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidBinaryData
+     */
+    public function testParseInvalidBinaryData($data, $expectedMessage)
+    {
+        $this->setExpectedExceptionRegExp('\Symfony\Component\Yaml\Exception\ParseException', $expectedMessage);
+
+        Inline::parse($data);
+    }
+
+    public function getInvalidBinaryData()
+    {
+        return array(
+            'length not a multiple of four' => array('!!binary "SGVsbG8d29ybGQ="', '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/'),
+            'invalid characters' => array('!!binary "SGVsbG8#d29ybGQ="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'too many equals characters' => array('!!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'misplaced equals character' => array('!!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'),
+        );
+    }
 }

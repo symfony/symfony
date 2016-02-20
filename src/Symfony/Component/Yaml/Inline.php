@@ -197,6 +197,8 @@ class Inline
                 return $repr;
             case '' == $value:
                 return "''";
+            case Yaml::DUMP_BASE64_BINARY_DATA & $flags && self::isBinaryString($value):
+                return '!!binary '.base64_encode($value);
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
@@ -576,6 +578,8 @@ class Inline
                         return -log(0);
                     case '-.inf' === $scalarLower:
                         return log(0);
+                    case 0 === strpos($scalar, '!!binary '):
+                        return self::evaluateBinaryScalar(substr($scalar, 9));
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
@@ -593,6 +597,33 @@ class Inline
             default:
                 return (string) $scalar;
         }
+    }
+
+    /**
+     * @param string $scalar
+     *
+     * @return string
+     *
+     * @internal
+     */
+    public static function evaluateBinaryScalar($scalar)
+    {
+        $parsedBinaryData = self::parseScalar(preg_replace('/\s/', '', $scalar));
+
+        if (0 !== (strlen($parsedBinaryData) % 4)) {
+            throw new ParseException(sprintf('The normalized base64 encoded data (data without whitespace characters) length must be a multiple of four (%d bytes given).', strlen($parsedBinaryData)));
+        }
+
+        if (!preg_match('#^[A-Z0-9+/]+={0,2}$#i', $parsedBinaryData)) {
+            throw new ParseException(sprintf('The base64 encoded data (%s) contains invalid characters.', $parsedBinaryData));
+        }
+
+        return base64_decode($parsedBinaryData, true);
+    }
+
+    private static function isBinaryString($value)
+    {
+        return preg_match('/[^\x09-\x0d\x20-\xff]/', $value);
     }
 
     /**

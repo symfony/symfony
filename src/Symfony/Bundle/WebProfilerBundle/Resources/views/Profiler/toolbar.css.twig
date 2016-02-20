@@ -47,6 +47,10 @@
     text-align: left;
     text-transform: none;
     z-index: 99999;
+
+    /* neutralize the aliasing defined by external CSS styles */
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
 }
 .sf-toolbarreset abbr {
     border: dashed #777;

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\CommandsResolver\CommandResolver;
+use Symfony\Component\Console\CommandsResolver\CommandResolverInterface;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Exception\ExceptionInterface;
@@ -60,7 +62,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
-    private $commands = array();
+    /**
+     * @var CommandResolverInterface
+     */
+    private $commandResolver;
     private $wantHelps = false;
     private $runningCommand;
     private $name;
@@ -76,16 +81,19 @@ class Application
     /**
      * Constructor.
      *
-     * @param string $name    The name of the application
-     * @param string $version The version of the application
+     * @param string                   $name            The name of the application
+     * @param string                   $version         The version of the application
+     * @param CommandResolverInterface $commandResolver
      */
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', CommandResolverInterface $commandResolver = null)
     {
         $this->name = $name;
         $this->version = $version;
         $this->defaultCommand = 'list';
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
+
+        $this->commandResolver = $commandResolver !== null ? $commandResolver : new CommandResolver();
 
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
@@ -370,11 +378,7 @@ class Application
             throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
-        $this->commands[$command->getName()] = $command;
-
-        foreach ($command->getAliases() as $alias) {
-            $this->commands[$alias] = $command;
-        }
+        $this->commandResolver->add($command);
 
         return $command;
     }
@@ -390,11 +394,11 @@ class Application
      */
     public function get($name)
     {
-        if (!isset($this->commands[$name])) {
+        $command = $this->commandResolver->get($name);
+
+        if (!$command) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name));
         }
-
-        $command = $this->commands[$name];
 
         if ($this->wantHelps) {
             $this->wantHelps = false;
@@ -417,7 +421,7 @@ class Application
      */
     public function has($name)
     {
-        return isset($this->commands[$name]);
+        return $this->commandResolver->has($name);
     }
 
     /**
@@ -430,12 +434,8 @@ class Application
     public function getNamespaces()
     {
         $namespaces = array();
-        foreach ($this->commands as $command) {
-            $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command->getName()));
-
-            foreach ($command->getAliases() as $alias) {
-                $namespaces = array_merge($namespaces, $this->extractAllNamespaces($alias));
-            }
+        foreach ($this->commandResolver->getAllNames() as $command) {
+            $namespaces = array_merge($namespaces, $this->extractAllNamespaces($command));
         }
 
         return array_values(array_unique(array_filter($namespaces)));
@@ -494,7 +494,7 @@ class Application
      */
     public function find($name)
     {
-        $allCommands = array_keys($this->commands);
+        $allCommands = $this->commandResolver->getAllNames();
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 
@@ -520,9 +520,9 @@ class Application
 
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
-            $commandList = $this->commands;
-            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
-                $commandName = $commandList[$nameOrAlias]->getName();
+            $resolver = $this->commandResolver; 
+            $commands = array_filter($commands, function ($nameOrAlias) use ($resolver, $commands) {
+                $commandName = $resolver->get($nameOrAlias)->getName();
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);
             });
@@ -550,13 +550,13 @@ class Application
     public function all($namespace = null)
     {
         if (null === $namespace) {
-            return $this->commands;
+            return $this->commandResolver->getAll();
         }
 
         $commands = array();
-        foreach ($this->commands as $name => $command) {
+        foreach ($this->commandResolver->getAllNames() as $name) {
             if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
-                $commands[$name] = $command;
+                $commands[$name] = $this->commandResolver->get($name);
             }
         }
 

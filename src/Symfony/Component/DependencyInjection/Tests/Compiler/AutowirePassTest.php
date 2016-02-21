@@ -282,6 +282,36 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $arguments = $container->getDefinition('bar')->getArguments();
         $this->assertSame('foo', (string) $arguments[0]);
     }
+
+    public function testSomeSpecificArgumentsAreSet()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('a', __NAMESPACE__.'\A');
+        $container->register('dunglas', __NAMESPACE__.'\Dunglas');
+        $container->register('multiple', __NAMESPACE__.'\MultipleArguments')
+            ->setAutowired(true)
+            // set the 2nd (index 1) argument only: autowire the first and third
+            // args are: A, Foo, Dunglas
+            ->setArguments(array(
+                1 => new Reference('foo'),
+            ));
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $definition = $container->getDefinition('multiple');
+        // takes advantage of Reference's __toString
+        $this->assertEquals(
+            array(
+                new Reference('a'),
+                new Reference('foo'),
+                new Reference('dunglas'),
+            ),
+            $definition->getArguments()
+        );
+    }
 }
 
 class Foo
@@ -403,6 +433,12 @@ class NotGuessableArgument
 class NotGuessableArgumentForSubclass
 {
     public function __construct(A $k)
+    {
+    }
+}
+class MultipleArguments
+{
+    public function __construct(A $k, $foo, Dunglas $dunglas)
     {
     }
 }

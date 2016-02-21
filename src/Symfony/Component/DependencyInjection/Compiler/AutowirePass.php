@@ -110,12 +110,13 @@ class AutowirePass implements CompilerPassInterface
                 $value = $parameter->getDefaultValue();
             }
 
-            if ($argumentExists) {
-                $definition->replaceArgument($index, $value);
-            } else {
-                $definition->addArgument($value);
-            }
+            $arguments[$index] = $value;
         }
+
+        // it's possible index 1 was set, then index 0, then 2, etc
+        // make sure that we re-order so they're injected as expected
+        ksort($arguments);
+        $definition->setArguments($arguments);
     }
 
     /**

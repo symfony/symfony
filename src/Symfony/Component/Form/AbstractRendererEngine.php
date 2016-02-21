@@ -171,7 +171,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
             // The next two if statements contain slightly duplicated code. This is by intention
             // and tries to avoid execution of unnecessary checks in order to increase performance.
 
-            if (isset($this->resources[$cacheKey][$parentBlockName])) {
+            if (isset($this->resources[$cacheKey][$parentBlockName]) && $this->resources[$cacheKey][$parentBlockName] !== false) {
                 // It may happen that the parent block is already loaded, but its level is not.
                 // In this case, the parent block must have been loaded by loadResourceForBlock(),
                 // which does not check the hierarchy of the block. Subsequently the block must have

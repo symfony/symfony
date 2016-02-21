@@ -77,7 +77,10 @@ abstract class BaseType extends AbstractType
 
         $blockPrefixes = array();
         for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
-            array_unshift($blockPrefixes, $type->getBlockPrefix());
+            $blockPrefix = $type->getBlockPrefix();
+            if (!in_array($blockPrefix, $blockPrefixes)) {
+                array_unshift($blockPrefixes, $blockPrefix);
+            }
         }
         $blockPrefixes[] = $uniqueBlockPrefix;
 

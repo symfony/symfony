@@ -456,6 +456,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testDateTimeNormalizerRegistered()
     {
+        if (!class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
+            $this->markTestSkipped('The DateTimeNormalizer has been introduced in the Serializer Component version 3.1.');
+        }
+
         $container = $this->createContainerFromFile('full');
 
         $definition = $container->getDefinition('serializer.normalizer.datetime');

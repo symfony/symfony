@@ -26,11 +26,6 @@
             <tag name="serializer.normalizer" priority="-1000" />
         </service>
 
-        <service id="serializer.normalizer.datetime" class="Symfony\Component\Serializer\Normalizer\DateTimeNormalizer" public="false">
-            <!-- Run before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-910" />
-        </service>
-
         <!-- Loader -->
         <service id="serializer.mapping.chain_loader" class="Symfony\Component\Serializer\Mapping\Loader\LoaderChain" public="false">
             <argument type="collection" />

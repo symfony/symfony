@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -844,6 +845,7 @@ class FrameworkExtension extends Extension
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
                 ->replaceArgument(2, $config['debug'])
+                ->addAutowiringType(Reader::class)
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }

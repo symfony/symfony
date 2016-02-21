@@ -79,7 +79,10 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        return $this->memcache->get($this->prefix.$sessionId) ?: '';
+        $flags = null;
+        $cas = null;
+
+        return $this->memcache->get($this->prefix.$sessionId, $flags, $cas) ?: '';
     }
 
     /**

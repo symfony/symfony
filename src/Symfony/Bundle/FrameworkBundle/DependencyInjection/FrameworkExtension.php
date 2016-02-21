@@ -899,7 +899,7 @@ class FrameworkExtension extends Extension
             // Run after serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
             $definition->setPublic(false);
-            $definition->addTag('serializer.normalizer', -920);
+            $definition->addTag('serializer.normalizer', ['priority' => -920]);
         }
 
         $loader->load('serializer.xml');

@@ -92,6 +92,6 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
 
     public function testTranslationsAreNotInCore()
     {
-        $this->assertFalse(file_exists(__DIR__.'/../../Core/Resources/translations/'));
+        $this->assertFileNotExists(__DIR__.'/../../Core/Resources/translations/');
     }
 }

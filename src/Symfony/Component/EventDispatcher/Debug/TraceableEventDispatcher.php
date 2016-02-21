@@ -144,13 +144,24 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalledListeners()
+    public function getCalledListeners($eventName = null)
     {
+        if (null !== $eventName) {
+            if (!isset($this->called[$eventName])) {
+                return array();
+            }
+        }
+
         $called = array();
-        foreach ($this->called as $eventName => $listeners) {
+        foreach ($this->called as $eventKey => $listeners) {
+
+            if (null !== $eventName && $eventName !== $eventKey) {
+                continue;
+            }
+
             foreach ($listeners as $listener) {
-                $info = $this->getListenerInfo($listener->getWrappedListener(), $eventName);
-                $called[$eventName.'.'.$info['pretty']] = $info;
+                $info = $this->getListenerInfo($listener->getWrappedListener(), $eventKey);
+                $called[$eventKey.'.'.$info['pretty']] = $info;
             }
         }
 
@@ -160,7 +171,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getNotCalledListeners()
+    public function getNotCalledListeners($eventName = null)
     {
         try {
             $allListeners = $this->getListeners();
@@ -173,12 +184,23 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             return array();
         }
 
+        if (null !== $eventName) {
+            if (!isset($allListeners[$eventName])) {
+                return array();
+            }
+        }
+
         $notCalled = array();
-        foreach ($allListeners as $eventName => $listeners) {
+        foreach ($allListeners as $eventKey => $listeners) {
             foreach ($listeners as $listener) {
+
+                if (null !== $eventName && $eventName !== $eventKey) {
+                    continue;
+                }
+
                 $called = false;
-                if (isset($this->called[$eventName])) {
-                    foreach ($this->called[$eventName] as $l) {
+                if (isset($this->called[$eventKey])) {
+                    foreach ($this->called[$eventKey] as $l) {
                         if ($l->getWrappedListener() === $listener) {
                             $called = true;
 
@@ -188,8 +210,8 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 }
 
                 if (!$called) {
-                    $info = $this->getListenerInfo($listener, $eventName);
-                    $notCalled[$eventName.'.'.$info['pretty']] = $info;
+                    $info = $this->getListenerInfo($listener, $eventKey);
+                    $notCalled[$eventKey.'.'.$info['pretty']] = $info;
                 }
             }
         }

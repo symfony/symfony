@@ -216,14 +216,18 @@
             {% set context_dump = profiler_dump(log.context) %}
 
             <div class="metadata">
-                <strong>Context</strong>: {{ context_dump }}
+                <strong>Context</strong>:
 
                 {% if context_dump|length > 120 %}
-                    <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Collapse context">Expand context</a>
+                    {{ context_dump[:120] }} ...
+
+                    <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide full context">Show full context</a>
 
                     <div id="{{ context_id }}" class="context">
                         <pre>{{ context_dump }}</pre>
                     </div>
+                {% else %}
+                    {{ context_dump }}
                 {% endif %}
             </div>
         {% endif %}

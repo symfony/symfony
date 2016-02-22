@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-03T17:09:17Z
+
+@dunglas Did we already make a decision on how to ensure the proper Serializer component version?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-03T20:32:40Z
+
+IIRC, no. The easiest way is to register it in the extension with a call to class_exist. What do you think?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-21T18:54:24Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-21T22:12:44Z
+
+:+1:
+
+*Maybe* it should be configurable... but I can't think of when you would *not* want it (except for really optimizing for performance to not include this instantiated object) and we could add that later.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-22T07:00:01Z
+
+This is similar situation to https://github.com/symfony/symfony/pull/17603 where I have put a composer `conflicts` to make sure it has the correct version of the serializer component.
+My question would be, is there any reason for someone using version 3.0 of the component to want to upgrade the framework bundle but keep the old serializer component?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-22T07:08:23Z
+
+@mcfedr Probably. The basic use case is a dependency requiring an old version of the component.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-22T07:10:55Z
+
+@weaverryan for optimizations like that, a compiler pass can be used to remove unnecessary normalizers.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-22T07:55:50Z
+
+Most people would likely have a `^3.0.0` or similar dependancy.. Basically I'm not really fighting for either option being better, but I would be maybe more inclined to use the `conflict` to avoid having to introduce work arounds for old versions, which tend to make the code less clear.

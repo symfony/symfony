@@ -65,6 +65,7 @@ class SecurityExtension extends Extension
         $loader->load('templating_twig.xml');
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
+        $loader->load('security_debug.xml');
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
             $container->removeDefinition('security.expression_language');
@@ -95,6 +96,11 @@ class SecurityExtension extends Extension
         // load ACL
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $definition = $container->findDefinition('security.authorization_checker');
+            $definition->replaceArgument(2, new Reference('debug.security.access.decision_manager'));
         }
 
         // add some required classes for compilation

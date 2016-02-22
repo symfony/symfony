@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by havvg at 2016-02-19T17:45:28Z
+
+That's why https://github.com/symfony/symfony/pull/17574 existed to help merging without those issues (and being BC) :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-20T00:13:15Z
+
+@havvg I did not see that one, but looks like it ends the same way :)

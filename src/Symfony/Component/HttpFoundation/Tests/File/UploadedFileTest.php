@@ -164,8 +164,8 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
 
-        $this->assertTrue(file_exists($targetPath));
-        $this->assertFalse(file_exists($path));
+        $this->assertFileExists($targetPath);
+        $this->assertFileNotExists($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
 
         @unlink($targetPath);

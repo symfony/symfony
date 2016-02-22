@@ -27,7 +27,7 @@ class AutowirePass implements CompilerPassInterface
     private $reflectionClasses = array();
     private $definedTypes = array();
     private $types;
-    private $notGuessableTypes = array();
+    private $ambiguousServiceTypes = array();
 
     /**
      * {@inheritdoc}
@@ -46,7 +46,7 @@ class AutowirePass implements CompilerPassInterface
         $this->reflectionClasses = array();
         $this->definedTypes = array();
         $this->types = null;
-        $this->notGuessableTypes = array();
+        $this->ambiguousServiceTypes = array();
     }
 
     /**
@@ -197,17 +197,25 @@ class AutowirePass implements CompilerPassInterface
      */
     private function set($type, $id)
     {
-        if (isset($this->definedTypes[$type]) || isset($this->notGuessableTypes[$type])) {
+        if (isset($this->definedTypes[$type])) {
             return;
         }
 
+        // check to make sure the type doesn't match multiple services
         if (isset($this->types[$type])) {
             if ($this->types[$type] === $id) {
                 return;
             }
 
+            // keep an array of all services matching this type
+            if (!isset($this->ambiguousServiceTypes[$type])) {
+                $this->ambiguousServiceTypes[$type] = array(
+                    $this->types[$type],
+                );
+            }
+            $this->ambiguousServiceTypes[$type][] = $id;
+
             unset($this->types[$type]);
-            $this->notGuessableTypes[$type] = true;
 
             return;
         }
@@ -227,8 +235,16 @@ class AutowirePass implements CompilerPassInterface
      */
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
-        if (isset($this->notGuessableTypes[$typeHint->name]) || !$typeHint->isInstantiable()) {
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s".', $typeHint->name, $id));
+        if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
+
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $id, $classOrInterface, $matchingServices));
+        }
+
+        if (!$typeHint->isInstantiable()) {
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s.', $typeHint->name, $id, $classOrInterface));
         }
 
         $argumentId = sprintf('autowired.%s', $typeHint->name);

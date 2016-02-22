@@ -78,6 +78,14 @@ class AutowirePass implements CompilerPassInterface
 
             try {
                 if (!$typeHint = $parameter->getClass()) {
+                    // no default value? Then fail
+                    if (!$parameter->isOptional()) {
+                        throw new RuntimeException(sprintf('Unable to autowire argument index %s ($%s) for the service "%s". If this is an object, give it a type-hint. Otherwise, specify this argument\'s value explicitly.', $index, $parameter->name, $id));
+                    }
+
+                    // specifically pass the default value
+                    $arguments[$index] = $parameter->getDefaultValue();
+
                     continue;
                 }
 

@@ -213,18 +213,16 @@
     {% else %}
         {% if log.context is defined and log.context is not empty %}
             {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
-            {% set context_as_string = log.context|json_encode(64 b-or 256)|replace({
-                    '{"' : '{ "', '"}' : '" }', '":{' : '": {', '":"' : '": "', '","' : '", "'
-            }) %}
+            {% set context_dump = profiler_dump(log.context) %}
 
             <div class="metadata">
-                <strong>Context</strong>: {{ context_as_string }}
+                <strong>Context</strong>: {{ context_dump }}
 
-                {% if context_as_string|length > 120 %}
+                {% if context_dump|length > 120 %}
                     <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Collapse context">Expand context</a>
 
                     <div id="{{ context_id }}" class="context">
-                        <pre>{{ profiler_dump(log.context) }}</pre>
+                        <pre>{{ context_dump }}</pre>
                     </div>
                 {% endif %}
             </div>

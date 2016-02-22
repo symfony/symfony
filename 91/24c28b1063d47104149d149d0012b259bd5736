@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-21T11:57:39Z
+
+My 2 cents: I love the `assertFileExists()` and `assertFileNotExists()` ... but I don't like the `assertInternalType()`. I wish it was called `assertType()`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-21T13:06:19Z
+
+LGTM :+1:
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-02-21T13:10:44Z
+
+nice :)
+
+offtopic:
+@javiereguiluz I agree, don't know why they picked that method name. I created a trait with some aliases https://github.com/GeckoPackages/GeckoPHPUnit#scalarasserttrait (not useful for SF, but maybe for a little project of your own ;) )

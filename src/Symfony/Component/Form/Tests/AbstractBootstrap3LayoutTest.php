@@ -699,7 +699,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSingleChoiceExpandedWithLabelsAsFalse()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choices_as_values' => true,
             'choice_label' => false,
@@ -734,7 +734,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSingleChoiceExpandedWithLabelsSetByCallable()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
             'choices_as_values' => true,
             'choice_label' => function ($choice, $label, $value) {
@@ -785,7 +785,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testSingleChoiceExpandedWithLabelsSetFalseByCallable()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choices_as_values' => true,
             'choice_label' => function () {
@@ -1073,7 +1073,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testMultipleChoiceExpandedWithLabelsAsFalse()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choices_as_values' => true,
             'choice_label' => false,
@@ -1108,7 +1108,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testMultipleChoiceExpandedWithLabelsSetByCallable()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
             'choices_as_values' => true,
             'choice_label' => function ($choice, $label, $value) {
@@ -1159,7 +1159,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testMultipleChoiceExpandedWithLabelsSetFalseByCallable()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'choices_as_values' => true,
             'choice_label' => function () {

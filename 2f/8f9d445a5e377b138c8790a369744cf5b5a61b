@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-26T13:46:20Z
+
+ping @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T14:39:16Z
+
+Why not just creating two separate classes? A normalizer class and a denormalizer class? It will be easier and respectful of SOLID principles.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T14:41:09Z
+
+Forget my previous comment, I need to dive deeper into this PR.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-26T18:53:04Z
+
+Hum actually your comment makes me wonder if we could provides the 3 implementations as a Trait instead of an abstract class, so we would have better composition, WDYT ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-27T21:19:21Z
+
+I don't understand why this is not doable with the current system? Can you be more precise about the use case?
+
+Isn't tests like this one https://github.com/dunglas/DunglasApiBundle/blob/1.x/JsonLd/Serializer/ItemNormalizer.php#L102-L104 enough?
+For recursive normalization/denormalization, see https://github.com/symfony/symfony/pull/17193
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-27T21:32:02Z
+
+Use case is for recursivity like #17193,
+
+IMO SerializerAwareInterface does not make sense in the SerializerAwareNormalizer (interface make sense, but not the abstract class, unless you went to double encode / decode something, but never seen it).
+
+This is mainly to avoid the check of a NormalizerInterface / DenormalizerInterface each time and for each class,
+
+Another way to do this would be to transform the SerializerAwareNormalizer to depend on the Serializer Class (not the interface).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-27T21:49:00Z
+
+IMO it introduces a lot of complexity (with crossed circular references) and can be hard to debug (what if the user sets different objects in $normalizer, $serializer and $denormalizer) for no real gain.
+
+As the default `Serializer` implements the `NormalizerInterface` and the `DenormalizerInterface` interface, having some `instanceof` checks doesn't hurt.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-27T21:54:31Z
+
+Having the check of NormalizerInterface / DenormalizerInterface over a class which is expected to be a SerializerInterface feel hackish IMO
+
+What about having a trait for each of the 3 aware interface and deprecate the SerializerAwareNormalizer ?
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-27T21:57:45Z
+
+Also having the check on the current SerializerAwareNormalizer force users to use the Serializer class (or anything implementing the SerializerInterface), having this would better decouple the Normalizer part from the Serializer.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-27T22:01:45Z
+
+:+1: for the traits.
+
+They can solve some issues in API Platform too.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-27T22:50:00Z
+
+Done with traits and deprecated the SerializerAwareNormalizer
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-01T14:16:24Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-02-19T10:49:09Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-22T07:35:21Z
+
+Thanks @joelwurtz for working on this feature, this is much appreciated.

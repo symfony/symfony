@@ -358,6 +358,28 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testFilesExistsFails()
+    {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Test covers edge case on Windows only.');
+        }
+
+        $basePath = $this->workspace.'\\directory\\';
+
+        $oldPath = getcwd();
+        mkdir($basePath);
+        chdir($basePath);
+        $file = str_repeat('T', 259 - strlen($basePath));
+        $path = $basePath.$file;
+        exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
+        self::$longPathNamesWindows[] = $path; // save this so we can clean up later
+        chdir($oldPath);
+        $this->filesystem->exists($path);
+    }
+
     public function testFilesExistsTraversableObjectOfFilesAndDirectories()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR;

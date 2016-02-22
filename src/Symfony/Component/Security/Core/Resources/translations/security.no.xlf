@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>En autentiserings feil har skjedd.</target>
+                <target>En autentiseringsfeil har skjedd.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Ingen tilgang til å be om gitt kilde.</target>
+                <target>Ingen tilgang til å be om gitt ressurs.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>

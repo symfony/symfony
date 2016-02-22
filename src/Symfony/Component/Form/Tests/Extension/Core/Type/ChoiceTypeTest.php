@@ -29,15 +29,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         'No' => false,
         'n/a' => '',
     );
-
-    private $numericChoicesFlipped = array(
-        0 => 'Bernhard',
-        1 => 'Fabien',
-        2 => 'Kris',
-        3 => 'Jon',
-        4 => 'Roman',
-    );
-
+	
     private $objectChoices;
 
     protected $groupedChoices = array(

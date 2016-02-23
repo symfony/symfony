@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -23,7 +24,7 @@ class ApplicationTest extends TestCase
     {
         $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
 
-        $kernel = $this->getKernel(array($bundle));
+        $kernel = $this->getKernel(array($bundle), true);
 
         $application = new Application($kernel);
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
@@ -34,10 +35,73 @@ class ApplicationTest extends TestCase
         $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
         $bundle->expects($this->once())->method('registerCommands');
 
-        $kernel = $this->getKernel(array($bundle));
+        $kernel = $this->getKernel(array($bundle), true);
 
         $application = new Application($kernel);
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
+
+        // Calling twice: registration should only be done once.
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+    }
+
+    public function testBundleCommandsAreRetrievable()
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
+        $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $application->all();
+
+        // Calling twice: registration should only be done once.
+        $application->all();
+    }
+
+    public function testBundleSingleCommandIsRetrievable()
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
+        $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+
+        $command = new Command('example');
+        $application->add($command);
+
+        $this->assertSame($command, $application->get('example'));
+    }
+
+    public function testBundleCommandCanBeFound()
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
+        $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+
+        $command = new Command('example');
+        $application->add($command);
+
+        $this->assertSame($command, $application->find('example'));
+    }
+
+    public function testBundleCommandCanBeFoundByAlias()
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
+        $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+
+        $command = new Command('example');
+        $command->setAliases(array('alias'));
+        $application->add($command);
+
+        $this->assertSame($command, $application->find('alias'));
     }
 
     public function testBundleCommandsHaveRightContainer()
@@ -46,7 +110,7 @@ class ApplicationTest extends TestCase
         $command->setCode(function () {});
         $command->expects($this->exactly(2))->method('setContainer');
 
-        $application = new Application($this->getKernel(array()));
+        $application = new Application($this->getKernel(array(), true));
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $application->add($command);
@@ -59,21 +123,23 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
-    private function getKernel(array $bundles)
+    private function getKernel(array $bundles, $useDispatcher = false)
     {
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $dispatcher
-            ->expects($this->atLeastOnce())
-            ->method('dispatch')
-        ;
-
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('get')
-            ->with($this->equalTo('event_dispatcher'))
-            ->will($this->returnValue($dispatcher))
-        ;
+
+        if ($useDispatcher) {
+            $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+            $dispatcher
+                ->expects($this->atLeastOnce())
+                ->method('dispatch')
+            ;
+            $container
+                ->expects($this->atLeastOnce())
+                ->method('get')
+                ->with($this->equalTo('event_dispatcher'))
+                ->will($this->returnValue($dispatcher));
+        }
+
         $container
             ->expects($this->once())
             ->method('hasParameter')

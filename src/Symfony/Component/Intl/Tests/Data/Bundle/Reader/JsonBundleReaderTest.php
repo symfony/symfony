@@ -32,7 +32,7 @@ class JsonBundleReaderTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/json', 'en');
 
-        $this->assertTrue(is_array($data));
+        $this->assertInternalType('array', $data);
         $this->assertSame('Bar', $data['Foo']);
         $this->assertFalse(isset($data['ExistsNot']));
     }

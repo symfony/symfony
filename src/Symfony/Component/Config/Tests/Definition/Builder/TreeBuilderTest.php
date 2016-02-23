@@ -120,7 +120,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
         $tree = $builder->buildTree();
         $children = $tree->getChildren();
 
-        $this->assertTrue(is_array($tree->getExample()));
+        $this->assertInternalType('array', $tree->getExample());
         $this->assertEquals('example', $children['child']->getExample());
     }
 }

@@ -61,9 +61,10 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass = new AutowirePass();
         $pass->process($container);
 
-        $this->assertCount(2, $container->getDefinition('g')->getArguments());
+        $this->assertCount(3, $container->getDefinition('g')->getArguments());
         $this->assertEquals('f', (string) $container->getDefinition('g')->getArgument(0));
         $this->assertEquals('f', (string) $container->getDefinition('g')->getArgument(1));
+        $this->assertEquals('f', (string) $container->getDefinition('g')->getArgument(2));
     }
 
     public function testCompleteExistingDefinition()
@@ -317,13 +318,21 @@ interface EInterface extends DInterface
 {
 }
 
-class F implements EInterface
+interface IInterface
+{
+}
+
+class I implements IInterface
+{
+}
+
+class F extends I implements EInterface
 {
 }
 
 class G
 {
-    public function __construct(DInterface $d, EInterface $e)
+    public function __construct(DInterface $d, EInterface $e, IInterface $i)
     {
     }
 }

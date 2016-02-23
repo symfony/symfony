@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-28T12:50:58Z
+
+@Triiistan could you please rebase to trigger tests again?
+
+---------------------------------------------------------------------------
+
+by Triiistan at 2015-12-28T16:19:22Z
+
+@nicolas-grekas Done
+
+---------------------------------------------------------------------------
+
+by Triiistan at 2016-01-24T14:36:59Z
+
+Fixed a typo + rebased again
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T08:02:37Z
+
+Shouldn't this be merged into older branches? It can be seen as a bug fix as having to repeat the class under the alias item seems useless.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T08:02:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Triiistan at 2016-01-25T10:07:31Z
+
+I did that because the current behavior is [already documented](https://symfony.com/doc/current/cookbook/validation/custom_constraint.html#constraint-validators-with-dependencies), so I supposed this was a new feature. But I agree with you that it looks like a bug fix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T10:22:05Z
+
+It's indeed documented as being required, so making that optional is not really a problem IMHO.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-22T16:35:01Z
+
+This contribution looks finished. Do Symfony mergers want @Triiistan to create a new pull request against 2.3 .... or can you merge this into older branches? Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-23T19:56:30Z
+
+:+1:

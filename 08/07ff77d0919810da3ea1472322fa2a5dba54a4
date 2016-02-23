@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-02-23T11:58:06Z
+
+You could add the tests to the phpunit bridge, imo the `WebTestCase` and `KernelTestCase` should go there too. Additionally any other TestCase files that are an extension point should be moved there or a special package for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-23T12:18:17Z
+
+@javiereguiluz detailed error messages look the more useful to me
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-23T14:19:25Z
+
+> Additionally any other TestCase files that are an extension point should be moved there or a special package for this.
+
+This is not always a good idea. For instance, we have a base test case for ConstraintValidator in the Validator component. Moving it to the bridge would be a pain, as the logic in the testcase depends on the version of the component. So I would vote against moving everything to the bridge.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-23T14:25:04Z
+
+> How do I validate the translation files of the Security and Form components? Do I just copy+paste this test in those components?
+
+Copy-pasting is probably the easiest here, yes. Moving this to the bridge will mean exposing it as a part of our API, which does not seem useful yet.
+
+a way to simplify the copy-pasted logic would be to use ``PHPUnit_Util_Xml::loadFile`` to perform the loading. When putting it in strict mode, it will throw a PHPUnit_Framework_Exception when the file is invalid, and include the errors in the exception message. You just have to catch this exception and use ``$this->fail($e->getMessage())`` then.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-23T14:38:55Z
+
+Refactored as suggested by Nicolas and now I'm going to try @stof's idea.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-23T14:49:04Z
+
+@stof I've applied your ideas and the tests now look very simple. I've also copy+pasted the test in the 3 components. Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-23T14:56:44Z
+
+:+1: for this. And we indeed don't need to extract this to the bridge, given how simple the logic is now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-23T15:02:09Z
+
+I've removed the `try ... catch` and the test seems to work...
+
+![output_correct](https://cloud.githubusercontent.com/assets/73419/13255515/c5beb5c2-da46-11e5-9012-1b41d29f6eeb.png)
+
+...and the output is reasonably good when there is an error:
+
+![output](https://cloud.githubusercontent.com/assets/73419/13255476/9d2c3134-da46-11e5-8d7c-f9a5037b642b.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-23T15:06:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-23T15:09:03Z
+
+:+1: (we may need the same test in one more places in Symfony 2.7+ in the Security component btw)

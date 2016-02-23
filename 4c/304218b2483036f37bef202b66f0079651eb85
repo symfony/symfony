@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-23T11:01:23Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-23T11:06:00Z
+
+:+1: for this fix
+
+@javiereguiluz it may be worth adding unit tests in the different components containing translation to assert the validaty of these files, to avoid such mistakes in the future (catching them on CI).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-23T11:10:20Z
+
+@stof good idea! I'm going to try to create a pull request for that. Thanks!

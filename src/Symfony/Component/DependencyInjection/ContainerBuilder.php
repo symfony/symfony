@@ -1079,7 +1079,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (null === $this->expressionLanguage) {
-            return new ExpressionLanguage(null, $this->expressionLanguageProviders);
+            return $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
         }
     }
 }

@@ -15,9 +15,10 @@ class TranslationFilesTest extends \PHPUnit_Framework_TestCase
 {
     public function testXlfFilesAreValid()
     {
+        libxml_use_internal_errors(true);
+
         $translationFiles = glob(__DIR__.'/../../Resources/translations/*.xlf');
         foreach ($translationFiles as $filePath) {
-            libxml_use_internal_errors(true);
             libxml_clear_errors();
             simplexml_load_file($filePath);
             $errors = libxml_get_errors();

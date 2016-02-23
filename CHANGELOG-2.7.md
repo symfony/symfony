@@ -40,7 +40,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #17129 [Config] Fix array sort on normalization in edge case (romainneutron)
  * bug #17094 [Process] More robustness and deterministic tests (nicolas-grekas)
  * bug #17112 [PropertyAccess] Reorder elements array after PropertyPathBuilder::replace (alekitto)
- * bug #16797 [Filesystem] Recursivly widen non-executable directories (Slamdunk)
+ * bug #16797 [Filesystem] Recursively widen non-executable directories (Slamdunk)
  * bug #17040 [Console] Avoid extra blank lines when rendering exceptions (ogizanagi)
  * bug #17055 [Security] Verify if a password encoded with bcrypt is no longer than 72 characters (jakzal)
  * bug #16959 [Form] fix #15544 when a collection type attribute "required" is false, "prototype" should too (HeahDude)

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
@@ -515,7 +514,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \TypeError
      */
-    public function testConvertTypeErrorToInvalidArgumentException()
+    public function testThrowTypeError()
     {
         $this->propertyAccessor->setValue(new TestClass('Kévin'), 'date', 'This is a string, \DateTime excepted.');
     }

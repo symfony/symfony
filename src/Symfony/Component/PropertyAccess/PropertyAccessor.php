@@ -541,8 +541,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string $property The property to write
      * @param mixed  $value    The value to write
      *
-     * @throws NoSuchPropertyException  If the property does not exist or is not
-     *                                  public.
+     * @throws NoSuchPropertyException If the property does not exist or is not
+     *                                 public.
      * @throws \TypeError
      */
     private function writeProperty(&$object, $property, $value)
@@ -575,7 +575,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Emulates PHP 7 behavior in PHP 5.
+     * Throws a {@see \TypeError} as in PHP 7 when using PHP 5.
      *
      * @param object $object
      * @param string $method
@@ -591,7 +591,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             return;
         }
 
-        // Emulates PHP 7 behavior
         set_error_handler(function ($errno, $errstr) use ($object, $method) {
             if (E_RECOVERABLE_ERROR === $errno && false !== strpos($errstr, sprintf('passed to %s::%s() must', get_class($object), $method))) {
                 throw new \TypeError($errstr);

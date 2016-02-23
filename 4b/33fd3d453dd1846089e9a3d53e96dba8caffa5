@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-02-22T16:44:33Z
+
+Actually, 2.7 will need both this code and the code added in the other PR (as 2.7 has both the new ``factory`` and the old ``factory-service`` features).
+So this could be inlined as these would still stay 2 separate methods in 2.7

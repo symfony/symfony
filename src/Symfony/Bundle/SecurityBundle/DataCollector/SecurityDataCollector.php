@@ -110,19 +110,17 @@ class SecurityDataCollector extends DataCollector
         }
 
         // collect voters and access decision manager information
-        $this->data['access_decision_log'] = array();
-        $this->data['voter_strategy'] = 'unknown';
-        $this->data['voters'] = array();
-
         if (null !== $this->accessDecisionManager) {
             $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
-        }
 
-        if (!empty($this->accessDecisionManager->getVoters())) {
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
                 $this->data['voters'][] = get_class($voter);
             }
+        } else {
+            $this->data['access_decision_log'] = array();
+            $this->data['voter_strategy'] = 'unknown';
+            $this->data['voters'] = array();
         }
     }
 

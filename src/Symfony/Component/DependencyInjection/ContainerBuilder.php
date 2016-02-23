@@ -1025,10 +1025,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
-            return [(string) $value];
+            return array((string) $value);
         }
 
-        return [];
+        return array();
     }
 
     /**

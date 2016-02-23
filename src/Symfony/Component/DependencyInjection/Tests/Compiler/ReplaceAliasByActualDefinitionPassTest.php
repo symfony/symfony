@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,8 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
         $aDefinition = $container->register('a', '\stdClass');
         $aDefinition->setFactoryService('b');
         $aDefinition->setFactoryMethod('createA');
+
+        $aDefinition->setFactory(array(new Reference('b'), 'createA'));
 
         $bDefinition = new Definition('\stdClass');
         $bDefinition->setPublic(false);
@@ -41,7 +44,11 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
             $container->has('b_alias') && !$container->hasAlias('b_alias'),
             '->process() replaces alias to actual.'
         );
+
         $this->assertSame('b_alias', $aDefinition->getFactoryService());
+
+        $resolvedFactory = $aDefinition->getFactory();
+        $this->assertSame('b_alias', (string) $resolvedFactory[0]);
     }
 
     /**

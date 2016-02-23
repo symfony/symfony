@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Resources;
 
-class ConstraintTest extends \PHPUnit_Framework_TestCase
+class TranslationFilesTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {

@@ -19,7 +19,7 @@ use Symfony\Component\Ldap\LdapInterface;
 /**
  * @requires extension ldap
  */
-class AdapterTest extends \PHPUnit_Framework_TestCase
+class AdapterTest extends LdapTestCase
 {
     public function testLdapEscape()
     {
@@ -33,7 +33,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testLdapQuery()
     {
-        $ldap = new Adapter(array('host' => 'localhost', 'port' => 3389));
+        $ldap = new Adapter($this->getLdapConfig());
 
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
         $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());

@@ -19,14 +19,14 @@ use Symfony\Component\Ldap\Exception\LdapException;
 /**
  * @requires extension ldap
  */
-class LdapManagerTest extends \PHPUnit_Framework_TestCase
+class LdapManagerTest extends LdapTestCase
 {
     /** @var Adapter */
     private $adapter;
 
     protected function setUp()
     {
-        $this->adapter = new Adapter(array('host' => 'localhost', 'port' => 3389));
+        $this->adapter = new Adapter($this->getLdapConfig());
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
     }
 

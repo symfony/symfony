@@ -204,7 +204,7 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>Denne samlingen må inneholde {{ limit }} element eller flere.|Denne samlingen må inneholde {{ limit }} elementer eller flere./target>
+                <target>Denne samlingen må inneholde {{ limit }} element eller flere.|Denne samlingen må inneholde {{ limit }} elementer eller flere.</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>

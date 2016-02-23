@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -588,6 +587,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function callMethod($object, $method, $value) {
         if (PHP_MAJOR_VERSION >= 7) {
             $object->{$method}($value);
+
             return;
         }
 

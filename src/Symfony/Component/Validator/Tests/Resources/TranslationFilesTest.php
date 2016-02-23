@@ -13,34 +13,23 @@ namespace Symfony\Component\Validator\Tests\Resources;
 
 class TranslationFilesTest extends \PHPUnit_Framework_TestCase
 {
-    public function testXlfFilesAreValid()
+    /**
+     * @dataProvider provideTranslationFiles
+     */
+    public function testTranslationFilesAreValid($filePath)
     {
         libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        simplexml_load_file($filePath);
 
-        $translationFiles = glob(__DIR__.'/../../Resources/translations/*.xlf');
-        foreach ($translationFiles as $filePath) {
-            libxml_clear_errors();
-            simplexml_load_file($filePath);
-            $errors = libxml_get_errors();
-
-            if (!empty($errors)) {
-                $this->renderErrors($errors);
-            }
-
-            $this->assertEmpty($errors, sprintf('The "%s" file is not a valid XML file.', realpath($filePath)));
-        }
+        $this->assertSame(array(), libxml_get_errors());
     }
 
-    private function renderErrors(array $errors)
+    public function provideTranslationFiles()
     {
-        $firstError = $errors[0];
-
-        echo sprintf("\nErrors found in '%s' file\n", basename($firstError->file));
-        echo sprintf("(path: %s)\n\n", realpath($firstError->file));
-
-        foreach ($errors as $error) {
-            echo sprintf("  Line %d, Column %d\n", $error->line, $error->column);
-            echo sprintf("  %s\n", $error->message);
-        }
+        return array_map(
+            function ($filePath) { return (array) $filePath; },
+            glob(__DIR__.'/../../Resources/translations/*.xlf')
+        );
     }
 }

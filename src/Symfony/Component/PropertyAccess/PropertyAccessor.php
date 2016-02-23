@@ -586,22 +586,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @throws \Exception
      */
     private function callMethod($object, $method, $value) {
-        // Cannot use class_exists because the PHP 7 polyfill defines \TypeError
         if (PHP_MAJOR_VERSION >= 7) {
-            // PHP 7
-            try {
-                $object->{$method}($value);
-            } catch (\TypeError $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            }
-
+            $object->{$method}($value);
             return;
         }
 
-        // PHP 5
-        set_error_handler(function ($errno, $errstr) {
-            if (E_RECOVERABLE_ERROR === $errno) {
-                throw new InvalidArgumentException($errstr);
+        // Emulates PHP 7 behavior
+        set_error_handler(function ($errno, $errstr) use ($object, $method) {
+            if (E_RECOVERABLE_ERROR === $errno && false !== strpos($errstr, sprintf('passed to %s::%s() must', get_class($object), $method))) {
+                throw new \TypeError($errstr);
             }
 
             return false;

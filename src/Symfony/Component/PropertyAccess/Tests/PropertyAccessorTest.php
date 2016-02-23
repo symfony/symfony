@@ -513,7 +513,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \TypeError
      */
     public function testConvertTypeErrorToInvalidArgumentException()
     {

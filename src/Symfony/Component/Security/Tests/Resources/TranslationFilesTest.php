@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Resources;
+namespace Symfony\Component\Security\Tests\Resources;
 
 class TranslationFilesTest extends \PHPUnit_Framework_TestCase
 {

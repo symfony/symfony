@@ -917,12 +917,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as $k => $v) {
                 $value[$k] = $this->resolveServices($v);
             }
-        } elseif ($value instanceof Reference) {
-            $value = $this->get((string) $value, $value->getInvalidBehavior());
-        } elseif ($value instanceof Definition) {
-            $value = $this->createService($value, null);
-        } elseif ($value instanceof Expression) {
-            $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
+
+            return $value;
+        }
+
+        if ($value instanceof Reference) {
+            return $this->get((string) $value, $value->getInvalidBehavior());
+        }
+
+        if ($value instanceof Definition) {
+            return $this->createService($value, null);
+        }
+
+        if ($value instanceof Expression) {
+            return $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
         }
 
         return $value;
@@ -1006,17 +1014,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public static function getServiceConditionals($value)
     {
-        $services = array();
-
         if (is_array($value)) {
+            $services = array();
+
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
-        } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
-            $services[] = (string) $value;
+
+            return $services;
         }
 
-        return $services;
+        if ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+            return [(string) $value];
+        }
+
+        return [];
     }
 
     /**
@@ -1062,13 +1074,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private function getExpressionLanguage()
     {
-        if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
-            }
-            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
+        if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
         }
 
-        return $this->expressionLanguage;
+        if (null === $this->expressionLanguage) {
+            return new ExpressionLanguage(null, $this->expressionLanguageProviders);
+        }
     }
 }

@@ -543,7 +543,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException  If the property does not exist or is not
      *                                  public.
-     * @throws InvalidArgumentException
+     * @throws \TypeError
      */
     private function writeProperty(&$object, $property, $value)
     {
@@ -575,13 +575,13 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Call a method and convert {@see \TypeError} to {@see InvalidArgumentException}.
+     * Emulates PHP 7 behavior in PHP 5.
      *
      * @param object $object
      * @param string $method
      * @param mixed  $value
      *
-     * @throws InvalidArgumentException
+     * @throws \TypeError
      * @throws \Exception
      */
     private function callMethod($object, $method, $value) {
@@ -621,7 +621,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
      *
-     * @throws InvalidArgumentException
+     * @throws \TypeError
      */
     private function writeCollection($object, $property, $collection, $addMethod, $removeMethod)
     {

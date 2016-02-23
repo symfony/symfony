@@ -48,4 +48,24 @@ class ChoiceListView
         $this->choices = $choices;
         $this->preferredChoices = $preferredChoices;
     }
+
+    /**
+     * Returns whether a placeholder is in the choices.
+     *
+     * A placeholder must be the first child element, not be in a group and have an empty value.
+     *
+     * @return bool
+     */
+    public function hasPlaceholder()
+    {
+        if ($this->preferredChoices) {
+            $firstChoice = reset($this->preferredChoices);
+
+            return $firstChoice instanceof ChoiceView && '' === $firstChoice->value;
+        }
+
+        $firstChoice = reset($this->choices);
+
+        return $firstChoice instanceof ChoiceView && '' === $firstChoice->value;
+    }
 }

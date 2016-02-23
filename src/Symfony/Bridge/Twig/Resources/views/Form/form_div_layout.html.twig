@@ -52,7 +52,7 @@
 {%- endblock choice_widget_expanded -%}
 
 {%- block choice_widget_collapsed -%}
-    {%- if required and placeholder is none and not placeholder_in_choices and not multiple -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
         {% set required = false %}
     {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>

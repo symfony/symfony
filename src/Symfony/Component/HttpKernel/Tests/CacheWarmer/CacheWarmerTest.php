@@ -32,7 +32,7 @@ class CacheWarmerTest extends \PHPUnit_Framework_TestCase
         $warmer = new TestCacheWarmer(self::$cacheFile);
         $warmer->warmUp(dirname(self::$cacheFile));
 
-        $this->assertTrue(file_exists(self::$cacheFile));
+        $this->assertFileExists(self::$cacheFile);
     }
 
     /**

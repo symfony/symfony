@@ -25,7 +25,7 @@ class TranslationFilesTest extends \PHPUnit_Framework_TestCase
     {
         return array_map(
             function ($filePath) { return (array) $filePath; },
-            glob(__DIR__.'/../../Resources/translations/*.xlf')
+            glob(dirname(dirname(__DIR__)).'/Resources/translations/*.xlf')
         );
     }
 }

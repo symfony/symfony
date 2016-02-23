@@ -16,13 +16,9 @@ class TranslationFilesTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideTranslationFiles
      */
-    public function testTranslationFilesAreValid($filePath)
+    public function testTranslationFileIsValid($filePath)
     {
-        try {
-            \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
-        } catch (\PHPUnit_Framework_Exception $e) {
-            $this->fail($e->getMessage());
-        }
+        \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
     }
 
     public function provideTranslationFiles()

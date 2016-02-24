@@ -7,7 +7,7 @@ class ProjectServiceContainer extends Container
     {
         if ($lazyLoad) {
 
-            return $this->services['foo'] = new stdClass_%s(
+            return $this->services['foo'] =%sstdClass_%s(
                 function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
                     $wrappedInstance = $this->getFooService(false);
 

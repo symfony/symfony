@@ -141,6 +141,18 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'status_text' => Response::$statusTexts[(int) $statusCode],
             ));
         }
+
+        if ($parentRequestAttributes = $request->attributes->get('_forwarded')) {
+            if ($parentRequestAttributes instanceof ParameterBag) {
+                $parentRequestAttributes->set('_forward_token', $response->headers->get('x-debug-token'));
+            }
+        }
+        if ($request->attributes->has('_forward_controller')) {
+            $this->data['forward'] = array(
+                'token' => $request->attributes->get('_forward_token'),
+                'controller' => $this->parseController($request->attributes->get('_forward_controller')),
+            );
+        }
     }
 
     public function getPathInfo()
@@ -274,9 +286,26 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return isset($this->data['redirect']) ? $this->data['redirect'] : false;
     }
 
+    /**
+     * Gets the parsed forward controller.
+     *
+     * @return array|bool An array with keys 'token' the forward profile token, and
+     *                    'controller' the parsed forward controller, false otherwise
+     */
+    public function getForward()
+    {
+        return isset($this->data['forward']) ? $this->data['forward'] : false;
+    }
+
     public function onKernelController(FilterControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
+
+        if ($parentRequestAttributes = $event->getRequest()->attributes->get('_forwarded')) {
+            if ($parentRequestAttributes instanceof ParameterBag) {
+                $parentRequestAttributes->set('_forward_controller', $event->getController());
+            }
+        }
     }
 
     public static function getSubscribedEvents()

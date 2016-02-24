@@ -13,12 +13,20 @@
         {% endset %}
     {% endif %}
 
+    {% if collector.forward %}
+        {% set forward_handler %}
+            {% import _self as helper %}
+            {{ helper.set_handler(collector.forward.controller) }}
+        {% endset %}
+    {% endif %}
+
     {% set request_status_code_color = (collector.statuscode >= 400) ? 'red' : (collector.statuscode >= 300) ? 'yellow' : 'green' %}
 
     {% set icon %}
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
+            {% if collector.forward %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">@</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
@@ -67,6 +75,18 @@
                     </span>
                 </div>
             </div>
+        {% endif %}
+		
+        {% if forward_handler is defined %}
+        	<div class="sf-toolbar-info-group">
+            	<div class="sf-toolbar-info-piece">
+                	<b>Forwarded to</b>
+                	<span>
+                    	{{ forward_handler }}
+                    	(<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+                	</span>
+            	</div>
+        	</div>
         {% endif %}
     {% endset %}
 

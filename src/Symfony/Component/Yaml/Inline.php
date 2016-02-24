@@ -201,10 +201,9 @@ class Inline
               if (Yaml::DUMP_MULTI_LINE_AS_BLOCK & $flags) {
                 if ($indent) {
                   $prefix = $indent ? str_repeat(' ', $indent) : '';
-                  return "|\n$prefix". preg_replace( '/\n/',"\n$prefix", str_replace( "\r", '', $value ) );
+                  return "|\n$prefix".preg_replace( '/\n/',"\n$prefix", str_replace( "\r", '', $value ) );
               }
             }
-
 
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);

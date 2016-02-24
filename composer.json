@@ -69,10 +69,17 @@
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
-        "monolog/monolog": "~1.3",
-        "propel/propel1": "~1.6",
-        "ircmaxell/password-compat": "~1.0",
-        "ocramius/proxy-manager": "~0.3.1"
+        "doctrine/doctrine-bundle": "~1.4",
+        "monolog/monolog": "~1.11",
+        "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
+        "egulias/email-validator": "~1.2",
+        "symfony/polyfill-apcu": "~1.1",
+        "symfony/security-acl": "~2.8|~3.0",
+        "ocramius/proxy-manager": "~0.3.1|~1.0|~2.0",
+        "phpdocumentor/reflection": "^1.0.7"
+    },
+    "conflict": {
+        "phpdocumentor/reflection": "<1.0.7"
     },
     "autoload": {
         "psr-0": { "Symfony\\": "src/" },

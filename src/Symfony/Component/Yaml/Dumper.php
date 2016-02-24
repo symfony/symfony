@@ -55,7 +55,7 @@ class Dumper
      *
      * @return string The YAML representation of the PHP value
      */
-    public function dump($input, $inline = 0, $indent = 0, $flags = 0)
+    public function dump($input, $inline = 0, $indent = 0, $absIndent = 0, $flags = 0)
     {
         if (is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
@@ -79,7 +79,7 @@ class Dumper
         $prefix = $indent ? str_repeat(' ', $indent) : '';
 
         if ($inline <= 0 || !is_array($input) || empty($input)) {
-            $output .= $prefix.Inline::dump($input, $flags);
+            $output .= $prefix.Inline::dump($input, $flags, $absIndent);
         } else {
             $isAHash = array_keys($input) !== range(0, count($input) - 1);
 
@@ -88,9 +88,10 @@ class Dumper
 
                 $output .= sprintf('%s%s%s%s',
                     $prefix,
-                    $isAHash ? Inline::dump($key, $flags).':' : '-',
+                    $isAHash ? Inline::dump($key, $flags, $absIndent).':' : '-',
                     $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $flags)
+                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $inline - 1 <= 0 ? 0 : $absIndent + $this->indentation, $flags)
+
                 ).($willBeInlined ? "\n" : '');
             }
         }

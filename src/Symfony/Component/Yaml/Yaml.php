@@ -90,7 +90,7 @@ class Yaml
      *
      * @return string A YAML string representing the original PHP array
      */
-    public static function dump($array, $inline = 2, $indent = 4, $absInden = 0,$flags = 0)
+    public static function dump($array, $inline = 2, $indent = 4, $absIndent = 0,$flags = 0)
     {
         if (is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);

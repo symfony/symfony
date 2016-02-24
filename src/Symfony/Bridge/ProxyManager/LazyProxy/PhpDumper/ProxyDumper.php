@@ -119,8 +119,6 @@ EOF;
     }
 
     /**
-     * @param Definition $definition
-     *
      * @return ClassGenerator
      */
     private function generateProxyClass(Definition $definition)

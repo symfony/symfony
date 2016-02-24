@@ -201,6 +201,7 @@ class Inline
               if (Yaml::DUMP_MULTI_LINE_AS_BLOCK & $flags) {
                 if ($indent) {
                   $prefix = $indent ? str_repeat(' ', $indent) : '';
+
                   return "|\n$prefix".preg_replace( '/\n/',"\n$prefix", str_replace( "\r", '', $value ) );
               }
             }

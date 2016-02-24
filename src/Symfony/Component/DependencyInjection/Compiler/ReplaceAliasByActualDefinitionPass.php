@@ -96,7 +96,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
                 $this->updateArgumentReferences($definition->getProperties(), $currentId, $newId)
             );
 
-            $definition->setFactoryService($this->updateFactoryServiceReference($definition->getFactoryService(), $currentId, $newId));
+            $definition->setFactoryService($this->updateFactoryServiceReference($definition->getFactoryService(false), $currentId, $newId), false);
             $definition->setFactory($this->updateFactoryReference($definition->getFactory(), $currentId, $newId));
         }
     }

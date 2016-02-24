@@ -51,9 +51,9 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testDumpContainerWithProxyServiceWillShareProxies()
     {
         if (class_exists(StaticProxyConstructor::class)) { // detecting ProxyManager v2
-            require_once __DIR__ . '/../Fixtures/php/lazy_service_with_hints.php';
+            require_once __DIR__.'/../Fixtures/php/lazy_service_with_hints.php';
         } else {
-            require_once __DIR__ . '/../Fixtures/php/lazy_service.php';
+            require_once __DIR__.'/../Fixtures/php/lazy_service.php';
         }
 
         $container = new \LazyServiceProjectServiceContainer();

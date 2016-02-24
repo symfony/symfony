@@ -77,8 +77,8 @@ class ProxyDumper implements DumperInterface
         $generatedClass = $this->generateProxyClass($definition);
 
         $constructorCall = $generatedClass->hasMethod('staticProxyConstructor')
-            ? $proxyClass . '::staticProxyConstructor'
-            : 'new ' . $proxyClass;
+            ? $proxyClass.'::staticProxyConstructor'
+            : 'new '.$proxyClass;
 
         return <<<EOF
         if (\$lazyLoad) {

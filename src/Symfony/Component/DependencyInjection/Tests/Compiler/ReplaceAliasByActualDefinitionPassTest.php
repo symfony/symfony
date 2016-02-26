@@ -23,8 +23,6 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $aDefinition = $container->register('a', '\stdClass');
-        $aDefinition->setFactoryService('b', false);
-
         $aDefinition->setFactory(array(new Reference('b'), 'createA'));
 
         $bDefinition = new Definition('\stdClass');
@@ -43,8 +41,6 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
             $container->has('b_alias') && !$container->hasAlias('b_alias'),
             '->process() replaces alias to actual.'
         );
-
-        $this->assertSame('b_alias', $aDefinition->getFactoryService(false));
 
         $resolvedFactory = $aDefinition->getFactory(false);
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);

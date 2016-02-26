@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+* added support for serializing objects that implement `JsonSerializable`
+
 2.7.0
 -----
 

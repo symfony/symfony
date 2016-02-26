@@ -963,6 +963,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'multiple' => false,
             'expanded' => true,
             'choice_translation_domain' => false,
+            'placeholder' => 'Placeholder&Not&Translated',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1034,7 +1035,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
             'expanded' => true,
-            'translation_domain' => false,
+            'required' => false,
+            'choice_translation_domain' => false,
             'placeholder' => 'Placeholder&Not&Translated',
         ));
 

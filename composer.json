@@ -86,10 +86,10 @@
         "egulias/email-validator": "~1.2",
         "symfony/polyfill-apcu": "~1.1",
         "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection": "^1.0.7"
+        "phpdocumentor/reflection-docblock": "^3.0"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection-docblock": "<3.0"
     },
     "autoload": {
         "psr-4": {

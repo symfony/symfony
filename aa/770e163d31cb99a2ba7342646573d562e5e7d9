@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-14T10:10:40Z
+
+ping @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-14T14:49:46Z
+
+Looks good to me. @maryo did you tested it? Btw, we need to add some functional tests for this set of rules.
+
+---------------------------------------------------------------------------
+
+by maryo at 2016-02-15T22:38:06Z
+
+@dunglas Yes. I tested it manually. I'll see if I can provide some functional tests.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-21T18:45:32Z
+
+:+1:

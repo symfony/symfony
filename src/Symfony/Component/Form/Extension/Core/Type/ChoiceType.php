@@ -144,6 +144,14 @@ class ChoiceType extends AbstractType
                         $event->setData(null);
                     }
                 });
+                // For radio lists, pre selection of the choice needs to pre set data
+                // with the string value so it can be matched in
+                // {@link \Symfony\Component\Form\Extension\Core\DataMapper\RadioListMapper::mapDataToForms()}
+                $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                    $choiceList = $event->getForm()->getConfig()->getOption('choice_list');
+                    $value = current($choiceList->getValuesForChoices(array($event->getData())));
+                    $event->setData((string) $value);
+                });
             }
         } elseif ($options['multiple']) {
             // <select> tag with "multiple" option

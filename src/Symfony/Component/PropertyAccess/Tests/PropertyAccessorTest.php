@@ -510,4 +510,21 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
     }
+
+    /**
+     * @expectedException \TypeError
+     */
+    public function testThrowTypeError()
+    {
+        $this->propertyAccessor->setValue(new TestClass('Kévin'), 'date', 'This is a string, \DateTime excepted.');
+    }
+
+    public function testSetTypeHint()
+    {
+        $date = new \DateTimeImmutable();
+        $object = new TestClass('Kévin');
+
+        $this->propertyAccessor->setValue($object, 'date', $date);
+        $this->assertSame($date, $object->getDate());
+    }
 }

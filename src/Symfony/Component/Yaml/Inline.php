@@ -125,7 +125,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $flags = 0)
+    public static function dump($value, $flags = 0, $indent = 0)
     {
         if (is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
@@ -165,7 +165,7 @@ class Inline
 
                 return 'null';
             case is_array($value):
-                return self::dumpArray($value, $flags);
+                return self::dumpArray($value, $flags, $indent);
             case null === $value:
                 return 'null';
             case true === $value:
@@ -197,6 +197,15 @@ class Inline
                 return $repr;
             case '' == $value:
                 return "''";
+            case strstr($value, "\n"):
+              if (Yaml::DUMP_MULTI_LINE_AS_BLOCK & $flags) {
+                if ($indent) {
+                  $prefix = $indent ? str_repeat(' ', $indent) : '';
+
+                  return "|\n$prefix".preg_replace( '/\n/',"\n$prefix", str_replace( "\r", '', $value ) );
+              }
+            }
+
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
@@ -216,7 +225,7 @@ class Inline
      *
      * @return string The YAML string representing the PHP array
      */
-    private static function dumpArray($value, $flags)
+    private static function dumpArray($value, $flags, $indent)
     {
         // array
         $keys = array_keys($value);
@@ -226,7 +235,7 @@ class Inline
         ) {
             $output = array();
             foreach ($value as $val) {
-                $output[] = self::dump($val, $flags);
+                $output[] = self::dump($val, $flags, $indent);
             }
 
             return sprintf('[%s]', implode(', ', $output));
@@ -235,7 +244,7 @@ class Inline
         // mapping
         $output = array();
         foreach ($value as $key => $val) {
-            $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
+            $output[] = sprintf('%s: %s', self::dump($key, $flags, $indent), self::dump($val, $flags, $indent));
         }
 
         return sprintf('{ %s }', implode(', ', $output));

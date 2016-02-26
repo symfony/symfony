@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-22T19:33:16Z
+
+For anyone reading this pull request, keep in mind to **not** apply this change blindly in your own projects. GitHub employees recommend to use a reasonable git depth and Travis employees say that there is no noticeable performance improvement in the majority of cases.

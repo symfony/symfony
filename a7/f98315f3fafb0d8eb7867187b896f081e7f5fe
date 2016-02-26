@@ -1,0 +1,190 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-11T09:12:53Z
+
+:+1:
+
+Status: Reviewed
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-12T08:12:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by webdevilopers at 2016-02-12T10:35:14Z
+
+Fix works! :+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-12T20:40:20Z
+
+This fix contradicts https://github.com/symfony/symfony/pull/16681/files#r45997531
+But I think @webmozart was forgetting that `false` would then conflict with the placeholder optional value.
+So changing `false` to `0` looks better to me indeed.
+But then `castableToString` must also be updated to reflect that change.
+
+Please add a test for that (which would currently fail AFAIK):
+
+```
+'choices' => [
+        'Yes'  => true,
+        'No'   => false,
+        'Undecided'   => null,
+    ],
+```
+
+null and false should not conflict and thus can both be used as `''` and `'0'` value (instead of fallback solution to use incrementing numbers).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-12T20:48:50Z
+
+Btw, this would fix `false` choices with `required => false`. But a `null` choice with required false, would still have the same problem?! IMO a placeholder value should always be different than any given choice.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-12T21:03:50Z
+
+So basically we need to map all scalars that would result in an empty string to something else to not conflict we the placeholder:
+
+I would propose this mapping:
+
+- `false` -> `0`
+- `null` -> `~`
+- <del>`''` -> `-`</del> Seems like this is supposed to be possible. It will be treated as the placeholder itself which then prevents the placeholder to be added: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php#L205
+
+And if there are still conflicts e.g. because someone has both `null` and `'~'` as choices (which would conflict with above mapping), then it still uses the incrementing numbers as fallback which is what `castableToString` ensures.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-13T06:13:17Z
+
+Thanks @Tobion for the review. You're right, `castableToString` must be refactored so when using both `boolean` and `null` values it returns true for the test you mention pass.
+
+I'm fixing it.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-13T09:09:55Z
+
+Tests are fixed.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-13T11:19:07Z
+
+The problem now is
+
+```
+'choices' => [
+    'Undecided'   => null,
+    'Yes'  => true,
+    'No'   => false,
+],
+'placeholder' => 'Please choose',
+```
+
+will not add the placeholder anymore because `null` is mapped to `''` value and thus the placeholder is ignored because the choice assumes the null is already the placeholder value. And even worse is that people cannot select `Undecided` in this required select anymore because the browser will treat it as the placeholder as well (cuz it has an empty value). Before it used incrementing integers and thus was not affected by this.
+That is why I suggested to change the mapping from `null` to something like `~` as value to not be treated as placeholder.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-13T11:32:38Z
+
+@Tobion, thanks again for the heads-up, so I keep on testing.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-18T13:11:22Z
+
+@Tobion thanks for confirming :)
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-18T14:13:20Z
+
+I think https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/DataTransformer/ChoiceToValueTransformer.php#L42 should only accept null and string.
+
+Accepting scalar seems unecessary and also conflicts with `false` -> `'0'` behavior as the string cast below is disregarding this.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-19T14:41:27Z
+
+@Tobion `ChoiceToValueTransformer` is a `ViewTransformer` and is called after the model data of the `ArrayChoiceList` is set, meaning at this time `false` is already casted to `'0'`.
+
+So I don't know if it's worth changing it.
+
+I've reverted `null` being castable to string in commit 5dabbd5.
+
+All my tests handling a `false` value pre selected are passing except the two with an expanded single choice list.
+
+I've reverted the "hack" I used to get this one passing (see https://github.com/symfony/symfony/commit/5dabbd5406025ee8091b07ec93059a847b94de54#diff-11ee91a32c601e8e1d509117556d53b3L150), because it was not working if `null` and `false` are both in choices as they use in this case a numerical index value (so `false` may be !== `'0'`) but it would fail with any object anyway as it depends on `castableToString`.
+
+I've finally managed to get it fix but it implies a little refactoring of `RadioListMapper::mapDataToForms()`.
+AFAIK it is only used by the `ChoiceList` in this special case of expanded and not multiple, I think we should do it but it might be a BC break as this method "fixed" will expect a "value" instead of a "choice" as argument.
+
+I don't know if there is some use cases where some one overrides or extends this class or even use it independently but it seems to be the only way to fix those last two tests see de27034.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-19T17:36:46Z
+
+ you are right that `ChoiceToValueTransformer` is not called with boolean. That is exactly the reason why it should also not be allowed to. Otherwise it allows things that are not consistent and behave wrong if misused.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-19T23:12:35Z
+
+@Tobion it may be not be called for `null` either at this point, shouldn't it accept strings only ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-20T01:16:29Z
+
+@Tobion also you said :
+
+>Btw, this would fix false choices with required => false. But a null choice with required false, would still have the same problem?! IMO a placeholder value should always be different than any given choice.
+
+I don't fully understand what you mean by that, is there anything more I can try to fix or a test to add ?
+
+Thanks again for you feedback so far, much appreciated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-22T00:29:18Z
+
+>  it may be not be called for null either at this point, shouldn't it accept strings only ?
+
+Normally empty strings are converted to null by the form component. So I would assume ChoiceToValueTransformer is called with null. So I guess we have to keep the null behavior.
+
+> I don't fully understand what you mean by that, is there anything more I can try to fix or a test to add ?
+
+That was when I thought null is mapped to `''` (same as false). But it uses numeric indexes then as we found out. So you can ignore that.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-22T14:19:03Z
+
+Rebased and squashed, all comments addressed.
+
+I left the `RadioListMapper` refactoring in a different commit because it solves #17789 independently and it may not be the best way to do it so I can discard it and we can keep tracking this bug in #17789.
+Be aware that merging only the first commit will add some failing tests for this.
+
+Needs a final review.

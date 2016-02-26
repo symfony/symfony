@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-16T12:06:31Z
+
+CI errors look unrelated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-18T01:06:35Z
+
+I'm not sure the current `InvalidArgumentException` is a good idea. It prevents people to actually catch a `\TypeError` on PHP 7 as they are now wrapped with a new exception. In this sense it's also a BC break.
+And the next question is why is it an `InvalidArgumentException` that extends from LogicException. To me it's more a RuntimeException as it seems impossible to detect such errors before runtime.
+
+So I would propose to not cach `\TypeError` on PHP 7 and on PHP 5 throw a fake `\TypeError` from the polyfill.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-23T16:58:43Z
+
+@Tobion I like your approach. It's now implemented like that.
+
+ping @symfony/deciders

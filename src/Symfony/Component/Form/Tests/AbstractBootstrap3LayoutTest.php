@@ -235,7 +235,6 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'choices' => array('a', 'b'),
-            'choices_as_values' => true,
             'multiple' => false,
             'expanded' => false,
             'attr' => array('size' => 2),
@@ -818,7 +817,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
             'multiple' => false,
             'expanded' => true,
-            'translation_domain' => false,
+            'required' => false,
+            'choice_translation_domain' => false,
             'placeholder' => 'Placeholder&Not&Translated',
         ));
 

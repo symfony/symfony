@@ -1306,7 +1306,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'required' => $required,
             'placeholder' => $placeholder,
             'choices' => array('Empty' => '', 'A' => 'a'),
-            'choices_as_values' => true,
         ));
         $view = $form->createView();
 

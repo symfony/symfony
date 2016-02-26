@@ -847,7 +847,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'choices_as_values' => true,
             'multiple' => false,
             'expanded' => true,
-            'translation_domain' => false,
+            'required' => false,
+            'choice_translation_domain' => false,
             'placeholder' => 'Placeholder&Not&Translated',
         ));
 

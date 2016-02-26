@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-11T08:30:34Z
+
+Isn't this the same as #17760?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-11T08:39:21Z
+
+@xabbuh indeed. But as for #17694 tests in 2.8 need FQCN or they will fail.
+Once #17760 is merged, this PR will fix them.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-02-11T09:23:42Z
+
+What if someone uses `null`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-11T09:28:35Z
+
+@iltar it returns an empty string as expected. But it was the same for `false` which caused these bugs.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-13T06:18:04Z
+
+Status : Needs Work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T05:08:27Z
+
+#17760 has been merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T05:59:38Z
+
+Is this one still needed?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-26T06:01:15Z
+
+No let's close.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-26T06:05:24Z
+
+But it would be more consistent with other tests. I missed the ping this should have been merged before #17886 :(
+
+Will there be some conflicts ? I let you decide to close then.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-26T06:15:13Z
+
+I've rebased, it's up to you.

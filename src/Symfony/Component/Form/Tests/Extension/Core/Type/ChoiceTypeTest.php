@@ -1306,7 +1306,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'required' => $required,
             'placeholder' => $placeholder,
             'choices' => array('Empty' => '', 'A' => 'a'),
-            'choices_as_values' => true,
         ));
         $view = $form->createView();
 
@@ -1496,7 +1495,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
                     '1' => '1',
                     '2' => '2',
                 ),
-                'choices_as_values' => true,
             )
         );
         $builder->add('subChoice', 'Symfony\Component\Form\Tests\Fixtures\ChoiceSubType');

@@ -1,6 +1,5 @@
 build: false
-shallow_clone: true
-platform: x86
+clone_depth: 1
 clone_folder: c:\projects\symfony
 
 cache:

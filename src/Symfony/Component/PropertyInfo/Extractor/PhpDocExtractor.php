@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use phpDocumentor\Reflection\Types\Null_;
@@ -46,9 +47,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private $contextFactory;
 
-    public function __construct()
+    public function __construct(DocBlockFactoryInterface $docBlockFactory = null)
     {
-        $this->docBlockFactory = DocBlockFactory::createInstance();
+        $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
     }
 

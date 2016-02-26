@@ -50,7 +50,10 @@
         "symfony/validator": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/property-info": "~2.8|~3.0",
-        "phpdocumentor/reflection": "^1.0.7"
+        "phpdocumentor/reflection-docblock": "^3.0"
+    },
+    "conflict": {
+        "phpdocumentor/reflection-docblock": "<3.0"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

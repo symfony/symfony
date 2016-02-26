@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T21:15:04Z
+
+Do you know when version 3.0 will be out? If it's going to be before 3.1, we can definitely merge this.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-25T21:23:23Z
+
+I don't know :/, i ask them here https://github.com/phpDocumentor/ReflectionDocBlock/issues/70
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-01-28T12:56:21Z
+
+Stable release ok for phpdocblock 3.0
+
+Ready to review poke @dunglas (i believe your are in charge of this component ?)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-01T10:30:38Z
+
+@joelwurtz this PR needs a rebase. Also, it looks like phpdocumentor/reflection-docblock 3.0.0 was released.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-02-01T19:45:43Z
+
+Rebased and fix issues from feedback.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2016-02-19T09:33:14Z
+
+Rebased on master and fix feedback, what about the conflict in the master composer.json ?

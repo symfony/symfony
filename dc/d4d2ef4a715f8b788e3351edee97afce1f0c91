@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-24T09:42:22Z
+
+Tests are actually failing globally in travis on 2.8, this PR is the fix.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-24T09:50:58Z
+
+Some builds still fail but locally tests are green. Am I missing something ? (sorry for the) ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-25T11:03:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-25T11:43:06Z
+
+@xabbuh forgive me to ask this as I don't understand, what about the failing builds ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-25T22:14:02Z
+
+@HeahDude The failing tests on AppVeyor have been fixed in the meantime (you can trigger a rebuild by push a new commit). The `deps=high` tests can fail when some tests depend on changes in a different component made in this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-25T22:24:49Z
+
+ping @symfony/deciders
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-25T23:11:25Z
+
+Ok thank you @xabbuh, I was just worried because some tests I fixed here were still failing in some travis build (with php 5.6) while the others were green (green also for my local tests and I am on php 5.6).

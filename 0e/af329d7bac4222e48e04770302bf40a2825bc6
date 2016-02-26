@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-02-23T21:35:47Z
+
+Example, with a virtual machine using port 3389:
+
+```
+LDAP_HOST=192.168.99.100 LDAP_PORT=3389 phpunit src/Symfony/Component/Ldap
+```
+
+Or, directly from the Ldap component's directory:
+
+```
+LDAP_HOST=192.168.99.100 LDAP_PORT=3389 phpunit
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-24T18:58:56Z
+
+:+1:

@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-31T13:51:49Z
+
+I left some minor comments but :+1:. It's a good improvement to the Serializer component.
+
+Do you think it's possible to add support to normalization groups, max depth and circular references handling (extending `AbstractObjectNormalizer`?).
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-01T07:49:24Z
+
+Not sure how groups would work, the interface for `JsonSerializable` is basic, it would only work if you started removing keys from whatever `jsonSerialize` returns (it doesn't have to be an array, it could be an integer for example), and if you start doing its probably easier to convert to using the `ObjectNormalizer`.
+
+Max depth and circular should be do able.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-01T13:57:38Z
+
+I've added handling of circular references, but as i updated in the description, because groups and max depth are based on property annotations I don't think it makes sense to apply them to this normalizer.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-01T14:14:15Z
+
+Fair enough. :+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-01T17:04:45Z
+
+should also be added to the component's changelog
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-02T08:18:58Z
+
+I am sort of assuming the tests not working is nothing to do with me, but could it be? I have run the same tests locally, with no fails...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-02T09:09:53Z
+
+@mcfedr That's not your fault. Our test suite is currently broken for the `3.0` and `master` branch.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-15T08:30:27Z
+
+@nicolas-grekas Can you have a look at the composer constraint changes?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-22T07:09:19Z
+
+An alternative is to register this normalizer conditionally as in #17631.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-25T07:38:44Z
+
+Updated to use the same style as @dunglas - checking for existing classes
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-25T19:03:34Z
+
+Except minor comments I left, :+1: for me.
+
+Status: Reviewed

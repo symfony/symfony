@@ -131,6 +131,6 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             return;
         }
 
-        return $currentId === $factoryService ? $newId : $currentId;
+        return $currentId === $factoryService ? $newId : $factoryService;
     }
 }

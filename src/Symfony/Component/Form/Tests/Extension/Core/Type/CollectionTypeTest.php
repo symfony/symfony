@@ -273,6 +273,9 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPrototypeData()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
@@ -288,6 +291,31 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
         $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
+    }
+
+    public function testPrototypeOptions()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'entry_options' => array(
+                'data' => 'foo',
+                'label' => 'Item:',
+                'attr' => array('class' => 'my&item&class'),
+                'label_attr' => array('class' => 'my&item&label&class'),
+            ),
+            'prototype_options' => array(
+                'data' => 'bar',
+                'label' => false,
+                'attr' => array('class' => 'my&prototype&class'),
+            ),
+        ));
+
+        $this->assertSame('bar', $form->createView()->vars['prototype']->vars['value']);
+        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
+        $this->assertSame('my&prototype&class', $form->createView()->vars['prototype']->vars['attr']['class']);
+        $this->assertSame('my&item&label&class', $form->createView()->vars['prototype']->vars['label_attr']['class']);
     }
 
     public function testPrototypeDefaultRequired()

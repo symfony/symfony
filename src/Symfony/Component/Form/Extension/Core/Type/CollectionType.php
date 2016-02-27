@@ -27,16 +27,7 @@ class CollectionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $prototypeOptions = array_replace(array(
-                'required' => $options['required'],
-                'label' => $options['prototype_name'].'label__',
-            ), $options['entry_options']);
-
-            if (null !== $options['prototype_data']) {
-                $prototypeOptions['data'] = $options['prototype_data'];
-            }
-
-            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $prototypeOptions);
+            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $options['prototype_options']);
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -81,24 +72,53 @@ class CollectionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $entryOptionsNormalizer = function (Options $options, $value) {
-            $value['block_name'] = 'entry';
+        $entryOptionsNormalizer = function (Options $options, $entryOptions) {
+            $entryOptions['block_name'] = 'entry';
 
-            return $value;
+            return $entryOptions;
+        };
+
+        $prototypeOptionsNormalizer = function (Options $options, $prototypeOptions) {
+            // Default to 'entry_options' option
+            $prototypeOptions = array_replace($options['entry_options'], $prototypeOptions);
+
+            if (null !== $options['prototype_data']) {
+                @trigger_error('The "prototype_data" option is deprecated since version 3.1 and will be removed in 4.0. You should use "prototype_options" option instead.', E_USER_DEPRECATED);
+
+                // BC, Let 'prototype_data' option override `$entryOptions['data']`
+                $prototypeOptions['data'] = $options['prototype_data'];
+            }
+
+            return array_replace(array(
+                // Use the collection required state
+                'required' => $options['required'],
+                'label' => $options['prototype_name'].'label__',
+            ), $prototypeOptions);
         };
 
         $resolver->setDefaults(array(
-            'allow_add' => false,
-            'allow_delete' => false,
-            'prototype' => true,
-            'prototype_data' => null,
-            'prototype_name' => '__name__',
             'entry_type' => __NAMESPACE__.'\TextType',
             'entry_options' => array(),
+            'prototype' => true,
+            'prototype_data' => null, // deprecated
+            'prototype_name' => '__name__',
+            'prototype_options' => array(),
+            'allow_add' => false,
+            'allow_delete' => false,
             'delete_empty' => false,
         ));
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
+        $resolver->setNormalizer('prototype_options', $prototypeOptionsNormalizer);
+
+        $resolver->setAllowedTypes('entry_type', array('string', 'Symfony\Component\Form\FormTypeInterface'));
+        $resolver->setAllowedTypes('entry_options', 'array');
+        $resolver->setAllowedTypes('prototype', 'bool');
+        $resolver->setAllowedTypes('prototype_name', 'string');
+        $resolver->setAllowedTypes('prototype_options', 'array');
+        $resolver->setAllowedTypes('allow_add', 'bool');
+        $resolver->setAllowedTypes('allow_delete', 'bool');
+        $resolver->setAllowedTypes('delete_empty', 'bool');
     }
 
     /**

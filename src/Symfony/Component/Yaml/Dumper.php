@@ -84,6 +84,16 @@ class Dumper
             $isAHash = array_keys($input) !== range(0, count($input) - 1);
 
             foreach ($input as $key => $value) {
+                if ($inline > 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n")) {
+                    $output .= sprintf("%s%s%s |\n", $prefix, $isAHash ? Inline::dump($key, $flags).':' : '-', '');
+
+                    foreach (preg_split('/\n|\r\n/', $value) as $row) {
+                        $output .= sprintf("%s%s%s\n", $prefix, str_repeat(' ', $this->indentation), $row);
+                    }
+
+                    continue;
+                }
+
                 $willBeInlined = $inline - 1 <= 0 || !is_array($value) || empty($value);
 
                 $output .= sprintf('%s%s%s%s',

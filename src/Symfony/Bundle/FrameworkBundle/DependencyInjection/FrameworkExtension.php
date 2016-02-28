@@ -1010,7 +1010,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_info.xml');
 
-        if (class_exists('phpDocumentor\Reflection\ClassReflector')) {
+        if (class_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));

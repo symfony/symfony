@@ -59,6 +59,10 @@ class ChoiceFormField extends FormField
      */
     public function isDisabled()
     {
+        if (parent::isDisabled() && 'select' === $this->type) {
+            return true;
+        }
+
         foreach ($this->options as $option) {
             if ($option['value'] == $this->value && $option['disabled']) {
                 return true;

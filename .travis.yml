@@ -2,6 +2,9 @@ language: php
 
 sudo: false
 
+git:
+    depth: 1
+
 addons:
     apt_packages:
         - parallel

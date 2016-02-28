@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+require_once __DIR__.'/../Fixtures/includes/foo.php';
+
 class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
@@ -44,6 +46,26 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
 
         $resolvedFactory = $aDefinition->getFactory(false);
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testPrivateAliasesInFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', 'FooClass');
+        $container->register('b', 'FooClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('getInstance');
+
+        $container->register('c', 'stdClass')->setPublic(false);
+        $container->setAlias('c_alias', 'c');
+
+        $this->process($container);
+
+        $this->assertInstanceOf('FooClass', $container->get('b'));
     }
 
     /**

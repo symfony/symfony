@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-08T17:22:24Z
+
+I am not convinced that we should do this for all objects. Maybe it would be better to only support this option for `stdClass` instances.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-09T09:33:22Z
+
+I agree that it should not be done for any object. It makes sense for stdClass, ArrayObject, and maybe other Traversable objects.
+
+DateTime and DateTimeImmutable should be better dumped as a Yaml timestamp (with a parser flag to parse timestamps as a DateTime rather than as an integer too btw)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-15T16:29:04Z
+
+I updated here to have the mapping only work with `stdClass` and `ArrayObject` instances instead of each and every kind of object.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T21:31:35Z
+
+see #17836 for the `DateTime` support
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T06:13:02Z
+
+This one needs to  be rebased
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-27T08:27:34Z
+
+rebased, failures are unrelated

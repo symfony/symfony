@@ -20,6 +20,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Parser
 {
+    const TAG_PATTERN = '((?P<tag>![\w!.\/:-]+) +)?';
     const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
     private $offset = 0;
@@ -516,10 +517,16 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (preg_match('/^'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
+        if (preg_match('/^'.self::TAG_PATTERN.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
-            return $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+            $data = $this->parseBlockScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), (int) abs($modifiers));
+
+            if (isset($matches['tag']) && '!!binary' === $matches['tag']) {
+                return Inline::evaluateBinaryScalar($data);
+            }
+
+            return $data;
         }
 
         try {

@@ -1120,6 +1120,87 @@ EOT
             $this->parser->parse($yaml)
         );
     }
+
+    /**
+     * @dataProvider getBinaryData
+     */
+    public function testParseBinaryData($data)
+    {
+        $this->assertSame(array('data' => 'Hello world'), $this->parser->parse($data));
+    }
+
+    public function getBinaryData()
+    {
+        return array(
+            'enclosed with double quotes' => array('data: !!binary "SGVsbG8gd29ybGQ="'),
+            'enclosed with single quotes' => array("data: !!binary 'SGVsbG8gd29ybGQ='"),
+            'containing spaces' => array('data: !!binary  "SGVs bG8gd 29ybGQ="'),
+            'in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29ybGQ=
+EOT
+    ),
+            'containing spaces in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVs bG8gd 29ybGQ=
+EOT
+    ),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidBinaryData
+     */
+    public function testParseInvalidBinaryData($data, $expectedMessage)
+    {
+        $this->setExpectedExceptionRegExp('\Symfony\Component\Yaml\Exception\ParseException', $expectedMessage);
+
+        $this->parser->parse($data);
+    }
+
+    public function getInvalidBinaryData()
+    {
+        return array(
+            'length not a multiple of four' => array('data: !!binary "SGVsbG8d29ybGQ="', '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/'),
+            'invalid characters' => array('!!binary "SGVsbG8#d29ybGQ="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'too many equals characters' => array('data: !!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'misplaced equals character' => array('data: !!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'length not a multiple of four in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8d29ybGQ=
+EOT
+                ,
+                '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/',
+            ),
+            'invalid characters in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8#d29ybGQ=
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+            'too many equals characters in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29yb===
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+            'misplaced equals character in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29ybG=Q
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+        );
+    }
 }
 
 class B

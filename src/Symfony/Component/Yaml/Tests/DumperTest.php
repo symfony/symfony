@@ -276,6 +276,22 @@ EOF;
             'paragraph-separator' => array("\t\\P", '"\t\\\\P"'),
         );
     }
+
+    public function testBinaryDataIsDumpedAsIsWithoutFlag()
+    {
+        $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
+        $expected = "{ data: '".str_replace("'", "''", $binaryData)."' }";
+
+        $this->assertSame($expected, $this->dumper->dump(array('data' => $binaryData)));
+    }
+
+    public function testBinaryDataIsDumpedBase64EncodedWithFlag()
+    {
+        $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
+        $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
+
+        $this->assertSame($expected, $this->dumper->dump(array('data' => $binaryData), 0, 0, Yaml::DUMP_BASE64_BINARY_DATA));
+    }
 }
 
 class A

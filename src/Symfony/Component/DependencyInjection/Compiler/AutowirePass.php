@@ -148,45 +148,17 @@ class AutowirePass implements CompilerPassInterface
             $this->types[$type] = $id;
         }
 
-        // Cannot use reflection if the class isn't set
-        if (!$definition->getClass()) {
+        if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {
             return;
         }
 
-        if ($reflectionClass = $this->getReflectionClass($id, $definition)) {
-            $this->extractInterfaces($id, $reflectionClass);
-            $this->extractAncestors($id, $reflectionClass);
+        foreach ($reflectionClass->getInterfaces() as $reflectionInterface) {
+            $this->set($reflectionInterface->name, $id);
         }
-    }
 
-    /**
-     * Extracts the list of all interfaces implemented by a class.
-     *
-     * @param string           $id
-     * @param \ReflectionClass $reflectionClass
-     */
-    private function extractInterfaces($id, \ReflectionClass $reflectionClass)
-    {
-        foreach ($reflectionClass->getInterfaces() as $interfaceName => $reflectionInterface) {
-            $this->set($interfaceName, $id);
-
-            $this->extractInterfaces($id, $reflectionInterface);
-        }
-    }
-
-    /**
-     * Extracts all inherited types of a class.
-     *
-     * @param string           $id
-     * @param \ReflectionClass $reflectionClass
-     */
-    private function extractAncestors($id, \ReflectionClass $reflectionClass)
-    {
-        $this->set($reflectionClass->name, $id);
-
-        if ($reflectionParentClass = $reflectionClass->getParentClass()) {
-            $this->extractAncestors($id, $reflectionParentClass);
-        }
+        do {
+            $this->set($reflectionClass->name, $id);
+        } while ($reflectionClass = $reflectionClass->getParentClass());
     }
 
     /**
@@ -256,6 +228,7 @@ class AutowirePass implements CompilerPassInterface
             return $this->reflectionClasses[$id];
         }
 
+        // Cannot use reflection if the class isn't set
         if (!$class = $definition->getClass()) {
             return;
         }

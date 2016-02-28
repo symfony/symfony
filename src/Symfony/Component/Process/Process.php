@@ -1263,8 +1263,6 @@ class Process
                 call_user_func($callback, $type, $data);
             }
         };
-
-        return $callback;
     }
 
     /**

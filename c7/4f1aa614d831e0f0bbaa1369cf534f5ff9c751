@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-20T10:35:52Z
+
+@stof In #17599 you suggested to dump binary strings with the `!!binary` tag. Do you have an idea how we can best detect such strings (dumping with the `!!binary` should still be an opt-in feature though in my opinion).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-26T12:14:48Z
+
+:+1: nice addition and perfectly tested! Thanks @xabbuh.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-26T12:24:40Z
+
+@xabbuh PHPUnit looks for control chars to detect binary strings
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-27T16:32:49Z
+
+@stof Thanks for the tip. I added support for detecting binary data and dumping them as base64 encoded strings (as an opt-in feature).

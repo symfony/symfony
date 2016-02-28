@@ -55,8 +55,8 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', 'FooClass');
-        $container->register('b', 'FooClass')
+        $container->register('a', 'Bar\FooClass');
+        $container->register('b', 'Bar\FooClass')
             ->setFactoryService('a')
             ->setFactoryMethod('getInstance');
 
@@ -65,7 +65,7 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
 
         $this->process($container);
 
-        $this->assertInstanceOf('FooClass', $container->get('b'));
+        $this->assertInstanceOf('Bar\FooClass', $container->get('b'));
     }
 
     /**

@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-24T18:59:25Z
+
+Failures seem to be unrelated with this diff.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-25T19:03:30Z
+
+I suggest applying this as a bugfix in older branches, as ProxyManager 2 is the only version being officially compatible with PHP 7 AFAIK
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-25T19:05:45Z
+
+1.x works with PHP7, but doesn't provide scalar- and return- type-hinting support, heh...
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-25T19:07:42Z
+
+OK, then that's OK to include this feature in Symfony 3.1. It will be an incentive for people to upgrade their projects to Symfony 3 if they want to use lazy services together with PHP 7 features
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-25T19:08:15Z
+
+@Ocramius please also update the composer.json of the component
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-25T19:09:22Z
+
+Thanks for the reminder!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T04:24:55Z
+
+Is it really a feature? Looks a bug fix to me. And in the linked ticket, some people seems to have this issue on 3.0 as well.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-26T09:28:20Z
+
+@fabpot this is 100% a bugfix
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-26T10:15:39Z
+
+Well, people have this issue because they install ProxyManager v2, while Symfony 3.0 does not support it. The question is whether this support is considered as a bug fix (and so should go in 2.3) or as a new feature (and so should stay in 3.1).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-28T07:36:51Z
+
+If otherwise they can't use scalar type hints on PHP 7, it's a bugfix to me.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-02-28T14:07:47Z
+
+*Please merge this as a bug fix in the currently supported releases.*
+
+@stof, @fabpot: While I'm aware only 0.5 and 1.0 Proxy Manager releases are endorsed in the documentation, I assert support for 2.x should be treated as a bugfix as the previous releases never reached parity with many PHP 5.6.x/7.x language features (for example, variadics, scalar types hints, etc) while the 2.0 release is receiving these improvements (can you correct me if I am wrong in this regard @Ocramius).
+
+Also, the 2.x code base is beautiful --- much appreciation for the amazing work by @Ocramius and other contributors to ProxyManager/zend-code/etc!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-28T14:57:12Z
+
+So, as 2.3 supports PHP 7, this is definitely a bug fix. @Ocramius Would you mind creating a PR on Symfony 2.3?
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-28T15:04:56Z
+
+@fabpot hmm, this code hasn't changed since the precambrian eon: can it be cherry-picked?
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-28T15:07:39Z
+
+Hmmm, no, never mind. Cherry-picking leads to conflicts. I'll try sending a new PR for 2.3 only
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-28T15:09:12Z
+
+Resolving the conflicts should be relatively easy. I've done most of the work but then, you need to update the tests, and I gave up :(
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-28T15:12:55Z
+
+Yeah, all those horrible `$container = $this` due to PHP 5.3 compat :-\
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-02-28T15:37:33Z
+
+PR for 2.3 @ #17947

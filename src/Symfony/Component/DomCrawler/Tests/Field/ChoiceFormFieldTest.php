@@ -120,6 +120,14 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('bar', $field->getValue());
     }
 
+    public function testSelectIsDisabled()
+    {
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => true), array('disabled' => 'disabled'));
+        $field = new ChoiceFormField($node);
+
+        $this->assertTrue($field->isDisabled(), '->isDisabled() returns true for selects with a disabled attribute');
+    }
+
     public function testMultipleSelects()
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));

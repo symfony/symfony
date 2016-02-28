@@ -1,5 +1,6 @@
 | Q             | A
 | ------------- | ---
+| Branch        | master for features and deprecations / lowest applicable and maintained version otherwise
 | Bug fix?      | yes/no
 | New feature?  | yes/no
 | BC breaks?    | yes/no

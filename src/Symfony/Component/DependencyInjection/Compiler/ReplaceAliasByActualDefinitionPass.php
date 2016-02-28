@@ -132,7 +132,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             return;
         }
 
-        return $currentId === $factoryService ? $newId : $currentId;
+        return $currentId === $factoryService ? $newId : $factoryService;
     }
 
     private function updateFactoryReference($factory, $currentId, $newId)

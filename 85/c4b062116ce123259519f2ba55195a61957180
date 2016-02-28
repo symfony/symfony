@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-27T00:08:49Z
+
+:+1:
+
+Oh my God, what a silly mistake. Thanks Wouter for the fix!
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-02-27T14:38:13Z
+
+Was the test failing before? If not, a test would be nice to prevent this bug from happening again
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-02-27T14:47:56Z
+
+@iltar I've added a test now (although this is a very specific test, so I'm not 100% sure if we should include it).

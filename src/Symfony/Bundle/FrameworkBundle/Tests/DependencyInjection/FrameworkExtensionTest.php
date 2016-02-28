@@ -486,7 +486,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(-910, $tag[0]['priority']);
     }
 
-    public function testJsonNormalizerRegistered()
+    public function testJsonSerializableNormalizerRegistered()
     {
         if (!class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
             $this->markTestSkipped('The JsonSerializableNormalizer has been introduced in the Serializer Component version 3.1.');
@@ -494,7 +494,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('full');
 
-        $definition = $container->getDefinition('serializer.normalizer.json');
+        $definition = $container->getDefinition('serializer.normalizer.json_serializable');
         $tag = $definition->getTag('serializer.normalizer');
 
         $this->assertEquals(JsonSerializableNormalizer::class, $definition->getClass());

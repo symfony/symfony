@@ -80,6 +80,37 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
     }
 
+    /**
+     * @dataProvider provideRanges
+     */
+    public function testRequestsWithoutEtag($requestRange, $offset, $length, $responseRange)
+    {
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200, array('Content-Type' => 'application/octet-stream'));
+
+        // do a request to get the LastModified
+        $request = Request::create('/');
+        $response->prepare($request);
+        $lastModified = $response->headers->get('Last-Modified');
+
+        // prepare a request for a range of the testing file
+        $request = Request::create('/');
+        $request->headers->set('If-Range', $lastModified);
+        $request->headers->set('Range', $requestRange);
+
+        $file = fopen(__DIR__.'/File/Fixtures/test.gif', 'r');
+        fseek($file, $offset);
+        $data = fread($file, $length);
+        fclose($file);
+
+        $this->expectOutputString($data);
+        $response = clone $response;
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertEquals(206, $response->getStatusCode());
+        $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
+    }
+
     public function provideRanges()
     {
         return array(
@@ -89,6 +120,25 @@ class BinaryFileResponseTest extends ResponseTestCase
             array('bytes=30-30', 30, 1, 'bytes 30-30/35'),
             array('bytes=30-34', 30, 5, 'bytes 30-34/35'),
         );
+    }
+
+    public function testRangeRequestsWithoutLastModifiedDate()
+    {
+        // prevent auto last modified
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif', 200, array('Content-Type' => 'application/octet-stream'), true, null, false, false);
+
+        // prepare a request for a range of the testing file
+        $request = Request::create('/');
+        $request->headers->set('If-Range', date('D, d M Y H:i:s').' GMT');
+        $request->headers->set('Range', 'bytes=1-4');
+
+        $this->expectOutputString(file_get_contents(__DIR__.'/File/Fixtures/test.gif'));
+        $response = clone $response;
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNull($response->headers->get('Content-Range'));
     }
 
     /**

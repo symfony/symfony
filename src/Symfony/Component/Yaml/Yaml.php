@@ -27,6 +27,7 @@ class Yaml
     const DUMP_EXCEPTION_ON_INVALID_TYPE = 16;
     const PARSE_DATETIME = 32;
     const DUMP_BASE64_BINARY_DATA = 64;
+    const DUMP_OBJECT_AS_MAP = 128;
 
     /**
      * Parses YAML into a PHP value.

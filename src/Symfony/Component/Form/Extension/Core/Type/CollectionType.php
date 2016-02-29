@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -73,14 +74,41 @@ class CollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $entryOptionsNormalizer = function (Options $options, $entryOptions) {
+            if (is_callable($entryOptions)) {
+                // Wrap the callable to override 'block_name' option value
+                return function ($entry) use ($entryOptions) {
+                    $dynamicOptions = call_user_func($entryOptions, $entry);
+
+                    if (!is_array($dynamicOptions)) {
+                        throw new InvalidOptionsException(sprintf('The "entry_options" callable should return an array but got %s', is_object($dynamicOptions) ? get_class($dynamicOptions) : gettype($dynamicOptions)));
+                    }
+
+                    $dynamicOptions['block_name'] = 'entry';
+
+                    return $dynamicOptions;
+                };
+            }
+
+            // Else $entryOption is an array
             $entryOptions['block_name'] = 'entry';
 
             return $entryOptions;
         };
 
-        $prototypeOptionsNormalizer = function (Options $options, $prototypeOptions) {
+        $prototypeOptionsNormalizer = function (Options $options, $value) {
+            if (is_callable($options['entry_options'])) {
+                // Pass the prototype data to the callable
+                $entryOptions = call_user_func(
+                    $options['entry_options'],
+                    // BC, 'prototype_data' will be removed in 4.0.
+                    $options['prototype_data'] ?: (isset($value['data']) ? $value['data'] : null)
+                );
+            } else {
+                $entryOptions = $options['entry_options'];
+            }
+
             // Default to 'entry_options' option
-            $prototypeOptions = array_replace($options['entry_options'], $prototypeOptions);
+            $prototypeOptions = array_replace($entryOptions, $value);
 
             if (null !== $options['prototype_data']) {
                 @trigger_error('The "prototype_data" option is deprecated since version 3.1 and will be removed in 4.0. You should use "prototype_options" option instead.', E_USER_DEPRECATED);
@@ -112,7 +140,7 @@ class CollectionType extends AbstractType
         $resolver->setNormalizer('prototype_options', $prototypeOptionsNormalizer);
 
         $resolver->setAllowedTypes('entry_type', array('string', 'Symfony\Component\Form\FormTypeInterface'));
-        $resolver->setAllowedTypes('entry_options', 'array');
+        $resolver->setAllowedTypes('entry_options', array('array', 'callable'));
         $resolver->setAllowedTypes('prototype', 'bool');
         $resolver->setAllowedTypes('prototype_name', 'string');
         $resolver->setAllowedTypes('prototype_options', 'array');

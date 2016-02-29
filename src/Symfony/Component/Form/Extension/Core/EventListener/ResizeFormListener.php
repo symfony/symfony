@@ -29,7 +29,9 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $type;
 
     /**
-     * @var array
+     * A callable get passed each entry as only argument.
+     *
+     * @var array|callable
      */
     protected $options;
 
@@ -52,7 +54,7 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct($type, $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -91,9 +93,10 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
+
             $form->add($name, $this->type, array_replace(array(
                 'property_path' => '['.$name.']',
-            ), $this->options));
+            ), $this->getOptionsForEntry($value)));
         }
     }
 
@@ -125,7 +128,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 if (!$form->has($name)) {
                     $form->add($name, $this->type, array_replace(array(
                         'property_path' => '['.$name.']',
-                    ), $this->options));
+                    ), $this->getOptionsForEntry($value)));
                 }
             }
         }
@@ -179,5 +182,17 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         $event->setData($data);
+    }
+
+    /**
+     * If options are dynamic pass the item value to the callable.
+     *
+     * @param mixed $value Data value of a collection item
+     *
+     * @return array The options
+     */
+    protected function getOptionsForEntry($value)
+    {
+        return is_callable($this->options) ? call_user_func($this->options, $value) : $this->options;
     }
 }

@@ -498,6 +498,14 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testThrowUnexpectedValueException()
+    {
+        $this->normalizer->denormalize(array('foo' => 'bar'), ObjectTypeHinted::class);
+    }
 }
 
 class ObjectDummy
@@ -656,5 +664,12 @@ class ObjectWithStaticPropertiesAndMethods
     public static function getBaz()
     {
         return 'L';
+    }
+}
+
+class ObjectTypeHinted
+{
+    public function setFoo(array $f)
+    {
     }
 }

@@ -116,6 +116,6 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matchingRequest = Request::create('/foo', 'GET', array(), array(), array(), array('HTTP_USER_AGENT' => 'Firefox'));
         $traces = $matcher->getTracesFromRequest($matchingRequest);
-        $this->assertEquals("Route matches!", $traces[0]['log']);
+        $this->assertEquals('Route matches!', $traces[0]['log']);
     }
 }

@@ -35,6 +35,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $rendererEngine = new TwigRendererEngine(array(
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
+            'javascript.html.twig',
         ));
         $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
 
@@ -154,6 +155,29 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
+    public function testFormJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType');
+
+        $this->assertEmpty($this->renderJavascript($form->createView()));
+    }
+
+    public function testButtonJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ButtonType');
+
+        $this->assertEmpty($this->renderJavascript($form->createView()));
+    }
+
+    public function testCustomJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TextType');
+
+        $html = $this->renderJavascript($form->createView());
+
+        $this->assertSame('<script type="text/javascript">text</script>', $html);
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
@@ -196,6 +220,11 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     protected function renderEnd(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
+    }
+
+    protected function renderJavascript(FormView $view, array $vars = array())
+    {
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'javascript', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

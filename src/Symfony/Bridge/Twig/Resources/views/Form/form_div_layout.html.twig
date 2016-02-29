@@ -305,6 +305,14 @@
     {%- endfor %}
 {% endblock form_rest %}
 
+{%- block form_javascript -%}
+    {% for child in form -%}
+        {{- form_javascript(child) -}}
+    {%- endfor %}
+{% endblock form_javascript %}
+
+{% block button_javascript '' %}
+
 {# Support #}
 
 {%- block form_rows -%}

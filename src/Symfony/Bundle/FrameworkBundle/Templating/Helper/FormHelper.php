@@ -187,6 +187,19 @@ class FormHelper extends Helper
     }
 
     /**
+     * Renders the javascript of the given view.
+     *
+     * @param FormView $view      The view to render the javascript for
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function javascript(FormView $view, array $variables = array())
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'javascript', $variables);
+    }
+
+    /**
      * Renders views which have not already been rendered.
      *
      * @param FormView $view      The parent view

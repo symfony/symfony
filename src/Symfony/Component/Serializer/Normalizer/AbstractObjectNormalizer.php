@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -172,7 +174,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
-                $this->setAttributeValue($object, $attribute, $value, $format, $context);
+                try {
+                    $this->setAttributeValue($object, $attribute, $value, $format, $context);
+                } catch (InvalidArgumentException $e) {
+                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                }
             }
         }
 

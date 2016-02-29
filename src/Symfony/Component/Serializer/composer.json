@@ -27,6 +27,9 @@
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
+    "conflict": {
+        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4"
+    },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",

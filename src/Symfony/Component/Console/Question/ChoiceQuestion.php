@@ -150,6 +150,11 @@ class ChoiceQuestion extends Question
 
                 $result = array_search($value, $choices);
 
+                // Always return numeric keys as string
+                if (false !== $result) {
+                    $result = (string) $result;
+                }
+
                 if (!$isAssoc) {
                     if (false !== $result) {
                         $result = $choices[$result];
@@ -164,7 +169,7 @@ class ChoiceQuestion extends Question
                     throw new InvalidArgumentException(sprintf($errorMessage, $value));
                 }
 
-                $multiselectChoices[] = (string) $result;
+                $multiselectChoices[] = $result;
             }
 
             if ($multiselect) {

@@ -1730,14 +1730,8 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      * @dataProvider getOptionsWithPlaceholderAndEmptyValue
      * @group legacy
      */
-    public function testPlaceholderOptionWithEmptyValueOption(
-        $multiple,
-        $expanded,
-        $required,
-        $placeholder,
-        $emptyValue,
-        $viewValue
-    ) {
+    public function testPlaceholderOptionWithEmptyValueOption($multiple, $expanded, $required, $placeholder, $emptyValue, $viewValue)
+    {
         $form = $this->factory->create('choice', null, array(
             'multiple' => $multiple,
             'expanded' => $expanded,

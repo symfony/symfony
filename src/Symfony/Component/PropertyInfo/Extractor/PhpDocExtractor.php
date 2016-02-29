@@ -193,21 +193,25 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $ucFirstProperty = ucfirst($property);
 
-        switch (true) {
-            case $docBlock = $this->getDocBlockFromProperty($class, $property):
-                $data = array($docBlock, self::PROPERTY, null);
-                break;
+        try {
+            switch (true) {
+                case $docBlock = $this->getDocBlockFromProperty($class, $property):
+                    $data = array($docBlock, self::PROPERTY, null);
+                    break;
 
-            case list($docBlock) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
-                $data = array($docBlock, self::ACCESSOR, null);
-                break;
+                case list($docBlock) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
+                    $data = array($docBlock, self::ACCESSOR, null);
+                    break;
 
-            case list($docBlock, $prefix) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
-                $data = array($docBlock, self::MUTATOR, $prefix);
-                break;
+                case list($docBlock, $prefix) = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
+                    $data = array($docBlock, self::MUTATOR, $prefix);
+                    break;
 
-            default:
-                $data = array(null, null, null);
+                default:
+                    $data = array(null, null, null);
+            }
+        } catch (\InvalidArgumentException $e) {
+            $data = array(null, null, null);
         }
 
         return $this->docBlocks[$propertyHash] = $data;

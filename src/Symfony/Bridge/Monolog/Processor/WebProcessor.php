@@ -32,6 +32,7 @@ class WebProcessor extends BaseWebProcessor
     {
         if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
             $this->serverData = $event->getRequest()->server->all();
+            $this->serverData['REMOTE_ADDR'] = $event->getRequest()->getClientIp();
         }
     }
 }

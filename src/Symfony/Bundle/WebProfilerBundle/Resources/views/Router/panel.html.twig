@@ -31,23 +31,14 @@
                 <th>Log</th>
             </tr>
             {% for trace in traces %}
-                {% if trace.level == -1 %}
-                    <tr class="status-error">
-                        <td colspan="3">
-                            {{ trace.log }}
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
-                        <td>{{ trace.name }}</td>
-                        <td>{{ trace.path }}</td>
-                        <td>{{ trace.log }}</td>
-                    </tr>
-                {% endif %}
+                <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
+                    <td>{{ trace.name }}</td>
+                    <td>{{ trace.path }}</td>
+                    <td>{{ trace.log }}</td>
+                </tr>
             {% endfor %}
         </table>
         <em><small>Note: The above matching is based on the configuration for the current router which might differ from
-        the configuration used while routing this request.
-        Logs are not available for routes that define conditions using the "request" object.</small></em>
+        the configuration used while routing this request.</small></em>
     </li>
 </ul>

@@ -18,8 +18,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * about the security voters and the decisions made by them.
  *
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ *
+ * @internal
  */
-class DebugAccessDecisionManager implements AccessDecisionManagerInterface //extends AccessDecisionManager
+class DebugAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
     private $strategy;
@@ -66,12 +68,10 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface //ext
      */
     public function getStrategy()
     {
-        // The $strategy property stores the name of its method, instead of the
-        // original strategy name. Example:
-        // method name = 'decideAffirmative', strategy = 'affirmative'
-        $strategyName = strtolower(substr($this->strategy, 6));
-
-        return $strategyName;
+        // The $strategy property is misleading because it store the name of its
+        // method (e.g. 'decideAffirmative') instead of the original strategy name
+        // (e.g. 'affirmative')
+        return strtolower(substr($this->strategy, 6));
     }
 
     /**

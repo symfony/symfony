@@ -88,7 +88,7 @@ class RouterController
             $request->getRequestServer()->get('REQUEST_METHOD'),
             $request->getRequestAttributes()->all(),
             $request->getRequestCookies()->all(),
-            [],
+            array(),
             $request->getRequestServer()->all()
         );
 

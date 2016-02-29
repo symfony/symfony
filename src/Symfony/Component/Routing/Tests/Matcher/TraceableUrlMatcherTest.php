@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -99,18 +100,22 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         return $levels;
     }
 
-    public function testExceptionOnRouteCondition()
+    public function testRoutesWithConditions()
     {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array(), array(), 'baz', array(), array(), "request.headers.get('User-Agent') matches '/firefox/i'"));
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo', array(), array(), array(), 'baz', array(), array(), "request.headers.get('User-Agent') matches '/firefox/i'"));
 
         $context = new RequestContext();
         $context->setHost('baz');
 
-        $matcher = new TraceableUrlMatcher($coll, $context);
-        $traces = $matcher->getTraces('/foo');
+        $matcher = new TraceableUrlMatcher($routes, $context);
 
-        $this->assertEquals(-1, $traces[0]['level']);
-        $this->assertRegExp('/\[ERROR\] The following exception prevented the route to be matched against application routes: "Unable to get a property on a non-object\." \(in .* line \d+\)/', $traces[0]['log']);
+        $notMatchingRequest = Request::create('/foo', 'GET');
+        $traces = $matcher->getTracesFromRequest($notMatchingRequest);
+        $this->assertEquals("Condition \"request.headers.get('User-Agent') matches '/firefox/i'\" does not evaluate to \"true\"", $traces[0]['log']);
+
+        $matchingRequest = Request::create('/foo', 'GET', array(), array(), array(), array('HTTP_USER_AGENT' => 'Firefox'));
+        $traces = $matcher->getTracesFromRequest($matchingRequest);
+        $this->assertEquals("Route matches!", $traces[0]['log']);
     }
 }

@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintD;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +52,74 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected->setGroupSequence(array('Foo', 'Entity'));
+        $expected->addConstraint(new ConstraintA());
+        $expected->addConstraint(new ConstraintB());
+        $expected->addConstraint(new Callback('validateMe'));
+        $expected->addConstraint(new Callback('validateMeStatic'));
+        $expected->addConstraint(new Callback(array('Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback')));
+        $expected->addPropertyConstraint('firstName', new NotNull());
+        $expected->addPropertyConstraint('firstName', new Range(array('min' => 3)));
+        $expected->addPropertyConstraint('firstName', new Choice(array('A', 'B')));
+        $expected->addPropertyConstraint('firstName', new All(array(new NotNull(), new Range(array('min' => 3)))));
+        $expected->addPropertyConstraint('firstName', new All(array('constraints' => array(new NotNull(), new Range(array('min' => 3))))));
+        $expected->addPropertyConstraint('firstName', new Collection(array('fields' => array(
+            'foo' => array(new NotNull(), new Range(array('min' => 3))),
+            'bar' => array(new Range(array('min' => 5))),
+        ))));
+        $expected->addPropertyConstraint('firstName', new Choice(array(
+            'message' => 'Must be one of %choices%',
+            'choices' => array('A', 'B'),
+        )));
+        $expected->addGetterConstraint('lastName', new NotNull());
+        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterConstraint('permissions', new IsTrue());
+
+        $this->assertEquals($expected, $metadata);
+    }
+
+    /**
+     * Test MetaData merge with parent annotation.
+     */
+    public function testLoadParentClassMetadata()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+
+        // Load Parent MetaData
+        $parent_metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $loader->loadClassMetadata($parent_metadata);
+
+        $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent->addConstraint(new ConstraintD(array('target' => 'Symfony\Component\Validator\Tests\Fixtures\EntityParent')));
+        $expected_parent->addPropertyConstraint('other', new NotNull());
+
+        $this->assertEquals($expected_parent, $parent_metadata);
+    }
+    /**
+     * Test MetaData merge with parent annotation.
+     */
+    public function testLoadClassMetadataAndMerge()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+
+        // Load Parent MetaData
+        $parent_metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $loader->loadClassMetadata($parent_metadata);
+
+        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+
+        // Merge parent metaData.
+        $metadata->mergeConstraints($parent_metadata);
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected_parent = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\EntityParent');
+        $expected_parent->addConstraint(new ConstraintD(array('target' => 'Symfony\Component\Validator\Tests\Fixtures\EntityParent')));
+        $expected_parent->addPropertyConstraint('other', new NotNull());
+
+        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected->mergeConstraints($expected_parent);
+
         $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new ConstraintB());

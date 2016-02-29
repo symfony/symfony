@@ -1,6 +1,14 @@
 namespaces:
   custom: Symfony\Component\Validator\Tests\Fixtures\
 
+Symfony\Component\Validator\Tests\Fixtures\EntityParent:
+  constraints:
+    # Target aware constraint
+    - Symfony\Component\Validator\Tests\Fixtures\ConstraintD: ~
+  properties:
+    other:
+      - NotNull: ~
+
 Symfony\Component\Validator\Tests\Fixtures\Entity:
   group_sequence:
     - Foo

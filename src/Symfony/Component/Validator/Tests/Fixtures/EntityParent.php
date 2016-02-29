@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @Symfony\Component\Validator\Tests\Fixtures\ConstraintD
+ */
 class EntityParent
 {
     protected $firstName;

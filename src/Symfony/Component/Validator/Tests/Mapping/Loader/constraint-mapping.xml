@@ -6,6 +6,15 @@
 
   <namespace prefix="custom">Symfony\Component\Validator\Tests\Fixtures\</namespace>
 
+  <class name="Symfony\Component\Validator\Tests\Fixtures\EntityParent">
+    <!-- Target aware constraint -->
+    <constraint name="Symfony\Component\Validator\Tests\Fixtures\ConstraintD" />
+
+      <property name="other">
+        <constraint name="NotNull" />
+      </property>
+  </class>
+
   <class name="Symfony\Component\Validator\Tests\Fixtures\Entity">
 
     <group-sequence>

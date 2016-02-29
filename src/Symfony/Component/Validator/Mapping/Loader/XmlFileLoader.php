@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\Validator\Constraints\TargetAwareConstraintInterface;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -201,6 +202,10 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($this->parseConstraints($classDescription->constraint) as $constraint) {
+            if ($constraint instanceof TargetAwareConstraintInterface) {
+                $constraint->target = $metadata->getClassName();
+            }
+
             $metadata->addConstraint($constraint);
         }
 

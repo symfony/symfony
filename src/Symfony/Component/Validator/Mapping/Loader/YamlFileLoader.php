@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\TargetAwareConstraintInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
@@ -157,6 +158,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($classDescription['constraints']) && is_array($classDescription['constraints'])) {
             foreach ($this->parseNodes($classDescription['constraints']) as $constraint) {
+                if ($constraint instanceof TargetAwareConstraintInterface) {
+                    $constraint->target = $metadata->getClassName();
+                }
+
                 $metadata->addConstraint($constraint);
             }
         }

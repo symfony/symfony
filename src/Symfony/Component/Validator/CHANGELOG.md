@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added Target Aware Constraints and its support in loaders for class constraints
+
 2.8.0
 -----
 

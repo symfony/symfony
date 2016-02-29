@@ -31,7 +31,6 @@ class LdapClient implements LdapClientInterface
     private $useStartTls;
     private $optReferrals;
     private $connection;
-    private $charmaps;
 
     /**
      * Constructor.

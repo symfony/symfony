@@ -13,7 +13,6 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\LdapException;
-use Symfony\Component\Security\Core\User\LdapUserProvider;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>

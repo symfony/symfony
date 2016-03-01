@@ -4,6 +4,8 @@ CHANGELOG
 3.1.0
 -----
 
+ * Added support for dumping multi line strings as literal blocks.
+
  * Added support for parsing base64 encoded binary data when they are tagged
    with the `!!binary` tag.
 

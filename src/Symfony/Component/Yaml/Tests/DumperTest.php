@@ -332,6 +332,21 @@ EOF;
 
         return $tests;
     }
+
+    public function testDumpMultiLineStringAsScalarBlock()
+    {
+        $data = array(
+            'data' => array(
+                'single_line' => 'foo bar baz',
+                'multi_line' => "foo\nline with trailing spaces:\n  \nbar\r\ninteger like line:\n123456789\nempty line:\n\nbaz",
+                'nested_inlined_multi_line_string' => array(
+                    'inlined_multi_line' => "foo\nbar\r\nempty line:\n\nbaz",
+                ),
+            ),
+        );
+
+        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
 }
 
 class A

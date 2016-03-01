@@ -666,7 +666,7 @@ TABLE;
                 array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
                 array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
             ))
-            ->setColumnWidths(array(15, 'auto', -1, 10));
+            ->setColumnWidths(array(15, 0, -1, 10));
 
         $style = new TableStyle();
         $style->setPadType(STR_PAD_LEFT);

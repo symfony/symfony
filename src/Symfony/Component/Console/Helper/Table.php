@@ -194,25 +194,17 @@ class Table
     }
 
     /**
-     * Sets the width for a column.
+     * Sets the minimum width of a column.
      *
-     * @param int        $columnIndex Column index.
-     * @param int|string $width       Column with in characters. Set to 'auto' to auto-fit the content.
+     * @param int $columnIndex Column index.
+     * @param int $width       Column minimum with in characters.
      *
      * @return Table
      */
     public function setColumnWidth($columnIndex, $width)
     {
         $columnIndex = intval($columnIndex);
-
-        if ('auto' !== $width) {
-            $width = intval($width);
-
-            if (-1 > $width) {
-                throw new InvalidArgumentException(sprintf('Width "%d" is not a valid column width for column %d. Expected width > 0 or "auto".',$width,$columnIndex));
-            }
-        }
-
+        $width = intval($width);
 
         $this->columnWidths[$columnIndex] = $width;
 
@@ -220,7 +212,7 @@ class Table
     }
 
     /**
-     * Set all column widths. Use 'auto' to auto-fit the content.
+     * Set the minimum width of all columns.
      *
      * @param array $widths
      *

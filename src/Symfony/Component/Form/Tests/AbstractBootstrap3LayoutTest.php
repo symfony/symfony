@@ -1005,7 +1005,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
                         ./input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
                     ]
             ]
-        /following-sibling::input[@type="hidden"][@id="name__token"][@class="form-control"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
 '
         );

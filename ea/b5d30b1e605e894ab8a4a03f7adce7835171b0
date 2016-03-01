@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-22T07:25:40Z
+
+:+1:
+
+Just a minor thing, this block https://github.com/weaverryan/symfony/blob/auto-wiring-individuals/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php#L74-L77 can now be inlined (the `$argumentExists` variable is not needed anymore).
+
+Thank for fixing this!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-29T00:47:50Z
+
+Ping @symfony/deciders - failure on appveyor is unrelated :)

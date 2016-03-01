@@ -46,9 +46,8 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
         $result = $this->manager->decide($token, $attributes, $object);
 
         $this->decisionLog[] = array(
-            'token' => $token,
             'attributes' => $attributes,
-            'object' => $object,
+            'object' => $this->getStringRepresentation($object),
             'result' => $result,
         );
 
@@ -68,7 +67,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function getStrategy()
     {
-        // The $strategy property is misleading because it store the name of its
+        // The $strategy property is misleading because it stores the name of its
         // method (e.g. 'decideAffirmative') instead of the original strategy name
         // (e.g. 'affirmative')
         return strtolower(substr($this->strategy, 6));
@@ -88,5 +87,21 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     public function getDecisionLog()
     {
         return $this->decisionLog;
+    }
+
+    /**
+     * @param  mixed $object
+     *
+     * @return string
+     */
+    private function getStringRepresentation($object)
+    {
+        if (!is_object($object)) {
+            return gettype($object);
+        }
+
+        $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);
+
+        return method_exists($object, '__toString') ? (string) $object : $objectClass.'@'.spl_object_hash($object);
     }
 }

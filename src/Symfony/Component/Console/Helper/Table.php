@@ -207,15 +207,12 @@ class Table
 
         if ('auto' !== $width) {
             $width = intval($width);
+
+            if (-1 > $width) {
+                throw new InvalidArgumentException(sprintf('Width "%d" is not a valid column width for column %d. Expected width > 0 or "auto".',$width,$columnIndex));
+            }
         }
 
-        if ('auto' !== $width && 0 >= $width) {
-            throw new InvalidArgumentException(sprintf(
-                'Width "%d" is not a valid column width for column %d. Expected width > 0 or \'auto\'.',
-                $width,
-                $columnIndex
-            ));
-        }
 
         $this->columnWidths[$columnIndex] = $width;
 
@@ -237,20 +234,6 @@ class Table
         }
 
         return $this;
-    }
-
-    /**
-     * Gets the column's declared width.
-     *
-     * If no width was set, it returns the default 'auto'.
-     *
-     * @param int $columnIndex
-     *
-     * @return int|string
-     */
-    public function getColumnWidth($columnIndex)
-    {
-        return isset($this->columnWidths[$columnIndex]) ? $this->columnWidths[$columnIndex] : 'auto';
     }
 
     public function setHeaders(array $headers)
@@ -674,7 +657,9 @@ class Table
             }
         }
 
-        return max($cellWidth, $this->getColumnWidth($column));
+        $columnWidth = isset($this->columnWidths[$column]) ? $this->columnWidths[$column] : 0;
+
+        return max($cellWidth, $columnWidth);
     }
 
     /**

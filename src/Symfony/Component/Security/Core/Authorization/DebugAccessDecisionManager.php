@@ -102,7 +102,14 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);
-        $objectAsString = method_exists($object, '__toString') ? (string) $object : 'object hash: '.spl_object_hash($object);
+
+        if (method_exists($object, 'getId')) {
+            $objectAsString = sprintf('ID: %s', $object->getId());
+        } elseif (method_exists($object, '__toString')) {
+            $objectAsString = (string) $object;
+        } else {
+            $objectAsString = sprintf('object hash: %s', spl_object_hash($object));
+        }
 
         return sprintf('%s (%s)', $objectClass, $objectAsString);
     }

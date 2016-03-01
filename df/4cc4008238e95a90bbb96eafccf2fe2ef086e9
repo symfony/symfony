@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by satanasdiabolo at 2016-01-27T13:16:47Z
+
+The widget `choice_widget_collapsed` also need to be modified to remove the `form-control` class.
+Maybe I was unclear about this in my comment on the ticket.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T14:25:19Z
+
+@satanasdiabolo I've removed the `form-control` class from `<select>` elements too, as Bootstrap does. But beware that this change can severely change the look of your application. This is what happened to one of my applications:
+
+#### Before
+![select_before](https://cloud.githubusercontent.com/assets/73419/12616201/21c207a4-c50a-11e5-94d9-f9fd2e781020.png)
+
+#### After
+![select_after](https://cloud.githubusercontent.com/assets/73419/12616203/2497aa10-c50a-11e5-8cb6-5d1d1f4496b9.png)
+
+---------------------------------------------------------------------------
+
+by michaelPf85 at 2016-01-27T14:33:56Z
+
+@javiereguiluz You shouldn't remove it from the select. In the issue I gave the list of "input" types that were intended to be used with the "form-control" class but I forgot to cite "select" and "textarea" as they seemed "off topic", I might have been wrong.
+
+```less
+// Common form controls
+//
+// Shared size and type resets for form controls. Apply `.form-control` to any
+// of the following form controls:
+//
+// select
+// textarea
+// input[type="text"]
+// input[type="password"]
+// input[type="datetime"]
+// input[type="datetime-local"]
+// input[type="date"]
+// input[type="month"]
+// input[type="time"]
+// input[type="week"]
+// input[type="number"]
+// input[type="email"]
+// input[type="url"]
+// input[type="search"]
+// input[type="tel"]
+// input[type="color"]
+
+.form-control {
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T14:36:42Z
+
+@michaelPf85 thanks. I've reverted the last change.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-11T14:27:09Z
+
+I don't understand the failed tests. They refer to the `vendor/` dir inside the Twig Bridge:
+
+```
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:84
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:106
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractBootstrap3LayoutTest.php:697
+```
+
+Can we ignore these fails or should we do something else? Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-16T03:36:59Z
+
+It seems like 02b06e5 is not committed in those failing tests, see [this line](https://travis-ci.org/symfony/symfony/jobs/108056570#L2303) `[@class="form-control"]` is still there.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-16T06:53:41Z
+
+@javiereguiluz Can you finish this one and fix the tests?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-16T15:29:07Z
+
+I've got the same problem in my tests of #17609, could something go wrong with travis ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T16:52:22Z
+
+Looks like you need to bump requirements of the Form component in the TwigBridge or make it flexible enough to provide output that satisfied all versions.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-17T16:54:53Z
+
+@xabbuh thanks for the hint. Do you have any proposal for the new requirements to use? Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T17:03:41Z
+
+@javiereguiluz I think changing the version constraint from `~2.7,>=2.7.8` to `~2.7,>=2.7.10` should make the low dependency tests pass.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-17T17:05:25Z
+
+@xabbuh thank you! I've changed it. Let's see if tests go green again.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T17:14:20Z
+
+@javiereguiluz sorry, I forgot about 2.8, please try `~2.7.10|~2.8.3`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:50:41Z
+
+Tests are still red.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T07:08:19Z
+
+@fabpot This failure is expected as the subtree split of the Form component doesn't know anything about the updated tests here (only the `deps=high` tests for the TwigBridge are failing).
+
+:+1:
+
+Status: Reviewed

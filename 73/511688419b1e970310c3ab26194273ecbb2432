@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-13T14:46:15Z
+
+I'm :+1: for the idea of this pull request, but I have some comments and questions.
+
+1) I don't like the use of the "Fixed" word. In the Console component, column widths are always "fixed". The only difference is whether they are `auto` or, if this PR is merged, set explicitly:
+
+```diff
+-->setColumnFixedWidth(0, 15)
++->setColumnWidth(0, 15);
+```
+
+2) Maybe we could add support for 'auto' as the value of the column width, for those developers who prefer to define all widths explicitly:
+
+```php
+->setColumnWidth(0, 15)
+->setColumnWidth(1, 'auto')
+->setColumnWidth(2, 25);
+->setColumnWidth(3, 'auto')
+```
+
+3) Maybe we could also add a shortcut method to define all the column widths at once:
+
+```php
+$table
+    ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+    ->setColumnWidths(array('13', 'auto', 'auto', '5'))
+    ->setRows(array(
+        // ...
+    ))
+```
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-02-13T16:09:51Z
+
+Thanks for your input.
+
+1) I used the word 'fixed' to distinguish this feature's config from the already internally used 'columnWidths' (which is used to cache the calculated (effective) column widths). So maybe I can do some renaming there, because the setters (and thus getters) you proposed do sound more straight forward. I'm thinking of renaming that cache to 'effectiveColumnWidth', so I can use 'columnWidth', 'setColumnWidth', 'getColumnWidth', 'setColumnWidths', and 'getColumnWidths'. The property I'm then going to rename is private, so it shouldn't have too much impact on other stuff.
+
+2) The 'auto' thing sounds like a good plan, as it's more clear than just using 0. Internally it will be converted to 0, as it allows easy calculating. Especially while the set width kind of represents the minimum width and will stretch when the content of a row demands more space. If someone thinks it's needed I can, of course, always look into other modes, like trimming and/or wrapping.
+
+3) Sounds good.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T05:19:37Z
+
+@akeeman Can you submit a documentation pull request (on symfony/symfony-docs) to document this new feature? Can you also add a small note about this in the component CHANGELOG? Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-27T20:37:59Z
+
+@fabpot Was it intended to close here?
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-02-28T10:58:27Z
+
+I did already [provide the documentation](https://github.com/symfony/symfony-docs/pull/6296), but as this PR is closed cannot [provide the change log line](https://github.com/akeeman/symfony/commit/c6b528564852f53893c74ca2f7dfee2b45333561) along with this PR.
+
+```diff
+diff --git a/src/Symfony/Component/Console/CHANGELOG.md b/src/Symfony/Component/Console/CHANGELOG.md
+index 6d4e0f9..df37640 100644
+--- a/src/Symfony/Component/Console/CHANGELOG.md
++++ b/src/Symfony/Component/Console/CHANGELOG.md
+@@ -5,6 +5,7 @@ CHANGELOG
+ -----
+
+  * added truncate method to FormatterHelper
++ * added setColumnWidth(s) method to Table
+
+ 2.8.3
+ -----
+```
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-02-28T18:28:25Z
+
+The code and change log line are now given in this PR, where some documentation is provided [here](https://github.com/symfony/symfony-docs/pull/6296). Let me know if there is any further feedback. If not, I consider this PR finished.
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-02-28T18:29:39Z
+
+(Woops, wrong button)
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-03-01T14:52:38Z
+
+Given that the column width is the maximum value over the cell's content width and the int casted column width that is given to the setColumnWidth or setColumnWidths method, the values -1, 0 or "auto" will result in the same behavior.
+I think the support for 'auto' as a valid value makes these methods easier to use. One does not have to think about the way a column's width is calculated to have an automatically set width.
+As it doen't matter that much, I've added the support for all three values: 0, -1, and "auto". (These are documented too.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-01T14:53:45Z
+
+I still think that "auto" support should be removed. Mixing strings with integer is not a good idea IMO.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T15:00:58Z
+
+And it's ugly when using tools such as `CoreSphere/console-bundle` or IDE.
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-03-01T15:08:47Z
+
+It was a wish of your fellow member. However, it has been removed as it keeps the whole thing simpler anyway.

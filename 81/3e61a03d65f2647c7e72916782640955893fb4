@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T04:48:27Z
+
+I'm :+1: for this addition, but I made several comments about the implementation.
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-27T13:50:50Z
+
+@fabpot Comments addressed
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-01-27T14:00:47Z
+
+The failing tests seems to not be related.
+
+```sh
+Fatal error: Call to undefined method Symfony\Component\DependencyInjection\Definition::getParent() in /home/travis/build/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php on line 535
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-01-30T08:29:48Z
+
+Can we add a check to the constraint that ensures that the format string is something that is understood by `DateTime::createFormFormat()`?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-10T16:57:26Z
+
+@dosten Can you make the missing changes?
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-10T17:20:08Z
+
+@xabbuh I'll work on this ASAP
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-15T23:39:00Z
+
+@xabbuh The `DateTime::createFromFormat()` method can return `false` when the given string does not match the format, but this is already covered by this statement: https://github.com/dosten/symfony/blob/validator/add-datetime-format/src/Symfony/Component/Validator/Constraints/DateTimeValidator.php#L51-L58
+Also, the format can be anything, for example this code is valid: `DateTime::createFromFormat('foo', 'foo')`, so, any string is understood by  `DateTime::createFromFormat()`
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-19T17:16:02Z
+
+Thanks for that feature :+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-26T04:40:06Z
+
+Some feedback? @xabbuh @webmozart @fabpot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-27T18:52:48Z
+
+@dosten But wouldn't be better to use a different error code if the format string cannot be parsed?
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-27T22:47:37Z
+
+@xabbuh can you give an example of a "unparsable" format?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-28T09:12:25Z
+
+@dosten Take this example:
+
+```php
+$date = \DateTime::createFromFormat('f.m.Y', '27.02.2016');
+```
+
+`\DateTime::getLastErrors()` will now contain something like this:
+
+```
+Array (
+    [warning_count] => 0
+    [warnings] => Array
+        (
+        )
+
+    [error_count] => 3
+    [errors] => Array
+        (
+            [0] => The format separator does not match
+            [1] => The separation symbol could not be found
+            [5] => Trailing data
+        )
+
+)
+```
+
+see https://3v4l.org/tTAvU
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:54:54Z
+
+@dosten Any news on this one?
+
+---------------------------------------------------------------------------
+
+by dosten at 2016-02-29T17:46:53Z
+
+@fabpot @xabbuh The "f" format char does not exists, so your code is expecting a format like: "f.02.2016":
+
+```php
+$date = \DateTime::createFromFormat('f.m.Y', 'f.02.2016');
+```
+
+`\DateTime::getLastErrors()` will now contain something like this:
+
+```
+Array
+(
+    [warning_count] => 0
+    [warnings] => Array
+        (
+        )
+
+    [error_count] => 0
+    [errors] => Array
+        (
+        )
+
+)
+```
+
+If you pass "27.02.2016" the validator will add a INVALID_FORMAT_ERROR violation, IMO this is correct.
+I can add a test case for this to prove that this works correctly.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T07:21:58Z
+
+Ah yes, you are right. I missed that you have to use these characters if they are present in the user input. Sorry for the confusion.
+
+:+1:
+
+Status: Reviewed

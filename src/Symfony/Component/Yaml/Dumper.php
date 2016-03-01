@@ -30,6 +30,10 @@ class Dumper
      */
     public function __construct($indentation = 4)
     {
+        if ($indentation < 1) {
+            throw new \InvalidArgumentException('The indentation must be greater than zero.');
+        }
+
         $this->indentation = $indentation;
     }
 

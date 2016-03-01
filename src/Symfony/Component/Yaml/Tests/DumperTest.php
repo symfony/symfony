@@ -347,6 +347,24 @@ EOF;
 
         $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The indentation must be greater than zero
+     */
+    public function testZeroIndentationInConstructorThrowsException()
+    {
+        new Dumper(0);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The indentation must be greater than zero
+     */
+    public function testNegativeIndentationInConstructorThrowsException()
+    {
+        new Dumper(-4);
+    }
 }
 
 class A

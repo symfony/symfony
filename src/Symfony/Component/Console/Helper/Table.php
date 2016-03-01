@@ -196,8 +196,8 @@ class Table
     /**
      * Sets the minimum width of a column.
      *
-     * @param int $columnIndex Column index.
-     * @param int $width       Column minimum with in characters.
+     * @param int $columnIndex Column index
+     * @param int $width       Minimum column width in characters
      *
      * @return Table
      */
@@ -209,7 +209,7 @@ class Table
     }
 
     /**
-     * Set the minimum width of all columns.
+     * Sets the minimum width of all columns.
      *
      * @param array $widths
      *

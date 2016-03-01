@@ -36,7 +36,7 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testUseRequestClientIp()
     {
-        Request::setTrustedProxies(['192.168.0.1']);
+        Request::setTrustedProxies(array('192.168.0.1'));
         list($event, $server) = $this->createRequestEvent(array('X_FORWARDED_FOR' => '192.168.0.2'));
 
         $processor = new WebProcessor();

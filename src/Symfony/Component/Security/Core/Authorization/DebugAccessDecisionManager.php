@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -101,7 +102,8 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);
+        $objectAsString = method_exists($object, '__toString') ? (string) $object : 'object hash: '.spl_object_hash($object);
 
-        return method_exists($object, '__toString') ? (string) $object : $objectClass.'@'.spl_object_hash($object);
+        return sprintf('%s (%s)', $objectClass, $objectAsString);
     }
 }

@@ -90,7 +90,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * @param  mixed $object
+     * @param mixed $object
      *
      * @return string
      */

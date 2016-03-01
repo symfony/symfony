@@ -105,7 +105,11 @@ class ControllerResolver implements ControllerResolverInterface
         $arguments = array();
         foreach ($parameters as $param) {
             if (array_key_exists($param->name, $attributes)) {
-                $arguments[] = $attributes[$param->name];
+                if (PHP_VERSION_ID >= 50600 && $param->isVariadic() && is_array($attributes[$param->name])) {
+                    $arguments = array_merge($arguments, array_values($attributes[$param->name]));
+                } else {
+                    $arguments[] = $attributes[$param->name];
+                }
             } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {

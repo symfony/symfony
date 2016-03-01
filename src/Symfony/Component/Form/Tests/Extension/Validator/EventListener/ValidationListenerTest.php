@@ -63,32 +63,6 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->params = array('foo' => 'bar');
     }
 
-    private function getConstraintViolation($code = null)
-    {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
-    }
-
-    private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
-    {
-        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
-        $builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
-        $builder->setAttribute('error_mapping', array());
-        $builder->setErrorBubbling(false);
-        $builder->setMapped(true);
-
-        return $builder;
-    }
-
-    private function getForm($name = 'name', $propertyPath = null, $dataClass = null)
-    {
-        return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
-    }
-
-    private function getMockForm()
-    {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
-    }
-
     // More specific mapping tests can be found in ViolationMapperTest
     public function testMapViolation()
     {
@@ -137,5 +111,31 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('mapViolation');
 
         $this->listener->validateForm(new FormEvent($form, null));
+    }
+
+    private function getConstraintViolation($code = null)
+    {
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
+    }
+
+    private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
+    {
+        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
+        $builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
+        $builder->setAttribute('error_mapping', array());
+        $builder->setErrorBubbling(false);
+        $builder->setMapped(true);
+
+        return $builder;
+    }
+
+    private function getForm($name = 'name', $propertyPath = null, $dataClass = null)
+    {
+        return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
+    }
+
+    private function getMockForm()
+    {
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 }

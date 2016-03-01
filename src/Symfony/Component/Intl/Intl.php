@@ -99,6 +99,13 @@ final class Intl
     private static $entryReader;
 
     /**
+     * This class must not be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Returns whether the intl extension is installed.
      *
      * @return bool Returns true if the intl extension is installed, false otherwise.
@@ -262,12 +269,5 @@ final class Intl
         }
 
         return self::$entryReader;
-    }
-
-    /**
-     * This class must not be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

@@ -28,6 +28,14 @@ class ListCommand extends Command
     /**
      * {@inheritdoc}
      */
+    public function getNativeDefinition()
+    {
+        return $this->createDefinition();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -53,14 +61,6 @@ It's also possible to get raw list of commands (useful for embedding command run
 EOF
             )
         ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNativeDefinition()
-    {
-        return $this->createDefinition();
     }
 
     /**

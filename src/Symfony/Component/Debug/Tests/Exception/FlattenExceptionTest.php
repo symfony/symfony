@@ -208,11 +208,6 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotContains('*value1*', $serializeTrace);
     }
 
-    private function createException($foo)
-    {
-        return new \Exception();
-    }
-
     public function testSetTraceIncompleteClass()
     {
         $flattened = FlattenException::create(new \Exception('test', 123));
@@ -252,5 +247,10 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         ), $flattened->toArray());
+    }
+
+    private function createException($foo)
+    {
+        return new \Exception();
     }
 }

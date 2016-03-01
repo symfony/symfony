@@ -19,6 +19,13 @@ namespace Symfony\Component\Intl\Util;
 class IcuVersion
 {
     /**
+     * Must not be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Compares two ICU versions with an operator.
      *
      * This method is identical to {@link version_compare()}, except that you
@@ -96,12 +103,5 @@ class IcuVersion
         }
 
         return Version::normalize($version, $precision);
-    }
-
-    /**
-     * Must not be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

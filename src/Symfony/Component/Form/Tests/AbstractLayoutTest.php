@@ -32,95 +32,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         parent::setUp();
     }
 
-    protected function getExtensions()
-    {
-        return array(
-            new CsrfExtension($this->csrfProvider),
-        );
-    }
-
     protected function tearDown()
     {
         $this->csrfProvider = null;
 
         parent::tearDown();
     }
-
-    protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)
-    {
-        $xpath = new \DOMXPath($element->ownerDocument);
-        $nodeList = $xpath->evaluate($expression);
-        $this->assertEquals(1, $nodeList->length);
-        $this->assertEquals($nodeValue, $nodeList->item(0)->nodeValue);
-    }
-
-    protected function assertMatchesXpath($html, $expression, $count = 1)
-    {
-        $dom = new \DomDocument('UTF-8');
-        try {
-            // Wrap in <root> node so we can load HTML with multiple tags at
-            // the top level
-            $dom->loadXML('<root>'.$html.'</root>');
-        } catch (\Exception $e) {
-            $this->fail(sprintf(
-                "Failed loading HTML:\n\n%s\n\nError: %s",
-                $html,
-                $e->getMessage()
-            ));
-        }
-        $xpath = new \DOMXPath($dom);
-        $nodeList = $xpath->evaluate('/root'.$expression);
-
-        if ($nodeList->length != $count) {
-            $dom->formatOutput = true;
-            $this->fail(sprintf(
-                "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
-                $expression,
-                $count == 1 ? 'once' : $count.' times',
-                $nodeList->length == 1 ? 'once' : $nodeList->length.' times',
-                // strip away <root> and </root>
-                substr($dom->saveHTML(), 6, -8)
-            ));
-        }
-    }
-
-    protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
-    {
-        // include ampersands everywhere to validate escaping
-        $html = $this->renderWidget($view, array_merge(array(
-            'id' => 'my&id',
-            'attr' => array('class' => 'my&class'),
-        ), $vars));
-
-        $xpath = trim($xpath).'
-    [@id="my&id"]
-    [@class="my&class"]';
-
-        $this->assertMatchesXpath($html, $xpath);
-    }
-
-    abstract protected function renderForm(FormView $view, array $vars = array());
-
-    protected function renderEnctype(FormView $view)
-    {
-        $this->markTestSkipped(sprintf('Legacy %s::renderEnctype() is not implemented.', get_class($this)));
-    }
-
-    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
-
-    abstract protected function renderErrors(FormView $view);
-
-    abstract protected function renderWidget(FormView $view, array $vars = array());
-
-    abstract protected function renderRow(FormView $view, array $vars = array());
-
-    abstract protected function renderRest(FormView $view, array $vars = array());
-
-    abstract protected function renderStart(FormView $view, array $vars = array());
-
-    abstract protected function renderEnd(FormView $view, array $vars = array());
-
-    abstract protected function setTheme(FormView $view, array $themes);
 
     /**
      * @group legacy
@@ -1914,4 +1831,87 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html, '/form//input[@title="[trans]Foo[/trans]"]');
         $this->assertMatchesXpath($html, '/form//input[@placeholder="[trans]Bar[/trans]"]');
     }
+
+    protected function getExtensions()
+    {
+        return array(
+            new CsrfExtension($this->csrfProvider),
+        );
+    }
+
+    protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)
+    {
+        $xpath = new \DOMXPath($element->ownerDocument);
+        $nodeList = $xpath->evaluate($expression);
+        $this->assertEquals(1, $nodeList->length);
+        $this->assertEquals($nodeValue, $nodeList->item(0)->nodeValue);
+    }
+
+    protected function assertMatchesXpath($html, $expression, $count = 1)
+    {
+        $dom = new \DomDocument('UTF-8');
+        try {
+            // Wrap in <root> node so we can load HTML with multiple tags at
+            // the top level
+            $dom->loadXML('<root>'.$html.'</root>');
+        } catch (\Exception $e) {
+            $this->fail(sprintf(
+                "Failed loading HTML:\n\n%s\n\nError: %s",
+                $html,
+                $e->getMessage()
+            ));
+        }
+        $xpath = new \DOMXPath($dom);
+        $nodeList = $xpath->evaluate('/root'.$expression);
+
+        if ($nodeList->length != $count) {
+            $dom->formatOutput = true;
+            $this->fail(sprintf(
+                "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
+                $expression,
+                $count == 1 ? 'once' : $count.' times',
+                $nodeList->length == 1 ? 'once' : $nodeList->length.' times',
+                // strip away <root> and </root>
+                substr($dom->saveHTML(), 6, -8)
+            ));
+        }
+    }
+
+    protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
+    {
+        // include ampersands everywhere to validate escaping
+        $html = $this->renderWidget($view, array_merge(array(
+            'id' => 'my&id',
+            'attr' => array('class' => 'my&class'),
+        ), $vars));
+
+        $xpath = trim($xpath).'
+    [@id="my&id"]
+    [@class="my&class"]';
+
+        $this->assertMatchesXpath($html, $xpath);
+    }
+
+    abstract protected function renderForm(FormView $view, array $vars = array());
+
+    protected function renderEnctype(FormView $view)
+    {
+        $this->markTestSkipped(sprintf('Legacy %s::renderEnctype() is not implemented.', get_class($this)));
+    }
+
+    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
+
+    abstract protected function renderErrors(FormView $view);
+
+    abstract protected function renderWidget(FormView $view, array $vars = array());
+
+    abstract protected function renderRow(FormView $view, array $vars = array());
+
+    abstract protected function renderRest(FormView $view, array $vars = array());
+
+    abstract protected function renderStart(FormView $view, array $vars = array());
+
+    abstract protected function renderEnd(FormView $view, array $vars = array());
+
+    abstract protected function setTheme(FormView $view, array $themes);
 }

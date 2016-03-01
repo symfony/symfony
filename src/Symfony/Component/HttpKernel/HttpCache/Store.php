@@ -212,18 +212,6 @@ class Store implements StoreInterface
     }
 
     /**
-     * Returns content digest for $response.
-     *
-     * @param Response $response
-     *
-     * @return string
-     */
-    protected function generateContentDigest(Response $response)
-    {
-        return 'en'.sha1($response->getContent());
-    }
-
-    /**
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
@@ -250,6 +238,41 @@ class Store implements StoreInterface
         if ($modified && false === $this->save($key, serialize($entries))) {
             throw new \RuntimeException('Unable to store the metadata.');
         }
+    }
+
+    /**
+     * Purges data for the given URL.
+     *
+     * @param string $url A URL
+     *
+     * @return bool true if the URL exists and has been purged, false otherwise
+     */
+    public function purge($url)
+    {
+        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+            unlink($path);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getPath($key)
+    {
+        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
+    }
+
+    /**
+     * Returns content digest for $response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function generateContentDigest(Response $response)
+    {
+        return 'en'.sha1($response->getContent());
     }
 
     /**
@@ -299,24 +322,6 @@ class Store implements StoreInterface
     }
 
     /**
-     * Purges data for the given URL.
-     *
-     * @param string $url A URL
-     *
-     * @return bool true if the URL exists and has been purged, false otherwise
-     */
-    public function purge($url)
-    {
-        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
-            unlink($path);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Loads data for the given key.
      *
      * @param string $key The store key
@@ -361,11 +366,6 @@ class Store implements StoreInterface
         }
 
         @chmod($path, 0666 & ~umask());
-    }
-
-    public function getPath($key)
-    {
-        return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
     }
 
     /**

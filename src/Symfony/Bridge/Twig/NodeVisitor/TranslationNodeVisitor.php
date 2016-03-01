@@ -45,6 +45,14 @@ class TranslationNodeVisitor extends \Twig_BaseNodeVisitor
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doEnterNode(\Twig_Node $node, \Twig_Environment $env)
     {
         if (!$this->enabled) {
@@ -88,14 +96,6 @@ class TranslationNodeVisitor extends \Twig_BaseNodeVisitor
     protected function doLeaveNode(\Twig_Node $node, \Twig_Environment $env)
     {
         return $node;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
-    {
-        return 0;
     }
 
     /**

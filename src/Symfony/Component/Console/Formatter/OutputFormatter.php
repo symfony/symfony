@@ -23,26 +23,6 @@ class OutputFormatter implements OutputFormatterInterface
     private $styleStack;
 
     /**
-     * Escapes "<" special char in given text.
-     *
-     * @param string $text Text to escape
-     *
-     * @return string Escaped text
-     */
-    public static function escape($text)
-    {
-        $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
-
-        if ('\\' === substr($text, -1)) {
-            $len = strlen($text);
-            $text = rtrim($text, '\\');
-            $text .= str_repeat('<<', $len - strlen($text));
-        }
-
-        return $text;
-    }
-
-    /**
      * Initializes console output formatter.
      *
      * @param bool                            $decorated Whether this formatter should actually decorate strings
@@ -62,6 +42,26 @@ class OutputFormatter implements OutputFormatterInterface
         }
 
         $this->styleStack = new OutputFormatterStyleStack();
+    }
+
+    /**
+     * Escapes "<" special char in given text.
+     *
+     * @param string $text Text to escape
+     *
+     * @return string Escaped text
+     */
+    public static function escape($text)
+    {
+        $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
+
+        if ('\\' === substr($text, -1)) {
+            $len = strlen($text);
+            $text = rtrim($text, '\\');
+            $text .= str_repeat('<<', $len - strlen($text));
+        }
+
+        return $text;
     }
 
     /**

@@ -395,21 +395,6 @@ EOF;
         $this->assertTrue($kernel->isClassInActiveBundle(__NAMESPACE__.'\Fixtures\FooBarBundle\SomeClass'));
     }
 
-    protected function getKernelMockForIsClassInActiveBundleTest()
-    {
-        $bundle = new FooBarBundle();
-
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getBundles'))
-            ->getMock();
-        $kernel->expects($this->once())
-            ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
-
-        return $kernel;
-    }
-
     public function testGetRootDir()
     {
         $kernel = new KernelForTest('test', true);
@@ -847,6 +832,21 @@ EOF;
 
         $kernel->setIsBooted(true);
         $kernel->terminate(Request::create('/'), new Response());
+    }
+
+    protected function getKernelMockForIsClassInActiveBundleTest()
+    {
+        $bundle = new FooBarBundle();
+
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        return $kernel;
     }
 
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)

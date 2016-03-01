@@ -763,6 +763,41 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * @param int $position
+     *
+     * @return \DOMElement|null
+     */
+    protected function getNode($position)
+    {
+        foreach ($this as $i => $node) {
+            if ($i == $position) {
+                return $node;
+            }
+        // @codeCoverageIgnoreStart
+        }
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * @param \DOMElement $node
+     * @param string      $siblingDir
+     *
+     * @return array
+     */
+    protected function sibling($node, $siblingDir = 'nextSibling')
+    {
+        $nodes = array();
+
+        do {
+            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
+                $nodes[] = $node;
+            }
+        } while ($node = $node->$siblingDir);
+
+        return $nodes;
+    }
+
+    /**
      * Filters the list of nodes with an XPath expression.
      *
      * The XPath expression should already be processed to apply it in the context of each node.
@@ -851,40 +886,5 @@ class Crawler extends \SplObjectStorage
         }
 
         return implode(' | ', $expressions);
-    }
-
-    /**
-     * @param int $position
-     *
-     * @return \DOMElement|null
-     */
-    protected function getNode($position)
-    {
-        foreach ($this as $i => $node) {
-            if ($i == $position) {
-                return $node;
-            }
-        // @codeCoverageIgnoreStart
-        }
-        // @codeCoverageIgnoreEnd
-    }
-
-    /**
-     * @param \DOMElement $node
-     * @param string      $siblingDir
-     *
-     * @return array
-     */
-    protected function sibling($node, $siblingDir = 'nextSibling')
-    {
-        $nodes = array();
-
-        do {
-            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
-                $nodes[] = $node;
-            }
-        } while ($node = $node->$siblingDir);
-
-        return $nodes;
     }
 }

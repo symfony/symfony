@@ -79,6 +79,14 @@ class LogoutUrlHelper extends Helper
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'logout_url';
+    }
+
+    /**
      * Generates the logout URL for the firewall.
      *
      * @param string      $key           The firewall key
@@ -111,13 +119,5 @@ class LogoutUrlHelper extends Helper
         }
 
         return $url;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'logout_url';
     }
 }

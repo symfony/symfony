@@ -126,8 +126,6 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    abstract protected function getCollection(array $array);
-
     public function testGetValueReadsArrayAccess()
     {
         $object = $this->getCollection(array('firstName' => 'Bernhard'));
@@ -309,4 +307,6 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
 
         return $data;
     }
+
+    abstract protected function getCollection(array $array);
 }

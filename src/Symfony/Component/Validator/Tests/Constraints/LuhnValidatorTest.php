@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\LuhnValidator;
 
 class LuhnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new LuhnValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Luhn());
@@ -114,5 +109,10 @@ class LuhnValidatorTest extends AbstractConstraintValidatorTest
             array(378282246310005),
             array(371449635398431),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new LuhnValidator();
     }
 }

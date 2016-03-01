@@ -60,13 +60,6 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::tearDown();
     }
 
-    protected function getExtensions()
-    {
-        return array_merge(parent::getExtensions(), array(
-            new CsrfExtension($this->csrfProvider, $this->translator),
-        ));
-    }
-
     public function testCsrfProtectionByDefaultIfRootAndCompound()
     {
         $view = $this->factory
@@ -395,5 +388,12 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
         $this->assertGreaterThan(0, count($errors));
         $this->assertEquals(new FormError('[trans]Foobar[/trans]'), $errors[0]);
+    }
+
+    protected function getExtensions()
+    {
+        return array_merge(parent::getExtensions(), array(
+            new CsrfExtension($this->csrfProvider, $this->translator),
+        ));
     }
 }

@@ -19,6 +19,13 @@ namespace Symfony\Component\PropertyAccess;
 final class PropertyAccess
 {
     /**
+     * This class cannot be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Creates a property accessor with the default configuration.
      *
      * @return PropertyAccessor The new property accessor
@@ -49,12 +56,5 @@ final class PropertyAccess
     public static function getPropertyAccessor()
     {
         return self::createPropertyAccessor();
-    }
-
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

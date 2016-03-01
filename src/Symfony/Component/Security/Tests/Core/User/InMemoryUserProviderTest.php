@@ -39,20 +39,6 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($refreshedUser->isCredentialsNonExpired());
     }
 
-    /**
-     * @return InMemoryUserProvider
-     */
-    protected function createProvider()
-    {
-        return new InMemoryUserProvider(array(
-            'fabien' => array(
-                'password' => 'foo',
-                'enabled' => false,
-                'roles' => array('ROLE_USER'),
-            ),
-        ));
-    }
-
     public function testCreateUser()
     {
         $provider = new InMemoryUserProvider();
@@ -79,5 +65,19 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');
+    }
+
+    /**
+     * @return InMemoryUserProvider
+     */
+    protected function createProvider()
+    {
+        return new InMemoryUserProvider(array(
+            'fabien' => array(
+                'password' => 'foo',
+                'enabled' => false,
+                'roles' => array('ROLE_USER'),
+            ),
+        ));
     }
 }

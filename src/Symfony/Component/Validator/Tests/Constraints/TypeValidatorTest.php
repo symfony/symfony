@@ -18,9 +18,12 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
 {
     protected static $file;
 
-    protected function createValidator()
+    public static function tearDownAfterClass()
     {
-        return new TypeValidator();
+        if (static::$file) {
+            fclose(static::$file);
+            static::$file = null;
+        }
     }
 
     public function testNullIsValid()
@@ -160,6 +163,11 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
+    protected function createValidator()
+    {
+        return new TypeValidator();
+    }
+
     protected function createFile()
     {
         if (!static::$file) {
@@ -167,13 +175,5 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
         }
 
         return static::$file;
-    }
-
-    public static function tearDownAfterClass()
-    {
-        if (static::$file) {
-            fclose(static::$file);
-            static::$file = null;
-        }
     }
 }

@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\IsNullValidator;
 
 class IsNullValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IsNullValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new IsNull());
@@ -56,5 +51,10 @@ class IsNullValidatorTest extends AbstractConstraintValidatorTest
             array(new \stdClass(), 'object'),
             array(array(), 'array'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new IsNullValidator();
     }
 }

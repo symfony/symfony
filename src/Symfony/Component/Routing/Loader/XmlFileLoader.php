@@ -61,6 +61,14 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports($resource, $type = null)
+    {
+        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
+    }
+
+    /**
      * Parses a node from a loaded XML file.
      *
      * @param RouteCollection $collection Collection to associate with the node
@@ -86,14 +94,6 @@ class XmlFileLoader extends FileLoader
             default:
                 throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->localName, $path));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($resource, $type = null)
-    {
-        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'xml' === $type);
     }
 
     /**

@@ -18,11 +18,6 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class AllValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new AllValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new All(new Range(array('min' => 4))));
@@ -83,5 +78,10 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
             array(array(5, 6, 7)),
             array(new \ArrayObject(array(5, 6, 7))),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new AllValidator();
     }
 }

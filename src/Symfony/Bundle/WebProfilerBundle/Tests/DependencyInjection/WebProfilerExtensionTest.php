@@ -28,20 +28,6 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '')
-    {
-        $errors = array();
-        foreach ($container->getServiceIds() as $id) {
-            try {
-                $container->get($id);
-            } catch (\Exception $e) {
-                $errors[$id] = $e->getMessage();
-            }
-        }
-
-        self::assertEquals(array(), $errors, $message);
-    }
-
     protected function setUp()
     {
         parent::setUp();
@@ -74,6 +60,20 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->container = null;
         $this->kernel = null;
+    }
+
+    public static function assertSaneContainer(Container $container, $message = '')
+    {
+        $errors = array();
+        foreach ($container->getServiceIds() as $id) {
+            try {
+                $container->get($id);
+            } catch (\Exception $e) {
+                $errors[$id] = $e->getMessage();
+            }
+        }
+
+        self::assertEquals(array(), $errors, $message);
     }
 
     /**

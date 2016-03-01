@@ -39,43 +39,6 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper = new PropertyPathMapper($this->propertyAccessor);
     }
 
-    /**
-     * @param $path
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getPropertyPath($path)
-    {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->setConstructorArgs(array($path))
-            ->setMethods(array('getValue', 'setValue'))
-            ->getMock();
-    }
-
-    /**
-     * @param FormConfigInterface $config
-     * @param bool                $synchronized
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
-    {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->setConstructorArgs(array($config))
-            ->setMethods(array('isSynchronized', 'isSubmitted'))
-            ->getMock();
-
-        $form->expects($this->any())
-            ->method('isSynchronized')
-            ->will($this->returnValue($synchronized));
-
-        $form->expects($this->any())
-            ->method('isSubmitted')
-            ->will($this->returnValue($submitted));
-
-        return $form;
-    }
-
     public function testMapDataToFormsPassesObjectRefIfByReference()
     {
         $car = new \stdClass();
@@ -356,5 +319,42 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $form = $this->getForm($config);
 
         $this->mapper->mapFormsToData(array($form), $car);
+    }
+
+    /**
+     * @param $path
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getPropertyPath($path)
+    {
+        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
+            ->setConstructorArgs(array($path))
+            ->setMethods(array('getValue', 'setValue'))
+            ->getMock();
+    }
+
+    /**
+     * @param FormConfigInterface $config
+     * @param bool                $synchronized
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
+    {
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($config))
+            ->setMethods(array('isSynchronized', 'isSubmitted'))
+            ->getMock();
+
+        $form->expects($this->any())
+            ->method('isSynchronized')
+            ->will($this->returnValue($synchronized));
+
+        $form->expects($this->any())
+            ->method('isSubmitted')
+            ->will($this->returnValue($submitted));
+
+        return $form;
     }
 }

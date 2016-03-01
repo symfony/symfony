@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\TimeValidator;
 
 class TimeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new TimeValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Time());
@@ -96,5 +91,10 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
             array('00:60:00'),
             array('00:00:60'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new TimeValidator();
     }
 }

@@ -20,12 +20,12 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
  */
 class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    public $options;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $mongo;
     private $storage;
-    public $options;
 
     protected function setUp()
     {

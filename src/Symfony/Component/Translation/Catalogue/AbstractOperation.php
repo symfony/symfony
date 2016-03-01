@@ -37,14 +37,14 @@ abstract class AbstractOperation implements OperationInterface
     protected $result;
 
     /**
-     * @var null|array
-     */
-    private $domains;
-
-    /**
      * @var array
      */
     protected $messages;
+
+    /**
+     * @var null|array
+     */
+    private $domains;
 
     /**
      * @param MessageCatalogueInterface $source

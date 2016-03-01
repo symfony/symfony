@@ -19,11 +19,6 @@ namespace Symfony\Component\Form;
 class FormError
 {
     /**
-     * @var string
-     */
-    private $message;
-
-    /**
      * The template for the error message.
      *
      * @var string
@@ -43,6 +38,10 @@ class FormError
      * @var int|null
      */
     protected $messagePluralization;
+    /**
+     * @var string
+     */
+    private $message;
 
     /**
      * Constructor.

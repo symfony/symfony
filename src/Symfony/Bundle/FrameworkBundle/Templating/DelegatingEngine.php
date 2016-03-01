@@ -55,6 +55,20 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     }
 
     /**
+     * Renders a view and returns a Response.
+     *
+     * @param string   $view       The view name
+     * @param array    $parameters An array of parameters to pass to the view
+     * @param Response $response   A Response instance
+     *
+     * @return Response A Response instance
+     */
+    public function renderResponse($view, array $parameters = array(), Response $response = null)
+    {
+        return $this->getEngine($view)->renderResponse($view, $parameters, $response);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getEngine($name)
@@ -70,19 +84,5 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
         }
 
         throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
-    }
-
-    /**
-     * Renders a view and returns a Response.
-     *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
-     */
-    public function renderResponse($view, array $parameters = array(), Response $response = null)
-    {
-        return $this->getEngine($view)->renderResponse($view, $parameters, $response);
     }
 }

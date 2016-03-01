@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\NotEqualToValidator;
  */
 class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new NotEqualToValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new NotEqualTo($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -55,5 +45,15 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array(new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new NotEqualToValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new NotEqualTo($options);
     }
 }

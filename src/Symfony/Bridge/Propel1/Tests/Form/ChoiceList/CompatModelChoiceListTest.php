@@ -30,23 +30,6 @@ class CompatModelChoiceListTest extends AbstractChoiceListTest
     protected $item3;
     protected $item4;
 
-    public function testGetChoicesForValues()
-    {
-        $this->query
-            ->expects($this->once())
-            ->method('filterById')
-            ->with(array(1, 2))
-            ->will($this->returnSelf())
-        ;
-
-        ItemQuery::$result = array(
-            $this->item2,
-            $this->item1,
-        );
-
-        parent::testGetChoicesForValues();
-    }
-
     protected function setUp()
     {
         $this->query = $this->getMock('Symfony\Bridge\Propel1\Tests\Fixtures\ItemQuery', array(
@@ -70,6 +53,23 @@ class CompatModelChoiceListTest extends AbstractChoiceListTest
         );
 
         parent::setUp();
+    }
+
+    public function testGetChoicesForValues()
+    {
+        $this->query
+            ->expects($this->once())
+            ->method('filterById')
+            ->with(array(1, 2))
+            ->will($this->returnSelf())
+        ;
+
+        ItemQuery::$result = array(
+            $this->item2,
+            $this->item1,
+        );
+
+        parent::testGetChoicesForValues();
     }
 
     protected function createItems()

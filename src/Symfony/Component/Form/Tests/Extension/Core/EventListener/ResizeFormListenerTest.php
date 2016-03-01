@@ -39,29 +39,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form = null;
     }
 
-    protected function getBuilder($name = 'name')
-    {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
-    }
-
-    protected function getForm($name = 'name')
-    {
-        return $this->getBuilder($name)->getForm();
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getDataMapper()
-    {
-        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
-    }
-
-    protected function getMockForm()
-    {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
-    }
-
     public function testPreSetDataResizesForm()
     {
         $this->form->add($this->getForm('0'));
@@ -273,5 +250,28 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey(0, $event->getData());
         $this->assertArrayNotHasKey(2, $event->getData());
+    }
+
+    protected function getBuilder($name = 'name')
+    {
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
+    }
+
+    protected function getForm($name = 'name')
+    {
+        return $this->getBuilder($name)->getForm();
+    }
+
+    protected function getMockForm()
+    {
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 }

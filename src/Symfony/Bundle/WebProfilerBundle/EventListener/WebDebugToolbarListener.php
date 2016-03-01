@@ -89,6 +89,13 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->injectToolbar($response);
     }
 
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
+    }
+
     /**
      * Injects the web debug toolbar into the given Response.
      *
@@ -110,12 +117,5 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
         }
-    }
-
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::RESPONSE => array('onKernelResponse', -128),
-        );
     }
 }

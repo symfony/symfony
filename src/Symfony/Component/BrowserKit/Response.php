@@ -61,19 +61,6 @@ class Response
     }
 
     /**
-     * Returns the build header line.
-     *
-     * @param string $name  The header name
-     * @param string $value The header value
-     *
-     * @return string The built header line
-     */
-    protected function buildHeader($name, $value)
-    {
-        return sprintf("%s: %s\n", $name, $value);
-    }
-
-    /**
      * Gets the response content.
      *
      * @return string The response content
@@ -125,5 +112,18 @@ class Response
         }
 
         return $first ? null : array();
+    }
+
+    /**
+     * Returns the build header line.
+     *
+     * @param string $name  The header name
+     * @param string $value The header value
+     *
+     * @return string The built header line
+     */
+    protected function buildHeader($name, $value)
+    {
+        return sprintf("%s: %s\n", $name, $value);
     }
 }

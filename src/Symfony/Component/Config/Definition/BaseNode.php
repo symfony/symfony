@@ -270,18 +270,6 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Normalizes the value before any other normalization is applied.
-     *
-     * @param $value
-     *
-     * @return $value The normalized array value
-     */
-    protected function preNormalize($value)
-    {
-        return $value;
-    }
-
-    /**
      * Finalizes a value, applying all finalization closures.
      *
      * @param mixed $value The value to finalize
@@ -309,6 +297,18 @@ abstract class BaseNode implements NodeInterface
             }
         }
 
+        return $value;
+    }
+
+    /**
+     * Normalizes the value before any other normalization is applied.
+     *
+     * @param $value
+     *
+     * @return $value The normalized array value
+     */
+    protected function preNormalize($value)
+    {
         return $value;
     }
 

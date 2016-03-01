@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\NotNullValidator;
 
 class NotNullValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new NotNullValidator();
-    }
-
     /**
      * @dataProvider getValidValues
      */
@@ -50,5 +45,10 @@ class NotNullValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate(null, $constraint);
 
         $this->buildViolation('myMessage')->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new NotNullValidator();
     }
 }

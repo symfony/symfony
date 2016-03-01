@@ -13,6 +13,20 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 class SessionTest extends WebTestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->deleteTmpDir('SessionTest');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('SessionTest');
+    }
+
     /**
      * Tests session attributes persist.
      *
@@ -133,19 +147,5 @@ class SessionTest extends WebTestCase
             array('config.yml', true),
             array('config.yml', false),
         );
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->deleteTmpDir('SessionTest');
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->deleteTmpDir('SessionTest');
     }
 }

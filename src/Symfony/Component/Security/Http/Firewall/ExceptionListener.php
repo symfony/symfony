@@ -94,6 +94,17 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
+    /**
+     * @param Request $request
+     */
+    protected function setTargetPath(Request $request)
+    {
+        // session isn't required when using HTTP basic authentication mechanism for example
+        if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
+            $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
+        }
+    }
+
     private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
     {
         if (null !== $this->logger) {
@@ -190,16 +201,5 @@ class ExceptionListener
         }
 
         return $this->authenticationEntryPoint->start($request, $authException);
-    }
-
-    /**
-     * @param Request $request
-     */
-    protected function setTargetPath(Request $request)
-    {
-        // session isn't required when using HTTP basic authentication mechanism for example
-        if ($request->hasSession() && $request->isMethodSafe() && !$request->isXmlHttpRequest()) {
-            $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
-        }
     }
 }

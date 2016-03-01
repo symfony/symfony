@@ -19,6 +19,13 @@ namespace Symfony\Component\Validator;
 final class Validation
 {
     /**
+     * This class cannot be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Creates a new validator.
      *
      * If you want to configure the validator, use
@@ -39,12 +46,5 @@ final class Validation
     public static function createValidatorBuilder()
     {
         return new ValidatorBuilder();
-    }
-
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

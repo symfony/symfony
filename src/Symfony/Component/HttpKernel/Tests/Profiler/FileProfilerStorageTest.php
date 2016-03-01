@@ -19,19 +19,6 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     protected static $tmpDir;
     protected static $storage;
 
-    protected static function cleanDir()
-    {
-        $flags = \FilesystemIterator::SKIP_DOTS;
-        $iterator = new \RecursiveDirectoryIterator(self::$tmpDir, $flags);
-        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-        foreach ($iterator as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
-        }
-    }
-
     public static function setUpBeforeClass()
     {
         self::$tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
@@ -49,14 +36,6 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     protected function setUp()
     {
         self::$storage->purge();
-    }
-
-    /**
-     * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
-     */
-    protected function getStorage()
-    {
-        return self::$storage;
     }
 
     public function testMultiRowIndexFile()
@@ -96,5 +75,26 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
 
         $this->assertEquals('line2', $r->invoke(self::$storage, $h));
         $this->assertEquals('line1', $r->invoke(self::$storage, $h));
+    }
+
+    protected static function cleanDir()
+    {
+        $flags = \FilesystemIterator::SKIP_DOTS;
+        $iterator = new \RecursiveDirectoryIterator(self::$tmpDir, $flags);
+        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+    }
+
+    /**
+     * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
+     */
+    protected function getStorage()
+    {
+        return self::$storage;
     }
 }

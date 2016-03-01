@@ -23,13 +23,6 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
     private $fs;
     private $translationDir;
 
-    public function testDumpMessagesAndClean()
-    {
-        $tester = $this->createCommandTester($this->getContainer(array('foo' => 'foo')));
-        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true));
-        $this->assertRegExp('/foo/', $tester->getDisplay());
-    }
-
     protected function setUp()
     {
         $this->fs = new Filesystem();
@@ -41,6 +34,13 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->fs->remove($this->translationDir);
+    }
+
+    public function testDumpMessagesAndClean()
+    {
+        $tester = $this->createCommandTester($this->getContainer(array('foo' => 'foo')));
+        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true));
+        $this->assertRegExp('/foo/', $tester->getDisplay());
     }
 
     /**

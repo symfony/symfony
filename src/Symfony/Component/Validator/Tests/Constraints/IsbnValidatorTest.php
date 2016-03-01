@@ -19,11 +19,6 @@ use Symfony\Component\Validator\Constraints\IsbnValidator;
  */
 class IsbnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IsbnValidator();
-    }
-
     public function getValidIsbn10()
     {
         return array(
@@ -235,5 +230,10 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$isbn.'"')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new IsbnValidator();
     }
 }

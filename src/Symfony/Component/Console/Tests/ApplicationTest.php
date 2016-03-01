@@ -44,23 +44,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
     }
 
-    protected function normalizeLineBreaks($text)
-    {
-        return str_replace(PHP_EOL, "\n", $text);
-    }
-
-    /**
-     * Replaces the dynamic placeholders of the command help text with a static version.
-     * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
-     */
-    protected function ensureStaticCommandHelp(Application $application)
-    {
-        foreach ($application->all() as $command) {
-            $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
-        }
-    }
-
     public function testConstructor()
     {
         $application = new Application('foo', 'bar');
@@ -835,6 +818,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
         $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
+    }
+
+    protected function normalizeLineBreaks($text)
+    {
+        return str_replace(PHP_EOL, "\n", $text);
+    }
+
+    /**
+     * Replaces the dynamic placeholders of the command help text with a static version.
+     * The placeholder %command.full_name% includes the script path that is not predictable
+     * and can not be tested against.
+     */
+    protected function ensureStaticCommandHelp(Application $application)
+    {
+        foreach ($application->all() as $command) {
+            $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
+        }
     }
 
     protected function getDispatcher()

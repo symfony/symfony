@@ -23,14 +23,13 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string
-     */
-    private $sessionDir;
-
-    /**
      * @var MockFileSessionStorage
      */
     protected $storage;
+    /**
+     * @var string
+     */
+    private $sessionDir;
 
     protected function setUp()
     {

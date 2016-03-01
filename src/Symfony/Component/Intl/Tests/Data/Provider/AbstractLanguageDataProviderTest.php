@@ -832,8 +832,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
-
     public function testGetLanguages()
     {
         $this->assertEquals(static::$languages, $this->dataProvider->getLanguages());
@@ -930,4 +928,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     {
         $this->dataProvider->getAlpha3Code($currency);
     }
+
+    abstract protected function getDataDirectory();
 }

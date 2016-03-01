@@ -19,11 +19,6 @@ use Symfony\Component\Validator\Constraints\IssnValidator;
  */
 class IssnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IssnValidator();
-    }
-
     public function getValidLowerCasedIssn()
     {
         return array(
@@ -220,5 +215,10 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$issn.'"')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new IssnValidator();
     }
 }

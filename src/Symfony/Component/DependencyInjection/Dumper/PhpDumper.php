@@ -144,6 +144,22 @@ class PhpDumper extends Dumper
     }
 
     /**
+     * Dumps a parameter.
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    public function dumpParameter($name)
+    {
+        if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
+            return $this->dumpValue($this->container->getParameter($name), false);
+        }
+
+        return sprintf("\$this->getParameter('%s')", strtolower($name));
+    }
+
+    /**
      * Retrieves the currently set proxy dumper or instantiates one.
      *
      * @return ProxyDumper
@@ -1263,22 +1279,6 @@ EOF;
         } else {
             return $this->export($value);
         }
-    }
-
-    /**
-     * Dumps a parameter.
-     *
-     * @param string $name
-     *
-     * @return string
-     */
-    public function dumpParameter($name)
-    {
-        if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
-            return $this->dumpValue($this->container->getParameter($name), false);
-        }
-
-        return sprintf("\$this->getParameter('%s')", strtolower($name));
     }
 
     /**

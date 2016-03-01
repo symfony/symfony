@@ -340,24 +340,6 @@ class InputDefinition
     }
 
     /**
-     * Returns the InputOption name given a shortcut.
-     *
-     * @param string $shortcut The shortcut
-     *
-     * @return string The InputOption name
-     *
-     * @throws \InvalidArgumentException When option given does not exist
-     */
-    private function shortcutToName($shortcut)
-    {
-        if (!isset($this->shortcuts[$shortcut])) {
-            throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
-        }
-
-        return $this->shortcuts[$shortcut];
-    }
-
-    /**
      * Gets the synopsis.
      *
      * @return string The synopsis
@@ -409,5 +391,23 @@ class InputDefinition
         $descriptor = new XmlDescriptor();
 
         return $descriptor->describe($this, array('as_dom' => $asDom));
+    }
+
+    /**
+     * Returns the InputOption name given a shortcut.
+     *
+     * @param string $shortcut The shortcut
+     *
+     * @return string The InputOption name
+     *
+     * @throws \InvalidArgumentException When option given does not exist
+     */
+    private function shortcutToName($shortcut)
+    {
+        if (!isset($this->shortcuts[$shortcut])) {
+            throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
+        }
+
+        return $this->shortcuts[$shortcut];
     }
 }

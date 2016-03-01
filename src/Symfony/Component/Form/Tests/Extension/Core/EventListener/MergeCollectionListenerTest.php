@@ -34,20 +34,6 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form = null;
     }
 
-    abstract protected function getBuilder($name = 'name');
-
-    protected function getForm($name = 'name', $propertyPath = null)
-    {
-        $propertyPath = $propertyPath ?: $name;
-
-        return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
-    }
-
-    protected function getMockForm()
-    {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
-    }
-
     public function getBooleanMatrix1()
     {
         return array(
@@ -65,8 +51,6 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
             array(false, false),
         );
     }
-
-    abstract protected function getData(array $data);
 
     /**
      * @dataProvider getBooleanMatrix1
@@ -252,4 +236,20 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($event->getData());
     }
+
+    abstract protected function getBuilder($name = 'name');
+
+    protected function getForm($name = 'name', $propertyPath = null)
+    {
+        $propertyPath = $propertyPath ?: $name;
+
+        return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
+    }
+
+    protected function getMockForm()
+    {
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+    }
+
+    abstract protected function getData(array $data);
 }

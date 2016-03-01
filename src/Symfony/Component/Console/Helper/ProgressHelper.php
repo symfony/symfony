@@ -320,6 +320,14 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'progress';
+    }
+
+    /**
      * Initializes the progress helper.
      */
     private function initialize()
@@ -443,13 +451,5 @@ class ProgressHelper extends Helper
         $output->write($message);
 
         $this->lastMessagesLength = $this->strlen($message);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'progress';
     }
 }

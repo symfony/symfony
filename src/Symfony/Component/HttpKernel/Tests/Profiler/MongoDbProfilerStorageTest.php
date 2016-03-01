@@ -72,6 +72,15 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         }
     }
 
+    protected function setUp()
+    {
+        if (self::$storage) {
+            self::$storage->purge();
+        } else {
+            $this->markTestSkipped('A MongoDB server on localhost is required.');
+        }
+    }
+
     public function getDsns()
     {
         return array(
@@ -153,14 +162,5 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
     protected function getStorage()
     {
         return self::$storage;
-    }
-
-    protected function setUp()
-    {
-        if (self::$storage) {
-            self::$storage->purge();
-        } else {
-            $this->markTestSkipped('A MongoDB server on localhost is required.');
-        }
     }
 }

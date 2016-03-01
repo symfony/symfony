@@ -48,14 +48,13 @@ namespace Symfony\Component\ClassLoader;
  */
 class WinCacheClassLoader
 {
-    private $prefix;
-
     /**
      * A class loader object that implements the findFile() method.
      *
      * @var object
      */
     protected $decorated;
+    private $prefix;
 
     /**
      * Constructor.

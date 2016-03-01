@@ -570,8 +570,6 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
-
     public function testGetCurrencies()
     {
         $this->assertSame(static::$currencies, $this->dataProvider->getCurrencies());
@@ -764,6 +762,8 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     {
         $this->dataProvider->forNumericCode($currency);
     }
+
+    abstract protected function getDataDirectory();
 
     private function getNumericToAlpha3Mapping()
     {

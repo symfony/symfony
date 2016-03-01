@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  */
 class Definition
 {
+    protected $arguments;
     private $class;
     private $file;
     private $factoryClass;
@@ -36,8 +37,6 @@ class Definition
     private $abstract;
     private $synchronized;
     private $lazy;
-
-    protected $arguments;
 
     /**
      * Constructor.

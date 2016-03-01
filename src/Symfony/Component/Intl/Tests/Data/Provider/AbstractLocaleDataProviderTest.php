@@ -35,8 +35,6 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
-
     public function testGetLocales()
     {
         $this->assertSame($this->getLocales(), $this->dataProvider->getLocales());
@@ -105,4 +103,6 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
             $this->assertSame($name, $this->dataProvider->getName($locale));
         }
     }
+
+    abstract protected function getDataDirectory();
 }

@@ -34,22 +34,6 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $this->removeDirectory($this->directory);
     }
 
-    protected function removeDirectory($directory)
-    {
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory), \RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($iterator as $path) {
-            if (preg_match('#[/\\\\]\.\.?$#', $path->__toString())) {
-                continue;
-            }
-            if ($path->isDir()) {
-                rmdir($path->__toString());
-            } else {
-                unlink($path->__toString());
-            }
-        }
-        rmdir($directory);
-    }
-
     public function testGetResource()
     {
         $resource = new DirectoryResource($this->directory);
@@ -162,5 +146,21 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $resourceB = new DirectoryResource($this->directory, '/.yaml$/');
 
         $this->assertEquals(2, count(array_unique(array($resourceA, $resourceB))));
+    }
+
+    protected function removeDirectory($directory)
+    {
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory), \RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($iterator as $path) {
+            if (preg_match('#[/\\\\]\.\.?$#', $path->__toString())) {
+                continue;
+            }
+            if ($path->isDir()) {
+                rmdir($path->__toString());
+            } else {
+                unlink($path->__toString());
+            }
+        }
+        rmdir($directory);
     }
 }

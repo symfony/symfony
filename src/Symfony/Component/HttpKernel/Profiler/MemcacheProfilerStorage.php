@@ -24,6 +24,16 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     private $memcache;
 
     /**
+     * Set instance of the Memcache.
+     *
+     * @param \Memcache $memcache
+     */
+    public function setMemcache($memcache)
+    {
+        $this->memcache = $memcache;
+    }
+
+    /**
      * Internal convenience method that returns the instance of the Memcache.
      *
      * @return \Memcache
@@ -47,16 +57,6 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
         }
 
         return $this->memcache;
-    }
-
-    /**
-     * Set instance of the Memcache.
-     *
-     * @param \Memcache $memcache
-     */
-    public function setMemcache($memcache)
-    {
-        $this->memcache = $memcache;
     }
 
     /**

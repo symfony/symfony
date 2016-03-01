@@ -253,19 +253,6 @@ class BinaryFileResponse extends Response
         return $this;
     }
 
-    private function hasValidIfRangeHeader($header)
-    {
-        if ($this->getEtag() === $header) {
-            return true;
-        }
-
-        if (null === $lastModified = $this->getLastModified()) {
-            return false;
-        }
-
-        return $lastModified->format('D, d M Y H:i:s').' GMT' === $header;
-    }
-
     /**
      * Sends the file.
      *
@@ -320,5 +307,18 @@ class BinaryFileResponse extends Response
     public static function trustXSendfileTypeHeader()
     {
         self::$trustXSendfileTypeHeader = true;
+    }
+
+    private function hasValidIfRangeHeader($header)
+    {
+        if ($this->getEtag() === $header) {
+            return true;
+        }
+
+        if (null === $lastModified = $this->getLastModified()) {
+            return false;
+        }
+
+        return $lastModified->format('D, d M Y H:i:s').' GMT' === $header;
     }
 }

@@ -94,26 +94,6 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Returns the parent collection.
-     *
-     * @return DumperCollection|null The parent collection or null if the collection has no parent
-     */
-    protected function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Sets the parent collection.
-     *
-     * @param DumperCollection $parent The parent collection
-     */
-    protected function setParent(DumperCollection $parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
      * Returns true if the attribute is defined.
      *
      * @param string $name The attribute name
@@ -157,5 +137,25 @@ class DumperCollection implements \IteratorAggregate
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Returns the parent collection.
+     *
+     * @return DumperCollection|null The parent collection or null if the collection has no parent
+     */
+    protected function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Sets the parent collection.
+     *
+     * @param DumperCollection $parent The parent collection
+     */
+    protected function setParent(DumperCollection $parent)
+    {
+        $this->parent = $parent;
     }
 }

@@ -268,22 +268,6 @@ class Filesystem
     }
 
     /**
-     * Tells whether a file exists and is readable.
-     *
-     * @param string $filename Path to the file.
-     *
-     * @throws IOException When windows path is longer than 258 characters
-     */
-    private function isReadable($filename)
-    {
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($filename) > 258) {
-            throw new IOException(sprintf('Could not check if file is readable because path length exceeds 258 characters for file "%s"', $filename));
-        }
-
-        return is_readable($filename);
-    }
-
-    /**
      * Creates a symbolic link or copy a directory.
      *
      * @param string $originDir     The origin directory path
@@ -459,20 +443,6 @@ class Filesystem
     }
 
     /**
-     * @param mixed $files
-     *
-     * @return \Traversable
-     */
-    private function toIterator($files)
-    {
-        if (!$files instanceof \Traversable) {
-            $files = new \ArrayObject(is_array($files) ? $files : array($files));
-        }
-
-        return $files;
-    }
-
-    /**
      * Atomically dumps content into a file.
      *
      * @param string   $filename The file to be written to.
@@ -502,5 +472,35 @@ class Filesystem
             $this->chmod($tmpFile, $mode);
         }
         $this->rename($tmpFile, $filename, true);
+    }
+
+    /**
+     * Tells whether a file exists and is readable.
+     *
+     * @param string $filename Path to the file.
+     *
+     * @throws IOException When windows path is longer than 258 characters
+     */
+    private function isReadable($filename)
+    {
+        if ('\\' === DIRECTORY_SEPARATOR && strlen($filename) > 258) {
+            throw new IOException(sprintf('Could not check if file is readable because path length exceeds 258 characters for file "%s"', $filename));
+        }
+
+        return is_readable($filename);
+    }
+
+    /**
+     * @param mixed $files
+     *
+     * @return \Traversable
+     */
+    private function toIterator($files)
+    {
+        if (!$files instanceof \Traversable) {
+            $files = new \ArrayObject(is_array($files) ? $files : array($files));
+        }
+
+        return $files;
     }
 }

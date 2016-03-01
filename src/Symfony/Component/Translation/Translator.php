@@ -231,38 +231,6 @@ class Translator implements TranslatorInterface
         $this->loadFallbackCatalogues($locale);
     }
 
-    private function doLoadCatalogue($locale)
-    {
-        $this->catalogues[$locale] = new MessageCatalogue($locale);
-
-        if (isset($this->resources[$locale])) {
-            foreach ($this->resources[$locale] as $resource) {
-                if (!isset($this->loaders[$resource[0]])) {
-                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
-                }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
-            }
-        }
-    }
-
-    private function loadFallbackCatalogues($locale)
-    {
-        $current = $this->catalogues[$locale];
-
-        foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
-            }
-
-            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
-            foreach ($this->catalogues[$fallback]->getResources() as $resource) {
-                $fallbackCatalogue->addResource($resource);
-            }
-            $current->addFallbackCatalogue($fallbackCatalogue);
-            $current = $fallbackCatalogue;
-        }
-    }
-
     protected function computeFallbackLocales($locale)
     {
         $locales = array();
@@ -292,6 +260,38 @@ class Translator implements TranslatorInterface
     {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
+        }
+    }
+
+    private function doLoadCatalogue($locale)
+    {
+        $this->catalogues[$locale] = new MessageCatalogue($locale);
+
+        if (isset($this->resources[$locale])) {
+            foreach ($this->resources[$locale] as $resource) {
+                if (!isset($this->loaders[$resource[0]])) {
+                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+                }
+                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
+            }
+        }
+    }
+
+    private function loadFallbackCatalogues($locale)
+    {
+        $current = $this->catalogues[$locale];
+
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->doLoadCatalogue($fallback);
+            }
+
+            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            foreach ($this->catalogues[$fallback]->getResources() as $resource) {
+                $fallbackCatalogue->addResource($resource);
+            }
+            $current->addFallbackCatalogue($fallbackCatalogue);
+            $current = $fallbackCatalogue;
         }
     }
 }

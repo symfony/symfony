@@ -19,13 +19,6 @@ use Symfony\Component\Validator\Constraints\CountValidator;
  */
 abstract class CountValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CountValidator();
-    }
-
-    abstract protected function createCollection(array $content);
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Count(6));
@@ -177,4 +170,11 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
         $this->assertEquals(5, $constraint->min);
         $this->assertEquals(5, $constraint->max);
     }
+
+    protected function createValidator()
+    {
+        return new CountValidator();
+    }
+
+    abstract protected function createCollection(array $content);
 }

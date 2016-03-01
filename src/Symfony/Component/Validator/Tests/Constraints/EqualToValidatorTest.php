@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\EqualToValidator;
  */
 class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new EqualToValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new EqualTo($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -55,5 +45,15 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array(new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new EqualToValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new EqualTo($options);
     }
 }

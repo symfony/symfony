@@ -27,6 +27,13 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
+    protected function tearDown()
+    {
+        $this->engine = null;
+
+        parent::tearDown();
+    }
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -49,13 +56,6 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
                 'FrameworkBundle:FormTable',
             )),
         ));
-    }
-
-    protected function tearDown()
-    {
-        $this->engine = null;
-
-        parent::tearDown();
     }
 
     protected function renderForm(FormView $view, array $vars = array())

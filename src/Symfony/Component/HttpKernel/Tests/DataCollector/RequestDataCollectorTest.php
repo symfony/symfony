@@ -164,17 +164,6 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Inject the given controller callable into the data collector.
-     */
-    protected function injectController($collector, $controller, $request)
-    {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver);
-        $event = new FilterControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
-        $collector->onKernelController($event);
-    }
-
-    /**
      * Dummy method used as controller callable.
      */
     public static function staticControllerMethod()
@@ -196,5 +185,16 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     public static function __callStatic($method, $args)
     {
         throw new \LogicException('Unexpected method call');
+    }
+
+    /**
+     * Inject the given controller callable into the data collector.
+     */
+    protected function injectController($collector, $controller, $request)
+    {
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $event = new FilterControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
+        $collector->onKernelController($event);
     }
 }

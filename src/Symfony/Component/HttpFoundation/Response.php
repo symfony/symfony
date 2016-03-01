@@ -24,31 +24,6 @@ class Response
     public $headers;
 
     /**
-     * @var string
-     */
-    protected $content;
-
-    /**
-     * @var string
-     */
-    protected $version;
-
-    /**
-     * @var int
-     */
-    protected $statusCode;
-
-    /**
-     * @var string
-     */
-    protected $statusText;
-
-    /**
-     * @var string
-     */
-    protected $charset;
-
-    /**
      * Status codes translation table.
      *
      * The list of codes is complete according to the
@@ -122,6 +97,31 @@ class Response
         510 => 'Not Extended',                                                // RFC2774
         511 => 'Network Authentication Required',                             // RFC6585
     );
+
+    /**
+     * @var string
+     */
+    protected $content;
+
+    /**
+     * @var string
+     */
+    protected $version;
+
+    /**
+     * @var int
+     */
+    protected $statusCode;
+
+    /**
+     * @var string
+     */
+    protected $statusText;
+
+    /**
+     * @var string
+     */
+    protected $charset;
 
     /**
      * Constructor.

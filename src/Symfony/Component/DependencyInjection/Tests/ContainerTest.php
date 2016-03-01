@@ -480,20 +480,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getField($obj, $field)
-    {
-        $reflection = new \ReflectionProperty($obj, $field);
-        $reflection->setAccessible(true);
-
-        return $reflection->getValue($obj);
-    }
-
     public function testAlias()
     {
         $c = new ProjectServiceContainer();
 
         $this->assertTrue($c->has('alias'));
         $this->assertSame($c->get('alias'), $c->get('bar'));
+    }
+
+    protected function getField($obj, $field)
+    {
+        $reflection = new \ReflectionProperty($obj, $field);
+        $reflection->setAccessible(true);
+
+        return $reflection->getValue($obj);
     }
 }
 

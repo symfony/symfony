@@ -146,40 +146,6 @@ class Inline
     }
 
     /**
-     * Dumps a PHP array to a YAML string.
-     *
-     * @param array $value                  The PHP array to dump
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
-     *
-     * @return string The YAML string representing the PHP array
-     */
-    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
-    {
-        // array
-        $keys = array_keys($value);
-        $keysCount = count($keys);
-        if ((1 === $keysCount && '0' == $keys[0])
-            || ($keysCount > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) === $keysCount * ($keysCount - 1) / 2)
-        ) {
-            $output = array();
-            foreach ($value as $val) {
-                $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport);
-            }
-
-            return sprintf('[%s]', implode(', ', $output));
-        }
-
-        // mapping
-        $output = array();
-        foreach ($value as $key => $val) {
-            $output[] = sprintf('%s: %s', self::dump($key, $exceptionOnInvalidType, $objectSupport), self::dump($val, $exceptionOnInvalidType, $objectSupport));
-        }
-
-        return sprintf('{ %s }', implode(', ', $output));
-    }
-
-    /**
      * Parses a scalar to a YAML string.
      *
      * @param string $scalar
@@ -228,6 +194,40 @@ class Inline
         }
 
         return $output;
+    }
+
+    /**
+     * Dumps a PHP array to a YAML string.
+     *
+     * @param array $value                  The PHP array to dump
+     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     *
+     * @return string The YAML string representing the PHP array
+     */
+    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
+    {
+        // array
+        $keys = array_keys($value);
+        $keysCount = count($keys);
+        if ((1 === $keysCount && '0' == $keys[0])
+            || ($keysCount > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) === $keysCount * ($keysCount - 1) / 2)
+        ) {
+            $output = array();
+            foreach ($value as $val) {
+                $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport);
+            }
+
+            return sprintf('[%s]', implode(', ', $output));
+        }
+
+        // mapping
+        $output = array();
+        foreach ($value as $key => $val) {
+            $output[] = sprintf('%s: %s', self::dump($key, $exceptionOnInvalidType, $objectSupport), self::dump($val, $exceptionOnInvalidType, $objectSupport));
+        }
+
+        return sprintf('{ %s }', implode(', ', $output));
     }
 
     /**

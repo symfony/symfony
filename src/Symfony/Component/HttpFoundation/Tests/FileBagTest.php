@@ -22,6 +22,20 @@ use Symfony\Component\HttpFoundation\FileBag;
  */
 class FileBagTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        mkdir(sys_get_temp_dir().'/form_test', 0777, true);
+    }
+
+    protected function tearDown()
+    {
+        foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
+            unlink($file);
+        }
+
+        rmdir(sys_get_temp_dir().'/form_test');
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -130,19 +144,5 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
     protected function createTempFile()
     {
         return tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
-    }
-
-    protected function setUp()
-    {
-        mkdir(sys_get_temp_dir().'/form_test', 0777, true);
-    }
-
-    protected function tearDown()
-    {
-        foreach (glob(sys_get_temp_dir().'/form_test/*') as $file) {
-            unlink($file);
-        }
-
-        rmdir(sys_get_temp_dir().'/form_test');
     }
 }

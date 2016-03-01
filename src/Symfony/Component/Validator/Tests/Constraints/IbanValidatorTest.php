@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\IbanValidator;
 
 class IbanValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IbanValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Iban());
@@ -182,5 +177,10 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('Ae260211000000230064016'),
             array('ae260211000000230064016'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new IbanValidator();
     }
 }

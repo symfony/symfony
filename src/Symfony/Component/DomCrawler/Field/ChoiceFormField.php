@@ -192,6 +192,41 @@ class ChoiceFormField extends FormField
     }
 
     /**
+     * Checks whether given value is in the existing options.
+     *
+     * @param string $optionValue
+     * @param array  $options
+     *
+     * @return bool
+     */
+    public function containsOption($optionValue, $options)
+    {
+        foreach ($options as $option) {
+            if ($option['value'] == $optionValue) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns list of available field options.
+     *
+     * @return array
+     */
+    public function availableOptionValues()
+    {
+        $values = array();
+
+        foreach ($this->options as $option) {
+            $values[] = $option['value'];
+        }
+
+        return $values;
+    }
+
+    /**
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
@@ -264,40 +299,5 @@ class ChoiceFormField extends FormField
         $option['disabled'] = $node->hasAttribute('disabled');
 
         return $option;
-    }
-
-    /**
-     * Checks whether given value is in the existing options.
-     *
-     * @param string $optionValue
-     * @param array  $options
-     *
-     * @return bool
-     */
-    public function containsOption($optionValue, $options)
-    {
-        foreach ($options as $option) {
-            if ($option['value'] == $optionValue) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns list of available field options.
-     *
-     * @return array
-     */
-    public function availableOptionValues()
-    {
-        $values = array();
-
-        foreach ($this->options as $option) {
-            $values[] = $option['value'];
-        }
-
-        return $values;
     }
 }

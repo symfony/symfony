@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\IsFalseValidator;
 
 class IsFalseValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IsFalseValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new IsFalse());
@@ -46,5 +41,10 @@ class IsFalseValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'true')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new IsFalseValidator();
     }
 }

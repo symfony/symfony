@@ -22,6 +22,27 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     private $tmp;
     private $storage;
 
+    protected function setUp()
+    {
+        $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        if (file_exists($this->tmp)) {
+            @unlink($this->tmp);
+        }
+
+        $this->storage = new FileProfilerStorage('file:'.$this->tmp);
+        $this->storage->purge();
+    }
+
+    protected function tearDown()
+    {
+        if (null !== $this->storage) {
+            $this->storage->purge();
+            $this->storage = null;
+
+            @unlink($this->tmp);
+        }
+    }
+
     public function testCollect()
     {
         $request = new Request();
@@ -56,26 +77,5 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, 'some string', ''));
-    }
-
-    protected function setUp()
-    {
-        $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
-        if (file_exists($this->tmp)) {
-            @unlink($this->tmp);
-        }
-
-        $this->storage = new FileProfilerStorage('file:'.$this->tmp);
-        $this->storage->purge();
-    }
-
-    protected function tearDown()
-    {
-        if (null !== $this->storage) {
-            $this->storage->purge();
-            $this->storage = null;
-
-            @unlink($this->tmp);
-        }
     }
 }

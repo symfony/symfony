@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\RangeValidator;
 
 class RangeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new RangeValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Range(array('min' => 10, 'max' => 20)));
@@ -225,5 +220,10 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"abcd"')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new RangeValidator();
     }
 }

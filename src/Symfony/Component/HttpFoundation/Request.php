@@ -33,34 +33,6 @@ class Request
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT = 'client_port';
 
-    protected static $trustedProxies = array();
-
-    /**
-     * @var string[]
-     */
-    protected static $trustedHostPatterns = array();
-
-    /**
-     * @var string[]
-     */
-    protected static $trustedHosts = array();
-
-    /**
-     * Names for headers that can be trusted when
-     * using trusted proxies.
-     *
-     * The default names are non-standard, but widely used
-     * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
-     */
-    protected static $trustedHeaders = array(
-        self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
-        self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
-        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
-        self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
-    );
-
-    protected static $httpMethodParameterOverride = false;
-
     /**
      * Custom parameters.
      *
@@ -109,6 +81,34 @@ class Request
      * @var \Symfony\Component\HttpFoundation\HeaderBag
      */
     public $headers;
+
+    protected static $trustedProxies = array();
+
+    /**
+     * @var string[]
+     */
+    protected static $trustedHostPatterns = array();
+
+    /**
+     * @var string[]
+     */
+    protected static $trustedHosts = array();
+
+    /**
+     * Names for headers that can be trusted when
+     * using trusted proxies.
+     *
+     * The default names are non-standard, but widely used
+     * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     */
+    protected static $trustedHeaders = array(
+        self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
+        self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
+        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
+        self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
+    );
+
+    protected static $httpMethodParameterOverride = false;
 
     /**
      * @var string

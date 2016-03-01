@@ -90,39 +90,6 @@ class FormRegistry implements FormRegistryInterface
     }
 
     /**
-     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
-     * it with its parent type.
-     *
-     * @param FormTypeInterface $type The type to resolve.
-     *
-     * @return ResolvedFormTypeInterface The resolved type.
-     */
-    private function resolveAndAddType(FormTypeInterface $type)
-    {
-        $parentType = $type->getParent();
-
-        if ($parentType instanceof FormTypeInterface) {
-            $this->resolveAndAddType($parentType);
-            $parentType = $parentType->getName();
-        }
-
-        $typeExtensions = array();
-
-        foreach ($this->extensions as $extension) {
-            $typeExtensions = array_merge(
-                $typeExtensions,
-                $extension->getTypeExtensions($type->getName())
-            );
-        }
-
-        $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
-            $type,
-            $typeExtensions,
-            $parentType ? $this->getType($parentType) : null
-        );
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function hasType($name)
@@ -168,5 +135,38 @@ class FormRegistry implements FormRegistryInterface
     public function getExtensions()
     {
         return $this->extensions;
+    }
+
+    /**
+     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
+     * it with its parent type.
+     *
+     * @param FormTypeInterface $type The type to resolve.
+     *
+     * @return ResolvedFormTypeInterface The resolved type.
+     */
+    private function resolveAndAddType(FormTypeInterface $type)
+    {
+        $parentType = $type->getParent();
+
+        if ($parentType instanceof FormTypeInterface) {
+            $this->resolveAndAddType($parentType);
+            $parentType = $parentType->getName();
+        }
+
+        $typeExtensions = array();
+
+        foreach ($this->extensions as $extension) {
+            $typeExtensions = array_merge(
+                $typeExtensions,
+                $extension->getTypeExtensions($type->getName())
+            );
+        }
+
+        $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
+            $type,
+            $typeExtensions,
+            $parentType ? $this->getType($parentType) : null
+        );
     }
 }

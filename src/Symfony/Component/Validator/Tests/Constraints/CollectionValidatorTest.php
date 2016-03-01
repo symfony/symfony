@@ -20,13 +20,6 @@ use Symfony\Component\Validator\Constraints\Required;
 
 abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CollectionValidator();
-    }
-
-    abstract protected function prepareTestData(array $contents);
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Collection(array('fields' => array(
@@ -377,4 +370,11 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'foo' => 3,
         ), (array) $value);
     }
+
+    protected function createValidator()
+    {
+        return new CollectionValidator();
+    }
+
+    abstract protected function prepareTestData(array $contents);
 }

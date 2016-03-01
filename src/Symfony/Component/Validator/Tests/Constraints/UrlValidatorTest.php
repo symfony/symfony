@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\UrlValidator;
 
 class UrlValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new UrlValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Url());
@@ -180,6 +175,11 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('file://127.0.0.1'),
             array('git://[::1]/'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new UrlValidator();
     }
 }
 

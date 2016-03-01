@@ -48,17 +48,6 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->savePath = null;
     }
 
-    /**
-     * @return PhpBridgeSessionStorage
-     */
-    protected function getStorage()
-    {
-        $storage = new PhpBridgeSessionStorage();
-        $storage->registerBag(new AttributeBag());
-
-        return $storage;
-    }
-
     public function testPhpSession53()
     {
         if (PHP_VERSION_ID >= 50400) {
@@ -118,5 +107,16 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->clear();
         $this->assertEquals($_SESSION[$key], array());
         $this->assertEquals($_SESSION['drak'], 'loves symfony');
+    }
+
+    /**
+     * @return PhpBridgeSessionStorage
+     */
+    protected function getStorage()
+    {
+        $storage = new PhpBridgeSessionStorage();
+        $storage->registerBag(new AttributeBag());
+
+        return $storage;
     }
 }

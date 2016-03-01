@@ -137,6 +137,20 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
     }
 
+    public static function themeBlockInheritanceProvider()
+    {
+        return array(
+            array(array('theme.html.twig')),
+        );
+    }
+
+    public static function themeInheritanceProvider()
+    {
+        return array(
+            array(array('parent_label.html.twig'), array('child_label.html.twig')),
+        );
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
@@ -189,19 +203,5 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->extension->renderer->setTheme($view, $themes);
-    }
-
-    public static function themeBlockInheritanceProvider()
-    {
-        return array(
-            array(array('theme.html.twig')),
-        );
-    }
-
-    public static function themeInheritanceProvider()
-    {
-        return array(
-            array(array('parent_label.html.twig'), array('child_label.html.twig')),
-        );
     }
 }

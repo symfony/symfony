@@ -20,6 +20,10 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RecursiveArrayAccess
 {
+    private function __construct()
+    {
+    }
+
     public static function get($array, array $indices)
     {
         foreach ($indices as $index) {
@@ -43,9 +47,5 @@ class RecursiveArrayAccess
         }
 
         return $array;
-    }
-
-    private function __construct()
-    {
     }
 }

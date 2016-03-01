@@ -13,6 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class LocalizedRoutesAsPathTest extends WebTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
     /**
      * @dataProvider getLocales
      */
@@ -75,15 +85,5 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     public function getLocales()
     {
         return array(array('en'), array('de'));
-    }
-
-    public static function setUpBeforeClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
     }
 }

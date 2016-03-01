@@ -111,6 +111,14 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'inline';
+    }
+
     protected function createSubRequest($uri, Request $request)
     {
         $cookies = $request->cookies->all();
@@ -141,13 +149,5 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
 
         return $subRequest;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'inline';
     }
 }

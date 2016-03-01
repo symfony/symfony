@@ -27,6 +27,11 @@ class MetadataBag implements SessionBagInterface
     const LIFETIME = 'l';
 
     /**
+     * @var array
+     */
+    protected $meta = array();
+
+    /**
      * @var string
      */
     private $name = '__metadata';
@@ -35,11 +40,6 @@ class MetadataBag implements SessionBagInterface
      * @var string
      */
     private $storageKey;
-
-    /**
-     * @var array
-     */
-    protected $meta = array();
 
     /**
      * Unix timestamp.

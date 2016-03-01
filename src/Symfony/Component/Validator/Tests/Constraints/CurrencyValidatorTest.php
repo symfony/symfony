@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Constraints\CurrencyValidator;
 
 class CurrencyValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CurrencyValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Currency());
@@ -101,5 +96,10 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
             array('EN'),
             array('foobar'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new CurrencyValidator();
     }
 }

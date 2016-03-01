@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class FormEvent extends Event
 {
-    private $form;
     protected $data;
+    private $form;
 
     /**
      * Constructs an event.

@@ -13,6 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class SecurityRoutingIntegrationTest extends WebTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
     /**
      * @dataProvider getConfigs
      */
@@ -86,6 +96,11 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $this->assertRestricted($barredClient, '/secured-by-two-ips');
     }
 
+    public function getConfigs()
+    {
+        return array(array('config.yml'), array('routes_as_path.yml'));
+    }
+
     private function assertAllowed($client, $path)
     {
         $client->request('GET', $path);
@@ -96,20 +111,5 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     {
         $client->request('GET', $path);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
-    }
-
-    public function getConfigs()
-    {
-        return array(array('config.yml'), array('routes_as_path.yml'));
-    }
-
-    public static function setUpBeforeClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
     }
 }

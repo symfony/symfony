@@ -209,11 +209,6 @@ class Form extends Link implements \ArrayAccess
         return $uri;
     }
 
-    protected function getRawUri()
-    {
-        return $this->node->getAttribute('action');
-    }
-
     /**
      * Gets the form method.
      *
@@ -335,6 +330,11 @@ class Form extends Link implements \ArrayAccess
     public function offsetUnset($name)
     {
         $this->fields->remove($name);
+    }
+
+    protected function getRawUri()
+    {
+        return $this->node->getAttribute('action');
     }
 
     /**

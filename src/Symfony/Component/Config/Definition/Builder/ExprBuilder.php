@@ -21,9 +21,9 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ExprBuilder
 {
-    protected $node;
     public $ifPart;
     public $thenPart;
+    protected $node;
 
     /**
      * Constructor.

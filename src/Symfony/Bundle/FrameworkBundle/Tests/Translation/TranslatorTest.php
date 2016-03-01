@@ -32,16 +32,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
-    {
-        if (!file_exists($dir = $this->tmpDir)) {
-            return;
-        }
-
-        $fs = new Filesystem();
-        $fs->remove($dir);
-    }
-
     public function testTransWithoutCaching()
     {
         $translator = $this->getTranslator($this->getLoader());
@@ -235,6 +225,31 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
+    public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    {
+        $translator = $this->createTranslator($loader, $options, $translatorClass);
+
+        $translator->addResource('loader', 'foo', 'fr');
+        $translator->addResource('loader', 'foo', 'en');
+        $translator->addResource('loader', 'foo', 'es');
+        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
+        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+        $translator->addResource('loader', 'foo', 'fr.UTF-8');
+        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+
+        return $translator;
+    }
+
+    protected function deleteTmpDir()
+    {
+        if (!file_exists($dir = $this->tmpDir)) {
+            return;
+        }
+
+        $fs = new Filesystem();
+        $fs->remove($dir);
+    }
+
     protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
@@ -316,21 +331,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ;
 
         return $container;
-    }
-
-    public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
-    {
-        $translator = $this->createTranslator($loader, $options, $translatorClass);
-
-        $translator->addResource('loader', 'foo', 'fr');
-        $translator->addResource('loader', 'foo', 'en');
-        $translator->addResource('loader', 'foo', 'es');
-        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
-        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
-        $translator->addResource('loader', 'foo', 'fr.UTF-8');
-        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
-
-        return $translator;
     }
 
     private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')

@@ -16,6 +16,17 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
+    protected $groupedChoices = array(
+        'Symfony' => array(
+            'a' => 'Bernhard',
+            'b' => 'Fabien',
+            'c' => 'Kris',
+        ),
+        'Doctrine' => array(
+            'd' => 'Jon',
+            'e' => 'Roman',
+        ),
+    );
     private $choices = array(
         'a' => 'Bernhard',
         'b' => 'Fabien',
@@ -33,18 +44,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     );
 
     private $objectChoices;
-
-    protected $groupedChoices = array(
-        'Symfony' => array(
-            'a' => 'Bernhard',
-            'b' => 'Fabien',
-            'c' => 'Kris',
-        ),
-        'Doctrine' => array(
-            'd' => 'Jon',
-            'e' => 'Roman',
-        ),
-    );
 
     protected function setUp()
     {

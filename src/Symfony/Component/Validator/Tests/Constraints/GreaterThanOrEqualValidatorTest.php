@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqualValidator;
  */
 class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new GreaterThanOrEqualValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new GreaterThanOrEqual($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -55,5 +45,15 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
             array(new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005, 12:00 AM', 'DateTime'),
             array('b', '"b"', 'c', '"c"', 'string'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new GreaterThanOrEqualValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new GreaterThanOrEqual($options);
     }
 }

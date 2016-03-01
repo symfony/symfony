@@ -53,6 +53,22 @@ class Regex implements ValueInterface
     private $endJoker;
 
     /**
+     * @param string $pattern
+     * @param string $options
+     * @param string $delimiter
+     */
+    public function __construct($pattern, $options = '', $delimiter = null)
+    {
+        if (null !== $delimiter) {
+            // removes delimiter escaping
+            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
+        }
+
+        $this->parsePattern($pattern);
+        $this->options = $options;
+    }
+
+    /**
      * @param string $expr
      *
      * @return Regex
@@ -75,22 +91,6 @@ class Regex implements ValueInterface
         }
 
         throw new \InvalidArgumentException('Given expression is not a regex.');
-    }
-
-    /**
-     * @param string $pattern
-     * @param string $options
-     * @param string $delimiter
-     */
-    public function __construct($pattern, $options = '', $delimiter = null)
-    {
-        if (null !== $delimiter) {
-            // removes delimiter escaping
-            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
-        }
-
-        $this->parsePattern($pattern);
-        $this->options = $options;
     }
 
     /**

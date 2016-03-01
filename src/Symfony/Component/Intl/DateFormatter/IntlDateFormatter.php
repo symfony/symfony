@@ -46,6 +46,16 @@ use Symfony\Component\Intl\Locale\Locale;
  */
 class IntlDateFormatter
 {
+    /* date/time format types */
+    const NONE = -1;
+    const FULL = 0;
+    const LONG = 1;
+    const MEDIUM = 2;
+    const SHORT = 3;
+
+    /* calendar formats */
+    const TRADITIONAL = 0;
+    const GREGORIAN = 1;
     /**
      * The error code from the last operation.
      *
@@ -59,17 +69,6 @@ class IntlDateFormatter
      * @var string
      */
     protected $errorMessage = 'U_ZERO_ERROR';
-
-    /* date/time format types */
-    const NONE = -1;
-    const FULL = 0;
-    const LONG = 1;
-    const MEDIUM = 2;
-    const SHORT = 3;
-
-    /* calendar formats */
-    const TRADITIONAL = 0;
-    const GREGORIAN = 1;
 
     /**
      * Patterns used to format the date when no pattern is provided.

@@ -27,6 +27,13 @@ use Symfony\Component\Intl\Intl;
 class IntlTestHelper
 {
     /**
+     * Must not be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Should be called before tests that work fine with the stub implementation.
      *
      * @param \PhpUnit_Framework_TestCase $testCase
@@ -109,12 +116,5 @@ class IntlTestHelper
         if (8 !== PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 64 bit is required.');
         }
-    }
-
-    /**
-     * Must not be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

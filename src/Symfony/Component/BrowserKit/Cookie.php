@@ -18,6 +18,14 @@ namespace Symfony\Component\BrowserKit;
  */
 class Cookie
 {
+    protected $name;
+    protected $value;
+    protected $expires;
+    protected $path;
+    protected $domain;
+    protected $secure;
+    protected $httponly;
+    protected $rawValue;
     /**
      * Handles dates as defined by RFC 2616 section 3.3.1, and also some other
      * non-standard, but common formats.
@@ -33,15 +41,6 @@ class Cookie
         'D M j G:i:s Y',
         'D M d H:i:s Y T',
     );
-
-    protected $name;
-    protected $value;
-    protected $expires;
-    protected $path;
-    protected $domain;
-    protected $secure;
-    protected $httponly;
-    protected $rawValue;
 
     /**
      * Sets a cookie.
@@ -196,27 +195,6 @@ class Cookie
         );
     }
 
-    private static function parseDate($dateValue)
-    {
-        // trim single quotes around date if present
-        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
-            $dateValue = substr($dateValue, 1, -1);
-        }
-
-        foreach (self::$dateFormats as $dateFormat) {
-            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
-                return $date->getTimestamp();
-            }
-        }
-
-        // attempt a fallback for unusual formatting
-        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
-            return $date->getTimestamp();
-        }
-
-        throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));
-    }
-
     /**
      * Gets the name of the cookie.
      *
@@ -305,5 +283,26 @@ class Cookie
     public function isExpired()
     {
         return null !== $this->expires && 0 !== $this->expires && $this->expires < time();
+    }
+
+    private static function parseDate($dateValue)
+    {
+        // trim single quotes around date if present
+        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
+            $dateValue = substr($dateValue, 1, -1);
+        }
+
+        foreach (self::$dateFormats as $dateFormat) {
+            if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
+                return $date->getTimestamp();
+            }
+        }
+
+        // attempt a fallback for unusual formatting
+        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+            return $date->getTimestamp();
+        }
+
+        throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));
     }
 }

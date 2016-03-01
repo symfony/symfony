@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\EmailValidator;
 
 class EmailValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new EmailValidator(false);
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Email());
@@ -85,5 +80,10 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example@'),
             array('example@localhost'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new EmailValidator(false);
     }
 }

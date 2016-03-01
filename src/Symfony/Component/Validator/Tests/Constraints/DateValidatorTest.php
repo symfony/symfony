@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\DateValidator;
 
 class DateValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new DateValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Date());
@@ -95,5 +90,10 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
             array('2010-04-32'),
             array('2010-02-29'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new DateValidator();
     }
 }

@@ -28,23 +28,6 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $file
-     */
-    private function clean($file)
-    {
-        if (is_dir($file) && !is_link($file)) {
-            $dir = new \FilesystemIterator($file);
-            foreach ($dir as $childFile) {
-                $this->clean($childFile);
-            }
-
-            rmdir($file);
-        } else {
-            unlink($file);
-        }
-    }
-
-    /**
      * @dataProvider getTestCreateMapTests
      */
     public function testDump($directory)
@@ -146,5 +129,22 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
             $actual[$ns] = str_replace('\\', '/', $path);
         }
         $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @param string $file
+     */
+    private function clean($file)
+    {
+        if (is_dir($file) && !is_link($file)) {
+            $dir = new \FilesystemIterator($file);
+            foreach ($dir as $childFile) {
+                $this->clean($childFile);
+            }
+
+            rmdir($file);
+        } else {
+            unlink($file);
+        }
     }
 }

@@ -205,12 +205,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $resolver = new ControllerResolver();
 
         $request = Request::create('/');
-        $param1 = new \stdClass();
-        $param2 = new \stdClass();
         $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', array($param1, $param2));
+        $request->attributes->set('bar', array('foo', 'bar'));
         $controller = array(new VariadicController(), 'action');
-        $this->assertEquals(array('foo', $param1, $param2), $resolver->getArguments($request, $controller));
+        $this->assertEquals(array('foo', 'foo', 'bar'), $resolver->getArguments($request, $controller));
     }
 
     public function testCreateControllerCanReturnAnyCallable()

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T13:39:07Z
+
+Tests are globally failing because of a conflict with tests added in #17798 and patch from #17600
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T13:39:41Z
+
+ping __@symfony/mergers__
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-01T14:35:37Z
+
+:+1:
+
+But some tests still fail, probably because of what @xabbuh explained here: https://github.com/symfony/symfony/pull/17568#issuecomment-190585004
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T15:03:33Z
+
+Yes, I still don't understand the reason, but it makes TwigBridge difficult to debug.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T15:14:56Z
+
+The `deps=low` test should not fail.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T15:26:14Z
+
+Ok I keep investigating then.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-01T15:35:08Z
+
+@xabbuh, It's not the first PR where I notice this, travis builds for php 5.6 and php 7 run the tests without taking into account the PR commits.
+
+I don't see what I can do...
+
+???

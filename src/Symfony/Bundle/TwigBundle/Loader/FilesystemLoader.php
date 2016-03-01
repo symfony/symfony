@@ -77,20 +77,18 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         try {
             $file = parent::findTemplate($logicalName);
         } catch (\Twig_Error_Loader $e) {
-            $previous = $e;
-            $errorMessage = $e->getMessage();
+            $twigLoaderException = $e;
 
             // for BC
             try {
                 $template = $this->parser->parse($template);
                 $file = $this->locator->locate($template);
             } catch (\Exception $e) {
-                $previous = $e;
             }
         }
 
         if (false === $file || null === $file) {
-            throw new \Twig_Error_Loader($errorMessage, -1, null, $previous);
+            throw $twigLoaderException;
         }
 
         return $this->cache[$logicalName] = $file;

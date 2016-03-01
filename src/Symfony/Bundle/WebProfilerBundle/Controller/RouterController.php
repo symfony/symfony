@@ -96,6 +96,6 @@ class RouterController
         $context->setMethod($method);
         $matcher = new TraceableUrlMatcher($this->routes, $context);
 
-        return $matcher->getTracesFromRequest($traceRequest);
+        return $matcher->getTracesForRequest($traceRequest);
     }
 }

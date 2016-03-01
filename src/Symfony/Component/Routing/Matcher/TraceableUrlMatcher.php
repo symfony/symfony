@@ -41,7 +41,7 @@ class TraceableUrlMatcher extends UrlMatcher
         return $this->traces;
     }
 
-    public function getTracesFromRequest(Request $request)
+    public function getTracesForRequest(Request $request)
     {
         $this->request = $request;
         $traces = $this->getTraces($request->getPathInfo());

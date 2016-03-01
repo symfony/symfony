@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T10:58:13Z
+
+@Pierstoval thanks for providing this fix. A while ago we fixed the problem of long form types (see #17417). Could you please check if your fix is needed even after applying the mentioned merge? Thanks!
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2016-01-27T11:08:41Z
+
+I applied the fix from #17417 but even if the FQCN is reduced to the final class name, the problem persists: it does not come from the toggle buttons, but from the red error count badge. So when having long field names, the issue is still present.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-27T11:09:42Z
+
+IMO, the right fix is not to use absolute positionning (which will make content overflow). A better way would be to use a clearfix on the parent element to ensure the floated element stays in the parent
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2016-01-27T11:16:04Z
+
+@stof your proposal is good, didn't thought about it, but now the label wraps down for long form type classes.
+
+I don't know if very long form type class names are common though :confused:
+What do you think?
+![capture d ecran 2016-01-27 a 12 12 44](https://cloud.githubusercontent.com/assets/3369266/12611874/4e0cc88c-c4ef-11e5-944f-e1a43c591f0c.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-27T11:19:36Z
+
+@Pierstoval this is because a right-floated label should appear before the non-floated content in the DOM, not after it, if you want it to be floated near the beginning of the content rather than near the end. This is the behavior of float.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-09T19:17:12Z
+
+I agree with @stof here. @Pierstoval could you please update this PR to use floats instead of absolute positioning? Thanks!
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2016-02-10T00:05:19Z
+
+I updated it and simply moved the error badge at the beginning of the `<li>` flow so it comes prior
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-10T07:25:12Z
+
+@Pierstoval that would be a significant change. Could you please paste a screenshot of the new design? Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:51:40Z
+
+@Pierstoval Can you provide some screenshots? Is this PR ready to be merged?
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2016-02-29T20:44:31Z
+
+Here is the new "before/after" I can test on one app with this PR:
+
+| Before | After |
+| ------- | ------- |
+| ![admin_before](https://cloud.githubusercontent.com/assets/3369266/13408304/5f6560a0-df2d-11e5-86ab-77382d9e92ed.png) | ![admin_after](https://cloud.githubusercontent.com/assets/3369266/13408303/5f62f48c-df2d-11e5-86b4-ed83a4e0c340.png) |
+
+IMO it could be merged as-is

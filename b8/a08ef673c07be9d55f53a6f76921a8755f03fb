@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:09:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T15:35:12Z
+
+I would like to rename the `DUMP_MULTI_LINE_AS_BLOCK` constant to `DUMP_MULTI_LINE_LITERAL_BLOCK`. What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-01T16:10:02Z
+
+The rename sounds like a good idea to me.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T17:09:53Z
+
+I renamed the constant and added a changelog entry. This is ready for the final review.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-01T17:22:26Z
+
+:+1:
+
+We will need a doc PR for that though

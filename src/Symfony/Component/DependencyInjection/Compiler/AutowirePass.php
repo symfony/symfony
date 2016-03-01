@@ -71,13 +71,20 @@ class AutowirePass implements CompilerPassInterface
 
         $arguments = $definition->getArguments();
         foreach ($constructor->getParameters() as $index => $parameter) {
-            $argumentExists = array_key_exists($index, $arguments);
-            if ($argumentExists && '' !== $arguments[$index]) {
+            if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
 
             try {
                 if (!$typeHint = $parameter->getClass()) {
+                    // no default value? Then fail
+                    if (!$parameter->isOptional()) {
+                        throw new RuntimeException(sprintf('Unable to autowire argument index %d ($%s) for the service "%s". If this is an object, give it a type-hint. Otherwise, specify this argument\'s value explicitly.', $index, $parameter->name, $id));
+                    }
+
+                    // specifically pass the default value
+                    $arguments[$index] = $parameter->getDefaultValue();
+
                     continue;
                 }
 
@@ -110,12 +117,13 @@ class AutowirePass implements CompilerPassInterface
                 $value = $parameter->getDefaultValue();
             }
 
-            if ($argumentExists) {
-                $definition->replaceArgument($index, $value);
-            } else {
-                $definition->addArgument($value);
-            }
+            $arguments[$index] = $value;
         }
+
+        // it's possible index 1 was set, then index 0, then 2, etc
+        // make sure that we re-order so they're injected as expected
+        ksort($arguments);
+        $definition->setArguments($arguments);
     }
 
     /**

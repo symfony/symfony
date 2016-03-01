@@ -98,7 +98,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     private function getStringRepresentation($object)
     {
         if (!is_object($object)) {
-            return gettype($object);
+            return sprintf('%s (%s)', gettype($object), $object);
         }
 
         $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);

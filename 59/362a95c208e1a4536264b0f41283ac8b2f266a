@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-03T16:25:54Z
+
+seems to be related to #17488 and #17494
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:38:34Z
+
+I think this one should be closed for the same reasons #17494 was closed as well.
+
+---------------------------------------------------------------------------
+
+by garak at 2016-03-02T12:49:56Z
+
+Well, my proposal is similar to the one in #17494, but much simpler: I'd like not to fail due to a common situation. The situation is an `Entity` type inside a form, where `required` option is false (or `placeholder` option is set). In this situation, the `guid` type fails on Postgres.
+I don't mean to add any complex validation, like the referenced issue, just this super-simple one. I don't care about edge cases, database configuration, you name it. I'd just like to get an optional relation working.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:49:23Z
+
+LGTM now :+1:

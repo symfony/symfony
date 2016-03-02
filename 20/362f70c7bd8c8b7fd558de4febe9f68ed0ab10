@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-19T15:00:30Z
+
+Nice feature ! Thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-19T15:08:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-02-19T16:00:46Z
+
+Very nice! Just today I fixed a log that put a massive array in the log message but adding it to the context wasn't much better in terms of readability (besides of being lighter of color).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-20T11:49:51Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-20T16:31:15Z
+
+I find it weird to have a JSON representation for the inline log and a pseudo-PHP one for the expanded view.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-20T18:33:59Z
+
+I think @fabpot is right. I'd like to display the original JSON expanded, formatted and highlighted.
+
+Would you agree with including a client-side highlighter in the profiler? (I'm thinking about [highlight.js](https://highlightjs.org/)) We could reuse it to highlight SQL queries (removing our custom highlighter), other log files, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-22T15:30:22Z
+
+I would do the opposite and always display a PHP-like output, that's much easier.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-22T15:47:09Z
+
+I've updated the PR to always display pseudo-PHP:
+
+**Short contexts**
+
+![short_contexts](https://cloud.githubusercontent.com/assets/73419/13223160/66540984-d983-11e5-916b-00dd0affd523.png)
+
+**Long contexts** (expanded)
+
+![long_context_expanded](https://cloud.githubusercontent.com/assets/73419/13223184/823daa06-d983-11e5-81b1-8d32d27ad070.png)
+
+---
+
+If you like, we could even hide the full context when is very long:
+
+**Before**
+
+![before_logs](https://cloud.githubusercontent.com/assets/73419/13223264/daaecb20-d983-11e5-990b-f7087002895d.png)
+
+**After**
+
+![after_logs](https://cloud.githubusercontent.com/assets/73419/13223265/dc6c08a6-d983-11e5-9610-447b1cede58f.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-22T15:48:52Z
+
+I like the second version.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-22T15:57:08Z
+
+Updated. Let's recap the new behavior:
+
+### Short context (<= 120 chars)
+
+Full context is displayed and no link is added:
+
+![short_context](https://cloud.githubusercontent.com/assets/73419/13223567/0c2c3e70-d985-11e5-90fd-add337a1f4cc.png)
+
+### Long context (> 120 chars)
+
+Only the first 120 chars are displayed and a `Show full context` link is added:
+
+![long_context_hidden](https://cloud.githubusercontent.com/assets/73419/13223578/1fe14366-d985-11e5-8c8c-b8febbe187a5.png)
+
+When clicked, the full context is shown formatted in several lines:
+
+![long_context_shown](https://cloud.githubusercontent.com/assets/73419/13223594/32ee7a6e-d985-11e5-88a8-0986598efba2.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-22T16:01:36Z
+
+:+1:

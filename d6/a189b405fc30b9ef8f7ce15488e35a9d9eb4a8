@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-14T22:40:50Z
+
+:+1: except your last test being very difficult to read.
+
+Perhaps you could organise lines by BC first, then by expanded or multiple.
+Rephrasing might help like :
+"If placeholder is null", "If placeholder is false and empty_value is empty" ...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-18T11:33:04Z
+
+The fix looks good, but do we really need so many test fixtures? Can we reduce them to the bare minimum?
+
+---------------------------------------------------------------------------
+
+by boite at 2016-02-28T12:48:26Z
+
+@xabbuh the (admittedly extensive) test data were invaluable in that they revealed when the fix was finally correct after a number of failed attempts. Surely, one datum for each possible permutation *is* the bare minimum.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T17:07:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-02T09:16:29Z
+
+:+1:

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-23T11:16:11Z
+
+I'm not sure about this one. Extension names are derived from bundle names.
+
+---------------------------------------------------------------------------
+
+by kix at 2016-01-23T11:39:08Z
+
+@fabpot, well, technically they should be derived (they do match bundle names right after the bundle has been generated), but there's nothing that could stop someone from (mistakenly) overriding those. That's going against the rules, yes, but I think it's better to handle these cases transparently.
+Also, checking Levenshtein distance for both the bundle name and its extension alias seems to make sense in both cases because of this:
+```php
+levenshtein('SensioFrameworkExtraBundle', 'sensioframeworkextra') => int(9)
+levenshtein('sensio_framework_extra', 'sensioframeworkextra')) => int(2)
+```
+I mean, the reason here is just suggesting the best possible match for the given input, and I think this solution might be satisfying.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T14:37:30Z
+
+Fair enough, can you add some tests?
+
+---------------------------------------------------------------------------
+
+by kix at 2016-01-25T14:39:51Z
+
+@fabpot, sure, will do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-26T05:50:14Z
+
+@kix any news?
+
+---------------------------------------------------------------------------
+
+by kix at 2016-02-26T05:51:16Z
+
+@fabpot, sorry, not yet :(

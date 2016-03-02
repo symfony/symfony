@@ -493,7 +493,7 @@ class Configuration implements ConfigurationInterface
                 ->always(function ($v) {
                     if (!isset($v['annotations'])) {
                         $v['annotations']['enabled'] = true;
-                        @trigger_error('You must explicitly define wheter to enable "framework.annotations" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
+                        // @trigger_error('You must explicitly define wheter to enable "framework.annotations" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
                     }
 
                     return $v;
@@ -537,7 +537,7 @@ class Configuration implements ConfigurationInterface
                 ->always(function ($v) {
                     if (!isset($v['property_access'])) {
                         $v['property_access']['enabled'] = true;
-                        @trigger_error('You must explicitly define wheter to enable "framework.property_access" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
+                        // @trigger_error('You must explicitly define wheter to enable "framework.property_access" or not. It will be disabled by default in 4.0', E_USER_DEPRECATED);
                     }
 
                     return $v;

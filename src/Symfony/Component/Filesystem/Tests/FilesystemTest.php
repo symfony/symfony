@@ -278,7 +278,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertTrue(!is_dir($basePath));
+        $this->assertFileNotExists($basePath);
     }
 
     public function testRemoveCleansArrayOfFilesAndDirectories()
@@ -294,8 +294,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
-        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileNotExists($basePath.'file');
     }
 
     public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
@@ -311,8 +311,8 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
-        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileNotExists($basePath.'file');
     }
 
     public function testRemoveIgnoresNonExistingFiles()
@@ -327,7 +327,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
+        $this->assertFileNotExists($basePath.'dir');
     }
 
     public function testRemoveCleansInvalidLinks()
@@ -339,11 +339,19 @@ class FilesystemTest extends FilesystemTestCase
         mkdir($basePath);
         mkdir($basePath.'dir');
         // create symlink to nonexistent file
-        @symlink($basePath.'file', $basePath.'link');
+        @symlink($basePath.'file', $basePath.'file-link');
+
+        // create symlink to dir using trailing forward slash
+        $this->filesystem->symlink($basePath.'dir/', $basePath.'dir-link');
+        $this->assertTrue(is_dir($basePath.'dir-link'));
+
+        // create symlink to nonexistent dir
+        rmdir($basePath.'dir');
+        $this->assertFalse(is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
-        $this->assertTrue(!is_dir($basePath));
+        $this->assertFileNotExists($basePath);
     }
 
     public function testFilesExists()

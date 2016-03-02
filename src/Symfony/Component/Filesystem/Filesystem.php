@@ -158,26 +158,23 @@ class Filesystem
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!$this->exists($file) && !is_link($file)) {
-                continue;
-            }
-
-            if (is_dir($file) && !is_link($file)) {
+            if (is_link($file)) {
+                // Workaround https://bugs.php.net/52176
+                if (!@unlink($file) && !@rmdir($file)) {
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to remove symlink "%s": %s.', $file, $error['message']));
+                }
+            } elseif (is_dir($file)) {
                 $this->remove(new \FilesystemIterator($file));
 
-                if (true !== @rmdir($file)) {
-                    throw new IOException(sprintf('Failed to remove directory "%s".', $file), 0, null, $file);
+                if (!@rmdir($file)) {
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to remove directory "%s": %s.', $file, $error['message']));
                 }
-            } else {
-                // https://bugs.php.net/bug.php?id=52176
-                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
-                    if (true !== @rmdir($file)) {
-                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
-                    }
-                } else {
-                    if (true !== @unlink($file)) {
-                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
-                    }
+            } elseif ($this->exists($file)) {
+                if (!@unlink($file)) {
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
                 }
             }
         }
@@ -308,10 +305,15 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && $copyOnWindows) {
-            $this->mirror($originDir, $targetDir);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $originDir = strtr($originDir, '/', '\\');
+            $targetDir = strtr($targetDir, '/', '\\');
 
-            return;
+            if ($copyOnWindows) {
+                $this->mirror($originDir, $targetDir);
+
+                return;
+            }
         }
 
         $this->mkdir(dirname($targetDir));

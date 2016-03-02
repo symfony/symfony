@@ -32,6 +32,10 @@ class Dumper
      */
     public function setIndentation($num)
     {
+        if ($num < 1) {
+            throw new \InvalidArgumentException('The indentation must be greater than zero.');
+        }
+
         $this->indentation = (int) $num;
     }
 

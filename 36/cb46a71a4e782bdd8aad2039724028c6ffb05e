@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-03T16:11:02Z
+
+Can you please add a test that would fail without this fix?
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-18T15:31:44Z
+
+@IchHabRecht Can you add a unit test to cover the fix? Do you need help writing such a test?

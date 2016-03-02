@@ -228,6 +228,24 @@ EOF;
             'paragraph-separator' => array("\t\\P", '"\t\\\\P"'),
         );
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The indentation must be greater than zero
+     */
+    public function testZeroIndentationThrowsException()
+    {
+        $this->dumper->setIndentation(0);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The indentation must be greater than zero
+     */
+    public function testNegativeIndentationThrowsException()
+    {
+        $this->dumper->setIndentation(-4);
+    }
 }
 
 class A

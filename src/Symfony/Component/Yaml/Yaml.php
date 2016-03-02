@@ -88,6 +88,10 @@ class Yaml
      */
     public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
     {
+        if ($indent < 1) {
+            throw new \InvalidArgumentException('The indentation must be greater than zero.');
+        }
+
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 

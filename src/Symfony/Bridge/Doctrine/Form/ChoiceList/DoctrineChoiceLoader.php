@@ -146,7 +146,9 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        if (null === $value && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
+        $optimize = null === $value || is_array($value) && $value[0] === $this->idReader;
+
+        if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
             $objectsById = array();
             $objects = array();

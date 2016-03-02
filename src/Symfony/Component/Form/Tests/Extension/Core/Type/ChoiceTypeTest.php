@@ -1805,7 +1805,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals($viewValue, $view->vars['placeholder']);
+        $this->assertSame($viewValue, $view->vars['placeholder']);
         $this->assertFalse($view->vars['placeholder_in_choices']);
     }
 
@@ -1825,9 +1825,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals($viewValue, $view->vars['placeholder']);
+        $this->assertSame($viewValue, $view->vars['placeholder']);
         $this->assertFalse($view->vars['placeholder_in_choices']);
-        $this->assertEquals($viewValue, $view->vars['empty_value']);
+        $this->assertSame($viewValue, $view->vars['empty_value']);
         $this->assertFalse($view->vars['empty_value_in_choices']);
     }
 
@@ -1891,6 +1891,134 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             array(true, true, true, '', null),
             array(true, true, true, null, null),
             array(true, true, true, false, null),
+        );
+    }
+
+    /**
+     * @dataProvider getOptionsWithPlaceholderAndEmptyValue
+     * @group legacy
+     */
+    public function testPlaceholderOptionWithEmptyValueOption($multiple, $expanded, $required, $placeholder, $emptyValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'placeholder' => $placeholder,
+            'empty_value' => $emptyValue,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertSame($viewValue, $view->vars['placeholder']);
+        $this->assertFalse($view->vars['placeholder_in_choices']);
+    }
+
+    public function getOptionsWithPlaceholderAndEmptyValue()
+    {
+        return array(
+            // single non-expanded, not required
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, false, false, false, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, false, false, null, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, false, false, '', null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, false, false, 'bar', null),
+            'A placeholder is not used if empty_value is set to false [maintains BC]' => array(false, false, false, null, false, null),
+            'An unset empty_value is automaticaly made an empty string in a non-required field (but null is expected here) [maintains BC]' => array(false, false, false, null, null, ''),
+            'An empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, false, false, null, '', ''),
+            'A non-empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, false, false, null, 'bar', 'bar'),
+            'A placeholder is not used if it is an empty string and empty_value is set to false [maintains BC]' => array(false, false, false, '', false, null),
+            'An unset empty_value is automatically made an empty string in a non-required field (but null is expected here) [maintains BC]' => array(false, false, false, '', null, null),
+            'An empty string empty_value is used if placeholder is also an empty string [maintains BC]' => array(false, false, false, '', '', ''),
+            'A non-empty string empty_value is used if placeholder is an empty string [maintains BC]' => array(false, false, false, '', 'bar', 'bar'),
+            'A non-empty string placeholder takes precedence over an empty_value set to false' => array(false, false, false, 'foo', false, 'foo'),
+            'A non-empty string placeholder takes precendece over a not set empty_value' => array(false, false, false, 'foo', null, 'foo'),
+            'A non-empty string placeholder takes precedence over an empty string empty_value' => array(false, false, false, 'foo', '', 'foo'),
+            'A non-empty string placeholder takes precedence over a non-empty string empty_value' => array(false, false, false, 'foo', 'bar', 'foo'),
+            // single non-expanded, required
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, true, false, false, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, true, false, null, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, true, false, '', null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, false, true, false, 'bar', null),
+            'A placeholder is not used if empty_value is set to false [maintains BC]' => array(false, false, true, null, false, null),
+            'A placeholder is not used if empty_value is not set [maintains BC]' => array(false, false, true, null, null, null),
+            'An empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, false, true, null, '', ''),
+            'A non-empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, false, true, null, 'bar', 'bar'),
+            'A placeholder is not used if it is an empty string and empty_value is set to false [maintains BC]' => array(false, false, true, '', false, null),
+            'A placeholder is not used if empty_value is not set [maintains BC]' => array(false, false, true, '', null, null),
+            'An empty string empty_value is used if placeholder is also an empty string [maintains BC]' => array(false, false, true, '', '', ''),
+            'A non-empty string empty_value is used if placeholder is an empty string [maintains BC]' => array(false, false, true, '', 'bar', 'bar'),
+            'A non-empty string placeholder takes precedence over an empty_value set to false' => array(false, false, true, 'foo', false, 'foo'),
+            'A non-empty string placeholder takes precendece over a not set empty_value' => array(false, false, true, 'foo', null, 'foo'),
+            'A non-empty string placeholder takes precedence over an empty string empty_value' => array(false, false, true, 'foo', '', 'foo'),
+            'A non-empty string placeholder takes precedence over a non-empty string empty_value' => array(false, false, true, 'foo', 'bar', 'foo'),
+            // single expanded, not required
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, false, false, false, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, false, false, null, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, false, false, '', null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, false, false, 'bar', null),
+            'A placeholder is not used if empty_value is set to false [maintains BC]' => array(false, true, false, null, false, null),
+            'An unset empty_value is automaticaly made an empty string in a non-required field (but null is expected here) [maintains BC]' => array(false, true, false, null, null, null),
+            'An empty string empty_value is converted to "None" in an expanded single choice field [maintains BC]' => array(false, true, false, null, '', 'None'),
+            'A non-empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, true, false, null, 'bar', 'bar'),
+            'A placeholder is not used if it is an empty string and empty_value is set to false [maintains BC]' => array(false, true, false, '', false, null),
+            'An unset empty_value is automatically made an empty string in a non-required field (but null is expected here) [maintains BC]' => array(false, true, false, '', null, null),
+            'An empty string empty_value is converted to "None" in an expanded single choice field [maintains BC]' => array(false, true, false, '', '', 'None'),
+            'A non-empty string empty_value is used if placeholder is an empty string [maintains BC]' => array(false, true, false, '', 'bar', 'bar'),
+            'A non-empty string placeholder takes precedence over an empty_value set to false' => array(false, true, false, 'foo', false, 'foo'),
+            'A non-empty string placeholder takes precendece over a not set empty_value' => array(false, true, false, 'foo', null, 'foo'),
+            'A non-empty string placeholder takes precedence over an empty string empty_value' => array(false, true, false, 'foo', '', 'foo'),
+            'A non-empty string placeholder takes precedence over a non-empty string empty_value' => array(false, true, false, 'foo', 'bar', 'foo'),
+            // single expanded, required
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, true, false, false, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, true, false, null, null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, true, false, '', null),
+            'A placeholder is not used if it is explicitly set to false' => array(false, true, true, false, 'bar', null),
+            'A placeholder is not used if empty_value is set to false [maintains BC]' => array(false, true, true, null, false, null),
+            'A placeholder is not used if empty_value is not set [maintains BC]' => array(false, true, true, null, null, null),
+            'An empty string empty_value is converted to "None" in an expanded single choice field [maintains BC]' => array(false, true, true, null, '', 'None'),
+            'A non-empty string empty_value is used if placeholder is not set [maintains BC]' => array(false, true, true, null, 'bar', 'bar'),
+            'A placeholder is not used if it is an empty string and empty_value is set to false [maintains BC]' => array(false, true, true, '', false, null),
+            'A placeholder is not used if empty_value is not set [maintains BC]' => array(false, true, true, '', null, null),
+            'An empty string empty_value is converted to "None" in an expanded single choice field [maintains BC]' => array(false, true, true, '', '', 'None'),
+            'A non-empty string empty_value is used if placeholder is an empty string [maintains BC]' => array(false, true, true, '', 'bar', 'bar'),
+            'A non-empty string placeholder takes precedence over an empty_value set to false' => array(false, true, true, 'foo', false, 'foo'),
+            'A non-empty string placeholder takes precendece over a not set empty_value' => array(false, true, true, 'foo', null, 'foo'),
+            'A non-empty string placeholder takes precedence over an empty string empty_value' => array(false, true, true, 'foo', '', 'foo'),
+            'A non-empty string placeholder takes precedence over a non-empty string empty_value' => array(false, true, true, 'foo', 'bar', 'foo'),
+            // multiple expanded, not required
+            array(true, true, false, false, false, null),
+            array(true, true, false, false, null, null),
+            array(true, true, false, false, '', null),
+            array(true, true, false, false, 'bar', null),
+            array(true, true, false, null, false, null),
+            array(true, true, false, null, null, null),
+            array(true, true, false, null, '', null),
+            array(true, true, false, null, 'bar', null),
+            array(true, true, false, '', false, null),
+            array(true, true, false, '', null, null),
+            array(true, true, false, '', '', null),
+            array(true, true, false, '', 'bar', null),
+            array(true, true, false, 'foo', false, null),
+            array(true, true, false, 'foo', null, null),
+            array(true, true, false, 'foo', '', null),
+            array(true, true, false, 'foo', 'bar', null),
+            // multiple expanded, required
+            array(true, true, true, false, false, null),
+            array(true, true, true, false, null, null),
+            array(true, true, true, false, '', null),
+            array(true, true, true, false, 'bar', null),
+            array(true, true, true, null, false, null),
+            array(true, true, true, null, null, null),
+            array(true, true, true, null, '', null),
+            array(true, true, true, null, 'bar', null),
+            array(true, true, true, '', false, null),
+            array(true, true, true, '', null, null),
+            array(true, true, true, '', '', null),
+            array(true, true, true, '', 'bar', null),
+            array(true, true, true, 'foo', false, null),
+            array(true, true, true, 'foo', null, null),
+            array(true, true, true, 'foo', '', null),
+            array(true, true, true, 'foo', 'bar', null),
         );
     }
 

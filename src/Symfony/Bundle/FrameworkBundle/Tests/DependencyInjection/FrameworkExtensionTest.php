@@ -501,6 +501,17 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(-900, $tag[0]['priority']);
     }
 
+    public function testObjectNormalizerRegistered()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $definition = $container->getDefinition('serializer.normalizer.object');
+        $tag = $definition->getTag('serializer.normalizer');
+
+        $this->assertEquals('Symfony\Component\Serializer\Normalizer\ObjectNormalizer', $definition->getClass());
+        $this->assertEquals(-1000, $tag[0]['priority']);
+    }
+
     public function testAssetHelperWhenAssetsAreEnabled()
     {
         $container = $this->createContainerFromFile('full');

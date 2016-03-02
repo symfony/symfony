@@ -219,8 +219,11 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $content The XML content
      * @param string $charset The charset
+     * @param int    $options Bitwise OR of the libxml option constants
+     *                        LIBXML_PARSEHUGE is dangerous, see
+     *                        http://symfony.com/blog/security-release-symfony-2-0-17-released
      */
-    public function addXmlContent($content, $charset = 'UTF-8')
+    public function addXmlContent($content, $charset = 'UTF-8', $options = LIBXML_NONET)
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
@@ -230,7 +233,7 @@ class Crawler extends \SplObjectStorage
 
         if ('' !== trim($content)) {
             // remove the default namespace to make XPath expressions simpler
-            @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET | (defined('LIBXML_PARSEHUGE') ? LIBXML_PARSEHUGE : 0));
+            @$dom->loadXML(str_replace('xmlns', 'ns', $content), $options);
         }
 
         libxml_use_internal_errors($internalErrors);

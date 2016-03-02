@@ -281,7 +281,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->remove($basePath);
 
-        $this->assertTrue(!is_dir($basePath));
+        $this->assertFileNotExists($basePath);
     }
 
     public function testRemoveCleansArrayOfFilesAndDirectories()
@@ -297,8 +297,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
-        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileNotExists($basePath.'file');
     }
 
     public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
@@ -314,8 +314,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
-        $this->assertTrue(!is_file($basePath.'file'));
+        $this->assertFileNotExists($basePath.'dir');
+        $this->assertFileNotExists($basePath.'file');
     }
 
     public function testRemoveIgnoresNonExistingFiles()
@@ -330,7 +330,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->remove($files);
 
-        $this->assertTrue(!is_dir($basePath.'dir'));
+        $this->assertFileNotExists($basePath.'dir');
     }
 
     public function testRemoveCleansInvalidLinks()
@@ -342,11 +342,19 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         mkdir($basePath);
         mkdir($basePath.'dir');
         // create symlink to nonexistent file
-        @symlink($basePath.'file', $basePath.'link');
+        @symlink($basePath.'file', $basePath.'file-link');
+
+        // create symlink to dir using trailing forward slash
+        $this->filesystem->symlink($basePath.'dir/', $basePath.'dir-link');
+        $this->assertTrue(is_dir($basePath.'dir-link'));
+
+        // create symlink to nonexistent dir
+        rmdir($basePath.'dir');
+        $this->assertFalse(is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
-        $this->assertTrue(!is_dir($basePath));
+        $this->assertFileNotExists($basePath);
     }
 
     public function testFilesExists()
@@ -1062,10 +1070,6 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      */
     private function markAsSkippedIfSymlinkIsMissing($relative = false)
     {
-        if (!function_exists('symlink')) {
-            $this->markTestSkipped('symlink is not supported');
-        }
-
         if (false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }

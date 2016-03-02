@@ -108,6 +108,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
 
         $defaultConfig = array(
+            'enabled' => true,
             'version_strategy' => null,
             'version' => null,
             'version_format' => '%%s?%%s',
@@ -193,6 +194,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
+                'matcher' => array(
+                    'enabled' => false,
+                    'ips' => array(),
+                ),
             ),
             'translator' => array(
                 'enabled' => false,
@@ -222,6 +227,43 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'property_info' => array(
                 'enabled' => false,
+            ),
+            'router' => array(
+                'enabled' => false,
+                'http_port' => 80,
+                'https_port' => 443,
+                'strict_requirements' => true,
+            ),
+            'session' => array(
+                'enabled' => false,
+                'storage_id' => 'session.storage.native',
+                'handler_id' => 'session.handler.native_file',
+                'cookie_httponly' => true,
+                'gc_probability' => 1,
+                'save_path' => '%kernel.cache_dir%/sessions',
+                'metadata_update_threshold' => '0',
+            ),
+            'request' => array(
+                'enabled' => false,
+                'formats' => array(),
+            ),
+            'templating' => array(
+                'enabled' => false,
+                'hinclude_default_template' => null,
+                'form' => array(
+                    'resources' => array('FrameworkBundle:Form'),
+                ),
+                'engines' => array(),
+                'loaders' => array(),
+            ),
+            'assets' => array(
+                'enabled' => false,
+                'version_strategy' => null,
+                'version' => null,
+                'version_format' => '%%s?%%s',
+                'base_path' => '',
+                'base_urls' => array(),
+                'packages' => array(),
             ),
         );
     }

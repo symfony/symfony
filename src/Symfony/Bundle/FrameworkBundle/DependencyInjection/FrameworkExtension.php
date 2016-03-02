@@ -87,12 +87,12 @@ class FrameworkExtension extends Extension
             $loader->load('test.xml');
         }
 
-        if (isset($config['session'])) {
+        if ($this->isConfigEnabled($container, $config['session'])) {
             $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
-        if (isset($config['request'])) {
+        if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
@@ -108,11 +108,11 @@ class FrameworkExtension extends Extension
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
-        if (isset($config['assets'])) {
+        if ($this->isConfigEnabled($container, $config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
         }
 
-        if (isset($config['templating'])) {
+        if ($this->isConfigEnabled($container, $config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
@@ -123,7 +123,7 @@ class FrameworkExtension extends Extension
         $this->registerTranslatorConfiguration($config['translator'], $container);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
-        if (isset($config['router'])) {
+        if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
@@ -313,7 +313,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
 
-        if (isset($config['matcher'])) {
+        if ($this->isConfigEnabled($container, $config['matcher'])) {
             if (isset($config['matcher']['service'])) {
                 $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
             } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
@@ -899,7 +899,7 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$config['enabled']) {
+        if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
 
@@ -1004,7 +1004,7 @@ class FrameworkExtension extends Extension
      */
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$config['enabled']) {
+        if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
 

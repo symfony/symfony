@@ -1050,8 +1050,8 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $sourceFilePath = $this->workspace . DIRECTORY_SEPARATOR . 'copy_source_file';
-        $targetFilePath = $this->workspace . DIRECTORY_SEPARATOR . 'copy_target_file';
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         chmod($sourceFilePath, 0745);

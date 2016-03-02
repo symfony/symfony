@@ -161,8 +161,15 @@ class Filesystem
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        $error = error_get_last();
-                        throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
+                        // handle broken symlinks on Windows systems
+                        if (is_link($file) && false === @readlink($file)) {
+                            if (true !== @rmdir($file)) {
+                                throw new IOException(sprintf('Failed to remove broken symlink "%s".', $file), 0, null, $file);
+                            }
+                        } else {
+                            $error = error_get_last();
+                            throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
+                        }
                     }
                 }
             }

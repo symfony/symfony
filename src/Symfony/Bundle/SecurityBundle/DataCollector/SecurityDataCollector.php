@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 
 /**
  * SecurityDataCollector.
@@ -110,7 +111,7 @@ class SecurityDataCollector extends DataCollector
         }
 
         // collect voters and access decision manager information
-        if (null !== $this->accessDecisionManager) {
+        if ($this->accessDecisionManager instance of DebugAccessDecisionManager) {
             $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
 

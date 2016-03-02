@@ -27,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface
 {
+    /** @var \SplObjectStorage */
     protected $controllers;
 
     public function __construct()
@@ -286,26 +287,9 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return isset($this->data['redirect']) ? $this->data['redirect'] : false;
     }
 
-    /**
-     * Gets the parsed forward controller.
-     *
-     * @return array|bool An array with keys 'token' the forward profile token, and
-     *                    'controller' the parsed forward controller, false otherwise
-     */
-    public function getForward()
-    {
-        return isset($this->data['forward']) ? $this->data['forward'] : false;
-    }
-
     public function onKernelController(FilterControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
-
-        if ($parentRequestAttributes = $event->getRequest()->attributes->get('_forwarded')) {
-            if ($parentRequestAttributes instanceof ParameterBag) {
-                $parentRequestAttributes->set('_forward_controller', $event->getController());
-            }
-        }
     }
 
     public static function getSubscribedEvents()
@@ -321,43 +305,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return 'request';
     }
 
-    private function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
-    {
-        $cookie = sprintf('%s=%s', $name, urlencode($value));
-
-        if (0 !== $expires) {
-            if (is_numeric($expires)) {
-                $expires = (int) $expires;
-            } elseif ($expires instanceof \DateTime) {
-                $expires = $expires->getTimestamp();
-            } else {
-                $tmp = strtotime($expires);
-                if (false === $tmp || -1 == $tmp) {
-                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid (%s).', $expires));
-                }
-                $expires = $tmp;
-            }
-
-            $cookie .= '; expires='.str_replace('+0000', '', \DateTime::createFromFormat('U', $expires, new \DateTimeZone('GMT'))->format('D, d-M-Y H:i:s T'));
-        }
-
-        if ($domain) {
-            $cookie .= '; domain='.$domain;
-        }
-
-        $cookie .= '; path='.$path;
-
-        if ($secure) {
-            $cookie .= '; secure';
-        }
-
-        if ($httponly) {
-            $cookie .= '; httponly';
-        }
-
-        return $cookie;
-    }
-
     /**
      * Parse a controller.
      *
@@ -365,7 +312,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return array|string An array of controller data or a simple string
      */
-    private function parseController($controller)
+    protected function parseController($controller)
     {
         if (is_string($controller) && false !== strpos($controller, '::')) {
             $controller = explode('::', $controller);
@@ -417,5 +364,42 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         return (string) $controller ?: 'n/a';
+    }
+
+    private function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
+    {
+        $cookie = sprintf('%s=%s', $name, urlencode($value));
+
+        if (0 !== $expires) {
+            if (is_numeric($expires)) {
+                $expires = (int) $expires;
+            } elseif ($expires instanceof \DateTime) {
+                $expires = $expires->getTimestamp();
+            } else {
+                $tmp = strtotime($expires);
+                if (false === $tmp || -1 == $tmp) {
+                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid (%s).', $expires));
+                }
+                $expires = $tmp;
+            }
+
+            $cookie .= '; expires='.str_replace('+0000', '', \DateTime::createFromFormat('U', $expires, new \DateTimeZone('GMT'))->format('D, d-M-Y H:i:s T'));
+        }
+
+        if ($domain) {
+            $cookie .= '; domain='.$domain;
+        }
+
+        $cookie .= '; path='.$path;
+
+        if ($secure) {
+            $cookie .= '; secure';
+        }
+
+        if ($httponly) {
+            $cookie .= '; httponly';
+        }
+
+        return $cookie;
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 trait TargetPathTrait
 {
     /**
-     * Set the target path the user should be redirected to after authentication.
+     * Sets the target path the user should be redirected to after authentication.
      *
      * Usually, you do not need to set this directly.
      *

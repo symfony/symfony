@@ -289,6 +289,14 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
+    public function progressRedrawFrequency($step = 1)
+    {
+        $this->getProgressBar()->setRedrawFrequency($step);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function progressFinish()
     {
         $this->getProgressBar()->finish();

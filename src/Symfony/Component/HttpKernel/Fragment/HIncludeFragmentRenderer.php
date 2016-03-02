@@ -125,6 +125,14 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'hinclude';
+    }
+
+    /**
      * @param string $template
      *
      * @return bool
@@ -152,13 +160,5 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'hinclude';
     }
 }

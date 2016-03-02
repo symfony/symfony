@@ -30,17 +30,16 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $serverParams;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $dispatcher;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $factory;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $serverParams;
 
     protected function setUp()
     {
@@ -52,11 +51,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         );
 
         parent::setUp();
-    }
-
-    protected function createValidator()
-    {
-        return new FormValidator($this->serverParams);
     }
 
     public function testValidate()
@@ -567,6 +561,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     public function getValidationGroups(FormInterface $form)
     {
         return array('group1', 'group2');
+    }
+
+    protected function createValidator()
+    {
+        return new FormValidator($this->serverParams);
     }
 
     /**

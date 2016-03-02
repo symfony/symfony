@@ -37,6 +37,16 @@ class SvnRepository
     private $lastCommit;
 
     /**
+     * Reads the SVN repository at the given path.
+     *
+     * @param string $path The path to the repository.
+     */
+    public function __construct($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
      * Downloads the ICU data for the given version.
      *
      * @param string $url       The URL to download from.
@@ -68,16 +78,6 @@ class SvnRepository
         }
 
         return new static(realpath($targetDir));
-    }
-
-    /**
-     * Reads the SVN repository at the given path.
-     *
-     * @param string $path The path to the repository.
-     */
-    public function __construct($path)
-    {
-        $this->path = $path;
     }
 
     /**

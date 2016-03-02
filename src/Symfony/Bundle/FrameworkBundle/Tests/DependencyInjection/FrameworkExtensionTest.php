@@ -20,8 +20,6 @@ abstract class FrameworkExtensionTest extends TestCase
 {
     private static $containerCache = array();
 
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
-
     public function testCsrfProtection()
     {
         $container = $this->createContainerFromFile('full');
@@ -294,6 +292,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
+
+    abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
     protected function createContainer(array $data = array())
     {

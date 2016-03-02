@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 
 class RegexValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new RegexValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Regex(array('pattern' => '/^[0-9]+$/')));
@@ -87,5 +82,10 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
             array('abcd'),
             array('090foo'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new RegexValidator();
     }
 }

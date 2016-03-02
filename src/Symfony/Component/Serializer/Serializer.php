@@ -170,6 +170,38 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
+    final public function encode($data, $format, array $context = array())
+    {
+        return $this->encoder->encode($data, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function decode($data, $format, array $context = array())
+    {
+        return $this->decoder->decode($data, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsEncoding($format)
+    {
+        return $this->encoder->supportsEncoding($format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDecoding($format)
+    {
+        return $this->decoder->supportsDecoding($format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     private function getNormalizer($data, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
@@ -193,22 +225,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         throw new RuntimeException(sprintf('No denormalizer found for format "%s".', $format));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    final public function encode($data, $format, array $context = array())
-    {
-        return $this->encoder->encode($data, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    final public function decode($data, $format, array $context = array())
-    {
-        return $this->decoder->decode($data, $format, $context);
     }
 
     /**
@@ -275,21 +291,5 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $class));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsEncoding($format)
-    {
-        return $this->encoder->supportsEncoding($format);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDecoding($format)
-    {
-        return $this->decoder->supportsDecoding($format);
     }
 }

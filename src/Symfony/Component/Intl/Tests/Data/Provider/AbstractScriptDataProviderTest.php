@@ -199,8 +199,6 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
-
     public function testGetScripts()
     {
         $this->assertSame(static::$scripts, $this->dataProvider->getScripts());
@@ -264,4 +262,6 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
             $this->assertSame($name, $this->dataProvider->getName($script));
         }
     }
+
+    abstract protected function getDataDirectory();
 }

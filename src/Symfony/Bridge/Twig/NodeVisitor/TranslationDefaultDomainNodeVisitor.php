@@ -37,6 +37,14 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return -10;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doEnterNode(\Twig_Node $node, \Twig_Environment $env)
     {
         if ($node instanceof \Twig_Node_Block || $node instanceof \Twig_Node_Module) {
@@ -100,14 +108,6 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
         }
 
         return $node;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
-    {
-        return -10;
     }
 
     /**

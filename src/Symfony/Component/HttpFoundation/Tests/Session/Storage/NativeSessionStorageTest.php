@@ -53,19 +53,6 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->savePath = null;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return NativeSessionStorage
-     */
-    protected function getStorage(array $options = array())
-    {
-        $storage = new NativeSessionStorage($options);
-        $storage->registerBag(new AttributeBag());
-
-        return $storage;
-    }
-
     public function testBag()
     {
         $storage = $this->getStorage();
@@ -260,5 +247,18 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->start();
         $this->assertSame($id, $storage->getId(), 'Same session ID after restarting');
         $this->assertSame(7, $storage->getBag('attributes')->get('lucky'), 'Data still available');
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return NativeSessionStorage
+     */
+    protected function getStorage(array $options = array())
+    {
+        $storage = new NativeSessionStorage($options);
+        $storage->registerBag(new AttributeBag());
+
+        return $storage;
     }
 }

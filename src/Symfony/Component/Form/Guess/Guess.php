@@ -63,6 +63,23 @@ abstract class Guess
     private $confidence;
 
     /**
+     * Constructor.
+     *
+     * @param int $confidence The confidence
+     *
+     * @throws InvalidArgumentException if the given value of confidence is unknown
+     */
+    public function __construct($confidence)
+    {
+        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
+            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
+            throw new InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
+        }
+
+        $this->confidence = $confidence;
+    }
+
+    /**
      * Returns the guess most likely to be correct from a list of guesses.
      *
      * If there are multiple guesses with the same, highest confidence, the
@@ -85,23 +102,6 @@ abstract class Guess
         }
 
         return $result;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param int $confidence The confidence
-     *
-     * @throws InvalidArgumentException if the given value of confidence is unknown
-     */
-    public function __construct($confidence)
-    {
-        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
-            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
-            throw new InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
-        }
-
-        $this->confidence = $confidence;
     }
 
     /**

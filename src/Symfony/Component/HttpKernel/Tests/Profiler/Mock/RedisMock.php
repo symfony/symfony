@@ -222,6 +222,19 @@ class RedisMock
         return true;
     }
 
+    public function select($dbnum)
+    {
+        if (!$this->connected) {
+            return false;
+        }
+
+        if (0 > $dbnum) {
+            return false;
+        }
+
+        return true;
+    }
+
     private function getData($key)
     {
         if (isset($this->storage[$key])) {
@@ -234,19 +247,6 @@ class RedisMock
     private function storeData($key, $value)
     {
         $this->storage[$key] = serialize($value);
-
-        return true;
-    }
-
-    public function select($dbnum)
-    {
-        if (!$this->connected) {
-            return false;
-        }
-
-        if (0 > $dbnum) {
-            return false;
-        }
 
         return true;
     }

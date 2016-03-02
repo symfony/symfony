@@ -21,11 +21,6 @@ function choice_callback()
 
 class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new ChoiceValidator();
-    }
-
     public static function staticCallback()
     {
         return array('foo', 'bar');
@@ -283,5 +278,10 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new ChoiceValidator();
     }
 }

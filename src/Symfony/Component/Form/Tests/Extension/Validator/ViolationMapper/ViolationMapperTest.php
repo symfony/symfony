@@ -67,53 +67,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->params = array('foo' => 'bar');
     }
 
-    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $inheritData = false, $synchronized = true)
-    {
-        $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, array(
-            'error_mapping' => $errorMapping,
-        ));
-        $config->setMapped(true);
-        $config->setInheritData($inheritData);
-        $config->setPropertyPath($propertyPath);
-        $config->setCompound(true);
-        $config->setDataMapper($this->getDataMapper());
-
-        if (!$synchronized) {
-            $config->addViewTransformer(new CallbackTransformer(
-                function ($normData) { return $normData; },
-                function () { throw new TransformationFailedException(); }
-            ));
-        }
-
-        return new Form($config);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getDataMapper()
-    {
-        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
-    }
-
-    /**
-     * @param $propertyPath
-     *
-     * @return ConstraintViolation
-     */
-    protected function getConstraintViolation($propertyPath)
-    {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
-    }
-
-    /**
-     * @return FormError
-     */
-    protected function getFormError()
-    {
-        return new FormError($this->message, $this->messageTemplate, $this->params);
-    }
-
     public function testMapToFormInheritingParentDataIfDataDoesNotMatch()
     {
         $violation = $this->getConstraintViolation('children[address].data.foo');
@@ -1494,5 +1447,52 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $child1->getErrors(), $child1->getName().' should not have an error, but has one');
         $this->assertCount(0, $child2->getErrors(), $child2->getName().' should not have an error, but has one');
         $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChild->getName().' should have an error, but has none');
+    }
+
+    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $inheritData = false, $synchronized = true)
+    {
+        $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, array(
+            'error_mapping' => $errorMapping,
+        ));
+        $config->setMapped(true);
+        $config->setInheritData($inheritData);
+        $config->setPropertyPath($propertyPath);
+        $config->setCompound(true);
+        $config->setDataMapper($this->getDataMapper());
+
+        if (!$synchronized) {
+            $config->addViewTransformer(new CallbackTransformer(
+                function ($normData) { return $normData; },
+                function () { throw new TransformationFailedException(); }
+            ));
+        }
+
+        return new Form($config);
+    }
+
+    /**
+     * @param $propertyPath
+     *
+     * @return ConstraintViolation
+     */
+    protected function getConstraintViolation($propertyPath)
+    {
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
+    }
+
+    /**
+     * @return FormError
+     */
+    protected function getFormError()
+    {
+        return new FormError($this->message, $this->messageTemplate, $this->params);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getDataMapper()
+    {
+        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
     }
 }

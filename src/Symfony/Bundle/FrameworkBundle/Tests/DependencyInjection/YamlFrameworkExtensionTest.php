@@ -17,16 +17,16 @@ use Symfony\Component\Config\FileLocator;
 
 class YamlFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
-    {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
-        $loader->load($file.'.yml');
-    }
-
     public function testCsrfProtectionShouldBeEnabledByDefault()
     {
         $container = $this->createContainerFromFile('csrf');
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
+    protected function loadFromFile(ContainerBuilder $container, $file)
+    {
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
+        $loader->load($file.'.yml');
     }
 }

@@ -61,11 +61,6 @@ abstract class Input implements InputInterface
     }
 
     /**
-     * Processes command line arguments.
-     */
-    abstract protected function parse();
-
-    /**
      * Validates the input.
      *
      * @throws \RuntimeException When not enough arguments are given
@@ -229,4 +224,9 @@ abstract class Input implements InputInterface
     {
         return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }
+
+    /**
+     * Processes command line arguments.
+     */
+    abstract protected function parse();
 }

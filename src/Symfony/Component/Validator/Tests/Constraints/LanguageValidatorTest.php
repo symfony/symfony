@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Constraints\LanguageValidator;
 
 class LanguageValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new LanguageValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Language());
@@ -99,5 +94,10 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertNoViolation();
+    }
+
+    protected function createValidator()
+    {
+        return new LanguageValidator();
     }
 }

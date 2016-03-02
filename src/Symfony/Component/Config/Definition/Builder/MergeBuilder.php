@@ -18,9 +18,9 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class MergeBuilder
 {
-    protected $node;
     public $allowFalse;
     public $allowOverwrite;
+    protected $node;
 
     /**
      * Constructor.

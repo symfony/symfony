@@ -105,6 +105,14 @@ class IcuResFileDumper implements DumperInterface
         return $header.$root.$data;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtension()
+    {
+        return 'res';
+    }
+
     private function writePadding($data)
     {
         $padding = strlen($data) % 4;
@@ -117,13 +125,5 @@ class IcuResFileDumper implements DumperInterface
     private function getPosition($data)
     {
         return (strlen($data) + 28) / 4;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExtension()
-    {
-        return 'res';
     }
 }

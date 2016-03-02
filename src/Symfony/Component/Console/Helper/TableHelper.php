@@ -323,6 +323,14 @@ class TableHelper extends Helper
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'table';
+    }
+
+    /**
      * Renders horizontal header separator.
      *
      * Example: +-----+-----------+-------+
@@ -477,13 +485,5 @@ class TableHelper extends Helper
         $formatter->setDecorated($isDecorated);
 
         return $this->strlen($string);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'table';
     }
 }

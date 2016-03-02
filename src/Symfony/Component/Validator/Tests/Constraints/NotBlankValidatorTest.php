@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\NotBlankValidator;
 
 class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new NotBlankValidator();
-    }
-
     /**
      * @dataProvider getValidValues
      */
@@ -92,5 +87,10 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
             ->assertRaised();
+    }
+
+    protected function createValidator()
+    {
+        return new NotBlankValidator();
     }
 }

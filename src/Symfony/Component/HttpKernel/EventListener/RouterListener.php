@@ -120,6 +120,13 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+        );
+    }
+
     private function parametersToString(array $parameters)
     {
         $pieces = array();
@@ -128,12 +135,5 @@ class RouterListener implements EventSubscriberInterface
         }
 
         return implode(', ', $pieces);
-    }
-
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
-        );
     }
 }

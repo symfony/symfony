@@ -25,13 +25,6 @@ class PhpExtractor implements ExtractorInterface
     const MESSAGE_TOKEN = 300;
 
     /**
-     * Prefix for new found message.
-     *
-     * @var string
-     */
-    private $prefix = '';
-
-    /**
      * The sequence that captures translation messages.
      *
      * @var array
@@ -50,6 +43,13 @@ class PhpExtractor implements ExtractorInterface
             self::MESSAGE_TOKEN,
         ),
     );
+
+    /**
+     * Prefix for new found message.
+     *
+     * @var string
+     */
+    private $prefix = '';
 
     /**
      * {@inheritdoc}
@@ -91,6 +91,43 @@ class PhpExtractor implements ExtractorInterface
         }
 
         return $token;
+    }
+
+    /**
+     * Extracts trans message from PHP tokens.
+     *
+     * @param array            $tokens
+     * @param MessageCatalogue $catalog
+     */
+    protected function parseTokens($tokens, MessageCatalogue $catalog)
+    {
+        $tokenIterator = new \ArrayIterator($tokens);
+
+        for ($key = 0; $key < $tokenIterator->count(); ++$key) {
+            foreach ($this->sequences as $sequence) {
+                $message = '';
+                $tokenIterator->seek($key);
+
+                foreach ($sequence as $item) {
+                    $this->seekToNextRelevantToken($tokenIterator);
+
+                    if ($this->normalizeToken($tokenIterator->current()) == $item) {
+                        $tokenIterator->next();
+                        continue;
+                    } elseif (self::MESSAGE_TOKEN == $item) {
+                        $message = $this->getMessage($tokenIterator);
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($message) {
+                    $catalog->set($message, $this->prefix.$message);
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -141,42 +178,5 @@ class PhpExtractor implements ExtractorInterface
         }
 
         return $message;
-    }
-
-    /**
-     * Extracts trans message from PHP tokens.
-     *
-     * @param array            $tokens
-     * @param MessageCatalogue $catalog
-     */
-    protected function parseTokens($tokens, MessageCatalogue $catalog)
-    {
-        $tokenIterator = new \ArrayIterator($tokens);
-
-        for ($key = 0; $key < $tokenIterator->count(); ++$key) {
-            foreach ($this->sequences as $sequence) {
-                $message = '';
-                $tokenIterator->seek($key);
-
-                foreach ($sequence as $item) {
-                    $this->seekToNextRelevantToken($tokenIterator);
-
-                    if ($this->normalizeToken($tokenIterator->current()) == $item) {
-                        $tokenIterator->next();
-                        continue;
-                    } elseif (self::MESSAGE_TOKEN == $item) {
-                        $message = $this->getMessage($tokenIterator);
-                        break;
-                    } else {
-                        break;
-                    }
-                }
-
-                if ($message) {
-                    $catalog->set($message, $this->prefix.$message);
-                    break;
-                }
-            }
-        }
     }
 }

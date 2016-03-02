@@ -26,16 +26,6 @@ class Expression implements ValueInterface
 
     /**
      * @param string $expr
-     *
-     * @return Expression
-     */
-    public static function create($expr)
-    {
-        return new self($expr);
-    }
-
-    /**
-     * @param string $expr
      */
     public function __construct($expr)
     {
@@ -44,6 +34,16 @@ class Expression implements ValueInterface
         } catch (\InvalidArgumentException $e) {
             $this->value = new Glob($expr);
         }
+    }
+
+    /**
+     * @param string $expr
+     *
+     * @return Expression
+     */
+    public static function create($expr)
+    {
+        return new self($expr);
     }
 
     /**

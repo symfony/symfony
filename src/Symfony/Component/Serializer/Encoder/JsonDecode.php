@@ -18,6 +18,7 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 class JsonDecode implements DecoderInterface
 {
+    protected $serializer;
     /**
      * Specifies if the returned result should be an associative array or a nested stdClass object hierarchy.
      *
@@ -33,7 +34,6 @@ class JsonDecode implements DecoderInterface
     private $recursionDepth;
 
     private $lastError = JSON_ERROR_NONE;
-    protected $serializer;
 
     /**
      * Constructs a new JsonDecode instance.

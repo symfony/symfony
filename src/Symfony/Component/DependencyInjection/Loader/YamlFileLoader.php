@@ -79,6 +79,42 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
+     * Loads a YAML file.
+     *
+     * @param string $file
+     *
+     * @return array The file content
+     *
+     * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
+     */
+    protected function loadFile($file)
+    {
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
+        }
+
+        if (!stream_is_local($file)) {
+            throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
+        }
+
+        if (!file_exists($file)) {
+            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
+        }
+
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new YamlParser();
+        }
+
+        try {
+            $configuration = $this->yamlParser->parse(file_get_contents($file));
+        } catch (ParseException $e) {
+            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
+        }
+
+        return $this->validate($configuration, $file);
+    }
+
+    /**
      * Parses all imports.
      *
      * @param array  $content
@@ -263,42 +299,6 @@ class YamlFileLoader extends FileLoader
         }
 
         $this->container->setDefinition($id, $definition);
-    }
-
-    /**
-     * Loads a YAML file.
-     *
-     * @param string $file
-     *
-     * @return array The file content
-     *
-     * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
-     */
-    protected function loadFile($file)
-    {
-        if (!class_exists('Symfony\Component\Yaml\Parser')) {
-            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
-        }
-
-        if (!stream_is_local($file)) {
-            throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
-        }
-
-        if (!file_exists($file)) {
-            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
-        }
-
-        if (null === $this->yamlParser) {
-            $this->yamlParser = new YamlParser();
-        }
-
-        try {
-            $configuration = $this->yamlParser->parse(file_get_contents($file));
-        } catch (ParseException $e) {
-            throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
-        }
-
-        return $this->validate($configuration, $file);
     }
 
     /**

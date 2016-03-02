@@ -745,30 +745,6 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal width in which this application runs.
-     *
-     * @return int|null
-     */
-    protected function getTerminalWidth()
-    {
-        $dimensions = $this->getTerminalDimensions();
-
-        return $dimensions[0];
-    }
-
-    /**
-     * Tries to figure out the terminal height in which this application runs.
-     *
-     * @return int|null
-     */
-    protected function getTerminalHeight()
-    {
-        $dimensions = $this->getTerminalDimensions();
-
-        return $dimensions[1];
-    }
-
-    /**
      * Tries to figure out the terminal dimensions based on the current environment.
      *
      * @return array Array containing width and height
@@ -798,6 +774,48 @@ class Application
         }
 
         return array(null, null);
+    }
+
+    /**
+     * Returns the namespace part of the command name.
+     *
+     * This method is not part of public API and should not be used directly.
+     *
+     * @param string $name  The full name of the command
+     * @param string $limit The maximum number of parts of the namespace
+     *
+     * @return string The namespace of the command
+     */
+    public function extractNamespace($name, $limit = null)
+    {
+        $parts = explode(':', $name);
+        array_pop($parts);
+
+        return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
+    }
+
+    /**
+     * Tries to figure out the terminal width in which this application runs.
+     *
+     * @return int|null
+     */
+    protected function getTerminalWidth()
+    {
+        $dimensions = $this->getTerminalDimensions();
+
+        return $dimensions[0];
+    }
+
+    /**
+     * Tries to figure out the terminal height in which this application runs.
+     *
+     * @return int|null
+     */
+    protected function getTerminalHeight()
+    {
+        $dimensions = $this->getTerminalDimensions();
+
+        return $dimensions[1];
     }
 
     /**
@@ -994,24 +1012,6 @@ class Application
     private function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
-    }
-
-    /**
-     * Returns the namespace part of the command name.
-     *
-     * This method is not part of public API and should not be used directly.
-     *
-     * @param string $name  The full name of the command
-     * @param string $limit The maximum number of parts of the namespace
-     *
-     * @return string The namespace of the command
-     */
-    public function extractNamespace($name, $limit = null)
-    {
-        $parts = explode(':', $name);
-        array_pop($parts);
-
-        return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
     }
 
     /**

@@ -66,6 +66,124 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Validates a documents XML schema.
+     *
+     * @param \DOMDocument $dom
+     *
+     * @return bool
+     *
+     * @throws RuntimeException When extension references a non-existent XSD file
+     */
+    public function validateSchema(\DOMDocument $dom)
+    {
+        $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
+
+        if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
+            $items = preg_split('/\s+/', $element);
+            for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
+                if (!$this->container->hasExtension($items[$i])) {
+                    continue;
+                }
+
+                if (($extension = $this->container->getExtension($items[$i])) && false !== $extension->getXsdValidationBasePath()) {
+                    $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
+
+                    if (!is_file($path)) {
+                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
+                    }
+
+                    $schemaLocations[$items[$i]] = $path;
+                }
+            }
+        }
+
+        $tmpfiles = array();
+        $imports = '';
+        foreach ($schemaLocations as $namespace => $location) {
+            $parts = explode('/', $location);
+            if (0 === stripos($location, 'phar://')) {
+                $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+                if ($tmpfile) {
+                    copy($location, $tmpfile);
+                    $tmpfiles[] = $tmpfile;
+                    $parts = explode('/', str_replace('\\', '/', $tmpfile));
+                }
+            }
+            $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+            $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+
+            $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
+        }
+
+        $source = <<<EOF
+<?xml version="1.0" encoding="utf-8" ?>
+<xsd:schema xmlns="http://symfony.com/schema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema"
+    elementFormDefault="qualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+$imports
+</xsd:schema>
+EOF
+        ;
+
+        $valid = @$dom->schemaValidateSource($source);
+
+        foreach ($tmpfiles as $tmpfile) {
+            @unlink($tmpfile);
+        }
+
+        return $valid;
+    }
+
+    /**
+     * Converts a \DomElement object to a PHP array.
+     *
+     * The following rules applies during the conversion:
+     *
+     *  * Each tag is converted to a key value or an array
+     *    if there is more than one "value"
+     *
+     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
+     *    if the tag also has some nested tags
+     *
+     *  * The attributes are converted to keys (<foo foo="bar"/>)
+     *
+     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
+     *
+     * @param \DomElement $element A \DomElement instance
+     *
+     * @return array A PHP array
+     */
+    public static function convertDomElementToArray(\DomElement $element)
+    {
+        return XmlUtils::convertDomElementToArray($element);
+    }
+
+    /**
+     * Parses a XML file.
+     *
+     * @param string $file Path to a file
+     *
+     * @return SimpleXMLElement
+     *
+     * @throws InvalidArgumentException When loading of XML file returns error
+     */
+    protected function parseFile($file)
+    {
+        try {
+            $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidArgumentException(sprintf('Unable to parse file "%s".', $file), $e->getCode(), $e);
+        }
+
+        $this->validateExtensions($dom, $file);
+
+        return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
+    }
+
+    /**
      * Parses parameters.
      *
      * @param SimpleXMLElement $xml
@@ -197,28 +315,6 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML file.
-     *
-     * @param string $file Path to a file
-     *
-     * @return SimpleXMLElement
-     *
-     * @throws InvalidArgumentException When loading of XML file returns error
-     */
-    protected function parseFile($file)
-    {
-        try {
-            $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
-        } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to parse file "%s".', $file), $e->getCode(), $e);
-        }
-
-        $this->validateExtensions($dom, $file);
-
-        return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
-    }
-
-    /**
      * Processes anonymous services.
      *
      * @param SimpleXMLElement $xml
@@ -271,78 +367,6 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Validates a documents XML schema.
-     *
-     * @param \DOMDocument $dom
-     *
-     * @return bool
-     *
-     * @throws RuntimeException When extension references a non-existent XSD file
-     */
-    public function validateSchema(\DOMDocument $dom)
-    {
-        $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
-
-        if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
-            $items = preg_split('/\s+/', $element);
-            for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
-                if (!$this->container->hasExtension($items[$i])) {
-                    continue;
-                }
-
-                if (($extension = $this->container->getExtension($items[$i])) && false !== $extension->getXsdValidationBasePath()) {
-                    $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
-
-                    if (!is_file($path)) {
-                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
-                    }
-
-                    $schemaLocations[$items[$i]] = $path;
-                }
-            }
-        }
-
-        $tmpfiles = array();
-        $imports = '';
-        foreach ($schemaLocations as $namespace => $location) {
-            $parts = explode('/', $location);
-            if (0 === stripos($location, 'phar://')) {
-                $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
-                if ($tmpfile) {
-                    copy($location, $tmpfile);
-                    $tmpfiles[] = $tmpfile;
-                    $parts = explode('/', str_replace('\\', '/', $tmpfile));
-                }
-            }
-            $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-            $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
-
-            $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
-        }
-
-        $source = <<<EOF
-<?xml version="1.0" encoding="utf-8" ?>
-<xsd:schema xmlns="http://symfony.com/schema"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://symfony.com/schema"
-    elementFormDefault="qualified">
-
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-$imports
-</xsd:schema>
-EOF
-        ;
-
-        $valid = @$dom->schemaValidateSource($source);
-
-        foreach ($tmpfiles as $tmpfile) {
-            @unlink($tmpfile);
-        }
-
-        return $valid;
-    }
-
-    /**
      * Validates an extension.
      *
      * @param \DOMDocument $dom
@@ -390,29 +414,5 @@ EOF
 
             $this->container->loadFromExtension($node->namespaceURI, $values);
         }
-    }
-
-    /**
-     * Converts a \DomElement object to a PHP array.
-     *
-     * The following rules applies during the conversion:
-     *
-     *  * Each tag is converted to a key value or an array
-     *    if there is more than one "value"
-     *
-     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
-     *    if the tag also has some nested tags
-     *
-     *  * The attributes are converted to keys (<foo foo="bar"/>)
-     *
-     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
-     *
-     * @param \DomElement $element A \DomElement instance
-     *
-     * @return array A PHP array
-     */
-    public static function convertDomElementToArray(\DomElement $element)
-    {
-        return XmlUtils::convertDomElementToArray($element);
     }
 }

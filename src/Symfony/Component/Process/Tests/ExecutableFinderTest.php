@@ -28,12 +28,6 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private function setPath($path)
-    {
-        $this->path = getenv('PATH');
-        putenv('PATH='.$path);
-    }
-
     /**
      * @requires PHP 5.4
      */
@@ -126,6 +120,12 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $result = $finder->find($this->getPhpBinaryName(), false);
 
         $this->assertSamePath(PHP_BINARY, $result);
+    }
+
+    private function setPath($path)
+    {
+        $this->path = getenv('PATH');
+        putenv('PATH='.$path);
     }
 
     private function assertSamePath($expected, $tested)

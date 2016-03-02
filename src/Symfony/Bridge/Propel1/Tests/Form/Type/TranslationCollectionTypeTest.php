@@ -23,11 +23,6 @@ class TranslationCollectionTypeTest extends TypeTestCase
     const TRANSLATABLE_I18N_CLASS = 'Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItemI18n';
     const NON_TRANSLATION_CLASS = 'Symfony\Bridge\Propel1\Tests\Fixtures\Item';
 
-    protected function getExtensions()
-    {
-        return array(new PropelExtension());
-    }
-
     public function testTranslationsAdded()
     {
         $item = new TranslatableItem();
@@ -147,5 +142,10 @@ class TranslationCollectionTypeTest extends TypeTestCase
                 'data_class' => self::TRANSLATABLE_I18N_CLASS,
             ),
         ));
+    }
+
+    protected function getExtensions()
+    {
+        return array(new PropelExtension());
     }
 }

@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\GreaterThanValidator;
  */
 class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new GreaterThanValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new GreaterThan($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -58,5 +48,15 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             array('22', '"22"', '333', '"333"', 'string'),
             array('22', '"22"', '22', '"22"', 'string'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new GreaterThanValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new GreaterThan($options);
     }
 }

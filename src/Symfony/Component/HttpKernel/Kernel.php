@@ -43,6 +43,12 @@ use Symfony\Component\ClassLoader\ClassCollectionLoader;
  */
 abstract class Kernel implements KernelInterface, TerminableInterface
 {
+    const VERSION = '2.3.39-DEV';
+    const VERSION_ID = 20339;
+    const MAJOR_VERSION = 2;
+    const MINOR_VERSION = 3;
+    const RELEASE_VERSION = 39;
+    const EXTRA_VERSION = 'DEV';
     /**
      * @var BundleInterface[]
      */
@@ -57,13 +63,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $loadClassCache;
-
-    const VERSION = '2.3.39-DEV';
-    const VERSION_ID = 20339;
-    const MAJOR_VERSION = 2;
-    const MINOR_VERSION = 3;
-    const RELEASE_VERSION = 39;
-    const EXTRA_VERSION = 'DEV';
 
     /**
      * Constructor.
@@ -174,16 +173,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         return $this->getHttpKernel()->handle($request, $type, $catch);
-    }
-
-    /**
-     * Gets a HTTP kernel from the container.
-     *
-     * @return HttpKernel
-     */
-    protected function getHttpKernel()
-    {
-        return $this->container->get('http_kernel');
     }
 
     /**
@@ -387,6 +376,91 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getCharset()
     {
         return 'UTF-8';
+    }
+
+    /**
+     * Removes comments from a PHP source string.
+     *
+     * We don't use the PHP php_strip_whitespace() function
+     * as we want the content to be readable and well-formatted.
+     *
+     * @param string $source A PHP string
+     *
+     * @return string The PHP string with the comments removed
+     */
+    public static function stripComments($source)
+    {
+        if (!function_exists('token_get_all')) {
+            return $source;
+        }
+
+        $rawChunk = '';
+        $output = '';
+        $tokens = token_get_all($source);
+        $ignoreSpace = false;
+        for ($i = 0; isset($tokens[$i]); ++$i) {
+            $token = $tokens[$i];
+            if (!isset($token[1]) || 'b"' === $token) {
+                $rawChunk .= $token;
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= $rawChunk.$token[1];
+                do {
+                    $token = $tokens[++$i];
+                    $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
+            } elseif (T_WHITESPACE === $token[0]) {
+                if ($ignoreSpace) {
+                    $ignoreSpace = false;
+
+                    continue;
+                }
+
+                // replace multiple new lines with a single newline
+                $rawChunk .= preg_replace(array('/\n{2,}/S'), "\n", $token[1]);
+            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+                $ignoreSpace = true;
+            } else {
+                $rawChunk .= $token[1];
+
+                // The PHP-open tag already has a new-line
+                if (T_OPEN_TAG === $token[0]) {
+                    $ignoreSpace = true;
+                }
+            }
+        }
+
+        $output .= $rawChunk;
+
+        if (PHP_VERSION_ID >= 70000) {
+            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+            unset($tokens, $rawChunk);
+            gc_mem_caches();
+        }
+
+        return $output;
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->environment, $this->debug));
+    }
+
+    public function unserialize($data)
+    {
+        list($environment, $debug) = unserialize($data);
+
+        $this->__construct($environment, $debug);
+    }
+
+    /**
+     * Gets a HTTP kernel from the container.
+     *
+     * @return HttpKernel
+     */
+    protected function getHttpKernel()
+    {
+        return $this->container->get('http_kernel');
     }
 
     protected function doLoadClassCache($name, $extension)
@@ -677,80 +751,5 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         ));
 
         return new DelegatingLoader($resolver);
-    }
-
-    /**
-     * Removes comments from a PHP source string.
-     *
-     * We don't use the PHP php_strip_whitespace() function
-     * as we want the content to be readable and well-formatted.
-     *
-     * @param string $source A PHP string
-     *
-     * @return string The PHP string with the comments removed
-     */
-    public static function stripComments($source)
-    {
-        if (!function_exists('token_get_all')) {
-            return $source;
-        }
-
-        $rawChunk = '';
-        $output = '';
-        $tokens = token_get_all($source);
-        $ignoreSpace = false;
-        for ($i = 0; isset($tokens[$i]); ++$i) {
-            $token = $tokens[$i];
-            if (!isset($token[1]) || 'b"' === $token) {
-                $rawChunk .= $token;
-            } elseif (T_START_HEREDOC === $token[0]) {
-                $output .= $rawChunk.$token[1];
-                do {
-                    $token = $tokens[++$i];
-                    $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
-                } while ($token[0] !== T_END_HEREDOC);
-                $rawChunk = '';
-            } elseif (T_WHITESPACE === $token[0]) {
-                if ($ignoreSpace) {
-                    $ignoreSpace = false;
-
-                    continue;
-                }
-
-                // replace multiple new lines with a single newline
-                $rawChunk .= preg_replace(array('/\n{2,}/S'), "\n", $token[1]);
-            } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $ignoreSpace = true;
-            } else {
-                $rawChunk .= $token[1];
-
-                // The PHP-open tag already has a new-line
-                if (T_OPEN_TAG === $token[0]) {
-                    $ignoreSpace = true;
-                }
-            }
-        }
-
-        $output .= $rawChunk;
-
-        if (PHP_VERSION_ID >= 70000) {
-            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
-            unset($tokens, $rawChunk);
-            gc_mem_caches();
-        }
-
-        return $output;
-    }
-
-    public function serialize()
-    {
-        return serialize(array($this->environment, $this->debug));
-    }
-
-    public function unserialize($data)
-    {
-        list($environment, $debug) = unserialize($data);
-
-        $this->__construct($environment, $debug);
     }
 }

@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\LocaleValidator;
 
 class LocaleValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new LocaleValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Locale());
@@ -86,5 +81,10 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
             array('EN'),
             array('foobar'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new LocaleValidator();
     }
 }

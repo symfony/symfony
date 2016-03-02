@@ -322,97 +322,6 @@ abstract class Client
     }
 
     /**
-     * Makes a request in another process.
-     *
-     * @param object $request An origin request instance
-     *
-     * @return object An origin response instance
-     *
-     * @throws \RuntimeException When processing returns exit code
-     */
-    protected function doRequestInProcess($request)
-    {
-        $process = new PhpProcess($this->getScript($request), null, null);
-        $process->run();
-
-        if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
-            throw new \RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s', $process->getOutput(), $process->getErrorOutput()));
-        }
-
-        return unserialize($process->getOutput());
-    }
-
-    /**
-     * Makes a request.
-     *
-     * @param object $request An origin request instance
-     *
-     * @return object An origin response instance
-     */
-    abstract protected function doRequest($request);
-
-    /**
-     * Returns the script to execute when the request must be insulated.
-     *
-     * @param object $request An origin request instance
-     *
-     * @throws \LogicException When this abstract class is not implemented
-     */
-    protected function getScript($request)
-    {
-        // @codeCoverageIgnoreStart
-        throw new \LogicException('To insulate requests, you need to override the getScript() method.');
-        // @codeCoverageIgnoreEnd
-    }
-
-    /**
-     * Filters the BrowserKit request to the origin one.
-     *
-     * @param Request $request The BrowserKit Request to filter
-     *
-     * @return object An origin request instance
-     */
-    protected function filterRequest(Request $request)
-    {
-        return $request;
-    }
-
-    /**
-     * Filters the origin response to the BrowserKit one.
-     *
-     * @param object $response The origin response to filter
-     *
-     * @return Response An BrowserKit Response instance
-     */
-    protected function filterResponse($response)
-    {
-        return $response;
-    }
-
-    /**
-     * Creates a crawler.
-     *
-     * This method returns null if the DomCrawler component is not available.
-     *
-     * @param string $uri     A URI
-     * @param string $content Content for the crawler to use
-     * @param string $type    Content type
-     *
-     * @return Crawler|null
-     */
-    protected function createCrawlerFromContent($uri, $content, $type)
-    {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            return;
-        }
-
-        $crawler = new Crawler(null, $uri);
-        $crawler->addContent($content, $type);
-
-        return $crawler;
-    }
-
-    /**
      * Goes back in the browser history.
      *
      * @return Crawler
@@ -501,6 +410,97 @@ abstract class Client
     {
         $this->cookieJar->clear();
         $this->history->clear();
+    }
+
+    /**
+     * Makes a request in another process.
+     *
+     * @param object $request An origin request instance
+     *
+     * @return object An origin response instance
+     *
+     * @throws \RuntimeException When processing returns exit code
+     */
+    protected function doRequestInProcess($request)
+    {
+        $process = new PhpProcess($this->getScript($request), null, null);
+        $process->run();
+
+        if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
+            throw new \RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s', $process->getOutput(), $process->getErrorOutput()));
+        }
+
+        return unserialize($process->getOutput());
+    }
+
+    /**
+     * Makes a request.
+     *
+     * @param object $request An origin request instance
+     *
+     * @return object An origin response instance
+     */
+    abstract protected function doRequest($request);
+
+    /**
+     * Returns the script to execute when the request must be insulated.
+     *
+     * @param object $request An origin request instance
+     *
+     * @throws \LogicException When this abstract class is not implemented
+     */
+    protected function getScript($request)
+    {
+        // @codeCoverageIgnoreStart
+        throw new \LogicException('To insulate requests, you need to override the getScript() method.');
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Filters the BrowserKit request to the origin one.
+     *
+     * @param Request $request The BrowserKit Request to filter
+     *
+     * @return object An origin request instance
+     */
+    protected function filterRequest(Request $request)
+    {
+        return $request;
+    }
+
+    /**
+     * Filters the origin response to the BrowserKit one.
+     *
+     * @param object $response The origin response to filter
+     *
+     * @return Response An BrowserKit Response instance
+     */
+    protected function filterResponse($response)
+    {
+        return $response;
+    }
+
+    /**
+     * Creates a crawler.
+     *
+     * This method returns null if the DomCrawler component is not available.
+     *
+     * @param string $uri     A URI
+     * @param string $content Content for the crawler to use
+     * @param string $type    Content type
+     *
+     * @return Crawler|null
+     */
+    protected function createCrawlerFromContent($uri, $content, $type)
+    {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            return;
+        }
+
+        $crawler = new Crawler(null, $uri);
+        $crawler->addContent($content, $type);
+
+        return $crawler;
     }
 
     /**

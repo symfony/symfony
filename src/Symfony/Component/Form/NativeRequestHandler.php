@@ -27,14 +27,6 @@ class NativeRequestHandler implements RequestHandlerInterface
     private $serverParams;
 
     /**
-     * {@inheritdoc}
-     */
-    public function __construct(ServerParams $params = null)
-    {
-        $this->serverParams = $params ?: new ServerParams();
-    }
-
-    /**
      * The allowed keys of the $_FILES array.
      *
      * @var array
@@ -46,6 +38,14 @@ class NativeRequestHandler implements RequestHandlerInterface
         'tmp_name',
         'type',
     );
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
 
     /**
      * {@inheritdoc}

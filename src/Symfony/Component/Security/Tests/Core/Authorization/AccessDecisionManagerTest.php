@@ -93,20 +93,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getVoterFor2Roles($token, $vote1, $vote2)
-    {
-        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->any())
-              ->method('vote')
-              ->will($this->returnValueMap(array(
-                  array($token, null, array('ROLE_FOO'), $vote1),
-                  array($token, null, array('ROLE_BAR'), $vote2),
-              )))
-        ;
-
-        return $voter;
-    }
-
     public function getStrategyTests()
     {
         return array(
@@ -140,6 +126,20 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
             array('unanimous', $this->getVoters(0, 0, 2), false, true, false),
             array('unanimous', $this->getVoters(0, 0, 2), true, true, true),
         );
+    }
+
+    protected function getVoterFor2Roles($token, $vote1, $vote2)
+    {
+        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
+        $voter->expects($this->any())
+              ->method('vote')
+              ->will($this->returnValueMap(array(
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
+              )))
+        ;
+
+        return $voter;
     }
 
     protected function getVoters($grants, $denies, $abstains)

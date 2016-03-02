@@ -127,15 +127,6 @@ class TwigExtension extends Extension
         ));
     }
 
-    private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
-    {
-        $name = $bundle;
-        if ('Bundle' === substr($name, -6)) {
-            $name = substr($name, 0, -6);
-        }
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
-    }
-
     /**
      * Returns the base path for the XSD files.
      *
@@ -149,5 +140,14 @@ class TwigExtension extends Extension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/twig';
+    }
+
+    private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
+    {
+        $name = $bundle;
+        if ('Bundle' === substr($name, -6)) {
+            $name = substr($name, 0, -6);
+        }
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 }

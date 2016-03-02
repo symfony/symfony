@@ -266,18 +266,6 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Adds a member metadata.
-     *
-     * @param MemberMetadata $metadata
-     */
-    protected function addMemberMetadata(MemberMetadata $metadata)
-    {
-        $property = $metadata->getPropertyName();
-
-        $this->members[$property][] = $metadata;
-    }
-
-    /**
      * Returns true if metadatas of members is present for the given property.
      *
      * @param string $property The name of the property
@@ -425,5 +413,17 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     public function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
+    }
+
+    /**
+     * Adds a member metadata.
+     *
+     * @param MemberMetadata $metadata
+     */
+    protected function addMemberMetadata(MemberMetadata $metadata)
+    {
+        $property = $metadata->getPropertyName();
+
+        $this->members[$property][] = $metadata;
     }
 }

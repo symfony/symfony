@@ -13,6 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class SwitchUserTest extends WebTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('StandardFormLogin');
+    }
+
     /**
      * @dataProvider getTestParameters
      */
@@ -69,15 +79,5 @@ class SwitchUserTest extends WebTestCase
         $client->submit($form);
 
         return $client;
-    }
-
-    public static function setUpBeforeClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::deleteTmpDir('StandardFormLogin');
     }
 }

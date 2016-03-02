@@ -40,6 +40,12 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 class MimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
+     * All registered MimeTypeGuesserInterface instances.
+     *
+     * @var array
+     */
+    protected $guessers = array();
+    /**
      * The singleton instance.
      *
      * @var MimeTypeGuesser
@@ -47,11 +53,18 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     private static $instance = null;
 
     /**
-     * All registered MimeTypeGuesserInterface instances.
-     *
-     * @var array
+     * Registers all natively provided mime type guessers.
      */
-    protected $guessers = array();
+    private function __construct()
+    {
+        if (FileBinaryMimeTypeGuesser::isSupported()) {
+            $this->register(new FileBinaryMimeTypeGuesser());
+        }
+
+        if (FileinfoMimeTypeGuesser::isSupported()) {
+            $this->register(new FileinfoMimeTypeGuesser());
+        }
+    }
 
     /**
      * Returns the singleton instance.
@@ -73,20 +86,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     public static function reset()
     {
         self::$instance = null;
-    }
-
-    /**
-     * Registers all natively provided mime type guessers.
-     */
-    private function __construct()
-    {
-        if (FileBinaryMimeTypeGuesser::isSupported()) {
-            $this->register(new FileBinaryMimeTypeGuesser());
-        }
-
-        if (FileinfoMimeTypeGuesser::isSupported()) {
-            $this->register(new FileinfoMimeTypeGuesser());
-        }
     }
 
     /**

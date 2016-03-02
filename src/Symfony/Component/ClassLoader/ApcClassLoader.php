@@ -47,14 +47,13 @@ namespace Symfony\Component\ClassLoader;
  */
 class ApcClassLoader
 {
-    private $prefix;
-
     /**
      * A class loader object that implements the findFile() method.
      *
      * @var object
      */
     protected $decorated;
+    private $prefix;
 
     /**
      * Constructor.

@@ -15,6 +15,11 @@ use Symfony\Component\Security\Http\Firewall\DigestData;
 
 class DigestDataTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
+    }
+
     public function testGetResponse()
     {
         $digestAuth = new DigestData(
@@ -154,11 +159,6 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
         $digestAuth->validateAndDecode($key, 'Welcome, robot!');
 
         $this->assertFalse($digestAuth->isNonceExpired());
-    }
-
-    protected function setUp()
-    {
-        class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
     }
 
     private function calculateServerDigest($username, $realm, $password, $key, $nc, $cnonce, $qop, $method, $uri)

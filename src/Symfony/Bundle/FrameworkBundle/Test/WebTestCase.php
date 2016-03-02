@@ -30,6 +30,16 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     protected static $kernel;
 
     /**
+     * Shuts the kernel down if it was used in the test.
+     */
+    protected function tearDown()
+    {
+        if (null !== static::$kernel) {
+            static::$kernel->shutdown();
+        }
+    }
+
+    /**
      * Creates a Client.
      *
      * @param array $options An array of options to pass to the createKernel class
@@ -88,36 +98,6 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Finds the value of the CLI configuration option.
-     *
-     * PHPUnit will use the last configuration argument on the command line, so this only returns
-     * the last configuration argument.
-     *
-     * @return string The value of the PHPUnit CLI configuration option
-     */
-    private static function getPhpUnitCliConfigArgument()
-    {
-        $dir = null;
-        $reversedArgs = array_reverse($_SERVER['argv']);
-        foreach ($reversedArgs as $argIndex => $testArg) {
-            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
-                $dir = realpath($reversedArgs[$argIndex - 1]);
-                break;
-            } elseif (0 === strpos($testArg, '--configuration=')) {
-                $argPath = substr($testArg, strlen('--configuration='));
-                $dir = realpath($argPath);
-                break;
-            } elseif (0 === strpos($testArg, '-c')) {
-                $argPath = substr($testArg, strlen('-c'));
-                $dir = realpath($argPath);
-                break;
-            }
-        }
-
-        return $dir;
-    }
-
-    /**
      * Attempts to guess the kernel location.
      *
      * When the Kernel is located, the file is required.
@@ -170,12 +150,32 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Shuts the kernel down if it was used in the test.
+     * Finds the value of the CLI configuration option.
+     *
+     * PHPUnit will use the last configuration argument on the command line, so this only returns
+     * the last configuration argument.
+     *
+     * @return string The value of the PHPUnit CLI configuration option
      */
-    protected function tearDown()
+    private static function getPhpUnitCliConfigArgument()
     {
-        if (null !== static::$kernel) {
-            static::$kernel->shutdown();
+        $dir = null;
+        $reversedArgs = array_reverse($_SERVER['argv']);
+        foreach ($reversedArgs as $argIndex => $testArg) {
+            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
+                $dir = realpath($reversedArgs[$argIndex - 1]);
+                break;
+            } elseif (0 === strpos($testArg, '--configuration=')) {
+                $argPath = substr($testArg, strlen('--configuration='));
+                $dir = realpath($argPath);
+                break;
+            } elseif (0 === strpos($testArg, '-c')) {
+                $argPath = substr($testArg, strlen('-c'));
+                $dir = realpath($argPath);
+                break;
+            }
         }
+
+        return $dir;
     }
 }

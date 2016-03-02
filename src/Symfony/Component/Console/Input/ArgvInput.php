@@ -61,6 +61,103 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
+    /**
+     * Returns the first argument from the raw parameters (not parsed).
+     *
+     * @return string The value of the first argument or null otherwise
+     */
+    public function getFirstArgument()
+    {
+        foreach ($this->tokens as $token) {
+            if ($token && '-' === $token[0]) {
+                continue;
+            }
+
+            return $token;
+        }
+    }
+
+    /**
+     * Returns true if the raw parameters (not parsed) contain a value.
+     *
+     * This method is to be used to introspect the input parameters
+     * before they have been validated. It must be used carefully.
+     *
+     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
+     *
+     * @return bool true if the value is contained in the raw parameters
+     */
+    public function hasParameterOption($values)
+    {
+        $values = (array) $values;
+
+        foreach ($this->tokens as $token) {
+            foreach ($values as $value) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the value of a raw option (not parsed).
+     *
+     * This method is to be used to introspect the input parameters
+     * before they have been validated. It must be used carefully.
+     *
+     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default The default value to return if no result is found
+     *
+     * @return mixed The option value
+     */
+    public function getParameterOption($values, $default = false)
+    {
+        $values = (array) $values;
+        $tokens = $this->tokens;
+
+        while (0 < count($tokens)) {
+            $token = array_shift($tokens);
+
+            foreach ($values as $value) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                    if (false !== $pos = strpos($token, '=')) {
+                        return substr($token, $pos + 1);
+                    }
+
+                    return array_shift($tokens);
+                }
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Returns a stringified representation of the args passed to the command.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $self = $this;
+        $tokens = array_map(function ($token) use ($self) {
+            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
+                return $match[1].$self->escapeToken($match[2]);
+            }
+
+            if ($token && $token[0] !== '-') {
+                return $self->escapeToken($token);
+            }
+
+            return $token;
+        }, $this->tokens);
+
+        return implode(' ', $tokens);
+    }
+
     protected function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
@@ -248,102 +345,5 @@ class ArgvInput extends Input
         } else {
             $this->options[$name] = $value;
         }
-    }
-
-    /**
-     * Returns the first argument from the raw parameters (not parsed).
-     *
-     * @return string The value of the first argument or null otherwise
-     */
-    public function getFirstArgument()
-    {
-        foreach ($this->tokens as $token) {
-            if ($token && '-' === $token[0]) {
-                continue;
-            }
-
-            return $token;
-        }
-    }
-
-    /**
-     * Returns true if the raw parameters (not parsed) contain a value.
-     *
-     * This method is to be used to introspect the input parameters
-     * before they have been validated. It must be used carefully.
-     *
-     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
-     *
-     * @return bool true if the value is contained in the raw parameters
-     */
-    public function hasParameterOption($values)
-    {
-        $values = (array) $values;
-
-        foreach ($this->tokens as $token) {
-            foreach ($values as $value) {
-                if ($token === $value || 0 === strpos($token, $value.'=')) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the value of a raw option (not parsed).
-     *
-     * This method is to be used to introspect the input parameters
-     * before they have been validated. It must be used carefully.
-     *
-     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed        $default The default value to return if no result is found
-     *
-     * @return mixed The option value
-     */
-    public function getParameterOption($values, $default = false)
-    {
-        $values = (array) $values;
-        $tokens = $this->tokens;
-
-        while (0 < count($tokens)) {
-            $token = array_shift($tokens);
-
-            foreach ($values as $value) {
-                if ($token === $value || 0 === strpos($token, $value.'=')) {
-                    if (false !== $pos = strpos($token, '=')) {
-                        return substr($token, $pos + 1);
-                    }
-
-                    return array_shift($tokens);
-                }
-            }
-        }
-
-        return $default;
-    }
-
-    /**
-     * Returns a stringified representation of the args passed to the command.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        $self = $this;
-        $tokens = array_map(function ($token) use ($self) {
-            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
-                return $match[1].$self->escapeToken($match[2]);
-            }
-
-            if ($token && $token[0] !== '-') {
-                return $self->escapeToken($token);
-            }
-
-            return $token;
-        }, $this->tokens);
-
-        return implode(' ', $tokens);
     }
 }

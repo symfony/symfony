@@ -176,6 +176,22 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return is_object($data) && $this->supports(get_class($data));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return $this->supports($type);
+    }
+
+    /**
      * Format attribute name to access parameters or methods
      * As option, if attribute name is found on camelizedAttributes array
      * returns attribute name in camelcase format.
@@ -195,22 +211,6 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
         }
 
         return $attributeName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return is_object($data) && $this->supports(get_class($data));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return $this->supports($type);
     }
 
     /**

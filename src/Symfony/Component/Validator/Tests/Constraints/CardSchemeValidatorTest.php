@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\CardSchemeValidator;
 
 class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CardSchemeValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new CardScheme(array('schemes' => array())));
@@ -123,5 +118,10 @@ class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
             array('DINERS', '3056930'), // only first part of the number
             array('DISCOVER', '1117'), // only last 4 digits
         );
+    }
+
+    protected function createValidator()
+    {
+        return new CardSchemeValidator();
     }
 }

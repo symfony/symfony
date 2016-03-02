@@ -45,11 +45,6 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CallbackValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Callback(array('foo')));
@@ -186,5 +181,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Callback(array('value' => array(__CLASS__.'_Class', 'validateCallback')));
 
         $this->assertEquals(new Callback(array(__CLASS__.'_Class', 'validateCallback')), $constraint);
+    }
+
+    protected function createValidator()
+    {
+        return new CallbackValidator();
     }
 }

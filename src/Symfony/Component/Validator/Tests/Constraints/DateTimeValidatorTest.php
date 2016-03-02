@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\DateTimeValidator;
 
 class DateTimeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new DateTimeValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new DateTime());
@@ -99,5 +94,10 @@ class DateTimeValidatorTest extends AbstractConstraintValidatorTest
             array('2010-01-01 00:60:00'),
             array('2010-01-01 00:00:60'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new DateTimeValidator();
     }
 }

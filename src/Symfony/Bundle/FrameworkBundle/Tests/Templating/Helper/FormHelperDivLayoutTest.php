@@ -27,6 +27,27 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
      */
     protected $engine;
 
+    protected function tearDown()
+    {
+        $this->engine = null;
+
+        parent::tearDown();
+    }
+
+    public static function themeBlockInheritanceProvider()
+    {
+        return array(
+            array(array('TestBundle:Parent')),
+        );
+    }
+
+    public static function themeInheritanceProvider()
+    {
+        return array(
+            array(array('TestBundle:Parent'), array('TestBundle:Child')),
+        );
+    }
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -48,13 +69,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
                 'FrameworkBundle:Form',
             )),
         ));
-    }
-
-    protected function tearDown()
-    {
-        $this->engine = null;
-
-        parent::tearDown();
     }
 
     protected function renderForm(FormView $view, array $vars = array())
@@ -109,19 +123,5 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->engine->get('form')->setTheme($view, $themes);
-    }
-
-    public static function themeBlockInheritanceProvider()
-    {
-        return array(
-            array(array('TestBundle:Parent')),
-        );
-    }
-
-    public static function themeInheritanceProvider()
-    {
-        return array(
-            array(array('TestBundle:Parent'), array('TestBundle:Child')),
-        );
     }
 }

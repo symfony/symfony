@@ -28,6 +28,10 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
     /**
+     * @var bool
+     */
+    protected $locked = false;
+    /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
      *
      * @var NativeRequestHandler
@@ -46,11 +50,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         'DELETE',
         'PATCH',
     );
-
-    /**
-     * @var bool
-     */
-    protected $locked = false;
 
     /**
      * @var EventDispatcherInterface

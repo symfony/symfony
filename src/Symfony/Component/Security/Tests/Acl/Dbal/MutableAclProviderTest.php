@@ -34,6 +34,25 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $con;
 
+    protected function setUp()
+    {
+        $this->con = DriverManager::getConnection(array(
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+        ));
+
+        // import the schema
+        $schema = new Schema($this->getOptions());
+        foreach ($schema->toSql($this->con->getDatabasePlatform()) as $sql) {
+            $this->con->exec($sql);
+        }
+    }
+
+    protected function tearDown()
+    {
+        $this->con = null;
+    }
+
     public static function assertAceEquals(EntryInterface $a, EntryInterface $b)
     {
         self::assertInstanceOf(get_class($a), $b);
@@ -413,6 +432,14 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $provider->updateAcl($acl);
     }
 
+    public function setField($object, $field, $value)
+    {
+        $reflection = new \ReflectionProperty($object, $field);
+        $reflection->setAccessible(true);
+        $reflection->setValue($object, $value);
+        $reflection->setAccessible(false);
+    }
+
     /**
      * Imports acls.
      *
@@ -484,39 +511,12 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         return $method->invokeArgs($object, $args);
     }
 
-    protected function setUp()
-    {
-        $this->con = DriverManager::getConnection(array(
-            'driver' => 'pdo_sqlite',
-            'memory' => true,
-        ));
-
-        // import the schema
-        $schema = new Schema($this->getOptions());
-        foreach ($schema->toSql($this->con->getDatabasePlatform()) as $sql) {
-            $this->con->exec($sql);
-        }
-    }
-
-    protected function tearDown()
-    {
-        $this->con = null;
-    }
-
     protected function getField($object, $field)
     {
         $reflection = new \ReflectionProperty($object, $field);
         $reflection->setAccessible(true);
 
         return $reflection->getValue($object);
-    }
-
-    public function setField($object, $field, $value)
-    {
-        $reflection = new \ReflectionProperty($object, $field);
-        $reflection->setAccessible(true);
-        $reflection->setValue($object, $value);
-        $reflection->setAccessible(false);
     }
 
     protected function getOptions()

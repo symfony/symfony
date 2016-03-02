@@ -24,18 +24,17 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class PropelDataCollector extends DataCollector
 {
     /**
-     * Propel logger.
-     *
-     * @var PropelLogger
-     */
-    private $logger;
-
-    /**
      * Propel configuration.
      *
      * @var \PropelConfiguration
      */
     protected $propelConfiguration;
+    /**
+     * Propel logger.
+     *
+     * @var PropelLogger
+     */
+    private $logger;
 
     /**
      * Constructor.

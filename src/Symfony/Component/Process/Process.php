@@ -37,35 +37,6 @@ class Process
     // Timeout Precision in seconds.
     const TIMEOUT_PRECISION = 0.2;
 
-    private $callback;
-    private $commandline;
-    private $cwd;
-    private $env;
-    private $stdin;
-    private $starttime;
-    private $timeout;
-    private $options;
-    private $exitcode;
-    private $fallbackStatus = array();
-    private $processInformation;
-    private $stdout;
-    private $stderr;
-    private $enhanceWindowsCompatibility = true;
-    private $enhanceSigchildCompatibility;
-    private $process;
-    private $status = self::STATUS_READY;
-    private $incrementalOutputOffset = 0;
-    private $incrementalErrorOutputOffset = 0;
-    private $tty;
-
-    private $useFileHandles = false;
-    /** @var ProcessPipes */
-    private $processPipes;
-
-    private $latestSignal;
-
-    private static $sigchild;
-
     /**
      * Exit codes translation table.
      *
@@ -115,6 +86,35 @@ class Process
         // 158 - not defined
         159 => 'Bad syscall',
     );
+
+    private $callback;
+    private $commandline;
+    private $cwd;
+    private $env;
+    private $stdin;
+    private $starttime;
+    private $timeout;
+    private $options;
+    private $exitcode;
+    private $fallbackStatus = array();
+    private $processInformation;
+    private $stdout;
+    private $stderr;
+    private $enhanceWindowsCompatibility = true;
+    private $enhanceSigchildCompatibility;
+    private $process;
+    private $status = self::STATUS_READY;
+    private $incrementalOutputOffset = 0;
+    private $incrementalErrorOutputOffset = 0;
+    private $tty;
+
+    private $useFileHandles = false;
+    /** @var ProcessPipes */
+    private $processPipes;
+
+    private $latestSignal;
+
+    private static $sigchild;
 
     /**
      * Constructor.
@@ -982,18 +982,6 @@ class Process
     }
 
     /**
-     * Creates the descriptors needed by the proc_open.
-     *
-     * @return array
-     */
-    private function getDescriptors()
-    {
-        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty);
-
-        return $this->processPipes->getDescriptors();
-    }
-
-    /**
      * Builds up the callback used by wait().
      *
      * The callbacks adds all occurred output to the specific buffer and calls
@@ -1065,6 +1053,18 @@ class Process
         phpinfo(INFO_GENERAL);
 
         return self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
+    }
+
+    /**
+     * Creates the descriptors needed by the proc_open.
+     *
+     * @return array
+     */
+    private function getDescriptors()
+    {
+        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty);
+
+        return $this->processPipes->getDescriptors();
     }
 
     /**

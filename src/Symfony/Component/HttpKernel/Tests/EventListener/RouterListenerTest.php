@@ -54,20 +54,6 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $uri
-     *
-     * @return GetResponseEvent
-     */
-    private function createGetResponseEventForUri($uri)
-    {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $request = Request::create($uri);
-        $request->attributes->set('_controller', null); // Prevents going in to routing process
-
-        return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      */
     public function testInvalidMatcher()
@@ -149,5 +135,19 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
             array(array('_route' => 'foo'), 'Matched route "foo" (parameters: "_route": "foo")'),
             array(array(), 'Matched route "n/a" (parameters: )'),
         );
+    }
+
+    /**
+     * @param string $uri
+     *
+     * @return GetResponseEvent
+     */
+    private function createGetResponseEventForUri($uri)
+    {
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $request = Request::create($uri);
+        $request->attributes->set('_controller', null); // Prevents going in to routing process
+
+        return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 }

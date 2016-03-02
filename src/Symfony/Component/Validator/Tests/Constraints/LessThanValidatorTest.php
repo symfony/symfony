@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\LessThanValidator;
  */
 class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new LessThanValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new LessThan($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -57,5 +47,15 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             array(new ComparisonTest_Class(6), '6', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
             array('333', '"333"', '22', '"22"', 'string'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new LessThanValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new LessThan($options);
     }
 }

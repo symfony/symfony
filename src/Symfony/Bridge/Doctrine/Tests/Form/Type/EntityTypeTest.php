@@ -76,24 +76,6 @@ class EntityTypeTest extends TypeTestCase
         $this->emRegistry = null;
     }
 
-    protected function getExtensions()
-    {
-        return array_merge(parent::getExtensions(), array(
-            new DoctrineOrmExtension($this->emRegistry),
-        ));
-    }
-
-    protected function persist(array $entities)
-    {
-        foreach ($entities as $entity) {
-            $this->em->persist($entity);
-        }
-
-        $this->em->flush();
-        // no clear, because entities managed by the choice field must
-        // be managed!
-    }
-
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
@@ -739,6 +721,24 @@ class EntityTypeTest extends TypeTestCase
             'required' => false,
             'property' => 'name',
         ));
+    }
+
+    protected function getExtensions()
+    {
+        return array_merge(parent::getExtensions(), array(
+            new DoctrineOrmExtension($this->emRegistry),
+        ));
+    }
+
+    protected function persist(array $entities)
+    {
+        foreach ($entities as $entity) {
+            $this->em->persist($entity);
+        }
+
+        $this->em->flush();
+        // no clear, because entities managed by the choice field must
+        // be managed!
     }
 
     protected function createRegistryMock($name, $em)

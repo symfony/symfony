@@ -256,8 +256,8 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 class GetSetDummy
 {
     protected $foo;
-    private $bar;
     protected $camelCase;
+    private $bar;
 
     public function getFoo()
     {

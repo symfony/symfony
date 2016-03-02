@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\LengthValidator;
 
 class LengthValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new LengthValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Length(6));
@@ -227,5 +222,10 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertEquals(5, $constraint->min);
         $this->assertEquals(5, $constraint->max);
+    }
+
+    protected function createValidator()
+    {
+        return new LengthValidator();
     }
 }

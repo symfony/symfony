@@ -47,35 +47,6 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
         $this->checkIdentifierType('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity', Connection::PARAM_INT_ARRAY);
     }
 
-    protected function checkIdentifierType($classname, $expectedType)
-    {
-        $em = DoctrineTestHelper::createTestEntityManager();
-
-        $query = $this->getMockBuilder('QueryMock')
-            ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
-            ->getMock();
-
-        $query->expects($this->once())
-            ->method('setParameter')
-            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(1, 2), $expectedType)
-            ->willReturn($query);
-
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setConstructorArgs(array($em))
-            ->setMethods(array('getQuery'))
-            ->getMock();
-
-        $qb->expects($this->once())
-            ->method('getQuery')
-            ->willReturn($query);
-
-        $qb->select('e')
-            ->from($classname, 'e');
-
-        $loader = new ORMQueryBuilderLoader($qb);
-        $loader->getEntitiesByIds('id', array(1, 2));
-    }
-
     public function testFilterNonIntegerValues()
     {
         $em = DoctrineTestHelper::createTestEntityManager();
@@ -137,5 +108,34 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader = new ORMQueryBuilderLoader($qb);
         $loader->getEntitiesByIds('id.value', array(1, '', 2, 3, 'foo'));
+    }
+
+    protected function checkIdentifierType($classname, $expectedType)
+    {
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getMockBuilder('QueryMock')
+            ->setMethods(array('setParameter', 'getResult', 'getSql', '_doExecute'))
+            ->getMock();
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', array(1, 2), $expectedType)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setConstructorArgs(array($em))
+            ->setMethods(array('getQuery'))
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from($classname, 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id', array(1, 2));
     }
 }

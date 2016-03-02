@@ -145,6 +145,19 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
+     * @param Command $command
+     * @param string  $sort
+     */
+    abstract protected function buildFormatSorting(Command $command, $sort);
+
+    /**
+     * @param Command $command
+     * @param array   $contains
+     * @param bool    $not
+     */
+    abstract protected function buildContentFiltering(Command $command, array $contains, $not = false);
+
+    /**
      * @param Command  $command
      * @param string[] $names
      * @param bool     $not
@@ -311,17 +324,4 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     {
         $this->buildFormatSorting($command, $sort);
     }
-
-    /**
-     * @param Command $command
-     * @param string  $sort
-     */
-    abstract protected function buildFormatSorting(Command $command, $sort);
-
-    /**
-     * @param Command $command
-     * @param array   $contains
-     * @param bool    $not
-     */
-    abstract protected function buildContentFiltering(Command $command, array $contains, $not = false);
 }

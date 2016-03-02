@@ -18,6 +18,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 class ProcessPipes
 {
+    const CHUNK_SIZE = 16384;
     /** @var array */
     public $pipes = array();
     /** @var array */
@@ -30,8 +31,6 @@ class ProcessPipes
     private $useFiles;
     /** @var bool    */
     private $ttyMode;
-
-    const CHUNK_SIZE = 16384;
 
     public function __construct($useFiles, $ttyMode)
     {

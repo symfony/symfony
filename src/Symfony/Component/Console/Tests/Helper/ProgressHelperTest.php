@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProgressHelperTest extends \PHPUnit_Framework_TestCase
 {
+    protected $lastMessagesLength;
+
     public function testAdvance()
     {
         $progress = new ProgressHelper();
@@ -184,8 +186,6 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
     }
-
-    protected $lastMessagesLength;
 
     protected function generateOutput($expected)
     {

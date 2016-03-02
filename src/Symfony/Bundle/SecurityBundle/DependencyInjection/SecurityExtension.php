@@ -103,6 +103,37 @@ class SecurityExtension extends Extension
         ));
     }
 
+    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
+    {
+        $this->factories[$factory->getPosition()][] = $factory;
+    }
+
+    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
+    {
+        $this->userProviderFactories[] = $factory;
+    }
+
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/security';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        // first assemble the factories
+        return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
     private function aclLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -592,36 +623,5 @@ class SecurityExtension extends Extension
         ;
 
         return $this->requestMatchers[$id] = new Reference($id);
-    }
-
-    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
-    {
-        $this->factories[$factory->getPosition()][] = $factory;
-    }
-
-    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
-    {
-        $this->userProviderFactories[] = $factory;
-    }
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    public function getNamespace()
-    {
-        return 'http://symfony.com/schema/dic/security';
-    }
-
-    public function getConfiguration(array $config, ContainerBuilder $container)
-    {
-        // first assemble the factories
-        return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 }

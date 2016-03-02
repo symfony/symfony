@@ -21,14 +21,13 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 class FlashBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
-     */
-    private $bag;
-
-    /**
      * @var array
      */
     protected $array = array();
+    /**
+     * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+     */
+    private $bag;
 
     protected function setUp()
     {

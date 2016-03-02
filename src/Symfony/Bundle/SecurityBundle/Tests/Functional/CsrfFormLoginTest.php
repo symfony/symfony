@@ -13,6 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class CsrfFormLoginTest extends WebTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::deleteTmpDir('CsrfFormLogin');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('CsrfFormLogin');
+    }
+
     /**
      * @dataProvider getConfigs
      */
@@ -107,15 +117,5 @@ class CsrfFormLoginTest extends WebTestCase
             array('config.yml'),
             array('routes_as_path.yml'),
         );
-    }
-
-    public static function setUpBeforeClass()
-    {
-        parent::deleteTmpDir('CsrfFormLogin');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        parent::deleteTmpDir('CsrfFormLogin');
     }
 }

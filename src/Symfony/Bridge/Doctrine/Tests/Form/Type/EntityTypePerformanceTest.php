@@ -30,24 +30,6 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      */
     private $em;
 
-    protected function getExtensions()
-    {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $manager->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($this->em));
-
-        $manager->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
-
-        return array(
-            new CoreExtension(),
-            new DoctrineOrmExtension($manager),
-        );
-    }
-
     protected function setUp()
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
@@ -135,5 +117,23 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
             // force loading of the choice list
             $form->createView();
         }
+    }
+
+    protected function getExtensions()
+    {
+        $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $manager->expects($this->any())
+            ->method('getManager')
+            ->will($this->returnValue($this->em));
+
+        $manager->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($this->em));
+
+        return array(
+            new CoreExtension(),
+            new DoctrineOrmExtension($manager),
+        );
     }
 }

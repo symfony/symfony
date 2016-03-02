@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Constraints\CountryValidator;
 
 class CountryValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new CountryValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Country());
@@ -99,5 +94,10 @@ class CountryValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($existingCountry, new Country());
 
         $this->assertNoViolation();
+    }
+
+    protected function createValidator()
+    {
+        return new CountryValidator();
     }
 }

@@ -19,16 +19,6 @@ use Symfony\Component\Validator\Constraints\NotIdenticalToValidator;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function createValidator()
-    {
-        return new NotIdenticalToValidator();
-    }
-
-    protected function createConstraint(array $options)
-    {
-        return new NotIdenticalTo($options);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -58,5 +48,15 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array($date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array($object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new NotIdenticalToValidator();
+    }
+
+    protected function createConstraint(array $options)
+    {
+        return new NotIdenticalTo($options);
     }
 }

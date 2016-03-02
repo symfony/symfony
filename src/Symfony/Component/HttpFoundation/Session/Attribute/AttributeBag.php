@@ -16,17 +16,16 @@ namespace Symfony\Component\HttpFoundation\Session\Attribute;
  */
 class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Countable
 {
+    /**
+     * @var array
+     */
+    protected $attributes = array();
     private $name = 'attributes';
 
     /**
      * @var string
      */
     private $storageKey;
-
-    /**
-     * @var array
-     */
-    protected $attributes = array();
 
     /**
      * Constructor.

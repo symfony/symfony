@@ -108,29 +108,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
-     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
-     *
-     * @param UserInterface  $user  The user
-     * @param TokenInterface $token The token
-     *
-     * @return array The user roles
-     */
-    private function getRoles(UserInterface $user, TokenInterface $token)
-    {
-        $roles = $user->getRoles();
-
-        foreach ($token->getRoles() as $role) {
-            if ($role instanceof SwitchUserRole) {
-                $roles[] = $role;
-
-                break;
-            }
-        }
-
-        return $roles;
-    }
-
-    /**
      * Retrieves the user from an implementation-specific location.
      *
      * @param string                $username The username to retrieve
@@ -152,4 +129,27 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @throws AuthenticationException if the credentials could not be validated
      */
     abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
+
+    /**
+     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
+     *
+     * @param UserInterface  $user  The user
+     * @param TokenInterface $token The token
+     *
+     * @return array The user roles
+     */
+    private function getRoles(UserInterface $user, TokenInterface $token)
+    {
+        $roles = $user->getRoles();
+
+        foreach ($token->getRoles() as $role) {
+            if ($role instanceof SwitchUserRole) {
+                $roles[] = $role;
+
+                break;
+            }
+        }
+
+        return $roles;
+    }
 }

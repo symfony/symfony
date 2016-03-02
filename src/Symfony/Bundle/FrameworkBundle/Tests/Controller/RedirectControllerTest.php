@@ -228,6 +228,11 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
+    public function assertRedirectUrl(Response $returnResponse, $expectedUrl)
+    {
+        $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
+    }
+
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
@@ -288,10 +293,5 @@ class RedirectControllerTest extends TestCase
         $controller->setContainer($container);
 
         return $controller;
-    }
-
-    public function assertRedirectUrl(Response $returnResponse, $expectedUrl)
-    {
-        $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
     }
 }

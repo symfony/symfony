@@ -26,11 +26,6 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     protected $imageLandscape;
     protected $imagePortrait;
 
-    protected function createValidator()
-    {
-        return new ImageValidator();
-    }
-
     protected function setUp()
     {
         parent::setUp();
@@ -181,5 +176,10 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
         ));
 
         $this->validator->validate($this->image, $constraint);
+    }
+
+    protected function createValidator()
+    {
+        return new ImageValidator();
     }
 }

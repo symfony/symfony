@@ -21,8 +21,6 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     private static $containerCache = array();
 
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
-
     public function testRolesHierarchy()
     {
         $container = $this->getContainer('container1');
@@ -181,6 +179,8 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
         $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
     }
+
+    abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
     protected function getContainer($file)
     {

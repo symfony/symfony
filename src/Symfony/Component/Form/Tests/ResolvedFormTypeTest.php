@@ -231,6 +231,17 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $name
+     * @param array  $options
+     *
+     * @return FormBuilder
+     */
+    protected function getBuilder($name = 'name', array $options = array())
+    {
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockFormType()
@@ -252,16 +263,5 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     private function getMockFormFactory()
     {
         return $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-    }
-
-    /**
-     * @param string $name
-     * @param array  $options
-     *
-     * @return FormBuilder
-     */
-    protected function getBuilder($name = 'name', array $options = array())
-    {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
     }
 }

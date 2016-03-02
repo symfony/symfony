@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\IpValidator;
 
 class IpValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new IpValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Ip());
@@ -434,5 +429,10 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
     public function getInvalidPublicIpsAll()
     {
         return array_merge($this->getInvalidPublicIpsV4(), $this->getInvalidPublicIpsV6());
+    }
+
+    protected function createValidator()
+    {
+        return new IpValidator();
     }
 }

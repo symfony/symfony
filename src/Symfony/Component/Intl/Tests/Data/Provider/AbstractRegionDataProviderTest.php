@@ -298,8 +298,6 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
-
     public function testGetRegions()
     {
         $this->assertSame(static::$territories, $this->dataProvider->getRegions());
@@ -352,4 +350,6 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
             $this->assertSame($name, $this->dataProvider->getName($country, $displayLocale));
         }
     }
+
+    abstract protected function getDataDirectory();
 }

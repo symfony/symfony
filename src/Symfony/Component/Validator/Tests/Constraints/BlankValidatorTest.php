@@ -16,11 +16,6 @@ use Symfony\Component\Validator\Constraints\BlankValidator;
 
 class BlankValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function createValidator()
-    {
-        return new BlankValidator();
-    }
-
     public function testNullIsValid()
     {
         $this->validator->validate(null, new Blank());
@@ -59,5 +54,10 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
             array(false, 'false'),
             array(1234, '1234'),
         );
+    }
+
+    protected function createValidator()
+    {
+        return new BlankValidator();
     }
 }

@@ -596,6 +596,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $this->store->unlock($request);
     }
 
+    protected function processResponseBody(Request $request, Response $response)
+    {
+        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
+            $this->esi->process($request, $response);
+        }
+    }
+
     /**
      * Restores the Response body.
      *
@@ -633,13 +640,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         $response->headers->remove('X-Body-File');
-    }
-
-    protected function processResponseBody(Request $request, Response $response)
-    {
-        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
-            $this->esi->process($request, $response);
-        }
     }
 
     /**

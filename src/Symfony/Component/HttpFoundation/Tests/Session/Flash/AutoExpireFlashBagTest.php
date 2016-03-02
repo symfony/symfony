@@ -21,14 +21,13 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
 class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
-     */
-    private $bag;
-
-    /**
      * @var array
      */
     protected $array = array();
+    /**
+     * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
+     */
+    private $bag;
 
     protected function setUp()
     {

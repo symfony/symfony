@@ -92,31 +92,6 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Initializes the list with choices.
-     *
-     * Safe to be called multiple times. The list is cleared on every call.
-     *
-     * @param array|\Traversable $choices          The choices to write into the list.
-     * @param array              $labels           The labels belonging to the choices.
-     * @param array              $preferredChoices The choices to display with priority.
-     */
-    protected function initialize($choices, array $labels, array $preferredChoices)
-    {
-        $this->choices = array();
-        $this->values = array();
-        $this->preferredViews = array();
-        $this->remainingViews = array();
-
-        $this->addChoices(
-            $this->preferredViews,
-            $this->remainingViews,
-            $choices,
-            $labels,
-            $preferredChoices
-        );
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getChoices()
@@ -242,6 +217,31 @@ class ChoiceList implements ChoiceListInterface
         }
 
         return $indices;
+    }
+
+    /**
+     * Initializes the list with choices.
+     *
+     * Safe to be called multiple times. The list is cleared on every call.
+     *
+     * @param array|\Traversable $choices          The choices to write into the list.
+     * @param array              $labels           The labels belonging to the choices.
+     * @param array              $preferredChoices The choices to display with priority.
+     */
+    protected function initialize($choices, array $labels, array $preferredChoices)
+    {
+        $this->choices = array();
+        $this->values = array();
+        $this->preferredViews = array();
+        $this->remainingViews = array();
+
+        $this->addChoices(
+            $this->preferredViews,
+            $this->remainingViews,
+            $choices,
+            $labels,
+            $preferredChoices
+        );
     }
 
     /**

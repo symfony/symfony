@@ -19,6 +19,13 @@ namespace Symfony\Component\Intl\Util;
 class Version
 {
     /**
+     * Must not be instantiated.
+     */
+    private function __construct()
+    {
+    }
+
+    /**
      * Compares two versions with an operator.
      *
      * This method is identical to {@link version_compare()}, except that you
@@ -87,12 +94,5 @@ class Version
         }
 
         return $matches[0];
-    }
-
-    /**
-     * Must not be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

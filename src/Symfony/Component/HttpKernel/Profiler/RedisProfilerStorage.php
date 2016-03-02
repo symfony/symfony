@@ -194,6 +194,16 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
+     * Set instance of the Redis.
+     *
+     * @param \Redis $redis
+     */
+    public function setRedis($redis)
+    {
+        $this->redis = $redis;
+    }
+
+    /**
      * Internal convenience method that returns the instance of Redis.
      *
      * @return \Redis
@@ -230,16 +240,6 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         }
 
         return $this->redis;
-    }
-
-    /**
-     * Set instance of the Redis.
-     *
-     * @param \Redis $redis
-     */
-    public function setRedis($redis)
-    {
-        $this->redis = $redis;
     }
 
     private function createProfileFromData($token, $data, $parent = null)

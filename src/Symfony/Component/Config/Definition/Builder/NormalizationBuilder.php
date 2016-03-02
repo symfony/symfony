@@ -18,9 +18,9 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 class NormalizationBuilder
 {
-    protected $node;
     public $before;
     public $remappings;
+    protected $node;
 
     /**
      * Constructor.

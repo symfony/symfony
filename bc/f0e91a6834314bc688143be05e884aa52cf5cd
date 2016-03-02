@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:30:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:32:47Z
+
+To keep BC, I would keep the `canBeUnset()` call as well.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-02T13:03:46Z
+
+@fabpot in case someone uses the FrameworkBundle's ``Configuration`` class and check if keys exist ?
+Otherwise ``canBeEnabled`` threat ``false`` so it should not change anything to the actual configurations.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:07:15Z
+
+@Ener-Getick I know that the BC break would be small, but as it does not cost us anything to not break BC, I prefer to.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-02T13:19:36Z
+
+@fabpot well having both options wouldn't change the ``Configuration`` output.
+(``allowFalse`` is checked after ``equivalentValues``, see [here](https://github.com/symfony/config/blob/master/Definition/BaseNode.php#L254-L261)).
+The only thing changing would be that ``ArrayNode::setAllowFalse()`` would be called. Is this what you want ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:22:54Z
+
+ok, fair enough, :+1:

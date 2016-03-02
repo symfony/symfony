@@ -94,7 +94,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                 return (string) $v === (string) (int) $v;
             }));
         } elseif ('guid' === $metadata->getTypeOfField($identifier)) {
-            $parameterType = Connection::PARAM_INT_ARRAY;
+            $parameterType = Connection::PARAM_STR_ARRAY;
 
             // Like above, but we just filter out empty strings.
             $values = array_values(array_filter($values, function ($v) {

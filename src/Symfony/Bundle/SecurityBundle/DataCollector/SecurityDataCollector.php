@@ -111,7 +111,7 @@ class SecurityDataCollector extends DataCollector
         }
 
         // collect voters and access decision manager information
-        if ($this->accessDecisionManager instance of DebugAccessDecisionManager) {
+        if ($this->accessDecisionManager instanceof DebugAccessDecisionManager) {
             $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
 

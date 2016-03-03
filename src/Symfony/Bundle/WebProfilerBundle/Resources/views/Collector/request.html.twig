@@ -27,7 +27,7 @@
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
             {% if collector.forward %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
-            <span class="sf-toolbar-label">@</span>
+            <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
     {% endset %}
@@ -38,6 +38,13 @@
                 <b>HTTP status</b>
                 <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
             </div>
+
+            {% if 'GET' != collector.method -%}
+                <div class="sf-toolbar-info-piece">
+                    <b>Method</b>
+                    <span>{{ collector.method }}</span>
+                </div>
+            {%- endif %}
 
             <div class="sf-toolbar-info-piece">
                 <b>Controller</b>

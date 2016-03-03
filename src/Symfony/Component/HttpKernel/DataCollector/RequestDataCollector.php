@@ -90,6 +90,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $statusCode = $response->getStatusCode();
 
         $this->data = array(
+            'method' => $request->getMethod(),
             'format' => $request->getRequestFormat(),
             'content' => $content,
             'content_type' => $response->headers->get('Content-Type', 'text/html'),
@@ -154,6 +155,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'controller' => $this->parseController($request->attributes->get('_forward_controller')),
             );
         }
+    }
+
+    public function getMethod()
+    {
+        return $this->data['method'];
     }
 
     public function getPathInfo()

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-01-28T19:53:59Z
+
+We need a test reproducing this.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-28T19:55:13Z
+
+And this seems the wrong fix IMO. the right fix would be to avoid generating ``_path`` in the query string when setting a controller directly
+
+---------------------------------------------------------------------------
+
+by cmenning at 2016-01-28T20:10:15Z
+
+The alternative would be patching `\Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer::generateFragmentUri` to not append the "_path" to the generated URI, but I'm not sure what other impact that would have downstream when handling the subrequest.
+
+---------------------------------------------------------------------------
+
+by cmenning at 2016-01-28T20:47:52Z
+
+The more I look at it, the more I think this is the appropriate fix. "_path" is in the query string specifically for the FragmentListener to parse; once it's been parsed, it's removed from the ParameterBag.
+
+It makes sense to remove it when finished with the listener, whether we use it or not, in order to keep behavior consistent.
+
+Suppressing "_path" during generation has a higher likelihood of side effects, and would make the generation code more complex: generateFragmentUri() then has to know whether the URI is intended to be consumed by a genuine ESI/Hinclude request, or whether it's being inlined.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:50:03Z
+
+@cmenning Will you be able to add a test?
+
+---------------------------------------------------------------------------
+
+by cmenning at 2016-03-02T14:50:35Z
+
+@fabpot Tests added.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T14:59:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-03T08:29:36Z
+
+:+1:
+
+Status: reviewed

@@ -111,11 +111,11 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new TraceableUrlMatcher($routes, $context);
 
         $notMatchingRequest = Request::create('/foo', 'GET');
-        $traces = $matcher->getTracesFromRequest($notMatchingRequest);
+        $traces = $matcher->getTracesForRequest($notMatchingRequest);
         $this->assertEquals("Condition \"request.headers.get('User-Agent') matches '/firefox/i'\" does not evaluate to \"true\"", $traces[0]['log']);
 
         $matchingRequest = Request::create('/foo', 'GET', array(), array(), array(), array('HTTP_USER_AGENT' => 'Firefox'));
-        $traces = $matcher->getTracesFromRequest($matchingRequest);
+        $traces = $matcher->getTracesForRequest($matchingRequest);
         $this->assertEquals('Route matches!', $traces[0]['log']);
     }
 }

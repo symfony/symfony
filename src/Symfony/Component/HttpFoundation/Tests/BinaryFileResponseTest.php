@@ -192,7 +192,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->sendContent();
 
         $this->assertEquals(416, $response->getStatusCode());
-        #$this->assertEquals('', $response->headers->get('Content-Range'));
+        $this->assertEquals('', $response->headers->get('Content-Range'));
     }
 
     public function provideInvalidRanges()

@@ -43,6 +43,8 @@ class IntegerNodeTest extends \PHPUnit_Framework_TestCase
             array(1798),
             array(-678),
             array(0),
+            array(INF),
+            array(-INF),
         );
     }
 

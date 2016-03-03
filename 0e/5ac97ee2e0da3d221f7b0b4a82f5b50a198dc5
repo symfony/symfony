@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-01T20:11:25Z
+
+Why not something like https://github.com/dunglas/DunglasApiBundle/blob/1.x/Controller/ResourceController.php#L79-L93?
+
+I agree with @stof, `Response` should be a value object. The serializer should not be injected in it. An helper method in the controller like this one API Platform would be better IMO. Btw, we should wait for a decision about #16863 before adding new methods to the controller IMO.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-01T20:43:22Z
+
+Now I look at it again, I completely agree on the weirdness of inserting the Serializer into the Response.
+
+How about what I have done now? Its very similar to how DunglasApiBundle does it, but keeping the `JsonResponse`.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-02-01T21:08:37Z
+
+@dunglas That was a long read! Would certainly wait until a decision is made there. I see some real value in breaking up an every growing Controller class.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:46:52Z
+
+LGTM. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-03-01T08:23:10Z
+
+@xabbuh Does anything else need to be done?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T14:25:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-03-01T19:20:14Z
+
+@xabbuh does the 'needs work' label still need to be here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T19:58:34Z
+
+@mcfedr No, you're right.
+
+Status: Reviewed

@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-22T18:53:58Z
+
+@francoispluchino @wesleylancel would you mind checking if this fixes your issues please?
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-02-22T20:25:34Z
+
+@jakzal It's OK for me! Thank you for this PR.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-22T21:27:15Z
+
+I just confirmed it also fixes the issue reported by @Congelli501. Waiting for @wesleylancel to either confirm his case's fixed, or to provide a failing scenario.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-23T18:15:47Z
+
+Not really related to this PR, but loading templates via an absolute path looks terrible.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-02-24T08:55:09Z
+
+@fabpot I agree with you if you load  a template from a Bundle or App Resources, but when the template file is generated dynamically, and it is not in a Bundle we have no other choice.
+
+Personally, I have this problem with the mail templates that are accessible via a custom stream, with the email generator that provided me the absolute path of the template. So, dynamically add the template file before loading the template is not very subtle, Because the `templating.locator` will search the template, while the path is already known ...
+
+Of course, I am interested by best practices, if you have any.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-24T09:26:30Z
+
+Back to the topic... I confirmed wesleylancel's problem still persists. I'll work on a fix this afternoon.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-02-29T13:32:53Z
+
+@hcomnetworkers can you try this patch please?
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by hcomnetworkers at 2016-03-01T07:11:20Z
+
+@jakzal I have tested your patch and it works for #17958, thank you!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-01T11:30:50Z
+
+Several people confirmed this fixes the issue for them.
+
+status: reviewed

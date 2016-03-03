@@ -97,6 +97,10 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function getStringRepresentation($object)
     {
+        if (null === $object) {
+            return 'NULL';
+        }
+
         if (!is_object($object)) {
             return sprintf('%s (%s)', gettype($object), $object);
         }

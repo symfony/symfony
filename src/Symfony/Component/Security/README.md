@@ -1,17 +1,12 @@
 Security Component
 ==================
 
-Security provides an infrastructure for sophisticated authorization systems,
-which makes it possible to easily separate the actual authorization logic from
-so called user providers that hold the users credentials. It is inspired by
-the Java Spring framework.
-
-Resources
----------
-
-Documentation:
-
-https://symfony.com/doc/2.3/book/security.html
+The Security component provides a complete security system for your web
+application. It ships with facilities for authenticating using HTTP basic or
+digest authentication, interactive form login or X.509 certificate login, but
+also allows you to implement your own authentication strategies. Furthermore,
+the component provides ways to authorize authenticated users based on their
+roles, and it contains an advanced ACL system.
 
 Resources
 ---------

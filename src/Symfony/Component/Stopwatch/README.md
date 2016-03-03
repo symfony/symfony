@@ -1,7 +1,7 @@
 Stopwatch Component
 ===================
 
-Stopwatch provides a way to profile code.
+The Stopwatch component provides a way to profile code.
 
 Resources
 ---------

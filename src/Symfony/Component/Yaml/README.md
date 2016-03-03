@@ -1,15 +1,7 @@
 Yaml Component
 ==============
 
-YAML implements most of the YAML 1.2 specification.
-
-```php
-use Symfony\Component\Yaml\Yaml;
-
-$array = Yaml::parse(file_get_contents(filename));
-
-print Yaml::dump($array);
-```
+The Yaml component loads and dumps YAML files.
 
 Resources
 ---------

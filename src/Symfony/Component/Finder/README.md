@@ -1,25 +1,8 @@
 Finder Component
 ================
 
-Finder finds files and directories via an intuitive fluent interface, both in
-local and remote filesystems (such as Amazon S3):
-
-```php
-use Symfony\Component\Finder\Finder;
-
-$finder = new Finder();
-
-$iterator = $finder
-  ->files()
-  ->name('*.php')
-  ->depth(0)
-  ->size('>= 1K')
-  ->in(__DIR__);
-
-foreach ($iterator as $file) {
-    print $file->getRealpath()."\n";
-}
-```
+The Finder component finds files and directories via an intuitive fluent
+interface.
 
 Resources
 ---------

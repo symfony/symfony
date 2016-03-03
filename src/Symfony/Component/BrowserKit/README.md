@@ -1,17 +1,8 @@
 BrowserKit Component
 ====================
 
-BrowserKit simulates the behavior of a web browser.
-
-The component only provides an abstract client and does not provide any
-"default" backend for the HTTP layer.
-
-For a simple implementation of a browser based on an HTTP layer, have a look
-at [Goutte](https://github.com/FriendsOfPHP/Goutte).
-
-For an implementation based on HttpKernelInterface, have a look at the
-[Client](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Client.php)
-provided by the HttpKernel component.
+The BrowserKit component simulates the behavior of a web browser, allowing you
+to make requests, click on links and submit forms programmatically.
 
 Resources
 ---------

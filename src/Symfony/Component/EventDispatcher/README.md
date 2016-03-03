@@ -1,21 +1,9 @@
 EventDispatcher Component
 =========================
 
-The Symfony EventDispatcher component implements the Mediator pattern in a
-simple and effective way to make your projects truly extensible.
-
-```php
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
-
-$dispatcher = new EventDispatcher();
-
-$dispatcher->addListener('event_name', function (Event $event) {
-    // ...
-});
-
-$dispatcher->dispatch('event_name');
-```
+The EventDispatcher component provides tools that allow your application
+components to communicate with each other by dispatching events and listening to
+them.
 
 Resources
 ---------

@@ -1,8 +1,8 @@
 PropertyAccess Component
 ========================
 
-PropertyAccess reads/writes values from/to object/array graphs using a simple
-string notation.
+The PropertyAccess component provides function to read and write from/to an
+object or array using a simple string notation.
 
 Resources
 ---------

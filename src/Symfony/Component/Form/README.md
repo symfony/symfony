@@ -1,9 +1,7 @@
 Form Component
 ==============
 
-Form provides tools for defining forms, rendering and mapping request data to
-related models. Furthermore it provides integration with the Validation
-component.
+The Form component allows you to easily create, process and reuse HTML forms.
 
 Resources
 ---------

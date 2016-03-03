@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T17:11:27Z
+
+Feel free to close this one in favor of an alternative by @boite if any.
+
+---------------------------------------------------------------------------
+
+by boite at 2016-03-02T18:06:36Z
+
+Thanks @HeahDude I'll look these over and make sure they agree with some recent changes to the placeholder normalizer.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T18:36:23Z
+
+Yes I've already changed some assertions to take that into account ;)
+
+---------------------------------------------------------------------------
+
+by boite at 2016-03-02T23:09:00Z
+
+:+1: Good work @HeahDude.
+
+What was your reason for removing the final three tests in the single, expanded, required section?
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T23:14:00Z
+
+@boite Because when `ChoiceType` is expanded and required, it never has a placeholder.
+
+see https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php#L356
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T23:18:13Z
+
+Note to merger : only 2.x branches.
+
+---------------------------------------------------------------------------
+
+by boite at 2016-03-02T23:21:30Z
+
+I suppose that if that code is unlikely to change then there's no harm in having removed the tests.
+
+---------------------------------------------------------------------------
+
+by boite at 2016-03-02T23:23:01Z
+
+Branches 2.7 and 2.8 only.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T23:35:13Z
+
+yes, this precision was in the description ;)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-03T08:36:54Z
+
+Thanks for this PR @HeahDude :) What about the failing tests in the PHP 7 build?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-03T09:18:52Z
+
+@webmozart I know I still miss to understand.
+
+It's like the PHP 7 build of travis does not take into account commits of #17568 and #17973.
+
+Any lead ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-03T12:40:48Z
+
+@HeahDude That's because the tests use the form component from v2.7.10, which does not include the two PRs you mention.

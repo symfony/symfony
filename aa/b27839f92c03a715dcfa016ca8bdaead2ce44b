@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2016-02-04T14:24:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-04T18:07:15Z
+
+:+1: (I made this mistake recently).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-09T16:43:45Z
+
+I've implemented the changes asked by reviewers. This is now ready for the final review. Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T17:04:10Z
+
+I left a minor comment, but beside that :+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-10T12:21:25Z
+
+AFAIK you can technically have a service id like `@foo`. The limitation is only in the PhpDumper (https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L1342) (which is arbitrary and could be fixed in the future).
+So this change is not consistent with the rest and could break code that actually references a service beginning with an `@`.
+Dumping with the YamlDumper would work and then loading it with the YamlLoader would fail which is really strange.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-10T12:26:13Z
+
+If I'm right, we need a different solution.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-10T14:15:05Z
+
+@Tobion IMO, the right solution is to restrict the list of allowed chars in service ids to chars working everywhere (anything not working for the PhpDumper means it cannot work in a project wanting performance, as it would prevent dumping the container in the cache). This could start as a deprecation for now though
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-02-10T15:25:02Z
+
+Yes that is probably the easiest solution. Another one would be the remove this restriction in the PhpDumper by encoding special chars (hex for example).
+
+And IMO the better solution to this is issue here is to improve the real exception message in the ContainerBuilder: mention which service is decorating the non-existing one and maybe add suggestions for existing ones (like it is done for console commands). This would also work if we remove the restriction on service ids.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-15T08:28:11Z
+
+I'm :+1: to merge this one as is (even if technically, a service name can start with `@`, nobody will ever do that anyway). @javiereguiluz Can you create another PR or an issue to forbid usage of characters not supported by the dumper?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-15T08:31:52Z
+
+Yes, I'll take care of that in the new issue #17801.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-15T11:27:57Z
+
+But wouldn't it indeed be better to raise this exception only in the `DecoratorServicePass` if the `getDecoratedService()` method returns a non-existent service or alias id?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:40:35Z
+
+@xabbuh I think it's better to throw the exception as early as possible; it is a YAML issue, so it should probably be dealt with there.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T07:45:28Z
+
+@fabpot The only thing is that technically, you can have a service id starting with `@`.
+
+But anyway, I think it makes sense to restrict the list of allowed characters and deprecate everything else. So :+1: for doing this check for the YAML part only.

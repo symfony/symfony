@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T23:53:58Z
+
+Tests are falling now.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-10T07:41:38Z
+
+I've fixed tests and I've added a test for the new error message.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-02-17T09:15:40Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-24T18:56:16Z
+
+@javiereguiluz I've investigated this problem too and I found a way to display the traces instead of display an exception message:
+```diff
++use Symfony\Component\HttpFoundation\Request;
+
+class TraceableUrlMatcher extends UrlMatcher
+{
+     //...
++   public function getTracesRequest(Request $request)
++   {
++       $this->request = $request;
++
++       $ret = $this->getTraces($request->getPathInfo());
++
++       $this->request = null;
++
++       return $ret;
++   }
+}
+```
+And
+```diff
+use Symfony\Component\HttpFoundation\Request;
+
+class RouterController
+{
+    //...
+    public function panelAction($token)
+    {
+        //...
+
++       /** @var RequestDataCollector $request */
+        $request = $profile->getCollector('request');
+
++       $traceRequest = Request::create(
++           $request->getPathInfo(),
++           $request->getRequestServer()->get('REQUEST_METHOD'),
++           $request->getRequestAttributes()->all(),
++           $request->getRequestCookies()->all(),
++           [],
++           $request->getRequestServer()->all()
++       );
+
+        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
+            'request' => $request,
+            'router' => $profile->getCollector('router'),
+-           'traces' => $matcher->getTraces($request->getPathInfo()),
++           'traces' => $matcher->getTracesRequest($traceRequest),
+        )), 200, array('Content-Type' => 'text/html'));
+    }
+}
+```
+WDYT?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-29T07:53:34Z
+
+I've made the changes suggested by @yceruto. Everything works as expected and his solution is much better than mine. Now you can see better error messages when a route with an expression doesn't match:
+
+![not_match](https://cloud.githubusercontent.com/assets/73419/13388628/dbbc6660-dec1-11e5-93af-065323759ada.png)
+
+Thanks @yceruto!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-02-29T13:11:26Z
+
+AppVeyor build faild (no related)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T18:37:58Z
+
+LGTM

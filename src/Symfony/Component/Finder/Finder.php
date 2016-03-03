@@ -630,10 +630,9 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function first()
     {
-        $iterator = $this->getIterator();
-        $iterator->rewind();
-
-        return $iterator->current();
+        foreach ($this as $file) {
+            return $file;
+        }
     }
 
     /**

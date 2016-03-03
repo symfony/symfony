@@ -101,7 +101,7 @@ class FilesystemLoaderTest extends TestCase
 
     /**
      * @expectedException \Twig_Error_Loader
-     * @expectedExceptionMessageRegExp /Unable to find template "name\.format\.engine" \(looked into: .*\/Tests\/Loader\/\.\.\/DependencyInjection\/Fixtures\/Resources\/views\)/
+     * @expectedExceptionMessageRegExp /Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/
      */
     public function testTwigErrorIfTemplateDoesNotExist()
     {

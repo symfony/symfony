@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-19T09:34:27Z
+
+I'd prefer a real sentence like `Unable to find template "..." in any of these locations: ...`
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-19T09:37:59Z
+
+@Tobion I prefer a real sentence too. I did this to use the same error message as the original FilesystemLoader of Twig library (see https://github.com/twigphp/Twig/blob/1.x/lib/Twig/Loader/Filesystem.php#L209). Anyway, if others agree with you, I'll do the change. Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-01-19T13:40:58Z
+
+@javiereguiluz is it possible to use the Alias of bundles instead of the full path? I'm mentioning this because of my directory structure. If I were to look into a bundle it would become pretty deep:
+ - `/home/ivanderberg/projects/my_project/www/app/Resources/views/`
+ - `/home/ivanderberg/projects/my_project/www/src/Hostnet/Bundle/AppBundle/Resources/views/`
+ - `/home/ivanderberg/projects/my_project/www/vendor/hostnet/some-bundle/src/Resources/views/`
+
+And this is with PSR-4 with only 1 vendor bundle. My suggestion would be to make an exception to /app and alias the rest with the bundle name:
+ - `/app/Resources/views/`
+ - `@AppBundle/Resources/views/`
+ - `@SomeBundle/Resources/views/`
+
+It's quite clear in which application/project you are working with the given error so that information is redundant. Given you hardly ever use vendor templates, the last case would hardly ever be useful but cause a lot of clutter. The AppBundle shouldn't contain templates according to the best-practices but I think enough people still use multiple bundles in their application and know how to find it with the alias.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-01-27T16:53:09Z
+
+In 88b913b I'm trying to solve the problem just by reusing the error message that Twig provides us. The result is the same:
+
+![wrong_template](https://cloud.githubusercontent.com/assets/73419/12620936/a0274f82-c51e-11e5-8ae6-ca3fd7827c30.png)
+
+@iltar I prefer to not show the namespaces. Although is more verbose, is easier to understand which real paths Symfony is looking into.
+
+Now I'll try to add some test.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:55:28Z
+
+Now that the patch is much simpler, I don't get why we would need to change this. Basically, you are hiding one exception that might occur and the exception you put front and center is anyway available in the linked exceptions. So, I don't get it. Are you saying that people don't look at linked exceptions?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-03T14:24:50Z
+
+Let me explain why I think we should change this:
+
+If your application uses the modern template syntax and put this in your controller:
+
+```php
+return $this->render('wrong_template.html.twig');
+```
+
+Symfony will show you this message:
+
+![error_before](https://cloud.githubusercontent.com/assets/73419/13496680/e8288356-e151-11e5-82fa-060bd56d09ae.png)
+
+If we apply this patch, this other message is displayed:
+
+![error_after](https://cloud.githubusercontent.com/assets/73419/13496691/f2ec987c-e151-11e5-8e8d-c5ea16398d19.png)
+
+---
+
+If your application uses the old template syntax and put this in your controller:
+
+```php
+return $this->render('AppBundle:Default:wrong_template.html.twig');
+```
+
+Symfony will show you this message:
+
+(the four chained exceptions don't provide any information)
+
+![old_error_before](https://cloud.githubusercontent.com/assets/73419/13496860/c6a11fda-e152-11e5-9e90-f9eaca999a2a.png)
+
+If we apply this patch, this other message is displayed:
+
+![old_error_after](https://cloud.githubusercontent.com/assets/73419/13496867/d5bb4068-e152-11e5-8c35-b00af6c3fa4d.png)
+
+---
+
+And if your application uses the namespace template syntax and put this in your controller:
+
+```php
+return $this->render('@App/Default/wrong_template.html.twig');
+```
+
+Symfony will show you this message:
+
+(everything is very misleading! The second exception says that AppBundle doesn't exist!!!)
+
+![namespace_before](https://cloud.githubusercontent.com/assets/73419/13497060/bdd11882-e153-11e5-95c8-074aec9d92b8.png)
+
+If we apply this patch, this other message is displayed:
+
+![namespace_after](https://cloud.githubusercontent.com/assets/73419/13497069/c34e4d70-e153-11e5-97fc-5ec56b225242.png)
+
+---
+
+So, it seems that the new error messages are more useful and always consistent, regardless of the template syntax used. But let's ping @nicolas-grekas to check if he sees something wrong in this proposed exception change.

@@ -53,8 +53,8 @@ Resources
     [send Pull Requests](https://github.com/symfony/symfony/pulls)
     in the [main Symfony repository](https://github.com/symfony/symfony)
 
-Third Party Dependencies
-------------------------
+Credits
+-------
 
 `Resources/bin/hiddeninput.exe` is a third party binary provided within this
 component. Find sources and license at https://github.com/Seldaek/hidden-input.

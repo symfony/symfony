@@ -8,17 +8,6 @@ component.
 Resources
 ---------
 
-Silex integration:
-
-https://github.com/silexphp/Silex/blob/master/src/Silex/Provider/FormServiceProvider.php
-
-Documentation:
-
-https://symfony.com/doc/2.3/book/forms.html
-
-Resources
----------
-
   * [Documentation](https://symfony.com/doc/current/components/form/index.html)
   * [Contributing](https://symfony.com/doc/current/contributing/index.html)
   * [Report issues](https://github.com/symfony/symfony/issues) and

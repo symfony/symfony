@@ -42,8 +42,8 @@ Resources
     [send Pull Requests](https://github.com/symfony/symfony/pulls)
     in the [main Symfony repository](https://github.com/symfony/symfony)
 
-Third Party Dependencies
-------------------------
+Credits
+-------
 
 This component is a port of the Python cssselect library
 [v0.7.1](https://github.com/SimonSapin/cssselect/releases/tag/v0.7.1),

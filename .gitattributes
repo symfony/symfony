@@ -1,0 +1,10 @@
+* whitespace=space-before-tab,tab-in-indent,trailing-space,tabwidth=4
+
+.git* export-ignore
+Tests export-ignore
+phpunit.xml.dist export-ignore
+
+/.composer-auth.json export-ignore
+/.travis.php export-ignore
+/.travis.yml export-ignore
+/appveyor.yml export-ignore

@@ -159,7 +159,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
-    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToNotCopy()
+    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
     {
         $sourceFilePath = 'http://symfony.com/images/common/logo/logo_symfony_header.png';
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';

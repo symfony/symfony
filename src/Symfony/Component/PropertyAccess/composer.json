@@ -21,6 +21,7 @@
         "symfony/inflector": "~3.1"
     },
     "require-dev": {
+        "doctrine/annotations": "~1.2",
         "symfony/cache": "~3.1"
     },
     "suggest": {
@@ -35,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.1-dev"
         }
     }
 }

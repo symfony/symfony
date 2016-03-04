@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
+use Doctrine\ORM\Mapping\Column;
+use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
+
 class TestClass
 {
     public $publicProperty;
@@ -28,6 +31,11 @@ class TestClass
     private $publicGetter;
     private $date;
 
+    /**
+     * @PropertyAccessor(getter="customGetterTest", setter="customSetterTest")
+     */
+    private $customGetterSetter;
+
     public function __construct($value)
     {
         $this->publicProperty = $value;
@@ -40,6 +48,7 @@ class TestClass
         $this->publicIsAccessor = $value;
         $this->publicHasAccessor = $value;
         $this->publicGetter = $value;
+        $this->customGetterSetter = $value;
     }
 
     public function setPublicAccessor($value)
@@ -183,5 +192,15 @@ class TestClass
     public function getDate()
     {
         return $this->date;
+    }
+
+    public function customGetterTest()
+    {
+        return $this->customGetterSetter;
+    }
+
+    public function customSetterTest($value)
+    {
+        $this->customGetterSetter = $value;
     }
 }

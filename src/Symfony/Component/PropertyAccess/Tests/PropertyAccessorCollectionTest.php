@@ -11,19 +11,35 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
 
+    /**
+     * @Symfony\Component\PropertyAccess\Annotation\PropertyAccessor(adder="addAxisTest", remover="removeAxisTest")
+     */
+    private $customAxes;
+
     public function __construct($axes = null)
     {
         $this->axes = $axes;
+        $this->customAxes = $axes;
     }
 
     // In the test, use a name that StringUtil can't uniquely singularify
     public function addAxis($axis)
     {
         $this->axes[] = $axis;
+    }
+
+    // In the test, use a name that StringUtil can't uniquely singularify
+    public function addAxisTest($axis)
+    {
+        $this->customAxes[] = $axis;
     }
 
     public function removeAxis($axis)
@@ -37,9 +53,25 @@ class PropertyAccessorCollectionTest_Car
         }
     }
 
+    public function removeAxisTest($axis)
+    {
+        foreach ($this->customAxes as $key => $value) {
+            if ($value === $axis) {
+                unset($this->customAxes[$key]);
+
+                return;
+            }
+        }
+    }
+
     public function getAxes()
     {
         return $this->axes;
+    }
+
+    public function getCustomAxes()
+    {
+        return $this->customAxes;
     }
 }
 
@@ -144,6 +176,28 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
             ->with('third');
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
+    }
+
+    public function testSetValueCallsCustomAdderAndRemoverForCollections()
+    {
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
+        $axesMerged = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axesAfter = $this->getContainer(array(1 => 'second', 5 => 'first', 6 => 'third'));
+        $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
+
+        // Don't use a mock in order to test whether the collections are
+        // modified while iterating them
+        $car = new PropertyAccessorCollectionTest_Car($axesBefore);
+
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+
+        $this->propertyAccessor->setValue($car, 'customAxes', $axesMerged);
+
+        $this->assertEquals($axesAfter, $car->getCustomAxes());
+
+        // The passed collection was not modified
+        $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
     /**

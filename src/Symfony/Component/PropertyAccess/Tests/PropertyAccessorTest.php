@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -198,6 +200,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
+    public function testGetWithCustomGetter()
+    {
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+        $this->assertSame('webmozart', $this->propertyAccessor->getValue(new TestClass('webmozart'), 'customGetterSetter'));
+    }
+
     /**
      * @dataProvider getValidPropertyPaths
      */
@@ -296,6 +305,18 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
+    }
+
+    public function testSetValueWithCustomSetter()
+    {
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+
+        $custom = new TestClass('webmozart');
+
+        $this->propertyAccessor->setValue($custom, 'customGetterSetter', 'it works!');
+
+        $this->assertEquals('it works!', $custom->customGetterTest());
     }
 
     public function testGetValueWhenArrayValueIsNull()

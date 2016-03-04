@@ -34,14 +34,12 @@ class JsonResponse extends Response
     protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
-     * Constructor.
-     *
-     * @param mixed $data       The response data
-     * @param int   $status     The response status code
-     * @param array $headers    An array of response headers
-     * @param bool  $preEncoded If the data is already a JSON string
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     * @param bool  $json    If the data is already a JSON string
      */
-    public function __construct($data = null, $status = 200, $headers = array(), $preEncoded = false)
+    public function __construct($data = null, $status = 200, $headers = array(), $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -49,7 +47,7 @@ class JsonResponse extends Response
             $data = new \ArrayObject();
         }
 
-        $this->setData($data, $preEncoded);
+        $json ? $this->setJson($data) : $this->setData($data);
     }
 
     /**
@@ -88,45 +86,56 @@ class JsonResponse extends Response
     }
 
     /**
-     * Sets the data to be sent as JSON.
+     * Sets a raw string containing a JSON document to be sent.
      *
-     * @param mixed $data
-     * @param bool  $preEncoded If the data is already a JSON string
+     * @param string $data
      *
      * @return JsonResponse
      *
      * @throws \InvalidArgumentException
      */
-    public function setData($data = array(), $preEncoded = false)
+    public function setJson($json)
     {
-        if (!$preEncoded) {
-            if (defined('HHVM_VERSION')) {
-                // HHVM does not trigger any warnings and let exceptions
-                // thrown from a JsonSerializable object pass through.
-                // If only PHP did the same...
-                $data = json_encode($data, $this->encodingOptions);
-            } else {
-                try {
-                    // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
-                    // objects in a new exception that needs to be removed.
-                    // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
-                    $data = json_encode($data, $this->encodingOptions);
-                } catch (\Exception $e) {
-                    if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
-                        throw $e->getPrevious() ?: $e;
-                    }
-                    throw $e;
-                }
-            }
+        $this->data = $json;
 
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new \InvalidArgumentException(json_last_error_msg());
+        return $this->update();
+    }
+
+    /**
+     * Sets the data to be sent as JSON.
+     *
+     * @param mixed $data
+     *
+     * @return JsonResponse
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setData($data = array())
+    {
+        if (defined('HHVM_VERSION')) {
+            // HHVM does not trigger any warnings and let exceptions
+            // thrown from a JsonSerializable object pass through.
+            // If only PHP did the same...
+            $data = json_encode($data, $this->encodingOptions);
+        } else {
+            try {
+                // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
+                // objects in a new exception that needs to be removed.
+                // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
+                $data = json_encode($data, $this->encodingOptions);
+            } catch (\Exception $e) {
+                if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                    throw $e->getPrevious() ?: $e;
+                }
+                throw $e;
             }
         }
 
-        $this->data = $data;
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException(json_last_error_msg());
+        }
 
-        return $this->update();
+        return $this->setJson($data);
     }
 
     /**

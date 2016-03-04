@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-14T17:02:26Z
+
+Could you create another PR against 2.7 that changes `ProgressBar` and `QuestionHelper` accordingly please?
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-14T17:04:57Z
+
+Yes already working on a PR for 2.7.
+
+Are `ProgressBar` and `QuestionHelper` the only ones eligible?
+There is also a `SymfonyQuestionHelper`. I take it that is for internal stuff only then?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-14T17:05:46Z
+
+SymfonyQuestionHelper extends QuestionHelper and thus should be convered already
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-14T17:24:02Z
+
+Please let me know if #15795 covers it or if any amendments need to be made.
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-14T17:24:54Z
+
+@Seldaek here you go (again).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-14T19:16:35Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T09:44:48Z
+
+Tests covering this are missing
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-15T09:48:42Z
+
+What would be an acceptable test scenario in your opinion, to validate these changes?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-09-15T10:09:17Z
+
+@alcohol Creating the helper with a ConsoleOutputInterface, and asserting that it writes its output to the error output.
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-15T10:26:30Z
+
+Allright. Will implement something later today. Thanks for the feedback.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-09-20T14:55:47Z
+
+Status: Needs Work
+Tests
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-21T21:09:48Z
+
+@Tobion got any tips?
+
+I tried the following for the `DialogHelper` for example, but yeah obviously it doesn't work as expected.
+
+``` php
+    public function testAskOnStderrWithConsoleOutput()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stderr` is required to test stderr output functionality');
+        }
+
+        $dialog = new DialogHelper();
+
+        $dialog->setInputStream($this->getInputStream("\nnot stdout\n"));
+
+        $this->assertEquals('stderr', $dialog->ask(new ConsoleOutput(), 'Where should output go?', 'stderr'));
+        $this->assertEquals('not stdout', $dialog->ask($output = new ConsoleOutput(), 'Where should output go?', 'stderr'));
+
+        rewind($output->getErrorOutput()->getStream());
+        $this->assertEquals('Where should output go?', stream_get_contents($output->getErrorOutput()->getStream()));
+    }
+```
+
+```
+/srv/git/github/symfony (2.3-default-to-stderr*) $ ./phpunit src/Symfony/Component/Console/Tests/Helper/DialogHelperTest.php
+PHPUnit 4.8.9 by Sebastian Bergmann and contributors.
+
+..F....
+
+Time: 236 ms, Memory: 6.00Mb
+
+There was 1 failure:
+
+1) Symfony\Component\Console\Tests\Helper\DialogHelperTest::testAskOnStderrWithConsoleOutput
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'Where should output go?'
++''
+
+/srv/git/github/symfony/src/Symfony/Component/Console/Tests/Helper/DialogHelperTest.php:81
+
+FAILURES!
+Tests: 7, Assertions: 35, Failures: 1.
+Where should output go?Where should output go?KO src/Symfony/Component/Console/Tests/Helper/DialogHelperTest.php
+```
+
+I noticed all the tests use `php://memory` for output. Nothing actually ever tests `stdout` or `stderr`.
+
+---------------------------------------------------------------------------
+
+by alcohol at 2015-09-21T21:40:41Z
+
+@Tobion, @stof, can you let me know if the above added tests are in line with what you in mind? I'll add more in that case.
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-02-06T17:39:23Z
+
+Hi everyone !
+Whan is the state of this PR ?
+
+---------------------------------------------------------------------------
+
+by alcohol at 2016-02-07T23:15:45Z
+
+@keradus not sure, getting dusty? :d

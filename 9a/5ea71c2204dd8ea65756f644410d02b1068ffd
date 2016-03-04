@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:53:29Z
+
+ping @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-02T20:23:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-02T20:44:04Z
+
+@dunglas should I change something [here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Encoder/XmlEncoder.php#L472-L475) too ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-03T20:32:36Z
+
+It should be tested but it looks like a good idea.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-03T21:04:25Z
+
+@dunglas I already added a test [here](https://github.com/symfony/symfony/pull/17984/files#diff-0590165d9e66621f7d21653e42d21f65R207).
+
+And I didn't completely understand what does ``selectNodeType`` so I can't tell if this patch has to be added in it and what would it change.

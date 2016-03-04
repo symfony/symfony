@@ -75,7 +75,7 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
 
-    public function testConstructorWithPreEncoded()
+    public function testSetJson()
     {
         $response = new JsonResponse('1', 200, array(), true);
         $this->assertEquals('1', $response->getContent());
@@ -83,7 +83,8 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $response = new JsonResponse('[1]', 200, array(), true);
         $this->assertEquals('[1]', $response->getContent());
 
-        $response = new JsonResponse('true', 200, array(), true);
+        $response = new JsonResponse(null, 200, array());
+        $response->setJson('true');
         $this->assertEquals('true', $response->getContent());
     }
 

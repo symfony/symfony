@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-22T15:23:44Z
+
+Really awesome ! Many thanks for that feature !
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:12:06Z
+
+@javiereguiluz Can you rebase as tests have been fixed since your submitted the PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:19:51Z
+
+Apart from my minor comments, :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-29T16:28:58Z
+
+I've made all the requested changes (thanks for the review!) ... but before merging this, it should be tested by someone which works on Symfony apps with complex security needs (maybe @iltar could help us?)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-02-29T17:02:19Z
+
+@javiereguiluz sadly still running on 2.8 in the application I can test it on properly. The 3.0 upgrade will be done somewhere starting in 2 weeks as we are still gathering deprecations in our production env. Maybe I'll be able to upgrade just the security bundle as most (if not all) of those are already fixed.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-01T08:46:46Z
+
+@javiereguiluz I've downloaded your branch as zip, extracted it and symlinked vendor/symfony/symfony to your branch. However, I cannot get it to work. The error I'm getting is `Warning: Invalid argument supplied for foreach()`:
+
+### issue 1
+Most important part of the stacktrace:
+```
+in SecurityDataCollector.php line 117
+at ErrorHandler->handleError('2', 'Invalid argument supplied for foreach()', '/home/ivanderberg/projects/forks/symfony-fix_17856/src/Symfony/Bundle/SecurityBundle/DataCollector/SecurityDataCollector.php', '117', ...)
+```
+
+I've checked the service and it has the `DebugAccessDecisionManager` which is correct. However, `getVoters()` returns `null`. I've checked and `setVoters()` is never called. I've traced that back to `AddSecurityVotersPass:48`:
+```php
+$container->getDefinition('security.access.decision_manager')->addMethodCall('setVoters', array(array_values($voters)));
+```
+
+There's 2 possible solutions:
+ - `DebugAccessDecisionManager` setVoters()` should be removed and `getVoters()` should forward the call to `$this->manager`. Sadly this class doesn't have `getVoters()` yet so it will have to be added.
+ - The `setVoters()` should also be called on the decorating service. It seems like this is not added because the decoration pass is later (correct me if I'm wrong)
+
+----
+
+### issue 2
+After patching either one of the above issues, I have a serialization issue "You cannot serialize or unserialize PDO instances". The @Template is being cached now and causes the bug I fixed in this pending PR: sensiolabs/SensioFrameworkExtraBundle#404. However, fixing this issue didn't solve my serialization issue. After digging a bit deeper it made sense... The request also contains your session. This means that if you use a database session storage like I do, it will try to serialize this. This will also fail if you use the `@ParamConverter` and put objects in your attribute bag.
+
+I've changed `DebugAccessDecisionManager:50` to `'object' => is_object($object) ? get_class($object) : gettype($object),` and now it works. In the actual PR you might want to use the ClassUtils from doctrine to fetch the actual class though, otherwise you'll see useless proxy names.
+
+----
+
+### After fixing
+
+The following screens are on my login page. The first thing I notice is that the Token column might be redundant.
+![](http://i.imgur.com/2KSqSGF.png)
+![](http://i.imgur.com/5gAS2nB.png)
+
+----
+
+When I'm logged in, it shows more information on my dashboard. The things I notice:
+ - The attributes are not shown in the most readable format for the most common case (1 attribute).
+ - Column numbers get put on multiple lines
+ - The Token column is redundant
+ - I'm unable to trace back where it came from (but this could be a future PR)
+
+![](http://i.imgur.com/NzS7dia.png)
+![](http://i.imgur.com/u6yv2eR.png)
+
+----
+When viewing a page which as _a lot_ of `isGranted()` checks, it becomes hard to trace back the data. Maybe it could be grouped but that would be annoying to trace back either way. A nice feature that I'm missing is the ability to show the "identifier" of an entity in this case. In this list it looks like I have inconsistent results while in fact it's 80 different entities being checked in a list. Finding the identifier might be nice as it will help debugging a lot but you will run into the same issue I have: iltar/http-bundle#12.
+
+![](http://i.imgur.com/HMDCylH.png)
+_and the list goes on_
+![](http://i.imgur.com/Ms3sWFG.png)
+
+----
+Looking at a page with less different objects, it becomes a bit of a mess as well.
+![](http://i.imgur.com/Huxk4uu.png)
+
+----
+
+### Conclusion
+It's a nice start but with lots of information it becomes a mess really quick. A possible solution would be to group the checks per object (via object hash?) and to add the ID of an object if managed by doctrine (plug & play system so people can hook in?). Additionally the last column could be removed and the attributes shown with the just attribute as comma imploded string.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-01T12:14:09Z
+
+@iltar thank you very much for your incredible review!!
+
+I've made some changes as requested:
+
+ * Removed the `token` column in the decision log
+ * Improved the way we display attributes when there is only 1 attribute
+ * Tried to improve the way objects are represented (this needs to be tested)
+ * Related to previous one: don't store objects to avoid serializing errors
+ * Other minor design tweaks
+
+I still need to fix the `setVoters()` problem.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-01T13:13:39Z
+
+Once the `setVoters()` is fixed I'll run it through the application again if I have some time today, otherwise it will be tomorrow. Can you ping me when it's ready to be tested?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-01T13:51:18Z
+
+@iltar it should be ready for review. Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-01T15:17:15Z
+
+Not sure if the Request gives the desired effect now, but works for me:
+
+![](http://i.imgur.com/aOQhSQP.png)
+----
+The list is a lot easier to read now but differences between objects is still hard to find. I suppose getting the actual ID field + the value of the object in question (if entity) would be too hard to implement in this patch for now. It's already an improvement but it takes a lot of time to see the different objects.
+
+*2 different objects*
+![](http://i.imgur.com/BSsJE0q.png)
+
+*Many different objects*
+![](http://i.imgur.com/As95MW1.png)
+
+*Found one with a basic type, someone found it necessary to use an ID instead of an object...*
+![image](https://cloud.githubusercontent.com/assets/1754678/13431020/ea5b4d4c-dfc7-11e5-8df3-81af81fa50a8.png)
+
+Besides of the minor comments (which are hard to fix), I think this shows a lot of usable information already. What I would still like to see is a way to identify an Entity in a generic fashion; I need it mysel and it could be re-used here to show useful info.
+
+----
+
+I hope this helps :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-01T15:37:43Z
+
+@iltar great! We're making progress here. I've just added a special case to check if `getId()` method exists to use it instead of the object hash. I think it's worth it because `getId()` is used very commonly.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-01T17:09:48Z
+
+I agree that this covers most use-cases. In a later stage I would like to ask the entity metadata what the identifier is, but I want this done in a generic fashion as not everything is a doctrine entity for example which probably blows up the scope of this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-01T17:38:40Z
+
+Good to merge? ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-03T14:54:53Z
+
+I've tested all kinds of attributes and objects and it seems to work as expected:
+
+![access_decision_log](https://cloud.githubusercontent.com/assets/73419/13497960/2b39f57a-e158-11e5-84c1-815e4ec90d27.png)
+
+The Travis errors are unrelated.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-03T15:02:22Z
+
+That looks really nice and useful! :+1:

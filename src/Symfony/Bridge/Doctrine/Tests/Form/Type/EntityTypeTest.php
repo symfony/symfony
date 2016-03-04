@@ -802,6 +802,30 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame('BooGroup/Bar', $field->getViewData());
     }
 
+    public function testChoicesForValuesOptimization()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'choice_label' => 'name',
+        ));
+
+        $this->em->clear();
+
+        $field->submit(1);
+
+        $unitOfWorkIdentityMap = $this->em->getUnitOfWork()->getIdentityMap();
+        $managedEntitiesNames = array_map('strval', $unitOfWorkIdentityMap['Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity']);
+
+        $this->assertContains((string) $entity1, $managedEntitiesNames);
+        $this->assertNotContains((string) $entity2, $managedEntitiesNames);
+    }
+
     public function testGroupByChoices()
     {
         $item1 = new GroupableEntity(1, 'Foo', 'Group1');

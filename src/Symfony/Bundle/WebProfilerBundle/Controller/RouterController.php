@@ -18,6 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 
 /**
  * RouterController.
@@ -62,16 +63,39 @@ class RouterController
 
         $profile = $this->profiler->loadProfile($token);
 
-        $context = $this->matcher->getContext();
-        $context->setMethod($profile->getMethod());
-        $matcher = new TraceableUrlMatcher($this->routes, $context);
-
+        /** @var RequestDataCollector $request */
         $request = $profile->getCollector('request');
 
         return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
             'request' => $request,
             'router' => $profile->getCollector('router'),
-            'traces' => $matcher->getTraces($request->getPathInfo()),
+            'traces' => $this->getTraces($request, $profile->getMethod()),
         )), 200, array('Content-Type' => 'text/html'));
+    }
+
+    /**
+     * Returns the routing traces associated to the given request.
+     *
+     * @param RequestDataCollector $request
+     * @param string               $method
+     *
+     * @return array
+     */
+    private function getTraces(RequestDataCollector $request, $method)
+    {
+        $traceRequest = Request::create(
+            $request->getPathInfo(),
+            $request->getRequestServer()->get('REQUEST_METHOD'),
+            $request->getRequestAttributes()->all(),
+            $request->getRequestCookies()->all(),
+            array(),
+            $request->getRequestServer()->all()
+        );
+
+        $context = $this->matcher->getContext();
+        $context->setMethod($method);
+        $matcher = new TraceableUrlMatcher($this->routes, $context);
+
+        return $matcher->getTracesForRequest($traceRequest);
     }
 }

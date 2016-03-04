@@ -313,4 +313,14 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->getDefinition('bar_service')->isAutowired());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").
+     */
+    public function testDecoratedServicesWithWrongSyntaxThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('bad_decorates.yml');
+    }
 }

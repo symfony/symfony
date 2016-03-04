@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -38,6 +39,15 @@ class TraceableUrlMatcher extends UrlMatcher
         }
 
         return $this->traces;
+    }
+
+    public function getTracesForRequest(Request $request)
+    {
+        $this->request = $request;
+        $traces = $this->getTraces($request->getPathInfo());
+        $this->request = null;
+
+        return $traces;
     }
 
     protected function matchCollection($pathinfo, RouteCollection $routes)

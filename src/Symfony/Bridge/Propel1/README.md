@@ -1,13 +1,11 @@
-Finder Component
-================
+Propel Bridge
+=============
 
-The Finder component finds files and directories via an intuitive fluent
-interface.
+Provides integration for Propel with various Symfony components.
 
 Resources
 ---------
 
-  * [Documentation](https://symfony.com/doc/current/components/finder.html)
   * [Contributing](https://symfony.com/doc/current/contributing/index.html)
   * [Report issues](https://github.com/symfony/symfony/issues) and
     [send Pull Requests](https://github.com/symfony/symfony/pulls)

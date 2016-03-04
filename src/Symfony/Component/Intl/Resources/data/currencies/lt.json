@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.9",
+    "Version": "2.1.13.46",
     "Names": {
         "ADP": [
             "ADP",
@@ -366,7 +366,7 @@
             "Etiopijos biras"
         ],
         "EUR": [
-            "EUR",
+            "€",
             "Euras"
         ],
         "FIM": [
@@ -387,7 +387,7 @@
         ],
         "GBP": [
             "GBP",
-            "Didžiosios Britanijos svaras sterlingų"
+            "Didžiosios Britanijos svaras"
         ],
         "GEK": [
             "GEK",
@@ -994,7 +994,7 @@
             "Ugandos šilingas"
         ],
         "USD": [
-            "USD",
+            "dol.",
             "JAV doleris"
         ],
         "USN": [

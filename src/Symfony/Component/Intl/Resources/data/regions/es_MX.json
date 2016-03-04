@@ -1,21 +1,16 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.13.23",
     "Names": {
-        "BA": "Bosnia-Herzegovina",
         "BD": "Bangladesh",
         "CC": "Islas Cocos (Keeling)",
-        "CG": "Congo Brazzaville",
         "CX": "Isla de Navidad",
         "GG": "Guernsey",
-        "GS": "Islas Georgias del Sur y Sandwich del Sur",
-        "GW": "Guinea-Bissau",
         "HK": "Región Administrativa Especial de Hong Kong de la República Popular China",
         "IC": "Islas Canarias",
         "MO": "Región Administrativa Especial de Macao de la República Popular China",
         "PW": "Palaos",
-        "QA": "Qatar",
         "TA": "Tristán de Acuña",
-        "UM": "Islas UltramarinasMenores de Estados Unidos",
+        "UM": "Islas Ultramarinas Menores de Estados Unidos",
         "VI": "Islas Vírgenes de los Estados Unidos"
     }
 }

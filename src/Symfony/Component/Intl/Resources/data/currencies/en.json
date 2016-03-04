@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.87",
+    "Version": "2.1.13.48",
     "Names": {
         "ADP": [
             "ADP",
@@ -387,7 +387,7 @@
         ],
         "GBP": [
             "£",
-            "British Pound Sterling"
+            "British Pound"
         ],
         "GEK": [
             "GEK",
@@ -1019,7 +1019,7 @@
         ],
         "UZS": [
             "UZS",
-            "Uzbekistan Som"
+            "Uzbekistani Som"
         ],
         "VEB": [
             "VEB",
@@ -1047,7 +1047,7 @@
         ],
         "XAF": [
             "FCFA",
-            "CFA Franc BEAC"
+            "Central African CFA Franc"
         ],
         "XCD": [
             "EC$",
@@ -1067,7 +1067,7 @@
         ],
         "XOF": [
             "CFA",
-            "CFA Franc BCEAO"
+            "West African CFA Franc"
         ],
         "XPF": [
             "CFPF",

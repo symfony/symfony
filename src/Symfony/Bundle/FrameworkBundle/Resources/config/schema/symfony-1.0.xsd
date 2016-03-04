@@ -206,11 +206,11 @@
 
     <xsd:complexType name="cache">
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="adapter" type="cache_adapter" />
+            <xsd:element name="pool" type="cache_pool" />
         </xsd:choice>
     </xsd:complexType>
 
-    <xsd:complexType name="cache_adapter">
+    <xsd:complexType name="cache_pool">
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="default-lifetime" type="xsd:integer" />

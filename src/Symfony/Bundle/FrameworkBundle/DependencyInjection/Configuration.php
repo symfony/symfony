@@ -555,40 +555,22 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('cache')
                     ->info('Cache configuration')
-                    ->fixXmlConfig('adapter')
+                    ->fixXmlConfig('pool')
                     ->children()
-                        ->arrayNode('adapters')
+                        ->arrayNode('pool')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->beforeNormalization()
-                                    ->always(function ($v) {
-                                        if (!isset($v['options'])) {
-                                            $v['options'] = array();
-                                        }
-
-                                        foreach ($v as $key => $value) {
-                                            if (!in_array($key, array('type', 'name', 'options'))) {
-                                                $v['options'][$key] = $value;
-                                                unset($v[$key]);
-                                            }
-                                        }
-
-                                        return $v;
-                                    })
                                 ->end()
                                 ->children()
                                     ->enumNode('type')
-                                        ->info('The cache adapter type (one of "apcu", "doctrine", "filesystem")')
+                                        ->info('The cache pool type (one of "apcu", "doctrine", "psr6" or "filesystem")')
                                         ->isRequired()
-                                        ->values(array('apcu', 'doctrine', 'filesystem'))
+                                        ->values(array('apcu', 'doctrine', 'psr6', 'filesystem'))
                                     ->end()
-                                    ->arrayNode('options')
-                                        ->children()
-                                            ->integerNode('default_lifetime')->end()
-                                            ->scalarNode('cache_provider_service')->end()
-                                            ->scalarNode('directory')->end()
-                                        ->end()
-                                    ->end()
+                                    ->integerNode('default_lifetime')->default(0)->end()
+                                    ->scalarNode('cache_provider_service')->defaultNull()->end()
+                                    ->scalarNode('directory')->defaultNull()->end()
                                 ->end()
                             ->end()
                         ->end()

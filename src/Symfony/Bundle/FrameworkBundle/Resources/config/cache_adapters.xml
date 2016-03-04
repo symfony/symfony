@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
+            <tag name="cache.adapter" namespace-arg-index="0"></tag>
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+        </service>
+
+        <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
+            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <argument /> <!-- doctrine provider service -->
+            <argument /> <!-- default lifetime -->
+            <argument /> <!-- namespace -->
+        </service>
+
+        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
+            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <argument /> <!-- PSR-6 provider service -->
+            <argument /> <!-- default lifetime -->
+            <argument /> <!-- namespace -->
+        </service>
+
+        <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
+            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <argument>%kernel.cache_dir%</argument>
+            <argument /> <!-- default lifetime -->
+            <argument /> <!-- namespace -->
+        </service>
+
+    </services>
+</container>

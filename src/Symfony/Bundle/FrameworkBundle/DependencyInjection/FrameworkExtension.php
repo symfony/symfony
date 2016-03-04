@@ -12,9 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\DoctrineAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -1023,43 +1020,24 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerCacheConfiguration(array $config, ContainerBuilder $container)
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        foreach ($config['adapters'] as $name => $adapter) {
-            $class = null;
-            $arguments = array();
-            $namespaceArgumentIndex = null;
+        if (!empty($config['pool'])) {
+            $loader->load('cache_adapters.xml');
+        }
 
-            switch ($adapter['type']) {
-                case 'apcu':
-                    $class = ApcuAdapter::class;
-                    $arguments[] = null;
-                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : 0;
-                    $namespaceArgumentIndex = 0;
-                    break;
-                case 'doctrine':
-                    $class = DoctrineAdapter::class;
-                    $arguments[] = isset($adapter['options']['cache_provider_service']) ? new Reference($adapter['options']['cache_provider_service']) : null;
-                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : null;
-                    break;
-                case 'filesystem':
-                    $class = FilesystemAdapter::class;
-                    $arguments[] = isset($adapter['options']['directory']) ? $adapter['options']['directory'] : null;
-                    $arguments[] = isset($adapter['options']['default_lifetime']) ? $adapter['options']['default_lifetime'] : null;
-                    break;
+        foreach ($config['pool'] as $name => $poolConfig) {
+            $poolDefinition = new DefinitionDecorator('cache.adapter.'.$poolConfig['type']);
+            $poolDefinition->replaceArgument(1, $poolConfig['default_lifetime']);
+
+            if ('doctrine' === $poolConfig['type'] || 'psr6' === $poolConfig['type']) {
+                $poolDefinition->replaceArgument(0, new Reference($poolConfig['cache_provider_service']));
+            } elseif ('filesystem' === $poolConfig['type'] && isset($poolConfig['directory'][0])) {
+                $poolDefinition->replaceArgument(0, $poolConfig['directory']);
             }
 
-            $tagAttributes = array('id' => $name);
-
-            if (null !== $namespaceArgumentIndex) {
-                $tagAttributes['namespace-arg-index'] = $namespaceArgumentIndex;
-            }
-
-            $adapterDefinition = new Definition($class);
-            $adapterDefinition->setArguments($arguments);
-            $adapterDefinition->setAbstract(true);
-            $adapterDefinition->addTag('cache.adapter', $tagAttributes);
-            $container->setDefinition('cache.adapter.'.$name, $adapterDefinition);
+            $poolDefinition->addTag('cache.pool');
+            $container->setDefinition('cache.pool.'.$name, $poolDefinition);
         }
     }
 

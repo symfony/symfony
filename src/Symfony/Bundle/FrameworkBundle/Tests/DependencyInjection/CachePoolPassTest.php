@@ -11,24 +11,24 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CacheAdapterPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CacheAdapterPassTest extends \PHPUnit_Framework_TestCase
+class CachePoolPassTest extends \PHPUnit_Framework_TestCase
 {
-    private $cacheAdapterPass;
+    private $cachePoolPass;
 
     protected function setUp()
     {
-        $this->cacheAdapterPass = new CacheAdapterPass();
+        $this->cachePoolPass = new CachePoolPass();
     }
 
     public function testAdapterIsInjectedIntoConstructorArguments()
     {
         $container = $this->initializeContainer();
-        $this->cacheAdapterPass->process($container);
+        $this->cachePoolPass->process($container);
         $adapter = $container->getDefinition('foo')->getArgument(0);
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $adapter);
@@ -40,7 +40,7 @@ class CacheAdapterPassTest extends \PHPUnit_Framework_TestCase
     public function testAdapterIsInjectedIntoMethodArguments()
     {
         $container = $this->initializeContainer();
-        $this->cacheAdapterPass->process($container);
+        $this->cachePoolPass->process($container);
         $methodCalls = $container->getDefinition('bar')->getMethodCalls();
         $arguments = $methodCalls[0][1];
         $adapter = $arguments[0];
@@ -53,7 +53,7 @@ class CacheAdapterPassTest extends \PHPUnit_Framework_TestCase
     public function testAdapterIsInjectIntoProperties()
     {
         $container = $this->initializeContainer();
-        $this->cacheAdapterPass->process($container);
+        $this->cachePoolPass->process($container);
         $properties = $container->getDefinition('baz')->getProperties();
         $adapter = $properties['cache'];
 
@@ -70,7 +70,7 @@ class CacheAdapterPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->setDefinition('foo', new Definition('Foo', array(new Reference('cache.adapter.bar'))));
-        $this->cacheAdapterPass->process($container);
+        $this->cachePoolPass->process($container);
     }
 
     private function initializeContainer()

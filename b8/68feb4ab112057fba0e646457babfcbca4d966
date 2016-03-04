@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-02-09T10:10:06Z
+
+The comments in the interface are from the doctrine cache interface and I have exactly the same questions about them. When looking at the implementations there, it seems "uptime" is implemented as "start time", but is it true for all drivers? Some of them fetch stats info that are called "uptime" natively. Does this mean doctrine's stats return values change semantic from implem to implem?
+@Ocramius & @Tobion, I'd really like to have your opinion on this and on the above @javiereguiluz's comments.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:25:05Z
+
+I would instead create a wrapper (possibly in the existing proxy) instead of changing all implementation.
+
+Overall, I'm not even sure it's something we need now. So, I'm -0 on this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T09:24:01Z
+
+Updated
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T09:29:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-04T09:34:58Z
+
+:+1:
+
+This is definitely going to help us a lot to display this info in the new Cache profiler panel. Thanks @nicolas-grekas!

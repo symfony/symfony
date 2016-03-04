@@ -29,4 +29,21 @@ class ProxyAdapterTest extends CachePoolTest
     {
         return new ProxyAdapter(new ArrayAdapter());
     }
+
+    public function testGetHitsMisses()
+    {
+        $pool = $this->createCachePool();
+
+        $this->assertSame(0, $pool->getHits());
+        $this->assertSame(0, $pool->getMisses());
+
+        $bar = $pool->getItem('bar');
+        $this->assertSame(0, $pool->getHits());
+        $this->assertSame(1, $pool->getMisses());
+
+        $pool->save($bar->set('baz'));
+        $bar = $pool->getItem('bar');
+        $this->assertSame(1, $pool->getHits());
+        $this->assertSame(1, $pool->getMisses());
+    }
 }

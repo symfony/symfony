@@ -41,12 +41,7 @@ class Filesystem
 
         $this->mkdir(dirname($targetFile));
 
-        $doCopy = true;
-        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
-            $doCopy = filemtime($originFile) > filemtime($targetFile);
-        }
-
-        if ($doCopy) {
+        if ($this->doCopy($originFile, $targetFile, $override)) {
             // https://bugs.php.net/bug.php?id=64634
             $source = fopen($originFile, 'r');
             // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
@@ -503,5 +498,24 @@ class Filesystem
             $this->chmod($tmpFile, $mode);
         }
         $this->rename($tmpFile, $filename, true);
+    }
+
+    /**
+     * Decides if an actual copy is needed or not.
+     *
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     * @param bool   $override   Whether to override an existing file or not
+     *
+     * @return bool
+     */
+    private function doCopy($originFile, $targetFile, $override)
+    {
+        $doCopy = true;
+        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
+            $doCopy = filemtime($originFile) > filemtime($targetFile);
+        }
+
+        return $doCopy;
     }
 }

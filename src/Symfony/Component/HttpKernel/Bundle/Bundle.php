@@ -82,7 +82,7 @@ abstract class Bundle implements BundleInterface
     public function getContainerExtension()
     {
         if (null !== $this->extension) {
-            return $this->extension ? $this->extension : null;
+            return $this->extension ?: null;
         }
         $extension = $this->createContainerExtension();
         if (null === $extension) {
@@ -104,7 +104,7 @@ abstract class Bundle implements BundleInterface
         }
         $this->extension = $extension;
 
-        return $this->extension ? $this->extension : null;
+        return $this->extension ?: null;
     }
 
     /**

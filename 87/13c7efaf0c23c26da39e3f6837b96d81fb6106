@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-03T12:29:51Z
+
+@stof I've done all the changes. Thanks for the review!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-03T12:46:29Z
+
+@javiereguiluz But you probably forgot to push :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-03T13:59:17Z
+
+I've removed all the old stuff included in the READMEs. Now we just explain briefly the purpose of each component using the same brief explanation showed in Symfony Docs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-03T17:05:05Z
+
+:+1:
+status: reviewed

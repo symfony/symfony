@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by Yannik at 2015-11-24T23:59:55Z
+
+Hi Christian,
+thanks a lot for addressing this!
+Maybe it's possible to convert the default filename to the nearest ascii equivalent instead of just replacing it with an underscore.
+For example: 'föö.html' => 'foo.html' instead of 'f__.html',
+'fòôbàř.txt' => 'foobar.txt' instead of 'f_____.txt'.
+I am not confident in what's the best way to do this - I use https://github.com/danielstjules/Stringy#toascii for such purposes in my own applications.
+
+Best regards, Yannik
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-25T08:08:11Z
+
+Why couldn't we use [RFC 2231](https://tools.ietf.org/html/rfc2231)?
+See also this old "paper" on the topic: http://greenbytes.de/tech/tc2231/
+Doing transliterations works for western languages but is quite limited in the general case, I'm not really fan of this approach...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-11-25T12:49:51Z
+
+@nicolas-grekas Encoding a string according to RFC 2231 leads to `%` characters in the resulting string, doesn't it? This would conflict with how the `makeDisposition()` method of the `ResponseHeaderBag` is working (see https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php#L256) (but maybe we need to fix it there). What do you think?
+
+---------------------------------------------------------------------------
+
+by JHGitty at 2016-01-31T02:06:06Z
+
+@xabbuh Your PR is awesome! Hopefully this will be merged into Symfony.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T17:12:29Z
+
+@nicolas-grekas @xabbuh Can we find something that works for everyone here? I'd like to merge this one ASAP if possible.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T07:06:42Z
+
+If we removed the limitation of not being able to have the percent character in the fallback filename, we could use RFC 2231 afaics as @nicolas-grekas proposed. But I am not sure why this check was added initially.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T09:28:08Z
+
+@xabbuh Do you have time to finish this one? If not, just let me know and I will finish it for you.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-04T09:37:33Z
+
+@fabpot @nicolas-grekas I pushed an update.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T09:38:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T09:41:20Z
+
+:+1:

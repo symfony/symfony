@@ -34,12 +34,10 @@ class JsonResponse extends Response
     protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
-     * Constructor.
-     *
-     * @param mixed $data       The response data
-     * @param int   $status     The response status code
-     * @param array $headers    An array of response headers
-     * @param bool  $json       If the data is already a JSON string
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     * @param bool  $json    If the data is already a JSON string
      */
     public function __construct($data = null, $status = 200, $headers = array(), $json = false)
     {

@@ -97,6 +97,13 @@ class SecurityExtension extends Extension
             $this->aclLoad($config['acl'], $container);
         }
 
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('security_debug.xml');
+
+            $definition = $container->findDefinition('security.authorization_checker');
+            $definition->replaceArgument(2, new Reference('debug.security.access.decision_manager'));
+        }
+
         // add some required classes for compilation
         $this->addClassesToCompile(array(
             'Symfony\Component\Security\Http\Firewall',

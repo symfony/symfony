@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T07:32:31Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T08:36:17Z
+
+You also need to update the UPGRADE and  Controller.php files that where modified in #17642, isn't it?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-04T09:00:02Z
+
+@nicolas-grekas, I don't think so. `Controller.php` only use the constructor and it's signature hasn't been modified and `CHANGELOG` files are still accurate.

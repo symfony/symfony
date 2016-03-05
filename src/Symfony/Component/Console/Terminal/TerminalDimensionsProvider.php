@@ -61,7 +61,9 @@ class TerminalDimensionsProvider
      */
     public function getTerminalWidth()
     {
-        return $this->getTerminalDimensions()[0];
+        $terminalDimensions = $this->getTerminalDimensions();
+
+        return $terminalDimensions[0];
     }
 
     /**
@@ -71,7 +73,9 @@ class TerminalDimensionsProvider
      */
     public function getTerminalHeight()
     {
-        return $this->getTerminalDimensions()[1];
+        $terminalDimensions = $this->getTerminalDimensions();
+
+        return $terminalDimensions[1];
     }
 
     /**

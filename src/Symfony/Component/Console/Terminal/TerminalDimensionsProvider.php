@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Console\Terminal;
 
-class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
+class TerminalDimensionsProvider
 {
     /**
      * @var int[]
@@ -19,7 +19,9 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
     private $terminalDimensions = array();
 
     /**
-     * {@inheritdoc}
+     * Tries to figure out the terminal dimensions based on the current environment.
+     *
+     * @return int[] Array containing width and height
      */
     public function getTerminalDimensions()
     {
@@ -53,7 +55,9 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Tries to figure out the terminal width in which this application runs.
+     *
+     * @return int|null
      */
     public function getTerminalWidth()
     {
@@ -61,7 +65,9 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Tries to figure out the terminal height in which this application runs.
+     *
+     * @return int|null
      */
     public function getTerminalHeight()
     {
@@ -69,7 +75,12 @@ class TerminalDimensionsProvider implements TerminalDimensionsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets terminal dimensions.
+     *
+     * Can be useful to force terminal dimensions for functional tests.
+     *
+     * @param int $width
+     * @param int $height
      */
     public function setTerminalDimensions($width, $height)
     {

@@ -15,7 +15,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
-use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 
 /**
  * @group time-sensitive
@@ -645,7 +644,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return TerminalDimensionsProviderInterface
+     * @return TerminalDimensionsProvider
      */
     private function createTerminalDimensionsProvider()
     {

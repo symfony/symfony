@@ -36,7 +36,6 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
-use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -69,16 +68,16 @@ class Application
     private $defaultCommand;
 
     /**
-     * @var TerminalDimensionsProviderInterface
+     * @var TerminalDimensionsProvider
      */
     private $terminalDimensionsProvider;
 
     /**
-     * @param string                              $name                       The name of the application
-     * @param string                              $version                    The version of the application
-     * @param TerminalDimensionsProviderInterface $terminalDimensionsProvider
+     * @param string                     $name                       The name of the application
+     * @param string                     $version                    The version of the application
+     * @param TerminalDimensionsProvider $terminalDimensionsProvider
      */
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', TerminalDimensionsProvider $terminalDimensionsProvider = null)
     {
         $this->name = $name;
         $this->version = $version;

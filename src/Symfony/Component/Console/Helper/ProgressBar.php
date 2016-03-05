@@ -15,7 +15,6 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
-use Symfony\Component\Console\Terminal\TerminalDimensionsProviderInterface;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -52,16 +51,16 @@ class ProgressBar
     private static $formats;
 
     /**
-     * @var TerminalDimensionsProviderInterface
+     * @var TerminalDimensionsProvider
      */
     private $terminalDimensionsProvider;
 
     /**
-     * @param OutputInterface                     $output                     An OutputInterface instance
-     * @param int                                 $max                        Maximum steps (0 if unknown)
-     * @param TerminalDimensionsProviderInterface $terminalDimensionsProvider
+     * @param OutputInterface            $output                     An OutputInterface instance
+     * @param int                        $max                        Maximum steps (0 if unknown)
+     * @param TerminalDimensionsProvider $terminalDimensionsProvider
      */
-    public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProviderInterface $terminalDimensionsProvider = null)
+    public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProvider $terminalDimensionsProvider = null)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();

@@ -32,7 +32,7 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
 
     protected function __construct($namespace = '', $defaultLifetime = 0)
     {
-        $this->namespace = $namespace;
+        $this->namespace = $this->getId($namespace, true);
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
@@ -331,12 +331,12 @@ abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInt
         }
     }
 
-    private function getId($key)
+    private function getId($key, $ns = false)
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));
         }
-        if (!isset($key[0])) {
+        if (!isset($key[0]) && !$ns) {
             throw new InvalidArgumentException('Cache key length must be greater than zero');
         }
         if (isset($key[strcspn($key, '{}()/\@:')])) {

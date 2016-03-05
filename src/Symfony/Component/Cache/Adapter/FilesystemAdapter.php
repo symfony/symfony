@@ -20,10 +20,16 @@ class FilesystemAdapter extends AbstractAdapter
 {
     private $directory;
 
-    public function __construct($directory, $defaultLifetime = null)
+    public function __construct($directory, $defaultLifetime = 0, $namespace = '')
     {
         parent::__construct('', $defaultLifetime);
 
+        if (!isset($directory[0])) {
+            $directory = sys_get_temp_dir().'/symfony-cache';
+        }
+        if (isset($namespace[0])) {
+            $directory .= '/'.$namespace;
+        }
         if (!file_exists($dir = $directory.'/.')) {
             @mkdir($directory, 0777, true);
         }

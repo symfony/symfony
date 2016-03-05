@@ -193,16 +193,16 @@ class DebugClassLoader
                             break;
                     }
                 }
-                $parent = $refl->getParentClass();
+                $parent = get_parent_class($class);
 
-                if (!$parent || strncmp($ns, $parent->name, $len)) {
-                    if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
-                        @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                if (!$parent || strncmp($ns, $parent, $len)) {
+                    if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {
+                        @trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent, self::$deprecated[$parent]), E_USER_DEPRECATED);
                     }
 
-                    foreach ($refl->getInterfaceNames() as $interface) {
-                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
-                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                    foreach (class_implements($class) as $interface) {
+                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !is_subclass_of($parent, $interface)) {
+                            @trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, interface_exists($class) ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }
                 }

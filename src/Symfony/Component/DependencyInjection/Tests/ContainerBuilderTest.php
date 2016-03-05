@@ -17,6 +17,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -284,10 +285,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->setResourceTracking(false);
-        $builderCompilerPasses = $builder->getCompiler()->getPassConfig()->getPasses();
-        $builder->addCompilerPass($this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
+        $defaultPasses = $builder->getCompiler()->getPassConfig()->getPasses();
+        $builder->addCompilerPass($pass1 = $this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
+        $builder->addCompilerPass($pass2 = $this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
 
-        $this->assertCount(count($builder->getCompiler()->getPassConfig()->getPasses()) - 1, $builderCompilerPasses);
+        $passes = $builder->getCompiler()->getPassConfig()->getPasses();
+        $this->assertCount(count($passes) - 2, $defaultPasses);
+        // Pass 1 is executed later
+        $this->assertTrue(array_search($pass1, $passes, true) > array_search($pass2, $passes, true));
     }
 
     public function testCreateService()

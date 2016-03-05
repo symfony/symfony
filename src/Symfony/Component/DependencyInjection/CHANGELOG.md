@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * allowed to prioritize compiler passes by introducing a third argument to `PassConfig::addPass()`, to `Compiler::addPass` and to `ContainerBuilder::addCompilerPass()`
+
 3.0.0
 -----
 

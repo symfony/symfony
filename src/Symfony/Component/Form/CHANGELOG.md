@@ -7,6 +7,9 @@ CHANGELOG
  * deprecated the "choices_as_values" option of ChoiceType
  * deprecated support for data objects that implements both `Traversable` and
    `ArrayAccess` in `ResizeFormListener::preSubmit` method
+   
+ * Using callable strings as choice options in `ChoiceType` has been deprecated
+   and will be used as `PropertyPath` instead of callable in Symfony 4.0.
 
 3.0.0
 -----

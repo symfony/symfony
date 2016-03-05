@@ -19,6 +19,25 @@ Form
  * Support for data objects that implements both `Traversable` and `ArrayAccess`
    in `ResizeFormListener::preSubmit` method has been deprecated and will be
    removed in Symfony 4.0.
+ 
+ * Using callable strings as choice options in ChoiceType has been deprecated
+   in favor of `PropertyPath` in Symfony 4.0 use a "\Closure" instead.
+    
+   Before:
+   
+   ```php
+   'choice_value' => new PropertyPath('range'),
+   'choice_label' => 'strtoupper',
+   ```
+ 
+   After:
+   
+   ```php
+   'choice_value' => 'range',
+   'choice_label' => function ($choice) {
+       return strtoupper($choice);
+   },
+   ```   
 
 FrameworkBundle
 ---------------

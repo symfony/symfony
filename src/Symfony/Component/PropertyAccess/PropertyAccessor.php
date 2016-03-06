@@ -485,9 +485,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             return;
         }
 
-        set_error_handler(function ($errno, $errstr) use ($object, $method, $value) {
+        $that = $this;
+        set_error_handler(function ($errno, $errstr) use ($object, $method, $value, $that) {
             if (E_RECOVERABLE_ERROR === $errno && false !== strpos($errstr, sprintf('passed to %s::%s() must', get_class($object), $method))) {
-                throw $this->createUnexpectedTypeException($object, $method, $value);
+                throw $that->createUnexpectedTypeException($object, $method, $value);
             }
 
             return false;

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-03-05T17:43:58Z
+
+Awesome idea!
+
+Are these all places in whole framework where Reflection use is redundant?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-05T17:50:08Z
+
+@TomasVotruba no there are probably other places,  reflection is used so much that it's complicated to find where it's wrongly used...

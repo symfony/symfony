@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.9",
+    "Version": "2.1.12.94",
     "Names": {
         "Afak": "Defaka",
         "Aghb": "Kaukasisch Albanees",
@@ -71,9 +71,9 @@
         "Kthi": "Kaithi",
         "Lana": "Lanna",
         "Laoo": "Laotiaans",
-        "Latf": "Gotisch Latijn",
-        "Latg": "Gaelisch Latijn",
-        "Latn": "Latijn",
+        "Latf": "Gotisch Latijns",
+        "Latg": "Gaelisch Latijns",
+        "Latn": "Latijns",
         "Lepc": "Lepcha",
         "Limb": "Limbu",
         "Lina": "Lineair A",

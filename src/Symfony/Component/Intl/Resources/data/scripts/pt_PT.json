@@ -1,20 +1,14 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.13.23",
     "Names": {
         "Armn": "arménio",
-        "Blis": "símbolos Bliss",
         "Egyd": "egípcio demótico",
         "Egyh": "egípcio hierático",
         "Gujr": "guzerate",
-        "Hans": "han simplificado",
-        "Hant": "han tradicional",
         "Inds": "indus",
-        "Lina": "linear A",
-        "Linb": "linear B",
         "Sylo": "siloti nagri",
         "Tale": "tai le",
         "Telu": "telugu",
-        "Xsux": "cuneiforme sumero-acadiano",
         "Zsym": "símbolos",
         "Zxxx": "não escrito"
     }

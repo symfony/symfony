@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.9",
+    "Version": "2.1.13.21",
     "Names": {
         "ADP": [
             "ADP",
@@ -67,7 +67,7 @@
         ],
         "AWG": [
             "AWG",
-            "florín de Aruba"
+            "florín arubeño"
         ],
         "AZM": [
             "AZM",
@@ -87,7 +87,7 @@
         ],
         "BBD": [
             "BBD",
-            "dólar de Barbados"
+            "dólar barbadense"
         ],
         "BDT": [
             "BDT",
@@ -111,7 +111,7 @@
         ],
         "BGN": [
             "BGN",
-            "leva"
+            "lev búlgaro"
         ],
         "BHD": [
             "BHD",
@@ -167,7 +167,7 @@
         ],
         "BSD": [
             "BSD",
-            "dólar de las Bahamas"
+            "dólar bahameño"
         ],
         "BTN": [
             "BTN",
@@ -191,7 +191,7 @@
         ],
         "BZD": [
             "BZD",
-            "dólar de Belice"
+            "dólar beliceño"
         ],
         "CAD": [
             "CA$",
@@ -339,7 +339,7 @@
         ],
         "FKP": [
             "FKP",
-            "libra de las Islas Malvinas"
+            "libra malvinense"
         ],
         "FRF": [
             "FRF",
@@ -347,7 +347,7 @@
         ],
         "GBP": [
             "GBP",
-            "libra esterlina"
+            "libra británica"
         ],
         "GEK": [
             "GEK",
@@ -407,7 +407,7 @@
         ],
         "HKD": [
             "HKD",
-            "dólar de Hong Kong"
+            "dólar hongkonés"
         ],
         "HNL": [
             "HNL",
@@ -427,7 +427,7 @@
         ],
         "HUF": [
             "HUF",
-            "forinto"
+            "forinto húngaro"
         ],
         "IDR": [
             "IDR",
@@ -467,7 +467,7 @@
         ],
         "JMD": [
             "JMD",
-            "dólar de Jamaica"
+            "dólar jamaicano"
         ],
         "JOD": [
             "JOD",
@@ -511,7 +511,7 @@
         ],
         "KZT": [
             "KZT",
-            "tengue"
+            "tenge kazako"
         ],
         "LAK": [
             "LAK",
@@ -523,7 +523,7 @@
         ],
         "LKR": [
             "LKR",
-            "rupia de Sri Lanka"
+            "rupia esrilanquesa"
         ],
         "LRD": [
             "LRD",
@@ -535,7 +535,7 @@
         ],
         "LTL": [
             "LTL",
-            "litas"
+            "litas lituano"
         ],
         "LTT": [
             "LTT",
@@ -555,7 +555,7 @@
         ],
         "LVL": [
             "LVL",
-            "lats"
+            "lats letón"
         ],
         "LVR": [
             "LVR",
@@ -627,7 +627,7 @@
         ],
         "MWK": [
             "MWK",
-            "kuacha malauí"
+            "kwacha malauí"
         ],
         "MXN": [
             "MXN",

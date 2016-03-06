@@ -38,7 +38,9 @@ class UnixPipes extends AbstractPipes
         if (is_resource($input)) {
             $this->input = $input;
         } else {
-            $this->inputBuffer = (string) $input;
+            $this->input = fopen('php://temp', 'w+');
+            fwrite($this->input, $input);
+            fseek($this->input, 0);
         }
     }
 
@@ -147,16 +149,16 @@ class UnixPipes extends AbstractPipes
             // lose key association, we have to find back the key
             $type = (false !== $found = array_search($pipe, $this->pipes)) ? $found : 'input';
             $data = '';
-            while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
-                $data .= $dataread;
-            }
-
-            if ('' !== $data) {
-                if ($type === 'input') {
-                    $this->inputBuffer .= $data;
-                } else {
-                    $read[$type] = $data;
+            if ($type !== 'input') {
+                while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
+                    $data .= $dataread;
                 }
+                // Remove extra null chars returned by fread
+                if ('' !== $data) {
+                    $read[$type] = rtrim($data, "\x00");
+                }
+            } elseif (isset($w[0])) {
+                stream_copy_to_stream($this->input, $w[0], 4096);
             }
 
             if (false === $data || (true === $close && feof($pipe) && '' === $data)) {
@@ -171,19 +173,8 @@ class UnixPipes extends AbstractPipes
             }
         }
 
-        if (null !== $w && 0 < count($w)) {
-            while (strlen($this->inputBuffer)) {
-                $written = fwrite($w[0], $this->inputBuffer, 2 << 18); // write 512k
-                if ($written > 0) {
-                    $this->inputBuffer = (string) substr($this->inputBuffer, $written);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        // no input to read on resource, buffer is empty and stdin still open
-        if ('' === $this->inputBuffer && null === $this->input && isset($this->pipes[0])) {
+        // no input to read on resource and stdin still open
+        if (null === $this->input && isset($this->pipes[0])) {
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
         }

@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-05T12:44:25Z
+
+How much faster is it?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-05T13:05:20Z
+
+@Tobion just as an example for ``is_subclass_of``, with
+```php
+<?php
+
+interface Bar { }
+interface FooBar { }
+
+class Foo implements Bar { }
+
+$start = microtime(true);
+for ($i = 0 ; $i <= 100000; $i++)
+{
+	$class = new \ReflectionClass('Foo');
+	$class->implementsInterface('Bar');
+	$class->implementsInterface('FooBar');
+}
+$end = microtime(true);
+$duration1 = $end - $start;
+
+$start = microtime(true);
+for ($i = 0 ; $i <= 100000; $i++)
+{
+    is_subclass_of('Foo', 'Bar');
+    is_subclass_of('Foo', 'FooBar');
+}
+$end = microtime(true);
+$duration2 = $end - $start;
+
+echo $duration1.'s vs '.$duration2.'s';
+```
+I get ``0.20954895019531s vs 0.086188077926636s``.
+So ``is_subclass_of`` is twice as fast as reflection.
+
+For ``->getMethods`` / ``get_class_methods``, I have ``0.15780186653137s vs 0.039294004440308s``.
+
+For ``->hasProperty`` / ``property_exists``, I have ``0.15087413787842s vs 0.073436975479126s``.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-05T15:33:45Z
+
+:+1:
+
+Reflection should never be used when there is a simple PHP function alternative.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-05T17:39:21Z
+
+See https://github.com/symfony/symfony/pull/18025

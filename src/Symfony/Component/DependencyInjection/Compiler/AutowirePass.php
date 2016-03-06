@@ -136,6 +136,13 @@ class AutowirePass implements CompilerPassInterface
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
         }
+
+        if ($this->container->hasParameter('autowiring.map')) {
+            $this->types = array_merge(
+                $this->types,
+                $this->container->getParameter('autowiring.map')
+            );
+        }
     }
 
     /**

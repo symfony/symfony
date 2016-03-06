@@ -298,6 +298,11 @@ class GetSetDummy
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
+
+    protected function getPrivate()
+    {
+        throw new \RuntimeException('Dummy::getPrivate() should not be called');        
+    }
 }
 
 class GetConstructorDummy

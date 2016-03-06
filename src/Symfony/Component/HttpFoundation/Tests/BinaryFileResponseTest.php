@@ -36,7 +36,13 @@ class BinaryFileResponseTest extends ResponseTestCase
 
     public function testConstructWithNonAsciiFilename()
     {
-        new BinaryFileResponse(__DIR__.'/Fixtures/föö.html', 200, array(), true, 'attachment');
+        touch(sys_get_temp_dir().'/fööö.html');
+
+        $response = new BinaryFileResponse(sys_get_temp_dir().'/fööö.html', 200, array(), true, 'attachment');
+
+        @unlink(sys_get_temp_dir().'/fööö.html');
+
+        $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
     /**

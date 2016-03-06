@@ -30,15 +30,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     private $format;
     private $context;
     private $rootNodeName = 'response';
+    private $loadOptions;
 
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string $rootNodeName
+     * @param string   $rootNodeName
+     * @param int|null $loadOptions
      */
-    public function __construct($rootNodeName = 'response')
+    public function __construct($rootNodeName = 'response', $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
+        $this->loadOptions = $loadOptions ?: LIBXML_NONET | LIBXML_NOBLANKS;
     }
 
     /**
@@ -80,8 +83,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
+        $loadOptions = isset($context['xml_load_options']) ? $context['xml_load_options'] : $this->loadOptions;
+
         $dom = new \DOMDocument();
-        $dom->loadXML($data, LIBXML_NONET | LIBXML_NOBLANKS);
+        $dom->loadXML($data, $loadOptions);
 
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);

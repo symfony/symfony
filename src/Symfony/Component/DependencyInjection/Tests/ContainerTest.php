@@ -150,6 +150,43 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
+    /**
+     * @dataProvider getSpecialCharServiceIds
+     */
+    public function testSpecialCharInServiceIdTriggersDeprecationInSet($id)
+    {
+        $container = new ProjectServiceContainer();
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $container->set($id, new \stdClass());
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertSame(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), $deprecations[0]);
+    }
+
+    public function getSpecialCharServiceIds()
+    {
+        return array(
+            'contains whitespace' => array('service id'),
+            'contains ASCII control sequence' => array("service\x07id"),
+            'contains exclamation mark' => array('service!'),
+            'contains question mark' => array('service?'),
+            'contains @' => array('@service_id'),
+            'contains double quote' => array('"my_service"'),
+            'contains single quote' => array("'my_service'"),
+            'contains backtick' => array('`my_service`'),
+            'contains dash' => array('my-service'),
+        );
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();

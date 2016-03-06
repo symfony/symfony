@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/polyfill-mbstring": "~1.1"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },

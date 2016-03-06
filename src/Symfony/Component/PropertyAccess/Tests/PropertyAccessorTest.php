@@ -15,6 +15,8 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
@@ -203,7 +205,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetWithCustomGetter()
     {
         AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
-        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
         $this->assertSame('webmozart', $this->propertyAccessor->getValue(new TestClass('webmozart'), 'customGetterSetter'));
     }
 
@@ -310,7 +312,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testSetValueWithCustomSetter()
     {
         AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
-        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
 
         $custom = new TestClass('webmozart');
 

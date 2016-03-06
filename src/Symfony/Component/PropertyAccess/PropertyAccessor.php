@@ -23,6 +23,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\Mapping\Factory\ClassMetadataFactory;
 
 /**
  * Default implementation of {@link PropertyAccessorInterface}.
@@ -148,9 +149,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     private static $resultProto = array(self::VALUE => null);
 
     /**
-     * @var AnnotationReader
+     * @var ClassMetadataFactory
      */
-    private $reader;
+    private $classMetadataFactory;
 
     /**
      * @var array
@@ -164,13 +165,14 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param bool                   $magicCall
      * @param bool                   $throwExceptionOnInvalidIndex
      * @param CacheItemPoolInterface $cacheItemPool
+     * @param ClassMetadataFactory   $classMetadataFactory
      */
-    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, AnnotationReader $reader = null)
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, ClassMetadataFactory $classMetadataFactory = null)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
-        $this->reader = $reader;
+        $this->classMetadataFactory = $classMetadataFactory;
     }
 
     /**
@@ -552,17 +554,16 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
-        $annotation = null;
+        $metadata = null;
         $access = array();
 
         $reflClass = new \ReflectionClass($class);
         $hasProperty = $reflClass->hasProperty($property);
         $access[self::ACCESS_HAS_PROPERTY] = $hasProperty;
 
-        if ($hasProperty && $this->reader) {
-            $annotation = $this->reader->getPropertyAnnotation($reflClass->getProperty($property),
-                'Symfony\Component\PropertyAccess\Annotation\PropertyAccessor');
-
+        if ($hasProperty && $this->classMetadataFactory) {
+            $metadata = $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata();
+            $metadata = isset($metadata[$property]) ? $metadata[$property] : null;
         }
 
         $camelProp = $this->camelize($property);
@@ -571,9 +572,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         $isser = 'is'.$camelProp;
         $hasser = 'has'.$camelProp;
 
-        if ($annotation && $annotation->getGetter()) {
+        if ($metadata && $metadata->getGetter()) {
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
-            $access[self::ACCESS_NAME] = $annotation->getGetter();
+            $access[self::ACCESS_NAME] = $metadata->getGetter();
         } elseif ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
             $access[self::ACCESS_NAME] = $getter;
@@ -741,7 +742,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
-        $annotation = null;
+        $metadata = null;
         $access = array();
 
         $reflClass = new \ReflectionClass($class);
@@ -751,19 +752,19 @@ class PropertyAccessor implements PropertyAccessorInterface
         $transversable = is_array($value) || $value instanceof \Traversable;
         $done = false;
 
-        if ($hasProperty && $this->reader) {
-            $annotation = $this->reader->getPropertyAnnotation($reflClass->getProperty($property),
-                'Symfony\Component\PropertyAccess\Annotation\PropertyAccessor');
+        if ($hasProperty && $this->classMetadataFactory) {
+            $metadata = $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata();
+            $metadata = isset($metadata[$property]) ? $metadata[$property] : null;
 
-            if ($annotation) {
-                if ($transversable && $annotation->getAdder() && $annotation->getRemover()) {
+            if ($metadata) {
+                if ($transversable && $metadata->getAdder() && $metadata->getRemover()) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
-                    $access[self::ACCESS_ADDER] = $annotation->getAdder();
-                    $access[self::ACCESS_REMOVER] = $annotation->getRemover();
+                    $access[self::ACCESS_ADDER] = $metadata->getAdder();
+                    $access[self::ACCESS_REMOVER] = $metadata->getRemover();
                     $done = true;
-                } elseif ($annotation->getSetter()) {
+                } elseif ($metadata->getSetter()) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_METHOD;
-                    $access[self::ACCESS_NAME] = $annotation->getSetter();
+                    $access[self::ACCESS_NAME] = $metadata->getSetter();
                     $done = true;
                 }
             }

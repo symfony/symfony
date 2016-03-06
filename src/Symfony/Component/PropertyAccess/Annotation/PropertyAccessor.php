@@ -15,6 +15,7 @@ namespace Symfony\Component\PropertyAccess\Annotation;
  * Property accessor configuration annotation.
  *
  * @Annotation
+ * @Target({"PROPERTY"})
  *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */

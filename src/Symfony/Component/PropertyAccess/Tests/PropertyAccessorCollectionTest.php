@@ -13,6 +13,8 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Component\PropertyAccess\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class PropertyAccessorCollectionTest_Car
@@ -190,7 +192,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $car = new PropertyAccessorCollectionTest_Car($axesBefore);
 
         AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
-        $this->propertyAccessor = new PropertyAccessor(false, false, new AnnotationReader());
+        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
 
         $this->propertyAccessor->setValue($car, 'customAxes', $axesMerged);
 

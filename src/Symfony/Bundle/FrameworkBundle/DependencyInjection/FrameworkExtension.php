@@ -138,7 +138,7 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -915,13 +915,90 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    /**
+     * Loads the PropertyAccess configuration.
+     *
+     * @param array            $config    A serializer configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;
+
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        $loader->load('property_access.xml');
+        $chainLoader = $container->getDefinition('property_access.mapping.chain_loader');
+
+        $serializerLoaders = array();
+        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            $annotationLoader = new Definition(
+                'Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader',
+                array(new Reference('annotation_reader'))
+            );
+            $annotationLoader->setPublic(false);
+
+            $serializerLoaders[] = $annotationLoader;
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            $dirname = dirname($reflection->getFileName());
+
+            if (is_file($file = $dirname.'/Resources/config/property_access.xml')) {
+                $definition = new Definition('Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_file($file = $dirname.'/Resources/config/property_access.yml')) {
+                $definition = new Definition('Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_dir($dir = $dirname.'/Resources/config/property_access')) {
+                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                    $definition = new Definition('Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                    $definition = new Definition('Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+
+                $container->addResource(new DirectoryResource($dir));
+            }
+        }
+
+        $chainLoader->replaceArgument(0, $serializerLoaders);
+
+        if (isset($config['cache']) && $config['cache']) {
+            $container->setParameter(
+                'property_access.mapping.cache.prefix',
+                'property_access_'.$this->getKernelRootHash($container)
+            );
+
+            $container->getDefinition('property_access.mapping.class_metadata_factory')->replaceArgument(
+                1, new Reference($config['cache'])
+            );
+        }
     }
 
     /**

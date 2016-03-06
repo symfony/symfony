@@ -99,7 +99,7 @@ class RegisterListenersPass implements CompilerPassInterface
             $class = $container->getParameterBag()->resolveValue($def->getClass());
 
             $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
-            if (!is_subclass_of($class, $interface))) {
+            if (!is_subclass_of($class, $interface)) {
                 throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
 

@@ -19,6 +19,12 @@ Form
    in `ResizeFormListener::preSubmit` method has been deprecated and will be
    removed in Symfony 4.0.
 
+FrameworkBundle
+---------------
+
+ * As it was never an officially supported feature, the support for absolute
+   template paths has been deprecated and will be removed in Symfony 4.0.
+
 HttpKernel
 ----------
 

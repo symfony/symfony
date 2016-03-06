@@ -16,6 +16,11 @@ Form
  * Support for data objects that implements both `Traversable` and
    `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed
 
+FrameworkBundle
+---------------
+
+ * Support for absolute template paths has been removed from the template name parser.
+
 HttpKernel
 ----------
 

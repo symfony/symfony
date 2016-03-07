@@ -117,6 +117,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
     }
 
+    public function testAbsoluteUrlWithExtraParametersAndDefault()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', array('foo' => 'bell')));
+        $url = $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertEquals('http://localhost/app.php/testing?foo=bar', $url);
+    }
+
     public function testUrlWithNullExtraParameters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
@@ -299,7 +307,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $routes = $this->getRoutes('test', new Route('/test', array('default' => 'value')));
 
-        $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
+        $this->assertSame('/app.php/test?default=foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
         $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test', array('default' => 'value')));
         $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test'));
     }

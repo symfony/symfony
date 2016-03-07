@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.9",
+    "Version": "2.1.13.33",
     "Names": {
         "AC": "Ascension-saari",
         "AD": "Andorra",
@@ -79,7 +79,7 @@
         "FO": "Färsaaret",
         "FR": "Ranska",
         "GA": "Gabon",
-        "GB": "Yhdistynyt kuningaskunta",
+        "GB": "Iso-Britannia",
         "GD": "Grenada",
         "GE": "Georgia",
         "GF": "Ranskan Guayana",
@@ -219,7 +219,7 @@
         "TA": "Tristan da Cunha",
         "TC": "Turks- ja Caicossaaret",
         "TD": "Tšad",
-        "TF": "Ranskan ulkopuoliset eteläiset alueet",
+        "TF": "Ranskan eteläiset alueet",
         "TG": "Togo",
         "TH": "Thaimaa",
         "TJ": "Tadžikistan",

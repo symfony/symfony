@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.3.9",
         "symfony/polyfill-php54": "~1.0",
-        "symfony/polyfill-php55": "~1.0"
+        "symfony/polyfill-php55": "~1.0",
+        "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
         "symfony/expression-language": "~2.4|~3.0.0"

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.13.23",
     "Names": {
         "AFN": [
             "Af",
@@ -8,10 +8,6 @@
         "ALL": [
             "ALL",
             "lek albanés"
-        ],
-        "AMD": [
-            "AMD",
-            "dram armenio"
         ],
         "ANG": [
             "Naf",
@@ -40,10 +36,6 @@
         "BDT": [
             "BDT",
             "taka de Bangladesh"
-        ],
-        "BGN": [
-            "BGN",
-            "lev búlgaro"
         ],
         "BND": [
             "BND",
@@ -117,21 +109,9 @@
             "ECV",
             "unidad de valor constante (UVC) ecuatoriana"
         ],
-        "ERN": [
-            "ERN",
-            "nakfa eritreo"
-        ],
         "ETB": [
             "ETB",
             "birr etíope"
-        ],
-        "FKP": [
-            "FKP",
-            "libra malvinense"
-        ],
-        "GBP": [
-            "GBP",
-            "libra esterlina británica"
         ],
         "GEL": [
             "GEL",
@@ -153,17 +133,9 @@
             "HRK",
             "kuna croata"
         ],
-        "HUF": [
-            "HUF",
-            "florín húngaro"
-        ],
         "ILS": [
             "ILS",
             "nuevo shéquel israelí"
-        ],
-        "JMD": [
-            "JMD",
-            "dólar jamaiquino"
         ],
         "JPY": [
             "JPY",
@@ -189,14 +161,6 @@
             "LKR",
             "rupia de Sri Lanka"
         ],
-        "LTL": [
-            "LTL",
-            "litas lituano"
-        ],
-        "LVL": [
-            "LVL",
-            "lats letón"
-        ],
         "MGA": [
             "MGA",
             "ariary malgache"
@@ -209,10 +173,6 @@
             "MNT",
             "tugrik mongol"
         ],
-        "MOP": [
-            "MOP",
-            "pataca de Macao"
-        ],
         "MRO": [
             "MRO",
             "ouguiya mauritano"
@@ -220,10 +180,6 @@
         "MVR": [
             "MVR",
             "rufiyaa de Maldivas"
-        ],
-        "MWK": [
-            "MWK",
-            "kwacha malauí"
         ],
         "MXN": [
             "$",
@@ -354,7 +310,7 @@
             "rand sudafricano"
         ],
         "ZMW": [
-            "ZMK",
+            "ZMW",
             "kwacha zambiano"
         ]
     }

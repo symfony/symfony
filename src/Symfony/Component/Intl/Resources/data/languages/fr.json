@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.9",
+    "Version": "2.1.13.46",
     "Names": {
         "aa": "afar",
         "ab": "abkhaze",
@@ -129,7 +129,7 @@
         "eo": "espéranto",
         "es": "espagnol",
         "es_419": "espagnol latino-américain",
-        "es_ES": "espagnol d’Europe",
+        "es_ES": "espagnol européen",
         "es_MX": "espagnol mexicain",
         "et": "estonien",
         "eu": "basque",
@@ -170,7 +170,7 @@
         "got": "gotique",
         "grb": "grebo",
         "grc": "grec ancien",
-        "gsw": "alémanique",
+        "gsw": "suisse allemand",
         "gu": "gujarati",
         "guz": "gusii",
         "gv": "manx",
@@ -371,7 +371,7 @@
         "ps": "pachto",
         "pt": "portugais",
         "pt_BR": "portugais brésilien",
-        "pt_PT": "portugais d’Europe",
+        "pt_PT": "portugais européen",
         "qu": "quechua",
         "quc": "k’iche’",
         "raj": "rajasthani",

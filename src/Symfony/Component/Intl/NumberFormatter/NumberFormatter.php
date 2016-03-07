@@ -259,7 +259,7 @@ class NumberFormatter
 
     private static $enTextAttributes = array(
         self::DECIMAL => array('', '', '-', '', '*', '', ''),
-        self::CURRENCY => array('¤', '', '(¤', ')', '*', ''),
+        self::CURRENCY => array('¤', '', '-¤', '', '*', ''),
     );
 
     /**
@@ -357,7 +357,7 @@ class NumberFormatter
 
         $ret = $symbol.$value;
 
-        return $negative ? '('.$ret.')' : $ret;
+        return $negative ? '-'.$ret : $ret;
     }
 
     /**

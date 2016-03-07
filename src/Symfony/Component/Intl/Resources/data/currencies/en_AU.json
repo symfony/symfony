@@ -1,33 +1,13 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.11.59",
     "Names": {
-        "BYR": [
-            "BYR",
-            "Belarusian Rouble"
-        ],
-        "GBP": [
-            "£",
-            "British Pound"
-        ],
-        "RUB": [
-            "RUB",
-            "Russian Rouble"
+        "AUD": [
+            "$",
+            "Australian Dollar"
         ],
         "SCR": [
             "SCR",
             "Seychelles Rupee"
-        ],
-        "UZS": [
-            "UZS",
-            "Uzbekistani Som"
-        ],
-        "XAF": [
-            "FCFA",
-            "Central African CFA Franc"
-        ],
-        "XOF": [
-            "CFA",
-            "West African CFA Franc"
         ]
     }
 }

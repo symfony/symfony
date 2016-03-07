@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.7.39",
+    "Version": "2.1.10.93",
     "Names": {
         "ADP": [
             "ADP",
@@ -315,7 +315,7 @@
         ],
         "GBP": [
             "£ RU",
-            "lur sterling Breizh-Veur"
+            "lur Breizh-Veur"
         ],
         "GEL": [
             "GEL",

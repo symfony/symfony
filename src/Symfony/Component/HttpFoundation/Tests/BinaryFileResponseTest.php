@@ -34,6 +34,17 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('inline; filename="README.md"', $response->headers->get('Content-Disposition'));
     }
 
+    public function testConstructWithNonAsciiFilename()
+    {
+        touch(sys_get_temp_dir().'/fööö.html');
+
+        $response = new BinaryFileResponse(sys_get_temp_dir().'/fööö.html', 200, array(), true, 'attachment');
+
+        @unlink(sys_get_temp_dir().'/fööö.html');
+
+        $this->assertSame('fööö.html', $response->getFile()->getFilename());
+    }
+
     /**
      * @expectedException \LogicException
      */
@@ -47,6 +58,14 @@ class BinaryFileResponseTest extends ResponseTestCase
     {
         $response = new BinaryFileResponse(__FILE__);
         $this->assertFalse($response->getContent());
+    }
+
+    public function testSetContentDispositionGeneratesSafeFallbackFilename()
+    {
+        $response = new BinaryFileResponse(__FILE__);
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'föö.html');
+
+        $this->assertSame('attachment; filename="f__.html"; filename*=utf-8\'\'f%C3%B6%C3%B6.html', $response->headers->get('Content-Disposition'));
     }
 
     /**

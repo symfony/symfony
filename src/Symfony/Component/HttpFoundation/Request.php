@@ -268,7 +268,7 @@ class Request
         // stores the Content-Type and Content-Length header values in
         // HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH fields.
         $server = $_SERVER;
-        if ('cli-server' === php_sapi_name()) {
+        if ('cli-server' === PHP_SAPI) {
             if (array_key_exists('HTTP_CONTENT_LENGTH', $_SERVER)) {
                 $server['CONTENT_LENGTH'] = $_SERVER['HTTP_CONTENT_LENGTH'];
             }

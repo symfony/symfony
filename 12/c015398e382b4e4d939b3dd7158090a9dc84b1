@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-06T17:58:12Z
+
+Tests pass everywhere now. In order for file names with non-ascii characters work on all platforms they need to be created from PHP (just like we do it in FileTest).
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-06T18:14:30Z
+
+We can now also remove the fixtures file that is not used anymore, can't we?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-06T18:19:44Z
+
+It's used in the other test.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-06T18:25:35Z
+
+Hm indeed, can't we reuse the same approach in that test?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-07T10:23:34Z
+
+@xabbuh actually, the other test didn't need the file to exist, as only the file name is used there. I removed the fixture.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-07T10:31:45Z
+
+@symfony/deciders this PR, when merged, will fix the build
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-07T10:40:17Z
+
+:+1:
+
+Status: Reviewed

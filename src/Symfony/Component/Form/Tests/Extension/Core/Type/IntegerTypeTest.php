@@ -32,4 +32,26 @@ class IntegerTypeTest extends TestCase
         $this->assertSame(1, $form->getData());
         $this->assertSame('1', $form->getViewData());
     }
+
+    public function testSubmitNull()
+    {
+        $form = $this->factory->create('integer');
+
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+        $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSubmitNullWithEmptyData()
+    {
+        $form = $this->factory->create('integer', null, array(
+            'empty_data' => 1,
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(1, $form->getData());
+        $this->assertSame('1', $form->getViewData());
+    }
 }

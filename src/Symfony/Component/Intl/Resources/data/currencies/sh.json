@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.20",
+    "Version": "2.1.13.24",
     "Names": {
         "ADP": [
             "ADP",
@@ -347,7 +347,7 @@
         ],
         "GBP": [
             "£",
-            "Britanska funta sterlinga"
+            "Britanska funta"
         ],
         "GEK": [
             "GEK",

@@ -487,7 +487,7 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView(1, '1', 'Jän'),
+            new ChoiceView(1, '1', 'Jän.'),
             new ChoiceView(4, '4', 'Apr.'),
         ), $view['month']->vars['choices']);
     }

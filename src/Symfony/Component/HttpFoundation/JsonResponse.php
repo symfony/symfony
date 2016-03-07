@@ -88,7 +88,7 @@ class JsonResponse extends Response
     /**
      * Sets a raw string containing a JSON document to be sent.
      *
-     * @param string $data
+     * @param string $json
      *
      * @return JsonResponse
      *

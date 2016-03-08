@@ -745,7 +745,7 @@ UPGRADE FROM 2.x to 3.0
    The `security.csrf.token_manager` should be used instead.
 
  * The `validator.mapping.cache.apc` service has been removed in favor of the `validator.mapping.cache.doctrine.apc` one.
-   
+
  * The ability to pass `apc` as the `framework.validation.cache` configuration key value has been removed.
    Use `validator.mapping.cache.doctrine.apc` instead:
 
@@ -1022,7 +1022,7 @@ UPGRADE FROM 2.x to 3.0
 
    ```php
    use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-   
+
    class MyVoter extends Voter
    {
        protected function supports($attribute, $object)
@@ -1624,3 +1624,26 @@ UPGRADE FROM 2.x to 3.0
  * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
    `Process::setInput()` and `Process::getInput()` that works the same way.
  * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+
+### HttpFoundation
+
+ * Deprecated finding deep items in `ParameterBag::get()`. This affects getting
+   parameters from the `Request` class:
+
+   Before:
+
+   ```php
+   // all parameters could be retrieved using `get()` method, no matter where
+   // they came from
+   $request->get('foo');
+   $request->get('bar');
+   ```
+
+   Before:
+
+   ```php
+   // each parameter must be retrieved from a specific bag (`query`, `request`,
+   // `files`, `cookies`, etc.)
+   $request->query->get('foo');
+   $request->request->get('bar');
+   ```

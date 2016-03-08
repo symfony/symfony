@@ -744,6 +744,8 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->remove($link);
 
         $this->assertTrue(!is_link($link));
+        $this->assertTrue(!is_file($link));
+        $this->assertTrue(!is_dir($link));
     }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
@@ -917,7 +919,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'file1', $targetPath.DIRECTORY_SEPARATOR.'link1');
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
@@ -937,7 +939,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
@@ -961,7 +963,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
         $this->assertEquals('\\' === DIRECTORY_SEPARATOR ? realpath($sourcePath.'\nested') : 'nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }

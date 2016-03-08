@@ -36,9 +36,8 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
         if ('\\' === DIRECTORY_SEPARATOR && null === self::$symlinkOnWindows) {
             $target = tempnam(sys_get_temp_dir(), 'sl');
             $link = sys_get_temp_dir().'/sl'.microtime(true).mt_rand();
-            if (self::$symlinkOnWindows = @symlink($target, $link)) {
-                unlink($link);
-            }
+            self::$symlinkOnWindows = @symlink($target, $link) && is_link($link);
+            @unlink($link);
             unlink($target);
         }
     }

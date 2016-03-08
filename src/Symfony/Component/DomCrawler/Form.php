@@ -130,17 +130,16 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Gets the field values as PHP.
-     *
      * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
      * @return array An array of field values.
      */
-    public function getPhpValues()
+    public function convertFieldsToArray($fields)
     {
         $values = array();
-        foreach ($this->getValues() as $name => $value) {
+
+        foreach ($fields as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
@@ -150,6 +149,16 @@ class Form extends Link implements \ArrayAccess
         }
 
         return $values;
+    }
+
+    /**
+     * Gets the field values as PHP.
+     *
+     * @return array An array of field values.
+     */
+    public function getPhpValues()
+    {
+        return $this->convertFieldsToArray($this->getValues());
     }
 
     /**

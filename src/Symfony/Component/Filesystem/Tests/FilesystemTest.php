@@ -347,7 +347,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse(is_dir($basePath.'dir-link'));
+        $this->assertFalse('\\' === DIRECTORY_SEPARATOR ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
@@ -383,7 +383,7 @@ class FilesystemTest extends FilesystemTestCase
         $file = str_repeat('T', 259 - strlen($basePath));
         $path = $basePath.$file;
         exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
-        self::$longPathNamesWindows[] = $path; // save this so we can clean up later
+        $this->longPathNamesWindows[] = $path; // save this so we can clean up later
         chdir($oldPath);
         $this->filesystem->exists($path);
     }

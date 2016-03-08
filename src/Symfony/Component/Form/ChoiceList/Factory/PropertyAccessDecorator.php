@@ -172,6 +172,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($label) && !is_callable($label)) {
             $label = new PropertyPath($label);
+        } elseif (is_string($label) && is_callable($label)) {
+            // Prevent a fatal error since a callable string may not handle the right arguments
+            $label = function ($choice) use ($label) {
+                return $label($choice);
+            };
         }
 
         if ($label instanceof PropertyPath) {
@@ -182,6 +187,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($preferredChoices) && !is_callable($preferredChoices)) {
             $preferredChoices = new PropertyPath($preferredChoices);
+        } elseif (is_string($preferredChoices) && is_callable($preferredChoices)) {
+            // Prevent a fatal error since a callable string may not handle the right arguments
+            $preferredChoices = function ($choice) use ($preferredChoices) {
+                return $preferredChoices($choice);
+            };
         }
 
         if ($preferredChoices instanceof PropertyPath) {
@@ -197,6 +207,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($index) && !is_callable($index)) {
             $index = new PropertyPath($index);
+        } elseif (is_string($index) && is_callable($index)) {
+            // Prevent a fatal error since a callable string may not handle the right arguments
+            $index = function ($choice) use ($index) {
+                return $index($choice);
+            };
         }
 
         if ($index instanceof PropertyPath) {
@@ -207,6 +222,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($groupBy) && !is_callable($groupBy)) {
             $groupBy = new PropertyPath($groupBy);
+        } elseif (is_string($groupBy) && is_callable($groupBy)) {
+            // Prevent a fatal error since a callable string may not handle the right arguments
+            $groupBy = function ($choice) use ($groupBy) {
+                return $groupBy($choice);
+            };
         }
 
         if ($groupBy instanceof PropertyPath) {
@@ -221,6 +241,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($attr) && !is_callable($attr)) {
             $attr = new PropertyPath($attr);
+        } elseif (is_string($attr) && is_callable($attr)) {
+            // Prevent a fatal error since a callable string may not handle the right arguments
+            $attr = function ($choice) use ($attr) {
+                return $attr($choice);
+            };
         }
 
         if ($attr instanceof PropertyPath) {

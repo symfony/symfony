@@ -1627,23 +1627,17 @@ UPGRADE FROM 2.x to 3.0
 
 ### HttpFoundation
 
- * Deprecated finding deep items in `ParameterBag::get()`. This affects getting
-   parameters from the `Request` class:
+ * Removed the feature that allowed finding deep items in `ParameterBag::get()`.
+   This may affect you when getting parameters from the `Request` class:
 
    Before:
 
    ```php
-   // all parameters could be retrieved using `get()` method, no matter where
-   // they came from
-   $request->get('foo');
-   $request->get('bar');
+   $request->query->get('foo[bar]', null, true);
    ```
 
-   Before:
+   After:
 
    ```php
-   // each parameter must be retrieved from a specific bag (`query`, `request`,
-   // `files`, `cookies`, etc.)
-   $request->query->get('foo');
-   $request->request->get('bar');
+   $request->query->get('foo')[bar];
    ```

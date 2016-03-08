@@ -38,10 +38,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         if ('\\' === DIRECTORY_SEPARATOR && null === self::$symlinkOnWindows) {
             $target = tempnam(sys_get_temp_dir(), 'sl');
             $link = sys_get_temp_dir().'/sl'.microtime(true).mt_rand();
-            if (@symlink($target, $link)) {
-                self::$symlinkOnWindows = @is_link($link);
-                unlink($link);
-            }
+            self::$symlinkOnWindows = @symlink($target, $link) && is_link($link);
+            @unlink($link);
             unlink($target);
         }
     }
@@ -61,6 +59,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             foreach ($this->longPathNamesWindows as $path) {
                 exec('DEL '.$path);
             }
+            $this->longPathNamesWindows = array();
         }
 
         $this->filesystem->remove($this->workspace);
@@ -350,7 +349,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         // create symlink to nonexistent dir
         rmdir($basePath.'dir');
-        $this->assertFalse(is_dir($basePath.'dir-link'));
+        $this->assertFalse('\\' === DIRECTORY_SEPARATOR ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
@@ -742,6 +741,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->remove($link);
 
         $this->assertTrue(!is_link($link));
+        $this->assertTrue(!is_file($link));
+        $this->assertTrue(!is_dir($link));
     }
 
     public function testSymlinkIsOverwrittenIfPointsToDifferentTarget()
@@ -915,7 +916,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'file1', $targetPath.DIRECTORY_SEPARATOR.'link1');
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
@@ -935,7 +936,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
@@ -959,7 +960,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
         $this->assertEquals('nested', readlink($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
@@ -1089,7 +1090,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     private function markAsSkippedIfPosixIsMissing()
     {
-        if ('\\' === DIRECTORY_SEPARATOR || !function_exists('posix_isatty')) {
+        if (!function_exists('posix_isatty')) {
             $this->markTestSkipped('POSIX is not supported');
         }
     }

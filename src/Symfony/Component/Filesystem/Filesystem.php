@@ -143,12 +143,13 @@ class Filesystem
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
         foreach ($files as $file) {
+            if (@(unlink($file) || rmdir($file))) {
+                continue;
+            }
             if (is_link($file)) {
-                // Workaround https://bugs.php.net/52176
-                if (!@unlink($file) && !@rmdir($file)) {
-                    $error = error_get_last();
-                    throw new IOException(sprintf('Failed to remove symlink "%s": %s.', $file, $error['message']));
-                }
+                // See https://bugs.php.net/52176
+                $error = error_get_last();
+                throw new IOException(sprintf('Failed to remove symlink "%s": %s.', $file, $error['message']));
             } elseif (is_dir($file)) {
                 $this->remove(new \FilesystemIterator($file));
 
@@ -156,11 +157,9 @@ class Filesystem
                     $error = error_get_last();
                     throw new IOException(sprintf('Failed to remove directory "%s": %s.', $file, $error['message']));
                 }
-            } elseif ($this->exists($file)) {
-                if (!@unlink($file)) {
-                    $error = error_get_last();
-                    throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
-                }
+            } elseif (file_exists($file)) {
+                $error = error_get_last();
+                throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
             }
         }
     }
@@ -403,7 +402,7 @@ class Filesystem
         }
 
         $copyOnWindows = false;
-        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
+        if (isset($options['copy_on_windows'])) {
             $copyOnWindows = $options['copy_on_windows'];
         }
 
@@ -420,7 +419,7 @@ class Filesystem
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
             if ($copyOnWindows) {
-                if (is_link($file) || is_file($file)) {
+                if (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);

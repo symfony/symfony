@@ -118,6 +118,24 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider methodProvider
+     */
+    public function testForceSubmitSimpleFormIfNameNotInRequest($method)
+    {
+        $form = $this->getMockForm('param1', $method, false, true);
+
+        $submittedData = array('test');
+
+        $this->setRequestData($method, $submittedData);
+
+        $form->expects($this->once())
+            ->method('submit')
+            ->with($submittedData);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
      * @dataProvider methodExceptGetProvider
      */
     public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
@@ -361,7 +379,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function getMockFile($suffix = '');
 
-    protected function getMockForm($name, $method = null, $compound = true)
+    protected function getMockForm($name, $method = null, $compound = true, $forceSubmit = false)
     {
         $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $config->expects($this->any())
@@ -370,6 +388,10 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         $config->expects($this->any())
             ->method('getCompound')
             ->will($this->returnValue($compound));
+        $config->expects($this->any())
+            ->method('getOption')
+            ->with('force_submit')
+            ->will($this->returnValue($forceSubmit));
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->any())

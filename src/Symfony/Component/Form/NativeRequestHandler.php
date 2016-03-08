@@ -66,7 +66,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         // For request methods that must not have a request body we fetch data
         // from the query string. Otherwise we look for data in the request body.
         if ('GET' === $method || 'HEAD' === $method || 'TRACE' === $method) {
-            if ('' === $name) {
+            if ('' === $name || $form->getConfig()->getOption('force_submit')) {
                 $data = $_GET;
             } else {
                 // Don't submit GET requests if the form's name does not exist
@@ -102,7 +102,7 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $fixedFiles[$fileKey] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
             }
 
-            if ('' === $name) {
+            if ('' === $name || $form->getConfig()->getOption('force_submit')) {
                 $params = $_POST;
                 $files = $fixedFiles;
             } elseif (array_key_exists($name, $_POST) || array_key_exists($name, $fixedFiles)) {

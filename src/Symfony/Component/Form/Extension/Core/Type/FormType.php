@@ -172,6 +172,9 @@ class FormType extends BaseType
             'action' => '',
             'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+            // Allow submission in request handlers if the form name does not belong
+            // to submitted data keys, see https://github.com/symfony/symfony/issues/16491
+            'force_submit' => false,
         ));
 
         $resolver->setAllowedTypes('label_attr', 'array');

@@ -269,14 +269,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // add a query string if needed
         $extra = array_diff_key($parameters, $variables, $defaults);
 
-        if ($parameters) {
-            foreach($parameters as $key => $value) {
-                if (isset($defaults[$key]) &&
-                    !array_key_exists($key, $variables) &&
-                    $defaults[$key] != $value
-                ) {
-                    $extra[$key] = $value;
-                }
+        foreach($parameters as $key => $value) {
+            if (isset($defaults[$key]) &&
+                !array_key_exists($key, $variables) &&
+                $defaults[$key] !== $value
+            ) {
+                $extra[$key] = $value;
             }
         }
 

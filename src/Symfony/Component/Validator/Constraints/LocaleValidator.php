@@ -38,8 +38,9 @@ class LocaleValidator extends ConstraintValidator
 
         $value = (string) $value;
         $locales = Intl::getLocaleBundle()->getLocaleNames();
+        $aliases = Intl::getLocaleBundle()->getAliases();
 
-        if (!isset($locales[$value])) {
+        if (!isset($locales[$value]) && !in_array($value, $aliases)) {
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $this->formatValue($value),
             ));

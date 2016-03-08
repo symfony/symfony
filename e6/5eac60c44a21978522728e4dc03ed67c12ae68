@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-03-08T15:56:00Z
+
+I think #18058 is about deprecating the `$deep` parameter of `ParamterBag::get`, not deprecating the `Request::get` method.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-08T16:07:45Z
+
+@jvasseur yes you are right. But if we explain the deprecation as *"Finding deep items in ParameterBag::get() is deprecated since version 2.8 and will be removed in 3.0."* most people won't understand it. This is in fact a huge BC break for some people because, as @zdenekdrahos said in his issue, upgrading to 3.0 will break their controllers (because they use `$request->get('foo')` instead of `$request->query->get('foo')`).
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-03-08T16:18:18Z
+
+@javiereguiluz `$request->get` isn't deprecated and still exists in Symfony 3. What is deprecated is doing something like `$request->query->get('foo[bar]', null, true)` instead of `$request->query->get('foo')['bar']`.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-08T16:21:31Z
+
+This got me really confused because I've seen 0 deprecation notices in 2.8 regarding the get method to fetch request and query parameters. I think @jvasseur is correct about simply that notation being deprecated and removed in 3.0.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-08T16:30:21Z
+
+@jvasseur I'm really sorry. You were completely right from the beginning. I've updated everything using your nice example. Thanks!

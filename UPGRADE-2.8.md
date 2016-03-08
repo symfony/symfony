@@ -514,12 +514,12 @@ FrameworkBundle
 
  * The `validator.mapping.cache.apc` service is deprecated, and will be removed in 3.0.
    Use `validator.mapping.cache.doctrine.apc` instead.
-   
- * The ability to pass `apc` as the `framework.validation.cache` configuration key value is deprecated, 
+
+ * The ability to pass `apc` as the `framework.validation.cache` configuration key value is deprecated,
    and will be removed in 3.0. Use `validator.mapping.cache.doctrine.apc` instead:
-   
+
    Before:
-   
+
    ```yaml
    framework:
        validation:
@@ -527,7 +527,7 @@ FrameworkBundle
    ```
 
    After:
-   
+
    ```yaml
    framework:
        validation:
@@ -611,4 +611,22 @@ Yaml
 
    ```yml
    class: "Foo\\Var"
+   ```
+
+HttpFoundation
+--------------
+
+ * Deprecated finding deep items in `ParameterBag::get()`. This may affect you
+   when getting parameters from the `Request` class:
+
+   Before:
+
+   ```php
+   $request->query->get('foo[bar]', null, true);
+   ```
+
+   After:
+
+   ```php
+   $request->query->get('foo')[bar];
    ```

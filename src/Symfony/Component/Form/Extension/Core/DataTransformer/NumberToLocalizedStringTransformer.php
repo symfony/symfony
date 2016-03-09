@@ -122,7 +122,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $value = str_replace(',', $decSep, $value);
         }
 
-        if (!strstr($value, $decSep)) {
+        if (!strstr($value, $decSep) && PHP_INT_SIZE === 8) {
             $result = $formatter->parse($value, \NumberFormatter::TYPE_INT64, $position);
         } else {
             $result = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);

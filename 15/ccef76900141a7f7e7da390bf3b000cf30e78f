@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-08T19:08:52Z
+
+I will not include a test case unless anyone thinks it's absolutely necessary or has a better idea than the test case below. It is rather fragile. It would also double test execution time for the finder component on travis. Finally, it [fails on hhvm](https://travis-ci.org/jakzal/symfony/jobs/114595091#L4569).
+
+```php
+namespace Symfony\Component\Finder\Tests\Iterator;
+
+use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
+use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
+
+class DepthRangeFilterIteratorTest extends RealIteratorTestCase
+{
+    // ...
+
+    public function testFtp()
+    {
+        $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+
+        $iterator = new DepthRangeFilterIterator($inner, 0, 0);
+
+        $files = iterator_to_array($iterator);
+
+        $this->assertArrayHasKey('ftp://speedtest.tele2.net/1000GB.zip', $files);
+        $this->assertArrayHasKey('ftp://speedtest.tele2.net/100GB.zip', $files);
+        $this->assertArrayHasKey('ftp://speedtest.tele2.net/10GB.zip', $files);
+        $this->assertArrayHasKey('ftp://speedtest.tele2.net/1GB.zip', $files);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-09T12:41:03Z
+
+@jakzal I think a small comment above the code to explain the reason why we have such a code would probably help any future regressions and should be enough.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-03-09T12:51:11Z
+
+Comment added.

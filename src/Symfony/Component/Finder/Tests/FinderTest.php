@@ -695,6 +695,16 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals($path, $firstPath);
     }
 
+    public function testFirstReturnsNull()
+    {
+        $finder = $this->buildFinder();
+        $finder->files()->in(self::$tmpDir);
+        $finder->name('nosuchfile.php');
+
+        $firstFile = $finder->first();
+        $this->assertNull($firstFile);
+    }
+
     protected function buildFinder()
     {
         return Finder::create();

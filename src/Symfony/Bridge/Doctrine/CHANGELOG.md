@@ -4,7 +4,9 @@ CHANGELOG
 3.1.0
 -----
 
- * added "{{ value }}" message placeholder to UniqueEntityValidator 
+ * added "{{ value }}" message placeholder to UniqueEntityValidator
+ * deprecated `MergeDoctrineCollectionListener::onBind` in favor of
+   `MergeDoctrineCollectionListener::onSubmit`
 
 3.0.0
 -----

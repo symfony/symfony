@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-07T20:05:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by peteward at 2016-03-08T10:32:58Z
+
+@nicolas-grekas, I ran some tests on my container after patching these changes into 2.8.
+
+In each case I did a hard clear of cache, followed by an apache restart as opcache memory usage wasn't being reported consistently without it.
+
+**Dev**
+```
+cache/dev/appDevDebugProjectContainer.php = 6,500,226 B
+opcache memory consumption = 12.29 MB
+```
+
+**Original - token_get_all**
+```
+cache/prod/appProdProjectContainer.php = 5,435,490 B
+opcache memory consumption = 11.12 MB
+	Command being timed: "php app/console cache:clear --env=prod --no-optional-warmers"
+	User time (seconds): 11.42
+	System time (seconds): 4.75
+	Percent of CPU this job got: 67%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:23.84
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 425032
+```
+
+**Mine - php_strip_whitespace**
+```
+cache/prod/appProdProjectContainer.php = 4,827,701 B
+opcache memory consumption = 11.12 MB
+	Command being timed: "php app/console cache:clear --env=prod --no-optional-warmers"
+	User time (seconds): 10.47
+	System time (seconds): 4.49
+	Percent of CPU this job got: 63%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:23.49
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 162140
+```
+
+**Proposed - single star opening comments**
+```
+cache/prod/appProdProjectContainer.php = 6,486,201 B
+opcache memory consumption = 11.52 MB
+	Command being timed: "php app/console cache:clear --env=prod --no-optional-warmers"
+	User time (seconds): 9.64
+	System time (seconds): 4.96
+	Percent of CPU this job got: 60%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:24.33
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 166896
+```
+
+**Summary**
+* compilation time not an issue
+* raw stripped container file bigger (but then we knew it was going to be).
+* container compiling memory savings in-line with other methods so works :+1:
+* slightly higher memory consumption in opcache - 11.12 MB vs 11.52 MB.
+
+For this last point when I investigated the Container I saw various extra classes and methods with double-commented sections. It's possible that this could have been my patching of the changes but I found it much simpler to just do the following instead of your `{$this->docStar}` approach at the end of the `dump()` method:
+
+```
+        // Replace double star comments with single for non-debug container to strip for opcache
+        return $options['debug'] ? $code : str_replace('/**', '/*', $code);
+```
+
+With this version I had no other negative impact, the container comment blocks were all `/*` and the opcache memory consumption was consistent at `11.12MB`
+
+In addition to these changes `stripComments` can I guess be removed along with `testStripComments`.
+
+Do you want to update your PR or would you prefer me to make one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T11:04:21Z
+
+~~Please make a new one after cherry-picking this one :)~~
+I'm going to find where these additional doc comments come from
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T14:18:48Z
+
+@peteward the delta you get is because this patch is for 2.3 and you apply it on 2.8, where a few more stars have to be removed.
+I think we should now merge this one and merge it up to 2.8.
+
+---------------------------------------------------------------------------
+
+by peteward at 2016-03-08T14:22:33Z
+
+See other PR - it's ProxyManager.
+
+I created my PR from a new branch from 2.3.
+My tests above were run on 2.8 but I'm pretty sure it's the same.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T14:36:30Z
+
+@peteward I added an str_replace on proxy-generated code. I now need to confirm this code can't contain arbitrary string values.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T14:43:55Z
+
+@Ocramius quick help needed plz: is it possible that a generated proxy class contains an arbitrary string, or are they all generated from well know templates so that the `/**` substring can't exist in generated proxies except for opening doc comments?
+
+---------------------------------------------------------------------------
+
+by peteward at 2016-03-08T14:48:06Z
+
+The output looks to be formulaic from my container here...
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2016-03-08T16:34:03Z
+
+I can't guarantee what you just asked for. `str_replace()`-based code manipulation is suicide. The ancients gave us AST: use it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T16:59:36Z
+
+@Ocramius OK thanks,
+then let's use the existing `Kernel::stripComments` for proxies.
+PR updated.
+
+---------------------------------------------------------------------------
+
+by peteward at 2016-03-08T21:18:20Z
+
+I was reluctant at reintroducing stripComments but running `token_get_all` in a loop on the individual generated ProxyFiles means the memory impact is almost negligible - there's no noticeable increase at all in total memory use on compiling my container and the opcache memory consumption is the same.
+
+Looks like a complete fix, great work :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T21:43:53Z
+
+Cool, thanks checking!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-09T12:38:19Z
+
+:+1:

@@ -54,6 +54,16 @@ class LdapClientTest extends \PHPUnit_Framework_TestCase
         $this->client->escape('foo', 'bar', 'baz');
     }
 
+    public function testLdapQuery()
+    {
+        $this->ldap
+            ->expects($this->once())
+            ->method('query')
+            ->with('foo', 'bar', array('baz'))
+        ;
+        $this->client->query('foo', 'bar', array('baz'));
+    }
+
     public function testLdapFind()
     {
         $collection = $this->getMock(CollectionInterface::class);

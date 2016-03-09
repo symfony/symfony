@@ -13,16 +13,27 @@ namespace Symfony\Component\Ldap;
 
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * Ldap interface.
  *
  * @author Charles Sarrazin <charles@sarraz.in>
  */
-interface LdapInterface extends BaseLdapInterface
+interface LdapInterface
 {
     const ESCAPE_FILTER = 0x01;
     const ESCAPE_DN = 0x02;
+
+    /**
+     * Return a connection bound to the ldap.
+     *
+     * @param string $dn       A LDAP dn
+     * @param string $password A password
+     *
+     * @throws ConnectionException If dn / password could not be bound.
+     */
+    public function bind($dn = null, $password = null);
 
     /**
      * Queries a ldap server for entries matching the given criteria.
@@ -39,4 +50,15 @@ interface LdapInterface extends BaseLdapInterface
      * @return EntryManagerInterface
      */
     public function getEntryManager();
+
+    /**
+     * Escape a string for use in an LDAP filter or DN.
+     *
+     * @param string $subject
+     * @param string $ignore
+     * @param int    $flags
+     *
+     * @return string
+     */
+    public function escape($subject, $ignore = '', $flags = 0);
 }

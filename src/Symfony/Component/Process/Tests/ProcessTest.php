@@ -192,9 +192,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetStreamAsInput($code, $size)
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestIncomplete('This test fails with a timeout on Windows, can someone investigate please?');
-        }
         $expected = str_repeat(str_repeat('*', 1024), $size).'!';
         $expectedLength = (1024 * $size) + 1;
 
@@ -791,10 +788,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIdleTimeoutNotExceededWhenOutputIsSent()
     {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestIncomplete('This test fails with a timeout on Windows, can someone investigate please?');
-        }
-        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('while (true) {echo "foo\n"; usleep(10000);}')));
+        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('while (true) {echo \'foo \'; usleep(1000);}')));
         $process->setTimeout(1);
         $process->start();
 
@@ -802,15 +796,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             usleep(1000);
         }
 
-        $process->setIdleTimeout(0.1);
+        $process->setIdleTimeout(0.5);
 
         try {
             $process->wait();
             $this->fail('A timeout exception was expected.');
-        } catch (ProcessTimedOutException $ex) {
-            $this->assertTrue($ex->isGeneralTimeout(), 'A general timeout is expected.');
-            $this->assertFalse($ex->isIdleTimeout(), 'No idle timeout is expected.');
-            $this->assertEquals(1, $ex->getExceededTimeout());
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isGeneralTimeout(), 'A general timeout is expected.');
+            $this->assertFalse($e->isIdleTimeout(), 'No idle timeout is expected.');
+            $this->assertEquals(1, $e->getExceededTimeout());
         }
     }
 

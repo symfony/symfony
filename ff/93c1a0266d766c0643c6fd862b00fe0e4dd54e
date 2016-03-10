@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-10T10:00:00Z
+
+I can't reproduce this issue, but I obviously give it a :+1:
+
+@rvanlaak I have another question: the `Search` button is slightly taller than the other buttons (I guess because of the icon). Could you please check if this can be solved in a simple way to include the fix in this pull request too? Thanks!
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-03-10T11:40:49Z
+
+@javiereguiluz you are right about the svg, it actually was the reason for the behavior as seen in the screenshots. The `svg` icons should always have `height` and `width`. Fixed it for another occurrence too.

@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T12:40:19Z
+
+On very long context it is impossible to read or scroll the log.
+
+I don't know if it's the best way to handle it though.
+
+Before:
+![pre_before](https://cloud.githubusercontent.com/assets/10107633/13601849/3964b476-e533-11e5-8857-348b95be8bad.jpg)
+
+After:
+![pre_after](https://cloud.githubusercontent.com/assets/10107633/13601859/47bf2b0a-e533-11e5-8a31-7a00a26188f9.jpg)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-08T13:54:11Z
+
+I'm :+1: for the change. Thanks @HeahDude.
+
+But I have a question: why don't you see the log contents in several lines? This is how I see this:
+
+![long_logs](https://cloud.githubusercontent.com/assets/73419/13603450/98a87e54-e53d-11e5-87d9-ca2a954f81a3.png)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T13:56:11Z
+
+I guess because it's an array with a single ~~key~~ value.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T13:59:28Z
+
+No, in fact I don't know :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T14:10:19Z
+
+Ok I think I found it, working on a patch ;)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T14:21:36Z
+
+I pushed a second commit 209c819 which fixes it, now looks like:
+![after_2](https://cloud.githubusercontent.com/assets/10107633/13604092/6e7af5ae-e541-11e5-8a73-74988e6f5176.jpg)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-08T16:11:40Z
+
+Thanks for working on this. However, I'm not sure about the second commit. The `ValueExporter` class is used in lots of places. This could "break" other things.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T21:54:57Z
+
+@javiereguiluz sure, I understand.
+
+Still, if this class is meant to ease reading while debugging, it may help to not inline arrays just because they don't have nested arrays, my captures are good example.
+
+Let me know if I should keep it like this, discard or squash this commit. Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-10T13:46:23Z
+
+@fabpot What do you think of  1be25ab ? May it "break" things somewhere ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-10T15:28:36Z
+
+The ValueExporter class is only used for the profiler, so I think it won't break anything. You can probably browse all the tabs from a profile to confirm that it works well everywhere.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-10T16:25:47Z
+
+Thanks, I can confirm. If I'm not wrong my commit only increase readability for inline arrays.

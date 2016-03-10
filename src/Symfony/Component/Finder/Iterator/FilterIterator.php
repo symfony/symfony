@@ -39,11 +39,18 @@ abstract class FilterIterator extends \FilterIterator
         while ($iterator instanceof \OuterIterator) {
             $innerIterator = $iterator->getInnerIterator();
 
-            if ($innerIterator instanceof \FilesystemIterator) {
+            if ($innerIterator instanceof RecursiveDirectoryIterator) {
+                // this condition is necessary for iterators to work properly with non-local filesystems like ftp
+                if ($innerIterator->isRewindable()) {
+                    $innerIterator->next();
+                    $innerIterator->rewind();
+                }
+            } elseif ($innerIterator instanceof \FilesystemIterator) {
                 $innerIterator->next();
                 $innerIterator->rewind();
             }
-            $iterator = $iterator->getInnerIterator();
+
+            $iterator = $innerIterator;
         }
 
         parent::rewind();

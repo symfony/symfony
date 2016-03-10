@@ -780,6 +780,8 @@ class Request
 
             if (!filter_var($clientIp, FILTER_VALIDATE_IP)) {
                 unset($clientIps[$key]);
+
+                continue;
             }
 
             if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {

@@ -495,7 +495,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseTimestampAsDateTimeObject($yaml, $year, $month, $day, $hour, $minute, $second)
     {
-        $expected = new \DateTime('now', new \DateTimeZone('UTC'));
+        $expected = new \DateTime($yaml);
+        $expected->setTimeZone(new \DateTimeZone('UTC'));
         $expected->setDate($year, $month, $day);
         $expected->setTime($hour, $minute, $second);
 

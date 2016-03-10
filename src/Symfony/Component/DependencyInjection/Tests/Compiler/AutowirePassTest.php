@@ -103,7 +103,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (c1, c2).
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (c1, c2, c3).
      */
     public function testTypeCollision()
     {
@@ -111,6 +111,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('c1', __NAMESPACE__.'\CollisionA');
         $container->register('c2', __NAMESPACE__.'\CollisionB');
+        $container->register('c3', __NAMESPACE__.'\CollisionB');
         $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
         $aDefinition->setAutowired(true);
 

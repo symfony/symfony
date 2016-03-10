@@ -49,8 +49,8 @@ before_install:
     - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then pecl install -f memcached-2.1.0; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then phpenv config-rm xdebug.ini; fi;
-    - if [[ $TRAVIS_REPO_SLUG = symfony/symfony ]]; then cp .composer-auth.json ~/.composer/auth.json; fi;
     - if [[ $deps != skip ]]; then composer self-update; fi;
+    - if [[ $deps != skip && $TRAVIS_REPO_SLUG = symfony/symfony ]]; then cp .composer/* ~/.composer/; composer global install --prefer-dist; fi;
     - if [[ $deps != skip ]]; then ./phpunit install; fi;
     - export PHPUNIT=$(readlink -f ./phpunit)
     - mkdir /tmp/slapd

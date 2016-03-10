@@ -63,6 +63,8 @@ class IpUtilsTest extends \PHPUnit_Framework_TestCase
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '2a01:198:603:0::/65')),
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('2a01:198:603:0::/65', '::1')),
             array(false, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '1a01:198:603:0::/65')),
+            array(false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'),
+            array(false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'),
         );
     }
 

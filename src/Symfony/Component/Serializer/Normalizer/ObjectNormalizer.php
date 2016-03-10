@@ -57,6 +57,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
             }
 
             $name = $reflMethod->name;
+            $attributeName = null;
 
             if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
                 // getters and hassers
@@ -66,7 +67,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 $attributeName = lcfirst(substr($name, 2));
             }
 
-            if ($this->isAllowedAttribute($object, $attributeName)) {
+            if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName)) {
                 $attributes[$attributeName] = true;
             }
         }

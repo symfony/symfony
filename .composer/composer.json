@@ -1,0 +1,6 @@
+{
+    "require": {
+        "php": ">=5.3.7",
+        "hirak/prestissimo": "^0.1.15"
+    }
+}

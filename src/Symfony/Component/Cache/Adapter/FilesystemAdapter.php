@@ -40,7 +40,7 @@ class FilesystemAdapter extends AbstractAdapter
             throw new InvalidArgumentException(sprintf('Cache directory is not writable (%s)', $directory));
         }
         // On Windows the whole path is limited to 258 chars
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($dir) > 190) {
+        if ('\\' === DIRECTORY_SEPARATOR && strlen($dir) > 234) {
             throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
         }
 
@@ -68,10 +68,13 @@ class FilesystemAdapter extends AbstractAdapter
                     @unlink($file);
                 }
             } else {
+                $i = rawurldecode(rtrim(fgets($h)));
                 $value = stream_get_contents($h);
                 flock($h, LOCK_UN);
                 fclose($h);
-                $values[$id] = unserialize($value);
+                if ($i === $id) {
+                    $values[$id] = unserialize($value);
+                }
             }
         }
 
@@ -131,7 +134,7 @@ class FilesystemAdapter extends AbstractAdapter
             if (!file_exists($dir)) {
                 @mkdir($dir, 0777, true);
             }
-            $value = $expiresAt."\n".serialize($value);
+            $value = $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
             if (false !== @file_put_contents($file, $value, LOCK_EX)) {
                 @touch($file, $expiresAt);
             } else {
@@ -144,8 +147,8 @@ class FilesystemAdapter extends AbstractAdapter
 
     private function getFile($id)
     {
-        $hash = hash('sha256', $id);
+        $hash = str_replace('/', '-', base64_encode(md5($id, true)));
 
-        return $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR.$hash;
+        return $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR.substr($hash, 2, -2);
     }
 }

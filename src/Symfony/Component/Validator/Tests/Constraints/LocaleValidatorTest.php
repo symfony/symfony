@@ -61,6 +61,7 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
             array('pt'),
             array('pt_PT'),
             array('zh_Hans'),
+            array('fil_PH'),
         );
     }
 

@@ -64,15 +64,15 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(100, 'ALL', 'ALL100'),
-            array(-100, 'ALL', '(ALL100)'),
+            array(-100, 'ALL', '-ALL100'),
             array(1000.12, 'ALL', 'ALL1,000'),
 
             array(100, 'JPY', '¥100'),
-            array(-100, 'JPY', '(¥100)'),
+            array(-100, 'JPY', '-¥100'),
             array(1000.12, 'JPY', '¥1,000'),
 
             array(100, 'EUR', '€100.00'),
-            array(-100, 'EUR', '(€100.00)'),
+            array(-100, 'EUR', '-€100.00'),
             array(1000.12, 'EUR', '€1,000.12'),
         );
     }
@@ -90,7 +90,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(100, 'CRC', 'CRC', '%s100'),
-            array(-100, 'CRC', 'CRC', '(%s100)'),
+            array(-100, 'CRC', 'CRC', '-%s100'),
             array(1000.12, 'CRC', 'CRC', '%s1,000'),
         );
     }
@@ -108,7 +108,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(100, 'BRL', 'R', '%s$100.00'),
-            array(-100, 'BRL', 'R', '(%s$100.00)'),
+            array(-100, 'BRL', 'R', '-%s$100.00'),
             array(1000.12, 'BRL', 'R', '%s$1,000.12'),
 
             // Rounding checks
@@ -135,7 +135,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(100, 'CHF', 'CHF', '%s100.00'),
-            array(-100, 'CHF', 'CHF', '(%s100.00)'),
+            array(-100, 'CHF', 'CHF', '-%s100.00'),
             array(1000.12, 'CHF', 'CHF', '%s1,000.12'),
             array('1000.12', 'CHF', 'CHF', '%s1,000.12'),
 
@@ -216,7 +216,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             array($formatter, 1, '¤1.00'),
             array($formatter, 1.1, '¤1.00'),
-            array($formatter, 2147483648, '(¤2,147,483,648.00)', $message),
+            array($formatter, 2147483648, '-¤2,147,483,648.00', $message),
             array($formatter, -2147483649, '¤2,147,483,647.00', $message),
         );
     }
@@ -261,7 +261,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array($formatter, 1, '¤1.00'),
             array($formatter, 1.1, '¤1.00'),
             array($formatter, 2147483648, '¤2,147,483,648.00'),
-            array($formatter, -2147483649, '(¤2,147,483,649.00)'),
+            array($formatter, -2147483649, '-¤2,147,483,649.00'),
         );
     }
 

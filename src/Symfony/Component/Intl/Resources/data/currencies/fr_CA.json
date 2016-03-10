@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.13.23",
     "Names": {
         "ARS": [
             "ARS",
@@ -8,10 +8,6 @@
         "AUD": [
             "$ AU",
             "dollar australien"
-        ],
-        "AZN": [
-            "AZN",
-            "manat azerbaïdjanais"
         ],
         "BMD": [
             "BMD",
@@ -44,10 +40,6 @@
         "COP": [
             "COP",
             "peso colombien"
-        ],
-        "CVE": [
-            "CVE",
-            "escudo du Cap-Vert"
         ],
         "FJD": [
             "FJD",
@@ -85,10 +77,6 @@
             "KRW",
             "won sud-coréen"
         ],
-        "LAK": [
-            "LAK",
-            "kip laotien"
-        ],
         "LBP": [
             "LBP",
             "livre libanaise"
@@ -105,14 +93,6 @@
             "$ NZ",
             "dollar néo-zélandais"
         ],
-        "PGK": [
-            "PGK",
-            "kina papou-néo-guinéen"
-        ],
-        "QAR": [
-            "QAR",
-            "riyal du Qatar"
-        ],
         "SBD": [
             "SBD",
             "dollar des îles Salomon"
@@ -121,17 +101,9 @@
             "$ SG",
             "dollar de Singapour"
         ],
-        "SRD": [
-            "SRD",
-            "dollar du Suriname"
-        ],
         "THB": [
             "THB",
             "baht thaïlandais"
-        ],
-        "TOP": [
-            "TOP",
-            "pa’anga"
         ],
         "TTD": [
             "TTD",
@@ -148,14 +120,6 @@
         "VND": [
             "VND",
             "dông vietnamien"
-        ],
-        "VUV": [
-            "VUV",
-            "vatu"
-        ],
-        "WST": [
-            "WST",
-            "tala"
         ],
         "XAF": [
             "XAF",

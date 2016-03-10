@@ -1,13 +1,9 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.13.23",
     "Names": {
         "BY": "Bélarus",
         "CC": "Îles Cocos (Keeling)",
         "FM": "Micronésie",
-        "GS": "Géorgie du Sud et les îles Sandwich du Sud",
-        "MF": "Saint-Martin (France)",
-        "SV": "Salvador",
-        "SX": "Saint-Martin (Pays-Bas)",
         "VC": "Saint-Vincent-et-les Grenadines"
     }
 }

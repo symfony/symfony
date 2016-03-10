@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.7.80",
+    "Version": "2.1.10.93",
     "Names": {
         "AED": [
             "AED",
@@ -187,7 +187,7 @@
         ],
         "GBP": [
             "£",
-            "Punt Sterling Prydain"
+            "Punt Prydain"
         ],
         "GEL": [
             "GEL",

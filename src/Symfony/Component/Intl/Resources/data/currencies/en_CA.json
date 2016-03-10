@@ -1,13 +1,9 @@
 {
-    "Version": "2.1.8.19",
+    "Version": "2.1.14.16",
     "Names": {
         "CAD": [
             "$",
             "Canadian Dollar"
-        ],
-        "USD": [
-            "US$",
-            "US Dollar"
         ]
     }
 }

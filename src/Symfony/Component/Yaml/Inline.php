@@ -206,6 +206,7 @@ class Inline
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
+            case preg_match('{^[0-9]+[_0-9]*$}', $value):
             case preg_match(self::getHexRegex(), $value):
             case preg_match(self::getTimestampRegex(), $value):
                 return Escaper::escapeWithSingleQuotes($value);
@@ -564,6 +565,9 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!float '):
                         return (float) substr($scalar, 8);
+                    case preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar):
+                        $scalar = str_replace('_', '', (string) $scalar);
+                        // omitting the break / return as integers are handled in the next case
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;
@@ -576,6 +580,8 @@ class Inline
                         return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
                     case preg_match(self::getHexRegex(), $scalar):
+                        $scalar = str_replace('_', '', $scalar);
+
                         return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;
                     case '.inf' === $scalarLower:
                     case '.nan' === $scalarLower:
@@ -584,8 +590,9 @@ class Inline
                         return log(0);
                     case 0 === strpos($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
-                    case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
-                        return (float) str_replace(',', '', $scalar);
+                    case preg_match('/^(-|\+)?[0-9][0-9,]*(\.[0-9_]+)?$/', $scalar):
+                    case preg_match('/^(-|\+)?[0-9][0-9_]*(\.[0-9_]+)?$/', $scalar):
+                        return (float) str_replace(array(',', '_'), '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         if (Yaml::PARSE_DATETIME & $flags) {
                             return new \DateTime($scalar, new \DateTimeZone('UTC'));
@@ -662,6 +669,6 @@ EOF;
      */
     private static function getHexRegex()
     {
-        return '~^0x[0-9a-f]++$~i';
+        return '~^0x[0-9a-f_]++$~i';
     }
 }

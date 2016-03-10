@@ -28,6 +28,6 @@ class ApcuAdapterTest extends CachePoolTest
             $this->markTestSkipped('Fails transiently on Windows.');
         }
 
-        return new ApcuAdapter(__CLASS__);
+        return new ApcuAdapter(str_replace('\\', '.', __CLASS__));
     }
 }

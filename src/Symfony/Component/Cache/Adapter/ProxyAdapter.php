@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -21,19 +22,24 @@ use Symfony\Component\Cache\CacheItem;
 class ProxyAdapter implements CacheItemPoolInterface
 {
     private $pool;
+    private $namespace;
+    private $namespaceLen;
     private $createCacheItem;
     private $hits = 0;
     private $misses = 0;
 
-    public function __construct(CacheItemPoolInterface $pool)
+    public function __construct(CacheItemPoolInterface $pool, $defaultLifetime = 0, $namespace = '')
     {
         $this->pool = $pool;
+        $this->namespace = $this->getId($namespace, true);
+        $this->namespaceLen = strlen($namespace);
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, $isHit) {
+            function ($key, $value, $isHit) use ($defaultLifetime) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
+                $item->defaultLifetime = $defaultLifetime;
 
                 return $item;
             },
@@ -48,7 +54,7 @@ class ProxyAdapter implements CacheItemPoolInterface
     public function getItem($key)
     {
         $f = $this->createCacheItem;
-        $item = $this->pool->getItem($key);
+        $item = $this->pool->getItem($this->getId($key));
         if ($isHit = $item->isHit()) {
             ++$this->hits;
         } else {
@@ -63,6 +69,12 @@ class ProxyAdapter implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
+        if ($this->namespaceLen) {
+            foreach ($keys as $i => $key) {
+                $keys[$i] = $this->getId($key);
+            }
+        }
+
         return $this->generateItems($this->pool->getItems($keys));
     }
 
@@ -71,7 +83,7 @@ class ProxyAdapter implements CacheItemPoolInterface
      */
     public function hasItem($key)
     {
-        return $this->pool->hasItem($key);
+        return $this->pool->hasItem($this->getId($key));
     }
 
     /**
@@ -87,7 +99,7 @@ class ProxyAdapter implements CacheItemPoolInterface
      */
     public function deleteItem($key)
     {
-        return $this->pool->deleteItem($key);
+        return $this->pool->deleteItem($this->getId($key));
     }
 
     /**
@@ -95,6 +107,12 @@ class ProxyAdapter implements CacheItemPoolInterface
      */
     public function deleteItems(array $keys)
     {
+        if ($this->namespaceLen) {
+            foreach ($keys as $i => $key) {
+                $keys[$i] = $this->getId($key);
+            }
+        }
+
         return $this->pool->deleteItems($keys);
     }
 
@@ -129,7 +147,7 @@ class ProxyAdapter implements CacheItemPoolInterface
         }
         $item = (array) $item;
         $expiry = $item[CacheItem::CAST_PREFIX.'expiry'];
-        $poolItem = $this->pool->getItem($item[CacheItem::CAST_PREFIX.'key']);
+        $poolItem = $this->pool->getItem($this->namespace.$item[CacheItem::CAST_PREFIX.'key']);
         $poolItem->set($item[CacheItem::CAST_PREFIX.'value']);
         $poolItem->expiresAt(null !== $expiry ? \DateTime::createFromFormat('U', $expiry) : null);
 
@@ -145,6 +163,9 @@ class ProxyAdapter implements CacheItemPoolInterface
                 ++$this->hits;
             } else {
                 ++$this->misses;
+            }
+            if ($this->namespaceLen) {
+                $key = substr($key, $this->namespaceLen);
             }
 
             yield $key => $f($key, $item->get(), $isHit);
@@ -169,5 +190,20 @@ class ProxyAdapter implements CacheItemPoolInterface
     public function getMisses()
     {
         return $this->misses;
+    }
+
+    private function getId($key, $ns = false)
+    {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));
+        }
+        if (!isset($key[0]) && !$ns) {
+            throw new InvalidArgumentException('Cache key length must be greater than zero');
+        }
+        if (isset($key[strcspn($key, '{}()/\@:')])) {
+            throw new InvalidArgumentException('Cache key contains reserved characters {}()/\@:');
+        }
+
+        return $this->namespace.$key;
     }
 }

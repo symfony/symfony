@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-08T19:23:33Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-09T14:37:11Z
+
+GREEN!
+Status: needs review
+This PR fixes current failures on 2.7 and allows unskipping previously failing tests on Windows.
+Ping @romainneutron
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-10T09:33:14Z
+
+Amazing work @nicolas-grekas. I almost got mad when trying to fix this build failure. The change itself looks good but I am not too familiar with how the different systems handle processes.

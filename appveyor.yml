@@ -18,6 +18,7 @@ init:
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
+    - IF %PHP%==1 appveyor DownloadFile https://curl.haxx.se/ca/cacert.pem
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.3.11-nts-Win32-VC9-x86.zip
     - IF %PHP%==1 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile http://nebm.ist.utl.pt/~glopes/misc/intl_win/ICU-51.2-dlls.zip
@@ -38,6 +39,8 @@ install:
     - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min
     - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
+    - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-min
+    - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-min
     - IF %PHP%==1 copy /Y php.ini-min php.ini-max
     - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
     - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
@@ -51,7 +54,8 @@ install:
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - mkdir %APPDATA%\Composer
-    - IF %APPVEYOR_REPO_NAME%==symfony/symfony copy /Y .composer-auth.json %APPDATA%\Composer\auth.json
+    - IF %APPVEYOR_REPO_NAME%==symfony/symfony copy /Y .composer\* %APPDATA%\Composer\
+    - IF %APPVEYOR_REPO_NAME%==symfony/symfony composer global install --prefer-dist --no-progress --ansi || echo curl.cainfo needs PHP 5.3.7
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - composer update --prefer-dist --no-progress --ansi

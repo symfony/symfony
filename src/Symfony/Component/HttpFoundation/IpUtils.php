@@ -112,8 +112,12 @@ class IpUtils
             $netmask = 128;
         }
 
-        $bytesAddr = unpack('n*', inet_pton($address));
-        $bytesTest = unpack('n*', inet_pton($requestIp));
+        $bytesAddr = unpack('n*', @inet_pton($address));
+        $bytesTest = unpack('n*', @inet_pton($requestIp));
+
+        if (!$bytesAddr || !$bytesTest) {
+            return false;
+        }
 
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; ++$i) {
             $left = $netmask - 16 * ($i - 1);

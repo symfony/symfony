@@ -574,6 +574,11 @@ class GetSetDummy
     {
         self::$staticObject = $object;
     }
+
+    protected function getPrivate()
+    {
+        throw new \RuntimeException('Dummy::getPrivate() should not be called');
+    }
 }
 
 class GetConstructorDummy

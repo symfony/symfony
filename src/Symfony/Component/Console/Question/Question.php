@@ -138,8 +138,8 @@ class Question
      */
     public function setAutocompleterValues($values)
     {
-        if (is_array($values) && $this->isAssoc($values)) {
-            $values = array_merge(array_keys($values), array_values($values));
+        if (is_array($values)) {
+            $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
         }
 
         if (null !== $values && !is_array($values)) {

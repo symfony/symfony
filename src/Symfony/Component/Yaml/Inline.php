@@ -454,6 +454,8 @@ class Inline
                         }
 
                         return;
+                    case preg_match('{^[+-]?[0-9][0-9_]*$}', $scalar):
+                        $scalar = str_replace('_', '', (string) $scalar);
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;
@@ -466,14 +468,16 @@ class Inline
                         return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
                     case preg_match(self::getHexRegex(), $scalar):
+                        $scalar = str_replace('_', '', $scalar);
+
                         return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;
                     case '.inf' === $scalarLower:
                     case '.nan' === $scalarLower:
                         return -log(0);
                     case '-.inf' === $scalarLower:
                         return log(0);
-                    case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
-                        return (float) str_replace(',', '', $scalar);
+                    case preg_match('/^(-|\+)?[0-9][0-9,_]*(\.[0-9_]+)?$/', $scalar):
+                        return (float) str_replace(array(',', '_'), '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         $timeZone = date_default_timezone_get();
                         date_default_timezone_set('UTC');
@@ -519,6 +523,6 @@ EOF;
      */
     private static function getHexRegex()
     {
-        return '~^0x[0-9a-f]++$~i';
+        return '~^0x[0-9a-f_]++$~i';
     }
 }

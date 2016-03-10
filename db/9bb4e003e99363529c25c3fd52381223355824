@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-10T15:11:55Z
+
+What is the idea behind this change?
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-10T15:28:12Z
+
+Parallel package installation on composer
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-10T17:04:09Z
+
+PR is ready:
+saves +1 minutes on appveyor (once merged on 2.7 because php 5.3.7 is required and 2.3 is tested against 5.3.3)
+and ~10s per job on travis

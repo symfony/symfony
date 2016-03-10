@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-01-04T11:03:22Z
+
+Not sure how or if BC should be handled here, any opinions?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-01-25T13:51:00Z
+
+I'll rework this and create a new proposal :)
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-01-27T14:26:47Z
+
+@iltar please have a look at it again.
+I've reverted all changes not needed, especially the visibility changes to the methods.
+This PR uses reflection to gain access to the streams. It is now also free from BC breaks.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-02-07T11:34:20Z
+
+Ping @nicolas-grekas, sorry for pinging you from a PR you are not involved in so far, hope it is OK.
+I would like to move forward on a fix for this issue, one way or another. Please let me know if I'm on the right track. Than I know how I could make a temp. fix over at PHP-CS-Fixer (https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/1654) while this PR @ SF is being processed.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-02-16T12:03:46Z
+
+ping @stof (sorry, but please have look)
+suggestions welcome :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-02-25T11:35:41Z
+
+Any news on that?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-03-09T21:31:05Z
+
+Reworked, happy to take notes/comments

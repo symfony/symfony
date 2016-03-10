@@ -14,7 +14,14 @@
 
         <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
             <tag name="cache.adapter" namespace-arg-index="2"></tag>
-            <argument /> <!-- doctrine provider -->
+            <argument /> <!-- doctrine provider service -->
+            <argument /> <!-- default lifetime -->
+            <argument /> <!-- namespace -->
+        </service>
+
+        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
+            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <argument /> <!-- PSR-6 provider service -->
             <argument /> <!-- default lifetime -->
             <argument /> <!-- namespace -->
         </service>

@@ -1031,7 +1031,7 @@ class FrameworkExtension extends Extension
             $poolDefinition = new DefinitionDecorator('cache.adapter.'.$poolConfig['type']);
             $poolDefinition->replaceArgument(1, $poolConfig['default_lifetime']);
 
-            if ('doctrine' === $poolConfig['type']) {
+            if ('doctrine' === $poolConfig['type'] || 'psr6' === $poolConfig['type']) {
                 $poolDefinition->replaceArgument(0, new Reference($poolConfig['cache_provider_service']));
             } elseif ('filesystem' === $poolConfig['type'] && isset($poolConfig['directory'][0])) {
                 $poolDefinition->replaceArgument(0, $poolConfig['directory']);

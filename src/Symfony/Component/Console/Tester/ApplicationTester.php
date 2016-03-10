@@ -37,7 +37,7 @@ class ApplicationTester
      * @var OutputInterface
      */
     private $output;
-    private $captureOutputStreamsIndependent = false;
+    private $captureStreamsIndependently = false;
 
     public function __construct(Application $application)
     {
@@ -66,8 +66,8 @@ class ApplicationTester
             $this->input->setInteractive($options['interactive']);
         }
 
-        $this->captureOutputStreamsIndependent = array_key_exists('capture_stderr_separately', $options) && $options['capture_stderr_separately'];
-        if (!$this->captureOutputStreamsIndependent) {
+        $this->captureStreamsIndependently = array_key_exists('capture_stderr_separately', $options) && $options['capture_stderr_separately'];
+        if (!$this->captureStreamsIndependently) {
             $this->output = new StreamOutput(fopen('php://memory', 'w', false));
             if (isset($options['decorated'])) {
                 $this->output->setDecorated($options['decorated']);
@@ -129,8 +129,8 @@ class ApplicationTester
      */
     public function getErrorOutput($normalize = false)
     {
-        if (!$this->captureOutputStreamsIndependent) {
-            throw new \LogicException('Error output not available when tester run without "capture_stderr_separately" option set.');
+        if (!$this->captureStreamsIndependently) {
+            throw new \LogicException('The error output is not available when the tester is run without "capture_stderr_separately" option set.');
         }
 
         rewind($this->output->getErrorOutput()->getStream());

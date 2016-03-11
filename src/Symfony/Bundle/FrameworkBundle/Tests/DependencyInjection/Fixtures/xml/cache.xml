@@ -7,9 +7,10 @@
 
     <framework:config>
         <framework:cache>
-            <framework:adapter name="foo" type="apcu" default-lifetime="30" />
-            <framework:adapter name="bar" type="doctrine" default-lifetime="5" cache-provider-service="app.doctrine_cache_provider" />
-            <framework:adapter name="baz" type="filesystem" default-lifetime="7" directory="app/cache/psr" />
+            <framework:pool name="foo" type="apcu" default-lifetime="30" />
+            <framework:pool name="bar" type="doctrine" default-lifetime="5" cache-provider-service="app.doctrine_cache_provider" />
+            <framework:pool name="baz" type="filesystem" default-lifetime="7" directory="app/cache/psr" />
+            <framework:pool name="foobar" type="psr6" default-lifetime="10" cache-provider-service="app.cache_pool" />
         </framework:cache>
     </framework:config>
 </container>

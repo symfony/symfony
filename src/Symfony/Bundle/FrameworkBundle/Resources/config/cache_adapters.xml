@@ -7,27 +7,27 @@
     <services>
 
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="0"></tag>
+            <tag name="cache.adapter" namespace-arg-index="0" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <tag name="cache.adapter" namespace-arg-index="2" />
             <argument /> <!-- doctrine provider service -->
             <argument /> <!-- default lifetime -->
             <argument /> <!-- namespace -->
         </service>
 
         <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <tag name="cache.adapter" namespace-arg-index="2" />
             <argument /> <!-- PSR-6 provider service -->
             <argument /> <!-- default lifetime -->
             <argument /> <!-- namespace -->
         </service>
 
         <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2"></tag>
+            <tag name="cache.adapter" namespace-arg-index="2" />
             <argument>%kernel.cache_dir%</argument>
             <argument /> <!-- default lifetime -->
             <argument /> <!-- namespace -->

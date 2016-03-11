@@ -139,7 +139,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['cache'])) {
-            $this->registerCacheConfiguration($config['cache'], $container);
+            $this->registerCacheConfiguration($config['cache'], $container, $loader);
         }
 
         $loader->load('debug_prod.xml');
@@ -1022,11 +1022,11 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!empty($config['pool'])) {
+        if (!empty($config['pools'])) {
             $loader->load('cache_adapters.xml');
         }
 
-        foreach ($config['pool'] as $name => $poolConfig) {
+        foreach ($config['pools'] as $name => $poolConfig) {
             $poolDefinition = new DefinitionDecorator('cache.adapter.'.$poolConfig['type']);
             $poolDefinition->replaceArgument(1, $poolConfig['default_lifetime']);
 

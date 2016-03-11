@@ -41,7 +41,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     public function __construct($rootNodeName = 'response', $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
-        $this->loadOptions = null !== $loadOptions ?: LIBXML_NONET | LIBXML_NOBLANKS;
+        $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
     }
 
     /**

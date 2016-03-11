@@ -557,7 +557,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Cache configuration')
                     ->fixXmlConfig('pool')
                     ->children()
-                        ->arrayNode('pool')
+                        ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->children()

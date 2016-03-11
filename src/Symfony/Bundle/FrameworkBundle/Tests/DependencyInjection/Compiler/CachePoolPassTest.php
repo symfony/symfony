@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class CachePoolPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,85 +25,84 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $this->cachePoolPass = new CachePoolPass();
     }
 
-    public function testAdapterIsInjectedIntoConstructorArguments()
+    public function testNamespaceArgumentIsReplaced()
     {
-        $container = $this->initializeContainer();
+        $container = new ContainerBuilder();
+        $adapter = new Definition();
+        $adapter->setAbstract(true);
+        $adapter->addTag('cache.adapter', array('namespace_arg_index' => 0));
+        $container->setDefinition('app.cache_adapter', $adapter);
+        $cachePool = new DefinitionDecorator('app.cache_adapter');
+        $cachePool->addArgument(null);
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
+
         $this->cachePoolPass->process($container);
-        $adapter = $container->getDefinition('foo')->getArgument(0);
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $adapter);
-        $this->assertFalse($adapter->isAbstract());
-        $this->assertSame('cache.adapter.apcu_adapter', $adapter->getParent());
-        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $adapter->getArgument(0));
-    }
-
-    public function testAdapterIsInjectedIntoMethodArguments()
-    {
-        $container = $this->initializeContainer();
-        $this->cachePoolPass->process($container);
-        $methodCalls = $container->getDefinition('bar')->getMethodCalls();
-        $arguments = $methodCalls[0][1];
-        $adapter = $arguments[0];
-
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $adapter);
-        $this->assertFalse($adapter->isAbstract());
-        $this->assertSame('cache.adapter.doctrine_adapter', $adapter->getParent());
-    }
-
-    public function testAdapterIsInjectIntoProperties()
-    {
-        $container = $this->initializeContainer();
-        $this->cachePoolPass->process($container);
-        $properties = $container->getDefinition('baz')->getProperties();
-        $adapter = $properties['cache'];
-
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $adapter);
-        $this->assertFalse($adapter->isAbstract());
-        $this->assertSame('cache.adapter.fs_adapter', $adapter->getParent());
+        $this->assertSame('yRnzIIVLvL', $cachePool->getArgument(0));
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The cache adapter "bar" is not configured
+     * @expectedExceptionMessage Services tagged with "cache.pool" must have a parent service but "app.cache_pool" has none.
      */
-    public function testThrowsExceptionWhenReferencedAdapterIsNotConfigured()
+    public function testThrowsExceptionWhenCachePoolHasNoParentDefinition()
     {
         $container = new ContainerBuilder();
-        $container->setDefinition('foo', new Definition('Foo', array(new Reference('cache.adapter.bar'))));
+        $cachePool = new Definition();
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
+
         $this->cachePoolPass->process($container);
     }
 
-    private function initializeContainer()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Services tagged with "cache.pool" must have a parent service tagged with "cache.adapter" but "app.cache_pool" has none.
+     */
+    public function testThrowsExceptionWhenCachePoolIsNotBasedOnAdapter()
     {
         $container = new ContainerBuilder();
+        $container->register('app.cache_adapter');
+        $cachePool = new DefinitionDecorator('app.cache_adapter');
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
 
-        $apcuAdapter = new Definition('Symfony\Component\Cache\Adapter\ApcuAdapter');
-        $apcuAdapter->setAbstract(true);
-        $apcuAdapter->addTag('cache.adapter', array('id' => 'adapter1', 'namespace-arg-index' => 0));
-        $container->setDefinition('cache.adapter.apcu_adapter', $apcuAdapter);
+        $this->cachePoolPass->process($container);
+    }
 
-        $doctrineAdapter = new Definition('Symfony\Component\Cache\Adapter\DoctrineAdapter');
-        $doctrineAdapter->setAbstract(true);
-        $doctrineAdapter->addTag('cache.adapter', array('id' => 'adapter2'));
-        $container->setDefinition('cache.adapter.doctrine_adapter', $doctrineAdapter);
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid "cache.adapter" tag for service "app.cache_adapter": attribute "namespace_arg_index" is missing.
+     */
+    public function testThrowsExceptionWhenCacheAdapterDefinesNoNamespaceArgument()
+    {
+        $container = new ContainerBuilder();
+        $adapter = new Definition();
+        $adapter->setAbstract(true);
+        $adapter->addTag('cache.adapter');
+        $container->setDefinition('app.cache_adapter', $adapter);
+        $cachePool = new DefinitionDecorator('app.cache_adapter');
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
 
-        $filesystemAdapter = new Definition('Symfony\Component\Cache\Adapter\FilesystemAdapter');
-        $filesystemAdapter->setAbstract(true);
-        $filesystemAdapter->addTag('cache.adapter', array('id' => 'adapter3'));
-        $container->setDefinition('cache.adapter.fs_adapter', $filesystemAdapter);
+        $this->cachePoolPass->process($container);
+    }
 
-        $foo = new Definition();
-        $foo->setArguments(array(new Reference('cache.adapter.adapter1')));
-        $container->setDefinition('foo', $foo);
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Services tagged as "cache.adapter" must be abstract: "app.cache_adapter" is not.
+     */
+    public function testThrowsExceptionWhenCacheAdapterIsNotAbstract()
+    {
+        $container = new ContainerBuilder();
+        $adapter = new Definition();
+        $adapter->addTag('cache.adapter', array('namespace_arg_index' => 0));
+        $container->setDefinition('app.cache_adapter', $adapter);
+        $cachePool = new DefinitionDecorator('app.cache_adapter');
+        $cachePool->addTag('cache.pool');
+        $container->setDefinition('app.cache_pool', $cachePool);
 
-        $bar = new Definition();
-        $bar->addMethodCall('setCache', array(new Reference('cache.adapter.adapter2')));
-        $container->setDefinition('bar', $bar);
-
-        $baz = new Definition();
-        $baz->setProperty('cache', new Reference('cache.adapter.adapter3'));
-        $container->setDefinition('baz', $baz);
-
-        return $container;
+        $this->cachePoolPass->process($container);
     }
 }

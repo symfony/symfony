@@ -1,17 +1,14 @@
 framework:
     cache:
-        adapters:
+        pools:
             foo:
                 type: apcu
-                options:
-                    default_lifetime: 30
+                default_lifetime: 30
             bar:
                 type: doctrine
-                options:
-                    default_lifetime: 5
-                    cache_provider_service: app.doctrine_cache_provider
+                default_lifetime: 5
+                cache_provider_service: app.doctrine_cache_provider
             baz:
                 type: filesystem
-                options:
-                    default_lifetime: 7
-                    directory: app/cache/psr
+                default_lifetime: 7
+                directory: app/cache/psr

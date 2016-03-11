@@ -200,7 +200,7 @@ class Profiler
         foreach ($this->collectors as $collector) {
             $collector->collect($request, $response, $exception);
 
-            // forces collectors to become "read/only" (they loose their object dependencies)
+            // forces collectors to become "read/only" (they lose their object dependencies)
             $profile->addCollector(unserialize(serialize($collector)));
         }
 

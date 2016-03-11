@@ -59,6 +59,6 @@ class CachePoolPass implements CompilerPassInterface
 
     private function getNamespace($id)
     {
-        return substr(str_replace('/', '-', base64_encode(md5('symfony.'.$id, true)), 0, 10));
+        return substr(str_replace('/', '-', base64_encode(md5('symfony.'.$id, true))), 0, 10);
     }
 }

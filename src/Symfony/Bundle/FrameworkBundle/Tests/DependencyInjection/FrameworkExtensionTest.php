@@ -578,6 +578,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'foo', 'apcu', array('index_1' => 30), 0);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'bar', 'doctrine', array('index_0' => new Reference('app.doctrine_cache_provider'), 'index_1' => 5));
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'baz', 'filesystem', array('index_0' => 'app/cache/psr', 'index_1' => 7));
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foobar', 'psr6', array('index_0' => new Reference('app.cache_pool'), 'index_1' => 10));
     }
 
     protected function createContainer(array $data = array())

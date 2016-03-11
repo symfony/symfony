@@ -17,6 +17,11 @@ $container->loadFromExtension('framework', array(
                 'default_lifetime' => 7,
                 'directory' => 'app/cache/psr',
             ),
+            'foobar' => array(
+                'type' => 'psr6',
+                'default_lifetime' => 10,
+                'cache_provider_service' => 'app.cache_pool',
+            ),
         ),
     ),
 ));

@@ -552,8 +552,9 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
         }
 
-        // Not supported for nested options
         if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for values %s', __METHOD__, $option, $this->formatValues($allowedValues)), E_USER_WARNING);
+
             return $this;
         }
 
@@ -602,8 +603,9 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
         }
 
-        // Not supported for nested options
         if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for values %s', __METHOD__, $option, $this->formatValues($allowedValues)), E_USER_WARNING);
+
             return $this;
         }
 
@@ -652,8 +654,9 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
         }
 
-        // Not supported for nested options
         if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for types %s', __METHOD__, $option, $this->formatValues($allowedTypes)), E_USER_WARNING);
+
             return $this;
         }
 
@@ -696,8 +699,9 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
         }
 
-        // Not supported for nested options
         if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for types %s', __METHOD__, $option, $this->formatValues($allowedTypes)), E_USER_WARNING);
+
             return $this;
         }
 

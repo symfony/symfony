@@ -42,7 +42,7 @@ class DebugClassLoader
         $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
 
         if ($this->wasFinder) {
-            @trigger_error('The ' . __METHOD__ . ' method will no longer support receiving an object into its $classLoader argument in 3.0.',
+            @trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.',
                 E_USER_DEPRECATED);
             $this->classLoader = [$classLoader, 'loadClass'];
             $this->isFinder = true;
@@ -134,7 +134,7 @@ class DebugClassLoader
      */
     public function findFile($class)
     {
-        @trigger_error('The ' . __METHOD__ . ' method is deprecated since version 2.5 and will be removed in 3.0.',
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.',
             E_USER_DEPRECATED);
 
         if ($this->wasFinder) {
@@ -239,7 +239,7 @@ class DebugClassLoader
                     $class, $file));
             }
             if (self::$caseCheck) {
-                $real = explode('\\', $class . strrchr($file, '.'));
+                $real = explode('\\', $class.strrchr($file, '.'));
                 $tail = explode(DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $file));
 
                 $i = count($tail) - 1;
@@ -253,7 +253,7 @@ class DebugClassLoader
                 array_splice($tail, 0, $i + 1);
             }
             if (self::$caseCheck && $tail) {
-                $tail = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $tail);
+                $tail = DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $tail);
                 $tailLen = strlen($tail);
                 $real = $refl->getFileName();
 
@@ -274,7 +274,7 @@ class DebugClassLoader
                         } else {
                             $dir = getcwd();
                             chdir($real);
-                            $real = getcwd() . '/';
+                            $real = getcwd().'/';
                             chdir($dir);
 
                             $dir = $real;

@@ -152,7 +152,7 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider privateTaggedServicesProvider
      */
-    public function testPrivateTaggedServices($id, $tagName, $expectedExceptionMessage)
+    public function testPrivateTaggedServices($id, $tagName, $argument, $expectedArguments)
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
@@ -166,19 +166,21 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ));
 
         $container->setDefinition('form.extension', $extDefinition);
-        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName);
-
-        $this->setExpectedException('\InvalidArgumentException', $expectedExceptionMessage);
+        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, array('extended_type' => 'stdClass'));
 
         $container->compile();
+
+        $extDefinition = $container->getDefinition('form.extension');
+
+        $this->assertSame($expectedArguments, $extDefinition->getArgument($argument));
     }
 
     public function privateTaggedServicesProvider()
     {
         return array(
-            array('my.type', 'form.type', 'The service "my.type" must be public as form types are lazy-loaded'),
-            array('my.type_extension', 'form.type_extension', 'The service "my.type_extension" must be public as form type extensions are lazy-loaded'),
-            array('my.guesser', 'form.type_guesser', 'The service "my.guesser" must be public as form type guessers are lazy-loaded'),
+            array('my.type', 'form.type', 1, array('stdClass' => 'public_services.my.type')),
+            array('my.type_extension', 'form.type_extension', 2, array('stdClass' => array('public_services.my.type_extension'))),
+            array('my.guesser', 'form.type_guesser', 3, array('public_services.my.guesser')),
         );
     }
 }

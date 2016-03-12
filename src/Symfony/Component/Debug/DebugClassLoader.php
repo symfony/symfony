@@ -54,7 +54,7 @@ class DebugClassLoader
             if(!file_exists(strtolower(__FILE__))) {
                 // filesystem is case sensitive
                 self::$caseCheck = 0;
-            } elseif(realpath(strtolower(__FILE__)) === realpath(__FILE__)) {
+            } elseif(realpath(strtolower(__FILE__)) === __FILE__) {
                 // filesystem is not case sensitive
                 self::$caseCheck = 1;
             } else {

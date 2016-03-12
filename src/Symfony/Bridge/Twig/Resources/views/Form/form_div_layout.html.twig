@@ -13,15 +13,22 @@
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {%- endblock form_widget_simple -%}
 
-{%- block form_widget_compound -%}
-    <div {{ block('widget_container_attributes') }}>
-        {%- if form.parent is empty -%}
-            {{ form_errors(form) }}
-        {%- endif -%}
-        {{- block('form_rows') -}}
-        {{- form_rest(form) -}}
-    </div>
-{%- endblock form_widget_compound -%}
+{% block form_widget_compound %}
+    {% spaceless %}
+        {% if form.parent is empty %}
+            <div>
+                {{ form_errors(form) }}
+                {{ block('form_rows') }}
+                {{ form_rest(form) }}
+            </div>
+        {% else %}
+            <div {{ block('widget_container_attributes') }}>
+                {{ block('form_rows') }}
+                {{ form_rest(form) }}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_widget_compound %}
 
 {%- block collection_widget -%}
     {% if prototype is defined %}

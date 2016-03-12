@@ -92,11 +92,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'attr' => array('class' => 'my&class'),
         ), $vars));
 
-        $xpath = trim($xpath).'
-    [@id="my&id"]
-    [@class="my&class"]';
-
-        $this->assertMatchesXpath($html, $xpath);
+        $this->assertMatchesXpath($html, trim($xpath));
     }
 
     abstract protected function renderForm(FormView $view, array $vars = array());

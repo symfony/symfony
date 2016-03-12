@@ -579,14 +579,14 @@ class Command
      *
      * It must be non-empty and parts can optionally be separated by ":".
      *
-     * @param string $name
+     * @param string      $name
      *
-     * @throws \InvalidArgumentException When the name is invalid
+     * @throws    \InvalidArgumentException When the name is invalid
      */
     private function validateName( $name )
     {
         if ( !preg_match('/^[^\:]+(\:[^\:]+)*$/', $name) ) {
-            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+            throw new     \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }
 }

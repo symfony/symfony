@@ -231,6 +231,53 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    // setNested()/isNested()/getNestedOptions()
+    ////////////////////////////////////////////////////////////////////////////
+
+    public function testSetNestedReturnsNewResolver()
+    {
+        $this->assertNotSame($this->resolver, $this->resolver->setNested('foo'));
+        $this->assertInstanceOf('Symfony\Component\OptionsResolver\OptionsResolver', $this->resolver->setNested('bar'));
+    }
+
+    public function testSetNested()
+    {
+        $this->resolver->setNested('one', array('un' => '1'));
+        $this->resolver->setNested('two', array('deux' => '2', 'vingt' => 20));
+
+        $this->assertEquals(array(
+            'one' => array('un' => '1'),
+            'two' => array('deux' => '2', 'vingt' => 20),
+        ), $this->resolver->resolve());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function testFailIfSetNestedFromLazyOption()
+    {
+        $this->resolver->setDefault('lazy', function (Options $options) {
+            $options->setNested('nested', array('number' => 42));
+        });
+
+        $this->resolver->resolve();
+    }
+
+    public function testIsNested()
+    {
+        $this->assertFalse($this->resolver->isNested('foo'));
+        $this->resolver->setNested('foo', array('number' => 42));
+        $this->assertTrue($this->resolver->isNested('foo'));
+    }
+
+    public function testIsNestedWithNoValue()
+    {
+        $this->assertFalse($this->resolver->isNested('foo'));
+        $this->resolver->setNested('foo');
+        $this->assertTrue($this->resolver->isNested('foo'));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // setRequired()/isRequired()/getRequiredOptions()
     ////////////////////////////////////////////////////////////////////////////
 
@@ -1546,5 +1593,21 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('lazy1', function () {});
 
         count($this->resolver);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Nested options
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The nested options in the option "z" could not be resolved.
+     */
+    public function testResolveFailsIfNonExistingNestedOption()
+    {
+        $this->resolver->setNested('z', array('one' => '1'));
+        $this->resolver->setNested('a', array('two' => '2'));
+
+        $this->resolver->resolve(array('z' => array('foo' => 'bar')));
     }
 }

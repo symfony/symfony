@@ -253,7 +253,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
 
             // check properties for deleted, and created ACEs, and perform deletions
-            // we need to perfom deletions before updating existing ACEs, in order to
+            // we need to perform deletions before updating existing ACEs, in order to
             // preserve uniqueness of the order field
             if (isset($propertyChanges['classAces'])) {
                 $this->updateOldAceProperty('classAces', $propertyChanges['classAces']);

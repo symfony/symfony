@@ -413,6 +413,39 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
             $definition->getArguments()
         );
     }
+
+    /**
+     * @dataProvider getCreateResourceTests
+     */
+    public function testCreateResourceForClass($className, $isEqual)
+    {
+        $startingResource = AutowirePass::createResourceForClass(
+            new \ReflectionClass(__NAMESPACE__.'\ClassForResource')
+        );
+        $newResource = AutowirePass::createResourceForClass(
+            new \ReflectionClass(__NAMESPACE__.'\\'.$className)
+        );
+
+        // hack so the objects don't differ by the class name
+        $startingReflObject = new \ReflectionObject($startingResource);
+        $reflProp = $startingReflObject->getProperty('class');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($startingResource, __NAMESPACE__.'\\'.$className);
+
+        if ($isEqual) {
+            $this->assertEquals($startingResource, $newResource);
+        } else {
+            $this->assertNotEquals($startingResource, $newResource);
+        }
+    }
+
+    public function getCreateResourceTests()
+    {
+        return array(
+            ['IdenticalClassResource', true],
+            ['ClassChangedConstructorArgs', false],
+        );
+    }
 }
 
 class Foo
@@ -559,6 +592,29 @@ class MultipleArgumentsOptionalScalarLast
 class MultipleArgumentsOptionalScalarNotReallyOptional
 {
     public function __construct(A $a, $foo = 'default_val', Lille $lille)
+    {
+    }
+}
+
+/*
+ * Classes used for testing createResourceForClass
+ */
+class ClassForResource
+{
+    public function __construct($foo, Bar $bar = null)
+    {
+    }
+
+    public function setBar(Bar $bar)
+    {
+    }
+}
+class IdenticalClassResource extends ClassForResource
+{
+}
+class ClassChangedConstructorArgs extends ClassForResource
+{
+    public function __construct($foo, Bar $bar, $baz)
     {
     }
 }

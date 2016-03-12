@@ -72,7 +72,7 @@ class FragmentRendererPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('Symfony\Component\HttpKernel\Tests\DependencyInjection\RendererService'));
         $definition
             ->expects($this->once())
-            ->method('isPublic')
+            ->method('setPublic')
             ->will($this->returnValue(true))
         ;
 

@@ -31,8 +31,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
-            ->method('isPublic')
-            ->will($this->returnValue(true));
+            ->method('setPublic')
+            ->with(true);
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
             ->will($this->returnValue('stdClass'));
@@ -66,8 +66,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
-            ->method('isPublic')
-            ->will($this->returnValue(true));
+            ->method('setPublic')
+            ->with(true);
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
             ->will($this->returnValue('Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService'));
@@ -103,7 +103,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     public function testPrivateEventListenerAndSubscriber($tag, array $tagAttributes, array $methodCalls)
     {
         $container = new ContainerBuilder();
-        $container
+        $listener = $container
             ->register('foo', SubscriberService::class)
             ->setPublic(false)
             ->addTag($tag, $tagAttributes);
@@ -113,16 +113,17 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $registerListenersPass->process($container);
 
         $this->assertSame($methodCalls, $eventDispatcher->getMethodCalls());
+        $this->assertTrue($listener->isPublic());
     }
 
     public function privateTaggedServicesProvider()
     {
         return array(
             array('kernel.event_subscriber', array(), array(
-                array('addSubscriberService', array('public_services.foo', SubscriberService::class)),
+                array('addSubscriberService', array('foo', SubscriberService::class)),
             )),
             array('kernel.event_listener', array('event' => 'foo_bar'), array(
-                array('addListenerService', array('foo_bar', array('public_services.foo', 'onFoobar'), 0)),
+                array('addListenerService', array('foo_bar', array('foo', 'onFoobar'), 0)),
             )),
         );
     }

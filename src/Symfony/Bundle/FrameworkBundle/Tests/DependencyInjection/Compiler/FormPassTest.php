@@ -166,21 +166,22 @@ class FormPassTest extends \PHPUnit_Framework_TestCase
         ));
 
         $container->setDefinition('form.extension', $extDefinition);
-        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, array('extended_type' => 'stdClass'));
+        $extension = $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, array('extended_type' => 'stdClass'));
 
         $container->compile();
 
         $extDefinition = $container->getDefinition('form.extension');
 
         $this->assertSame($expectedArguments, $extDefinition->getArgument($argument));
+        $this->assertTrue($extension->isPublic());
     }
 
     public function privateTaggedServicesProvider()
     {
         return array(
-            array('my.type', 'form.type', 1, array('stdClass' => 'public_services.my.type')),
-            array('my.type_extension', 'form.type_extension', 2, array('stdClass' => array('public_services.my.type_extension'))),
-            array('my.guesser', 'form.type_guesser', 3, array('public_services.my.guesser')),
+            array('my.type', 'form.type', 1, array('stdClass' => 'my.type')),
+            array('my.type_extension', 'form.type_extension', 2, array('stdClass' => array('my.type_extension'))),
+            array('my.guesser', 'form.type_guesser', 3, array('my.guesser')),
         );
     }
 }

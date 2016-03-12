@@ -37,6 +37,7 @@ class DebugClassLoader
      * @param callable|object $classLoader
      *
      * @api
+     *
      * @deprecated since 2.5, passing an object is deprecated and support for it will be removed in 3.0
      */
     public function __construct($classLoader)
@@ -52,7 +53,18 @@ class DebugClassLoader
         }
 
         if (!isset(self::$caseCheck)) {
-            self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;
+            if (!isset(self::$caseCheck)) {
+                if(!file_exists(strtolower(__FILE__))) {
+                    // filesystem is case sensitive
+                    self::$caseCheck = 0;
+                } elseif(realpath(strtolower(__FILE__)) === realpath(__FILE__)) {
+                    // filesystem is not case sensitive
+                    self::$caseCheck = 1;
+                } else {
+                    // filesystem is not case sensitive AND realpath() fails to normalize case
+                    self::$caseCheck = 2;
+                }
+            }
         }
     }
 
@@ -69,7 +81,7 @@ class DebugClassLoader
     }
 
     /**
-     * Wraps all autoloaders
+     * Wraps all autoloaders.
      */
     public static function enable()
     {
@@ -116,7 +128,7 @@ class DebugClassLoader
     }
 
     /**
-     * Finds a file by class name
+     * Finds a file by class name.
      *
      * @param string $class A class name to resolve to file
      *

@@ -186,7 +186,7 @@ class ModelChoiceListTest extends Propel1TestCase
         $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
 
-    public function testDifferentEqualObjectsAreChoosen()
+    public function testDifferentEqualObjectsAreChosen()
     {
         $item = new Item(1, 'Foo');
 
@@ -200,10 +200,10 @@ class ModelChoiceListTest extends Propel1TestCase
             array($item)
         );
 
-        $choosenItem = new Item(1, 'Foo');
+        $chosenItem = new Item(1, 'Foo');
 
-        $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($choosenItem)));
-        $this->assertEquals(array('1'), $choiceList->getValuesForChoices(array($choosenItem)));
+        $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($chosenItem)));
+        $this->assertEquals(array('1'), $choiceList->getValuesForChoices(array($chosenItem)));
     }
 
     public function testGetIndicesForNullChoices()

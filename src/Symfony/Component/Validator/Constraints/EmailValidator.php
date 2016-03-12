@@ -67,6 +67,7 @@ class EmailValidator extends ConstraintValidator
         if (!isset($cache[$host])) {
             $cache[$host] = checkdnsrr($host, 'MX');
         }
+
         return $cache[$host];
     }
 

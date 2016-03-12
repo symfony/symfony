@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sstok at 2016-03-12T15:46:32Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-12T16:27:25Z
+
+A note to you from Symfony maintainers:
+
+Thank you for making this contribution to Symfony. As you know, we prepared some simple issues so you could submit real pull requests fixing real issues. However, as there are more people than issues, we'll need to close some repeated pull requests without merging them.
+
+We are not sure about the criteria we'll use to close repeated pull requests (first one wins? randomly selected one wins?). So maybe your pull request is closed without merging it. But please, don't feel bad about that. You did great and you actually contributed to Symfony :tada: If this pull request doesn't get merged, there will be more opportunities to send new pull requests.
+
+Thank you for being part of the (big and awesome) Symfony Community!

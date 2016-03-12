@@ -480,6 +480,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->booleanNode('prevent_dns_lookups')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

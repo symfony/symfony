@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-12T15:30:00Z
+
+@Koalabaerchen congrats on this contribution. You did everything well: the actual code change, the pull request description, selecting the right branch, etc.
+
+As a very minor comment, I recommend to create local branches with more descriptive names. In your local computer you named this branch 2.3, which will collide with the real 2.3 branch from Symfony. When fixing issues, it's better to name the branch something like `issue_XXXX` or `fix_XXXX` and `XXXX` is the number of the issue. This is specially useful when contributing lots of pull requests. Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-12T16:27:29Z
+
+A note to you from Symfony maintainers:
+
+Thank you for making this contribution to Symfony. As you know, we prepared some simple issues so you could submit real pull requests fixing real issues. However, as there are more people than issues, we'll need to close some repeated pull requests without merging them.
+
+We are not sure about the criteria we'll use to close repeated pull requests (first one wins? randomly selected one wins?). So maybe your pull request is closed without merging it. But please, don't feel bad about that. You did great and you actually contributed to Symfony :tada: If this pull request doesn't get merged, there will be more opportunities to send new pull requests.
+
+Thank you for being part of the (big and awesome) Symfony Community!
+
+---------------------------------------------------------------------------
+
+by Koalabaerchen at 2016-03-12T16:34:14Z
+
+Thanks for the feedback

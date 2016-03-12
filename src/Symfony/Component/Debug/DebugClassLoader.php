@@ -52,7 +52,19 @@ class DebugClassLoader
         }
 
         if (!isset(self::$caseCheck)) {
-            self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;
+            if (!isset(self::$caseCheck)) {
+                if(!file_exists(strtolower(__FILE__))) {
+                    // filesystem is case sensitive
+                    self::$caseCheck = 0;
+                } elseif(realpath(strtolower(__FILE__)) === realpath(__FILE__)) {
+                    // filesystem is not case sensitive
+                    self::$caseCheck = 1;
+                } else {
+                    // filesystem is not case sensitive AND realpath() fails to normalize case
+                    // this is _probably_ OX
+                    self::$caseCheck = 2;
+                }
+            }
         }
     }
 

@@ -583,9 +583,9 @@ class Command
      *
      * @throws \InvalidArgumentException When the name is invalid
      */
-    private function validateName($name)
+    private function validateName( $name )
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+        if ( !preg_match('/^[^\:]+(\:[^\:]+)*$/', $name) ) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }

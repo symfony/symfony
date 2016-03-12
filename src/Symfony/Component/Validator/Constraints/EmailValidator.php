@@ -26,9 +26,15 @@ class EmailValidator extends ConstraintValidator
      */
     private $isStrict;
 
-    public function __construct($strict = false)
+    /**
+     * @var bool
+     */
+    private $preventDNSLookups;
+
+    public function __construct($strict = false, $preventDNSLookups = false)
     {
         $this->isStrict = $strict;
+        $this->preventDNSLookups = $preventDNSLookups;
     }
 
     /**
@@ -81,7 +87,7 @@ class EmailValidator extends ConstraintValidator
         $host = substr($value, strpos($value, '@') + 1);
 
         // Check for host DNS resource records
-        if ($constraint->checkMX) {
+        if (!$this->preventDNSLookups && $constraint->checkMX) {
             if (!$this->checkMX($host)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
@@ -92,7 +98,7 @@ class EmailValidator extends ConstraintValidator
             return;
         }
 
-        if ($constraint->checkHost && !$this->checkHost($host)) {
+        if (!$this->preventDNSLookups && $constraint->checkHost && !$this->checkHost($host)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::HOST_CHECK_FAILED_ERROR)

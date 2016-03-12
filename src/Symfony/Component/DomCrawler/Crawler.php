@@ -73,6 +73,16 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns base href.
+     *
+     * @return string
+     */
+    public function getBaseHref()
+    {
+        return $this->baseHref;
+    }
+
+    /**
      * Removes all the nodes.
      */
     public function clear()

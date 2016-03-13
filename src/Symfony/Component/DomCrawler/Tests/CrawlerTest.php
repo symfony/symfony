@@ -29,8 +29,9 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetBaseHref()
     {
-        $crawler = new Crawler(null,  null, 'http://symfony.com');
-        $this->assertEquals('http://symfony.com', $crawler->getBaseHref());
+        $baseHref = 'http://symfony.com';
+        $crawler = new Crawler(null,  null, $baseHref);
+        $this->assertEquals($baseHref, $crawler->getBaseHref());
     }
 
     public function testAdd()

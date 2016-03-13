@@ -165,11 +165,11 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
         $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
-        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '[' . preg_quote($chars) . ']+')));
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
 
         $matcher = new UrlMatcher($collection, new RequestContext());
-        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/' . rawurlencode($chars) . '/bar'));
-        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/' . strtr($chars, array('%' => '%25')) . '/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.rawurlencode($chars).'/bar'));
+        $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25')).'/bar'));
     }
 
     public function testMatchWithDotMetacharacterInRequirements()
@@ -178,7 +178,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '.+')));
 
         $matcher = new UrlMatcher($collection, new RequestContext());
-        $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/' . urlencode("\n") . '/bar'), 'linefeed character is matched');
+        $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
     }
 
     public function testMatchOverriddenRoute()
@@ -396,7 +396,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo/bar');
     }
 
-
     public function testWithExcludedHost()
     {
         $coll = new RouteCollection();
@@ -405,7 +404,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.net'));
         $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo'));
     }
-
 
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
@@ -431,8 +429,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'subdomain.example.com'));
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo'), $matcher->match('/foo/bar'));
     }
-
-
 
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException

@@ -88,8 +88,7 @@ class RouteCompiler implements RouteCompilerInterface
         $pos = 0;
         $defaultSeparator = $isHost ? '.' : '/';
 
-
-        /**
+        /*
          * Checks if the host is excluded from route.
          */
         if (true === $isHost) {
@@ -99,7 +98,6 @@ class RouteCompiler implements RouteCompilerInterface
                 $pattern = substr($pattern, 1);
             }
         }
-
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
@@ -127,7 +125,7 @@ class RouteCompiler implements RouteCompilerInterface
 
             $regexp = $route->getRequirement($varName);
             if (null === $regexp) {
-                $followingPattern = (string)substr($pattern, $pos);
+                $followingPattern = (string) substr($pattern, $pos);
                 // Find the next static character after the variable that functions as a separator. By default, this separator and '/'
                 // are disallowed for the variable. This default requirement makes sure that optional variables can be matched at all
                 // and that the generating-matching-combination of URLs unambiguous, i.e. the params used for generating the URL are
@@ -178,12 +176,11 @@ class RouteCompiler implements RouteCompilerInterface
             $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
         }
 
-
         $returnArray = array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            'regex' => self::REGEX_DELIMITER . '^' . $regexp . '$' . self::REGEX_DELIMITER . 's' . ($isHost ? 'i' : ''),
+            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
             'tokens' => array_reverse($tokens),
-            'variables' => $variables
+            'variables' => $variables,
         );
 
         if (true === $isHost) {

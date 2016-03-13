@@ -233,7 +233,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setHost('{locale}.example.net');
         $route->compile();
 
-
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }

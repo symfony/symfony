@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
@@ -143,18 +142,15 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-
             $hostMatches = array();
             $hostDontMatch = $compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches);
 
-
-            /**
+            /*
              * Checks if it is an other host than the one excluded.
              */
             if ($compiledRoute->isHostExcluded() && $compiledRoute->getHostRegex()) {
                 $hostDontMatch = !$hostDontMatch;
             }
-
 
             if (true === $hostDontMatch) {
                 continue;

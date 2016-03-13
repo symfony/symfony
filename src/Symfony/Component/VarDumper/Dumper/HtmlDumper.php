@@ -46,7 +46,7 @@ class HtmlDumper extends CliDumper
     );
 
     protected $jsProperties = array(
-        'collapsedByDefaultNodesHigherThan' => 1
+        'collapsedByDefaultNodesHigherThan' => 1,
     );
 
     /**
@@ -467,7 +467,7 @@ EOHTML;
                     $this->dumpId,
                     $this->indentPad,
                     $this->jsProperties['collapsedByDefaultNodesHigherThan']
-                ) . $this->line;
+                ).$this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;

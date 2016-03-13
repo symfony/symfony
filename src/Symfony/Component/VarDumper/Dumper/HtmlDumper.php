@@ -82,7 +82,7 @@ class HtmlDumper extends CliDumper
     }
 
     /**
-     * Configures js properties, it is not necessary to add all
+     * Configures js properties, it is not necessary to add all.
      *
      * @param array $jsProperties A map of jsProperties names to customize the behavior.
      */

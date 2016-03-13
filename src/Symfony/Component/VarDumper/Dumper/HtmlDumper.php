@@ -24,7 +24,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutput = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
+    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s" data-collapsed-by-default-nodes-higher-than="%s">';
     protected $dumpSuffix = '</pre><script>Sfdump("%s")</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
@@ -43,6 +43,10 @@ class HtmlDumper extends CliDumper
         'meta' => 'color:#B729D9',
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
+    );
+
+    protected $jsProperties = array(
+        'collapsedByDefaultNodesHigherThan' => 1
     );
 
     /**
@@ -73,6 +77,16 @@ class HtmlDumper extends CliDumper
     {
         $this->headerIsDumped = false;
         $this->styles = $styles + $this->styles;
+    }
+
+    /**
+     * Configures js properties.
+     *
+     * @param array $jsProperties A map of jsProperties names to customize the behavior.
+     */
+    public function setJsProperties(array $jsProperties)
+    {
+        $this->jsProperties = $jsProperties;
     }
 
     /**
@@ -119,6 +133,7 @@ class HtmlDumper extends CliDumper
 
         $line = <<<'EOHTML'
 <script>
+
 Sfdump = window.Sfdump || (function (doc) {
 
 var refStyle = doc.createElement('style'),
@@ -175,6 +190,7 @@ function toggle(a, recursive) {
 
 return function (root) {
     root = doc.getElementById(root);
+    var collapsedByDefaultNodesHigherThan = root.getAttribute('data-collapsed-by-default-nodes-higher-than');
 
     function a(e, f) {
         addEventListener(root, e, function (e) {
@@ -252,6 +268,19 @@ return function (root) {
     len = t.length;
     i = t = 0;
 
+    function getLevelNodeFromRoot(node, level) {
+        level = level || 0;
+        level++;
+
+        node = node.parentNode;
+
+        if ('sf-dump' == node.className) {
+            return level;
+        }
+
+        return getLevelNodeFromRoot(node, level);
+    }
+
     while (i < len) {
         elt = root[i];
         if ("SAMP" == elt.tagName) {
@@ -267,9 +296,11 @@ return function (root) {
             a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
-            if ('sf-dump' != elt.parentNode.className) {
+
+            if (getLevelNodeFromRoot(elt) > collapsedByDefaultNodesHigherThan) {
                 toggle(a);
             }
+
         } else if ("sf-dump-ref" == elt.className && (a = elt.getAttribute('href'))) {
             a = a.substr(1);
             elt.className += ' '+a;
@@ -431,7 +462,12 @@ EOHTML;
     protected function dumpLine($depth, $endOfValue = false)
     {
         if (-1 === $this->lastDepth) {
-            $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
+            $this->line = sprintf(
+                    $this->dumpPrefix,
+                    $this->dumpId,
+                    $this->indentPad,
+                    $this->jsProperties['collapsedByDefaultNodesHigherThan']
+                ) . $this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;

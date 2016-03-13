@@ -133,12 +133,12 @@ class HtmlDumper extends CliDumper
             return $this->dumpHeader;
         }
 
-        $line = "<script>
+        $line = '<script>
 Sfdump = window.Sfdump || (function (doc) {
 
-var defaultOptions = ".json_encode($this->jsPropertiesDefault).";
+var defaultOptions = '.json_encode($this->jsPropertiesDefault).';
 
-        ";
+        ';
 
         $line .= <<<'EOHTML'
 
@@ -490,7 +490,7 @@ EOHTML;
             $this->line .= sprintf(
                 $this->dumpSuffix,
                 $this->dumpId,
-                $this->jsProperties ? ','. json_encode($this->jsProperties) : ''
+                $this->jsProperties ? ','.json_encode($this->jsProperties) : ''
             );
         }
         $this->lastDepth = $depth;

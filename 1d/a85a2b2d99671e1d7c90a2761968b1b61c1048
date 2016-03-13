@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-12T15:55:14Z
+
+@blowski thanks for this contribution!  I'm afraid that there is a problem with your code: you use the short array syntax. This is obviously right for modern PHP code, but we decided to not use it on Symfony.
+
+The reason is that our existing code uses the old array syntax and updating it would require a lot of work. If we don't update the old code but use the new syntax in the new code, the result will be a mess. so let's use the old syntax everywhere. Thanks!
+
+---------------------------------------------------------------------------
+
+by blowski at 2016-03-12T15:57:53Z
+
+@javiereguiluz I'm blaming that one on PHPStorm. Third time lucky!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-12T16:17:39Z
+
+:+1: with one minor comment

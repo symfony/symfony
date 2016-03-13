@@ -65,7 +65,7 @@ class EmailValidator extends ConstraintValidator
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();
 
-            if (!$strictValidator->isValid($value, false, true)) {
+            if (!$strictValidator->isValid($value)) {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->addViolation();

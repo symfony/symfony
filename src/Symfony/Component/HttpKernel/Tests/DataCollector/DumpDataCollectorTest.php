@@ -40,7 +40,7 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $xDump = array(
             array(
-                'data' => "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \" data-collapsed-by-default-nodes-higher-than=\"1\"><span class=sf-dump-num>123</span>\n</pre><script>Sfdump(\"sf-dump\")</script>\n",
+                'data' => "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-num>123</span>\n</pre><script>Sfdump(\"sf-dump\")</script>\n",
                 'name' => 'DumpDataCollectorTest.php',
                 'file' => __FILE__,
                 'line' => $line,
@@ -86,7 +86,7 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $line = __LINE__ - 1;
         $file = __FILE__;
         $xOutput = <<<EOTXT
- <pre class=sf-dump id=sf-dump data-indent-pad="  " data-collapsed-by-default-nodes-higher-than="1"><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
+ <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
 <span class=sf-dump-num>123</span>
 </pre>
 

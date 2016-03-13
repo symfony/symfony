@@ -24,8 +24,8 @@ class HtmlDumper extends CliDumper
     public static $defaultOutput = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s" data-collapsed-by-default-nodes-higher-than="%s">';
-    protected $dumpSuffix = '</pre><script>Sfdump("%s")</script>';
+    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
+    protected $dumpSuffix = '</pre><script>Sfdump("%s"%s)</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
     protected $headerIsDumped = false;
@@ -45,9 +45,11 @@ class HtmlDumper extends CliDumper
         'index' => 'color:#1299DA',
     );
 
-    protected $jsProperties = array(
+    protected $jsPropertiesDefault = array(
         'collapsedByDefaultNodesHigherThan' => 1,
     );
+
+    protected $jsProperties = array();
 
     /**
      * {@inheritdoc}
@@ -80,7 +82,7 @@ class HtmlDumper extends CliDumper
     }
 
     /**
-     * Configures js properties.
+     * Configures js properties, it is not necessary to add all
      *
      * @param array $jsProperties A map of jsProperties names to customize the behavior.
      */
@@ -131,10 +133,26 @@ class HtmlDumper extends CliDumper
             return $this->dumpHeader;
         }
 
-        $line = <<<'EOHTML'
-<script>
-
+        $line = "<script>
 Sfdump = window.Sfdump || (function (doc) {
+
+var defaultOptions = ".json_encode($this->jsPropertiesDefault).";
+
+        ";
+
+        $line .= <<<'EOHTML'
+
+function extend(a, b){
+    if (!a) a= {};
+    if (!b) b= {};
+
+    for(var key in b)
+        if(b.hasOwnProperty(key))
+            a[key] = b[key];
+    return a;
+}
+
+options = extend(defaultOptions, options);
 
 var refStyle = doc.createElement('style'),
     rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
@@ -188,9 +206,9 @@ function toggle(a, recursive) {
     return true;
 };
 
-return function (root) {
+return function (root, options) {
     root = doc.getElementById(root);
-    var collapsedByDefaultNodesHigherThan = root.getAttribute('data-collapsed-by-default-nodes-higher-than');
+    options = extend(defaultOptions, options);
 
     function a(e, f) {
         addEventListener(root, e, function (e) {
@@ -297,7 +315,7 @@ return function (root) {
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
 
-            if (getLevelNodeFromRoot(elt) > collapsedByDefaultNodesHigherThan) {
+            if (getLevelNodeFromRoot(elt) > options.collapsedByDefaultNodesHigherThan) {
                 toggle(a);
             }
 
@@ -462,19 +480,18 @@ EOHTML;
     protected function dumpLine($depth, $endOfValue = false)
     {
         if (-1 === $this->lastDepth) {
-            $this->line = sprintf(
-                    $this->dumpPrefix,
-                    $this->dumpId,
-                    $this->indentPad,
-                    $this->jsProperties['collapsedByDefaultNodesHigherThan']
-                ).$this->line;
+            $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;
         }
 
         if (-1 === $depth) {
-            $this->line .= sprintf($this->dumpSuffix, $this->dumpId);
+            $this->line .= sprintf(
+                $this->dumpSuffix,
+                $this->dumpId,
+                $this->jsProperties ? ','. json_encode($this->jsProperties) : ''
+            );
         }
         $this->lastDepth = $depth;
 

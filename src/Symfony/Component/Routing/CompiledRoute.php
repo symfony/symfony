@@ -86,7 +86,7 @@ class CompiledRoute implements \Serializable
         $this->hostRegex = $data['host_regex'];
         $this->hostTokens = $data['host_tokens'];
         $this->hostVariables = $data['host_vars'];
-        $this->hostExcluded = $data['host_excluded'];
+        $this->hostExcluded = !isset($data['host_excluded']) ? false : $data['host_excluded'];
     }
 
     /**

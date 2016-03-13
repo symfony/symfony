@@ -26,6 +26,7 @@ class CompiledRoute implements \Serializable
     private $hostVariables;
     private $hostRegex;
     private $hostTokens;
+    private $hostExcluded;
 
     /**
      * Constructor.
@@ -38,10 +39,11 @@ class CompiledRoute implements \Serializable
      * @param array       $hostTokens    Host tokens
      * @param array       $hostVariables An array of host variables
      * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
+     * @param boolean     $hostExcluded  A boolean used to exclude the host
      */
-    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
+    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array(), $hostExcluded = false)
     {
-        $this->staticPrefix = (string) $staticPrefix;
+        $this->staticPrefix = (string)$staticPrefix;
         $this->regex = $regex;
         $this->tokens = $tokens;
         $this->pathVariables = $pathVariables;
@@ -49,6 +51,7 @@ class CompiledRoute implements \Serializable
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
+        $this->hostExcluded = (bool)$hostExcluded;
     }
 
     /**
@@ -65,6 +68,7 @@ class CompiledRoute implements \Serializable
             'host_regex' => $this->hostRegex,
             'host_tokens' => $this->hostTokens,
             'host_vars' => $this->hostVariables,
+            'host_excluded' => $this->hostExcluded,
         ));
     }
 
@@ -82,6 +86,7 @@ class CompiledRoute implements \Serializable
         $this->hostRegex = $data['host_regex'];
         $this->hostTokens = $data['host_tokens'];
         $this->hostVariables = $data['host_vars'];
+        $this->hostExcluded = $data['host_excluded'];
     }
 
     /**
@@ -162,5 +167,15 @@ class CompiledRoute implements \Serializable
     public function getHostVariables()
     {
         return $this->hostVariables;
+    }
+
+    /**
+     * Returns true if the host is excluded.
+     *
+     * @return boolean The status
+     */
+    public function isHostExcluded()
+    {
+        return $this->hostExcluded;
     }
 }

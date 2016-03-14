@@ -575,10 +575,11 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('cache');
 
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foo', 'apcu', array('index_1' => 30), 0);
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'bar', 'doctrine', array('index_0' => new Reference('app.doctrine_cache_provider'), 'index_1' => 5));
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'baz', 'filesystem', array('index_0' => 'app/cache/psr', 'index_1' => 7));
-        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foobar', 'psr6', array('index_0' => new Reference('app.cache_pool'), 'index_1' => 10));
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foo', 'cache.adapter.apcu', 30);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'bar', 'cache.adapter.doctrine', 5);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'baz', 'cache.adapter.filesystem', 7);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foobar', 'cache.adapter.psr6', 10);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'def', 'cache.adapter.filesystem', 11);
     }
 
     protected function createContainer(array $data = array())
@@ -650,38 +651,39 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
-    private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $name, $type, array $arguments, $namespaceArgumentIndex = null)
+    private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $name, $adapter, $defaultLifetime)
     {
         $id = 'cache.pool.'.$name;
 
-        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $type));
+        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $adapter));
 
         $poolDefinition = $container->getDefinition($id);
 
-        $this->assertInstanceOf(DefinitionDecorator::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache adapter.', $name));
-        $this->assertEquals($arguments, $poolDefinition->getArguments());
+        $this->assertInstanceOf(DefinitionDecorator::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache pool.', $name));
 
-        $adapterDefinition = $container->getDefinition($poolDefinition->getParent());
+        $this->assertTrue($poolDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
+        $this->assertFalse($poolDefinition->isAbstract(), sprintf('Service definition "%s" is not abstract.', $id));
 
-        switch ($type) {
-            case 'apcu':
+        $tag = $poolDefinition->getTag('cache.pool');
+        $this->assertTrue(isset($tag[0]['default_lifetime']), 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
+        $this->assertSame($defaultLifetime, $tag[0]['default_lifetime'], 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
+
+        $adapterId = $poolDefinition->getParent();
+        $adapterDefinition = $container->findDefinition($adapterId);
+
+        switch ($adapter) {
+            case 'cache.adapter.apcu':
                 $this->assertSame(ApcuAdapter::class, $adapterDefinition->getClass());
                 break;
-            case 'doctrine':
+            case 'cache.adapter.doctrine':
                 $this->assertSame(DoctrineAdapter::class, $adapterDefinition->getClass());
                 break;
-            case 'filesystem':
+            case 'cache.adapter.filesystem':
                 $this->assertSame(FilesystemAdapter::class, $adapterDefinition->getClass());
                 break;
         }
 
-        $this->assertTrue($adapterDefinition->hasTag('cache.adapter'), sprintf('Service definition "%s" is tagged with the "cache.adapter" tag.', $id));
-
-        $tag = $adapterDefinition->getTag('cache.adapter');
-
-        if (null !== $namespaceArgumentIndex) {
-            $this->assertTrue(isset($tag[0]['namespace-arg-index']), 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
-            $this->assertSame($namespaceArgumentIndex, $tag[0]['namespace-arg-index'], 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
-        }
+        $this->assertTrue($adapterDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $adapterId));
+        $this->assertTrue($adapterDefinition->isAbstract(), sprintf('Service definition "%s" is abstract.', $adapterId));
     }
 }

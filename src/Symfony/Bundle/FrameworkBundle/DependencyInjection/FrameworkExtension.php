@@ -1023,20 +1023,15 @@ class FrameworkExtension extends Extension
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!empty($config['pools'])) {
-            $loader->load('cache_adapters.xml');
+            $loader->load('cache_pools.xml');
         }
 
         foreach ($config['pools'] as $name => $poolConfig) {
-            $poolDefinition = new DefinitionDecorator('cache.adapter.'.$poolConfig['type']);
-            $poolDefinition->replaceArgument(1, $poolConfig['default_lifetime']);
+            $poolDefinition = new DefinitionDecorator($poolConfig['adapter_service']);
+            $poolDefinition->setPublic($poolConfig['public']);
+            unset($poolConfig['adapter_service'], $poolConfig['public']);
 
-            if ('doctrine' === $poolConfig['type'] || 'psr6' === $poolConfig['type']) {
-                $poolDefinition->replaceArgument(0, new Reference($poolConfig['cache_provider_service']));
-            } elseif ('filesystem' === $poolConfig['type'] && isset($poolConfig['directory'][0])) {
-                $poolDefinition->replaceArgument(0, $poolConfig['directory']);
-            }
-
-            $poolDefinition->addTag('cache.pool');
+            $poolDefinition->addTag('cache.pool', $poolConfig);
             $container->setDefinition('cache.pool.'.$name, $poolDefinition);
         }
     }

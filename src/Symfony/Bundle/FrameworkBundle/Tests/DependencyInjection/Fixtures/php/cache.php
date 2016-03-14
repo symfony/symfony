@@ -4,23 +4,26 @@ $container->loadFromExtension('framework', array(
     'cache' => array(
         'pools' => array(
             'foo' => array(
-                'type' => 'apcu',
+                'adapter_service' => 'cache.adapter.apcu',
                 'default_lifetime' => 30,
             ),
             'bar' => array(
-                'type' => 'doctrine',
+                'adapter_service' => 'cache.adapter.doctrine',
                 'default_lifetime' => 5,
-                'cache_provider_service' => 'app.doctrine_cache_provider',
+                'provider_service' => 'app.doctrine_cache_provider',
             ),
             'baz' => array(
-                'type' => 'filesystem',
+                'adapter_service' => 'cache.adapter.filesystem',
                 'default_lifetime' => 7,
                 'directory' => 'app/cache/psr',
             ),
             'foobar' => array(
-                'type' => 'psr6',
+                'adapter_service' => 'cache.adapter.psr6',
                 'default_lifetime' => 10,
-                'cache_provider_service' => 'app.cache_pool',
+                'provider_service' => 'app.cache_pool',
+            ),
+            'def' => array(
+                'default_lifetime' => 11,
             ),
         ),
     ),

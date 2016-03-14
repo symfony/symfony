@@ -6,31 +6,33 @@
 
     <services>
 
+        <service id="cache.adapter.default" alias="cache.adapter.filesystem" />
+
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="0" />
+            <tag name="cache.pool" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2" />
-            <argument /> <!-- doctrine provider service -->
-            <argument /> <!-- default lifetime -->
+            <tag name="cache.pool" />
+            <argument /> <!-- Doctrine provider service -->
             <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2" />
+            <tag name="cache.pool" />
             <argument /> <!-- PSR-6 provider service -->
-            <argument /> <!-- default lifetime -->
             <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
-            <tag name="cache.adapter" namespace-arg-index="2" />
-            <argument>%kernel.cache_dir%</argument>
-            <argument /> <!-- default lifetime -->
+            <tag name="cache.pool" />
             <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+            <argument>%kernel.cache_dir%</argument>
         </service>
 
     </services>

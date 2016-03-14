@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -25,36 +26,37 @@ class CachePoolPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $attributes = array(
+            'provider_service',
+            'namespace',
+            'default_lifetime',
+            'directory',
+        );
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $tags) {
-            $pool = $container->getDefinition($id);
+            $adapter = $pool = $container->getDefinition($id);
+            $tags[0] += array('namespace' => $this->getNamespace($id));
 
-            if (!$pool instanceof DefinitionDecorator) {
-                throw new \InvalidArgumentException(sprintf('Services tagged with "cache.pool" must have a parent service but "%s" has none.', $id));
+            while ($adapter instanceof DefinitionDecorator) {
+                $adapter = $container->findDefinition($adapter->getParent());
+                if ($t = $adapter->getTag('cache.pool')) {
+                    $tags[0] += $t[0];
+                }
             }
-
-            $adapter = $pool;
-
-            do {
-                $adapterId = $adapter->getParent();
-                $adapter = $container->getDefinition($adapterId);
-            } while ($adapter instanceof DefinitionDecorator && !$adapter->hasTag('cache.adapter'));
-
-            if (!$adapter->hasTag('cache.adapter')) {
-                throw new \InvalidArgumentException(sprintf('Services tagged with "cache.pool" must have a parent service tagged with "cache.adapter" but "%s" has none.', $id));
+            if ($pool->isAbstract()) {
+                continue;
             }
-
-            $tags = $adapter->getTag('cache.adapter');
-
-            if (!isset($tags[0]['namespace_arg_index'])) {
-                throw new \InvalidArgumentException(sprintf('Invalid "cache.adapter" tag for service "%s": attribute "namespace_arg_index" is missing.', $adapterId));
+            if (isset($tags[0]['provider_service']) && is_string($tags[0]['provider_service'])) {
+                $tags[0]['provider_service'] = new Reference($tags[0]['provider_service']);
             }
-
-            if (!$adapter->isAbstract()) {
-                throw new \InvalidArgumentException(sprintf('Services tagged as "cache.adapter" must be abstract: "%s" is not.', $adapterId));
+            $i = 0;
+            foreach ($attributes as $attr) {
+                if (isset($tags[0][$attr])) {
+                    $pool->replaceArgument($i++, $tags[0][$attr]);
+                    unset($tags[0][$attr]);
+                }
             }
-
-            if (0 <= $namespaceArgIndex = $tags[0]['namespace_arg_index']) {
-                $pool->replaceArgument($namespaceArgIndex, $this->getNamespace($id));
+            if (!empty($tags[0])) {
+                throw new \InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "provider_service", "namespace", "default_lifetime" and "directory", found "%s".', $id, implode('", "', array_keys($tags[0]))));
             }
         }
     }

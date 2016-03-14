@@ -132,16 +132,17 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
-     */
-    public function testAddServiceInvalidServiceId()
+    public function testAddServiceIdWithUnsupportedCharacters()
     {
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
+        $container->register('bar$!', 'FooClass');
         $dumper = new PhpDumper($container);
-        $dumper->dump();
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Unsupported_Characters')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Unsupported_Characters();
+        $this->assertTrue(method_exists($container, 'getBarService'));
+        $this->assertTrue(method_exists($container, 'getBar2Service'));
     }
 
     /**

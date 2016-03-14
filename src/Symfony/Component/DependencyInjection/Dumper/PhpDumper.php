@@ -58,6 +58,7 @@ class PhpDumper extends Dumper
     private $targetDirRegex;
     private $targetDirMaxMatches;
     private $docStar;
+    private $existingNames = array();
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -1349,13 +1350,21 @@ EOF;
      */
     private function camelize($id)
     {
-        $name = Container::camelize($id);
-
-        if (!preg_match('/^[a-zA-Z0-9_\x7f-\xff]+$/', $name)) {
-            throw new InvalidArgumentException(sprintf('Service id "%s" cannot be converted to a valid PHP method name.', $id));
+        if (isset($this->existingNames[$id])) {
+            return $this->existingNames[$id];
         }
 
-        return $name;
+        $name = Container::camelize($id);
+        $uniqueName = $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
+        $prefix = 1;
+
+        while (in_array($uniqueName, $this->existingNames)) {
+            ++$prefix;
+            $uniqueName = $name.$prefix;
+        }
+        $this->existingNames[$id] = $uniqueName;
+
+        return $uniqueName;
     }
 
     /**

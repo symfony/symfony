@@ -1319,7 +1319,7 @@ class OptionsResolver implements Options
             // BEGIN
             $this->calling[$option] = true;
             try {
-                $value = $normalizer($this, $value);
+                $value = $this->normalize($normalizer, $value);
             } finally {
                 unset($this->calling[$option]);
             }
@@ -1398,6 +1398,21 @@ class OptionsResolver implements Options
             $nestedOptions = clone $options;
             $this->nested[$name] = $nestedOptions->setRoot($this);
         }
+    }
+
+    /**
+     * Executes the normalizer on the validated option value.
+     *
+     * Extract this bit of logic in order to override it in NestedOptions.
+     *
+     * @param \Closure $normalizer The option normalizer
+     * @param mixed    $value      The validated option value to normalize
+     *
+     * @return mixed The normalized option value
+     */
+    protected function normalize(\Closure $normalizer, $value)
+    {
+        return $normalizer($this, $value);
     }
 
     /**

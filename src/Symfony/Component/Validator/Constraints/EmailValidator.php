@@ -29,12 +29,12 @@ class EmailValidator extends ConstraintValidator
     /**
      * @var bool
      */
-    private $preventDNSLookups;
+    private $useDNS;
 
-    public function __construct($strict = false, $preventDNSLookups = false)
+    public function __construct($strict = false, $useDNS = true)
     {
         $this->isStrict = $strict;
-        $this->preventDNSLookups = $preventDNSLookups;
+        $this->useDNS = $useDNS;
     }
 
     /**
@@ -86,23 +86,25 @@ class EmailValidator extends ConstraintValidator
 
         $host = substr($value, strpos($value, '@') + 1);
 
-        // Check for host DNS resource records
-        if (!$this->preventDNSLookups && $constraint->checkMX) {
-            if (!$this->checkMX($host)) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Email::MX_CHECK_FAILED_ERROR)
-                    ->addViolation();
+        if ($this->useDNS) {
+            // Check for host DNS resource records
+            if ($constraint->checkMX) {
+                if (!$this->checkMX($host)) {
+                    $this->context->buildViolation($constraint->message)
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode(Email::MX_CHECK_FAILED_ERROR)
+                        ->addViolation();
+                }
+
+                return;
             }
 
-            return;
-        }
-
-        if (!$this->preventDNSLookups && $constraint->checkHost && !$this->checkHost($host)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Email::HOST_CHECK_FAILED_ERROR)
-                ->addViolation();
+            if ($constraint->checkHost && !$this->checkHost($host)) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::HOST_CHECK_FAILED_ERROR)
+                    ->addViolation();
+            }
         }
     }
 

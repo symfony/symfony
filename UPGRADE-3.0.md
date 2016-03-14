@@ -403,7 +403,6 @@ UPGRADE FROM 2.x to 3.0
 
  * The `choice_list` option of `ChoiceType` was removed.
 
->>>>>>> 2.8
  * The option "precision" was renamed to "scale".
 
    Before:

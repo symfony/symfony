@@ -44,7 +44,7 @@ class OptionsResolver implements Options
     /**
      * The nested options.
      *
-     * @var OptionsResolver[]
+     * @var NestedOptions[]
      */
     private $nested = array();
 
@@ -187,7 +187,7 @@ class OptionsResolver implements Options
      * @param string $option The name of the option
      * @param mixed  $value  The default value of the option
      *
-     * @return OptionsResolver This instance or the nested instance
+     * @return OptionsResolver|NestedOptions This instance or the nested instance
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -291,9 +291,9 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Defines an option as a new self.
+     * Defines an option as a new NestedOptions instance.
      *
-     * Returns a new OptionsResolver instance to configure nested options.
+     * Returns a new NestedOptions instance to configure nested options.
      *
      *     $nestedOptions = $options->setNested('connexion', array(
      *         'host' => 'localhost',
@@ -313,7 +313,7 @@ class OptionsResolver implements Options
      * @param string $option   The option name
      * @param array  $defaults The default nested options
      *
-     * @return OptionsResolver The nested options resolver
+     * @return NestedOptions The nested options resolver
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -323,7 +323,7 @@ class OptionsResolver implements Options
             throw new AccessException('Options cannot be made nested from a lazy option or normalizer.');
         }
 
-        $nestedOptions = new self();
+        $nestedOptions = new NestedOptions($option);
 
         foreach ($defaults as $name => $default) {
             $nestedOptions->setDefault($name, $default);
@@ -980,6 +980,18 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Returns whether this instance is locked.
+     *
+     * @return bool Whether this instance is locked
+     *
+     * @internal Used by {@see NestedOptions} to prevent external resolving
+     */
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    /**
      * Removes the option with the given name.
      *
      * Undefined options are ignored.
@@ -1383,7 +1395,8 @@ class OptionsResolver implements Options
     public function __clone()
     {
         foreach ($this->nested as $name => $options) {
-            $this->nested[$name] = clone $options;
+            $nestedOptions = clone $options;
+            $this->nested[$name] = $nestedOptions->setRoot($this);
         }
     }
 

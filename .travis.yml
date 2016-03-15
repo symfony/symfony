@@ -31,7 +31,9 @@ cache:
         - .phpunit
         - php-$MIN_PHP
 
-services: mongodb
+services:
+    - mongodb
+    - redis-server
 
 before_install:
     # Matrix lines for intermediate PHP versions are skipped for pull requests

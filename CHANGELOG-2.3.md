@@ -7,6 +7,31 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.39 (2016-03-13)
+
+ * bug #18080 [HttpFoundation] Set the Content-Range header if the requested Range is unsatisfied (jakzal)
+ * bug #18084 [HttpFoundation] Avoid warnings when checking malicious IPs (jakzal)
+ * bug #18048 [HttpKernel] Fix mem usage when stripping the prod container (nicolas-grekas)
+ * bug #18065 [Finder] Partially revert #17134 to fix a regression (jakzal)
+ * bug #18018 [HttpFoundation] exception when registering bags for started sessions (xabbuh)
+ * bug #18054 [Filesystem] Fix false positive in ->remove() (nicolas-grekas)
+ * bug #18049 [Validator] Fix the locale validator so it treats a locale alias as a valid locale (jakzal)
+ * bug #18019 [Intl] Update ICU to version 55 (jakzal)
+ * bug #16656 [HttpFoundation] automatically generate safe fallback filename (xabbuh)
+ * bug #15794 [Console] default to stderr in the console helpers (alcohol)
+ * bug #17984 Allow to normalize \Traversable when serializing xml (Ener-Getick)
+ * bug #17434 Improved the error message when a template is not found (rvanginneken, javiereguiluz)
+ * bug #17894 [FrameworkBundle] Fix a regression in handling absolute template paths (jakzal)
+ * bug #17595 [HttpKernel] Remove _path from query parameters when fragment is a subrequest (cmenning)
+ * bug #17986 [DomCrawler] Dont use LIBXML_PARSEHUGE by default (nicolas-grekas)
+ * bug #17668 add 'guid' to list of exception to filter out (garak)
+ * bug #17615 Ensure backend slashes for symlinks on Windows systems (cpsitgmbh)
+ * bug #17626 Try to delete broken symlinks (IchHabRecht)
+ * bug #17978 [Yaml] ensure dump indentation to be greather than zero (xabbuh)
+ * bug #17976 [WebProfilerBundle] fix debug toolbar rendering by removing inadvertently added links (craue)
+ * bug #17971 Variadic controller params (NiR-, fabpot)
+ * bug #17925 [Bridge] The WebProcessor now forwards the client IP (magnetik)
+
 * 2.3.38 (2016-02-28)
 
  * bug #17947 Fix - #17676 (backport #17919 to 2.3) (Ocramius)

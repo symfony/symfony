@@ -58,7 +58,8 @@ class PhpDumper extends Dumper
     private $targetDirRegex;
     private $targetDirMaxMatches;
     private $docStar;
-    private $existingNames = array();
+    private $serviceIdToMethodNameMap = array();
+    private $usedMethodNames = array();
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -1350,21 +1351,22 @@ EOF;
      */
     private function camelize($id)
     {
-        if (isset($this->existingNames[$id])) {
-            return $this->existingNames[$id];
+        if (isset($this->serviceIdToMethodNameMap[$id])) {
+            return $this->serviceIdToMethodNameMap[$id];
         }
 
         $name = Container::camelize($id);
-        $uniqueName = $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
-        $prefix = 1;
+        $methodName = $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
+        $suffix = 1;
 
-        while (in_array($uniqueName, $this->existingNames)) {
-            ++$prefix;
-            $uniqueName = $name.$prefix;
+        while (isset($this->usedMethodNames[$methodName])) {
+            ++$suffix;
+            $methodName = $name.$suffix;
         }
-        $this->existingNames[$id] = $uniqueName;
+        $this->serviceIdToMethodNameMap[$id] = $methodName;
+        $this->usedMethodNames[$methodName] = true;
 
-        return $uniqueName;
+        return $methodName;
     }
 
     /**

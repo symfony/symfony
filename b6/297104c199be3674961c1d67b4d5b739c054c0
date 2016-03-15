@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-12T19:34:27Z
+
+@AAstakhov in other circumstances it would be weird to open a PR for some issue which already has a PR ... but you are right and we are in the Hack Day so you can open it. Maybe it gets closed without merging it ... but maybe the other one is closed. Let's wait and see. Thanks!
+
+---------------------------------------------------------------------------
+
+by AAstakhov at 2016-03-13T09:03:48Z
+
+@patrick-mcdougle, thank you for the comment, I've fixed CrawlerTest regarding to your suggestion.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-15T13:28:11Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-15T13:28:29Z
+
+:+1:
+Status: reviewed
+Note for an other reader: `$this->baseHref` is stateful in that it can change when `addHtmlContent` is called. This maybe the reason why the property has no getter. WDOT?

@@ -438,6 +438,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
-        $this->assertEquals(401657096594165125, (int) $transformer->reverseTransform((string) 401657096594165125));
+        $this->assertEquals(PHP_INT_MAX - 1, (int) $transformer->reverseTransform((string) (PHP_INT_MAX - 1)));
     }
 }

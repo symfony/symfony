@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 
+/**
+ * @group dns-sensitive
+ */
 class EmailValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
@@ -84,6 +88,41 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example'),
             array('example@'),
             array('example@localhost'),
+        );
+    }
+
+    /**
+     * @dataProvider getDnsChecks
+     */
+    public function testDnsChecks($type, $violation)
+    {
+        DnsMock::withMockedHosts(array('example.com' => array(array('type' => $violation ? false : $type))));
+
+        $constraint = new Email(array(
+            'message' => 'myMessage',
+            'MX' === $type ? 'checkMX' : 'checkHost' => true,
+        ));
+
+        $this->validator->validate('foo@example.com', $constraint);
+
+        if (!$violation) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ value }}', '"foo@example.com"')
+                ->assertRaised();
+        }
+    }
+
+    public function getDnsChecks()
+    {
+        return array(
+            array('MX', false),
+            array('MX', true),
+            array('A', false),
+            array('A', true),
+            array('AAAA', false),
+            array('AAAA', true),
         );
     }
 }

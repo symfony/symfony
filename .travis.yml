@@ -31,7 +31,9 @@ cache:
         - .phpunit
         - php-$MIN_PHP
 
-services: mongodb
+services:
+    - mongodb
+    - redis-server
 
 before_install:
     # Matrix lines for intermediate PHP versions are skipped for pull requests
@@ -48,6 +50,7 @@ before_install:
     - if [[ $TRAVIS_PHP_VERSION = 5.* && ! $deps ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi;
     - if [[ $TRAVIS_PHP_VERSION = 5.* ]]; then pecl install -f memcached-2.1.0; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi;
+    - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then echo extension = redis.so >> $INI_FILE; fi;
     - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then phpenv config-rm xdebug.ini; fi;
     - if [[ $deps != skip ]]; then composer self-update; fi;
     - if [[ $deps != skip && $TRAVIS_REPO_SLUG = symfony/symfony ]]; then cp .composer/* ~/.composer/; composer global install --prefer-dist; fi;

@@ -26,9 +26,15 @@ class EmailValidator extends ConstraintValidator
      */
     private $isStrict;
 
-    public function __construct($strict = false)
+    /**
+     * @var bool
+     */
+    private $useDNS;
+
+    public function __construct($strict = false, $useDNS = true)
     {
         $this->isStrict = $strict;
+        $this->useDNS = $useDNS;
     }
 
     /**
@@ -80,23 +86,25 @@ class EmailValidator extends ConstraintValidator
 
         $host = substr($value, strpos($value, '@') + 1);
 
-        // Check for host DNS resource records
-        if ($constraint->checkMX) {
-            if (!$this->checkMX($host)) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Email::MX_CHECK_FAILED_ERROR)
-                    ->addViolation();
+        if ($this->useDNS) {
+            // Check for host DNS resource records
+            if ($constraint->checkMX) {
+                if (!$this->checkMX($host)) {
+                    $this->context->buildViolation($constraint->message)
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode(Email::MX_CHECK_FAILED_ERROR)
+                        ->addViolation();
+                }
+
+                return;
             }
 
-            return;
-        }
-
-        if ($constraint->checkHost && !$this->checkHost($host)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->setCode(Email::HOST_CHECK_FAILED_ERROR)
-                ->addViolation();
+            if ($constraint->checkHost && !$this->checkHost($host)) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::HOST_CHECK_FAILED_ERROR)
+                    ->addViolation();
+            }
         }
     }
 

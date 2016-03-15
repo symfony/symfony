@@ -770,6 +770,7 @@ class FrameworkExtension extends Extension
 
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['strict_email']);
+        $definition->replaceArgument(1, $config['use_dns']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));

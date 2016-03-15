@@ -433,4 +433,11 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
+
+    public function testReverseTransformBigint()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $this->assertEquals(401657096594165125, (int) $transformer->reverseTransform((string) 401657096594165125));
+    }
 }

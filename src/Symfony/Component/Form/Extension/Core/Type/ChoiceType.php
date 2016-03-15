@@ -60,9 +60,7 @@ class ChoiceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['expanded']) {
-            $builder->setDataMapper($options['multiple']
-                ? new CheckboxListMapper($options['choice_list'])
-                : new RadioListMapper($options['choice_list']));
+            $builder->setDataMapper($options['multiple'] ? new CheckboxListMapper() : new RadioListMapper());
 
             // Initialize all choices before doing the index check below.
             // This helps in cases where index checks are optimized for non
@@ -133,22 +131,13 @@ class ChoiceType extends AbstractType
 
                 $event->setData($data);
             });
+        }
 
-            if (!$options['multiple']) {
-                // For radio lists, transform empty arrays to null
-                // This is kind of a hack necessary because the RadioListMapper
-                // is not invoked for forms without choices
-                $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-                    if (array() === $event->getData()) {
-                        $event->setData(null);
-                    }
-                });
-            }
-        } elseif ($options['multiple']) {
-            // <select> tag with "multiple" option
+        if ($options['multiple']) {
+            // <select> tag with "multiple" option or list of checkbox inputs
             $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list']));
         } else {
-            // <select> tag without "multiple" option
+            // <select> tag without "multiple" option or list of radio inputs
             $builder->addViewTransformer(new ChoiceToValueTransformer($options['choice_list']));
         }
 
@@ -247,7 +236,11 @@ class ChoiceType extends AbstractType
         $choiceListFactory = $this->choiceListFactory;
 
         $emptyData = function (Options $options) {
-            if ($options['multiple'] || $options['expanded']) {
+            if ($options['expanded'] && !$options['multiple']) {
+                return;
+            }
+
+            if ($options['multiple']) {
                 return array();
             }
 

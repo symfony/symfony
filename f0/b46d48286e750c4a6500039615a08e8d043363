@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by unkind at 2016-03-10T17:01:25Z
+
+If you want to register your command as private service, you don't need to add "console.command" tag, because command won't work with standard interface.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-10T17:21:31Z
+
+What do you mean @unkind?
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-03-10T17:28:07Z
+
+Console application from the FrameworkBundle requires public services: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Console/Application.php#L123
+This tag ("console.command") is needed for the FrameworkBundle only (right?).
+So what's the point to allow private services tagged with "console.command"?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-10T17:42:18Z
+
+Did you take a look at the changes ?
+
+A public alias is always registered with a command so I thought it would be better to use it instead of its original service id.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-03-10T18:51:08Z
+
+My bad, didn't notice an alias, sorry.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-11T06:41:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-11T12:15:05Z
+
+Looks sensible to me. :+1:
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-11T12:23:01Z
+
+BTW we can also do that for the event listeners and some other tags but we would need to create aliases (whereas here as they already exist), should I include it in this PR?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-03-12T11:54:11Z
+
+In order to get things merged quickly, I think it's better to create a new PR for the other tags. However, I think it'll be great to allow private services for listeners and such.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-03-12T11:54:45Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-12T12:07:49Z
+
+ok got it @WouterJ I'll do it.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-12T13:23:36Z
+
+see https://github.com/symfony/symfony/pull/18116
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-13T21:01:45Z
+
+@stof @fabpot this PR received three :+1: from core developers and no :-1: so I guess this can be merged, no?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-03-13T21:03:29Z
+
+@Ener-Getick that's correct. Please be patient, the mergers often scan through the Status: Reviewed PRs to merge new PRs. However, they are still volunteers and have a huge amount of issues and PRs to manage :)
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-13T21:11:01Z
+
+@WouterJ sorry as I don't know how you manage the PRs/issues (it could be the subject of an article btw) and as I know how easy it is to forget a notification, I thought it would be better to ping them directly :-)
+Thank you a lot for your work !
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-03-13T21:53:09Z
+
+Don't worry, you're doing a great job!
+
+Managing PRs is not much different than how regular contributors do it: Scanning through the list on github and finding PRs ready to merge/vote/review. As a side note, I'm not a Symfony Core Team Member, just a documentor :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-15T14:03:16Z
+
+:+1:

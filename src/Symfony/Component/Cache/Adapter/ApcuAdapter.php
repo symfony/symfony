@@ -50,7 +50,9 @@ class ApcuAdapter extends AbstractAdapter
      */
     protected function doClear($namespace)
     {
-        return apcu_clear_cache();
+        return isset($namespace[0]) && class_exists('APCuIterator', false)
+            ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
+            : apcu_clear_cache();
     }
 
     /**

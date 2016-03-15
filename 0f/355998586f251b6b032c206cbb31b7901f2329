@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-14T16:21:03Z
+
+Note to merger: The test class needs to be renamed when merging this up into the `2.7` branch (the new name should be `ResponseCacheStrategyTest`.

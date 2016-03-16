@@ -13,8 +13,8 @@ namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
-use Symfony\Component\PropertyAccess\Mapping\AttributeMetadata;
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
  * Annotation loader.
@@ -40,27 +40,27 @@ class AnnotationLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadata $classMetadata)
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $className = $reflectionClass->name;
         $loaded = false;
 
-        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $propertiesMetadata = $classMetadata->getPropertiesMetadata();
 
         foreach ($reflectionClass->getProperties() as $property) {
-            if (!isset($attributesMetadata[$property->name])) {
-                $attributesMetadata[$property->name] = new AttributeMetadata($property->name);
-                $classMetadata->addAttributeMetadata($attributesMetadata[$property->name]);
+            if (!isset($propertiesMetadata[$property->name])) {
+                $propertiesMetadata[$property->name] = new PropertyMetadata($property->name);
+                $classMetadata->addPropertyMetadata($propertiesMetadata[$property->name]);
             }
 
             if ($property->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
                     if ($annotation instanceof PropertyAccessor) {
-                        $attributesMetadata[$property->name]->setGetter($annotation->getGetter());
-                        $attributesMetadata[$property->name]->setSetter($annotation->getSetter());
-                        $attributesMetadata[$property->name]->setAdder($annotation->getAdder());
-                        $attributesMetadata[$property->name]->setRemover($annotation->getRemover());
+                        $propertiesMetadata[$property->name]->setGetter($annotation->getter);
+                        $propertiesMetadata[$property->name]->setSetter($annotation->setter);
+                        $propertiesMetadata[$property->name]->setAdder($annotation->adder);
+                        $propertiesMetadata[$property->name]->setRemover($annotation->remover);
                     }
 
                     $loaded = true;

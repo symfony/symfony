@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Mapping\Factory;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
  * Returns a {@see ClassMetadataInterface}.
@@ -36,7 +36,7 @@ interface ClassMetadataFactoryInterface
      *
      * @param string|object $value
      *
-     * @return ClassMetadataInterface
+     * @return ClassMetadata
      *
      * @throws InvalidArgumentException
      */

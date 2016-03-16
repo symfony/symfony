@@ -13,8 +13,8 @@ namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\PropertyAccess\Exception\MappingException;
-use Symfony\Component\PropertyAccess\Mapping\AttributeMetadata;
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
  * Loads XML mapping files.
@@ -33,7 +33,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadata $classMetadata)
     {
         if (null === $this->classes) {
             $this->classes = array();
@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $attributesMetadata = $classMetadata->getPropertiesMetadata();
 
         if (isset($this->classes[$classMetadata->getName()])) {
             $xml = $this->classes[$classMetadata->getName()];
@@ -55,8 +55,8 @@ class XmlFileLoader extends FileLoader
                 if (isset($attributesMetadata[$attributeName])) {
                     $attributeMetadata = $attributesMetadata[$attributeName];
                 } else {
-                    $attributeMetadata = new AttributeMetadata($attributeName);
-                    $classMetadata->addAttributeMetadata($attributeMetadata);
+                    $attributeMetadata = new PropertyMetadata($attributeName);
+                    $classMetadata->addPropertyMetadata($attributeMetadata);
                 }
 
                 if (isset($attribute['getter'])) {

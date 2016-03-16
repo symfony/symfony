@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Mapping;
 
-use Symfony\Component\PropertyAccess\Mapping\AttributeMetadata;
+use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
 use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
@@ -25,16 +25,16 @@ class TestClassMetadataFactory
 
         $expected->getReflectionClass();
 
-        $foo = new AttributeMetadata('foo');
+        $foo = new PropertyMetadata('foo');
         $foo->setGetter('getter1');
         $foo->setSetter('setter1');
         $foo->setAdder('adder1');
         $foo->setRemover('remover1');
-        $expected->addAttributeMetadata($foo);
+        $expected->addPropertyMetadata($foo);
 
-        $bar = new AttributeMetadata('bar');
+        $bar = new PropertyMetadata('bar');
         $bar->setGetter('getter2');
-        $expected->addAttributeMetadata($bar);
+        $expected->addPropertyMetadata($bar);
 
         return $expected;
     }
@@ -43,16 +43,16 @@ class TestClassMetadataFactory
     {
         $expected = new ClassMetadata('Symfony\Component\PropertyAccess\Tests\Fixtures\Dummy');
 
-        $foo = new AttributeMetadata('foo');
+        $foo = new PropertyMetadata('foo');
         $foo->setGetter('getter1');
         $foo->setSetter('setter1');
         $foo->setAdder('adder1');
         $foo->setRemover('remover1');
-        $expected->addAttributeMetadata($foo);
+        $expected->addPropertyMetadata($foo);
 
-        $bar = new AttributeMetadata('bar');
+        $bar = new PropertyMetadata('bar');
         $bar->setGetter('getter2');
-        $expected->addAttributeMetadata($bar);
+        $expected->addPropertyMetadata($bar);
 
         return $expected;
     }

@@ -14,7 +14,7 @@ namespace Symfony\Component\PropertyAccess\Exception;
 /**
  * MappingException.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Luis Ramón López <lrlopez@gmail.com>
  */
 class MappingException extends RuntimeException
 {

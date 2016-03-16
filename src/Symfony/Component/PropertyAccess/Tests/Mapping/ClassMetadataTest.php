@@ -21,37 +21,39 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadata('name');
-        $this->assertInstanceOf('Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface', $classMetadata);
+        $this->assertInstanceOf('Symfony\Component\PropertyAccess\Mapping\ClassMetadata', $classMetadata);
     }
 
     public function testAttributeMetadata()
     {
         $classMetadata = new ClassMetadata('c');
 
-        $a1 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\AttributeMetadataInterface');
+        $a1 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\PropertyMetadata');
         $a1->method('getName')->willReturn('a1');
 
-        $a2 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\AttributeMetadataInterface');
+        $a2 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\PropertyMetadata');
         $a2->method('getName')->willReturn('a2');
 
-        $classMetadata->addAttributeMetadata($a1);
-        $classMetadata->addAttributeMetadata($a2);
+        $classMetadata->addPropertyMetadata($a1);
+        $classMetadata->addPropertyMetadata($a2);
 
-        $this->assertEquals(array('a1' => $a1, 'a2' => $a2), $classMetadata->getAttributesMetadata());
+        $this->assertEquals(array('a1' => $a1, 'a2' => $a2), $classMetadata->getPropertiesMetadata());
     }
 
     public function testSerialize()
     {
         $classMetadata = new ClassMetadata('a');
 
-        $a1 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\AttributeMetadataInterface');
+        $a1 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\PropertyMetadata');
         $a1->method('getName')->willReturn('b1');
+        $a1->method('__sleep')->willReturn([]);
 
-        $a2 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\AttributeMetadataInterface');
+        $a2 = $this->getMock('Symfony\Component\PropertyAccess\Mapping\PropertyMetadata');
         $a2->method('getName')->willReturn('b2');
+        $a2->method('__sleep')->willReturn([]);
 
-        $classMetadata->addAttributeMetadata($a1);
-        $classMetadata->addAttributeMetadata($a2);
+        $classMetadata->addPropertyMetadata($a1);
+        $classMetadata->addPropertyMetadata($a2);
 
         $serialized = serialize($classMetadata);
         $this->assertEquals($classMetadata, unserialize($serialized));

@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Symfony\Component\PropertyAccess\Exception\MappingException;
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
  * Calls multiple {@link LoaderInterface} instances in a chain.
@@ -53,7 +53,7 @@ class LoaderChain implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata)
     {
         $success = false;
 

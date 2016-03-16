@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
 /**
  * Loads {@link ClassMetadataInterface}.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Luis Ramón López <lrlopez@gmail.com>
  */
 interface LoaderInterface
 {
     /**
      * Load class metadata.
      *
-     * @param ClassMetadataInterface $classMetadata A metadata
+     * @param ClassMetadata $classMetadata A metadata
      *
      * @return bool
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata);
+    public function loadClassMetadata(ClassMetadata $classMetadata);
 }

@@ -12,11 +12,11 @@
 namespace Symfony\Component\PropertyAccess\Mapping;
 
 /**
- * {@inheritdoc}
+ * Stores metadata needed for overriding properties access methods.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class AttributeMetadata implements AttributeMetadataInterface
+class PropertyMetadata
 {
     /**
      * @var string
@@ -68,13 +68,15 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @param string $name
      */
-    public function __construct($name)
+    public function __construct($name = null)
     {
         $this->name = $name;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the attribute name.
+     *
+     * @return string
      */
     public function getName()
     {
@@ -82,7 +84,9 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the setter method name.
+     *
+     * @return string
      */
     public function getSetter()
     {
@@ -90,15 +94,16 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the setter method name.
      */
     public function setSetter($setter)
     {
         $this->setter = $setter;
     }
-
     /**
-     * {@inheritdoc}
+     * Gets the getter method name.
+     *
+     * @return string
      */
     public function getGetter()
     {
@@ -106,7 +111,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the getter method name.
      */
     public function setGetter($getter)
     {
@@ -114,7 +119,9 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the adder method name.
+     *
+     * @return string
      */
     public function getAdder()
     {
@@ -122,7 +129,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the adder method name.
      */
     public function setAdder($adder)
     {
@@ -130,7 +137,9 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the remover method name.
+     *
+     * @return string
      */
     public function getRemover()
     {
@@ -138,7 +147,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the remover method name.
      */
     public function setRemover($remover)
     {
@@ -146,22 +155,24 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Merges another PropertyMetadata with the current one.
+     *
+     * @param PropertyMetadata $propertyMetadata
      */
-    public function merge(AttributeMetadataInterface $attributeMetadata)
+    public function merge(PropertyMetadata $propertyMetadata)
     {
         // Overwrite only if not defined
         if (null === $this->getter) {
-            $this->getter = $attributeMetadata->getGetter();
+            $this->getter = $propertyMetadata->getGetter();
         }
         if (null === $this->setter) {
-            $this->setter = $attributeMetadata->getSetter();
+            $this->setter = $propertyMetadata->getSetter();
         }
         if (null === $this->adder) {
-            $this->adder = $attributeMetadata->getAdder();
+            $this->adder = $propertyMetadata->getAdder();
         }
         if (null === $this->remover) {
-            $this->remover = $attributeMetadata->getRemover();
+            $this->remover = $propertyMetadata->getRemover();
         }
     }
 

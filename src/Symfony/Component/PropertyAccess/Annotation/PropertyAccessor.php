@@ -19,53 +19,33 @@ namespace Symfony\Component\PropertyAccess\Annotation;
  *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class PropertyAccessor extends ConfigurationAnnotation
+class PropertyAccessor
 {
-    protected $setter;
+    /**
+     * Custom setter method for the property
+     *
+     * @var string $setter
+     */
+    public $setter;
 
-    protected $getter;
+    /**
+     * Custom getter method for the property
+     *
+     * @var string $setter
+     */
+    public $getter;
 
-    protected $adder;
+    /**
+     * Custom adder method for the property
+     *
+     * @var string $setter
+     */
+    public $adder;
 
-    protected $remover;
-
-    public function getSetter()
-    {
-        return $this->setter;
-    }
-
-    public function setSetter($setter)
-    {
-        $this->setter = $setter;
-    }
-
-    public function getGetter()
-    {
-        return $this->getter;
-    }
-
-    public function setGetter($getter)
-    {
-        $this->getter = $getter;
-    }
-
-    public function getAdder()
-    {
-        return $this->adder;
-    }
-
-    public function setAdder($adder)
-    {
-        $this->adder = $adder;
-    }
-
-    public function getRemover()
-    {
-        return $this->remover;
-    }
-
-    public function setRemover($remover)
-    {
-        $this->remover = $remover;
-    }
+    /**
+     * Custom remover method for the property
+     *
+     * @var string $setter
+     */
+    public $remover;
 }

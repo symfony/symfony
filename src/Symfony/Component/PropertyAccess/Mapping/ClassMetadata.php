@@ -14,9 +14,9 @@ namespace Symfony\Component\PropertyAccess\Mapping;
 /**
  * {@inheritdoc}
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class ClassMetadata implements ClassMetadataInterface
+class ClassMetadata
 {
     /**
      * @var string
@@ -28,13 +28,13 @@ class ClassMetadata implements ClassMetadataInterface
     public $name;
 
     /**
-     * @var AttributeMetadataInterface[]
+     * @var PropertyMetadata[]
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getAttributesMetadata()} instead.
+     *           {@link getPropertiesMetadata()} instead.
      */
-    public $attributesMetadata = array();
+    public $propertiesMetadata = array();
 
     /**
      * @var \ReflectionClass
@@ -52,7 +52,9 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the name of the backing PHP class.
+     *
+     * @return string The name of the backing class.
      */
     public function getName()
     {
@@ -60,37 +62,45 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Adds an {@link AttributeMetadataInterface}.
+     *
+     * @param PropertyMetadata $propertyMetadata
      */
-    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata)
+    public function addPropertyMetadata(PropertyMetadata $propertyMetadata)
     {
-        $this->attributesMetadata[$attributeMetadata->getName()] = $attributeMetadata;
+        $this->propertiesMetadata[$propertyMetadata->getName()] = $propertyMetadata;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the list of {@link PropertyMetadata}.
+     *
+     * @return PropertyMetadata[]
      */
-    public function getAttributesMetadata()
+    public function getPropertiesMetadata()
     {
-        return $this->attributesMetadata;
+        return $this->propertiesMetadata;
     }
 
     /**
-     * {@inheritdoc}
+     * Merges a {@link ClassMetadata} into the current one.
+     *
+     * @param ClassMetadata $classMetadata
      */
-    public function merge(ClassMetadataInterface $classMetadata)
+    public function merge(ClassMetadata $classMetadata)
     {
-        foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
-            if (isset($this->attributesMetadata[$attributeMetadata->getName()])) {
-                $this->attributesMetadata[$attributeMetadata->getName()]->merge($attributeMetadata);
+        foreach ($classMetadata->getPropertiesMetadata() as $attributeMetadata) {
+            if (isset($this->propertiesMetadata[$attributeMetadata->getName()])) {
+                $this->propertiesMetadata[$attributeMetadata->getName()]->merge($attributeMetadata);
             } else {
-                $this->addAttributeMetadata($attributeMetadata);
+                $this->addPropertyMetadata($attributeMetadata);
             }
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a {@link \ReflectionClass} instance for this class.
+     *
+     * @return \ReflectionClass
      */
     public function getReflectionClass()
     {
@@ -110,7 +120,7 @@ class ClassMetadata implements ClassMetadataInterface
     {
         return array(
             'name',
-            'attributesMetadata',
+            'propertiesMetadata',
         );
     }
 }

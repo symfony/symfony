@@ -12,8 +12,8 @@
 namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Symfony\Component\PropertyAccess\Exception\MappingException;
-use Symfony\Component\PropertyAccess\Mapping\AttributeMetadata;
-use Symfony\Component\PropertyAccess\Mapping\ClassMetadataInterface;
+use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
+use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -36,7 +36,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
+    public function loadClassMetadata(ClassMetadata $classMetadata)
     {
         if (null === $this->classes) {
             if (!stream_is_local($this->file)) {
@@ -65,14 +65,14 @@ class YamlFileLoader extends FileLoader
             $yaml = $this->classes[$classMetadata->getName()];
 
             if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
-                $attributesMetadata = $classMetadata->getAttributesMetadata();
+                $attributesMetadata = $classMetadata->getPropertiesMetadata();
 
                 foreach ($yaml['attributes'] as $attribute => $data) {
                     if (isset($attributesMetadata[$attribute])) {
                         $attributeMetadata = $attributesMetadata[$attribute];
                     } else {
-                        $attributeMetadata = new AttributeMetadata($attribute);
-                        $classMetadata->addAttributeMetadata($attributeMetadata);
+                        $attributeMetadata = new PropertyMetadata($attribute);
+                        $classMetadata->addPropertyMetadata($attributeMetadata);
                     }
 
                     if (isset($data['getter'])) {

@@ -21,6 +21,12 @@ CHANGELOG
    Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
  * Deprecated `PropertyInfoPass`, use `Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass` instead
  * Deprecated extending `ConstraintValidatorFactory`
+ * Added `Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait` (requires PHP 7). Unlike the `Symfony\Bundle\FrameworkBundle\Controller\Controller`
+   class, this trait does not have access to the dependency injection container. Its dependencies are explicitly and lazily
+   injected using getter injection.
+   `render()`, `renderView()` and `stream()` methods can only use Twig (using the Templating component is not supported).
+   The `json()` method requires the Serializer component (use `Symfony\Component\HttpFoundation\JsonResponse` directly if
+   you do not want to use the Serializer).
 
 3.2.0
 -----

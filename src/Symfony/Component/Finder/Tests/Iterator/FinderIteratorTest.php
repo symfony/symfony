@@ -36,4 +36,12 @@ class FinderIteratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($iterator->last());
     }
+
+    public function testReturnLastWhenUsingHashTable()
+    {
+        $iterator = new FinderIterator();
+        $iterator->append(new \ArrayIterator(array('foo' => 'bar')));
+
+        $this->assertEquals('bar', $iterator->last());
+    }
 }

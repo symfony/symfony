@@ -28,7 +28,7 @@ class FinderIterator extends \AppendIterator
      */
     public function last()
     {
-        $elements = iterator_to_array($this);
+        $elements = array_values(iterator_to_array($this));
 
         return empty($elements) ? null : $elements[count($elements) - 1];
     }

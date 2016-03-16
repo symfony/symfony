@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by natechicago at 2016-03-15T17:54:03Z
+
+Thanks for this, @nicolas-grekas !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-16T10:18:07Z
+
+This PR now has mocks for all DNS functions, and unit tests.
+Ready for merge.

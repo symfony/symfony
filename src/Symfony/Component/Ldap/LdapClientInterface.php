@@ -21,9 +21,9 @@ namespace Symfony\Component\Ldap;
  *
  * @deprecated You should use LdapInterface instead
  */
-interface LdapClientInterface extends BaseLdapInterface
+interface LdapClientInterface extends LdapInterface
 {
-    /*
+    /**
      * Find a username into ldap connection.
      *
      * @param string $dn

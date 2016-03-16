@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Responsible for the creation of the action arguments.
  *
- * @author Iltar van der Berg <kjarli@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ArgumentResolver implements ArgumentResolverInterface
 {

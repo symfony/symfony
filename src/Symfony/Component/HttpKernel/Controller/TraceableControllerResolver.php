@@ -49,18 +49,4 @@ class TraceableControllerResolver implements ControllerResolverInterface
 
         return $ret;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        $e = $this->stopwatch->start('controller.get_arguments');
-
-        $ret = $this->resolver->getArguments($request, $controller);
-
-        $e->stop();
-
-        return $ret;
-    }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
@@ -142,8 +143,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $resolver
+        $controllerResolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $controllerResolver
             ->expects($this->once())
             ->method('getController')
             ->will($this->returnValue(function () {
@@ -152,13 +153,15 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
                 throw new \RuntimeException();
             }))
         ;
-        $resolver
+
+        $argumentResolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolverInterface');
+        $argumentResolver
             ->expects($this->once())
             ->method('getArguments')
             ->will($this->returnValue(array()))
         ;
 
-        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $kernel = new HttpKernel(new EventDispatcher(), $controllerResolver, new RequestStack(), $argumentResolver);
         $renderer = new InlineFragmentRenderer($kernel);
 
         // simulate a main request with output buffering

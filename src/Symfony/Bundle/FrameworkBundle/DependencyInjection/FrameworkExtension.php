@@ -150,9 +150,6 @@ class FrameworkExtension extends Extension
 
             $loader->load('debug.xml');
 
-            $definition = $container->findDefinition('http_kernel');
-            $definition->replaceArgument(1, new Reference('debug.controller_resolver'));
-
             // replace the regular event_dispatcher service with the debug one
             $definition = $container->findDefinition('event_dispatcher');
             $definition->setPublic(false);
@@ -173,6 +170,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
+            'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
             'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
             'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
             'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',

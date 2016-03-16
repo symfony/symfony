@@ -23,9 +23,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testGetFirstElement()
     {
         $finder = $this->buildFinder();
-        $finder->in(self::$tmpDir);
+        $finder->in(self::$tmpDir)->files();
 
-        $this->assertEquals('foo', $finder->first()->getFileName());
+        $this->assertNotNull($finder->files()->first());
     }
 
     public function testGetLastElement()
@@ -33,7 +33,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder->in(self::$tmpDir);
 
-        $this->assertEquals('toto', $finder->last()->getFileName());
+        $this->assertNotNull($finder->files()->last());
     }
 
     public function testDirectories()

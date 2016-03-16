@@ -87,7 +87,7 @@ class ControllerTest extends TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage The SecurityBundle is not registered in your application.
+     * @expectedExceptionMessage An instance of "Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" must be provided.
      */
     public function testGetUserWithEmptyContainer()
     {

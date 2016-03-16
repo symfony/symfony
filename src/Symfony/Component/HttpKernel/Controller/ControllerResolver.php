@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ControllerResolver implements ControllerResolverInterface
+class ControllerResolver extends ArgumentResolver implements ControllerResolverInterface
 {
     private $logger;
 
@@ -84,50 +84,24 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the ArgumentResolver instead.
      */
     public function getArguments(Request $request, $controller)
     {
-        if (is_array($controller)) {
-            $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && !$controller instanceof \Closure) {
-            $r = new \ReflectionObject($controller);
-            $r = $r->getMethod('__invoke');
-        } else {
-            $r = new \ReflectionFunction($controller);
-        }
+        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
 
-        return $this->doGetArguments($request, $controller, $r->getParameters());
+        return parent::getArguments($request, $controller);
     }
 
+    /**
+     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the ArgumentResolver instead.
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
-        $attributes = $request->attributes->all();
-        $arguments = array();
-        foreach ($parameters as $param) {
-            if (array_key_exists($param->name, $attributes)) {
-                if (PHP_VERSION_ID >= 50600 && $param->isVariadic() && is_array($attributes[$param->name])) {
-                    $arguments = array_merge($arguments, array_values($attributes[$param->name]));
-                } else {
-                    $arguments[] = $attributes[$param->name];
-                }
-            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
-                $arguments[] = $request;
-            } elseif ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } else {
-                if (is_array($controller)) {
-                    $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
-                } elseif (is_object($controller)) {
-                    $repr = get_class($controller);
-                } else {
-                    $repr = $controller;
-                }
+        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
 
-                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
-            }
-        }
-
-        return $arguments;
+        return parent::doGetArguments($request, $controller, $parameters);
     }
 
     /**

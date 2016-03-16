@@ -23,7 +23,7 @@
         "symfony/config": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~3.1",
-        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/http-kernel": "~3.1",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",

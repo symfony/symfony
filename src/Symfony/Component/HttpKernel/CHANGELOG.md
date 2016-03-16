@@ -4,6 +4,9 @@ CHANGELOG
 3.1.0
 -----
  * deprecated passing objects as URI attributes to the ESI and SSI renderers
+ * Added an `ArgumentResolver` with `getArguments()` and the respective interface `ArgumentResolverInterface`
+ * Deprecated `ControllerResolver::getArguments()`, which uses the `ArgumentResolver` as BC layer by extending it
+ * The `HttpKernel` now accepts an additional argument for an `ArgumentResolver`
 
 3.0.0
 -----

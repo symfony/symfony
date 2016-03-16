@@ -124,6 +124,86 @@ class ControllerTest extends TestCase
 
         return $container;
     }
+
+    public function testIsGranted()
+    {
+        $authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($authorizationChecker));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $this->assertTrue($controller->isGranted('foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function testdenyAccessUnlessGranted()
+    {
+        $authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($authorizationChecker));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $controller->denyAccessUnlessGranted('foo');
+    }
+
+    public function testRenderViewTwig()
+    {
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->willReturn('bar');
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(false));
+        $container->expects($this->at(1))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(2))->method('get')->will($this->returnValue($twig));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $this->assertEquals('bar', $controller->renderView('foo'));
+    }
+
+    public function testRenderTwig()
+    {
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->willReturn('bar');
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(false));
+        $container->expects($this->at(1))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(2))->method('get')->will($this->returnValue($twig));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $this->assertEquals('bar', $controller->render('foo')->getContent());
+    }
+
+    public function testStreamTwig()
+    {
+        $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(false));
+        $container->expects($this->at(1))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(2))->method('get')->will($this->returnValue($twig));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
+    }
 }
 
 class TestController extends Controller
@@ -136,5 +216,15 @@ class TestController extends Controller
     public function getUser()
     {
         return parent::getUser();
+    }
+
+    public function isGranted($attributes, $object = null)
+    {
+        return parent::isGranted($attributes, $object);
+    }
+
+    public function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    {
+        parent::denyAccessUnlessGranted($attributes, $object, $message);
     }
 }

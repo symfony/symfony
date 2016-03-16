@@ -72,6 +72,8 @@ interface TokenInterface extends \Serializable
      * Returns whether the user is authenticated or not.
      *
      * @return bool true if the token has been authenticated, false otherwise
+     *
+     * @deprecated Since version 3.1, to be removed in 4.0. Use instance of checks for AuthenticationRequestTokenInterface or AuthenticatedTokenInterface instead.
      */
     public function isAuthenticated();
 
@@ -79,6 +81,8 @@ interface TokenInterface extends \Serializable
      * Sets the authenticated flag.
      *
      * @param bool $isAuthenticated The authenticated flag
+     *
+     * @deprecated Since version 3.1, to be removed in 4.0. Use instance of checks for AuthenticationRequestTokenInterface or AuthenticatedTokenInterface instead.
      */
     public function setAuthenticated($isAuthenticated);
 

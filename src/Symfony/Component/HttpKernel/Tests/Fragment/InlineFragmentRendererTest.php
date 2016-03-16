@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
@@ -61,7 +62,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $kernel = new HttpKernel(new EventDispatcher(), $resolver, new RequestStack(), new ArgumentResolver());
         $renderer = new InlineFragmentRenderer($kernel);
 
         $response = $renderer->render(new ControllerReference('main_controller', array('object' => new \stdClass(), 'object1' => new Bar()), array()), Request::create('/'));

@@ -52,7 +52,12 @@
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
             <arguments>
                 <array>
-                    <element key="time-sensitive"><string>Symfony\Component\HttpFoundation</string></element>
+                    <element key="time-sensitive">
+                        <array>
+                            <element><string>Symfony\Component\Console</string></element>
+                            <element><string>Symfony\Component\HttpFoundation</string></element>
+                        </array>
+                    </element>
                 </array>
             </arguments>
         </listener>

@@ -482,7 +482,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')->defaultValue('file')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                        ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                        ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()
                 ->end()
             ->end()

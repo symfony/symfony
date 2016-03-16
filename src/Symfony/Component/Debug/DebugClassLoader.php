@@ -42,7 +42,16 @@ class DebugClassLoader
         $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
 
         if (!isset(self::$caseCheck)) {
-            self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;
+            if(!file_exists(strtolower(__FILE__))) {
+                // filesystem is case sensitive
+                self::$caseCheck = 0;
+            } elseif(realpath(strtolower(__FILE__)) === __FILE__) {
+                // filesystem is not case sensitive
+                self::$caseCheck = 1;
+            } else {
+                // filesystem is not case sensitive AND realpath() fails to normalize case
+                self::$caseCheck = 2;
+            }
         }
     }
 

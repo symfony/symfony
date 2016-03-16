@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-03-09T18:21:57Z
+
+It seems that the tests fail for an unrelated reason.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-10T13:38:06Z
+
+Don't you also have to update some dep versions in some composer.json files?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-03-10T22:22:57Z
+
+This will be done in the 3.0 and 2.8 branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-15T14:14:47Z
+
+@csarrazi can you open the sibling PR you're thinking about please?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-03-16T16:35:22Z
+
+Sure. Will do later today.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-03-16T16:39:45Z
+
+Rebased PR
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-03-16T17:01:42Z
+
+AppVeyor builds fail because of an issue in the Console component (unrelated to this PR).
+
+Related PR #18201 should be merged afterward, to release the version requirement on the `3.0` branch.

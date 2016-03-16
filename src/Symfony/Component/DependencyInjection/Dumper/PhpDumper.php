@@ -630,6 +630,7 @@ EOF;
         // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $visibility = $isProxyCandidate ? 'public' : 'protected';
+        $methodName = $this->generateMethodName($id);
         $code = <<<EOF
 
     /*{$this->docStar}
@@ -637,12 +638,12 @@ EOF;
      *$lazyInitializationDoc
      * $return
      */
-    {$visibility} function {$this->generateMethodName($id)}($lazyInitialization)
+    {$visibility} function {$methodName}($lazyInitialization)
     {
 
 EOF;
 
-        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id) : '';
+        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $methodName) : '';
 
         if ($definition->isSynthetic()) {
             $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);

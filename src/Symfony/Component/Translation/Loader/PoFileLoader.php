@@ -71,14 +71,20 @@ class PoFileLoader extends FileLoader
 
         $messages = array();
         $item = $defaults;
+        $flags = array();
 
         while ($line = fgets($stream)) {
             $line = trim($line);
 
             if ($line === '') {
                 // Whitespace indicated current item is done
-                $this->addMessage($messages, $item);
+                if (!in_array('fuzzy', $flags)) {
+                    $this->addMessage($messages, $item);
+                }
                 $item = $defaults;
+                $flags = array();
+            } elseif (substr($line, 0, 2) === '#,') {
+                $flags = array_map('trim', explode(',', substr($line, 2)));
             } elseif (substr($line, 0, 7) === 'msgid "') {
                 // We start a new msg so save previous
                 // TODO: this fails when comments or contexts are added
@@ -104,7 +110,9 @@ class PoFileLoader extends FileLoader
             }
         }
         // save last item
-        $this->addMessage($messages, $item);
+        if (!in_array('fuzzy', $flags)) {
+            $this->addMessage($messages, $item);
+        }
         fclose($stream);
 
         return $messages;

@@ -11,9 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 
+/**
+ * @group dns-sensitive
+ */
 class UrlValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
@@ -181,6 +185,35 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('file://127.0.0.1'),
             array('git://[::1]/'),
         );
+    }
+
+    /**
+     * @dataProvider getCheckDns
+     */
+    public function testCheckDns($violation)
+    {
+        DnsMock::withMockedHosts(array('example.com' => array(array('type' => $violation ? '' : 'A'))));
+
+        $constraint = new Url(array(
+            'checkDNS' => true,
+            'dnsMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate('http://example.com', $constraint);
+
+        if (!$violation) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ value }}', '"example.com"')
+                ->setCode(Url::INVALID_URL_ERROR)
+                ->assertRaised();
+        }
+    }
+
+    public function getCheckDns()
+    {
+        return array(array(true), array(false));
     }
 }
 

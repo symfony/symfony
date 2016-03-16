@@ -21,6 +21,20 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface SecurityFactoryInterface
 {
+    /**
+     * Configures the container services required to use the authentication listener.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $id                The unique id of the firewall 
+     * @param array            $config            The options array for the listener
+     * @param string           $userProvider      The service id of the user provider
+     * @param string           $defaultEntryPoint
+     *
+     * @return array containing three values:
+     *               - the provider id
+     *               - the listener id
+     *               - the entry point id
+     */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
 
     /**
@@ -31,6 +45,12 @@ interface SecurityFactoryInterface
      */
     public function getPosition();
 
+    /**
+     * Defines the configuration key used to reference the provider
+     * in the firewall configuration.
+     * 
+     * @return string
+     */
     public function getKey();
 
     public function addConfiguration(NodeDefinition $builder);

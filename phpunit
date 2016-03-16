@@ -11,7 +11,7 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id-Version: 2015-11-28 09:05 UTC
+// Cache-Id-Version: 2016-03-16 15:36 UTC
 
 use Symfony\Component\Process\ProcessUtils;
 
@@ -52,7 +52,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update symfony/yaml");
-    passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=2.8@dev\"");
+    passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=3.1@dev\"");
     passthru("$COMPOSER install --prefer-dist --no-progress --ansi");
     file_put_contents('phpunit', <<<EOPHP
 <?php

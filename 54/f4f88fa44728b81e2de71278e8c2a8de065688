@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-16T13:50:38Z
+
+And the answer is... YES, by one minute!
+https://travis-ci.org/symfony/symfony/jobs/116377636#L4458
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-16T14:00:35Z
+
+Great! Thanks for your continuous effort towards optimizing tests. This is much appreciated by lots of us!
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2016-03-16T14:20:36Z
+
+@nicolas-grekas there is a failed test and marked as pass : https://travis-ci.org/symfony/symfony/jobs/116377636#L4679
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-16T14:22:34Z
+
+@ProPheT777 this is hhvm behavior, nothing related to this PR, and no failure but only garbage output.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2016-03-16T14:23:17Z
+
+Ok great, that was just in case! Thank you

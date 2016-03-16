@@ -30,6 +30,7 @@ class Filesystem
      * @param string $originFile          The original filename
      * @param string $targetFile          The target filename
      * @param bool   $overwriteNewerFiles If true, target files newer than orign files are overwritten
+     *
      * @throws IOException When copy fails
      */
     public function copy($originFile, $targetFile, $overwriteNewerFiles = false)

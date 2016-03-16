@@ -118,9 +118,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * This method returns the equivalent PHP tokens for most scalar types
      * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
      * in double quotes ("). Objects, arrays and resources are formatted as
-     * "object", "array" and "resource". If the parameter $prettyDateTime
-     * is set to true, {@link \DateTime} objects will be formatted as
-     * RFC-3339 dates ("Y-m-d H:i:s").
+     * "object", "array" and "resource". If the $format bitmask contains
+     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted 
+     * as RFC-3339 dates ("Y-m-d H:i:s").
      *
      * Be careful when passing message parameters to a constraint violation
      * that (may) contain objects, arrays or resources. These parameters
@@ -159,7 +159,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (is_object($value)) {
-            if ($format & self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+            if (($format & self::OBJECT_TO_STRING) && method_exists($value, '__toString')) {
                 return $value->__toString();
             }
 

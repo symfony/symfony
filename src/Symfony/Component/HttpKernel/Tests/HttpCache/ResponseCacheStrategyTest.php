@@ -16,13 +16,13 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategy;
+use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
-class EsiResponseCacheStrategyTest extends \PHPUnit_Framework_TestCase
+class ResponseCacheStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testMinimumSharedMaxAgeWins()
     {
-        $cacheStrategy = new EsiResponseCacheStrategy();
+        $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
         $response1->setSharedMaxAge(60);
@@ -41,7 +41,7 @@ class EsiResponseCacheStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest()
     {
-        $cacheStrategy = new EsiResponseCacheStrategy();
+        $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
         $response1->setSharedMaxAge(60);
@@ -59,7 +59,7 @@ class EsiResponseCacheStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testSharedMaxAgeNotSetIfNotSetInMasterRequest()
     {
-        $cacheStrategy = new EsiResponseCacheStrategy();
+        $cacheStrategy = new ResponseCacheStrategy();
 
         $response1 = new Response();
         $response1->setSharedMaxAge(60);

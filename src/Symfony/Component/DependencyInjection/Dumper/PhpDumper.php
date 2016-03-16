@@ -58,8 +58,8 @@ class PhpDumper extends Dumper
     private $targetDirRegex;
     private $targetDirMaxMatches;
     private $docStar;
-    private $serviceIdToMethodNameMap = array();
-    private $usedMethodNames = array();
+    private $serviceIdToMethodNameMap;
+    private $usedMethodNames;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -108,6 +108,9 @@ class PhpDumper extends Dumper
             'namespace' => '',
             'debug' => true,
         ), $options);
+
+        $this->initializeMethodNamesMap($options['base_class']);
+
         $this->docStar = $options['debug'] ? '*' : '';
 
         if (!empty($options['file']) && is_dir($dir = dirname($options['file']))) {
@@ -1337,6 +1340,25 @@ EOF;
             }
 
             return sprintf('$this->get(\'%s\')', $id);
+        }
+    }
+
+    /**
+     * Initializes the method names map to avoid conflicts with the Container methods.
+     *
+     * @param string $class the container base class
+     */
+    private function initializeMethodNamesMap($class)
+    {
+        $this->serviceIdToMethodNameMap = array();
+        $this->usedMethodNames = array();
+
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+            foreach ($reflectionClass->getMethods() as $method) {
+                $this->usedMethodNames[strtolower($method->getName())] = true;
+            }
+        } catch (\ReflectionException $e) {
         }
     }
 

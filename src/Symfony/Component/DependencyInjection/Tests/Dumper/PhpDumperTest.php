@@ -158,6 +158,22 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(method_exists($class, 'getFoobar2Service'));
     }
 
+    public function testConflictingMethodsWithParent()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Method_With_Parent';
+        $container = new ContainerBuilder();
+        $container->register('bar', 'FooClass');
+        $container->register('foo_bar', 'FooClass');
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array(
+            'class' => $class,
+            'base_class' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\containers\CustomContainer',
+        )));
+
+        $this->assertTrue(method_exists($class, 'getBar2Service'));
+        $this->assertTrue(method_exists($class, 'getFoobar2Service'));
+    }
+
     /**
      * @dataProvider provideInvalidFactories
      * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException

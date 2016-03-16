@@ -16,6 +16,7 @@ CHANGELOG
  * added support for serializing objects that implement `DateTimeInterface`
  * added `AbstractObjectNormalizer` as a base class for normalizers that deal
    with objects
+ * added `ChainNameConverter` to process property names with multiple converters.
 
 2.7.0
 -----

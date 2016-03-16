@@ -14,9 +14,11 @@ class FinderIterator extends \AppendIterator
      */
     public function first()
     {
-        foreach ($this as $elem) {
-            return $elem;
+        foreach ($this as $element) {
+            return $element;
         }
+
+        return null;
     }
 
     /**
@@ -26,10 +28,8 @@ class FinderIterator extends \AppendIterator
      */
     public function last()
     {
-        foreach ($this as $elem) {
-            continue;
-        }
+        $elements = iterator_to_array($this);
 
-        return $elem;
+        return empty($elements) ? null : $elements[count($elements) - 1];
     }
 }

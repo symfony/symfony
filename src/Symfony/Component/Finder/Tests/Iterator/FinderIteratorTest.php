@@ -18,8 +18,22 @@ class FinderIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a', $this->iterator->first());
     }
 
+    public function testReturnNullAsFirstWhenEmpty()
+    {
+        $iterator = new FinderIterator();
+
+        $this->assertNull($iterator->first());
+    }
+
     public function testLast()
     {
         $this->assertEquals('z', $this->iterator->last());
+    }
+
+    public function testReturnNullAsLastWhenEmpty()
+    {
+        $iterator = new FinderIterator();
+
+        $this->assertNull($iterator->last());
     }
 }

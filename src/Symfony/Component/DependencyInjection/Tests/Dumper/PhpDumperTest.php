@@ -134,15 +134,28 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testAddServiceIdWithUnsupportedCharacters()
     {
+        $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
         $container->register('bar$!', 'FooClass');
         $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Unsupported_Characters')));
+        eval('?>'.$dumper->dump(array('class' => $class)));
 
-        $container = new \Symfony_DI_PhpDumper_Test_Unsupported_Characters();
-        $this->assertTrue(method_exists($container, 'getBarService'));
-        $this->assertTrue(method_exists($container, 'getBar2Service'));
+        $this->assertTrue(method_exists($class, 'getBarService'));
+        $this->assertTrue(method_exists($class, 'getBar2Service'));
+    }
+
+    public function testConflictingServiceIds()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Service_Ids';
+        $container = new ContainerBuilder();
+        $container->register('foo_bar', 'FooClass');
+        $container->register('foobar', 'FooClass');
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => $class)));
+
+        $this->assertTrue(method_exists($class, 'getFooBarService'));
+        $this->assertTrue(method_exists($class, 'getFoobar2Service'));
     }
 
     /**

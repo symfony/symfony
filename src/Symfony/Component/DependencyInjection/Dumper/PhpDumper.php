@@ -634,7 +634,7 @@ EOF;
      *$lazyInitializationDoc
      * $return
      */
-    {$visibility} function get{$this->camelize($id)}Service($lazyInitialization)
+    {$visibility} function {$this->generateMethodName($id)}($lazyInitialization)
     {
 
 EOF;
@@ -866,7 +866,7 @@ EOF;
         $code = "        \$this->methodMap = array(\n";
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            $code .= '            '.var_export($id, true).' => '.var_export('get'.$this->camelize($id).'Service', true).",\n";
+            $code .= '            '.var_export($id, true).' => '.var_export($this->generateMethodName($id), true).",\n";
         }
 
         return $code."        );\n";
@@ -1349,22 +1349,24 @@ EOF;
      *
      * @throws InvalidArgumentException
      */
-    private function camelize($id)
+    private function generateMethodName($id)
     {
         if (isset($this->serviceIdToMethodNameMap[$id])) {
             return $this->serviceIdToMethodNameMap[$id];
         }
 
         $name = Container::camelize($id);
-        $methodName = $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
+        $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
+        $methodName = 'get'.$name.'Service';
         $suffix = 1;
 
-        while (isset($this->usedMethodNames[$methodName])) {
+        while (isset($this->usedMethodNames[strtolower($methodName)])) {
             ++$suffix;
-            $methodName = $name.$suffix;
+            $methodName = 'get'.$name.$suffix.'Service';
         }
+
         $this->serviceIdToMethodNameMap[$id] = $methodName;
-        $this->usedMethodNames[$methodName] = true;
+        $this->usedMethodNames[strtolower($methodName)] = true;
 
         return $methodName;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\Finder\Iterator;
 
 /**
@@ -18,7 +19,7 @@ class FinderIterator extends \AppendIterator
             return $element;
         }
 
-        return null;
+        return;
     }
 
     /**

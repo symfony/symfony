@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\FinderIterator;

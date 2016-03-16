@@ -106,11 +106,15 @@ class WindowsPipes extends AbstractPipes
     public function readAndWrite($blocking, $close = false)
     {
         $this->unblock();
-        $this->write();
+        $w = $this->write();
+        $read = $r = $e = array();
 
-        $read = array();
-        if ($this->fileHandles && $blocking) {
-            usleep(Process::TIMEOUT_PRECISION * 1E6);
+        if ($blocking) {
+            if ($w) {
+                @stream_select($r, $w, $e, 0, Process::TIMEOUT_PRECISION * 1E6);
+            } elseif ($this->fileHandles) {
+                usleep(Process::TIMEOUT_PRECISION * 1E6);
+            }
         }
         foreach ($this->fileHandles as $type => $fileHandle) {
             $data = stream_get_contents($fileHandle, -1, $this->readBytes[$type]);

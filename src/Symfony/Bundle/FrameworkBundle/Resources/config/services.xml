@@ -31,6 +31,7 @@
 
         <service id="service_container" synthetic="true">
             <autowiring-type>Symfony\Component\DependencyInjection\ContainerInterface</autowiring-type>
+            <autowiring-type>Symfony\Component\DependencyInjection\Container</autowiring-type>
         </service>
 
         <service id="kernel" synthetic="true" />

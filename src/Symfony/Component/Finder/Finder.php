@@ -83,8 +83,8 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Get the first element in the finder.
      *
-     * @return mixed Returns the first element in the Finder or `null`
-     *               if it is empty.
+     * @return SplFileInfo|null The first element in the Finder or `null`
+     *                          if it is empty.
      */
     public function first()
     {
@@ -94,8 +94,8 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Get the last element in the Finder.
      *
-     * @return mixed Returns the last element in the Finder or `null`
-     *               if it is empty.
+     * @return SplFileInfo|null The last element in the Finder or `null`
+     *                          if it is empty.
      */
     public function last()
     {

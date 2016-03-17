@@ -14,6 +14,9 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * @group legacy
+ */
 class AnonymousTokenTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()

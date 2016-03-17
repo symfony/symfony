@@ -52,7 +52,7 @@ class AuthenticationTrustResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function getAnonymousToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(array('', ''))->getMock();
+        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AuthenticatedAnonymousToken')->setConstructorArgs(array('', ''))->getMock();
     }
 
     protected function getRememberMeToken()
@@ -63,7 +63,7 @@ class AuthenticationTrustResolverTest extends \PHPUnit_Framework_TestCase
     protected function getResolver()
     {
         return new AuthenticationTrustResolver(
-            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken',
+            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AuthenticatedAnonymousToken',
             'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken'
         );
     }

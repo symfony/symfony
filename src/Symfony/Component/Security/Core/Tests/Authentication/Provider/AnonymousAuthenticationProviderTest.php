@@ -15,12 +15,36 @@ use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticat
 
 class AnonymousAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupports()
-    {
-        $provider = $this->getProvider('foo');
+    private $provider;
 
-        $this->assertTrue($provider->supports($this->getSupportedToken('foo')));
-        $this->assertFalse($provider->supports($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
+    protected function setUp()
+    {
+        $this->provider = $this->getProvider('foo');
+    }
+
+    /**
+     * @dataProvider provideTokens
+     */
+    public function testSupports($token, $supported)
+    {
+        $this->assertEquals($supported, $this->provider->supports($token));
+    }
+
+    public function provideTokens()
+    {
+        return array(
+            array($this->getTokenMock('foo', 'AnonymousRequestToken'), true),
+            array($this->getTokenMock('foo', 'AuthenticatedAnonymousToken'), false),
+            array($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock(), false),
+        );
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacySupports()
+    {
+        $this->assertTrue($this->provider->supports($this->getTokenMock('foo', 'AnonymousToken')));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
@@ -37,20 +61,23 @@ class AnonymousAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider('foo');
 
-        $provider->authenticate($this->getSupportedToken('bar'));
+        $provider->authenticate($this->getTokenMock('bar'));
     }
 
     public function testAuthenticate()
     {
         $provider = $this->getProvider('foo');
-        $token = $this->getSupportedToken('foo');
+        $token = $this->getTokenMock('foo');
 
-        $this->assertSame($token, $provider->authenticate($token));
+        $authenticatedToken = $provider->authenticate($token);
+
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\AuthenticatedAnonymousToken', $authenticatedToken);
+        $this->assertEquals('foo', $authenticatedToken->getSecret());
     }
 
-    protected function getSupportedToken($secret)
+    private function getTokenMock($secret, $class = 'AnonymousRequestToken')
     {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setMethods(array('getSecret'))->disableOriginalConstructor()->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\\'.$class)->setMethods(array('getSecret'))->disableOriginalConstructor()->getMock();
         $token->expects($this->any())
               ->method('getSecret')
               ->will($this->returnValue($secret))

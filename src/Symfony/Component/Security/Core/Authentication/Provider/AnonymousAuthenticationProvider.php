@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousRequestToken;
+use Symfony\Component\Security\Core\Authentication\Token\AuthenticatedAnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -53,7 +55,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
             throw new BadCredentialsException('The Token does not contain the expected key.');
         }
 
-        return $token;
+        return new AuthenticatedAnonymousToken($token->getSecret(), $token->getUsername());
     }
 
     /**
@@ -61,6 +63,15 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof AnonymousToken;
+        if ($token instanceof AnonymousRequestToken) {
+            return true;
+        }
+
+        if (!$token instanceof AnonymousToken || $token instanceof AuthenticatedAnonymousToken) {
+            return false;
+        }
+
+        @trigger_error('Support for AnonymousToken in the AnonymousAuthenticationProvider class is deprecated in 3.1 and will be removed in 4.0. Pass an AnonymousRequestToken object instead.', E_USER_DEPRECATED);
+        return true;
     }
 }

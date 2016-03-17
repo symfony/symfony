@@ -1313,7 +1313,7 @@ class Process
      *
      * @param $caller The name of the method that needs fresh outputs
      *
-     * @throw LogicException in case output has been disabled or process is not started
+     * @throws LogicException in case output has been disabled or process is not started
      */
     private function readPipesForOutput($caller)
     {

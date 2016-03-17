@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Authentication Token for "Remember-Me".
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated Since version 3.1, to be removed in 4.0. Use RememberMeRequestToken or AuthenticatedUserToken instead.
  */
 class RememberMeToken extends AbstractToken
 {
@@ -32,8 +34,12 @@ class RememberMeToken extends AbstractToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, $providerKey, $secret)
+    public function __construct(UserInterface $user, $providerKey, $secret, $deprecation = true)
     {
+        if ($deprecation) {
+            @trigger_error(__CLASS__.' is deprecated since version 3.1 and will be removed in 4.0. Use RememberMeRequestToken or AuthenticatedUserToken instead.');
+        }
+
         parent::__construct($user->getRoles());
 
         if (empty($secret)) {

@@ -22,13 +22,15 @@ use Symfony\Component\Security\Core\User\EquatableInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated Since version 3.1, to be removed in 4.0. Use AbstractAuthenticatedToken or AbstractRequestToken instead.
  */
 abstract class AbstractToken implements TokenInterface
 {
-    private $user;
-    private $roles = array();
+    protected $user;
+    protected $roles = array();
     private $authenticated = false;
-    private $attributes = array();
+    protected $attributes = array();
 
     /**
      * Constructor.

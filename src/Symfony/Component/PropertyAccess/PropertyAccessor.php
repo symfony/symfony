@@ -89,6 +89,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private $magicCall;
     private $readPropertyCache = array();
     private $writePropertyCache = array();
+    private static $previousErrorHandler;
 
     /**
      * Should not be used by application code. Use
@@ -131,23 +132,66 @@ class PropertyAccessor implements PropertyAccessorInterface
             self::IS_REF => true,
         ));
 
-        for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
-            $objectOrArray = &$propertyValues[$i][self::VALUE];
-
-            if ($overwrite) {
-                $property = $propertyPath->getElement($i);
-                //$singular = $propertyPath->singulars[$i];
-                $singular = null;
-
-                if ($propertyPath->isIndex($i)) {
-                    $this->writeIndex($objectOrArray, $property, $value);
-                } else {
-                    $this->writeProperty($objectOrArray, $property, $singular, $value);
-                }
+        try {
+            if (PHP_VERSION_ID < 70000) {
+                self::$previousErrorHandler = set_error_handler(array(__CLASS__, 'handleError'));
             }
 
-            $value = &$objectOrArray;
-            $overwrite = !$propertyValues[$i][self::IS_REF];
+            for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
+                $objectOrArray = &$propertyValues[$i][self::VALUE];
+
+                if ($overwrite) {
+                    $property = $propertyPath->getElement($i);
+                    //$singular = $propertyPath->singulars[$i];
+                    $singular = null;
+
+                    if ($propertyPath->isIndex($i)) {
+                        $this->writeIndex($objectOrArray, $property, $value);
+                    } else {
+                        $this->writeProperty($objectOrArray, $property, $singular, $value);
+                    }
+                }
+
+                $value = &$objectOrArray;
+                $overwrite = !$propertyValues[$i][self::IS_REF];
+            }
+        } catch (\TypeError $e) {
+            try {
+                self::throwUnexpectedTypeException($e->getMessage(), $e->getTrace(), 0);
+            } catch (UnexpectedTypeException $e) {
+            }
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        if (PHP_VERSION_ID < 70000) {
+            restore_error_handler();
+            self::$previousErrorHandler = null;
+        }
+        if (isset($e)) {
+            throw $e;
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public static function handleError($type, $message, $file, $line, $context)
+    {
+        if (E_RECOVERABLE_ERROR === $type) {
+            self::throwUnexpectedTypeException($message, debug_backtrace(false), 1);
+        }
+
+        return null !== self::$previousErrorHandler && false !== call_user_func(self::$previousErrorHandler, $type, $message, $file, $line, $context);
+    }
+
+    private static function throwUnexpectedTypeException($message, $trace, $i)
+    {
+        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
+            $pos = strpos($message, $delim = 'must be of the type ') ?: strpos($message, $delim = 'must be an instance of ');
+            $pos += strlen($delim);
+
+            throw new UnexpectedTypeException($trace[$i]['args'][0], substr($message, $pos, strpos($message, ',', $pos) - $pos));
         }
     }
 
@@ -398,9 +442,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string|null  $singular The singular form of the property name or null
      * @param mixed        $value    The value to write
      *
-     * @throws NoSuchPropertyException If the property does not exist or is not
-     *                                 public.
-     * @throws UnexpectedTypeException
+     * @throws NoSuchPropertyException If the property does not exist or is not public.
      */
     private function writeProperty(&$object, $property, $singular, $value)
     {
@@ -411,7 +453,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access = $this->getWriteAccessInfo($object, $property, $singular, $value);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
+            $object->{$access[self::ACCESS_NAME]}($value);
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]} = $value;
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
@@ -458,76 +500,10 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $object->$property = $value;
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
-            $this->callMethod($object, $access[self::ACCESS_NAME], $value);
+            $object->{$access[self::ACCESS_NAME]}($value);
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
-    }
-
-    /**
-     * Throws a {@see UnexpectedTypeException} as in PHP 7 when using PHP 5.
-     *
-     * @param object $object
-     * @param string $method
-     * @param mixed  $value
-     *
-     * @throws UnexpectedTypeException
-     * @throws \Exception
-     */
-    private function callMethod($object, $method, $value) {
-        if (PHP_MAJOR_VERSION >= 7) {
-            try {
-                $object->{$method}($value);
-            } catch (\TypeError $e) {
-                throw $this->createUnexpectedTypeException($object, $method, $value);
-            }
-
-            return;
-        }
-
-        $that = $this;
-        set_error_handler(function ($errno, $errstr) use ($object, $method, $value, $that) {
-            if (E_RECOVERABLE_ERROR === $errno && false !== strpos($errstr, sprintf('passed to %s::%s() must', get_class($object), $method))) {
-                throw $that->createUnexpectedTypeException($object, $method, $value);
-            }
-
-            return false;
-        });
-
-        try {
-            $object->{$method}($value);
-            restore_error_handler();
-        } catch (\Exception $e) {
-            // Cannot use finally in 5.5 because of https://bugs.php.net/bug.php?id=67047
-            restore_error_handler();
-
-            throw $e;
-        }
-    }
-
-    /**
-     * Creates an UnexpectedTypeException.
-     *
-     * @param object $object
-     * @param string $method
-     * @param mixed  $value
-     *
-     * @return UnexpectedTypeException
-     */
-    private function createUnexpectedTypeException($object, $method, $value)
-    {
-        $reflectionMethod = new \ReflectionMethod($object, $method);
-        $parameters = $reflectionMethod->getParameters();
-
-        $expectedType = 'unknown';
-        if (isset($parameters[0])) {
-            $class = $parameters[0]->getClass();
-            if (null !== $class) {
-                $expectedType = $class->getName();
-            }
-        }
-
-        return new UnexpectedTypeException($value, $expectedType);
     }
 
     /**

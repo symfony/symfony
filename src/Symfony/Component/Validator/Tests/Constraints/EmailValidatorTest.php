@@ -128,10 +128,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
 
     public function testHostnameIsProperlyParsed()
     {
-        DnsMock::withMockedHosts(array(
-            'baz.com' => array(array('type' => 'MX')),
-            '@bar"@baz.com' => array(array('type' => false)),
-        ));
+        DnsMock::withMockedHosts(array('baz.com' => array(array('type' => 'MX'))));
 
         $this->validator->validate(
             '"foo@bar"@baz.com',

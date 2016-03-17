@@ -125,4 +125,19 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('AAAA', true),
         );
     }
+
+    public function testHostnameIsProperlyParsed()
+    {
+        DnsMock::withMockedHosts(array(
+            'baz.com' => array(array('type' => 'MX')),
+            '@bar"@baz.com' => array(array('type' => false)),
+        ));
+
+        $this->validator->validate(
+            '"foo@bar"@baz.com',
+            new Email(array('checkMX' => true))
+        );
+
+        $this->assertNoViolation();
+    }
 }

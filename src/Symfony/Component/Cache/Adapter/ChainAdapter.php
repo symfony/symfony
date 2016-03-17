@@ -13,27 +13,30 @@ namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
- * Chains adapters together.
+ * Chains several adapters together.
  *
- * Saves, deletes and clears all registered adapter.
- * Gets data from the first chained adapter having it in cache.
+ * Cached items are fetched from the first adapter having them in its data store.
+ * They are saved and deleted in all adapters at once.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ChainAdapter implements AdapterInterface
 {
     private $adapters = array();
+    private $saveUp;
 
     /**
-     * @param AdapterInterface[] $adapters
+     * @param CacheItemPoolInterface[] $adapters    The ordered list of adapters used to fetch cached items.
+     * @param int                      $maxLifetime The max lifetime of items propagated from lower adapters to upper ones.
      */
-    public function __construct(array $adapters)
+    public function __construct(array $adapters, $maxLifetime = 0)
     {
-        if (2 > count($adapters)) {
-            throw new InvalidArgumentException('At least two adapters must be chained.');
+        if (!$adapters) {
+            throw new InvalidArgumentException('At least one adapter must be specified.');
         }
 
         foreach ($adapters as $adapter) {
@@ -47,6 +50,21 @@ class ChainAdapter implements AdapterInterface
                 $this->adapters[] = new ProxyAdapter($adapter);
             }
         }
+
+        $this->saveUp = \Closure::bind(
+            function ($adapter, $item) use ($maxLifetime) {
+                $origDefaultLifetime = $item->defaultLifetime;
+
+                if (0 < $maxLifetime && ($origDefaultLifetime <= 0 || $maxLifetime < $origDefaultLifetime)) {
+                    $item->defaultLifetime = $maxLifetime;
+                }
+
+                $adapter->save($item);
+                $item->defaultLifetime = $origDefaultLifetime;
+            },
+            $this,
+            CacheItem::class
+        );
     }
 
     /**
@@ -54,10 +72,16 @@ class ChainAdapter implements AdapterInterface
      */
     public function getItem($key)
     {
-        foreach ($this->adapters as $adapter) {
+        $saveUp = $this->saveUp;
+
+        foreach ($this->adapters as $i => $adapter) {
             $item = $adapter->getItem($key);
 
             if ($item->isHit()) {
+                while (0 <= --$i) {
+                    $saveUp($this->adapters[$i], $item);
+                }
+
                 return $item;
             }
         }
@@ -70,12 +94,36 @@ class ChainAdapter implements AdapterInterface
      */
     public function getItems(array $keys = array())
     {
-        $items = array();
-        foreach ($keys as $key) {
-            $items[$key] = $this->getItem($key);
+        return $this->generateItems($this->adapters[0]->getItems($keys), 0);
+    }
+
+    private function generateItems($items, $adapterIndex)
+    {
+        $missing = array();
+        $nextAdapterIndex = $adapterIndex + 1;
+        $nextAdapter = isset($this->adapters[$nextAdapterIndex]) ? $this->adapters[$nextAdapterIndex] : null;
+
+        foreach ($items as $k => $item) {
+            if (!$nextAdapter || $item->isHit()) {
+                yield $k => $item;
+            } else {
+                $missing[] = $k;
+            }
         }
 
-        return $items;
+        if ($missing) {
+            $saveUp = $this->saveUp;
+            $adapter = $this->adapters[$adapterIndex];
+            $items = $this->generateItems($nextAdapter->getItems($missing), $nextAdapterIndex);
+
+            foreach ($items as $k => $item) {
+                if ($item->isHit()) {
+                    $saveUp($adapter, $item);
+                }
+
+                yield $k => $item;
+            }
+        }
     }
 
     /**

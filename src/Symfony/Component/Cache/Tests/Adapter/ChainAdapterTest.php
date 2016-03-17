@@ -22,12 +22,6 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class ChainAdapterTest extends CachePoolTest
 {
-    protected $skippedTests = array(
-        'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
-        'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
-        'testDeferredExpired' => 'Failing for now, needs to be fixed.',
-    );
-
     public function createCachePool()
     {
         if (defined('HHVM_VERSION')) {
@@ -37,22 +31,24 @@ class ChainAdapterTest extends CachePoolTest
             $this->markTestSkipped('APCu extension is required.');
         }
 
-        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new ApcuAdapter(__CLASS__)));
+        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new ApcuAdapter()));
     }
 
     /**
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedExceptionMessage At least one adapter must be specified.
      */
-    public function testLessThanTwoAdapterException()
+    public function testEmptyAdaptersException()
     {
         new ChainAdapter(array());
     }
 
     /**
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The class "stdClass" does not implement
      */
     public function testInvalidAdapterException()
     {
-        new ChainAdapter(array(new \stdClass(), new \stdClass()));
+        new ChainAdapter(array(new \stdClass()));
     }
 }

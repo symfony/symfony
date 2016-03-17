@@ -12,9 +12,10 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheItem;
 
 /**
- * Marker interface for adapters managing {@see \Symfony\Component\Cache\CacheItem} instances.
+ * Interface for adapters managing instances of Symfony's {@see CacheItem}.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

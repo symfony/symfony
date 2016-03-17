@@ -36,7 +36,7 @@ class UserPasswordValidator extends ConstraintValidator
     public function validate($password, Constraint $constraint)
     {
         if (!$constraint instanceof UserPassword) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');
+            throw new UnexpectedTypeException($constraint, UserPassword::class);
         }
 
         $user = $this->tokenStorage->getToken()->getUser();

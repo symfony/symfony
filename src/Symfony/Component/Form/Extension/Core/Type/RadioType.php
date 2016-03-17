@@ -20,7 +20,7 @@ class RadioType extends AbstractType
      */
     public function getParent()
     {
-        return __NAMESPACE__.'\CheckboxType';
+        return CheckboxType::class;
     }
 
     /**

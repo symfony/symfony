@@ -40,7 +40,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(__NAMESPACE__.'\ObjectSerializerNormalizer');
+        $this->serializer = $this->getMock(ObjectSerializerNormalizer::class);
         $this->normalizer = new ObjectNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -79,7 +79,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $obj = $this->normalizer->denormalize(
             array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
-            __NAMESPACE__.'\ObjectDummy',
+            ObjectDummy::class,
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
@@ -93,21 +93,21 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $data->foo = 'foo';
         $data->bar = 'bar';
         $data->fooBar = 'foobar';
-        $obj = $this->normalizer->denormalize($data, __NAMESPACE__.'\ObjectDummy', 'any');
+        $obj = $this->normalizer->denormalize($data, ObjectDummy::class, 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
     }
 
     public function testDenormalizeNull()
     {
-        $this->assertEquals(new ObjectDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\ObjectDummy'));
+        $this->assertEquals(new ObjectDummy(), $this->normalizer->denormalize(null, ObjectDummy::class));
     }
 
     public function testConstructorDenormalize()
     {
         $obj = $this->normalizer->denormalize(
             array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
-            __NAMESPACE__.'\ObjectConstructorDummy', 'any');
+            ObjectConstructorDummy::class, 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
         $this->assertTrue($obj->isBaz());
@@ -117,7 +117,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $obj = $this->normalizer->denormalize(
             array('foo' => 'foo', 'bar' => null, 'baz' => true),
-            __NAMESPACE__.'\ObjectConstructorDummy', 'any');
+            ObjectConstructorDummy::class, 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertNull($obj->bar);
         $this->assertTrue($obj->isBaz());
@@ -127,7 +127,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $obj = $this->normalizer->denormalize(
             array('foo' => 'test', 'baz' => array(1, 2, 3)),
-            __NAMESPACE__.'\ObjectConstructorOptionalArgsDummy', 'any');
+            ObjectConstructorOptionalArgsDummy::class, 'any');
         $this->assertEquals('test', $obj->getFoo());
         $this->assertEquals(array(), $obj->bar);
         $this->assertEquals(array(1, 2, 3), $obj->getBaz());
@@ -137,7 +137,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $obj = $this->normalizer->denormalize(
             array('bar' => 'test'),
-            __NAMESPACE__.'\ObjectConstructorArgsWithDefaultValueDummy', 'any');
+            ObjectConstructorArgsWithDefaultValueDummy::class, 'any');
         $this->assertEquals(array(), $obj->getFoo());
         $this->assertEquals('test', $obj->getBar());
     }
@@ -149,7 +149,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $data->bar = 'bar';
         $data->baz = true;
         $data->fooBar = 'foobar';
-        $obj = $this->normalizer->denormalize($data, __NAMESPACE__.'\ObjectConstructorDummy', 'any');
+        $obj = $this->normalizer->denormalize($data, ObjectConstructorDummy::class, 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->bar);
     }
@@ -433,7 +433,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             new ObjectDummy(),
-            $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\ObjectDummy')
+            $this->normalizer->denormalize(array('non_existing' => true), ObjectDummy::class)
         );
     }
 

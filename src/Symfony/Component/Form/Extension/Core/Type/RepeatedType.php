@@ -47,7 +47,7 @@ class RepeatedType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'type' => __NAMESPACE__.'\TextType',
+            'type' => TextType::class,
             'options' => array(),
             'first_options' => array(),
             'second_options' => array(),

@@ -30,7 +30,7 @@ class ImageValidator extends FileValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Image) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Image');
+            throw new UnexpectedTypeException($constraint, Image::class);
         }
 
         $violations = count($this->context->getViolations());

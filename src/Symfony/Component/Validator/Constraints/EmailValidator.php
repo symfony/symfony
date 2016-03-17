@@ -37,7 +37,7 @@ class EmailValidator extends ConstraintValidator
         $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
         if ($valid) {
-            $host = substr($value, strpos($value, '@') + 1);
+            $host = substr($value, strrpos($value, '@') + 1);
 
             // Check for host DNS resource records
             if ($valid && $constraint->checkMX) {

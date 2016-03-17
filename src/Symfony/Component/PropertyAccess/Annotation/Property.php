@@ -19,33 +19,33 @@ namespace Symfony\Component\PropertyAccess\Annotation;
  *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class PropertyAccessor
+class Property
 {
     /**
-     * Custom setter method for the property
+     * Custom setter method for the property.
      *
-     * @var string $setter
+     * @var string
      */
     public $setter;
 
     /**
-     * Custom getter method for the property
+     * Custom getter method for the property.
      *
-     * @var string $setter
+     * @var string
      */
     public $getter;
 
     /**
-     * Custom adder method for the property
+     * Custom adder method for the property.
      *
-     * @var string $setter
+     * @var string
      */
     public $adder;
 
     /**
-     * Custom remover method for the property
+     * Custom remover method for the property.
      *
-     * @var string $setter
+     * @var string
      */
     public $remover;
 }

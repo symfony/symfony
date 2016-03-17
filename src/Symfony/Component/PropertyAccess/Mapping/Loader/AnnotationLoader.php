@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Annotation\Property;
 use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
 use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
@@ -56,7 +56,7 @@ class AnnotationLoader implements LoaderInterface
 
             if ($property->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
-                    if ($annotation instanceof PropertyAccessor) {
+                    if ($annotation instanceof Property) {
                         $propertiesMetadata[$property->name]->setGetter($annotation->getter);
                         $propertiesMetadata[$property->name]->setSetter($annotation->setter);
                         $propertiesMetadata[$property->name]->setAdder($annotation->adder);

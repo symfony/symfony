@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
-use Doctrine\ORM\Mapping\Column;
-use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Annotation\Property;
 
 class TestClass
 {
     public $publicProperty;
     protected $protectedProperty;
-    private $privateProperty;
 
     private $publicAccessor;
     private $publicMethodAccessor;
@@ -32,7 +30,7 @@ class TestClass
     private $date;
 
     /**
-     * @PropertyAccessor(getter="customGetterTest", setter="customSetterTest")
+     * @Property(getter="customGetterTest", setter="customSetterTest")
      */
     private $customGetterSetter;
 

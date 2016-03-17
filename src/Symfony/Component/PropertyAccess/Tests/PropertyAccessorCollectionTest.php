@@ -22,7 +22,7 @@ class PropertyAccessorCollectionTest_Car
     private $axes;
 
     /**
-     * @Symfony\Component\PropertyAccess\Annotation\PropertyAccessor(adder="addAxisTest", remover="removeAxisTest")
+     * @Symfony\Component\PropertyAccess\Annotation\Property(adder="addAxisTest", remover="removeAxisTest")
      */
     private $customAxes;
 

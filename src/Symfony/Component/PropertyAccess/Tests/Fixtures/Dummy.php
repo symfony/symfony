@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
-use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Annotation\Property;
 
 /**
  * Fixtures for testing metadata.
@@ -19,12 +19,12 @@ use Symfony\Component\PropertyAccess\Annotation\PropertyAccessor;
 class Dummy
 {
     /**
-     * @PropertyAccessor(getter="getter1", setter="setter1", adder="adder1", remover="remover1")
+     * @Property(getter="getter1", setter="setter1", adder="adder1", remover="remover1")
      */
     protected $foo;
 
     /**
-     * @PropertyAccessor(getter="getter2")
+     * @Property(getter="getter2")
      */
     protected $bar;
 

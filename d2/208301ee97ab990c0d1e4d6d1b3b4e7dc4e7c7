@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-13T09:30:10Z
+
+@natechicago thanks for contributing this fix. As a very minor comment, next time is enough to include the fixed ticket number in the table and prefix it with `#` so GitHub turns it into a link. Thanks!
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-03-13T09:45:57Z
+
+Please update the tests to ensure will not break in the future :+1:
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by natechicago at 2016-03-13T17:19:11Z
+
+@javiereguiluz thanks for the tip!  @sstok I've added an appropriate unit test to make sure this problem won't recur in the future.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-15T17:49:19Z
+
+checkdnsrr mocking implemented in #18181
+I propose to rebase on top of it once it's merged
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-16T16:24:11Z
+
+@natechicago your turn
+
+---------------------------------------------------------------------------
+
+by natechicago at 2016-03-17T02:52:07Z
+
+@nicolas-grekas Since the new unit test depends on PHPUnit Bridge, should this PR (targed against 2.3) be closed and a new one opened against 2.7?
+
+http://symfony.com/blog/new-in-symfony-2-7-phpunit-bridge
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-17T05:21:12Z
+
+The bridge is used to test 2.3 also so this PR is fine. See my PRs from yesterday
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-17T08:16:05Z
+
+@natechicago Can you rebase here please?
+
+---------------------------------------------------------------------------
+
+by natechicago at 2016-03-17T13:16:21Z
+
+Thanks guys, this should now be ready to merge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-17T13:34:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-17T13:43:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-17T13:44:01Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-17T14:03:37Z
+
+:+1:

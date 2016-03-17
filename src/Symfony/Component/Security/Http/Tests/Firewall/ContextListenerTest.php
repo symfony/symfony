@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
@@ -81,6 +82,13 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             null,
             'C:10:"serialized"'
         );
+
+        $this->assertFalse($session->has('_security_session'));
+    }
+
+    public function testOnKernelResponseWillRemoveSessionOnAnonymousToken()
+    {
+        $session = $this->runSessionOnKernelResponse(new AnonymousToken('secret', 'anon.'), 'C:10:"serialized"');
 
         $this->assertFalse($session->has('_security_session'));
     }

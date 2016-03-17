@@ -124,7 +124,7 @@ class ContextListener implements ListenerInterface
         $request = $event->getRequest();
         $session = $request->getSession();
 
-        if ((null === $token = $this->tokenStorage->getToken()) || ($this->trustResolver->isAnonymous($token))) {
+        if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }

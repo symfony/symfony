@@ -113,7 +113,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -228,7 +228,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -526,5 +526,19 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyAccessor->setValue($object, 'date', $date);
         $this->assertSame($date, $object->getDate());
+    }
+
+    public function testSetPropertyOnArray()
+    {
+        $array = array();
+        $this->propertyAccessor->setValue($array, 'foo', 'bar');
+        $this->assertSame(array('foo' => 'bar'), $array);
+    }
+
+    public function testSetIndexOnObject()
+    {
+        $object = (object) array('foo' => 123);
+        $this->propertyAccessor->setValue($object, '[foo]', 'bar');
+        $this->assertSame('bar', $object->foo);
     }
 }

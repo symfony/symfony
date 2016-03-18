@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-17T12:27:34Z
+
+While you are at it, the `@return` on `parse` is wrong as well. It must be `@return int|float|false`
+
+When merging in 3.0 the `@see https://bugs.php.net/bug.php?id=59597 Bug #59597` should be removed as the bug is not relevant in the 3.x PHP versions. Maybe it's easiest the remove this `@see` directly here and thus merged upwards as the bug is already referenced in the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-17T14:25:05Z
+
+@Tobion updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-17T17:49:28Z
+
+:+1:
+
+Status: Reviewed

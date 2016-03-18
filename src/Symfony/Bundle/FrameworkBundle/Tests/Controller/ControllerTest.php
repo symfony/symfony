@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
@@ -124,6 +125,62 @@ class ControllerTest extends TestCase
 
         return $container;
     }
+
+    public function testRedirectToRoute()
+    {
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router->expects($this->once())->method('generate')->willReturn('/foo');
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('get')->will($this->returnValue($router));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+        $response = $controller->redirectToRoute('foo');
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+        $this->assertSame('/foo', $response->getTargetUrl());
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function testAddFlash()
+    {
+        $flashBag = new FlashBag();
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session');
+        $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($session));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+        $controller->addFlash('foo', 'bar');
+
+        $this->assertSame(array('bar'), $flashBag->get('foo'));
+    }
+
+    public function testCreateAccessDeniedException()
+    {
+        $controller = new TestController();
+
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Exception\AccessDeniedException', $controller->createAccessDeniedException());
+    }
+
+    public function testIsCsrfTokenValid()
+    {
+        $tokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
+        $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($tokenManager));
+
+        $controller = new TestController();
+        $controller->setContainer($container);
+
+        $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
+    }
 }
 
 class TestController extends Controller
@@ -136,5 +193,20 @@ class TestController extends Controller
     public function getUser()
     {
         return parent::getUser();
+    }
+
+    public function redirectToRoute($route, array $parameters = array(), $status = 302)
+    {
+        return parent::redirectToRoute($route, $parameters, $status);
+    }
+
+    public function addFlash($type, $message)
+    {
+        parent::addFlash($type, $message);
+    }
+
+    public function isCsrfTokenValid($id, $token)
+    {
+        return parent::isCsrfTokenValid($id, $token);
     }
 }

@@ -38,7 +38,7 @@ abstract class Client
     protected $crawler;
     protected $insulated = false;
     protected $redirect;
-    protected $followRedirects = true;
+    protected $followRedirects = false;
 
     private $maxRedirects = -1;
     private $redirectCount = 0;

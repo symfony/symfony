@@ -34,6 +34,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\HttpKernel\Exception\DisableLogDirectoryException;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -536,6 +537,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundles[$name] = get_class($bundle);
         }
 
+        try {
+            $logDir = realpath($this->getLogDir()) ?: $this->getLogDir();
+        } catch (DisableLogDirectoryException $e) {
+            $logDir = false;
+        }
+
         return array_merge(
             array(
                 'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
@@ -543,7 +550,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,
                 'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
-                'kernel.logs_dir' => false !== $this->getLogDir() && realpath($this->getLogDir()) ? realpath($this->getLogDir()) : $this->getLogDir(),
+                'kernel.logs_dir' => $logDir,
                 'kernel.bundles' => $bundles,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
@@ -580,7 +587,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function buildContainer()
     {
-        foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
+        try{
+            $logDir = $this->getLogDir();
+        } catch (DisableLogDirectoryException $e) {
+            $logDir = false;
+        }
+        foreach (array('cache' => $this->getCacheDir(), 'logs' => $logDir) as $name => $dir) {
             if (false === $dir && 'logs' === $name) {
                 continue;
             } elseif (!is_dir($dir)) {

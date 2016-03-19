@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class RedisSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var \Redis  Redis driver.
+     * @var \Redis Redis driver.
      */
     private $redis;
 
@@ -40,8 +40,8 @@ class RedisSessionHandler implements \SessionHandlerInterface
      *  * prefix: The prefix to use for the redis keys in order to avoid collision
      *  * expiretime: The time to live in seconds
      *
-     * @param \Redis    $redis  A \Redis instance
-     * @param array     $options    An associative array options
+     * @param \Redis $redis   A \Redis instance
+     * @param array  $options An associative array options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */

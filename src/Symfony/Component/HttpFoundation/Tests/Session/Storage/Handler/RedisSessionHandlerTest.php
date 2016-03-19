@@ -107,7 +107,7 @@ class RedisSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSupportedOptions($options, $supported)
     {
         try {
-            new RedisSessionHandlerTest($this->redis, $options);
+            new RedisSessionHandler($this->redis, $options);
             $this->assertTrue($supported);
         } catch (\InvalidArgumentException $e) {
             $this->assertFalse($supported);

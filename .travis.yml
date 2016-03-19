@@ -37,6 +37,8 @@ services:
     - redis-server
 
 before_install:
+    - mkdir /tmp/slapd
+    - slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
     # Matrix lines for intermediate PHP versions are skipped for pull requests
     - if [[ ! $deps && ! $TRAVIS_PHP_VERSION = ${MIN_PHP%.*} && $TRAVIS_PHP_VERSION != hhvm && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; fi;
     # A sigchild-enabled-PHP is used to test the Process component on the lowest PHP matrix line
@@ -57,9 +59,6 @@ before_install:
     - if [[ $deps != skip && $TRAVIS_REPO_SLUG = symfony/symfony ]]; then cp .composer/* ~/.composer/; composer global install; fi;
     - if [[ $deps != skip ]]; then ./phpunit install; fi;
     - export PHPUNIT=$(readlink -f ./phpunit)
-    - mkdir /tmp/slapd
-    - slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
-    - sleep 3
     - ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif
     - ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif
 

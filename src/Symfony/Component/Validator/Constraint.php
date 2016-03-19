@@ -18,9 +18,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Contains the properties of a constraint definition.
  *
- * A constraint can be defined on a class, an option or a getter method.
+ * A constraint can be defined on a class, a property or a getter method.
  * The Constraint class encapsulates all the configuration required for
- * validating this class, option or getter result successfully.
+ * validating this class, property or getter result successfully.
  *
  * Constraint instances are immutable and serializable.
  *

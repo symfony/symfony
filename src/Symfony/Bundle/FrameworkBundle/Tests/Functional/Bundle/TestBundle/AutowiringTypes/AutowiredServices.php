@@ -12,18 +12,34 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 class AutowiredServices
 {
     private $annotationReader;
+    private $frameworkBundleEngine;
+    private $engine;
 
-    public function __construct(Reader $annotationReader = null)
+    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine)
     {
         $this->annotationReader = $annotationReader;
+        $this->frameworkBundleEngine = $frameworkBundleEngine;
+        $this->engine = $engine;
     }
 
     public function getAnnotationReader()
     {
         return $this->annotationReader;
+    }
+
+    public function getFrameworkBundleEngine()
+    {
+        return $this->frameworkBundleEngine;
+    }
+
+    public function getEngine()
+    {
+        return $this->engine;
     }
 }

@@ -91,7 +91,7 @@ class RedisAdapter extends AbstractAdapter
     protected function doSave(array $values, $lifetime)
     {
         $serialized = array();
-        $failed     = array();
+        $failed = array();
 
         foreach ($values as $id => $v) {
             try {

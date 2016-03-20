@@ -97,6 +97,7 @@ class RedisAdapter extends AbstractAdapter
                 $values[$id] = serialize($v);
             } catch (\Exception $e) {
                 $failed[] = $id;
+                unset($values[$id]);
             }
         }
 

@@ -90,22 +90,23 @@ class RedisAdapter extends AbstractAdapter
      */
     protected function doSave(array $values, $lifetime)
     {
+        $serialized = array();
         $failed = array();
 
         foreach ($values as $id => $v) {
             try {
-                $values[$id] = serialize($v);
+                $serialized[$id] = serialize($v);
             } catch (\Exception $e) {
                 $failed[] = $id;
             }
         }
 
-        if (!$this->redis->mSet($values)) {
+        if (!$this->redis->mSet($serialized)) {
             return false;
         }
 
         if ($lifetime >= 1) {
-            foreach ($values as $id => $v) {
+            foreach ($serialized as $id => $v) {
                 $this->redis->expire($id, $lifetime);
             }
         }

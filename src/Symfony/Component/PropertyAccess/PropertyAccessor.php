@@ -178,8 +178,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
             //
             if ($i === $propertyMaxIndex || !$propertyValues[$i + 1][self::IS_REF]) {
-                if ($propertyPath->isIndex($i)) {
-                    $this->writeIndex($objectOrArray, $property, $value);
+                if (is_array($objectOrArray) || ($propertyPath->isIndex($i) && $objectOrArray instanceof \ArrayAccess)) {
+                    $objectOrArray[$property] = $value;
                 } else {
                     $this->writeProperty($objectOrArray, $property, $value);
                 }
@@ -324,7 +324,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
             }
 
-            if ($isIndex) {
+            if (is_array($objectOrArray) || ($isIndex && $objectOrArray instanceof \ArrayAccess)) {
                 $propertyValue = &$this->readIndex($objectOrArray, $property);
             } else {
                 $propertyValue = &$this->readProperty($objectOrArray, $property);
@@ -357,15 +357,9 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string|int         $index The key to read
      *
      * @return mixed The value of the key
-     *
-     * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
     private function &readIndex(&$array, $index)
     {
-        if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_class($array)));
-        }
-
         // Use an array instead of an object since performance is very crucial here
         $result = array(
             self::VALUE => null,
@@ -405,10 +399,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             self::VALUE => null,
             self::IS_REF => false,
         );
-
-        if (!is_object($object)) {
-            throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%s]" instead.', $property, $property));
-        }
 
         $access = $this->getReadAccessInfo($object, $property);
 
@@ -517,24 +507,6 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of an index in a given array-accessible value.
-     *
-     * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to
-     * @param string|int         $index The index to write at
-     * @param mixed              $value The value to write
-     *
-     * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
-     */
-    private function writeIndex(&$array, $index, $value)
-    {
-        if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
-        }
-
-        $array[$index] = $value;
-    }
-
-    /**
      * Sets the value of a property in the given object.
      *
      * @param object $object   The object to write to
@@ -547,10 +519,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function writeProperty(&$object, $property, $value)
     {
-        if (!is_object($object)) {
-            throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
-        }
-
         $access = $this->getWriteAccessInfo($object, $property, $value);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {

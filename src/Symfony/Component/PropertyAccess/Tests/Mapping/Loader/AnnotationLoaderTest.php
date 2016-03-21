@@ -41,7 +41,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $classMetadata = new ClassMetadata('Symfony\Component\PropertyAccess\Tests\Fixtures\Dummy');
-
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../../../..');
         $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 

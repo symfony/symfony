@@ -192,7 +192,9 @@
 
     <xsd:complexType name="property_access">
         <xsd:attribute name="magic-call" type="xsd:boolean" />
+        <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="throw-exception-on-invalid-index" type="xsd:boolean" />
+        <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="serializer">

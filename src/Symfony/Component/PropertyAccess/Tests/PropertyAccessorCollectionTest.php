@@ -16,7 +16,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\PropertyAccess\Annotation\Adder;
 use Symfony\Component\PropertyAccess\Annotation\Getter;
 use Symfony\Component\PropertyAccess\Annotation\Remover;
-use Symfony\Component\PropertyAccess\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\PropertyAccess\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -207,7 +207,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $car = new PropertyAccessorCollectionTest_Car($axesBefore);
 
         AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
-        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $this->propertyAccessor = new PropertyAccessor(false, false, new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
 
         $this->propertyAccessor->setValue($car, 'customAxes', $axesMerged);
 
@@ -229,7 +229,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $car = new PropertyAccessorCollectionTest_Car($axesBefore);
 
         AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
-        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $this->propertyAccessor = new PropertyAccessor(false, false, new LazyLoadingMetadataFactory(new AnnotationLoader(new AnnotationReader())));
 
         $this->propertyAccessor->setValue($car, 'customVirtualAxes', $axesMerged);
 

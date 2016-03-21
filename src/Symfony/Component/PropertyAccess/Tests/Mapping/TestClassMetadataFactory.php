@@ -36,6 +36,10 @@ class TestClassMetadataFactory
         $bar->setGetter('getter2');
         $expected->addPropertyMetadata($bar);
 
+        $test = new PropertyMetadata('test');
+        $test->setGetter('testChild');
+        $expected->addPropertyMetadata($test);
+
         return $expected;
     }
 

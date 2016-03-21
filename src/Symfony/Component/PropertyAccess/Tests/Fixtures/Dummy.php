@@ -12,11 +12,12 @@
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 use Symfony\Component\PropertyAccess\Annotation\Property;
+use Symfony\Component\PropertyAccess\Annotation\Getter;
 
 /**
  * Fixtures for testing metadata.
  */
-class Dummy
+class Dummy extends DummyParent
 {
     /**
      * @Property(getter="getter1", setter="setter1", adder="adder1", remover="remover1")
@@ -58,5 +59,13 @@ class Dummy
     public function setBar($bar)
     {
         $this->bar = $bar;
+    }
+
+    /**
+     * @Getter(property="test")
+     */
+    public function testChild()
+    {
+        return 'child';
     }
 }

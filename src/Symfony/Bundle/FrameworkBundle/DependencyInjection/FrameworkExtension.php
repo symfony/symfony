@@ -924,17 +924,14 @@ class FrameworkExtension extends Extension
      */
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        $loader->load('property_access.xml');
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;
 
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
-        $loader->load('property_access.xml');
         $chainLoader = $container->getDefinition('property_access.mapping.chain_loader');
 
         $serializerLoaders = array();

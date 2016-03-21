@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-03-18T10:35:25Z
+
+do you have a profiling comparison of the gain to know how much difference it makes ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-18T14:11:32Z
+
+Here is a first comparison:
+https://blackfire.io/profiles/compare/c77e869c-a5ba-44da-8cea-8a45c3c151ab/graph
+![capture du 2016-03-18 15 10 41](https://cloud.githubusercontent.com/assets/243674/13880235/a92cf030-ed1b-11e5-960d-5c3aebc791f1.png)
+
+```php
+$var = range(1, 1000000);
+$pa = new PropertyAccessor();
+$res = $pa->getValue($var, '[12]');
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-18T14:31:21Z
+
+A more realistic benchmark would be to use `range(1, 1000)` or so. In any case, impressive numbers! Thanks for the optimization.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-18T14:40:55Z
+
+And one with setValue:
+https://blackfire.io/profiles/compare/15688eff-7e1b-48fb-9d97-c6f22278603c/graph
+![capture du 2016-03-18 15 40 35](https://cloud.githubusercontent.com/assets/243674/13881084/c69f1874-ed1f-11e5-9216-ff31a8ba0994.png)
+
+```php
+$var = range(1, 100000);
+$pa = new PropertyAccessor();
+$res = $pa->setValue($var, '[12]', $var);
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-21T09:34:06Z
+
+These numbers are very impressive.
+
+@nicolas-grekas can you also post a benchmark for a deeper property path ?
+
+:+1:
+Status: reviewed

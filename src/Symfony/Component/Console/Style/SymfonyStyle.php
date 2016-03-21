@@ -274,7 +274,9 @@ class SymfonyStyle extends OutputStyle
      */
     public function progressStart($max = 0)
     {
-        $this->progressBar = $this->createProgressBar($max);
+        if (null === $this->progressBar) {
+            $this->progressBar = $this->createProgressBar($max);
+        }
         $this->progressBar->start();
     }
 
@@ -310,6 +312,14 @@ class SymfonyStyle extends OutputStyle
         }
 
         return $progressBar;
+    }
+
+    /**
+     * @param ProgressBar $progressBar
+     */
+    public function setProgressBar(ProgressBar $progressBar)
+    {
+        $this->progressBar = $progressBar;
     }
 
     /**

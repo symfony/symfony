@@ -102,7 +102,7 @@ class RedisAdapter extends AbstractAdapter
         }
 
         if ($lifetime > 0) {
-            $pipe = $this->redis->multi(Redis::PIPELINE);
+            $pipe = $this->redis->multi(\Redis::PIPELINE);
             foreach ($serialized as $id => $value) {
                 $pipe->setEx($id, $lifetime, $value);
             }

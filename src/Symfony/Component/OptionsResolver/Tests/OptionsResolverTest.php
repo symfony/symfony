@@ -940,6 +940,18 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'normalized'), $this->resolver->resolve());
     }
 
+    public function testSetNormalizerWithMultipleFieldsClosure()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setDefault('bar', 'qux');
+
+        $this->resolver->setNormalizer(array('foo', 'bar'), function () {
+            return 'normalized';
+        });
+
+        $this->assertEquals(array('foo' => 'normalized', 'bar' => 'normalized'), $this->resolver->resolve());
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */

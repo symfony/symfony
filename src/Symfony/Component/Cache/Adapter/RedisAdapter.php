@@ -93,22 +93,24 @@ class RedisAdapter extends AbstractAdapter
         $serialized = array();
         $failed = array();
 
-        foreach ($values as $id => $v) {
+        foreach ($values as $id => $value) {
             try {
-                $serialized[$id] = serialize($v);
+                $serialized[$id] = serialize($value);
             } catch (\Exception $e) {
                 $failed[] = $id;
             }
         }
 
-        if (!$this->redis->mSet($serialized)) {
-            return false;
-        }
-
-        if ($lifetime >= 1) {
-            foreach ($serialized as $id => $v) {
-                $this->redis->expire($id, $lifetime);
+        if ($lifetime > 0) {
+            $pipe = $this->redis->multi(\Redis::PIPELINE);
+            foreach ($serialized as $id => $value) {
+                $pipe->setEx($id, $lifetime, $value);
             }
+            if (!$pipe->exec()) {
+                return false;
+            }
+        } elseif (!$this->redis->mSet($serialized)) {
+            return false;
         }
 
         return $failed;

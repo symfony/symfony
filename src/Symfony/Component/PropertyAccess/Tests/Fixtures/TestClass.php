@@ -12,6 +12,8 @@
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 use Symfony\Component\PropertyAccess\Annotation\Property;
+use Symfony\Component\PropertyAccess\Annotation\Getter;
+use Symfony\Component\PropertyAccess\Annotation\Setter;
 
 class TestClass
 {
@@ -29,12 +31,14 @@ class TestClass
     private $publicGetter;
     private $date;
 
+    private $quantity;
+
     /**
      * @Property(getter="customGetterTest", setter="customSetterTest")
      */
     private $customGetterSetter;
 
-    public function __construct($value)
+    public function __construct($value, $quantity = 2, $pricePerUnit = 10)
     {
         $this->publicProperty = $value;
         $this->publicAccessor = $value;
@@ -47,6 +51,8 @@ class TestClass
         $this->publicHasAccessor = $value;
         $this->publicGetter = $value;
         $this->customGetterSetter = $value;
+        $this->quantity = $quantity;
+        $this->pricePerUnit = $pricePerUnit;
     }
 
     public function setPublicAccessor($value)
@@ -200,5 +206,31 @@ class TestClass
     public function customSetterTest($value)
     {
         $this->customGetterSetter = $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @Getter(property="total")
+     */
+    public function getTotal()
+    {
+        return $this->quantity * $this->pricePerUnit;
+    }
+
+    /**
+     * @Setter(property="total")
+     *
+     * @param mixed $total
+     */
+    public function setTotal($total)
+    {
+        $this->quantity = $total / $this->pricePerUnit;
     }
 }

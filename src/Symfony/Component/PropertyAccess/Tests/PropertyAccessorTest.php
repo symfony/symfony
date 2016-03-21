@@ -209,6 +209,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('webmozart', $this->propertyAccessor->getValue(new TestClass('webmozart'), 'customGetterSetter'));
     }
 
+    public function testGetWithCustomGetterMethodAnnotation()
+    {
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+        $this->assertSame(200, $this->propertyAccessor->getValue(new TestClass('webmozart', 10, 20), 'total'));
+    }
+
     /**
      * @dataProvider getValidPropertyPaths
      */
@@ -319,6 +326,18 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($custom, 'customGetterSetter', 'it works!');
 
         $this->assertEquals('it works!', $custom->customGetterTest());
+    }
+
+    public function testSetValueWithCustomSetterMethodAnnotation()
+    {
+        AnnotationRegistry::registerAutoloadNamespace('Symfony\Component\PropertyAccess\Annotation', __DIR__.'/../../../..');
+        $this->propertyAccessor = new PropertyAccessor(false, false, new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
+
+        $custom = new TestClass('webmozart', 10, 20);
+
+        $this->propertyAccessor->setValue($custom, 'total', 5);
+
+        $this->assertEquals(5, $custom->getTotal());
     }
 
     public function testGetValueWhenArrayValueIsNull()

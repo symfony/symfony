@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-17T08:46:39Z
+
+Missing dependency for Twig in the FrameworkBundle's `require-dev` section.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-17T09:06:47Z
+
+@xabbuh thanks, fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-17T10:18:36Z
+
+AppVeyor error not related.

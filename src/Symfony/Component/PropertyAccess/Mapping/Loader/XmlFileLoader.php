@@ -49,7 +49,7 @@ class XmlFileLoader extends FileLoader
         if (isset($this->classes[$classMetadata->getName()])) {
             $xml = $this->classes[$classMetadata->getName()];
 
-            foreach ($xml->attribute as $attribute) {
+            foreach ($xml->property as $attribute) {
                 $attributeName = (string) $attribute['name'];
 
                 if (isset($attributesMetadata[$attributeName])) {

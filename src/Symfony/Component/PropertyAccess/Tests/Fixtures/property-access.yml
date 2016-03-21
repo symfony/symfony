@@ -1,5 +1,5 @@
 'Symfony\Component\PropertyAccess\Tests\Fixtures\Dummy':
-  attributes:
+  properties:
     foo:
       getter: getter1
       setter: setter1

@@ -36,12 +36,12 @@
       ]]></xsd:documentation>
         </xsd:annotation>
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="attribute" type="attribute" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 
-    <xsd:complexType name="attribute">
+    <xsd:complexType name="property">
         <xsd:annotation>
             <xsd:documentation><![CDATA[
         Contains override values for attributes. The name of the attribute should be given in the "name" option.
